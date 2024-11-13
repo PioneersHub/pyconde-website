@@ -21,7 +21,7 @@ Following steps are required to develop and run the website locally:
 
 ### Run locally
 
-`lektor server`
+`make run`
 
 ### Pull newest content
 
