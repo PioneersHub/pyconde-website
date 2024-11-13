@@ -1,4 +1,4 @@
 build:
-	lektor build --output-path tmp
+	lektor build -O tmp
 run:
-	lektor server
+	lektor server -O tmp
