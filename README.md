@@ -97,6 +97,13 @@ https://eu-central-1.console.aws.amazon.com/s3/buckets/<bucket-name>?region=eu-c
 
 A github action workflow is provided and will take care of building and deployment. Check out `./.github/workflows/main.yml` for details.
 
+Don't forget to set the following secrets in the github project:
+
+- AWS_S3_BUCKET
+- AWS_REGION
+- AWS_ACCESS_KEY_ID
+- AWS_SECRET_ACCESS_KEY
+
 ### Manual Deployment
 
 You should probably not do that and rely on the github action for this. Otherwise you might have a local version deployed that is not reflected upstream.
