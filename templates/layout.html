@@ -12,6 +12,40 @@
   <link
     href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap"
     rel="stylesheet">
+
+  <meta property="og:title"
+    content="{% if this.meta_title %}{{ this.meta_title }}{% else %}{{ this.title }}{% endif %}">
+
+  {% if this.twitter_image %}{% set turl = this.twitter_image %}
+  <meta name="image" property="og:image:secure_url" content="{{ site.config.PROJECT.url }}{{ turl|url }}">
+  <meta name="image" property="og:image" content="{{ site.config.PROJECT.url }}{{ turl|url }}">
+  {% else %}
+  <meta name="image" property="og:image:secure_url"
+    content="{{ site.config.PROJECT.url }}{{ site.config.PROJECT.twitter_card|url }}">
+  <meta name="image" property="og:image"
+    content="{{ site.config.PROJECT.url }}{{ site.config.PROJECT.twitter_card|url }}">
+  {% endif %}
+
+  <meta property="og:description" content="{{ this.description }}">
+  <meta property="og:url" content="{{ site.config.PROJECT.url }}{{ '.'|url }}">
+  <meta property="og:type" content="article">
+  <meta property=“article:publisher“ content="https://de.pycon.org">
+  <meta property=“og:site_name“ content="PyConDE &amp; PyData Berlin" />
+
+  <meta property=“og:image:type“ content="image/jpeg" />
+  <meta property=“og:image:width“ content=“2108″ />
+  <meta property=“og:image:height“ content=“1054″ />
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@pyconde">
+  <meta name="twitter:title"
+    content="{% if this.meta_twitter_title %}{{ this.meta_twitter_title }}{% else %}{{ this.title }}{% endif %}">
+  <meta name="twitter:description" content="{{ this.description }}">
+  {% if this.twitter_image %}
+  <meta name="twitter:image" content="{{ site.config.PROJECT.url }}{{ this.twitter_image|asseturl }}">
+  {% else %}
+  <meta name="twitter:image" content="{{ site.config.PROJECT.url }}{{ site.config.PROJECT.twitter_card|url }}">
+  {% endif %}
 </head>
 
 <body>
