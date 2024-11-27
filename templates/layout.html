@@ -49,29 +49,17 @@
 </head>
 
 <body>
-  {% if not this.show_only_splash %}
   <header>
     <nav aria-label="Site Navigation">
       <ul class="nav navbar-nav">
         <li><a href="/">Home</a></li>
-        {% for href, title in [
-        ['/', 'Home'],
-        ['/blog', 'Blog'],
-        ['/faqs', 'FAQs'],
-        ['/sponsors', 'Sponsors'],
-        ['/program', 'Program'],
-        ['/schedule', 'Schedule'],
-        ['/speakers', 'Speakers'],
-        ['/info', 'Info'],
-        ['/register', 'Register'],
-        ] %}
-        <li{% if this.is_child_of(href) %} class="active" {% endif %}><a href="{{ href|url }}">{{ title }}</a></li>
-          {% endfor %}
+        {% for page in bag('links')['pages'] %}
+        <li><a href="{{ page.path|url }}">{{ page.name }}</a></li>
+        {% endfor %}
       </ul>
     </nav>
 
   </header>
-  {% endif %}
 
   {% block body %}
   {% endblock %}
