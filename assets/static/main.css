@@ -17,6 +17,15 @@ html {
     color: canvastext;
 }
 
+body, html {
+    height: 100%;
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+}
+
 nav ul, nav ol {
     list-style: none;
 }
@@ -28,11 +37,6 @@ img, picture, svg, video, canvas {
   font-style: italic;
   background-repeat: no-repeat;
   background-size: cover;
-}
-
-body, html {
-    height: 100%;
-    scroll-behavior: smooth;
 }
 
 input, button, textarea, select {
@@ -59,6 +63,14 @@ a:not([class]) {
     --grey: #B7BCBF;
     --pink: #D14190;
     --pink-light: #E199C3;
+
+    /* hamburger menu */
+    --bar-width: 50px;
+    --bar-height: 8px;
+    --hamburger-gap: 6px;
+    --hamburger-margin: 8px;
+    --animation-timing: 200ms ease-in-out;
+    --hamburger-height: calc(var(--bar-height) * 3 + var(--hamburger-gap) * 2);
 }
 
 /* Typography */
@@ -140,21 +152,61 @@ a {
     }
 }
 
-/* footer */
-.legal-links {
-    /* background-color: var(--red-light); */
-}
-
-.legal-links .links a {
-    display:block;
-    color: white;
-}
-
-.footer-outro .content {
-    padding: 0;
-}
-
 /* navigation */
+
+.hamburger-menu {
+    --x-width: calc(var(--hamburger-height) * 1.41421356237); /* height * sqrt(2) = length of the diagonal, since it is a right angle */
+    display: flex;
+    flex-direction: column;
+    gap: var(--hamburger-gap);
+    width: max-content;
+    position: absolute;
+    top: var(--hamburger-margin);
+    left: var(--hamburger-margin);
+    z-index: 2;
+    cursor: pointer;
+}
+
+.hamburger-menu::before,
+.hamburger-menu::after,
+.hamburger-menu input {
+    content: "";
+    width: var(--bar-width);
+    height: var(--bar-height);
+    background-color: white;
+    border-radius: 9999px;
+    transform-origin: left center;
+    transition: opacity var(--animation-timing),
+     width var(--animation-timing),
+     rotate var(--animation-timing),
+     translate var(--animation-timing);
+}
+
+.hamburger-menu input {
+    appearance: none;
+    padding: 0;
+    margin: 0;
+    outline: none;
+    pointer-events: none;
+}
+
+.hamburger-menu:has(input:checked)::before {
+    rotate: 45deg;
+    width: var(--x-width);
+    translate: 0 calc(var(--bar-height) / -2);
+}
+
+.hamburger-menu:has(input:checked)::after{
+    rotate: -45deg;
+    width: var(--x-width);
+    translate: 0 calc(var(--bar-height) / 2);
+}
+
+.hamburger-menu input:checked {
+    opacity: 0;
+    width: 0;
+}
+
 .main-navigation {
     display: grid;
     text-transform: uppercase;
@@ -211,6 +263,17 @@ a {
 /* .navigation-link:nth-child(even) { */
 /*     background-color: black; */
 /* } */
+
+/* footer */
+.legal-links .links a {
+    display:block;
+    color: white;
+}
+
+.footer-outro .content {
+    padding: 0;
+}
+
 
 /* home page */
 .subtitle {
