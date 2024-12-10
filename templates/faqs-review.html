@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+
+{% block body %}
+    <section>
+    <ol>
+    {% for section in bag('faq').sections|sort(attribute='order') %}
+        <li><a href="#{{ section.id }}">{{ section.name }}</a></li>
+    {% endfor %}
+    </ol>
+
+    {% for section in bag('faq').sections|sort(attribute='order') %}
+        {% if section.display %}
+            <ul>
+                <h2 id="{{ section.id }}">{{ section.name }}</h2>
+            {% if section.description %}
+                <p>{{ section.description }}</p>
+                {% endif %}
+
+                {% for qa in section.qa|sort(attribute='order') %}
+                    {% if qa.display %}
+                        <li>
+                            <h3>{{ qa.question }}</h3>
+                            {% if qa.answer.__class__.__name__ == 'list' %}
+                                <!-- list -->
+                                {% for item in qa.answer %}
+                                    <p>{% if item.startswith('<') %}
+                                        {{ item | safe }}
+                                    {% else %}
+                                        {{ item }}
+                                    {% endif %}</p>
+                                {% endfor %}
+                            {% elif qa.answer.startswith('<') %}
+                                <!-- HTML content -->
+                                {{ qa.answer | safe }}
+                            {% else %}
+                                {% if '\n' in  qa.answer %}
+                                    <p>{{ qa.answer | replace("\n","<br/>")  | safe }}</p>
+                                {% else %}
+                                    <p>{{ qa.answer }}</p>
+                                {% endif %}
+                            {% endif %}
+                            {% if qa.link %}
+                                <a href="{{ qa.link }}" target="_blank">{{ qa.link_display }}</a>
+                            {% endif %}
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+    {% endfor %}
+
+{% endblock %}
+
+</section>
+
