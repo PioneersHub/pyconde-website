@@ -6,6 +6,13 @@ PyCon DE &amp; PyData website for 2025 conference.
 
 ### Changing content
 
+#### Adding a sponsor
+
+To add a new sponsor, you need to do two things:
+
+1. Copy the svg logo to `./assets/static/media/sponsors/`
+2. Add the information for the sponsor to `./databags/sponsors.json`
+
 ### Updating website code
 
 ## Dev Setup
