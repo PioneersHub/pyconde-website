@@ -1,0 +1,33 @@
+{% macro render_team_member_image(image_file) %}
+{% if image_file %}
+<img src="{{bag('team')['team_images']}}{{image_file}}" alt="">
+{% else %}
+<img src="{{bag('team')['default_image']}}" alt="">
+{% endif %}
+{% endmacro %}
+
+{% macro render_team_member_role(role, type) %}
+{% if role %}
+<p class="member-role">
+  {% if type %}
+  {{type}}, {{role}}
+  {% else %}
+  {{ role }}
+  {% endif %}
+</p>
+{% endif %}
+{% endmacro %}
+
+{% macro render_team_member_socials(member) %}
+<ul class="member-socials">
+  {% for platform in ['website', 'linkedin', 'github', 'bluesky', 'mastodon', 'twitter'] %}
+  {% if member[platform] %}
+  <li class="member-social">
+    <a href="{{member[platform]}}">
+      <img src="/static/media/social/{{platform}}.svg" alt="link to the team members {{platform}}">
+    </a>
+  </li>
+  {% endif %}
+  {% endfor %}
+</ul>
+{% endmacro %}
