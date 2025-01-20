@@ -12,7 +12,7 @@ def main():
     _, subs = client.submissions(event_name)
     subs = list(subs)
     with open("databags/submissions.json", "w") as f:
-        f.write(json.dumps([normalize_submission(sub) for sub in subs], default=str))
+        f.write(json.dumps({'submissions': [normalize_submission(sub) for sub in subs]}, default=str))
 
 if __name__ == "__main__":
     main()
