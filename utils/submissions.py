@@ -4,6 +4,7 @@ import json
 def normalize_submission(submission):
     submission = submission.model_dump()
     submission['state'] = submission['state'].value
+    submission['speaker_names'] = ", ".join([speaker['name'] for speaker in submission['speakers']])
     return submission
 
 def main():
