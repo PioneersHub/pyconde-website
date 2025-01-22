@@ -7,7 +7,7 @@ from string import Template
 def normalize_talk(talk):
     talk = talk.model_dump()
     talk['state'] = talk['state'].value
-    talk['created'] = str(talk['created'])
+    talk['created'] = talk['created'].strftime("%Y-%m-%d")
     talk['speaker_names'] = ", ".join(
         [speaker['name'] for speaker in talk['speakers']])
     return talk
@@ -18,13 +18,14 @@ def convert_to_lektor_content(talk):
     Converts the object into a persisted lektor entry,
     defined as per the talk model.
     """
-    tmpl = Template('''
-                    title: $title
-                    ---
-                    created: $created
-                    ---
-                    code: $code
-                    ''')
+    tmpl = Template('''title: $title
+---
+created: $created
+---
+code: $code
+---
+speaker_names: $speaker_names
+''')
 
     normalized = normalize_talk(talk)
     return tmpl.substitute(normalized)
