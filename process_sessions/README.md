@@ -1,8 +1,9 @@
+
 # Website Schedule
 
 Based on data from pretalx build and manage corresponding pages for the website.
 
-Session pages are located in `website/content/program/<PRETALX_SESSION_ID>`
+Session pages are located in `content/program/<PRETALX_SESSION_ID>`
 
 PRETALX_SESSION_ID is the id for the submission accepted.
 
@@ -23,9 +24,9 @@ Filter all session with status and `confirmed`.
 
 `/process_sessions/session_template.py` template to generate the `contents.lr` file.
 
-The data fields are defined in `website/models/session.ini`.
+The data fields are defined in `models/session.ini`.
 
-The webpage template is `website/templates/session.html`. This is the hacky Jinja2 part if the website needs to be altered.
+The webpage template is `templates/session.html`. This is the hacky Jinja2 part if the website needs to be altered.
 
 ### To Dos / Updates
 The template uses format strings, the elements need to be renamed due to the switch from G-Sheet to Pretalx.
@@ -75,5 +76,5 @@ Similar
 
 ### Testing it!
 
-To test everything locally, add within `website/databags/links.json` the product `Program` accordingly. Just
+To test everything locally, add within `databags/links.json` the product `Program` accordingly. Just
 check in the git history how it was last time when the program was released.

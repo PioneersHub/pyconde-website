@@ -392,8 +392,8 @@ def generate_session_pages(cleaned_submissions, social_banner_path):
 
         contents = session_template.format(
             title=submission["title"],
-            short_description=submission["short_description"],
-            short_description_html=submission["short_description"],
+            short_description=submission.get("short_description",""),
+            short_description_html=submission.get("short_description",""),
             code=submission["code"],
             body=submission["abstract"], # changed from submission["description"]
             track=slugify(submission["track"]),
@@ -424,7 +424,7 @@ def generate_session_pages(cleaned_submissions, social_banner_path):
             f.write(contents)
         cpath = (
                 project_root
-                / Path("website/content/program-categories")
+                / Path("content/program-categories")
                 / slugify(submission["track"])
         )
         if not cpath.exists():
@@ -447,7 +447,7 @@ def generate_session_pages(cleaned_submissions, social_banner_path):
             if len(zombie) != 6 or "-" in zombie:
                 # #ignore slug changed, keep redirect to code
                 continue
-            zpath = project_root / Path("website/content/program/") / zombie
+            zpath = project_root / Path("content/program/") / zombie
             try:
                 code = zombie.split("-")[1].upper()
                 if redirects.get(code):
@@ -458,7 +458,7 @@ def generate_session_pages(cleaned_submissions, social_banner_path):
     for category in all_categories:
         cpath = (
                 project_root
-                / Path("website/content/program-categories")
+                / Path("content/program-categories")
                 / slugify(category)
         )
         if not cpath.exists():
@@ -479,7 +479,7 @@ description: All {0} sessions at the PyConDE & Pydata Berlin 2024 conference
 
 def run_lekor_update():
     command = (
-        f"cd {project_root.absolute()}/website && lektor build --output-path ../www"
+        f"cd {project_root.absolute()} && lektor build --output-path ../www"
     )
     process = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
     proc_stdout = process.communicate()[0].strip()
@@ -559,7 +559,7 @@ def process(use_cache: bool = False, git_push: bool = False, pending_ok: bool = 
 
         print("Prepare generating session pages...")
         # updates submissions, allows filtering by status
-        states = ["confirmed"]
+        states = ["submitted"] # use submitted for testing and "confirmed" for production
         cleaned_submissions = update_session_pages(submissions_dict, speakers_dict, publish_states=states, pending_ok=pending_ok)
         
         print("Generating", len(cleaned_submissions), "session pages ...")
