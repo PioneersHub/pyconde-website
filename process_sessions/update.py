@@ -294,7 +294,7 @@ def generate_session_pages(cleaned_submissions, social_banner_path):
     ToDo: Clean it up, using the types Pytanis provides
     """
     # book keeping
-    session_path = project_root / "website/content/program/"
+    session_path = project_root / "content/program/"
     session_path.mkdir(exist_ok=True)
 
     in_place_submissions = [x.name for x in session_path.glob("*") if x.name[0] != "."]
@@ -379,7 +379,7 @@ def generate_session_pages(cleaned_submissions, social_banner_path):
 
         twitter_banner = (
                 project_root
-                / f"website/assets/static/media/twitter/{submission['code']}.png"
+                / f"assets/static/media/twitter/{submission['code']}.png"
         )
 
         src = Path(social_banner_path) / Path(f"{submission['code']}.png")
