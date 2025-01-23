@@ -25,6 +25,8 @@ created: $created
 code: $code
 ---
 speaker_names: $speaker_names
+---
+abstract: $abstract
 ''')
 
     normalized = normalize_talk(talk)
