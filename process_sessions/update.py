@@ -25,7 +25,7 @@ from pydantic import BaseModel
 
 # Since the package structure is all fucked up, I cannot easily import `app.config`.
 # So rather duplicate instead of going down that rabbit hole of fixing this mess.
-EVENT_SLUG = "pyconde-pydata-2024"
+EVENT_SLUG = "pyconde-pydata-2025"
 project_root = Path(__file__).resolve().parents[1]
 # Have I yet complained about the package structure? Another necessary hack to be able to import `schedule
 import os
@@ -225,9 +225,9 @@ def update_session_pages(submissions, speakers, publish_states=None, pending_ok=
         "video_link",
     ]
     id_answers = {
-        3022: "short_description",  # changed for 2024 to "Abstract as a tweet"
-        3021: "python_skill",  # Changed for 2024
-        3020: "domain_expertise",  # Changed for 2024
+        4401: "short_description",  # changed for 2024 to "Abstract as a tweet"
+        4400: "python_skill",  # Changed for 2025
+        4399: "domain_expertise",  # Changed for 2025
     }
     cleaned_submissions = []
     for s in submissions:
