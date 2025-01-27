@@ -2,6 +2,7 @@ from pytanis import PretalxClient
 import json
 import os
 from string import Template
+from pydantic import BaseModel
 
 
 def normalize_talk(talk):
@@ -43,9 +44,27 @@ def create_lektor_content(talk):
         f.write(talk)
 
 
+def configure_pretalx_client():
+    pretalx_api_key = os.environ.get('PRETALX_API_KEY')
+
+    class PretalxBasicModel(BaseModel):
+        api_token: str | None = None
+
+    class PytanisBasicConfigModel(BaseModel):
+        Pretalx: PretalxBasicModel
+
+    cfg = PytanisBasicConfigModel.model_validate({
+        'Pretalx': {
+            'api_token': pretalx_api_key
+        }
+    })
+    client = PretalxClient(config=cfg)
+    return client
+
+
 def main():
     event_name = "pyconde-pydata-2025"
-    client = PretalxClient()
+    client = configure_pretalx_client()
     _, talks = client.submissions(event_name)
     talks = list(talks)
     # persist each talk as talk model content
