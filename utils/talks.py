@@ -1,6 +1,7 @@
 from pytanis import PretalxClient
 import json
 import os
+import shutil
 from string import Template
 from pydantic import BaseModel
 
@@ -28,10 +29,23 @@ code: $code
 speaker_names: $speaker_names
 ---
 abstract: $abstract
+---
+description: $description
 ''')
 
     normalized = normalize_talk(talk)
     return tmpl.substitute(normalized)
+
+
+def remove_old_talks():
+    """
+    Removes old talks before regenerating them to avoid having previously
+    on Pretalx removed talks still hanging around on the website.
+    Crude but simple.
+    """
+    talk_dirs = [f.path for f in os.scandir("content/talks") if f.is_dir()]
+    for dir in talk_dirs:
+        shutil.rmtree(dir)
 
 
 def create_lektor_content(talk):
@@ -67,6 +81,7 @@ def main():
     client = configure_pretalx_client()
     _, talks = client.submissions(event_name)
     talks = list(talks)
+    remove_old_talks()
     # persist each talk as talk model content
     for talk in talks:
         create_lektor_content(talk)
