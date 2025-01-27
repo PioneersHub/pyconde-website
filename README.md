@@ -46,6 +46,9 @@ the `body` is the blog post as markdown.
 
 The new blog post will automatically be deployed, once it has been merged. Note: Due to some technicalities it can take up to an hour for the changes to be visible on the website.
 
+#### Changing or adding Talks
+
+
 ### Updating website code
 
 ## Dev Setup
