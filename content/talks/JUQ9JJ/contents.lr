@@ -6,10 +6,14 @@ code: JUQ9JJ
 ---
 speaker_names: Martin Stancsics
 ---
-abstract: Generalized linear models (GLMs) are interpretable, relatively quick to train, and specifying them helps the modeler understand the main effects in the data. This makes them a popular choice today to complement other machine-learning approaches. `glum` was conceived with the aim of offering the community an efficient, feature-rich, and Python-first GLM library with a scikit-learn-style API. More recently, we are striving to keep up with PyData community's ongoing push for dataframe-agnosticism.
+abstract:
+
+Generalized linear models (GLMs) are interpretable, relatively quick to train, and specifying them helps the modeler understand the main effects in the data. This makes them a popular choice today to complement other machine-learning approaches. `glum` was conceived with the aim of offering the community an efficient, feature-rich, and Python-first GLM library with a scikit-learn-style API. More recently, we are striving to keep up with PyData community's ongoing push for dataframe-agnosticism.
 While `glum` was originally heavily based on `pandas`, with the help of `narwhals`, we are close to being able to fit models on any dataset that the latter supports. This talk presents our experiences with achieving this goal.
 ---
-description: Arguably, `glum`'s standout feature is its ability to efficiently handle datasets consisting of a mix of dense, sparse and categorical features. To facilitate this, it relies on our (similarly open-source) `tabmat` library, which provides classes and useful methods for mixed-sparsity data. `glum` fits models by first converting input data to `tabmat` matrices, and then using those matrices to do the necessary computations.
+full_description:
+
+Arguably, `glum`'s standout feature is its ability to efficiently handle datasets consisting of a mix of dense, sparse and categorical features. To facilitate this, it relies on our (similarly open-source) `tabmat` library, which provides classes and useful methods for mixed-sparsity data. `glum` fits models by first converting input data to `tabmat` matrices, and then using those matrices to do the necessary computations.
 
 Therefore, dataframe-agnostism in our case mostly boils down to handling the conversion of different dataframes to `tabmat` matrices (which themselves store data in `numpy` arrays and sparse `scipy` matrices) in an efficient manner. Most of it is rather smooth and straightforward due to `narwhals` providing a convenient compatibility layer for a wide range of dataframe functionality. However, we have encountered a couple of pain points that might be of interest to other package maintainers and the PyData community. In particular,
 

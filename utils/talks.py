@@ -28,9 +28,13 @@ code: $code
 ---
 speaker_names: $speaker_names
 ---
-abstract: $abstract
+abstract:
+
+$abstract
 ---
-description: $description
+full_description:
+
+$description
 ''')
 
     normalized = normalize_talk(talk)
