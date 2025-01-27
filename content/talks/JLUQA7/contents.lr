@@ -7,3 +7,27 @@ code: JLUQA7
 speaker_names: Tim Paine
 ---
 abstract: Apache Airflow is approaching the 10th anniversary of its initial release, and its development shows no signs of slowing down! A production airflow deployment is a complex piece of engineering, and many common tasks can still be quite difficult to manage. In this talk, we discuss a few Airflow plugins to bridge key gaps and make life easier for engineering and devops alike. In particular, we'll look at plugins for hierarchical central configuration, long-running or "always on" jobs, and integration with common alerting services.
+---
+description: Apache Airflow is one of the most popular and widely used schedulers in the world. As we approach the tenth anniversary of its release in June, developement continues to be very active with contributors around the world.
+
+There are several common problems that arise in production Airflow deployments. In this talk, we'll discuss three problems and their open source solutions.
+
+
+#### Problem 1: Python
+
+Dynamism and production jobs rarely get along. We adopt the *configuration-as-code* idea by integrating [`hydra`](https://hydra.cc) and [`pydantic`](https://pydantic.dev) to create composeable type-safe configuration, in [`airflow-config`](https://github.com/airflow-laminar/airflow-config). Key features
+
+- Define DAG- and Task- level configuration in a central location
+- Compose configurations for different environments
+- Generate DAGs directly from configuration
+- Integrate custom Airflow plugins and extensions with type-validated configurations
+
+#### Problem 2: Long-running Jobs
+
+Airflow was designed for batch jobs, but with some small tweaks, it also works for long-running or "always on" tasks.
+
+[`airflow-ha`](https://github.com/airflow-laminar/airflow-ha) provides a simple pattern for looping DAGs, and we connect to the popular process monitor [`supervisord`](https://supervisord.org) in [`airflow-supervisor`](https://github.com/airflow-laminar/airflow-supervisor). We can now run high-availability services efficiently without placing undo strain on Airflow from a single DAG.
+
+#### Problem 3: Alerting
+
+The last problem is arguably the most important: alerting when DAGs fail. We have built [`airflow-priority`](https://github.com/airflow-laminar/airflow-priority) on top of the "priority tag". Add a `P1`, `P2`, etc, tag to a DAG and failures alerts will propagate to upstream systems like Datadog and New Relic, without any changes to DAG-level code.

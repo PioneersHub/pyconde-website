@@ -9,3 +9,92 @@ speaker_names: Christopher-Eyk Hrabia, Jona Welsch
 abstract: Each new Python development project requires an initial setup to ensure a solid scaffolding that supports common company standards, best practices and recurrent requirements. In this talk, we show how the process of setting up Python projects in general and especially Python data projects made for data scientists and data engineers can be streamlined and automated in order to speed-up the project ramp-up time, enforce standards as well as to simplify switching project contexts for individual developers.
 
 We present the process and result on how we developed a common base template that can easily be specialized with incremental templates for specific needs of e.g. data engineers and data scientists. We discuss our technology evaluation and show the final implementation based on tools and Python packages such as copier, uv, ruff, commitizen, poethepoet and git. With our final solution a full setup from an empty project folder takes less than 4 minutes before the execution of the first commit and unit test instead of at least one hour with a manual setup. Within our talk you will learn how you can adopt our approach for your company environment to increase efficiency and standardization of future Python (data) projects.
+---
+description: Outline
+--------
+
+In a professional industry environment, each new Python development project in the context of data engineering and data science requires an initial setup to ensure a solid scaffolding that supports common company standards, software engineering best practices and recurrent requirements. This becomes even more important in bigger organizations with security concerns, multiple departments and an increasing number of developers and scientists. By providing a solid project base you can avoid redundant work, unsynchronized technology stacks and configurations. Furthermore, spending effort on the standardization and simplification of the overall process allows to save time and money for all future projects.
+
+Our proposed talk will focus on the following aspects of the challenge described.
+
+-	Why do you need a common scaffolding for Python data projects?
+-	Requirements we considered during our solution development
+-	Possible solutions and alternatives
+-	Our implemented approach
+-	How can you use or adapt our approach for your environment?
+
+In the following, we provide some details for each of the planned sections.
+
+Why do you need a common scaffolding for Python data projects?
+-----------------------------------------------------------------------
+
+As an organization, you want your development force to be focused on actual development and value generation as much as possible by avoiding repetitive and distracting work while also keeping high engineering and security standards. 
+
+Developers often work in multiple team constellations in parallel and need to switch between them frequently, especially in project-based businesses. Using a unified technology stack and structure across all projects significantly reduces the mental overhead for this switching process.
+A common scaffolding for Python projects also provides an explicit place to have discussions about standards and best-practices. It eliminates the need to have lengthy discussions at the start of every project by providing reasonable defaults for project structure and tooling, while still giving teams the freedom to modify these defaults on a per project basis, if needed.
+
+Requirements we considered during our solution development
+-------------------------------------------------------------------
+
+Before we started to develop a particular approach, we collected process steps within our development lifecycle with potential for standardization as well as steps that occurred regularly during project setup and development.
+
+Development lifecycle steps in our organization with high standardization potential were:
+- Choose a project structure
+- Select a dependency management tool
+- Setup the usual dependencies we use in projects
+- Setup testing
+- Setup linting, type checking and auto-formatting
+- Setup CI/CD
+- Write meaningful and standardized conventional commit messages
+- Implement a basic container image
+- Setup a data pipeline
+
+Our goal is to automate as many items from that list as possible and make the remaining as easy as possible. Moreover, it should be possible to propagate changes made to the standard to already existing projects using those standards and to allow for a set of common standards as well as task or project-specific standards, such as containerized images.
+
+Possible solutions and alternatives
+-------------------------------------
+
+There are different options to avoid recurring efforts of setting-up a new Python project. 
+A simple approach could be to work with mono repos, but they have several major drawbacks such as unnecessary coupling of code, conflicting dependencies and a general risk of losing proper project structure due to masses of files and folders. This is also generally challenging for organizations working for different clients, due to unwanted code sharing and other security concerns.
+
+An alternative method to minimize setup time involves duplicating and pasting existing projects. Though feasible, this method also presents challenges such as unintentional copying of project-specific code that may compromise security. Additionally, configurations tailored to the original project might be overlooked, requiring adjustments, and documentation may not be updated for the new project. Like the mono-repo approach, it's difficult to uniformly implement changes in standards across duplicated projects.
+
+A third option is to use templates which set up the basic desired structure of the project, provide an environment setup and whatever additional tooling is desired as standard. Given the right tooling, they also allow to propagate changes to the template to already existing projects.
+
+Our approach
+---------------
+
+The solution that we recommend is to rely on one or more project templates in connection with a rendering application that allows for updating existing projects and chaining of templates. 
+We provide a base template for elements which we assume to be universal across all Python projects in our organization. We also provide additional templates for specialized aspects which are not needed in every project. These templates can be applied after the base template and do not contain any duplicate information compared with the base template.
+In our case, we decided to use copier as templating engine and self-developed Jinja-based project templates. copier  instantiates a new project off one or more templates and additionally connects the new project to the template project(s), so that later updates on the template can be pulled into the instantiated projects.
+The choice of copier as engine allows also to chain templates after each other, which we use to enhance a very general-purpose base template with additional features which are commonly needed within dedicated teams, such as data engineering or data science teams. We show how we implemented this template chaining using git subprojects, jinja statements and renovate.
+One example of such a chained template is the creation of a container image, which is needed in a lot of projects, but not all. Instead of setting up a Dockerfile within the base template, we built another template that sits on top of the base referencing it instead of duplicating the code base.  Another example would be the setup of an ETL pipeline, which is standardized within our data engineering team, but not needed in projects without data pipelines.
+The core of our approach is the department wide base template. It ships with a basic Python project structure, several provisioned module files as well as tooling and corresponding configuration to streamline development, such as
+
+- ‘poethepoet’ for running tasks
+- ‘uv’ for managing python versions, dependencies and virtual environments
+- ‘ruff’ for linting and auto-reformatting
+- ‘mypy’ for type checking
+- ‘bandit’ for vulnerability and security checks
+- Reasonable default configurations for ruff, mypy, and bandit
+- ‘pytest’ as testing tool
+- ‘pre-commit’ for easy integration of pre-commit hooks
+    -	The hooks are setup to automatically conduct a variety of checks before an actual commit, such as unit tests, type checks, and formatting
+- ‘commitizen’ for easy creation of conventional commits
+
+Working exclusively in Gitlab, we also incorporated some basic CI/CD, that serves as a starting point for more project specific pipelines and already includes linting, testing, and format checks, corresponding to the steps defined as pre-commit hooks.
+Finally, the template includes a README whith (templated) instructions about project setup, usage and general structure for the additional documentation developers should provide while developing the project.
+The base template has been put together to ensure that developers can get to development as fast as possible and focus on it. Virtual environment setup, reasonable initial dependencies, testing setup, enforcement of formatting and even the generation of standardized commit messages are prepared automatically. A full setup starting from  an empty project folder takes less than 4 minutes before the first commit and unit test compared to up to at least one hour without any templates.
+
+How can you use or adapt our approach for your environment?
+--------------------------------------------------------------------
+
+Usage of the shown approach is very simple and will be demonstrated live in our talk.
+Apart from installing the tools copier, uv, and poethepoet only a single copier command is necessary to bootstrap a new project from the template and only one additional copier command for each chained template.
+Creating a new template with additional features is also very straightforward by including upstream templates as git subprojects. New files that do not exist in the upstream template(s) (e.g. the base template) can just be templated via jinja. Files already existing in an upstream template can easily be amended with the usage of jinjas “include” statement.
+We are planning to release our base template under a permissive open-source license, so that it can easily be adjusted to work within other organizations.
+
+Conclusion 
+------------
+
+We present our approach to standardize Python and especially Python data projects and automate recurring tasks during project setups, accommodating diverse team requirements. Our approach also facilitates seamless propagation of changes to these standards to new and existing projects. An added benefit is that this approach implicitly establishes a centralized place for documentation, discussion, and evolution of these standards (namely, the template projects), promoting organization-wide unification of tech stacks and security concerns. Our proposed talk will comprehensively describe the development of our solution, considered requirements, advantages and disadvantages of solution options and conclude with a live demonstration and instruction on how everybody can adapt our approach.

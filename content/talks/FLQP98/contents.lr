@@ -7,3 +7,33 @@ code: FLQP98
 speaker_names: Irena Grgic
 ---
 abstract: This technical session will explore how Python can be used to scale Machine Learning (ML) workloads on Kubernetes. We'll explore the architecture behind ZEISS's computer vision platform, which supports training and inference for various ML model types. You will learn how a Python-based service orchestrates containerized workloads, leveraging Celery, RabbitMQ, and Redis to manage tasks and monitor status. Gain insights into handling challenges such as inter-service communication, secure data access, and Kubernetes role configurations, all while adhering to the principle of least privilege. This session is ideal for developers building scalable ML platforms on Kubernetes.
+---
+description: In this session, we will explore how Python can be leveraged to scale diverse Machine Learning (ML) workloads on Kubernetes.
+
+At ZEISS, we develop and maintain a computer vision platform that enables users to train ML models across various types, including:
+
+- 2D and 3D segmentation
+- Classification
+- Anomaly detection
+- Object detection
+
+Our platform operates entirely on Kubernetes, with each ML workload (training or inference) running in its own Kubernetes pod. Each model type is a distinct, containerized application that implements the same abstract interface. Managing this complexity requires a dedicated orchestrating service capable of initiating ML workloads based on user-selected models and configuration parameters.
+
+### Workflow Overview
+
+We’ll dive into the end-to-end workflow of initiating and managing ML training tasks in Kubernetes:
+
+1. **User Request**: A user initiates an ML training task by providing a set of parameters.
+2. **Task Creation**: The task is transformed into a message and sent to RabbitMQ.
+3. **Task Processing**: The orchestrating service (a Celery worker) retrieves the task from RabbitMQ.
+4. **Pod Initialization**: The service starts a Kubernetes pod, executing a containerized ML workload based on the task parameters.
+5. **Monitoring**: The service continuously tracks workload status and stores updates in a Redis cache.
+
+### Key Topics and Challenges
+
+We will address the following technical complexities:
+
+- **Celery and RabbitMQ in Kubernetes**: Best practices for setting up and managing these components in a Kubernetes environment.
+- **Inter-Service Communication**: Strategies to ensure seamless interaction between ML workload pods and the orchestrating service.
+- **Data Access**: How workload pods access the necessary training data securely and efficiently.
+- **Principle of Least Privilege**: Configuring the service to create Kubernetes pods while maintaining the principle of least privilege.

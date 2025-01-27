@@ -16,3 +16,69 @@ Get answers to the following options and more, as to what is the cheapest and mo
 4. Implement purely via the pipeline workflow / DAGs and SQL OR create a separate Python package
 
 I hope this case study of a pipeline rewrite will give you insights that are applicable to Python use for your own data pipelines, and into cloud pricing.
+---
+description: # Cutting the price of  Scraping Cloud Costs
+
+Talk outline, header lines relate to separate slides.
+
+### How does cloud pricing work?
+
+It is complicated! … and the price lists are not small.
+
+The full price lists for the 3 main CSPs, AWS, Google and Azure together constitute about 5 million prices.
+
+For example, hard disk storage cost should be simple?  
+
+Calculate based on hardware type, size, throughput, iops, different price depending on zone (us-east2 vs ap-south1 etc.), charges for traffic between regions vs within regions Then there are the backup costs based on its retention size/time, schedule etc.
+
+### The tools and data sources for cloud pricing
+
+Kubecost (now IBM) has open source tools for analyzing real time k8s suppliers costs.
+ 
+Infracost.io - builds on kubecost and also adds its own tools to this.
+
+All the cloud providers have bulk and query APIs for getting their current pricing.
+
+### What pricing data does our case study need?
+
+### The original pipeline
+
+### Examine the assumptions behind the old pipeline’s architecture
+
+### Plus/minus of pipeline frameworks -  
+
+1. Using generic CI/CD pipelines - Github workflows (Codefresh, Jenkins/Artifactory etc)
+2. Airflow - the old standard, but what issues does it have?
+3. New generation, Dagster or Prefect
+
+### Create separate click based pkgs for fast dev and test
+
+### Demo
+
+A quick run through of the new pipeline for context 
+
+### Performance testing and simplicity of the solution?
+
+Research and trial - timings plus costings
+
+### Pipeline development, deployment and maintenance issues
+
+### Pricing strategy (or lack of it)
+
+The Rule of 40 is a financial metric used to assess the performance of a Software-as-a-Service (SaaS) company - one way to keep above the 40% profit margin is by keeping tighter control of costs.
+
+Sadly a common approach is that engineers / data scientists put together whatever they think is technically the correct solution, without thinking about cost.
+
+A few months later, the bill starts coming in and management tell everyone to turn off non-prod pipelines, delete dev environments … stop wasting money. The bill goes down a bit and the process repeats again. 
+
+There can be more formal processes put in place for cost reduction and control (details of those.)
+
+
+### What is the cost of the different pipeline architectures
+
+Charges for cloud SaaS are more concealed than raw Cloud PaaS. But it must be assessed too, and they have some interesting pricing. For example if your data pipeline is open source and public, Github workflows are free! If it is private they charge twice as much for compute as using direct Azure. 
+Similarly cloud pipeline providers are big in this space, but how does Astronomy SaaS pricing stack up vs. running yourself on cloud PaaS
+
+### What pipeline design principles can we derive from this case?
+
+### Conclusion and summing up

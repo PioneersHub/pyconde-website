@@ -7,3 +7,25 @@ code: PSJMTP
 speaker_names: Philipp Wendland
 ---
 abstract: In this session we present OptAB, a data-driven online-updateable antibiotic selection model based on Artificial Intelligence for Sepsis patients considering side-effects. OptAB performs an iterative optimal antibiotic selection for real-world Sepsis patients aimed at minimizing the Sepsis-related organ failure score (SOFA-Score) as treatment success while accounting for nephrotoxicity and hepatotoxicity as serious antibiotic side-effects. OptAB provides disease course forecasts for (combinations of) the antibiotics Vancomycin, Ceftriaxone and Piperacillin/Tazobactam and learns realistic treatment influences on the SOFA-Score and the side-effect indicating laboratory values creatinine, bilirubin total and alanine-transaminase. OptAB is based on a hybrid AI differential equation algorithm and can handle the special characteristics of patient data including irregular measurements, a large amount of missing values and time-dependent confounding. OptAB's selected optimal antibiotics exhibit faster efficacy than the administered antibiotics.
+---
+description: This talk introduces the hybrid AI optimal treatment selection model OptAB from Wendland et al., recently published at npj Digital Medicine.
+https://pubmed.ncbi.nlm.nih.gov/39613924/
+The code for OptAB is available at https://github.com/philippwendland/OptAB
+
+The talk consists of the following sections:
+
+1. Motivation:
+In this section we introduce personalized medicine, focus on challenges for disease course forecasting and introduce the specific challenges for antibiotic selection in Sepsis patients.
+Our research is focused on Electronic Health Records data. Typical challenges are: Very irregular data, a mixture of time-dependent and static variables and assimilating updated laboratory value measurements. 
+Sepsis is a severe dysregulation of the immune system, damaging own healthy tissue and organs. The choice of an initial antibiotic is challenging, because pathogen identification often lasts two days and in 30% to 70% of patients no pathogen can be detected at all. Consequently, treatment recommendations focus on broad-spectrum antibiotics, with little attention paid to side-effects.
+
+2. OptAB (Methods and implementation).
+This section introduces OptAB, a data-driven online-updateable antibiotic selection model based on Artificial Intelligence for Sepsis patients considering side-effects. OptAB performs an iterative optimal antibiotic selection for real-world Sepsis patients aimed at minimizing the Sepsis-related organ failure score (SOFA-Score) as treatment success while accounting for nephrotoxicity and hepatotoxicity as serious antibiotic side-effects. We trained OptAB on the MIMIC-IV dataset, a a large deidentified dataset of patients admitted to the emergency department or an intensive care unit at the Beth Israel Deaconess Medical Center in Boston (https://physionet.org/content/mimiciv/3.1/). We focus on the antibiotics Vancomycin, Piperacillin/Tazobactam and Ceftriaxone. OptAB is implemented using PyTorch and torchcde. 
+
+3. Results
+In this section we will present the results of OptAB in the MIMIC-IV testdataset and an external testdataset from AmsterdamUMCdb. First, we present heatmaps of the disease course forecasts. Then, we provide evidence, that OptAB learns realistic treatment effects. OptAB's treatment recommendations lead to a faster reduction in SOFA-Score that the factual administered treatment and OptAB is able to prevent antibiotic-induced Acute Kidney Injury. Finally, we illustrate OptAB on one or two example patients.
+
+4. Conclusion
+This section summarizes the main results, limitations and outlook for OptAB. Future work will focus on uncertainty quantification and enhancing interpretability of OptAB.
+
+5. References
