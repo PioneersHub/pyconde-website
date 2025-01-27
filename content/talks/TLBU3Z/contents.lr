@@ -5,3 +5,16 @@ created: 2024-12-22
 code: TLBU3Z
 ---
 speaker_names: Aditi Juneja
+---
+abstract: Hi! Have you ever wished your pure Python libraries were faster? Or wanted to fundamentally improve a Python library by rewriting everything in a faster language like C or Rust? Well, wish no more... NetworkX's backend dispatching mechanism redirects your plain old NetworkX function calls to a FASTER implementation present in a separate backend package by leveraging the Python's [`entry_point`](https://packaging.python.org/en/latest/specifications/entry-points) specification!
+
+[NetworkX](https://github.com/networkx/networkx) is a popular, pure Python library used for graph(aka network) analysis. But as the graph size increases (like a network of everyone in the world), the NetworkX algorithms could take days to solve a simple graph analysis problem. So, to address these performance issues, a backend dispatching mechanism was recently developed. In this talk, we will unveil this dispatching mechanism and its implementation details, and how we can use it just by specifying a `backend` kwarg like this:
+
+    >>> nx.betweenness_centrality(G, backend=“parallel”)
+
+or by passing the backend graph object(type-based dispatching):
+
+    >>> H = nxp.ParallelGraph(G)
+    >>> nx.betweenness_centrality(H)
+
+We'll also go over the limitations of this dispatch mechanism. Ending with a brief overview of how this API dispatch mechanism could be integrated in other scientific Python libraries, along with the potential challenges that may arise with them.
