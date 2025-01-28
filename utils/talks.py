@@ -62,6 +62,12 @@ def create_lektor_content(talk):
         f.write(talk)
 
 
+def create_talks_json(talks):
+    with open("databags/talks.json", "w") as f:
+        f.write(json.dumps(
+            {'talks': [normalize_talk(talk) for talk in talks]}, default=str))
+
+
 def configure_pretalx_client():
     pretalx_api_key = os.environ.get('PRETALX_API_KEY')
 
@@ -91,9 +97,7 @@ def main():
         create_lektor_content(talk)
 
     # persist talks as json
-    with open("databags/talks.json", "w") as f:
-        f.write(json.dumps(
-            {'talks': [normalize_talk(talk) for talk in talks]}, default=str))
+    create_talks_json(talks)
 
 
 if __name__ == "__main__":
