@@ -107,16 +107,14 @@ def configure_pretalx_client():
 
 
 def main():
-    event_name = "pyconde-pydata-2025"
+    event_name = os.environ.get('PRETALX_EVENT_NAME')
     client = configure_pretalx_client()
     _, talks = client.submissions(event_name)
     talks = list(talks)
     remove_old_talks()
-    # persist each talk as talk model content
     for talk in talks:
         create_lektor_content(talk)
 
-    # persist talks as json
     create_talks_json(talks)
 
 
