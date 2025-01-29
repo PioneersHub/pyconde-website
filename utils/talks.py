@@ -4,15 +4,27 @@ import os
 import shutil
 from string import Template
 from pydantic import BaseModel
+import calendar
+from collections import defaultdict
 
 
 def normalize_talk(talk):
-    talk = talk.model_dump()
-    talk['state'] = talk['state'].value
-    talk['created'] = talk['created'].strftime("%Y-%m-%d")
-    talk['speaker_names'] = ", ".join(
-        [speaker['name'] for speaker in talk['speakers']])
-    return talk
+    t = defaultdict(lambda: "")
+    t["title"] = talk.title
+    t["abstract"] = talk.abstract
+    t["full_description"] = talk.description
+    t["code"] = talk.code
+    t["state"] = talk.state.value
+    t["created"] = talk.created.strftime("%Y-%m-%d")
+    t["speaker_names"] = ", ".join([speaker.name for speaker in talk.speakers])
+
+    if talk.track is not None:
+        t["track"] = talk.track.en
+    if talk.slot is not None:
+        t["room"] = talk.slot.room.en
+        t["start_time"] = talk.slot.start.strftime("%H:%M")
+        t["day"] = calendar.day_name[talk.slot.start.weekday()]
+    return t
 
 
 def convert_to_lektor_content(talk):
@@ -34,7 +46,15 @@ $abstract
 ---
 full_description:
 
-$description
+$full_description
+---
+room: $room
+---
+day: $day
+---
+start_time: $start_time
+---
+track: $track
 ''')
 
     normalized = normalize_talk(talk)
