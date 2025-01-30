@@ -1,5 +1,4 @@
 {% extends "layout.html" %}
-{% from "macros/talks.html" import render_talk %}
 
 {% block title %}
 {{ this.title }}
@@ -20,7 +19,14 @@
         {% for talk in this.children %}
         <li>
             <a href="{{ talk|url }}" class="content talk">
-                {{ render_talk(talk) }}
+                <h3 class="talk-title">
+                    {{ talk['title'] }}
+                </h3>
+                <h4>
+                    {{ talk['speaker_names'] }}
+                </h4>
+                <p class="track">{{ talk['track'] }}</p>
+                <p class="talk-abstract">{{ talk['abstract'] }}</p>
             </a>
         </li>
         {% endfor %}
