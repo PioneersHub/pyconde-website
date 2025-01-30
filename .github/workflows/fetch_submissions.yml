@@ -1,0 +1,28 @@
+name: Fetch submissions
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+
+jobs:
+  fetch_submissions:
+    runs_on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setting up python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: '.python-version'
+          cache: 'pip'
+      - run: pip install -r requirements.txt
+
+      - name: Run submissions fetcher
+        run: python utils/talks.py
+        env:
+          PRETALX_API_KEY: ${{ secrets.PRETALX_API_KEY }}
+          PRETALX_EVENT_NAME: ${{ secrets.PRETALX_EVENT_NAME }}
+      - name: Commit changes
+        run: git status
