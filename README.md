@@ -48,6 +48,9 @@ The new blog post will automatically be deployed, once it has been merged. Note:
 
 #### Changing or adding Talks
 
+You should not try to change or add talks in this repository since they will be automatically updated via a script and would be pverwritten or deleted.
+
+You can change/add or remove talks in Pretalx and it will automatically be updated on the website via the previously mentioned update process. See the github actions in `./.github/workflows/main.yml` for details.
 
 ### Updating website code
 
