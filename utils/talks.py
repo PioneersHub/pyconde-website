@@ -1,6 +1,7 @@
 from pytanis import PretalxClient
 import json
 import os
+import re
 import shutil
 from string import Template
 from pydantic import BaseModel
@@ -21,6 +22,9 @@ def submission_to_talk(sub):
     t["created"] = sub.created.strftime("%Y-%m-%d")
     t["speaker_names"] = ", ".join([speaker.name for speaker in sub.speakers])
 
+    for speaker in sub.speakers:
+        t["speakers"] += speaker_to_markdown(speaker)
+
     for answer in sub.answers:
         if answer["question"]["id"] == PYTHON_SKILL_ID:
             t["python_skill"] = answer["answer"]
@@ -28,7 +32,7 @@ def submission_to_talk(sub):
             t["domain_expertise"] = answer["answer"]
 
     if sub.track is not None:
-        t["track"] = sub.track.en
+        t["track"] = re.sub(r'(?i)(pycon|pydata): ', "", sub.track.en)
     if sub.slot is not None:
         t["room"] = sub.slot.room.en
         t["start_time"] = sub.slot.start.strftime("%H:%M")
@@ -38,7 +42,7 @@ def submission_to_talk(sub):
 
 
 def speaker_to_markdown(speaker):
-    pass
+    return ""
 
 
 def submission_to_lektor(sub):
@@ -49,6 +53,10 @@ created: $created
 code: $code
 ---
 speaker_names: $speaker_names
+---
+speakers:
+
+$speakers
 ---
 abstract:
 
