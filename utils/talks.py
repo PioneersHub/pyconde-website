@@ -11,28 +11,28 @@ PYTHON_SKILL_ID = 4400
 DOMAIN_EXPERTISE_ID = 4399
 
 
-def submission_to_talk_dict(talk):
+def submission_to_talk_dict(sub):
     t = defaultdict(lambda: "")
-    t["title"] = talk.title
-    t["abstract"] = talk.abstract
-    t["full_description"] = talk.description
-    t["code"] = talk.code
-    t["state"] = talk.state.value
-    t["created"] = talk.created.strftime("%Y-%m-%d")
-    t["speaker_names"] = ", ".join([speaker.name for speaker in talk.speakers])
+    t["title"] = sub.title
+    t["abstract"] = sub.abstract
+    t["full_description"] = sub.description
+    t["code"] = sub.code
+    t["state"] = sub.state.value
+    t["created"] = sub.created.strftime("%Y-%m-%d")
+    t["speaker_names"] = ", ".join([speaker.name for speaker in sub.speakers])
 
-    for answer in talk.answers:
+    for answer in sub.answers:
         if answer["question"]["id"] == PYTHON_SKILL_ID:
             t["python_skill"] = answer["answer"]
         if answer["question"]["id"] == DOMAIN_EXPERTISE_ID:
             t["domain_expertise"] = answer["answer"]
 
-    if talk.track is not None:
-        t["track"] = talk.track.en
-    if talk.slot is not None:
-        t["room"] = talk.slot.room.en
-        t["start_time"] = talk.slot.start.strftime("%H:%M")
-        t["day"] = calendar.day_name[talk.slot.start.weekday()]
+    if sub.track is not None:
+        t["track"] = sub.track.en
+    if sub.slot is not None:
+        t["room"] = sub.slot.room.en
+        t["start_time"] = sub.slot.start.strftime("%H:%M")
+        t["day"] = calendar.day_name[sub.slot.start.weekday()]
 
     return t
 
@@ -42,10 +42,6 @@ def speaker_to_markdown(speaker):
 
 
 def talk_to_lektor(talk):
-    """
-    Converts the object into a persisted lektor entry,
-    defined as per the talk model.
-    """
     tmpl = Template('''title: $title
 ---
 created: $created
@@ -120,8 +116,7 @@ def configure_pretalx_client():
             'api_token': pretalx_api_key
         }
     })
-    client = PretalxClient(config=cfg)
-    return client
+    return PretalxClient(config=cfg)
 
 
 def main():
