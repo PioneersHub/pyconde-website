@@ -1,0 +1,79 @@
+title: Open Table Formats in the Wild: From Parquet to Delta Lake and Back
+---
+created: 2024-12-19
+---
+code: MRHNCV
+---
+speaker_names: Franz Wöllert
+---
+speakers:
+
+
+### Franz Wöllert
+
+Hi my name is Franz and I’m an open source and python enthuisiast:
+
+- father of 3 girls
+- major in psychology
+- chess hobbiyst
+- competitive ultimate frisbee player
+- likes cooking and baking sourdough bread
+
+---
+abstract:
+
+Open table formats have revolutionized analytical, columnar storage on cloud object stores with critical features like ACID compliance and enhanced metadata management, once exclusive to proprietary cloud data warehouses. Delta Lake, Iceberg, and Hudi have significantly advanced over traditional open file formats like Parquet and ORC.
+
+In an effort to modernize our data architecture, we aimed to replace our Parquet-based bronze layer with Delta Lake, anticipating better query performance, reduced maintenance, native support for incremental processing, and more. While our initial pilot showed promise, we encountered unexpected pitfalls that ultimately brought us back to where we began.
+
+Curious? Join me as we shed light on the current state of table formats.
+---
+full_description:
+
+# Description
+
+Open Table Formats (OTF) such as Hudi, Iceberg and Delta Lake have disruptively changed the data engineering landscape in recent years. While the Parquet file format has evolved as the de-facto standard for open, interoperable columnar storage for analyical workloads, it lacked first class support for critical features such as ACID compliance, incremental processing, flexible schema & partioning evolution and scalable meta data management. This led to increased development and maintenance efforts while building idempotent and failure tolerant data pipelines that often resulted in custom frameworks. OTFs solve all of these issues via providing a sophisticated meta data layer and improved maintenance capabilities on top of Parquet.
+
+Driven by the promises of OTFs, we intended to replace our own bronze-read-only Parquet-based storage layer with Delta Lake. In theory, this should have improved performance, reduced maintenanced and provided more flexibility. However, we've stumbled upon several issues:
+
+1. drastic performance issues with Liquid Clustering during incremental processing
+2. inmature interoperability in the python and cloud-based ecosystem (DuckDB, Pandas, Polars, Athena, Snowflake)
+3. maintaining logical session-boundaries during incremental processing
+
+While the first two issues are solvable in foreseeable future, the last one is specific to our requirements and does not overlap with design decisions made for incremental processing in Delta Lake. Taken together, these points ultimately led us to go back to relying on Parquet again.
+
+## Targeted Audience
+
+This talk is mainly intended for an intermediate data engineering audience but is well suited for interested beginners, too. The content of this talk is relevant for all architects and data engineers being responsible for storing and managing data for analytical workloads.
+
+# Key takeaways
+
+- What problems do OTFs solve?
+- How do OTFs contribute to an open, composable data stack?
+- Is there a predominant Open Table Format?
+- How does Delta Lake conceptionally work?
+- What are concrete real-world advantages of Delta Lake in contrast to "plain" Parquet?
+- What is the "small files" problem and how does Liquid Clustering help?
+- How is the current state of interoperability with Delta Lake?
+
+# Talk Outline
+- Introduction (5 min)
+- OTFs in comparison (5 min)
+- Delta Lake Internals (10 min)
+- Use Case Requirements (5 min)
+- Benchmarks & Results (10 min)
+- Conclusion and Outlook (5 min)
+- Questions (5 min)
+---
+room: 
+---
+day: 
+---
+start_time: 
+---
+track: Data Handling & Engineering
+---
+python_skill: 
+---
+domain_expertise: 
+

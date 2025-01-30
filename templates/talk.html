@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+{% block title %}
+{{ this.title }}
+{% endblock %}
+
+{% block body %}
+
+<div class="subsite">
+  <div class="subsite-title">
+    <section class="content">
+      <h2 class="talk-title">
+        {{ this.title }}
+      </h2>
+      <h3 class="talk-subtitle">
+        {{ this.speaker_names }}
+      </h3>
+
+      <div class="track filter">
+          <a href="">
+          {{ this.track }}
+          </a>
+      </div>
+    </section>
+  </div>
+</div>
+
+<section class="subsite talk">
+  <div class="content">
+      <div class="details">
+          {{ this.day }} {{ this.start_time }}
+          {% if this.room %}
+          in {{ this.room}}
+          {% endif %}
+      </div>
+
+      <div class="description">
+          {{ this.full_description }}
+      </div>
+
+      {% if this.python_skill or this.domain_expertise %}
+      <ul class="levels">
+          {% if this.python_skill %}
+          <li>
+              <a href="">{{ this.python_skill }}</a>
+          </li>
+          {% endif %}
+
+          {% if this.domain_expertise %}
+          <li>{{ this.domain_expertise }}</li>
+          {% endif %}
+      </ul>
+      {% endif %}
+
+      <div class="authors">
+        {{ this.speakers }}
+      </div>
+  </div>
+</section>
+
+{% endblock %}
