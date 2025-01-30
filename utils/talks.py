@@ -11,7 +11,7 @@ PYTHON_SKILL_ID = 4400
 DOMAIN_EXPERTISE_ID = 4399
 
 
-def submission_to_talk_dict(sub):
+def submission_to_talk(sub):
     t = defaultdict(lambda: "")
     t["title"] = sub.title
     t["abstract"] = sub.abstract
@@ -41,7 +41,7 @@ def speaker_to_markdown(speaker):
     pass
 
 
-def talk_to_lektor(talk):
+def submission_to_lektor(sub):
     tmpl = Template('''title: $title
 ---
 created: $created
@@ -72,8 +72,8 @@ domain_expertise: $domain_expertise
 
 ''')
 
-    talk_dict = submission_to_talk_dict(talk)
-    return tmpl.substitute(talk_dict)
+    talk = submission_to_talk(sub)
+    return tmpl.substitute(talk)
 
 
 def remove_old_talks():
@@ -86,19 +86,19 @@ def remove_old_talks():
         shutil.rmtree(dir)
 
 
-def talk_to_lektor_file(talk):
-    new_dir = f"content/talks/{talk.code}"
+def submission_to_lektor_file(sub):
+    new_dir = f"content/talks/{sub.code}"
     if not os.path.isdir(new_dir):
         os.mkdir(new_dir)
 
-    talk = talk_to_lektor(talk)
+    sub = submission_to_lektor(sub)
     with open(new_dir+"/contents.lr", "w") as f:
-        f.write(talk)
+        f.write(sub)
 
 
-def talks_to_json_file(talks):
+def submissions_to_json_file(submissions):
     with open("databags/talks.json", "w") as f:
-        talks = [submission_to_talk_dict(talk) for talk in talks]
+        talks = [submission_to_talk(sub) for sub in submissions]
         f.write(json.dumps({'talks': talks}, default=str))
 
 
@@ -122,14 +122,14 @@ def configure_pretalx_client():
 def main():
     event_name = os.environ.get('PRETALX_EVENT_NAME')
     client = configure_pretalx_client()
-    _, talks = client.submissions(
+    _, submissions = client.submissions(
         event_name, params={"state": ["accepted", "confirmed"]})
-    talks = list(talks)
+    submissions = list(submissions)
     remove_old_talks()
-    for talk in talks:
-        talk_to_lektor_file(talk)
+    for sub in submissions:
+        submission_to_lektor_file(sub)
 
-    talks_to_json_file(talks)
+    submissions_to_json_file(submissions)
 
 
 if __name__ == "__main__":
