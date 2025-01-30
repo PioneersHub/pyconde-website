@@ -32,7 +32,7 @@ def submission_to_talk(sub):
             t["domain_expertise"] = answer["answer"]
 
     if sub.track is not None:
-        t["track"] = re.sub(r'(?i)(pycon|pydata): ', "", sub.track.en)
+        t["track"] = re.sub(r'(?i)(pycon|pydata|general): ', "", sub.track.en)
     if sub.slot is not None:
         t["room"] = sub.slot.room.en
         t["start_time"] = sub.slot.start.strftime("%H:%M")
