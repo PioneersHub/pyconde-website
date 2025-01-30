@@ -11,7 +11,7 @@ PYTHON_SKILL_ID = 4400
 DOMAIN_EXPERTISE_ID = 4399
 
 
-def normalize_talk(talk):
+def submission_to_talk_dict(talk):
     t = defaultdict(lambda: "")
     t["title"] = talk.title
     t["abstract"] = talk.abstract
@@ -37,7 +37,11 @@ def normalize_talk(talk):
     return t
 
 
-def convert_to_lektor_content(talk):
+def speaker_to_markdown(speaker):
+    pass
+
+
+def talk_to_lektor(talk):
     """
     Converts the object into a persisted lektor entry,
     defined as per the talk model.
@@ -72,35 +76,34 @@ domain_expertise: $domain_expertise
 
 ''')
 
-    normalized = normalize_talk(talk)
-    return tmpl.substitute(normalized)
+    talk_dict = submission_to_talk_dict(talk)
+    return tmpl.substitute(talk_dict)
 
 
 def remove_old_talks():
     """
-    Removes old talks before regenerating them to avoid having previously
-    on Pretalx removed talks still hanging around on the website.
-    Crude but simple.
+    Removes old talks before regenerating them to avoid having previously on
+    Pretalx removed talks still hanging around on the website. Crude but simple
     """
     talk_dirs = [f.path for f in os.scandir("content/talks") if f.is_dir()]
     for dir in talk_dirs:
         shutil.rmtree(dir)
 
 
-def create_lektor_content(talk):
+def talk_to_lektor_file(talk):
     new_dir = f"content/talks/{talk.code}"
     if not os.path.isdir(new_dir):
         os.mkdir(new_dir)
 
-    talk = convert_to_lektor_content(talk)
+    talk = talk_to_lektor(talk)
     with open(new_dir+"/contents.lr", "w") as f:
         f.write(talk)
 
 
-def create_talks_json(talks):
+def talks_to_json_file(talks):
     with open("databags/talks.json", "w") as f:
-        f.write(json.dumps(
-            {'talks': [normalize_talk(talk) for talk in talks]}, default=str))
+        talks = [submission_to_talk_dict(talk) for talk in talks]
+        f.write(json.dumps({'talks': talks}, default=str))
 
 
 def configure_pretalx_client():
@@ -129,9 +132,9 @@ def main():
     talks = list(talks)
     remove_old_talks()
     for talk in talks:
-        create_lektor_content(talk)
+        talk_to_lektor_file(talk)
 
-    create_talks_json(talks)
+    talks_to_json_file(talks)
 
 
 if __name__ == "__main__":
