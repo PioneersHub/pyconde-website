@@ -7,6 +7,9 @@ from pydantic import BaseModel
 import calendar
 from collections import defaultdict
 
+PYTHON_SKILL_ID = 4400
+DOMAIN_EXPERTISE_ID = 4399
+
 
 def normalize_talk(talk):
     t = defaultdict(lambda: "")
@@ -18,12 +21,19 @@ def normalize_talk(talk):
     t["created"] = talk.created.strftime("%Y-%m-%d")
     t["speaker_names"] = ", ".join([speaker.name for speaker in talk.speakers])
 
+    for answer in talk.answers:
+        if answer["question"]["id"] == PYTHON_SKILL_ID:
+            t["python_skill"] = answer["answer"]
+        if answer["question"]["id"] == DOMAIN_EXPERTISE_ID:
+            t["domain_expertise"] = answer["answer"]
+
     if talk.track is not None:
         t["track"] = talk.track.en
     if talk.slot is not None:
         t["room"] = talk.slot.room.en
         t["start_time"] = talk.slot.start.strftime("%H:%M")
         t["day"] = calendar.day_name[talk.slot.start.weekday()]
+
     return t
 
 
@@ -55,6 +65,11 @@ day: $day
 start_time: $start_time
 ---
 track: $track
+---
+python_skill: $python_skill
+---
+domain_expertise: $domain_expertise
+
 ''')
 
     normalized = normalize_talk(talk)
