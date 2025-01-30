@@ -42,7 +42,15 @@ def submission_to_talk(sub):
 
 
 def speaker_to_markdown(speaker):
-    return ""
+    s = {"name": speaker.name}
+    s["biography"] = speaker.biography if speaker.biography is not None else ""
+    s["avatar"] = speaker.avatar
+    tmpl = Template('''
+### $name
+
+$biography
+''')
+    return tmpl.substitute(s)
 
 
 def submission_to_lektor(sub):
