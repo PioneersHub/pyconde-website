@@ -23,7 +23,7 @@ def main():
     for talk in talks:
         img = Image.open("assets/static/media/social/talks/social-card.png")
         d = ImageDraw.Draw(img)
-        headlines = "\n".join(textwrap.wrap(talk["title"], 55))
+        headlines = "\n".join(textwrap.wrap(talk["title"], 52))
         d.multiline_text((227, 1196), headlines,
                          fill=(55, 120, 190), font=font)
         d.text((227, 1500), talk["speaker_names"],
