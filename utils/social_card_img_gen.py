@@ -18,6 +18,8 @@ def main():
     # It is licensed under the Open Font License.
     font = ImageFont.truetype(
         "assets/static/media/social/talks/IBMPlexSans-SemiBold.ttf", 110)
+    code_font = ImageFont.truetype(
+        "assets/static/media/social/talks/IBMPlexSans-Medium.ttf", 60)
     for talk in talks:
         img = Image.open("assets/static/media/social/talks/social-card.png")
         d = ImageDraw.Draw(img)
@@ -26,6 +28,7 @@ def main():
                          fill=(55, 120, 190), font=font)
         d.text((227, 1500), talk["speaker_names"],
                fill=(0, 170, 65), font=font)
+        d.text((227, 1735), talk["code"], fill=(55, 120, 190), font=code_font)
         img.save(f"assets/static/media/social/talks/{talk['code']}.png")
 
 
