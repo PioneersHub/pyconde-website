@@ -20,7 +20,7 @@ def submission_to_talk(sub):
     t["code"] = sub.code
     t["state"] = sub.state.value
     t["created"] = sub.created.strftime("%Y-%m-%d")
-    t["social_card_image"] = f"/static/meida/social/{sub.code}.png"
+    t["social_card_image"] = f"/static/media/social/{sub.code}.png"
     t["speaker_names"] = ", ".join([speaker.name for speaker in sub.speakers])
 
     for speaker in sub.speakers:
