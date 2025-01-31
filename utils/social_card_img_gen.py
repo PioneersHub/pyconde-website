@@ -16,18 +16,16 @@ def main():
     # We are using IBM Plex Sans, since it is a free font
     # that is very close to the not free font Helvetica.
     # It is licensed under the Open Font License.
-    headline_font = ImageFont.truetype(
-        "assets/static/media/social/talks/IBMPlexSans-Bold.ttf", 80)
-    speaker_font = ImageFont.truetype(
-        "assets/static/media/social/talks/IBMPlexSans-Medium.ttf", 50)
-    color = (255, 255, 255)
+    font = ImageFont.truetype(
+        "assets/static/media/social/talks/IBMPlexSans-SemiBold.ttf", 110)
     for talk in talks:
         img = Image.open("assets/static/media/social/talks/social-card.png")
         d = ImageDraw.Draw(img)
-        headlines = "\n".join(textwrap.wrap(talk["title"], 25))
-        d.multiline_text((10, 10), headlines, fill=color, font=headline_font)
-        d.text((10, 550), talk["speaker_names"],
-               fill=color, font=speaker_font)
+        headlines = "\n".join(textwrap.wrap(talk["title"], 55))
+        d.multiline_text((227, 1196), headlines,
+                         fill=(55, 120, 190), font=font)
+        d.text((227, 1500), talk["speaker_names"],
+               fill=(0, 170, 65), font=font)
         img.save(f"assets/static/media/social/talks/{talk['code']}.png")
 
 
