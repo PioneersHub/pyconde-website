@@ -1,0 +1,70 @@
+title: High-performance dataframe-agnostic GLMs with glum
+---
+created: 2025-01-04
+---
+code: JUQ9JJ
+---
+speaker_names: Martin Stancsics
+---
+speakers:
+
+
+### Martin Stancsics
+
+Martin is a data-scientist/engineer at QuantCo. He is mainly working on developing the software packages that Quantco uses for insurance risk modeling and pricing. This includes QuantCo's open-source generalized linear modeling package, glum.
+
+He has a background in economics, and has previously worked at the Central Bank of Hungary as an applied researcher. He also taught a number of 'Programming for Economists' courses for college and PhD students.
+
+---
+abstract:
+
+Generalized linear models (GLMs) are interpretable, relatively quick to train, and specifying them helps the modeler understand the main effects in the data. This makes them a popular choice today to complement other machine-learning approaches. `glum` was conceived with the aim of offering the community an efficient, feature-rich, and Python-first GLM library with a scikit-learn-style API. More recently, we are striving to keep up with PyData community's ongoing push for dataframe-agnosticism.
+While `glum` was originally heavily based on `pandas`, with the help of `narwhals`, we are close to being able to fit models on any dataset that the latter supports. This talk presents our experiences with achieving this goal.
+---
+full_description:
+
+Arguably, `glum`'s standout feature is its ability to efficiently handle datasets consisting of a mix of dense, sparse and categorical features. To facilitate this, it relies on our (similarly open-source) `tabmat` library, which provides classes and useful methods for mixed-sparsity data. `glum` fits models by first converting input data to `tabmat` matrices, and then using those matrices to do the necessary computations.
+
+Therefore, dataframe-agnostism in our case mostly boils down to handling the conversion of different dataframes to `tabmat` matrices (which themselves store data in `numpy` arrays and sparse `scipy` matrices) in an efficient manner. Most of it is rather smooth and straightforward due to `narwhals` providing a convenient compatibility layer for a wide range of dataframe functionality. However, we have encountered a couple of pain points that might be of interest to other package maintainers and the PyData community. In particular,
+
+- We heavily rely on manipulating the category order and encoding of categorical variables, for which there is somewhat limited support. This is due to various dataframe libraries handling cateegorical columns somewhat differently.
+- Most dataframe libraries do not support sparse columns, while for us, it is important to be able to accept sparse inputs.
+
+In this talk I demonstrate how we used `narwhals` to easily accept multiple types of dataframes. I will go into details about categorical and sparse columns, and present the challenges we encountered with those. I will also examine the benefits and challenges of supporting sparse columns in dataframe libraries and the Arrow stardard. These points are meant to facilitate discussion among the participants and in the PyData community.
+
+At the end of the talk I will also briefly mention potential future plans for `glum` and `tabmat`, including the possibility to do computations directly on Arrow objects without converting them to `numpy` and `scipy` arrays. 
+
+### Outline
+
+1. A short intro to `glum`, it's backend library `tabmat`, and the main ideas that make them performant.
+2. Making `glum` dataframe-agnostic.
+    - Showcase how `narwhals` simplifies handling a wide variety of dataframes.
+    - Discuss handling categorical (and enum/dictionary) columns.
+    - Talk about representing sparse columns in dataframes.
+3. Concluding remarks and potential future plans.
+
+### Target audience
+- Basic understanding of the scientific Python ecosystem (with a focus on dataframe libraries) is recommended.
+- While some familiarity with linear models might be useful to get the most out of this talk, it is by no means required.
+
+### Main takeaways
+
+- How `glum` efficiently handles mixed-sparsity data
+- How `narwhals` helps to achieve dataframe-agnosticism with little effort
+- Differences between categorical types in various packages and the Apache Arrow specification.
+- How support for sparse column could be incorporated into dataframe libraries and the Arrow Columnar Format
+---
+room: 
+---
+day: 
+---
+start_time: 
+---
+track: PyData & Scientific Libraries Stack
+---
+python_skill: 
+---
+domain_expertise: 
+---
+social_card_image: /static/media/social/talks/JUQ9JJ.png
+
