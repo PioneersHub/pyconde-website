@@ -142,7 +142,7 @@ def main():
     event_name = os.environ.get('PRETALX_EVENT_NAME')
     client = configure_pretalx_client()
     _, submissions = client.submissions(
-        event_name, params={"state": ["accepted", "confirmed"]})
+        event_name, params={"state": ["confirmed"]})
     submissions = list(submissions)
     remove_old_talks()
     for sub in submissions:
