@@ -29,8 +29,8 @@ def opt_break(text, max_chars, keep_line=False):
     for c in (":", " - ", ", "):
         if c in text:
             idx = text.rfind(c, 0, max_chars)
-            if 0 < idx <= max_chars and len(text[idx + 1 :]) <= max_chars:
-                return text[: idx + 1].strip() + "\n" + text[idx + 1 :].strip()
+            if 0 < idx <= max_chars and len(text[idx + 1:]) <= max_chars:
+                return text[: idx + 1].strip() + "\n" + text[idx + 1:].strip()
     if len(text) <= max_chars:
         return text
     return "\n".join(textwrap.wrap(text, max_chars))
@@ -102,7 +102,8 @@ def main():
         dst = src_path / f"assets/static/media/social/talks/{talk['code']}.png"
         # make colors consistent
         card_color = load_random_color()
-        inf = src_path / f"assets/static/media/social/talks/{talk['code']}.json"
+        inf = src_path / \
+            f"assets/static/media/social/talks/{talk['code']}.json"
         if inf.exists():
             with inf.open() as f:
                 j = json.load(f)
@@ -118,11 +119,13 @@ def main():
         # headlines = "\n".join(textwrap.wrap(talk["title"], 60))
         headlines = opt_break(talk["title"], 60)
         d.multiline_text(
-            (227, 1196), headlines, fill=card_colors[card_color]["title"], font=font
+            (227, 1196), headlines, fill=card_colors[card_color]["title"],
+            font=font
         )
         speakers = opt_break(talk["speaker_names"], 60, keep_line=True)
         d.text(
-            (227, 1500), speakers, fill=card_colors[card_color]["speaker"], font=font
+            (227, 1500), speakers, fill=card_colors[card_color]["speaker"],
+            font=font
         )
         d.text(
             (227, 1735),
