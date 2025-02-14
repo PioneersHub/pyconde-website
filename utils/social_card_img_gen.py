@@ -5,10 +5,12 @@ from random import choice
 from PIL import Image, ImageDraw, ImageFont
 import textwrap
 
+src_path = Path(__file__).parents[1]
+
 
 def load_talks():
     talks = []
-    with (Path(__file__).parents[1] / "databags/talks.json").open() as f:
+    with (src_path / "databags/talks.json").open() as f:
         j = json.load(f)
         talks = j["talks"]
     return talks
@@ -92,14 +94,23 @@ def main():
     # We are using IBM Plex Sans, since it is a free font
     # that is very close to the not free font Helvetica.
     # It is licensed under the Open Font License.
-    fonts = Path(__file__).parents[1] / "assets/static/fonts"
-    cards = (
-        Path(__file__).parents[1] / "assets/static/media/social/social-card-templates"
-    )
+    fonts = src_path / "assets/static/fonts"
+    cards = src_path / "assets/static/media/social/social-card-templates"
     font = ImageFont.truetype(fonts / "IBMPlexSans-Medium.ttf", 110)
     code_font = ImageFont.truetype(fonts / "IBMPlexSans-Regular.ttf", 37)
     for talk in talks:
+        # make colors consistent
         card_color = load_random_color()
+        inf = src_path / f"assets/static/media/social/talks/{talk['code']}.json"
+        if inf.exists():
+            with inf.open() as f:
+                j = json.load(f)
+            if (talk["title"] == j["title"]) and (
+                talk["speaker_names"] == j["speaker_names"]
+            ):
+                continue
+            card_color = j["color"]
+
         img = Image.open(cards / f"social-card-{card_color}.png")
         d = ImageDraw.Draw(img)
         # we must limit to two lines, the title can be max 100 chars
@@ -118,10 +129,16 @@ def main():
             fill=card_colors[card_color]["title"],
             font=code_font,
         )
-        img.save(
-            Path(__file__).parents[1]
-            / f"assets/static/media/social/talks/{talk['code']}.png"
-        )
+        img.save(src_path / f"assets/static/media/social/talks/{talk['code']}.png")
+        with inf.open("w") as f:
+            json.dump(
+                {
+                    "title": talk["title"],
+                    "speaker_names": talk["speaker_names"],
+                    "color": card_color,
+                },
+                f,
+            )
 
 
 if __name__ == "__main__":
