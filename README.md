@@ -2,6 +2,12 @@
 
 PyCon DE &amp; PyData website for 2025 conference.
 
+> **Important Note for Speakers**  
+All speaker and session information is sourced from Pretalx.  
+**To update your bio or session description, please make the changes directly in Pretalx.**  
+The website updates periodically, at least once per day, to reflect changes from Pretalx.  
+
+
 ## Covered Workflows
 
 ### Changing content
