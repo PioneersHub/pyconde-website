@@ -99,6 +99,7 @@ def main():
     font = ImageFont.truetype(fonts / "IBMPlexSans-Medium.ttf", 110)
     code_font = ImageFont.truetype(fonts / "IBMPlexSans-Regular.ttf", 37)
     for talk in talks:
+        dst = src_path / f"assets/static/media/social/talks/{talk['code']}.png"
         # make colors consistent
         card_color = load_random_color()
         inf = src_path / f"assets/static/media/social/talks/{talk['code']}.json"
@@ -106,7 +107,7 @@ def main():
             with inf.open() as f:
                 j = json.load(f)
             if (talk["title"] == j["title"]) and (
-                talk["speaker_names"] == j["speaker_names"]
+                talk["speaker_names"] == j["speaker_names"] and dst.exists()
             ):
                 continue
             card_color = j["color"]
@@ -129,7 +130,7 @@ def main():
             fill=card_colors[card_color]["title"],
             font=code_font,
         )
-        img.save(src_path / f"assets/static/media/social/talks/{talk['code']}.png")
+        img.save(dst)
         with inf.open("w") as f:
             json.dump(
                 {
