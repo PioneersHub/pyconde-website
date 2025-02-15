@@ -45,6 +45,9 @@ yellow = (250, 200, 0)
 grey = (183, 188, 191)
 white = (255, 255, 255)
 black = (0, 0, 0)
+color_space = src_path / "assets/static/media/color/colorspace.icc"
+
+MAX_CHARS_PER_LINE = 55
 
 card_colors = {
     "blue": {
@@ -96,7 +99,8 @@ def main():
     # It is licensed under the Open Font License.
     fonts = src_path / "assets/static/fonts"
     cards = src_path / "assets/static/media/social/social-card-templates"
-    font = ImageFont.truetype(fonts / "IBMPlexSans-Medium.ttf", 110)
+    # font = ImageFont.truetype(fonts / "IBMPlexSans-Medium.ttf", 110)
+    font = ImageFont.truetype(fonts / "IBMPlexSans-SemiBold.ttf", 110)
     code_font = ImageFont.truetype(fonts / "IBMPlexSans-Regular.ttf", 37)
     for talk in talks:
         dst = src_path / f"assets/static/media/social/talks/{talk['code']}.png"
@@ -117,12 +121,12 @@ def main():
         d = ImageDraw.Draw(img)
         # we must limit to two lines, the title can be max 100 chars
         # headlines = "\n".join(textwrap.wrap(talk["title"], 60))
-        headlines = opt_break(talk["title"], 60)
+        headlines = opt_break(talk["title"], MAX_CHARS_PER_LINE)
         d.multiline_text(
             (227, 1196), headlines, fill=card_colors[card_color]["title"],
             font=font
         )
-        speakers = opt_break(talk["speaker_names"], 60, keep_line=True)
+        speakers = opt_break(talk["speaker_names"], MAX_CHARS_PER_LINE, keep_line=True)
         d.text(
             (227, 1500), speakers, fill=card_colors[card_color]["speaker"],
             font=font
