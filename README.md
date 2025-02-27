@@ -68,10 +68,24 @@ Following steps are required to develop and run the website locally:
 
 ### Setup
 
+There are two options for local development. Both option are valid.
+
+#### Conventional Setup
+
 1. Select the right Python version, the one used and tested is stored in `./.python-version`, however, most relatively current versions should work. Use whatever Python version manager you prefer, for example `pyenv`.
 2. Create a virtual environment and activate it, so that the dependencies for this project won't clash with other, locally installed libraries: `python -m venv`.
 3. Create a virtual environment and activate it, so that the dependencies for this project won't clash with other, locally installed libraries: `python -m venv ./venv && source venv/bin/activate`.
 4. Install the dependencies: `pip install -r requirements.txt`.
+
+#### Devcontainer Setup
+
+After having cloned this repository:
+
+1. Make sure to have a local installation of Docker and VS Code running.
+2. Open VS Code and make sure to have the Dev Containers Extension from Microsoft installed.
+3. Open the cloned project in VS Code and from the bottom right corner confirm to open the project to be opened within the Devcontainer.
+
+If you miss any dependencies check out the devcontainer.json within the .devcontainer folder. The correct python version and all python dependencies are already installed.
 
 ### Run locally
 
