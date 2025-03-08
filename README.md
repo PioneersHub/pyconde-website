@@ -181,3 +181,8 @@ But there will be the possibility for an emergency situation where you will need
 make build
 aws s3 cp tmp s3://<bucket-name>/ --recursive
 ```
+
+## License & Notice
+
+- 📜 **[MIT License](LICENSE)**
+- ⚠️ **[Notice - Logos & Trademarks Excluded](NOTICE.md)**
