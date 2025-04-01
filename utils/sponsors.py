@@ -12,7 +12,7 @@ type: $type
 ---
 type_id: $type_id
 ---
-headline: $headline
+title: $title
 ---
 full_description: $full_description
 ---
@@ -30,7 +30,7 @@ def json_to_dict(sponsor, type, type_id):
     s["id"] = sponsor.get("id")
     s["name"] = sponsor.get("name")
     s["logo"] = sponsor.get("logo")
-    s["headline"] = sponsor.get("headline")
+    s["title"] = sponsor.get("headline")
     s["website"] = sponsor.get("website") or ""
     s["full_description"] = sponsor.get("description")
     return s
