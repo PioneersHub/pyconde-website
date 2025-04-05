@@ -1,0 +1,23 @@
+{% macro render_sponsors_list() %}
+
+<div class="content">
+  {% for sponsor_type in bag('sponsors')['types'] %}
+  {% if sponsor_type.sponsors %}
+  <div class="{{ sponsor_type.id }} sponsor-type">
+    <h4>{{ sponsor_type.name }}</h4>
+    <ul class="sponsors">
+      {% for sponsor in sponsor_type.sponsors %}
+      <li class="sponsor {{ sponsor.scale }}" id="{{ sponsor.id }}">
+        <a href="/sponsors/{{ sponsor.id }}" target="_blank">
+          <img src="{{ sponsor.logo }}" alt="{{ sponsor.name }}" />
+
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+  {% endfor %}
+</div>
+
+{% endmacro %}
