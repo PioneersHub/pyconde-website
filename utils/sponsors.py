@@ -26,11 +26,12 @@ social_card_image: $social_card_image
 
 
 def json_to_dict(sponsor, _type, type_id):
-    what = f"{_type}"
     if _type.endswith("Sponsors"):
         what = _type.replace("Sponsors", "Sponsor")
     elif _type.endswith("Partners"):
         what = _type.replace("Partners", "Partner")
+    else:
+        what = f"{_type} Sponsor"
     s = {}
     s["type"] = what
     s["type_id"] = type_id
