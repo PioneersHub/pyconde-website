@@ -19,20 +19,23 @@ full_description: $full_description
 logo: $logo
 ---
 website: $website
+---
+social_card_image: $social_card_image
 """)
     return tmpl.substitute(sponsor)
 
 
-def json_to_dict(sponsor, type, type_id):
+def json_to_dict(sponsor, _type, type_id):
     s = {}
-    s["type"] = type
+    s["type"] = _type
     s["type_id"] = type_id
     s["id"] = sponsor.get("id")
     s["name"] = sponsor.get("name")
     s["logo"] = sponsor.get("logo")
-    s["title"] = sponsor.get("headline")
+    s["title"] = f"{sponsor.get('name')}-{_type} of PyCon DE & PyData"
     s["website"] = sponsor.get("website") or ""
     s["full_description"] = sponsor.get("description")
+    s["social_card_image"] = f"/sponsors/{sponsor['id']}/social_card.png"
     return s
 
 
