@@ -26,13 +26,18 @@ social_card_image: $social_card_image
 
 
 def json_to_dict(sponsor, _type, type_id):
+    what = f"{_type}"
+    if _type.endswith("Sponsors"):
+        what = _type.replace("Sponsors", "Sponsor")
+    elif _type.endswith("Partners"):
+        what = _type.replace("Partners", "Partner")
     s = {}
-    s["type"] = _type
+    s["type"] = what
     s["type_id"] = type_id
     s["id"] = sponsor.get("id")
     s["name"] = sponsor.get("name")
     s["logo"] = sponsor.get("logo")
-    s["title"] = f"{sponsor.get('name')}-{_type} of PyCon DE & PyData"
+    s["title"] = f"{sponsor.get('name')} - {what} of PyCon DE & PyData"
     s["website"] = sponsor.get("website") or ""
     s["full_description"] = sponsor.get("description")
     s["social_card_image"] = f"/sponsors/{sponsor['id']}/social_card.png"
