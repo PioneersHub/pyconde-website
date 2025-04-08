@@ -32,6 +32,9 @@ jobs:
           if [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]; then
             echo "PR is from a fork, skipping S3 upload."
             echo "skip_s3=true" >> $GITHUB_ENV
+          else
+            echo "PR is from origin, ok for S3 upload."
+            echo "skip_s3=false" >> $GITHUB_ENV
           fi
 
       - name: Upload to s3
