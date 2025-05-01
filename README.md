@@ -57,7 +57,7 @@ The new blog post will automatically be deployed, once it has been merged. Note:
 
 #### Adding a subsite
 
-Addins a subsite involves changes in /models, /databags, and /content structure. 
+Adding a subsite involves changes in /models, /databags, and /content structure. 
 
 #### Adding or changing talks
 
