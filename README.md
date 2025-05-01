@@ -55,6 +55,10 @@ the `body` is the blog post as markdown.
 
 The new blog post will automatically be deployed, once it has been merged. Note: Due to some technicalities it can take up to an hour for the changes to be visible on the website.
 
+#### Adding a subsite
+
+Addins a subsite involves changes in /models, /databags, and /content structure. 
+
 #### Adding or changing talks
 
 You should not try to change or add talks in this repository since they will be automatically updated via a script and would be pverwritten or deleted.
