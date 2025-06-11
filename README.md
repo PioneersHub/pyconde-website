@@ -22,20 +22,20 @@ The landing page should change, based on if the conference is currently running 
 
 The content for the landing pages is located in the following files:
 
-Landing Page (active)
+Landing Page (active, this is the content for the running conference)
 `content/landing-page-active/contents.lr`
 
-Landing Page (inactive)
+Landing Page (inactive, this is the content for when the conference is over)
 `content/landing-page-inactive/contents.lr`
 
-If you for example want to change the content for the landing page, change it in `content/landing-page-active/contents.lr`.
+If you for example want to change the content for the landing page of the running conference, change it in `content/landing-page-active/contents.lr`.
 
 Afterwards you need to run a little utility that will copy the correct landing page to the location that Lektor expects:
 
-Set the active landing page as the current one:
+Set the active landing page (when the conference is running) as the current one:
 `make activate-conference`
 
-Set the active landing page as the current one:
+Set the active landing page (when the conference is over) as the current one:
 `make disable-conference`
 
 #### Adding a sponsor
