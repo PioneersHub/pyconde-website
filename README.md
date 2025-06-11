@@ -23,9 +23,11 @@ The landing page should change, based on if the conference is currently running 
 The content for the landing pages is located in the following files:
 
 Landing Page (active, this is the content for the running conference)
+
 `content/landing-page-active/contents.lr`
 
 Landing Page (inactive, this is the content for when the conference is over)
+
 `content/landing-page-inactive/contents.lr`
 
 If you for example want to change the content for the landing page of the running conference, change it in `content/landing-page-active/contents.lr`.
