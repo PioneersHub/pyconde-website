@@ -20,7 +20,7 @@ DO NOT CHANGE THE CONTENT IN `content/contents.lr`. This file will be overwritte
 
 The landing page should change, based on if the conference is currently running (or soon to be running) or if the conference is over. When the conference is over the landing page should show a summary of the event and some preparation for the next event.
 
-The content for the landing pages is located in following folders:
+The content for the landing pages is located in the following files:
 
 Landing Page (active)
 `content/landing-page-active/contents.lr`
