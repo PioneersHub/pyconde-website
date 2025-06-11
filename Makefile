@@ -7,3 +7,7 @@ fetch-submissions:
 	python utils/social_card_img_gen.py
 sponsor-pages:
 	python utils/sponsors.py
+activate-conference:
+	utils/activate-conference
+disable-conference:
+	./utils/disable-conference
