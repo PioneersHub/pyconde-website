@@ -14,6 +14,30 @@ The website updates periodically, at least once per day, to reflect changes from
 
 ### Changing content
 
+#### Change the landing page
+
+DO NOT CHANGE THE CONTENT IN `content/contents.lr`. This file will be overwritten.
+
+The landing page should change, based on if the conference is currently running (or soon to be running) or if the conference is over. When the conference is over the landing page should show a summary of the event and some preparation for the next event.
+
+The content for the landing pages is located in following folders:
+
+Landing Page (active)
+`content/landing-page-active/contents.lr`
+
+Landing Page (inactive)
+`content/landing-page-inactive/contents.lr`
+
+If you for example want to change the content for the landing page, change it in `content/landing-page-active/contents.lr`.
+
+Afterwards you need to run a little utility that will copy the correct landing page to the location that Lektor expects:
+
+Set the active landing page as the current one:
+`make activate-conference`
+
+Set the active landing page as the current one:
+`make disable-conference`
+
 #### Adding a sponsor
 
 To add a new sponsor, you need to do two things:
