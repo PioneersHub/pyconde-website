@@ -51,9 +51,10 @@ def load_sponsors():
     with (Path(__file__).parents[1] / "databags/sponsors.json").open() as f:
         j = json.load(f)
         sponsor_types = j["types"]
-    for type in sponsor_types:
+    for sponsor_type in sponsor_types:
         sponsors += [
-            json_to_dict(s, type["name"], type["id"]) for s in type["sponsors"]
+            json_to_dict(s, sponsor_type["name"], sponsor_type["id"])
+            for s in sponsor_type["sponsors"]
         ]
 
     return sponsors
