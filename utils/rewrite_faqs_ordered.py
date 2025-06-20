@@ -1,6 +1,7 @@
 """
 For better readability, rearrange the FAQ databag in the order of the 'order' key within the section order
 """
+
 import json
 from pathlib import Path
 
@@ -24,7 +25,7 @@ def current_model():
 
 
 def first_model():
-    """ Just for backup"""
+    """Just for backup"""
     sorted_data = {"sections": [], "qa": []}
     for section_dict in sorted(data["sections"], key=lambda x: x["order"]):
         section_dict["qa"] = []
@@ -39,5 +40,3 @@ def first_model():
 
 if __name__ == "__main__":
     current_model()
-    # assert
-a = 44

@@ -1,12 +1,13 @@
-from pytanis import PretalxClient
+import calendar
 import json
 import os
 import re
 import shutil
-from string import Template
-from pydantic import BaseModel
-import calendar
 from collections import defaultdict
+from string import Template
+
+from pydantic import BaseModel
+from pytanis import PretalxClient
 
 PYTHON_SKILL_ID = 4400
 DOMAIN_EXPERTISE_ID = 4399
@@ -33,7 +34,7 @@ def submission_to_talk(sub):
             t["domain_expertise"] = answer["answer"]
 
     if sub.track is not None:
-        t["track"] = re.sub(r'(?i)(pycon|pydata|general): ', "", sub.track.en)
+        t["track"] = re.sub(r"(?i)(pycon|pydata|general): ", "", sub.track.en)
     if sub.slot is not None:
         t["room"] = sub.slot.room.en
         t["start_time"] = sub.slot.start.strftime("%H:%M")
@@ -46,16 +47,16 @@ def speaker_to_markdown(speaker):
     s = {"name": speaker.name}
     s["biography"] = speaker.biography if speaker.biography is not None else ""
     s["avatar"] = speaker.avatar
-    tmpl = Template('''
+    tmpl = Template("""
 ### $name
 
 $biography
-''')
+""")
     return tmpl.substitute(s)
 
 
 def submission_to_lektor(sub):
-    tmpl = Template('''title: $title
+    tmpl = Template("""title: $title
 ---
 created: $created
 ---
@@ -89,7 +90,7 @@ domain_expertise: $domain_expertise
 ---
 social_card_image: $social_card_image
 
-''')
+""")
 
     talk = submission_to_talk(sub)
     return tmpl.substitute(talk)
@@ -101,8 +102,8 @@ def remove_old_talks():
     Pretalx removed talks still hanging around on the website. Crude but simple
     """
     talk_dirs = [f.path for f in os.scandir("content/talks") if f.is_dir()]
-    for dir in talk_dirs:
-        shutil.rmtree(dir)
+    for talk_dir in talk_dirs:
+        shutil.rmtree(talk_dir)
 
 
 def submission_to_lektor_file(sub):
@@ -111,18 +112,18 @@ def submission_to_lektor_file(sub):
         os.mkdir(new_dir)
 
     sub = submission_to_lektor(sub)
-    with open(new_dir+"/contents.lr", "w") as f:
+    with open(new_dir + "/contents.lr", "w") as f:
         f.write(sub)
 
 
 def submissions_to_json_file(submissions):
     with open("databags/talks.json", "w") as f:
         talks = [submission_to_talk(sub) for sub in submissions]
-        f.write(json.dumps({'talks': talks}, default=str))
+        f.write(json.dumps({"talks": talks}, default=str))
 
 
 def configure_pretalx_client():
-    pretalx_api_key = os.environ.get('PRETALX_API_KEY')
+    pretalx_api_key = os.environ.get("PRETALX_API_KEY")
 
     class PretalxBasicModel(BaseModel):
         api_token: str | None = None
@@ -130,19 +131,16 @@ def configure_pretalx_client():
     class PytanisBasicConfigModel(BaseModel):
         Pretalx: PretalxBasicModel
 
-    cfg = PytanisBasicConfigModel.model_validate({
-        'Pretalx': {
-            'api_token': pretalx_api_key
-        }
-    })
+    cfg = PytanisBasicConfigModel.model_validate(
+        {"Pretalx": {"api_token": pretalx_api_key}}
+    )
     return PretalxClient(config=cfg)
 
 
 def main():
-    event_name = os.environ.get('PRETALX_EVENT_NAME')
+    event_name = os.environ.get("PRETALX_EVENT_NAME")
     client = configure_pretalx_client()
-    _, submissions = client.submissions(
-        event_name, params={"state": ["confirmed"]})
+    _, submissions = client.submissions(event_name, params={"state": ["confirmed"]})
     submissions = list(submissions)
     remove_old_talks()
     for sub in submissions:

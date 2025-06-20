@@ -1,9 +1,9 @@
 import json
+import textwrap
 from pathlib import Path
 from random import choice
 
 from PIL import Image, ImageDraw, ImageFont
-import textwrap
 
 src_path = Path(__file__).parents[1]
 
