@@ -40,6 +40,10 @@ Set the active landing page (when the conference is running) as the current one:
 Set the active landing page (when the conference is over) as the current one:
 `make disable-conference`
 
+#### Adding images for the "inactive" landing page
+
+Add images to the correct folders in `./assets/static/landing-page` then run `make landing-page` to update the databag.
+
 #### Adding a sponsor
 
 To add a new sponsor, you need to do two things:
