@@ -11,3 +11,5 @@ activate-conference:
 	utils/activate-conference
 disable-conference:
 	./utils/disable-conference
+landing-page:
+	python utils/landing_page.py
