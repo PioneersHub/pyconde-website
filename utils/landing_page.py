@@ -14,7 +14,7 @@ def assets_to_json_file(assets: dict):
 
 
 def files_to_relative_paths(relative_path: str) -> list[str]:
-    return [relative_path + p for p in listdir(relative_path)]
+    return [relative_path.replace("assets", "") + p for p in listdir(relative_path)]
 
 
 def main():
