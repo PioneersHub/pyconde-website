@@ -5,6 +5,9 @@ ASSET_FOLDERS = {
     "conference_images": "assets/static/landing-page/conference/",
     "content_images": "assets/static/landing-page/content/",
     "community_images": "assets/static/landing-page/community/",
+    "speaker_images": "assets/static/landing-page/speakers/",
+    "organizer_images": "assets/static/landing-page/organizers/",
+    "workshop_images": "assets/static/landing-page/workshops/",
 }
 
 
@@ -19,7 +22,7 @@ def files_to_relative_paths(relative_path: str) -> list[str]:
 
 def main():
     assets = {}
-    asset_types = ["conference_images", "content_images", "community_images"]
+    asset_types = ASSET_FOLDERS.keys()
     for asset in asset_types:
         assets[asset] = files_to_relative_paths(ASSET_FOLDERS[asset])
     assets_to_json_file(assets)
