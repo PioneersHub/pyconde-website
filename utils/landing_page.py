@@ -3,7 +3,6 @@ from os import listdir
 
 ASSET_FOLDERS = {
     "venue_images": "assets/static/landing-page/venue/",
-    "content_images": "assets/static/landing-page/content/",
     "community_images": "assets/static/landing-page/community/",
     "speaker_images": "assets/static/landing-page/speakers/",
     "organizer_images": "assets/static/landing-page/organizers/",
