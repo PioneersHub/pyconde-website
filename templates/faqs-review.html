@@ -9,7 +9,7 @@
     </div>
 </div>
 
-<section class="subsite faqs">
+<section class="subsite content-block--blue">
     <div class="content">
         <ol>
             {% for section in bag('faq').sections|sort(attribute='order') %}
@@ -33,25 +33,20 @@
                 {% if qa.answer.__class__.__name__ == 'list' %}
                 <!-- list -->
                 {% for item in qa.answer %}
-                <p>{% if item.startswith('<') %}
-                {{ item | safe }}
-                {% else %}
-                {{ item }}
-                {% endif %}</p>
-                {% endfor %}
-                {% elif qa.answer.startswith('<') %}
-                <!-- HTML content -->
-                {{ qa.answer | safe }}
-                {% else %}
-                {% if '\n' in  qa.answer %}
-                <p>{{ qa.answer | replace("\n","<br/>")  | safe }}</p>
-                {% else %}
-                <p>{{ qa.answer }}</p>
-                {% endif %}
-                {% endif %}
-                {% if qa.link %}
-                <a href="{{ qa.link }}" target="_blank">{{ qa.link_display }}</a>
-                {% endif %}
+                <p>{% if item.startswith('<') %} {{ item | safe }} {% else %} {{ item }} {% endif %}</p>
+                        {% endfor %}
+                        {% elif qa.answer.startswith('<') %} <!-- HTML content -->
+                            {{ qa.answer | safe }}
+                            {% else %}
+                            {% if '\n' in qa.answer %}
+                            <p>{{ qa.answer | replace("\n","<br />") | safe }}</p>
+                            {% else %}
+                            <p>{{ qa.answer }}</p>
+                            {% endif %}
+                            {% endif %}
+                            {% if qa.link %}
+                            <a href="{{ qa.link }}" target="_blank">{{ qa.link_display }}</a>
+                            {% endif %}
             </li>
             {% endif %}
             {% endfor %}
@@ -63,5 +58,3 @@
 </section>
 
 {% endblock %}
-
-
