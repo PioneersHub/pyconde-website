@@ -1,5 +1,6 @@
 import json
-from os import listdir
+from pathlib import Path
+from random import shuffle
 
 ASSET_FOLDERS = {
     "venue_images": "assets/static/landing-page/venue/",
@@ -16,16 +17,21 @@ def assets_to_json_file(assets: dict):
 
 
 def files_to_relative_paths(relative_path: str) -> list[str]:
-    return [
-        relative_path.replace("assets", "") + p for p in sorted(listdir(relative_path))
+    images = [
+        str(x)
+        for x in Path(relative_path).glob("*")
+        # ignore non-suitable files
+        if x.suffix in [".jpg", ".png", ".jpeg"]
     ]
+    return [p.replace("assets", "") for p in images]
 
 
 def main():
     assets = {}
-    asset_types = ASSET_FOLDERS.keys()
-    for asset in asset_types:
-        assets[asset] = files_to_relative_paths(ASSET_FOLDERS[asset])
+    for asset, _ in ASSET_FOLDERS.items():
+        the_assets = files_to_relative_paths(ASSET_FOLDERS[asset])
+        shuffle(the_assets)
+        assets[asset] = the_assets
     assets_to_json_file(assets)
 
 
