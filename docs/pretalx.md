@@ -1,7 +1,5 @@
-# Adding or changing talks
+# Managing Talks in Pretalx
 
-You should not try to change or add talks in this repository since they will be automatically updated via a script and would be pverwritten
-or deleted.
+Do not add or modify talks directly in this repository. All changes will be overwritten.
 
-You can change/add or remove talks in Pretalx and it will automatically be updated on the website via the previously mentioned update
-process. See the GitHub actions in `./.github/workflows/main.yml` for details.
+All talk management (adding, changing, or removing) should be done in Pretalx. The website is updated automatically from Pretalx via a GitHub Actions workflow. See `.github/workflows/fetch_submissions.yml` for implementation details.

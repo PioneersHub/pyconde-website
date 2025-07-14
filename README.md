@@ -60,5 +60,5 @@ make run
 
 ## License & Notice
 
-- 📜 **[MIT License](LICENSE)**
-- ⚠️ **[Notice - Logos & Trademarks Excluded](NOTICE.md)**
+- **[MIT License](LICENSE)**
+- **[Notice - Logos & Trademarks Excluded](NOTICE.md)**
