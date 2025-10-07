@@ -7,9 +7,9 @@ else
 endif
 
 build:
-	$(RUN) lektor build -O tmp
+	$(RUN) lektor build -O site
 run:
-	$(RUN) lektor server -O tmp -p 5001 || (cd content && $(RUN) lektor server -O tmp -p 5001)
+	$(RUN) lektor server -O site -p 5001 || (cd content && $(RUN) lektor server -O site -p 5001)
 fetch-submissions:
 	$(RUN) python utils/talks.py
 	$(RUN) python utils/social_card_img_gen.py
