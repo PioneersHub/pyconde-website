@@ -35,7 +35,7 @@ lektor server
 lektor server --with-admin
 
 # Build static site
-lektor build -O tmp/
+lektor build -O site/
 ```
 
 ## Creating Content

@@ -52,7 +52,7 @@ aws s3api put-bucket-policy --bucket <bucket-name> --policy '{
 Deploy website to S3:
 
 ```bash
-aws s3 cp tmp/ s3://<bucket-name>/ --recursive
+aws s3 cp site/ s3://<bucket-name>/ --recursive
 ```
 
 Configure website index document:
@@ -89,5 +89,5 @@ For emergency deployments only:
 
 ```bash
 make build
-aws s3 cp tmp/ s3://<bucket-name>/ --recursive
+aws s3 cp site/ s3://<bucket-name>/ --recursive
 ```
