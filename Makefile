@@ -1,15 +1,23 @@
+# Detect if uv is available and set up run command prefix
+HAVE_UV := $(shell command -v uv 2> /dev/null)
+ifdef HAVE_UV
+    RUN = PYTHONWARNINGS=ignore::ResourceWarning uv run
+else
+    RUN = PYTHONWARNINGS=ignore::ResourceWarning
+endif
+
 build:
-	lektor build -O tmp
+	$(RUN) lektor build -O tmp
 run:
-	lektor server -O tmp -p 5001 || (cd content && lektor server -O tmp -p 5001)
+	$(RUN) lektor server -O tmp -p 5001 || (cd content && $(RUN) lektor server -O tmp -p 5001)
 fetch-submissions:
-	python utils/talks.py
-	python utils/social_card_img_gen.py
+	$(RUN) python utils/talks.py
+	$(RUN) python utils/social_card_img_gen.py
 sponsor-pages:
-	python utils/sponsors.py
+	$(RUN) python utils/sponsors.py
 activate-conference:
-	utils/activate-conference
+	$(RUN) utils/activate-conference
 disable-conference:
-	./utils/disable-conference
+	$(RUN) ./utils/disable-conference
 landing-page:
-	python utils/landing_page.py
+	$(RUN) python utils/landing_page.py
