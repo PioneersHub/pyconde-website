@@ -1,6 +1,7 @@
-import json
 from pathlib import Path
 from string import Template
+
+import yaml
 
 
 def dict_to_lektor(sponsor):
@@ -48,8 +49,8 @@ def json_to_dict(sponsor, _type, type_id):
 def load_sponsors():
     sponsor_types = []
     sponsors = []
-    with (Path(__file__).parents[1] / "databags/sponsors.json").open() as f:
-        j = json.load(f)
+    with (Path(__file__).parents[1] / "databags/sponsors.yaml").open() as f:
+        j = yaml.load(f, Loader=yaml.SafeLoader)
         sponsor_types = j["types"]
     for sponsor_type in sponsor_types:
         sponsors += [
