@@ -1,19 +1,21 @@
-import json
 from pathlib import Path
 from random import shuffle
+
+import yaml
 
 ASSET_FOLDERS = {
     "venue_images": "assets/static/landing-page/venue/",
     "community_images": "assets/static/landing-page/community/",
     "speaker_images": "assets/static/landing-page/speakers/",
+    "promo_images": "assets/static/landing-page/promo_images/",
     "organizer_images": "assets/static/landing-page/organizers/",
     "workshop_images": "assets/static/landing-page/workshops/",
 }
 
 
 def assets_to_json_file(assets: dict):
-    with open("databags/landing_page.json", "w") as f:
-        f.write(json.dumps(assets))
+    with open("databags/landing_page.yaml", "w") as f:
+        yaml.dump(assets, f)
 
 
 def files_to_relative_paths(relative_path: str) -> list[str]:
