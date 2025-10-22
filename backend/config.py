@@ -22,10 +22,10 @@ class Settings(BaseSettings):
     email_sender: str = "noreply@pycon.de"
     email_subject_prefix: str = "[PyConDE Contact Form]"
 
-    # AWS SES settings
-    aws_region: str = "eu-central-1"
-    aws_access_key_id: str | None = None
-    aws_secret_access_key: str | None = None
+    # Mailgun settings
+    mailgun_api_key: str
+    mailgun_domain: str
+    mailgun_api_base_url: str = "https://api.mailgun.net/v3"
 
     # CORS settings
     allowed_origins: list[str] = [

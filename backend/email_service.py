@@ -1,10 +1,9 @@
-"""Email service for sending contact form submissions via AWS SES."""
+"""Email service for sending contact form submissions via Mailgun."""
 
 import logging
 from datetime import UTC, datetime
 
-import boto3
-from botocore.exceptions import BotoCoreError, ClientError
+import httpx
 
 from backend.config import settings
 
@@ -13,16 +12,6 @@ logger = logging.getLogger(__name__)
 
 class EmailServiceError(Exception):
     """Raised when email sending fails."""
-
-
-def get_ses_client():
-    """Create and return an AWS SES client."""
-    return boto3.client(
-        "ses",
-        region_name=settings.aws_region,
-        aws_access_key_id=settings.aws_access_key_id,
-        aws_secret_access_key=settings.aws_secret_access_key,
-    )
 
 
 def generate_email_html(name: str, email: str, subject: str, message: str) -> str:
@@ -165,7 +154,7 @@ async def send_contact_email(
     message: str,
 ) -> bool:
     """
-    Send contact form submission via AWS SES.
+    Send contact form submission via Mailgun.
 
     Args:
         name: Sender's name
@@ -180,46 +169,48 @@ async def send_contact_email(
         EmailServiceError: If email sending fails
     """
     try:
-        ses_client = get_ses_client()
-
         # Prepare email
         email_subject = f"{settings.email_subject_prefix} {subject}"
         html_body = generate_email_html(name, email, subject, message)
         text_body = generate_email_text(name, email, subject, message)
 
-        # Send email
-        response = ses_client.send_email(
-            Source=settings.email_sender,
-            Destination={
-                "ToAddresses": [settings.email_recipient],
-            },
-            Message={
-                "Subject": {
-                    "Data": email_subject,
-                    "Charset": "UTF-8",
-                },
-                "Body": {
-                    "Text": {
-                        "Data": text_body,
-                        "Charset": "UTF-8",
-                    },
-                    "Html": {
-                        "Data": html_body,
-                        "Charset": "UTF-8",
-                    },
-                },
-            },
-            ReplyToAddresses=[email],
+        # Construct Mailgun API URL
+        mailgun_url = (
+            f"{settings.mailgun_api_base_url}/{settings.mailgun_domain}/messages"
         )
 
-        message_id = response.get("MessageId")
+        # Prepare email data for Mailgun
+        email_data = {
+            "from": settings.email_sender,
+            "to": settings.email_recipient,
+            "subject": email_subject,
+            "text": text_body,
+            "html": html_body,
+            "h:Reply-To": email,
+        }
+
+        # Send email via Mailgun
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(
+                mailgun_url,
+                auth=("api", settings.mailgun_api_key),
+                data=email_data,
+            )
+            response.raise_for_status()
+            result = response.json()
+
+        message_id = result.get("id", "unknown")
         logger.info(
-            f"Email sent successfully. MessageId: {message_id}, From: {email}"
+            f"Email sent successfully via Mailgun. MessageId: {message_id}, From: {email}"
         )
         return True
 
-    except (BotoCoreError, ClientError) as e:
-        error_msg = f"Failed to send email via SES: {e}"
+    except httpx.HTTPStatusError as e:
+        error_msg = f"Mailgun API error (status {e.response.status_code}): {e.response.text}"
+        logger.error(error_msg)
+        raise EmailServiceError(error_msg) from e
+    except httpx.HTTPError as e:
+        error_msg = f"Failed to send email via Mailgun: {e}"
         logger.error(error_msg)
         raise EmailServiceError(error_msg) from e
     except Exception as e:
