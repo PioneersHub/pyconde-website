@@ -1,12 +1,12 @@
 # PyConDE Contact Form Backend
 
-FastAPI backend service for the PyConDE website contact form with Google reCAPTCHA protection and AWS SES email delivery.
+FastAPI backend service for the PyConDE website contact form with Google reCAPTCHA protection and Mailgun email delivery.
 
 ## Features
 
 - ✅ **reCAPTCHA v2 Integration**: Bot protection with Google reCAPTCHA
 - ✅ **Rate Limiting**: 5 requests/minute, 20 requests/hour per IP
-- ✅ **Email Delivery**: AWS SES integration with HTML templates
+- ✅ **Email Delivery**: Mailgun integration with HTML templates
 - ✅ **Honeypot Protection**: Additional bot detection
 - ✅ **CORS Support**: Configured for PyConDE domains
 - ✅ **Input Validation**: Comprehensive validation with Pydantic
@@ -15,7 +15,7 @@ FastAPI backend service for the PyConDE website contact form with Google reCAPTC
 ## Prerequisites
 
 - Python 3.11+
-- AWS Account with SES configured
+- Mailgun account (you already have one!)
 - Google reCAPTCHA account
 
 ## Setup
@@ -55,10 +55,10 @@ RECAPTCHA_SECRET_KEY=your_recaptcha_secret_key
 EMAIL_RECIPIENT=info26@pycon.de
 EMAIL_SENDER=noreply@pycon.de
 
-# AWS Configuration
-AWS_REGION=eu-central-1
-AWS_ACCESS_KEY_ID=your_aws_access_key_id
-AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
+# Mailgun Configuration
+MAILGUN_API_KEY=your_mailgun_api_key
+MAILGUN_DOMAIN=your_mailgun_domain.com
+MAILGUN_API_BASE_URL=https://api.mailgun.net/v3
 
 # CORS Configuration
 ALLOWED_ORIGINS=https://2026.pycon.de,https://pycon.de,http://localhost:5001
@@ -83,21 +83,35 @@ DEBUG=False
 5. Update `RECAPTCHA_SECRET_KEY` in `.env`
 6. Update `recaptcha_site_key` in `content/contact/contents.lr`
 
-### 4. Configure AWS SES
+### 4. Configure Mailgun
 
-1. Verify the sender email address in AWS SES:
-   - Go to AWS SES Console
-   - Navigate to "Verified identities"
-   - Add and verify `noreply@pycon.de`
+1. **Get your Mailgun credentials** from your dashboard:
+   - Go to [Mailgun Dashboard](https://app.mailgun.com/)
+   - Navigate to "Sending" → "Domains"
+   - Select your domain
+   - Copy your **API Key** (looks like: `key-xxxxxxxxxxxxxxxxxxxxxxxxxx`)
+   - Copy your **Domain name** (e.g., `mg.yourdomain.com`)
 
-2. Verify the recipient email address (if in sandbox):
-   - Verify `info26@pycon.de`
-   - Or request production access to send to any email
+2. **Verify your sending domain** (if not already done):
+   - Mailgun requires domain verification with DNS records
+   - Follow Mailgun's instructions to add DNS records (SPF, DKIM)
+   - This is usually already done for your account
 
-3. Configure AWS credentials:
-   - Use existing GitHub secrets or
-   - Create IAM user with `ses:SendEmail` permission
-   - Set credentials in `.env`
+3. **Choose your region**:
+   - **US region**: Use `https://api.mailgun.net/v3` (default)
+   - **EU region**: Use `https://api.eu.mailgun.net/v3` (for GDPR compliance)
+   - Set `MAILGUN_API_BASE_URL` in `.env` accordingly
+
+4. **Set credentials in `.env`**:
+   ```env
+   MAILGUN_API_KEY=key-your-actual-api-key-here
+   MAILGUN_DOMAIN=mg.yourdomain.com
+   MAILGUN_API_BASE_URL=https://api.mailgun.net/v3
+   ```
+
+5. **Configure sender email**:
+   - Ensure `EMAIL_SENDER` uses your verified Mailgun domain
+   - Example: `noreply@mg.yourdomain.com` or `noreply@pycon.de` (if domain is verified)
 
 ## Running Locally
 
@@ -305,10 +319,12 @@ curl -X POST http://localhost:8000/api/contact \
 - Check network connectivity to Google API
 
 **Issue: Email not sending**
-- Verify SES sender email is verified
-- Check AWS credentials have `ses:SendEmail` permission
-- Verify SES is out of sandbox mode
-- Check CloudWatch logs for error details
+- Verify `MAILGUN_API_KEY` is correct (starts with `key-`)
+- Check that `MAILGUN_DOMAIN` matches your verified domain
+- Ensure sender email domain is verified in Mailgun
+- Check Mailgun dashboard logs for delivery status
+- Verify API base URL matches your region (US/EU)
+- Check application logs for error details
 
 **Issue: CORS errors**
 - Verify frontend domain is in `ALLOWED_ORIGINS`
