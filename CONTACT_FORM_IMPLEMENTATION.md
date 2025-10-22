@@ -4,9 +4,11 @@
 
 Successfully implemented a secure contact form for the PyConDE website with:
 - **FastAPI backend** with reCAPTCHA v2 protection
-- **AWS SES** email delivery to info26@pycon.de
+- **Mailgun** email delivery to info26@pycon.de
 - **Bot protection** via reCAPTCHA, honeypot, and rate limiting
 - **Responsive design** matching the existing PyConDE website style
+
+**Latest Update:** Migrated from AWS SES to Mailgun for simpler setup and better developer experience.
 
 ## Implementation Details
 
@@ -27,10 +29,11 @@ Successfully implemented a secure contact form for the PyConDE website with:
    - Score validation for v3 compatibility
    - Detailed error handling
 
-3. **`email_service.py`** - AWS SES integration:
+3. **`email_service.py`** - Mailgun integration:
    - HTML and plain text email templates
    - PyConDE branding with color scheme
    - Reply-to sender's email address
+   - Async HTTP client (httpx) for Mailgun API
    - Comprehensive error handling and logging
 
 4. **`config.py`** - Configuration management:
@@ -107,20 +110,23 @@ Successfully implemented a secure contact form for the PyConDE website with:
    - **Backend**: Set `RECAPTCHA_SECRET_KEY` in `.env`
    - **Frontend**: Update `recaptcha_site_key` in `content/contact/contents.lr`
 
-### 2. AWS SES Setup
+### 2. Mailgun Setup
 
-1. **Verify sender email**:
-   - AWS SES Console → Verified identities
-   - Verify `noreply@pycon.de`
+Since you already have a Mailgun account, just gather your credentials:
 
-2. **Verify recipient** (if in sandbox):
-   - Verify `info26@pycon.de`
-   - OR request production access
+1. **Get API credentials** from [Mailgun Dashboard](https://app.mailgun.com/):
+   - Navigate to "Sending" → "Domains"
+   - Select your domain
+   - Copy **API Key** (starts with `key-`)
+   - Copy **Domain name** (e.g., `mg.yourdomain.com`)
 
-3. **Set credentials**:
-   - Use existing GitHub secrets OR
-   - Create IAM user with `ses:SendEmail` permission
-   - Set `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` in `.env`
+2. **Choose region**:
+   - US: `https://api.mailgun.net/v3` (default)
+   - EU: `https://api.eu.mailgun.net/v3` (for GDPR)
+
+3. **Verify domain** (if not already done):
+   - Ensure SPF and DKIM DNS records are configured
+   - Check verification status in Mailgun dashboard
 
 ### 3. Backend Environment Variables
 
@@ -130,9 +136,9 @@ Create `/backend/.env` from `/backend/.env.example`:
 RECAPTCHA_SECRET_KEY=your_secret_key_here
 EMAIL_RECIPIENT=info26@pycon.de
 EMAIL_SENDER=noreply@pycon.de
-AWS_REGION=eu-central-1
-AWS_ACCESS_KEY_ID=your_access_key
-AWS_SECRET_ACCESS_KEY=your_secret_key
+MAILGUN_API_KEY=key-your-mailgun-api-key
+MAILGUN_DOMAIN=mg.yourdomain.com
+MAILGUN_API_BASE_URL=https://api.mailgun.net/v3
 ALLOWED_ORIGINS=https://2026.pycon.de,https://pycon.de,http://localhost:5001
 RATE_LIMIT_PER_MINUTE=5
 RATE_LIMIT_PER_HOUR=20
