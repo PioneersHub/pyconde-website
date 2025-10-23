@@ -22,7 +22,20 @@ FastAPI backend service for the PyConDE website contact form with Google reCAPTC
 
 ### 1. Install Dependencies
 
-Using uv (recommended):
+**Option A: Using uv with pyproject.toml (recommended)**
+
+From the project root:
+```bash
+# Install all dependencies including backend
+uv pip install -e ".[backend]"
+
+# Or sync everything
+uv sync --extra backend
+```
+
+**Option B: Backend-only installation**
+
+For backend-only development or deployment:
 ```bash
 cd backend
 uv venv
@@ -30,7 +43,7 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 uv pip install -r requirements.txt
 ```
 
-Using pip:
+**Option C: Using pip**
 ```bash
 cd backend
 python -m venv venv
