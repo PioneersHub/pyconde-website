@@ -29,12 +29,8 @@ class Settings(BaseSettings):
     mailgun_api_base_url: str = "https://api.mailgun.net/v3"
 
     # CORS settings
-    allowed_origins: list[str] = [
-        "https://2026.pycon.de",
-        "https://pycon.de",
-        "http://localhost:5001",
-        "http://127.0.0.1:5001",
-    ]
+    # Note: In .env file, use comma-separated string: "origin1,origin2,origin3"
+    allowed_origins: str = "https://2026.pycon.de,https://pycon.de,http://localhost:5001,http://127.0.0.1:5001"
 
     # Rate limiting
     rate_limit_per_minute: int = 5
@@ -44,12 +40,12 @@ class Settings(BaseSettings):
     debug: bool = False
     api_prefix: str = "/api"
 
-    @field_validator("allowed_origins", mode="before")
+    @field_validator("allowed_origins", mode="after")
     @classmethod
     def parse_cors_origins(cls, v):
         """Parse comma-separated CORS origins from environment variable."""
         if isinstance(v, str):
-            return [origin.strip() for origin in v.split(",")]
+            return [origin.strip() for origin in v.split(",") if origin.strip()]
         return v
 
 
