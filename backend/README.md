@@ -130,10 +130,23 @@ DEBUG=False
 
 ### Development Server
 
+**From the backend directory:**
+
 ```bash
 cd backend
+
+# Option 1: Using uv run (recommended)
+uv run uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+# Option 2: After activating venv
+source .venv/bin/activate  # or venv/bin/activate
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+# Option 3: Direct uvicorn
+python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
+
+**Note:** The backend uses relative imports, so it must be run from the `backend/` directory.
 
 The API will be available at:
 - API: http://localhost:8000
