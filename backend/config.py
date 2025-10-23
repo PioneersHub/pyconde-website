@@ -1,5 +1,6 @@
 """Configuration settings for the contact form backend."""
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -42,6 +43,14 @@ class Settings(BaseSettings):
     # Application settings
     debug: bool = False
     api_prefix: str = "/api"
+
+    @field_validator("allowed_origins", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, v):
+        """Parse comma-separated CORS origins from environment variable."""
+        if isinstance(v, str):
+            return [origin.strip() for origin in v.split(",")]
+        return v
 
 
 settings = Settings()
