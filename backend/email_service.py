@@ -5,7 +5,7 @@ from datetime import UTC, datetime
 
 import httpx
 
-from backend.config import settings
+from config import settings
 
 logger = logging.getLogger(__name__)
 

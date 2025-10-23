@@ -11,9 +11,9 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
-from backend.config import settings
-from backend.email_service import EmailServiceError, send_contact_email
-from backend.recaptcha import RecaptchaVerificationError, verify_recaptcha
+from config import settings
+from email_service import EmailServiceError, send_contact_email
+from recaptcha import RecaptchaVerificationError, verify_recaptcha
 
 # Configure logging
 logging.basicConfig(

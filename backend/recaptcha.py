@@ -2,7 +2,7 @@
 
 import httpx
 
-from backend.config import settings
+from config import settings
 
 
 class RecaptchaVerificationError(Exception):
