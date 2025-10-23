@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     )
 
     # reCAPTCHA settings
+    recaptcha_site_key: str | None = None  # Optional: only used in frontend
     recaptcha_secret_key: str
     recaptcha_verify_url: str = "https://www.google.com/recaptcha/api/siteverify"
     recaptcha_min_score: float = 0.5
