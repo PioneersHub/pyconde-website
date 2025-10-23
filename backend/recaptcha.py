@@ -1,8 +1,12 @@
 """Google reCAPTCHA verification service."""
 
+import logging
+
 import httpx
 
 from config import settings
+
+logger = logging.getLogger(__name__)
 
 
 class RecaptchaVerificationError(Exception):
@@ -49,8 +53,12 @@ async def verify_recaptcha(token: str, remote_ip: str | None = None) -> bool:
             f"Failed to verify reCAPTCHA: {e}"
         ) from e
 
+    # Log the full response for debugging
+    logger.info(f"reCAPTCHA API response: {result}")
+
     if not result.get("success", False):
         error_codes = result.get("error-codes", [])
+        logger.warning(f"reCAPTCHA failed - Full response: {result}")
         raise RecaptchaVerificationError(
             f"reCAPTCHA verification failed: {', '.join(error_codes)}"
         )
