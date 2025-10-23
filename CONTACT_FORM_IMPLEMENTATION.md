@@ -159,12 +159,15 @@ recaptcha_site_key: your_site_key_here
 ### 1. Start Backend
 
 ```bash
+# From project root - install backend dependencies
+uv pip install -e ".[backend]"
+
+# Configure environment
 cd backend
-uv venv
-source .venv/bin/activate
-uv pip install -r requirements.txt
 cp .env.example .env
 # Edit .env with your credentials
+
+# Start backend
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
