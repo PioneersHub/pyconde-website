@@ -33,17 +33,18 @@ class Settings(BaseSettings):
     # Note: In .env file, use comma-separated string: "origin1,origin2,origin3"
     allowed_origins: str = "https://2026.pycon.de,https://pycon.de,http://localhost:5001,http://127.0.0.1:5001"
 
-    # Rate limiting
-    rate_limit_per_minute: int = 5
-    rate_limit_per_hour: int = 20
-
     # Application settings
     debug: bool = False
     api_prefix: str = "/api"
 
+    # Security settings
+    # Optional: Set this to require an API key header for additional security
+    # If set, all requests must include "X-API-Key" header with this value
+    api_key: str | None = None
+
     @field_validator("allowed_origins", mode="after")
     @classmethod
-    def parse_cors_origins(cls, v):
+    def parse_cors_origins(cls, v: str | list[str]) -> list[str]:
         """Parse comma-separated CORS origins from environment variable."""
         if isinstance(v, str):
             return [origin.strip() for origin in v.split(",") if origin.strip()]

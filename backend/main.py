@@ -3,17 +3,14 @@
 import logging
 from contextlib import asynccontextmanager
 
+from config import settings
+from email_service import EmailServiceError, send_contact_email
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, EmailStr, Field
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.errors import RateLimitExceeded
-from slowapi.util import get_remote_address
-
-from config import settings
-from email_service import EmailServiceError, send_contact_email
 from recaptcha import RecaptchaVerificationError, verify_recaptcha
+from starlette.middleware.base import BaseHTTPMiddleware
 
 # Configure logging
 logging.basicConfig(
@@ -22,29 +19,63 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Initialize rate limiter
-limiter = Limiter(key_func=get_remote_address)
-
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(_app: FastAPI):
     """Lifespan context manager for startup and shutdown events."""
-    logger.info("Starting PyConDE Contact Form API")
+    # Minimal startup - Lambda manages lifecycle
     yield
-    logger.info("Shutting down PyConDE Contact Form API")
+    # Cleanup if needed (currently none required)
 
 
 # Initialize FastAPI app
+# Security: Disable interactive docs in production to prevent exposure
 app = FastAPI(
     title="PyConDE Contact Form API",
     description="Backend API for PyConDE website contact form with reCAPTCHA protection",
     version="0.1.0",
     lifespan=lifespan,
+    # Disable docs in production (only available when DEBUG=True)
+    docs_url="/docs" if settings.debug else None,
+    redoc_url="/redoc" if settings.debug else None,
+    openapi_url="/openapi.json" if settings.debug else None,
 )
 
-# Add rate limiting
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Security: Optional API Key Middleware
+class APIKeyMiddleware(BaseHTTPMiddleware):
+    """Middleware to validate API key if configured."""
+
+    async def dispatch(self, request: Request, call_next):
+        """Validate API key header if api_key is configured."""
+        # Skip validation if no API key is configured
+        if settings.api_key is None:
+            return await call_next(request)
+
+        # Skip validation for health check and OPTIONS requests
+        if request.url.path == "/health" or request.method == "OPTIONS":
+            return await call_next(request)
+
+        # Validate API key
+        api_key = request.headers.get("X-API-Key")
+        if api_key != settings.api_key:
+            logger.warning(
+                "Invalid or missing API key from %s",
+                request.client.host if request.client else "unknown",
+            )
+            return JSONResponse(
+                status_code=status.HTTP_403_FORBIDDEN,
+                content={
+                    "success": False,
+                    "message": "Invalid or missing API key",
+                },
+            )
+
+        return await call_next(request)
+
+
+# Add security middleware
+app.add_middleware(APIKeyMiddleware)
 
 # Configure CORS
 app.add_middleware(
@@ -121,17 +152,12 @@ async def health_check():
     response_model=ContactFormResponse,
     status_code=status.HTTP_200_OK,
 )
-@limiter.limit(f"{settings.rate_limit_per_minute}/minute")
 async def submit_contact_form(
     request: Request,
     form_data: ContactFormRequest,
 ) -> ContactFormResponse:
     """
     Submit contact form with reCAPTCHA verification.
-
-    Rate limits:
-    - {settings.rate_limit_per_minute} requests per minute per IP
-    - {settings.rate_limit_per_hour} requests per hour per IP
 
     Args:
         request: FastAPI request object
@@ -143,12 +169,12 @@ async def submit_contact_form(
     Raises:
         HTTPException: On validation or processing errors
     """
-    client_ip = get_remote_address(request)
-    logger.info(f"Contact form submission from {client_ip}")
+    client_ip = request.client.host if request.client else "unknown"
+    logger.info("Contact form submission from %s", client_ip)
 
     # Check honeypot field (should be empty)
     if form_data.honeypot:
-        logger.warning(f"Honeypot triggered from {client_ip}")
+        logger.warning("Honeypot triggered from %s", client_ip)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid form submission",
@@ -157,9 +183,9 @@ async def submit_contact_form(
     # Verify reCAPTCHA
     try:
         await verify_recaptcha(form_data.recaptcha_token, client_ip)
-        logger.info(f"reCAPTCHA verified for {client_ip}")
+        logger.info("reCAPTCHA verified for %s", client_ip)
     except RecaptchaVerificationError as e:
-        logger.warning(f"reCAPTCHA verification failed for {client_ip}: {e}")
+        logger.warning("reCAPTCHA verification failed for %s: %s", client_ip, e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="reCAPTCHA verification failed. Please try again.",
@@ -174,10 +200,10 @@ async def submit_contact_form(
             message=form_data.message,
         )
         logger.info(
-            f"Contact email sent successfully from {form_data.email} ({client_ip})"
+            "Contact email sent successfully from %s (%s)", form_data.email, client_ip
         )
     except EmailServiceError as e:
-        logger.error(f"Failed to send email from {client_ip}: {e}")
+        logger.error("Failed to send email from %s: %s", client_ip, e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to send message. Please try again later.",
@@ -190,7 +216,7 @@ async def submit_contact_form(
 
 
 @app.exception_handler(HTTPException)
-async def http_exception_handler(request: Request, exc: HTTPException):
+async def http_exception_handler(_request: Request, exc: HTTPException):
     """Handle HTTP exceptions with consistent JSON response."""
     return JSONResponse(
         status_code=exc.status_code,
@@ -202,7 +228,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 
 
 @app.exception_handler(Exception)
-async def general_exception_handler(request: Request, exc: Exception):
+async def general_exception_handler(_request: Request, exc: Exception):
     """Handle unexpected exceptions."""
     logger.error(f"Unexpected error: {exc}", exc_info=True)
     return JSONResponse(

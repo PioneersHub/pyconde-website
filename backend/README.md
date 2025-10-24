@@ -4,13 +4,14 @@ FastAPI backend service for the PyConDE website contact form with Google reCAPTC
 
 ## Features
 
-- ✅ **reCAPTCHA v2 Integration**: Bot protection with Google reCAPTCHA
-- ✅ **Rate Limiting**: 5 requests/minute, 20 requests/hour per IP
+- ✅ **reCAPTCHA v3 Integration**: Bot protection with Google reCAPTCHA
+- ✅ **Serverless Ready**: Optimized for AWS Lambda deployment
 - ✅ **Email Delivery**: Mailgun integration with HTML templates
 - ✅ **Honeypot Protection**: Additional bot detection
 - ✅ **CORS Support**: Configured for PyConDE domains
 - ✅ **Input Validation**: Comprehensive validation with Pydantic
 - ✅ **Logging**: Structured logging for monitoring
+- ✅ **Auto-scaling**: Built-in redundancy via serverless architecture
 
 ## Prerequisites
 
@@ -25,6 +26,7 @@ FastAPI backend service for the PyConDE website contact form with Google reCAPTC
 **Option A: Using uv with pyproject.toml (recommended)**
 
 From the project root:
+
 ```bash
 # Install all dependencies including backend
 uv pip install -e ".[backend]"
@@ -36,6 +38,7 @@ uv sync --extra backend
 **Option B: Backend-only installation**
 
 For backend-only development or deployment:
+
 ```bash
 cd backend
 uv venv
@@ -44,6 +47,7 @@ uv pip install -r requirements.txt
 ```
 
 **Option C: Using pip**
+
 ```bash
 cd backend
 python -m venv venv
@@ -54,6 +58,7 @@ pip install -r requirements.txt
 ### 2. Configure Environment Variables
 
 Copy the example environment file:
+
 ```bash
 cp .env.example .env
 ```
@@ -76,18 +81,16 @@ MAILGUN_API_BASE_URL=https://api.mailgun.net/v3
 # CORS Configuration
 ALLOWED_ORIGINS=https://2026.pycon.de,https://pycon.de,http://localhost:5001
 
-# Rate Limiting
-RATE_LIMIT_PER_MINUTE=5
-RATE_LIMIT_PER_HOUR=20
-
 # Debug Mode
 DEBUG=False
+
+# Note: Rate limiting removed for serverless deployment
 ```
 
 ### 3. Configure Google reCAPTCHA
 
 1. Go to [Google reCAPTCHA Admin](https://www.google.com/recaptcha/admin)
-2. Create a new site with reCAPTCHA v2 ("I'm not a robot" Checkbox)
+2. Create a new site with reCAPTCHA v3
 3. Add your domains:
    - `2026.pycon.de`
    - `pycon.de`
@@ -116,6 +119,7 @@ DEBUG=False
    - Set `MAILGUN_API_BASE_URL` in `.env` accordingly
 
 4. **Set credentials in `.env`**:
+
    ```env
    MAILGUN_API_KEY=key-your-actual-api-key-here
    MAILGUN_DOMAIN=mg.yourdomain.com
@@ -149,6 +153,7 @@ python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 **Note:** The backend uses relative imports, so it must be run from the `backend/` directory.
 
 The API will be available at:
+
 - API: http://localhost:8000
 - Docs: http://localhost:8000/docs
 - Health: http://localhost:8000/health
@@ -156,6 +161,7 @@ The API will be available at:
 ### Run Frontend (Lektor)
 
 In a separate terminal:
+
 ```bash
 make run
 ```
@@ -169,6 +175,7 @@ The website will be available at http://localhost:5001
 Submit a contact form message.
 
 **Request Body:**
+
 ```json
 {
   "name": "John Doe",
@@ -181,6 +188,7 @@ Submit a contact form message.
 ```
 
 **Response (Success):**
+
 ```json
 {
   "success": true,
@@ -189,6 +197,7 @@ Submit a contact form message.
 ```
 
 **Response (Error):**
+
 ```json
 {
   "success": false,
@@ -201,6 +210,7 @@ Submit a contact form message.
 Health check endpoint.
 
 **Response:**
+
 ```json
 {
   "status": "healthy"
@@ -209,71 +219,45 @@ Health check endpoint.
 
 ## Deployment
 
-### Option 1: AWS Lambda with API Gateway (Recommended)
+### AWS Lambda (Recommended for Serverless)
+
+**See [DEPLOY.md](DEPLOY.md) for comprehensive deployment guide.**
+
+Quick start:
+
+```bash
+# Install AWS SAM CLI
+brew install aws-sam-cli  # macOS
+
+# Deploy
+sam build
+sam deploy --guided
+```
 
 **Advantages:**
-- Serverless (no server management)
-- Auto-scaling
-- Pay-per-request pricing
-- ~$0-5/month for typical usage
 
-**Setup:**
+- ✅ Fully serverless (no server management)
+- ✅ Auto-scaling and redundancy built-in
+- ✅ Pay-per-request pricing (~$0-5/month)
+- ✅ Multi-AZ by default
+- ✅ No rate limiting complexity
 
-1. Install deployment dependencies:
-   ```bash
-   pip install mangum
-   ```
+**Files for Lambda deployment:**
 
-2. Create Lambda deployment package:
-   ```bash
-   cd backend
-   pip install -r requirements.txt -t ./package
-   cp *.py ./package/
-   cd package
-   zip -r ../deployment.zip .
-   ```
-
-3. Deploy to AWS Lambda:
-   - Create Lambda function with Python 3.11 runtime
-   - Upload `deployment.zip`
-   - Set handler to `main.handler` (using Mangum adapter)
-   - Configure environment variables
-   - Create API Gateway trigger
-   - Update frontend `api_endpoint` with API Gateway URL
-
-### Option 2: AWS ECS/Fargate
-
-**Advantages:**
-- Better performance (no cold starts)
-- Full control over runtime
-- Container-based deployment
-
-**Setup:**
-
-1. Create Dockerfile:
-   ```dockerfile
-   FROM python:3.11-slim
-   WORKDIR /app
-   COPY requirements.txt .
-   RUN pip install --no-cache-dir -r requirements.txt
-   COPY . .
-   CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-   ```
-
-2. Build and push to ECR
-3. Deploy to ECS Fargate
-4. Configure Application Load Balancer
+- `lambda_handler.py` - Lambda entry point with Mangum
+- `template.yaml` - AWS SAM infrastructure as code
+- `DEPLOY.md` - Full deployment instructions
 
 ### Environment Variables in Production
 
-Set these in Lambda/ECS configuration:
+For AWS Lambda, configure via SAM template parameters:
+
 - `RECAPTCHA_SECRET_KEY`
-- `AWS_REGION`
+- `MAILGUN_API_KEY`
+- `MAILGUN_DOMAIN`
 - `EMAIL_RECIPIENT`
 - `EMAIL_SENDER`
 - `ALLOWED_ORIGINS`
-- `RATE_LIMIT_PER_MINUTE`
-- `RATE_LIMIT_PER_HOUR`
 - `DEBUG=False`
 
 ## Testing
@@ -281,11 +265,13 @@ Set these in Lambda/ECS configuration:
 ### Manual Testing
 
 1. Start the backend:
+
    ```bash
    uvicorn main:app --reload
    ```
 
 2. Start the frontend:
+
    ```bash
    make run
    ```
@@ -311,13 +297,13 @@ curl -X POST http://localhost:8000/api/contact \
 
 ## Security Considerations
 
-1. **reCAPTCHA**: Protects against automated bots
+1. **reCAPTCHA v3**: Protects against automated bots
 2. **Honeypot**: Hidden field that bots fill but humans don't
-3. **Rate Limiting**: Prevents abuse (5 req/min per IP)
-4. **Input Validation**: Pydantic models validate all inputs
-5. **CORS**: Restricted to PyConDE domains
-6. **HTTPS**: API Gateway/ALB enforce TLS
-7. **Environment Variables**: No secrets in code
+3. **Input Validation**: Pydantic models validate all inputs
+4. **CORS**: Restricted to PyConDE domains
+5. **HTTPS**: Lambda Function URLs enforce TLS
+6. **Environment Variables**: No secrets in code
+7. **Serverless Security**: Isolated execution environments per request
 
 ## Monitoring
 
@@ -340,11 +326,13 @@ curl -X POST http://localhost:8000/api/contact \
 ### Common Issues
 
 **Issue: reCAPTCHA verification fails**
+
 - Check that `RECAPTCHA_SECRET_KEY` is correct
 - Verify domain is added in reCAPTCHA admin
 - Check network connectivity to Google API
 
 **Issue: Email not sending**
+
 - Verify `MAILGUN_API_KEY` is correct (starts with `key-`)
 - Check that `MAILGUN_DOMAIN` matches your verified domain
 - Ensure sender email domain is verified in Mailgun
@@ -353,14 +341,10 @@ curl -X POST http://localhost:8000/api/contact \
 - Check application logs for error details
 
 **Issue: CORS errors**
-- Verify frontend domain is in `ALLOWED_ORIGINS`
-- Check API Gateway CORS configuration
-- Ensure preflight OPTIONS requests are allowed
 
-**Issue: Rate limit errors**
-- Check if IP is being blocked
-- Adjust `RATE_LIMIT_PER_MINUTE` if needed
-- Review rate limit logs
+- Verify frontend domain is in `ALLOWED_ORIGINS`
+- Check Lambda Function URL CORS configuration in template.yaml
+- Ensure preflight OPTIONS requests are allowed
 
 ## License
 

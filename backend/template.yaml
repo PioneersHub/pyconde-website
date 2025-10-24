@@ -1,0 +1,99 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: PyConDE Contact Form API - Serverless Backend
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 512
+    Runtime: python3.11
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        # These will be overridden by parameter values or .env
+        DEBUG: "false"
+        API_PREFIX: "/api"
+
+Parameters:
+  RecaptchaSecretKey:
+    Type: String
+    Description: Google reCAPTCHA secret key
+    NoEcho: true
+
+  RecaptchaSiteKey:
+    Type: String
+    Description: Google reCAPTCHA site key (optional, used in frontend)
+    Default: ""
+
+  MailgunApiKey:
+    Type: String
+    Description: Mailgun API key
+    NoEcho: true
+
+  MailgunDomain:
+    Type: String
+    Description: Mailgun domain
+    Default: "mg.pycon.de"
+
+  EmailRecipient:
+    Type: String
+    Description: Email recipient for contact form submissions
+    Default: "info26@pycon.de"
+
+  EmailSender:
+    Type: String
+    Description: Email sender address
+    Default: "noreply@pycon.de"
+
+  AllowedOrigins:
+    Type: String
+    Description: Comma-separated list of allowed CORS origins
+    Default: "https://2026.pycon.de,https://pycon.de"
+
+Resources:
+  ContactFormFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: pyconde-contact-form-api
+      CodeUri: ./
+      Handler: lambda_handler.handler
+      Description: PyConDE contact form API handler
+      Environment:
+        Variables:
+          RECAPTCHA_SECRET_KEY: !Ref RecaptchaSecretKey
+          RECAPTCHA_SITE_KEY: !Ref RecaptchaSiteKey
+          MAILGUN_API_KEY: !Ref MailgunApiKey
+          MAILGUN_DOMAIN: !Ref MailgunDomain
+          EMAIL_RECIPIENT: !Ref EmailRecipient
+          EMAIL_SENDER: !Ref EmailSender
+          ALLOWED_ORIGINS: !Ref AllowedOrigins
+      FunctionUrlConfig:
+        AuthType: NONE
+        Cors:
+          AllowOrigins:
+            - "https://2026.pycon.de"
+            - "https://pycon.de"
+            - "http://localhost:5001"
+            - "http://127.0.0.1:5001"
+          AllowMethods:
+            - POST
+            - OPTIONS
+            - GET
+          AllowHeaders:
+            - "*"
+          AllowCredentials: true
+          MaxAge: 300
+      Tags:
+        Project: PyConDE
+        Component: ContactForm
+        Environment: Production
+
+Outputs:
+  ContactFormApiUrl:
+    Description: "Function URL for PyConDE Contact Form API"
+    Value: !GetAtt ContactFormFunctionUrl.FunctionUrl
+
+  FunctionArn:
+    Description: "Lambda Function ARN"
+    Value: !GetAtt ContactFormFunction.Arn

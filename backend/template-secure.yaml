@@ -1,0 +1,290 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: PyConDE Contact Form API - Secure Serverless Backend with API Gateway and WAF
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 512
+    Runtime: python3.11
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        DEBUG: "false"
+        API_PREFIX: "/api"
+
+Parameters:
+  RecaptchaSecretKey:
+    Type: String
+    Description: Google reCAPTCHA secret key
+    NoEcho: true
+
+  RecaptchaSiteKey:
+    Type: String
+    Description: Google reCAPTCHA site key (optional, used in frontend)
+    Default: ""
+
+  MailgunApiKey:
+    Type: String
+    Description: Mailgun API key
+    NoEcho: true
+
+  MailgunDomain:
+    Type: String
+    Description: Mailgun domain
+    Default: "mg.pycon.de"
+
+  EmailRecipient:
+    Type: String
+    Description: Email recipient for contact form submissions
+    Default: "info26@pycon.de"
+
+  EmailSender:
+    Type: String
+    Description: Email sender address
+    Default: "noreply@pycon.de"
+
+  AllowedOrigins:
+    Type: String
+    Description: Comma-separated list of allowed CORS origins
+    Default: "https://2026.pycon.de,https://pycon.de"
+
+  ApiKey:
+    Type: String
+    Description: Optional API key for additional security (leave empty to disable)
+    NoEcho: true
+    Default: ""
+
+  RateLimitPerMinute:
+    Type: Number
+    Description: Maximum requests per minute per IP (API Gateway throttling)
+    Default: 10
+    MinValue: 1
+    MaxValue: 10000
+
+  BurstLimit:
+    Type: Number
+    Description: Maximum burst requests (API Gateway throttling)
+    Default: 20
+    MinValue: 1
+    MaxValue: 5000
+
+Resources:
+  # Lambda Function
+  ContactFormFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: pyconde-contact-form-api
+      CodeUri: ./
+      Handler: lambda_handler.handler
+      Description: PyConDE contact form API handler with security
+      Environment:
+        Variables:
+          RECAPTCHA_SECRET_KEY: !Ref RecaptchaSecretKey
+          RECAPTCHA_SITE_KEY: !Ref RecaptchaSiteKey
+          MAILGUN_API_KEY: !Ref MailgunApiKey
+          MAILGUN_DOMAIN: !Ref MailgunDomain
+          EMAIL_RECIPIENT: !Ref EmailRecipient
+          EMAIL_SENDER: !Ref EmailSender
+          ALLOWED_ORIGINS: !Ref AllowedOrigins
+          API_KEY: !Ref ApiKey
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ContactFormApi
+            Path: /{proxy+}
+            Method: ANY
+      Tags:
+        Project: PyConDE
+        Component: ContactForm
+        Environment: Production
+
+  # API Gateway with throttling
+  ContactFormApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: pyconde-contact-form-api
+      StageName: prod
+      Description: PyConDE Contact Form API with rate limiting and security
+      Cors:
+        AllowOrigin: "'https://2026.pycon.de,https://pycon.de'"
+        AllowMethods: "'POST,OPTIONS,GET'"
+        AllowHeaders: "'Content-Type,X-API-Key'"
+        AllowCredentials: true
+        MaxAge: "'300'"
+      MethodSettings:
+        - ResourcePath: "/*"
+          HttpMethod: "*"
+          # Throttling settings - protects against DDoS
+          ThrottlingRateLimit: !Ref RateLimitPerMinute
+          ThrottlingBurstLimit: !Ref BurstLimit
+          LoggingLevel: INFO
+          DataTraceEnabled: false
+          MetricsEnabled: true
+      # Enable request validation
+      DefinitionBody:
+        swagger: "2.0"
+        info:
+          title: "PyConDE Contact Form API"
+          version: "1.0"
+        paths:
+          /{proxy+}:
+            x-amazon-apigateway-any-method:
+              produces:
+                - application/json
+              responses:
+                "200":
+                  description: "Success"
+              x-amazon-apigateway-integration:
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ContactFormFunction.Arn}/invocations"
+                httpMethod: POST
+                type: aws_proxy
+      Tags:
+        Project: PyConDE
+        Component: ContactForm
+        Environment: Production
+
+  # WAF Web ACL for DDoS and bot protection
+  ContactFormWAF:
+    Type: AWS::WAFv2::WebACL
+    Properties:
+      Name: pyconde-contact-form-waf
+      Scope: REGIONAL
+      DefaultAction:
+        Allow: {}
+      Description: WAF rules for PyConDE contact form API
+      Rules:
+        # Rate limiting rule - 100 requests per 5 minutes per IP
+        - Name: RateLimitRule
+          Priority: 1
+          Statement:
+            RateBasedStatement:
+              Limit: 100
+              AggregateKeyType: IP
+          Action:
+            Block: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: RateLimitRule
+
+        # Block known bad inputs
+        - Name: BlockSQLInjection
+          Priority: 2
+          Statement:
+            SqliMatchStatement:
+              FieldToMatch:
+                Body:
+                  OversizeHandling: CONTINUE
+              TextTransformations:
+                - Priority: 0
+                  Type: URL_DECODE
+                - Priority: 1
+                  Type: HTML_ENTITY_DECODE
+          Action:
+            Block: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: SQLInjectionRule
+
+        # Block XSS attempts
+        - Name: BlockXSS
+          Priority: 3
+          Statement:
+            XssMatchStatement:
+              FieldToMatch:
+                Body:
+                  OversizeHandling: CONTINUE
+              TextTransformations:
+                - Priority: 0
+                  Type: URL_DECODE
+                - Priority: 1
+                  Type: HTML_ENTITY_DECODE
+          Action:
+            Block: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: XSSRule
+
+        # AWS Managed Rules - Core Rule Set
+        - Name: AWSManagedRulesCommonRuleSet
+          Priority: 4
+          OverrideAction:
+            None: {}
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesCommonRuleSet
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: AWSManagedRulesCommonRuleSetMetric
+
+        # AWS Managed Rules - Known Bad Inputs
+        - Name: AWSManagedRulesKnownBadInputsRuleSet
+          Priority: 5
+          OverrideAction:
+            None: {}
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesKnownBadInputsRuleSet
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: AWSManagedRulesKnownBadInputsRuleSetMetric
+
+      VisibilityConfig:
+        SampledRequestsEnabled: true
+        CloudWatchMetricsEnabled: true
+        MetricName: ContactFormWAFMetric
+      Tags:
+        - Key: Project
+          Value: PyConDE
+        - Key: Component
+          Value: ContactForm
+        - Key: Environment
+          Value: Production
+
+  # Associate WAF with API Gateway
+  WAFAssociation:
+    Type: AWS::WAFv2::WebACLAssociation
+    Properties:
+      ResourceArn: !Sub "arn:aws:apigateway:${AWS::Region}::/restapis/${ContactFormApi}/stages/prod"
+      WebACLArn: !GetAtt ContactFormWAF.Arn
+
+  # CloudWatch Log Group for API Gateway
+  ApiGatewayLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/apigateway/pyconde-contact-form-${AWS::StackName}"
+      RetentionInDays: 30
+
+Outputs:
+  ContactFormApiUrl:
+    Description: "API Gateway endpoint URL for PyConDE Contact Form API"
+    Value: !Sub "https://${ContactFormApi}.execute-api.${AWS::Region}.amazonaws.com/prod"
+    Export:
+      Name: !Sub "${AWS::StackName}-ApiUrl"
+
+  FunctionArn:
+    Description: "Lambda Function ARN"
+    Value: !GetAtt ContactFormFunction.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-FunctionArn"
+
+  WAFWebACLArn:
+    Description: "WAF Web ACL ARN"
+    Value: !GetAtt ContactFormWAF.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-WAFArn"
+
+  ApiGatewayId:
+    Description: "API Gateway ID"
+    Value: !Ref ContactFormApi
+    Export:
+      Name: !Sub "${AWS::StackName}-ApiGatewayId"

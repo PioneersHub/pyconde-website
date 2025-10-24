@@ -3,7 +3,6 @@
 import logging
 
 import httpx
-
 from config import settings
 
 logger = logging.getLogger(__name__)
@@ -49,16 +48,14 @@ async def verify_recaptcha(token: str, remote_ip: str | None = None) -> bool:
             result = response.json()
 
     except httpx.HTTPError as e:
-        raise RecaptchaVerificationError(
-            f"Failed to verify reCAPTCHA: {e}"
-        ) from e
+        raise RecaptchaVerificationError(f"Failed to verify reCAPTCHA: {e}") from e
 
     # Log the full response for debugging
-    logger.info(f"reCAPTCHA API response: {result}")
+    logger.info("reCAPTCHA API response: %s", result)
 
     if not result.get("success", False):
         error_codes = result.get("error-codes", [])
-        logger.warning(f"reCAPTCHA failed - Full response: {result}")
+        logger.warning("reCAPTCHA failed - Full response: %s", result)
         raise RecaptchaVerificationError(
             f"reCAPTCHA verification failed: {', '.join(error_codes)}"
         )

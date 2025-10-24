@@ -4,7 +4,6 @@ import logging
 from datetime import UTC, datetime
 
 import httpx
-
 from config import settings
 
 logger = logging.getLogger(__name__)
@@ -201,12 +200,16 @@ async def send_contact_email(
 
         message_id = result.get("id", "unknown")
         logger.info(
-            f"Email sent successfully via Mailgun. MessageId: {message_id}, From: {email}"
+            "Email sent successfully via Mailgun. MessageId: %s, From: %s",
+            message_id,
+            email,
         )
         return True
 
     except httpx.HTTPStatusError as e:
-        error_msg = f"Mailgun API error (status {e.response.status_code}): {e.response.text}"
+        error_msg = (
+            f"Mailgun API error (status {e.response.status_code}): {e.response.text}"
+        )
         logger.error(error_msg)
         raise EmailServiceError(error_msg) from e
     except httpx.HTTPError as e:
