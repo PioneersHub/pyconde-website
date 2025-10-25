@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from collections import OrderedDict
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -15,6 +16,62 @@ if TYPE_CHECKING:
     from lektor.environment import Environment
 
 YAML_EXTENSIONS = (".yaml", ".yml")
+
+
+def markdown_inline(text: str) -> str:
+    """Convert inline markdown syntax to HTML.
+
+    Args:
+        text: Text possibly containing markdown syntax
+
+    Returns:
+        Text with markdown converted to HTML
+    """
+    if not text or (isinstance(text, str) and text.strip().startswith('<')):
+        return text
+
+    # Convert **bold** to <strong>bold</strong>
+    text = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
+
+    return text
+
+
+def paragraphize(text: str) -> str:
+    """Convert text with blank lines into proper HTML paragraphs.
+
+    Args:
+        text: Text with paragraphs separated by blank lines
+        Note: YAML folded scalars (>) convert blank lines to single newlines,
+        so we split on lines ending with double spaces followed by newline.
+
+    Returns:
+        HTML with each paragraph wrapped in <p> tags
+    """
+    if not text or (isinstance(text, str) and text.strip().startswith('<')):
+        # Already HTML or empty
+        return text
+
+    # YAML folded scalars (>) preserve blank lines as lines ending with "  \n"
+    # Split on this pattern to get paragraphs
+    # First try double newlines (literal scalars)
+    if '\n\n' in text:
+        paragraphs = text.split('\n\n')
+    else:
+        # For folded scalars, split on "  \n" (two trailing spaces + newline)
+        paragraphs = re.split(r'  \n', text)
+
+    # Process each paragraph
+    result = []
+    for para in paragraphs:
+        para = para.strip()
+        if para:  # Skip empty paragraphs
+            # Apply markdown inline formatting
+            para = markdown_inline(para)
+            # Replace remaining single newlines within paragraph with spaces
+            para = re.sub(r'\s*\n\s*', ' ', para)
+            result.append(f'<p>{para}</p>')
+
+    return '\n'.join(result)
 
 
 def _load_yaml_databag(yaml_path: Path) -> OrderedDict | Any:
@@ -66,7 +123,16 @@ class YAMLDatabagPlugin(Plugin):
     name = "YAML Databags"
     description = "Adds support for .yaml and .yml databag files"
 
-    def on_setup_env(self, **_extra: Any) -> None:
+    def on_setup_env(self, **extra: Any) -> None:
+        """Register Jinja filters when environment is set up."""
+        # Register markdown filters for Jinja templates
+        self.env.jinja_env.filters['markdown_inline'] = markdown_inline
+        self.env.jinja_env.filters['paragraphize'] = paragraphize
+
+        # Call the databag setup
+        self._setup_databags()
+
+    def _setup_databags(self) -> None:
         """Patch databag loading to support YAML files.
 
         This hook is called during environment setup and patches both the
