@@ -8,7 +8,14 @@ endif
 
 build:
 	$(RUN) lektor build -O site
-run:
+
+clean-plugin-cache:
+	@echo "Clearing plugin and Lektor caches..."
+	@rm -rf packages/yaml-databags/__pycache__
+	@rm -rf site/.lektor
+	@echo "Cache cleared!"
+
+run: clean-plugin-cache
 	$(RUN) lektor server -O site -p 5001 || (cd content && $(RUN) lektor server -O site -p 5001)
 fetch-submissions:
 	$(RUN) python utils/talks.py
