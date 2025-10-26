@@ -1,6 +1,8 @@
 # PyCon DE Website
 
-[![Fetch submissions](https://github.com/PioneersHub/pyconde-website/actions/workflows/fetch_submissions.yml/badge.svg)](https://github.com/PioneersHub/pyconde-website/actions/workflows/fetch_submissions.yml) [![Upload website](https://github.com/PioneersHub/pyconde-website/actions/workflows/main.yml/badge.svg)](https://github.com/PioneersHub/pyconde-website/actions/workflows/main.yml)[![Upload staging website](https://github.com/PioneersHub/pyconde-website/actions/workflows/development.yml/badge.svg)](https://github.com/PioneersHub/pyconde-website/actions/workflows/development.yml)
+[![Fetch submissions](https://github.com/PioneersHub/pyconde-website/actions/workflows/fetch_submissions.yml/badge.svg)](https://github.com/PioneersHub/pyconde-website/actions/workflows/fetch_submissions.yml)
+[![Upload website](https://github.com/PioneersHub/pyconde-website/actions/workflows/main.yml/badge.svg)](https://github.com/PioneersHub/pyconde-website/actions/workflows/main.yml)
+[![Upload staging website](https://github.com/PioneersHub/pyconde-website/actions/workflows/development.yml/badge.svg)](https://github.com/PioneersHub/pyconde-website/actions/workflows/development.yml)
 
 PyCon DE &amp; PyData conference website.
 
@@ -18,8 +20,9 @@ PyCon DE &amp; PyData conference website.
 5. Add a subsite [details](./docs/subsites.md)
 6. Manage sessions (talks, tutorials,…) [details](./docs/pretalx.md)
 7. Manage speaker-information [details](./docs/pretalx.md)
-8. Update the coding [details](./docs/coding.md)
-9. Deploy the website [details](./docs/deployment.md)
+8. Manage contact form [details](./docs/contact_form.md)
+9. Update the coding [details](./docs/coding.md)
+10. Deploy the website [details](./docs/deployment.md)
 
 ---
 
@@ -58,11 +61,13 @@ dependencies are already installed.
 
 ### Run locally
 
+Lektor requires local plugins to be installed. This will take care of all of it.
+
 ``bash
 make run
 ``
 
---- 
+---
 
 ## License & Notice
 
