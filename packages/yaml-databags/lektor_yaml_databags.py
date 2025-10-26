@@ -41,8 +41,9 @@ def paragraphize(text: str) -> str:
 
     Args:
         text: Text with paragraphs separated by blank lines
-        Note: YAML folded scalars (>) convert blank lines to single newlines,
-        so we split on lines ending with double spaces followed by newline.
+        Note: YAML folded scalars (>) indicate paragraph breaks by:
+        - Lines ending with "  " (two spaces) before a newline
+        - Actual blank lines in literal scalars (\n\n)
 
     Returns:
         HTML with each paragraph wrapped in <p> tags
@@ -51,23 +52,23 @@ def paragraphize(text: str) -> str:
         # Already HTML or empty
         return text
 
-    # YAML folded scalars (>) preserve blank lines as lines ending with "  \n"
-    # Split on this pattern to get paragraphs
-    # First try double newlines (literal scalars)
+    # Handle literal scalars with \n\n first
     if '\n\n' in text:
-        paragraphs = text.split('\n\n')
+        # Literal scalar (|) - split on double newlines
+        paragraph_texts = text.split('\n\n')
     else:
-        # For folded scalars, split on "  \n" (two trailing spaces + newline)
-        paragraphs = re.split(r'  \n', text)
+        # Folded scalar (>) - split on lines ending with "  \n"
+        # This preserves the YAML convention for hard line breaks
+        paragraph_texts = re.split(r'  \n', text)
 
     # Process each paragraph
     result = []
-    for para in paragraphs:
+    for para in paragraph_texts:
         para = para.strip()
         if para:  # Skip empty paragraphs
             # Apply markdown inline formatting
             para = markdown_inline(para)
-            # Replace remaining single newlines within paragraph with spaces
+            # Replace any remaining single newlines with spaces
             para = re.sub(r'\s*\n\s*', ' ', para)
             result.append(f'<p>{para}</p>')
 
