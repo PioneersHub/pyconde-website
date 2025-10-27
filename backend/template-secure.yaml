@@ -103,8 +103,6 @@ Resources:
       MethodSettings:
         - ResourcePath: "/*"
           HttpMethod: "*"
-          LoggingLevel: INFO
-          DataTraceEnabled: false
           MetricsEnabled: true
       # Enable request validation
       DefinitionBody:
@@ -222,6 +220,7 @@ Resources:
   # Associate WAF with API Gateway
   WAFAssociation:
     Type: AWS::WAFv2::WebACLAssociation
+    DependsOn: ContactFormApiprodStage
     Properties:
       ResourceArn: !Sub "arn:aws:apigateway:${AWS::Region}::/restapis/${ContactFormApi}/stages/prod"
       WebACLArn: !GetAtt ContactFormWAF.Arn
