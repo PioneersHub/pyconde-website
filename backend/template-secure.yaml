@@ -56,20 +56,6 @@ Parameters:
     NoEcho: true
     Default: ""
 
-  RateLimitPerMinute:
-    Type: Number
-    Description: Maximum requests per minute per IP (API Gateway throttling)
-    Default: 10
-    MinValue: 1
-    MaxValue: 10000
-
-  BurstLimit:
-    Type: Number
-    Description: Maximum burst requests (API Gateway throttling)
-    Default: 20
-    MinValue: 1
-    MaxValue: 5000
-
 Resources:
   # Lambda Function
   ContactFormFunction:
@@ -101,13 +87,13 @@ Resources:
         Component: ContactForm
         Environment: Production
 
-  # API Gateway with throttling
+  # API Gateway
   ContactFormApi:
     Type: AWS::Serverless::Api
     Properties:
       Name: pyconde-contact-form-api
       StageName: prod
-      Description: PyConDE Contact Form API with rate limiting and security
+      Description: PyConDE Contact Form API with WAF security
       Cors:
         AllowOrigin: "'https://2026.pycon.de,https://pycon.de'"
         AllowMethods: "'POST,OPTIONS,GET'"
@@ -117,9 +103,6 @@ Resources:
       MethodSettings:
         - ResourcePath: "/*"
           HttpMethod: "*"
-          # Throttling settings - protects against DDoS
-          ThrottlingRateLimit: !Ref RateLimitPerMinute
-          ThrottlingBurstLimit: !Ref BurstLimit
           LoggingLevel: INFO
           DataTraceEnabled: false
           MetricsEnabled: true
@@ -156,23 +139,9 @@ Resources:
         Allow: {}
       Description: WAF rules for PyConDE contact form API
       Rules:
-        # Rate limiting rule - 100 requests per 5 minutes per IP
-        - Name: RateLimitRule
-          Priority: 1
-          Statement:
-            RateBasedStatement:
-              Limit: 100
-              AggregateKeyType: IP
-          Action:
-            Block: {}
-          VisibilityConfig:
-            SampledRequestsEnabled: true
-            CloudWatchMetricsEnabled: true
-            MetricName: RateLimitRule
-
         # Block known bad inputs
         - Name: BlockSQLInjection
-          Priority: 2
+          Priority: 1
           Statement:
             SqliMatchStatement:
               FieldToMatch:
@@ -192,7 +161,7 @@ Resources:
 
         # Block XSS attempts
         - Name: BlockXSS
-          Priority: 3
+          Priority: 2
           Statement:
             XssMatchStatement:
               FieldToMatch:
@@ -212,7 +181,7 @@ Resources:
 
         # AWS Managed Rules - Core Rule Set
         - Name: AWSManagedRulesCommonRuleSet
-          Priority: 4
+          Priority: 3
           OverrideAction:
             None: {}
           Statement:
@@ -226,7 +195,7 @@ Resources:
 
         # AWS Managed Rules - Known Bad Inputs
         - Name: AWSManagedRulesKnownBadInputsRuleSet
-          Priority: 5
+          Priority: 4
           OverrideAction:
             None: {}
           Statement:

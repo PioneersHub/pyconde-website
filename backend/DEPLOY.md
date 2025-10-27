@@ -20,14 +20,13 @@ Deploy the contact form API to AWS Lambda for redundant, serverless operation.
 
 - Simple Lambda Function URL
 - Cost: ~$0-2/month
-- No WAF or API Gateway throttling
+- No WAF
 - Use for: Development, low-traffic
 
 **Option 2: Secure** (`template-secure.yaml`) ⭐ **Recommended**
 
 - API Gateway + AWS WAF
 - DDoS, SQL injection, XSS protection
-- Rate limiting: 10 req/min (configurable)
 - Cost: ~$5-10/month
 - Use for: Production, public sites
 
@@ -60,8 +59,6 @@ sam deploy --guided --template-file template-secure.yaml
 - `EmailSender` - Sender email (e.g., `noreply@pycon.de`)
 - `AllowedOrigins` - CORS origins (comma-separated)
 - `ApiKey` - **(Secure only)** Optional API key for extra security
-- `RateLimitPerMinute` - **(Secure only)** Default: 10
-- `BurstLimit` - **(Secure only)** Default: 20
 
 ### Authentication Question
 
@@ -105,7 +102,7 @@ sam deploy --config-file samconfig.toml --config-env secure \
 The `samconfig.toml` file presets:
 - Stack name (without spaces!)
 - AWS region
-- Non-sensitive parameters (site key, emails, domains, rate limits)
+- Non-sensitive parameters (site key, emails, domains)
 - Deployment preferences
 
 **Note:** Stack name must be `pyconde-contact-form` (no trailing spaces or special characters).
@@ -197,7 +194,6 @@ open http://localhost:8000/docs
 ✅ **FastAPI docs disabled** in production (`DEBUG=False`)
 ✅ **Optional API key** authentication (`API_KEY` env var)
 ✅ **AWS WAF** protection (secure template only)
-✅ **API Gateway throttling** (secure template only)
 ✅ **reCAPTCHA v3** verification
 ✅ **Honeypot** detection
 ✅ **CORS** validation
@@ -256,11 +252,6 @@ Error: ValidationError - Value 'pyconde-contact-form -e1bfcfb0-CompanionStack' a
 
 - Ensure frontend includes `X-API-Key` header if `API_KEY` is set
 - To disable: Set `API_KEY=` (empty) or leave blank in SAM parameters
-
-**Rate limiting:**
-
-- Basic template: No rate limiting (rely on reCAPTCHA)
-- Secure template: 10 req/min per IP (adjust in template parameters)
 
 ## Cost Estimate
 

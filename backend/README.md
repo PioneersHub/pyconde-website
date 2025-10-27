@@ -83,8 +83,6 @@ ALLOWED_ORIGINS=https://2026.pycon.de,https://pycon.de,http://localhost:5001
 
 # Debug Mode
 DEBUG=False
-
-# Note: Rate limiting removed for serverless deployment
 ```
 
 ### 3. Configure Google reCAPTCHA
@@ -240,7 +238,6 @@ sam deploy --guided
 - ✅ Auto-scaling and redundancy built-in
 - ✅ Pay-per-request pricing (~$0-5/month)
 - ✅ Multi-AZ by default
-- ✅ No rate limiting complexity
 
 **Files for Lambda deployment:**
 
@@ -318,7 +315,6 @@ curl -X POST http://localhost:8000/api/contact \
 - Request count
 - Error rate
 - Response time
-- Rate limit hits
 - Email delivery success/failure
 
 ## Troubleshooting

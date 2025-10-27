@@ -103,7 +103,6 @@ After deployment, update frontend `api_endpoint` with the output URL.
 - **FastAPI docs disabled** in production (DEBUG=False)
 - **Optional API key** authentication
 - **AWS WAF** protection against DDoS, SQL injection, XSS (secure template)
-- **API Gateway throttling** (10 req/min default)
 - **reCAPTCHA v3** verification
 - **Honeypot** field for bot detection
 - **CORS** validation
@@ -138,11 +137,6 @@ View metrics in AWS Console:
 **API key errors (403):**
 
 - Include `X-API-Key` header in frontend requests if `API_KEY` is set
-
-**Rate limiting:**
-
-- Basic: No rate limiting
-- Secure: 10 req/min (configurable in template parameters)
 
 ## File Structure
 

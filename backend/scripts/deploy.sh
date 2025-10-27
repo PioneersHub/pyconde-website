@@ -58,7 +58,7 @@ fi
 if [[ "$DEPLOY_MODE" == "secure" ]]; then
     TEMPLATE_FILE="template-secure.yaml"
     CONFIG_ENV="secure"
-    info "Deploying SECURE configuration (API Gateway + WAF + Rate Limiting)"
+    info "Deploying SECURE configuration (API Gateway + WAF)"
 else
     TEMPLATE_FILE="template.yaml"
     CONFIG_ENV="default"
@@ -174,7 +174,6 @@ echo ""
 if [[ "$DEPLOY_MODE" == "secure" ]]; then
     info "Security features enabled:"
     echo "  ✓ AWS WAF with DDoS, SQL injection, XSS protection"
-    echo "  ✓ WAF rate limiting (100 req/5min per IP)"
     echo "  ✓ CloudWatch logging and metrics"
 fi
 

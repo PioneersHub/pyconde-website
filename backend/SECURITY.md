@@ -20,17 +20,15 @@ The API implements **defense-in-depth** with multiple security layers:
 ┌─────────────────────────────────────────────────────────┐
 │  Layer 1: AWS WAF (DDoS, SQL Injection, XSS)           │
 ├─────────────────────────────────────────────────────────┤
-│  Layer 2: API Gateway Throttling (Rate Limiting)        │
+│  Layer 2: API Key Middleware (Optional)                 │
 ├─────────────────────────────────────────────────────────┤
-│  Layer 3: API Key Middleware (Optional)                 │
+│  Layer 3: CORS Validation                               │
 ├─────────────────────────────────────────────────────────┤
-│  Layer 4: CORS Validation                               │
+│  Layer 4: Honeypot Detection                            │
 ├─────────────────────────────────────────────────────────┤
-│  Layer 5: Honeypot Detection                            │
+│  Layer 5: reCAPTCHA v3 Verification                     │
 ├─────────────────────────────────────────────────────────┤
-│  Layer 6: reCAPTCHA v3 Verification                     │
-├─────────────────────────────────────────────────────────┤
-│  Layer 7: Input Validation (Pydantic)                   │
+│  Layer 6: Input Validation (Pydantic)                   │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -40,7 +38,7 @@ The API implements **defense-in-depth** with multiple security layers:
 
 **Protection against:**
 
-- DDoS attacks (100 requests per 5 minutes per IP)
+- DDoS attacks
 - SQL injection attempts
 - Cross-site scripting (XSS)
 - Known bad inputs and attack patterns
@@ -50,33 +48,12 @@ The API implements **defense-in-depth** with multiple security layers:
 
 **Key Rules:**
 
-- Rate-based rule: 100 requests / 5 minutes per IP
 - AWS Managed Common Rule Set
 - AWS Managed Known Bad Inputs Rule Set
 - SQL injection pattern matching
 - XSS pattern matching
 
-### Layer 2: API Gateway Throttling
-
-**Protection against:**
-
-- API abuse
-- Request flooding
-- Resource exhaustion
-
-**Default Limits:**
-
-- **Rate Limit:** 10 requests/minute per user
-- **Burst Limit:** 20 requests (for traffic spikes)
-
-**Configurable via SAM parameters:**
-
-```yaml
-RateLimitPerMinute: 10  # Adjust as needed
-BurstLimit: 20          # Adjust as needed
-```
-
-### Layer 3: Optional API Key Authentication
+### Layer 2: Optional API Key Authentication
 
 **Protection against:**
 
@@ -114,7 +91,7 @@ fetch(API_URL, {
 
 ⚠️ **Important:** If API key is enabled, update frontend to include the header, otherwise all requests will be rejected with 403 Forbidden.
 
-### Layer 4: CORS (Cross-Origin Resource Sharing)
+### Layer 3: CORS (Cross-Origin Resource Sharing)
 
 **Protection against:**
 
@@ -133,7 +110,7 @@ fetch(API_URL, {
 - `https://pycon.de`
 - `http://localhost:5001` (development only)
 
-### Layer 5: Honeypot Field
+### Layer 4: Honeypot Field
 
 **Protection against:**
 
@@ -146,7 +123,7 @@ fetch(API_URL, {
 - Must remain empty (humans don't see it)
 - Bots often fill all fields, triggering detection
 
-### Layer 6: Google reCAPTCHA v3
+### Layer 5: Google reCAPTCHA v3
 
 **Protection against:**
 
@@ -160,7 +137,7 @@ fetch(API_URL, {
 - No user interaction required (invisible)
 - Analyzes user behavior patterns
 
-### Layer 7: Input Validation
+### Layer 6: Input Validation
 
 **Protection against:**
 
@@ -191,7 +168,6 @@ fetch(API_URL, {
 ❌ **Cons:**
 
 - No WAF protection
-- No API Gateway throttling
 - Function URL publicly visible
 
 **Suitable for:**
@@ -214,7 +190,6 @@ sam deploy --guided
 ✅ **Pros:**
 
 - Full WAF protection
-- API Gateway throttling
 - Managed rule sets
 - CloudWatch metrics
 - Professional-grade security
@@ -311,27 +286,6 @@ curl -X POST https://your-api-url/api/contact \
 # Response: 200 OK
 ```
 
-### Adjusting Rate Limits
-
-**API Gateway throttling:**
-
-```yaml
-# template-secure.yaml
-Parameters:
-  RateLimitPerMinute:
-    Default: 10  # Adjust this
-  BurstLimit:
-    Default: 20  # Adjust this
-```
-
-**WAF rate limiting:**
-
-```yaml
-# template-secure.yaml
-RateBasedStatement:
-  Limit: 100  # 100 requests per 5 minutes
-```
-
 ## Monitoring & Alerts
 
 ### CloudWatch Metrics
@@ -354,7 +308,6 @@ RateBasedStatement:
 
 - Allowed requests
 - Blocked requests
-- Rate limit violations
 - Rule matches
 
 ### Viewing Logs
@@ -485,8 +438,7 @@ aws cloudwatch put-metric-alarm \
 2. **Temporary Mitigation:**
 
    ```bash
-   # Enable stricter rate limiting (redeploy with lower limits)
-   # Or temporarily enable API key requirement
+   # Temporarily enable API key requirement
 
    # Update Lambda environment variable
    aws lambda update-function-configuration \
@@ -524,7 +476,6 @@ If legitimate users are blocked:
 1. **Check WAF logs** for specific rule matches
 2. **Adjust rule sensitivity** in `template-secure.yaml`
 3. **Whitelist specific patterns** if needed
-4. **Consider raising rate limits** for legitimate use cases
 
 ## Cost Considerations
 
@@ -557,7 +508,6 @@ Before deploying to production:
 - [ ] reCAPTCHA site key and secret configured
 - [ ] Mailgun API key secured (not in git)
 - [ ] Decided on deployment option (basic vs secure)
-- [ ] Reviewed and adjusted rate limits
 - [ ] Considered enabling API key authentication
 - [ ] Set up CloudWatch alarms
 - [ ] Documented API endpoint URL (keep private!)
