@@ -2,6 +2,7 @@
 
 import logging
 from contextlib import asynccontextmanager
+from enum import Enum
 
 from config import settings
 from email_service import EmailServiceError, send_contact_email
@@ -87,6 +88,17 @@ app.add_middleware(
 )
 
 
+class TopicEnum(str, Enum):
+    """Allowed contact form topics."""
+
+    PROGRAM = "Program"
+    TICKETS = "Tickets"
+    SPONSORING = "Sponsoring"
+    FINANCIAL_AID = "Financial Aid"
+    PARTNERING = "Partnering"
+    OTHER = "Other"
+
+
 class ContactFormRequest(BaseModel):
     """Contact form submission request model."""
 
@@ -99,6 +111,10 @@ class ContactFormRequest(BaseModel):
     email: EmailStr = Field(
         ...,
         description="Sender's email address",
+    )
+    topic: TopicEnum = Field(
+        ...,
+        description="Contact topic category",
     )
     subject: str = Field(
         ...,
@@ -196,6 +212,7 @@ async def submit_contact_form(
         await send_contact_email(
             name=form_data.name,
             email=form_data.email,
+            topic=form_data.topic.value,
             subject=form_data.subject,
             message=form_data.message,
         )

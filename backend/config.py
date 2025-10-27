@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     # Email settings
     email_recipient: str = "info26@pycon.de"
     email_sender: str = "noreply@pycon.de"
-    email_subject_prefix: str = "[PyConDE Contact Form]"
+    email_subject_prefix: str = "[Website]"
 
     # Mailgun settings
     mailgun_api_key: str

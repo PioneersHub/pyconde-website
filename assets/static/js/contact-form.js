@@ -18,6 +18,7 @@
   // Form fields
   const nameField = document.getElementById('name');
   const emailField = document.getElementById('email');
+  const topicField = document.getElementById('topic');
   const subjectField = document.getElementById('subject');
   const messageField = document.getElementById('message');
   const honeypotField = document.getElementById('website');
@@ -84,7 +85,7 @@
    * Clear all error messages
    */
   function clearAllErrors() {
-    ['name', 'email', 'subject', 'message', 'recaptcha'].forEach(clearError);
+    ['name', 'email', 'topic', 'subject', 'message', 'recaptcha'].forEach(clearError);
     errorMessage.style.display = 'none';
   }
 
@@ -118,6 +119,12 @@
       isValid = false;
     } else if (!isValidEmail(emailField.value.trim())) {
       showError('email', 'Please enter a valid email address');
+      isValid = false;
+    }
+
+    // Validate topic
+    if (!topicField.value) {
+      showError('topic', 'Please select a topic');
       isValid = false;
     }
 
@@ -225,10 +232,15 @@
     }
 
     // Prepare form data
+    const topic = topicField.value;
+    const subject = subjectField.value.trim();
+    const subjectWithTopic = `[${topic}] ${subject}`;
+
     const formData = {
       name: nameField.value.trim(),
       email: emailField.value.trim(),
-      subject: subjectField.value.trim(),
+      topic: topic,
+      subject: subjectWithTopic,
       message: messageField.value.trim(),
       recaptcha_token: recaptchaToken,
       honeypot: honeypotField.value
@@ -286,6 +298,13 @@
           clearError(this.id);
         }
       });
+    });
+
+    // Clear topic error when selection changes
+    topicField.addEventListener('change', function() {
+      if (this.value) {
+        clearError('topic');
+      }
     });
   }
 

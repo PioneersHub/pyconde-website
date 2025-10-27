@@ -13,13 +13,16 @@ class EmailServiceError(Exception):
     """Raised when email sending fails."""
 
 
-def generate_email_html(name: str, email: str, subject: str, message: str) -> str:
+def generate_email_html(
+    name: str, email: str, topic: str, subject: str, message: str
+) -> str:
     """
     Generate HTML email content for contact form submission.
 
     Args:
         name: Sender's name
         email: Sender's email address
+        topic: Contact topic category
         subject: Subject of the message
         message: Message content
 
@@ -94,6 +97,10 @@ def generate_email_html(name: str, email: str, subject: str, message: str) -> st
                 <div class="value"><a href="mailto:{email}">{email}</a></div>
             </div>
             <div class="field">
+                <div class="label">Topic:</div>
+                <div class="value">{topic}</div>
+            </div>
+            <div class="field">
                 <div class="label">Subject:</div>
                 <div class="value">{subject}</div>
             </div>
@@ -112,13 +119,16 @@ def generate_email_html(name: str, email: str, subject: str, message: str) -> st
     return html
 
 
-def generate_email_text(name: str, email: str, subject: str, message: str) -> str:
+def generate_email_text(
+    name: str, email: str, topic: str, subject: str, message: str
+) -> str:
     """
     Generate plain text email content for contact form submission.
 
     Args:
         name: Sender's name
         email: Sender's email address
+        topic: Contact topic category
         subject: Subject of the message
         message: Message content
 
@@ -133,6 +143,7 @@ PyConDE Contact Form Submission
 
 From: {name}
 Email: {email}
+Topic: {topic}
 Subject: {subject}
 
 Message:
@@ -149,6 +160,7 @@ This message was sent via the PyConDE 2026 contact form.
 async def send_contact_email(
     name: str,
     email: str,
+    topic: str,
     subject: str,
     message: str,
 ) -> bool:
@@ -158,7 +170,8 @@ async def send_contact_email(
     Args:
         name: Sender's name
         email: Sender's email address
-        subject: Subject of the message
+        topic: Contact topic category
+        subject: Subject of the message (already includes topic prefix)
         message: Message content
 
     Returns:
@@ -170,8 +183,8 @@ async def send_contact_email(
     try:
         # Prepare email
         email_subject = f"{settings.email_subject_prefix} {subject}"
-        html_body = generate_email_html(name, email, subject, message)
-        text_body = generate_email_text(name, email, subject, message)
+        html_body = generate_email_html(name, email, topic, subject, message)
+        text_body = generate_email_text(name, email, topic, subject, message)
 
         # Construct Mailgun API URL
         mailgun_url = (
