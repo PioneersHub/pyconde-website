@@ -39,7 +39,5 @@ Automated deployment script for AWS Lambda.
 - `EMAIL_SENDER`
 - `ALLOWED_ORIGINS`
 - `API_KEY` (optional)
-- `RATE_LIMIT_PER_MINUTE` (secure only)
-- `BURST_LIMIT` (secure only)
 
 See [DEPLOY.md](../DEPLOY.md) for more details.

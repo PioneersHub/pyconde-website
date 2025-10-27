@@ -125,12 +125,6 @@ if [[ -n "${API_KEY}" ]]; then
     info "API Key authentication enabled"
 fi
 
-# Add secure template parameters
-if [[ "$DEPLOY_MODE" == "secure" ]]; then
-    PARAMS+=("RateLimitPerMinute=${RATE_LIMIT_PER_MINUTE:-10}")
-    PARAMS+=("BurstLimit=${BURST_LIMIT:-20}")
-fi
-
 # Join parameters with space
 PARAM_STRING=$(IFS=' '; echo "${PARAMS[*]}")
 
@@ -179,9 +173,8 @@ echo ""
 
 if [[ "$DEPLOY_MODE" == "secure" ]]; then
     info "Security features enabled:"
-    echo "  ✓ API Gateway with throttling (${RATE_LIMIT_PER_MINUTE:-10} req/min)"
     echo "  ✓ AWS WAF with DDoS, SQL injection, XSS protection"
-    echo "  ✓ Rate limiting (100 req/5min per IP)"
+    echo "  ✓ WAF rate limiting (100 req/5min per IP)"
     echo "  ✓ CloudWatch logging and metrics"
 fi
 
