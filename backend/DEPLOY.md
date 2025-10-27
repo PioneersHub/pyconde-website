@@ -91,6 +91,9 @@ cd backend
 # Build
 sam build -t template-secure.yaml
 
+# Load all Variables from .env file
+export $(grep -v '^#' .env | xargs)
+
 # Deploy with preset configuration (still need to provide secrets)
 sam deploy --config-file samconfig.toml --config-env secure \
   --parameter-overrides \
@@ -226,6 +229,42 @@ sam build && sam deploy
 ```
 
 ## Troubleshooting
+
+**IAM permissions error:**
+
+```
+User: arn:aws:iam::xxx:user/xxx is not authorized to perform: iam:CreateRole
+```
+
+CloudFormation needs IAM permissions to create the Lambda execution role. Solutions:
+
+1. **Grant IAM permissions** (recommended): Have your AWS administrator attach this policy to your user:
+   ```json
+   {
+     "Version": "2012-10-17",
+     "Statement": [{
+       "Effect": "Allow",
+       "Action": [
+         "iam:CreateRole", "iam:DeleteRole", "iam:PutRolePolicy",
+         "iam:DeleteRolePolicy", "iam:AttachRolePolicy", "iam:DetachRolePolicy",
+         "iam:GetRole", "iam:GetRolePolicy", "iam:PassRole",
+         "iam:TagRole", "iam:UntagRole"
+       ],
+       "Resource": "arn:aws:iam::*:role/pyconde-contact-form-*"
+     }]
+   }
+   ```
+
+2. **Use different AWS profile**: Switch to a user with admin/IAM permissions:
+   ```bash
+   export AWS_PROFILE=admin
+   sam deploy --config-file samconfig.toml --config-env secure ...
+   ```
+
+3. **Clean up failed stack** before retrying:
+   ```bash
+   aws cloudformation delete-stack --stack-name pyconde-contact-form
+   ```
 
 **Stack name validation error:**
 
