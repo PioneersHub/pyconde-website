@@ -159,9 +159,13 @@ if [[ -n "${RECAPTCHA_SITE_KEY}" ]]; then
     PARAMS+=("RecaptchaSiteKey=${RECAPTCHA_SITE_KEY}")
 fi
 
+# Always pass ApiKey parameter (empty or set) to ensure Lambda environment is updated
 if [[ -n "${API_KEY}" ]]; then
     PARAMS+=("ApiKey=${API_KEY}")
     info "API Key authentication enabled"
+else
+    PARAMS+=("ApiKey=")
+    info "API Key authentication disabled"
 fi
 
 # Join parameters with space
