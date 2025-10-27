@@ -11,7 +11,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, EmailStr, Field
 from recaptcha import RecaptchaVerificationError, verify_recaptcha
-from starlette.middleware.base import BaseHTTPMiddleware
 
 # Configure logging
 logging.basicConfig(
@@ -41,42 +40,6 @@ app = FastAPI(
     redoc_url="/redoc" if settings.debug else None,
     openapi_url="/openapi.json" if settings.debug else None,
 )
-
-
-# Security: Optional API Key Middleware
-class APIKeyMiddleware(BaseHTTPMiddleware):
-    """Middleware to validate API key if configured."""
-
-    async def dispatch(self, request: Request, call_next):
-        """Validate API key header if api_key is configured."""
-        # Skip validation if no API key is configured
-        if settings.api_key is None:
-            return await call_next(request)
-
-        # Skip validation for health check and OPTIONS requests
-        if request.url.path == "/health" or request.method == "OPTIONS":
-            return await call_next(request)
-
-        # Validate API key
-        api_key = request.headers.get("X-API-Key")
-        if api_key != settings.api_key:
-            logger.warning(
-                "Invalid or missing API key from %s",
-                request.client.host if request.client else "unknown",
-            )
-            return JSONResponse(
-                status_code=status.HTTP_403_FORBIDDEN,
-                content={
-                    "success": False,
-                    "message": "Invalid or missing API key",
-                },
-            )
-
-        return await call_next(request)
-
-
-# Add security middleware
-app.add_middleware(APIKeyMiddleware)
 
 # Configure CORS
 app.add_middleware(

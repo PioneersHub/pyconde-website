@@ -8,7 +8,7 @@ Globals:
     MemorySize: 512
     Runtime: python3.11
     Architectures:
-      - x86_64
+      - arm64
     Environment:
       Variables:
         DEBUG: "false"
@@ -50,12 +50,6 @@ Parameters:
     Description: Comma-separated list of allowed CORS origins
     Default: "https://2026.pycon.de,https://pycon.de"
 
-  ApiKey:
-    Type: String
-    Description: Optional API key for additional security (leave empty to disable)
-    NoEcho: true
-    Default: ""
-
 Resources:
   # Lambda Function
   ContactFormFunction:
@@ -75,7 +69,6 @@ Resources:
           EMAIL_RECIPIENT: !Ref EmailRecipient
           EMAIL_SENDER: !Ref EmailSender
           ALLOWED_ORIGINS: !Ref AllowedOrigins
-          API_KEY: !Ref ApiKey
       Events:
         ApiEvent:
           Type: Api
@@ -87,8 +80,6 @@ Resources:
         Project: PyConDE
         Component: ContactForm
         Environment: Production
-    Metadata:
-      BuildMethod: python3.11
 
   # API Gateway
   ContactFormApi:

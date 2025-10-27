@@ -38,6 +38,5 @@ Automated deployment script for AWS Lambda.
 - `EMAIL_RECIPIENT`
 - `EMAIL_SENDER`
 - `ALLOWED_ORIGINS`
-- `API_KEY` (optional)
 
 See [DEPLOY.md](../DEPLOY.md) for more details.
