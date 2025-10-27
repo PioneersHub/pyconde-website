@@ -63,6 +63,78 @@ sam deploy --guided --template-file template-secure.yaml
 - `RateLimitPerMinute` - **(Secure only)** Default: 10
 - `BurstLimit` - **(Secure only)** Default: 20
 
+### Authentication Question
+
+During deployment, you'll see:
+
+```
+ContactFormFunction has no authentication. Is this okay? [y/N]:
+```
+
+**Answer: Yes (y)** - This is correct and intentional.
+
+**Why?** This is a public contact form that must be accessible to website visitors without login. Security is handled through multiple layers:
+
+- ✅ **reCAPTCHA v3** - Google bot protection validates every request
+- ✅ **CORS restrictions** - Only allows requests from `2026.pycon.de` and `pycon.de`
+- ✅ **Honeypot field** - Additional bot detection
+- ✅ **Input validation** - Pydantic models validate all data
+- ✅ **Optional API key** - Application-level auth available if needed (via `ApiKey` parameter)
+- ✅ **WAF protection** - (Secure template only) DDoS, SQL injection, XSS protection
+
+AWS authentication (IAM/Cognito) would block public access, which is not desired for a contact form. The current security model follows best practices for public-facing form APIs.
+
+### Using samconfig.toml (Preset Configuration)
+
+To avoid entering parameters manually every time, use the included `samconfig.toml`:
+
+```bash
+cd backend
+
+# Build
+sam build -t template-secure.yaml
+
+# Deploy with preset configuration (still need to provide secrets)
+sam deploy --config-file samconfig.toml --config-env secure \
+  --parameter-overrides \
+    RecaptchaSecretKey=$RECAPTCHA_SECRET_KEY \
+    MailgunApiKey=$MAILGUN_API_KEY \
+    ApiKey=$API_KEY  # Optional
+```
+
+The `samconfig.toml` file presets:
+- Stack name (without spaces!)
+- AWS region
+- Non-sensitive parameters (site key, emails, domains, rate limits)
+- Deployment preferences
+
+**Note:** Stack name must be `pyconde-contact-form` (no trailing spaces or special characters).
+
+### Automated Deployment with deploy.sh
+
+For fully automated deployment, use the included script:
+
+```bash
+cd backend
+
+# Ensure .env file is configured with all values
+cp .env.example .env
+# Edit .env with your actual credentials
+
+# Deploy secure configuration (recommended)
+./scripts/deploy.sh secure
+
+# Or deploy basic configuration
+./scripts/deploy.sh basic
+```
+
+The script will:
+1. Load all parameters from `.env`
+2. Validate required variables
+3. Build the SAM application
+4. Deploy non-interactively
+5. Display the API URL and next steps
+
 ### Subsequent Deploys
 
 ```bash
@@ -158,6 +230,17 @@ sam build && sam deploy
 ```
 
 ## Troubleshooting
+
+**Stack name validation error:**
+
+```
+Error: ValidationError - Value 'pyconde-contact-form -e1bfcfb0-CompanionStack' at 'stackName' failed to satisfy constraint
+```
+
+- Check for **trailing spaces** in your stack name
+- Stack name must match pattern: `[a-zA-Z][-a-zA-Z0-9]*`
+- Use `pyconde-contact-form` exactly (no spaces, no special characters)
+- Solution: Use `samconfig.toml` or `deploy.sh` script to avoid typos
 
 **Docs not accessible:**
 

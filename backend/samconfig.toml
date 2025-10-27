@@ -1,0 +1,68 @@
+# AWS SAM Configuration for PyConDE Contact Form API
+# ===================================================
+# This file contains preset deployment parameters to avoid manual entry during sam deploy.
+#
+# Usage:
+#   sam deploy --config-file samconfig.toml --config-env basic
+#   sam deploy --config-file samconfig.toml --config-env secure
+#
+# Note: Sensitive values (API keys, secrets) should be passed via --parameter-overrides
+# or loaded from .env file. See DEPLOY.md for details.
+
+version = 0.1
+
+[default.global.parameters]
+stack_name = "pyconde-contact-form"
+region = "eu-central-1"
+
+# Basic deployment configuration (template.yaml)
+[default.deploy.parameters]
+template_file = "template.yaml"
+stack_name = "pyconde-contact-form"
+region = "eu-central-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+disable_rollback = true
+resolve_s3 = true
+s3_prefix = "pyconde-contact-form"
+image_repositories = []
+
+# Parameter overrides for basic template
+# Note: RecaptchaSecretKey and MailgunApiKey must be provided via --parameter-overrides
+# because they are sensitive and not stored in this file
+parameter_overrides = [
+    "RecaptchaSiteKey=6LdlpgUrAAAAAERKT-_pzgwzjAIefN14ZErgkzyg",
+    "MailgunDomain=mg.pycon.de",
+    "EmailRecipient=info26@pycon.de",
+    "EmailSender=noreply@pycon.de",
+    "AllowedOrigins=https://2026.pycon.de,https://pycon.de"
+]
+
+# Secure deployment configuration (template-secure.yaml) - RECOMMENDED
+[secure.deploy.parameters]
+template_file = "template-secure.yaml"
+stack_name = "pyconde-contact-form"
+region = "eu-central-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+disable_rollback = true
+resolve_s3 = true
+s3_prefix = "pyconde-contact-form"
+image_repositories = []
+
+# Parameter overrides for secure template with rate limiting and WAF
+# Note: RecaptchaSecretKey, MailgunApiKey, and ApiKey must be provided via --parameter-overrides
+parameter_overrides = [
+    "RecaptchaSiteKey=6LdlpgUrAAAAAERKT-_pzgwzjAIefN14ZErgkzyg",
+    "MailgunDomain=mg.pycon.de",
+    "EmailRecipient=info26@pycon.de",
+    "EmailSender=noreply@pycon.de",
+    "AllowedOrigins=https://2026.pycon.de,https://pycon.de",
+    "RateLimitPerMinute=10",
+    "BurstLimit=20"
+]
+
+# Build parameters (shared across all environments)
+[default.build.parameters]
+cached = true
+parallel = true
