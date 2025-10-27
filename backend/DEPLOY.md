@@ -116,8 +116,7 @@ export $(grep -v '^#' .env | xargs)
 sam deploy --config-file samconfig.toml --config-env secure \
   --parameter-overrides \
     RecaptchaSecretKey=$RECAPTCHA_SECRET_KEY \
-    MailgunApiKey=$MAILGUN_API_KEY \
-    ApiKey=$API_KEY  # Optional
+    MailgunApiKey=$MAILGUN_API_KEY
 ```
 
 The `samconfig.toml` file presets:
