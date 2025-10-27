@@ -153,12 +153,33 @@ The script will:
 4. Deploy non-interactively
 5. Display the API URL and next steps
 
-### Subsequent Deploys
+### Redeploying After Changes
+
+**Quick redeploy (uses existing configuration):**
 
 ```bash
 cd backend
 sam build && sam deploy
 ```
+
+**Full redeploy with deploy.sh (recommended):**
+
+```bash
+cd backend
+./scripts/deploy.sh secure
+```
+
+This will:
+- Rebuild the SAM application
+- Pick up any changes from `.env`
+- Deploy to AWS without prompts
+- Show the updated API URL
+
+**What gets redeployed:**
+- Code changes (Python files, requirements.txt)
+- Template changes (template-secure.yaml)
+- Environment variables (from .env file)
+- Configuration updates (CORS, allowed origins, etc.)
 
 ## Post-Deployment
 
