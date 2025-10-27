@@ -20,8 +20,9 @@ PyCon DE &amp; PyData conference website.
 5. Add a subsite [details](./docs/subsites.md)
 6. Manage sessions (talks, tutorials,…) [details](./docs/pretalx.md)
 7. Manage speaker-information [details](./docs/pretalx.md)
-8. Update the coding [details](./docs/coding.md)
-9. Deploy the website [details](./docs/deployment.md)
+8. Manage contact form [details](./docs/contact_form.md)
+9. Update the coding [details](./docs/coding.md)
+10. Deploy the website [details](./docs/deployment.md)
 
 ---
 
