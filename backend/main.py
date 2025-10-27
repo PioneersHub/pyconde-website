@@ -82,8 +82,8 @@ app.add_middleware(APIKeyMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins,
-    allow_credentials=True,
-    allow_methods=["POST", "OPTIONS"],
+    allow_credentials=False,
+    allow_methods=["POST", "OPTIONS", "GET"],
     allow_headers=["*"],
 )
 
