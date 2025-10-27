@@ -18,7 +18,7 @@ The API implements **defense-in-depth** with multiple security layers:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  Layer 1: AWS WAF (DDoS, SQL Injection, XSS)           │
+│  Layer 1: AWS WAF (DDoS, SQL Injection, XSS)            │
 ├─────────────────────────────────────────────────────────┤
 │  Layer 2: API Key Middleware (Optional)                 │
 ├─────────────────────────────────────────────────────────┤
@@ -71,10 +71,6 @@ The API implements **defense-in-depth** with multiple security layers:
 ```bash
 # Generate a secure API key
 python3 -c "import secrets; print(secrets.token_urlsafe(32))"
-
-# Set in .env or Lambda environment
-API_KEY=your_generated_key_here
-```
 
 **Frontend integration:**
 
@@ -250,26 +246,18 @@ open http://localhost:8000/docs
 python3 -c "import secrets; print(secrets.token_urlsafe(32))"
 ```
 
-2. **Set in environment:**
-
-```bash
-# .env file
-API_KEY=your_generated_key_here
-
-# Or in SAM template parameters
-ApiKey: your_generated_key_here
-```
-
-3. **Update frontend:**
+2. **Update frontend:**
 
 ```javascript
 // Add header to all API requests
 headers: {
-  'X-API-Key': 'your_generated_key_here'
+    'X-API-Key'
+:
+    'your_generated_key_here'
 }
 ```
 
-4. **Test:**
+3. **Test:**
 
 ```bash
 # Without API key (should fail)
@@ -435,18 +423,7 @@ aws cloudwatch put-metric-alarm \
      --statistics Sum
    ```
 
-2. **Temporary Mitigation:**
-
-   ```bash
-   # Temporarily enable API key requirement
-
-   # Update Lambda environment variable
-   aws lambda update-function-configuration \
-     --function-name pyconde-contact-form-api \
-     --environment "Variables={API_KEY=temporary_key_12345,...}"
-   ```
-
-3. **Block Specific IPs (if needed):**
+2. **Block Specific IPs (if needed):**
 
    ```bash
    # Add IP set to WAF
@@ -481,13 +458,13 @@ If legitimate users are blocked:
 
 **Security features cost breakdown:**
 
-| Feature | Cost (Monthly) | Notes |
-|---------|----------------|-------|
-| Lambda invocations | $0-1 | Free tier: 1M requests |
-| API Gateway | $0-2 | $3.50 per million requests |
-| WAF (Base) | $5 | $5/month + $1 per rule |
-| WAF (Requests) | $0-2 | $0.60 per million requests |
-| CloudWatch Logs | $0-1 | First 5GB free |
+| Feature            | Cost (Monthly)  | Notes                          |
+|--------------------|-----------------|--------------------------------|
+| Lambda invocations | $0-1            | Free tier: 1M requests         |
+| API Gateway        | $0-2            | $3.50 per million requests     |
+| WAF (Base)         | $5              | $5/month + $1 per rule         |
+| WAF (Requests)     | $0-2            | $0.60 per million requests     |
+| CloudWatch Logs    | $0-1            | First 5GB free                 |
 | **Total (Secure)** | **$5-10/month** | For typical contact form usage |
 
 **Without WAF (basic template.yaml):** ~$0-2/month
@@ -514,8 +491,3 @@ Before deploying to production:
 - [ ] Tested all security layers
 - [ ] Reviewed WAF rules and tested blocking
 - [ ] Planned incident response procedures
-
----
-
-**Last Updated:** 2025-10-24
-**Security Contact:** [Your security team email]
