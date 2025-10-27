@@ -154,31 +154,46 @@ The script will:
 
 ### Redeploying After Changes
 
-**Quick redeploy (uses existing configuration):**
+**Option 1: Quick redeploy (uses existing configuration)**
 
 ```bash
 cd backend
 sam build && sam deploy
 ```
 
-**Full redeploy with deploy.sh (recommended):**
+**Option 2: Full redeploy with deploy.sh (recommended)**
 
 ```bash
 cd backend
 ./scripts/deploy.sh secure
 ```
 
-This will:
-- Rebuild the SAM application
-- Pick up any changes from `.env`
-- Deploy to AWS without prompts
-- Show the updated API URL
+**Option 3: Container build for maximum compatibility (best practice)**
+
+```bash
+cd backend
+./scripts/deploy.sh secure --use-container
+```
+
+Container builds provide:
+- ✅ Perfect Lambda runtime compatibility
+- ✅ Correct binary dependencies (matches Linux Lambda environment)
+- ✅ No architecture issues (works on Intel, M1/M2/M3, Linux)
+- ✅ Reproducible builds across different development machines
+- ⚠️ Requires Docker Desktop installed and running
+- ⚠️ Slower first build (downloads Lambda container image)
 
 **What gets redeployed:**
 - Code changes (Python files, requirements.txt)
 - Template changes (template-secure.yaml)
 - Environment variables (from .env file)
 - Configuration updates (CORS, allowed origins, etc.)
+
+**When to use container builds:**
+- First deployment to ensure everything works
+- After updating dependencies in requirements.txt
+- When deploying from different machines/architectures
+- For production deployments (most reliable)
 
 ## Post-Deployment
 

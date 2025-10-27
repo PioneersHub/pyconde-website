@@ -5,16 +5,18 @@
 # and deploying to AWS Lambda with minimal user interaction.
 #
 # Usage:
-#   ./scripts/deploy.sh [basic|secure]
+#   ./scripts/deploy.sh [basic|secure] [--use-container]
 #
 # Examples:
-#   ./scripts/deploy.sh secure    # Deploy with template-secure.yaml (recommended)
-#   ./scripts/deploy.sh basic     # Deploy with template.yaml
+#   ./scripts/deploy.sh secure                # Deploy with template-secure.yaml (recommended)
+#   ./scripts/deploy.sh secure --use-container  # Build in Docker container (best practice)
+#   ./scripts/deploy.sh basic                 # Deploy with template.yaml
 #
 # Requirements:
 #   - AWS CLI configured with valid credentials
 #   - AWS SAM CLI installed
 #   - .env file with all required parameters
+#   - Docker Desktop (optional, for --use-container builds)
 
 set -e  # Exit on any error
 
@@ -48,8 +50,18 @@ if [[ ! -f "template.yaml" ]] && [[ ! -f "template-secure.yaml" ]]; then
     error "This script must be run from the backend directory"
 fi
 
-# Parse deployment mode
+# Parse arguments
 DEPLOY_MODE="${1:-secure}"
+USE_CONTAINER=false
+
+# Check for --use-container flag in any position
+for arg in "$@"; do
+    if [[ "$arg" == "--use-container" ]]; then
+        USE_CONTAINER=true
+    fi
+done
+
+# Validate deployment mode
 if [[ "$DEPLOY_MODE" != "basic" ]] && [[ "$DEPLOY_MODE" != "secure" ]]; then
     error "Invalid deployment mode. Use 'basic' or 'secure'"
 fi
@@ -58,16 +70,31 @@ fi
 if [[ "$DEPLOY_MODE" == "secure" ]]; then
     TEMPLATE_FILE="template-secure.yaml"
     CONFIG_ENV="secure"
-    info "Deploying SECURE configuration (API Gateway + WAF)"
+    if [[ "$USE_CONTAINER" == true ]]; then
+        info "Deploying SECURE configuration (API Gateway + WAF) using Docker container"
+    else
+        info "Deploying SECURE configuration (API Gateway + WAF)"
+    fi
 else
     TEMPLATE_FILE="template.yaml"
     CONFIG_ENV="default"
-    info "Deploying BASIC configuration (Lambda Function URL only)"
+    if [[ "$USE_CONTAINER" == true ]]; then
+        info "Deploying BASIC configuration (Lambda Function URL only) using Docker container"
+    else
+        info "Deploying BASIC configuration (Lambda Function URL only)"
+    fi
 fi
 
 # Check for required tools
 command -v sam >/dev/null 2>&1 || error "AWS SAM CLI not found. Install with: brew install aws-sam-cli"
 command -v aws >/dev/null 2>&1 || error "AWS CLI not found. Install with: brew install awscli"
+
+# Check Docker if using container builds
+if [[ "$USE_CONTAINER" == true ]]; then
+    command -v docker >/dev/null 2>&1 || error "Docker not found. Install Docker Desktop from: https://www.docker.com/products/docker-desktop"
+    docker ps >/dev/null 2>&1 || error "Docker daemon not running. Please start Docker Desktop"
+    info "Docker is available and running"
+fi
 
 # Check AWS credentials
 aws sts get-caller-identity >/dev/null 2>&1 || error "AWS credentials not configured. Run: aws configure"
@@ -101,8 +128,13 @@ done
 success "All required environment variables are set"
 
 # Build the SAM application
-info "Building SAM application..."
-sam build -t "$TEMPLATE_FILE" || error "SAM build failed"
+if [[ "$USE_CONTAINER" == true ]]; then
+    info "Building SAM application in Docker container (Lambda-compatible environment)..."
+    sam build -t "$TEMPLATE_FILE" --use-container || error "SAM build failed"
+else
+    info "Building SAM application..."
+    sam build -t "$TEMPLATE_FILE" || error "SAM build failed"
+fi
 success "Build completed"
 
 # Prepare parameter overrides
