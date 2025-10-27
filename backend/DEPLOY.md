@@ -8,11 +8,29 @@ Deploy the contact form API to AWS Lambda for redundant, serverless operation.
 
 ### Prerequisites
 
-- AWS CLI configured with credentials
-- AWS SAM CLI installed: `brew install aws-sam-cli`
-- Python 3.11+
-- Google reCAPTCHA credentials
-- Mailgun API key and domain
+**Required tools:**
+
+1. **AWS CLI** - Install and configure:
+   ```bash
+   # macOS
+   brew install awscli
+
+   # Configure credentials
+   aws configure
+   ```
+
+2. **AWS SAM CLI** - Install:
+   ```bash
+   brew install aws-sam-cli
+   ```
+
+3. **Python 3.11+** - For local development
+
+**Required credentials:**
+
+- AWS account with IAM permissions (see Troubleshooting for required permissions)
+- Google reCAPTCHA site key and secret key
+- Mailgun API key and verified domain
 
 ### Choose Deployment Mode
 
