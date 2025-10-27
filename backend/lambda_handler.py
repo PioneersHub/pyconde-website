@@ -7,8 +7,10 @@ import os
 
 # Check common SAM dependency locations
 deps_paths = [
-    '/var/task/.aws-sam/deps',  # Lambda runtime location
-    '.aws-sam/deps',  # Local testing location
+    '/var/task/.aws-sam/deps',  # Lambda runtime location (non-container builds)
+    '/var/task/.aws-sam/cache',  # Lambda runtime location (container builds)
+    '.aws-sam/deps',  # Local testing location (non-container)
+    '.aws-sam/cache',  # Local testing location (container)
 ]
 
 for deps_base in deps_paths:
