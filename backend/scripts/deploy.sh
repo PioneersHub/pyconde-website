@@ -93,7 +93,14 @@ command -v aws >/dev/null 2>&1 || error "AWS CLI not found. Install with: brew i
 if [[ "$USE_CONTAINER" == true ]]; then
     command -v docker >/dev/null 2>&1 || error "Docker not found. Install Docker Desktop from: https://www.docker.com/products/docker-desktop"
     docker ps >/dev/null 2>&1 || error "Docker daemon not running. Please start Docker Desktop"
-    info "Docker is available and running"
+
+    # Set DOCKER_HOST for macOS if using non-standard socket location
+    if [[ -S "$HOME/.docker/run/docker.sock" ]] && [[ -z "$DOCKER_HOST" ]]; then
+        export DOCKER_HOST="unix://$HOME/.docker/run/docker.sock"
+        info "Docker is available (using socket at $HOME/.docker/run/docker.sock)"
+    else
+        info "Docker is available and running"
+    fi
 fi
 
 # Check AWS credentials
