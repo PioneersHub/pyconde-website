@@ -1,5 +1,8 @@
 {% extends "layout.html" %}
 
+{% set bag_name = bag_name|default('faq') %}
+{% set faq_data = bag(bag_name) %}
+
 {% block body %}
 <div class="subsite">
     <div class="subsite-title">
@@ -12,12 +15,12 @@
 <section class="subsite content-block--blue">
     <div class="content">
         <ol>
-            {% for section in bag('faq').sections|sort(attribute='order') %}
+            {% for section in faq_data.sections|sort(attribute='order') %}
             <li><a href="#{{ section.id }}">{{ section.name }}</a></li>
             {% endfor %}
         </ol>
 
-        {% for section in bag('faq').sections|sort(attribute='order') %}
+        {% for section in faq_data.sections|sort(attribute='order') %}
 
         {% if section.display %}
         <h2 id="{{ section.id }}">{{ section.name }}</h2>
