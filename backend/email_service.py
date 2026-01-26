@@ -5,6 +5,7 @@ from datetime import UTC, datetime
 
 import httpx
 from config import settings
+from topic_email_config import get_recipient_for_topic
 
 logger = logging.getLogger(__name__)
 
@@ -181,6 +182,10 @@ async def send_contact_email(
         EmailServiceError: If email sending fails
     """
     try:
+        # Resolve recipient based on topic
+        recipient = get_recipient_for_topic(topic, settings.email_recipient)
+        logger.info("Routing email for topic '%s' to %s", topic, recipient)
+
         # Prepare email
         email_subject = f"{settings.email_subject_prefix} {subject}"
         html_body = generate_email_html(name, email, topic, subject, message)
@@ -194,7 +199,7 @@ async def send_contact_email(
         # Prepare email data for Mailgun
         email_data = {
             "from": settings.email_sender,
-            "to": settings.email_recipient,
+            "to": recipient,
             "subject": email_subject,
             "text": text_body,
             "html": html_body,
