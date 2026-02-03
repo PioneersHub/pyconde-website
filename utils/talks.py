@@ -28,17 +28,17 @@ def submission_to_talk(sub):
         t["speakers"] += speaker_to_markdown(speaker)
 
     for answer in sub.answers:
-        if answer["question"]["id"] == PYTHON_SKILL_ID:
-            t["python_skill"] = answer["answer"]
-        if answer["question"]["id"] == DOMAIN_EXPERTISE_ID:
-            t["domain_expertise"] = answer["answer"]
+        if answer.question.id == PYTHON_SKILL_ID:
+            t["python_skill"] = answer.answer
+        if answer.question.id == DOMAIN_EXPERTISE_ID:
+            t["domain_expertise"] = answer.answer
 
     if sub.track is not None:
-        t["track"] = re.sub(r"(?i)(pycon|pydata|general): ", "", sub.track.en)
-    if sub.slot is not None:
-        t["room"] = sub.slot.room.en
-        t["start_time"] = sub.slot.start.strftime("%H:%M")
-        t["day"] = calendar.day_name[sub.slot.start.weekday()]
+        t["track"] = re.sub(r"(?i)(pycon|pydata|general): ", "", sub.track.name.en)
+    if sub.slot_count == 1 and sub.slots:
+        t["room"] = sub.slots[0].room.en
+        t["start_time"] = sub.slots[0].start.strftime("%H:%M")
+        t["day"] = calendar.day_name[sub.slots[0].start.weekday()]
 
     return t
 
@@ -46,7 +46,6 @@ def submission_to_talk(sub):
 def speaker_to_markdown(speaker):
     s = {"name": speaker.name}
     s["biography"] = speaker.biography if speaker.biography is not None else ""
-    s["avatar"] = speaker.avatar
     tmpl = Template("""
 ### $name
 
