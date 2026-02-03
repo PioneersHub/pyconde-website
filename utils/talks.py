@@ -9,8 +9,8 @@ from string import Template
 from pydantic import BaseModel
 from pytanis import PretalxClient
 
-PYTHON_SKILL_ID = 4400
-DOMAIN_EXPERTISE_ID = 4399
+PYTHON_SKILL_ID = 6206
+DOMAIN_EXPERTISE_ID = 6205
 
 
 def submission_to_talk(sub):
@@ -127,12 +127,21 @@ def configure_pretalx_client():
 
     class PretalxBasicModel(BaseModel):
         api_token: str | None = None
+        api_version: str | None = None
+        api_base_url: str | None = None
+        timeout: float | None = None
 
     class PytanisBasicConfigModel(BaseModel):
         Pretalx: PretalxBasicModel
 
     cfg = PytanisBasicConfigModel.model_validate(
-        {"Pretalx": {"api_token": pretalx_api_key}}
+        {
+            "Pretalx": {
+                "api_token": pretalx_api_key,
+                "api_version": "",
+                "api_base_url": "https://pretalx.com",
+            }
+        }
     )
     return PretalxClient(config=cfg)
 
