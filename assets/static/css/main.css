@@ -1158,45 +1158,42 @@ a.newsletter.cta {
 .featured-carousel {
     position: relative;
     width: 100%;
+    background: linear-gradient(135deg, var(--blue) 0%, var(--blue-light) 100%);
     overflow: hidden;
-    background-color: var(--blue);
 }
 
-/* Viewport — content-driven height, not aspect-ratio */
+/* Viewport & slides */
 .carousel-viewport {
     position: relative;
     width: 100%;
     overflow: hidden;
+    aspect-ratio: 16 / 9;
+    max-height: 560px;
 }
 
 .carousel-slides {
     position: relative;
     width: 100%;
+    height: 100%;
 }
 
 /* Individual slide — stacked, crossfade via opacity */
 .carousel-slide {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    min-height: 320px;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 600ms ease-in-out, visibility 600ms ease-in-out;
-    background: linear-gradient(135deg, var(--blue) 0%, #2a5f9e 100%);
-}
-
-/* Non-active slides: collapse out of flow */
-.carousel-slide:not(.active) {
     position: absolute;
     top: 0;
     left: 0;
+    width: 100%;
     height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 600ms ease-in-out, visibility 600ms ease-in-out;
+    background: linear-gradient(135deg, var(--blue) 0%, var(--blue-light) 100%);
 }
 
 .carousel-slide.active {
-    position: relative;
     opacity: 1;
     visibility: visible;
     z-index: 2;
@@ -1205,10 +1202,7 @@ a.newsletter.cta {
 /* Background image + gradient overlay */
 .slide-image-container {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     overflow: hidden;
 }
 
@@ -1221,14 +1215,11 @@ a.newsletter.cta {
 
 .slide-image-overlay {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     background: linear-gradient(
         135deg,
-        rgba(55, 120, 190, 0.82) 0%,
-        rgba(42, 95, 158, 0.7) 100%
+        rgba(55, 120, 190, 0.85) 0%,
+        rgba(0, 200, 225, 0.65) 100%
     );
     pointer-events: none;
 }
@@ -1239,10 +1230,9 @@ a.newsletter.cta {
     z-index: 3;
     max-width: var(--content-width-default);
     width: 90%;
-    margin: 0 auto;
     text-align: center;
     color: white;
-    padding: var(--space-xl) var(--space-lg);
+    padding: var(--space-lg);
 }
 
 /* Type badge */
@@ -1251,10 +1241,10 @@ a.newsletter.cta {
     font-size: var(--font-size-xs);
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    padding: 0.35em 1.1em;
+    letter-spacing: 0.08em;
+    padding: 0.4em 1em;
     border-radius: 2em;
-    margin-bottom: var(--space-sm);
+    margin-bottom: var(--space-md);
     background-color: rgba(255, 255, 255, 0.2);
     color: white;
 }
@@ -1266,68 +1256,62 @@ a.newsletter.cta {
 
 .slide-badge--panel {
     background-color: var(--green);
-    color: white;
 }
 
 .slide-badge--talk {
     background-color: var(--pink);
-    color: white;
 }
 
 .slide-badge--workshop {
     background-color: var(--orange);
-    color: white;
 }
 
 /* Speaker name */
 .slide-name {
-    font-size: var(--font-size-xl);
-    font-weight: 600;
-    margin: var(--space-sm) 0 var(--space-xs) 0;
+    font-size: var(--font-size-lg);
+    font-weight: 500;
+    margin: 0 0 var(--space-xs) 0;
     padding: 0;
-    color: white;
+    opacity: 0.95;
 }
 
 /* Talk title */
 .slide-title {
-    font-size: clamp(1.4rem, 2.5vw + 0.5rem, 2rem);
+    font-size: clamp(1.4rem, 3vw, 2.25rem);
     font-weight: 700;
-    line-height: 1.25;
+    line-height: 1.2;
     margin: 0 0 var(--space-sm) 0;
     padding: 0;
     letter-spacing: -0.01em;
-    color: white;
 }
 
 /* Teaser text */
 .slide-teaser {
     font-size: var(--font-size-base);
     line-height: 1.6;
-    margin: var(--space-xs) auto var(--space-md);
-    max-width: 580px;
-    opacity: 0.9;
+    margin: var(--space-sm) auto var(--space-md);
+    max-width: 600px;
+    opacity: 0.95;
     padding: 0;
-    color: white;
 }
 
 /* CTA button */
 .slide-cta {
     display: inline-block;
-    padding: 0.65em 1.8em;
-    background-color: var(--yellow);
+    padding: 0.6em 1.6em;
+    background-color: white;
     color: var(--blue);
     text-decoration: none;
     font-weight: 700;
     font-size: var(--font-size-sm);
-    border: none;
-    transition: background-color 0.2s, transform 0.15s;
+    border: 2px solid white;
+    transition: background-color 0.2s, color 0.2s;
 }
 
 .slide-cta:hover,
 .slide-cta:focus {
-    background-color: white;
-    color: var(--blue);
-    transform: translateY(-2px);
+    background-color: transparent;
+    color: white;
 }
 
 /* ── Carousel controls ── */
@@ -1336,9 +1320,8 @@ a.newsletter.cta {
     align-items: center;
     justify-content: center;
     gap: var(--space-md);
-    padding: var(--space-sm) var(--space-page-margin);
+    padding: var(--space-md) var(--space-page-margin);
     background-color: var(--blue);
-    border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 /* Prev / Next buttons */
@@ -1346,14 +1329,14 @@ a.newsletter.cta {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    border: 2px solid rgba(255, 255, 255, 0.5);
+    width: 44px;
+    height: 44px;
+    border: 2px solid rgba(255, 255, 255, 0.6);
     background: transparent;
     color: white;
     border-radius: 50%;
     cursor: pointer;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: bold;
     transition: border-color 0.2s, background-color 0.2s;
     padding: 0;
@@ -1376,7 +1359,7 @@ a.newsletter.cta {
 /* Dot indicators */
 .carousel-dots {
     display: flex;
-    gap: var(--space-xs);
+    gap: var(--space-sm);
     flex-wrap: wrap;
     justify-content: center;
 }
@@ -1385,15 +1368,15 @@ a.newsletter.cta {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    border: 2px solid rgba(255, 255, 255, 0.4);
+    width: 36px;
+    height: 36px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
     background: transparent;
     color: white;
     border-radius: 50%;
     cursor: pointer;
     font-weight: 600;
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-sm);
     transition: border-color 0.2s, background-color 0.2s;
     padding: 0;
 }
@@ -1409,9 +1392,9 @@ a.newsletter.cta {
 }
 
 .carousel-dot.active {
-    background-color: var(--yellow);
+    background-color: white;
     color: var(--blue);
-    border-color: var(--yellow);
+    border-color: white;
     font-weight: 700;
 }
 
@@ -1430,16 +1413,21 @@ a.newsletter.cta {
 
 /* ── Responsive ── */
 @media screen and (max-width: 768px) {
+    .carousel-viewport {
+        aspect-ratio: 4 / 5;
+        max-height: none;
+    }
+
     .carousel-slide {
-        min-height: 260px;
+        padding: var(--space-md);
     }
 
     .slide-content {
-        padding: var(--space-lg) var(--space-md);
+        padding: var(--space-md);
     }
 
     .slide-title {
-        font-size: clamp(1.15rem, 3.5vw, 1.5rem);
+        font-size: clamp(1.2rem, 4vw, 1.75rem);
     }
 
     .slide-teaser {
@@ -1448,21 +1436,28 @@ a.newsletter.cta {
 
     .carousel-controls {
         gap: var(--space-sm);
-        padding: var(--space-xs) var(--space-page-margin);
+        padding: var(--space-sm) var(--space-page-margin);
+    }
+
+    .carousel-btn {
+        width: 40px;
+        height: 40px;
+    }
+
+    .carousel-dot {
+        width: 32px;
+        height: 32px;
+        font-size: var(--font-size-xs);
     }
 }
 
 @media screen and (max-width: 480px) {
-    .carousel-slide {
-        min-height: 220px;
-    }
-
     .slide-name {
-        font-size: var(--font-size-lg);
+        font-size: var(--font-size-base);
     }
 
     .slide-title {
-        font-size: 1.1rem;
+        font-size: 1.15rem;
     }
 
     .slide-teaser {
