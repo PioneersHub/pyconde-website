@@ -5,6 +5,7 @@
 
 {% block body %}
 
+    {# ── Intro: conference name, dates, location (config-driven) ── #}
     <section class="intro">
         <div class="content">
             <h1>{{ site.config.PROJECT.name }}</h1>
@@ -18,19 +19,9 @@
         </div>
     </section>
 
-    {#    <section class="intro-illustration">#}
-    {#        <lottie-player src="/static/snakes-horizontal.json" speed="1" loop autoplay async></lottie-player>#}
-    {#    </section>#}
-
-    <section class="content-block about">
-        <div class="content">
-            {{ this.about }}
-        </div>
-    </section>
-
+    {# ── Image reel (from promo_pics databag) ── #}
     <section class="content-block about image-reel-section">
             <div class="content">
-
                 <ul class="image-reel">
                 {% for image in bag('promo_pics')['promo_images'] %}
                 <li><img src="{{ image }}" alt="conference image"></li>
@@ -39,97 +30,63 @@
             </div>
     </section>
 
-    <section class="content-block about">
-        <div class="content">
-            {{ this.expect }}
-        </div>
-    </section>
+    {# ── Generic content sections 1–6 ──────────────────────────── #}
+    {#                                                               #}
+    {#  Each section renders only when its content is non-empty.     #}
+    {#  Colors are fixed by position:                                #}
+    {#                                                               #}
+    {#    1  green-light / green                                     #}
+    {#    2  pink-light  / pink                                      #}
+    {#    3  blue-light  / blue                                      #}
+    {#    4  red-light   / red                                       #}
+    {#    5  orange      / yellow                                    #}
+    {#    6  blue-lighter / blue                                     #}
+    {#                                                               #}
+    {#  To reorder homepage content, move text between               #}
+    {#  section_N fields in contents.lr — no template edits needed.  #}
+    {# ──────────────────────────────────────────────────────────── #}
 
-    <section class="content-block--green-light content-block">
-        <div class="content">
-            {{ this.tickets }}
-        </div>
-    </section>
+    {% set section_colors = [
+        {'content': 'green-light', 'cta': 'green'},
+        {'content': 'pink-light',  'cta': 'pink'},
+        {'content': 'blue-light',  'cta': 'blue'},
+        {'content': 'red-light',   'cta': 'red'},
+        {'content': 'orange',      'cta': 'yellow'},
+        {'content': 'blue-lighter','cta': 'blue'}
+    ] %}
 
-    <section class="content-block--green cta">
-        <div class="content">
-            {{ this.tickets_cta }}
-        </div>
-    </section>
+    {% for colors in section_colors %}
+        {% set n = loop.index %}
+        {% set section_content = this['section_' ~ n] %}
+        {% set section_cta = this['section_' ~ n ~ '_cta'] %}
 
-{#    <section class="content-block--blue-light content-block">#}
-{#        <div class="content">#}
-{#            {{ this.call_for_committee_members }}#}
-{#        </div>#}
-{#    </section>#}
+        {% if section_content %}
+        <section class="content-block--{{ colors.content }} content-block">
+            <div class="content">
+                {{ section_content }}
+            </div>
+        </section>
+        {% endif %}
 
-{#    <section class="content-block--blue cta">#}
-{#        <div class="content">#}
-{#            {{ this.call_for_committee_members_cta }}#}
-{#        </div>#}
-{#    </section>#}
+        {% if section_cta %}
+        <section class="content-block--{{ colors.cta }} cta">
+            <div class="content">
+                {{ section_cta }}
+            </div>
+        </section>
+        {% endif %}
+    {% endfor %}
 
-    <section class="content-block--pink-light content-block">
-        <div class="content">
-            {{ this.updates }}
-        </div>
-    </section>
-
-    <section class="content-block--pink cta">
-        <div class="content">
-            {{ this.updates_cta }}
-        </div>
-    </section>
-
-    <section class="content-block">
-        <div class="content">
-            {{ this.call_for_proposals }}
-        </div>
-    </section>
-
-    <section class="content-block--green cta">
-        <div class="content">
-            {{ this.call_for_proposals_cta }}
-        </div>
-    </section>
-
-    <section class="content-block--blue-light content-block">
-        <div class="content">
-            {{ this.financial_aid }}
-        </div>
-    </section>
-
-    <section class="content-block--blue cta">
-        <div class="content">
-            {{ this.financial_aid_cta }}
-        </div>
-    </section>
-
-
-    <section class="content-block--red-light content-block">
-        <div class="content">
-            {{ this.sponsoring }}
-        </div>
-    </section>
-
-    <section class="content-block--red cta">
-        <div class="content">
-            {{ this.sponsoring_cta }}
-        </div>
-    </section>
-
+    {# ── Sponsors (from sponsors databag via macro) ── #}
     <section class="sponsors content-block">
         <div class="content">
-            {#            <h3>Our Sponsors</h3>#}
         </div>
-
         <div class="content">
             {{ render_sponsors_list() }}
         </div>
     </section>
 
-
-
+    {# ── Previous editions ── #}
     <section class="content-block">
         <div class="content">
             {{ this.previous_editions }}
