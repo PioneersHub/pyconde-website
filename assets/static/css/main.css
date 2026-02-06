@@ -1150,3 +1150,329 @@ a.newsletter.cta {
     font-weight: bold;
     text-transform: uppercase;
 }
+
+/* ──────────────────────────────────────────────────────────── */
+/* Featured Content Spotlight Carousel                          */
+/* ──────────────────────────────────────────────────────────── */
+
+.featured-carousel {
+    position: relative;
+    width: 100%;
+    background: linear-gradient(135deg, var(--blue) 0%, var(--blue-light) 100%);
+    overflow: hidden;
+}
+
+/* Viewport & slides */
+.carousel-viewport {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    max-height: 560px;
+}
+
+.carousel-slides {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Individual slide — stacked, crossfade via opacity */
+.carousel-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 600ms ease-in-out, visibility 600ms ease-in-out;
+    background: linear-gradient(135deg, var(--blue) 0%, var(--blue-light) 100%);
+}
+
+.carousel-slide.active {
+    opacity: 1;
+    visibility: visible;
+    z-index: 2;
+}
+
+/* Background image + gradient overlay */
+.slide-image-container {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+.slide-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+}
+
+.slide-image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(55, 120, 190, 0.85) 0%,
+        rgba(0, 200, 225, 0.65) 100%
+    );
+    pointer-events: none;
+}
+
+/* Slide content */
+.slide-content {
+    position: relative;
+    z-index: 3;
+    max-width: var(--content-width-default);
+    width: 90%;
+    text-align: center;
+    color: white;
+    padding: var(--space-lg);
+}
+
+/* Type badge */
+.slide-badge {
+    display: inline-block;
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.4em 1em;
+    border-radius: 2em;
+    margin-bottom: var(--space-md);
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.slide-badge--keynote {
+    background-color: var(--yellow);
+    color: var(--blue);
+}
+
+.slide-badge--panel {
+    background-color: var(--green);
+}
+
+.slide-badge--talk {
+    background-color: var(--pink);
+}
+
+.slide-badge--workshop {
+    background-color: var(--orange);
+}
+
+/* Speaker name */
+.slide-name {
+    font-size: var(--font-size-lg);
+    font-weight: 500;
+    margin: 0 0 var(--space-xs) 0;
+    padding: 0;
+    opacity: 0.95;
+}
+
+/* Talk title */
+.slide-title {
+    font-size: clamp(1.4rem, 3vw, 2.25rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0 0 var(--space-sm) 0;
+    padding: 0;
+    letter-spacing: -0.01em;
+}
+
+/* Teaser text */
+.slide-teaser {
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    margin: var(--space-sm) auto var(--space-md);
+    max-width: 600px;
+    opacity: 0.95;
+    padding: 0;
+}
+
+/* CTA button */
+.slide-cta {
+    display: inline-block;
+    padding: 0.6em 1.6em;
+    background-color: white;
+    color: var(--blue);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: var(--font-size-sm);
+    border: 2px solid white;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.slide-cta:hover,
+.slide-cta:focus {
+    background-color: transparent;
+    color: white;
+}
+
+/* ── Carousel controls ── */
+.carousel-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-page-margin);
+    background-color: var(--blue);
+}
+
+/* Prev / Next buttons */
+.carousel-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    background: transparent;
+    color: white;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: bold;
+    transition: border-color 0.2s, background-color 0.2s;
+    padding: 0;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.carousel-btn:hover,
+.carousel-btn:focus {
+    background-color: white;
+    color: var(--blue);
+    border-color: white;
+}
+
+.carousel-btn:focus {
+    outline: 2px solid var(--yellow);
+    outline-offset: 2px;
+}
+
+/* Dot indicators */
+.carousel-dots {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.carousel-dot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    background: transparent;
+    color: white;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    transition: border-color 0.2s, background-color 0.2s;
+    padding: 0;
+}
+
+.carousel-dot:hover {
+    border-color: white;
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.carousel-dot:focus {
+    outline: 2px solid var(--yellow);
+    outline-offset: 2px;
+}
+
+.carousel-dot.active {
+    background-color: white;
+    color: var(--blue);
+    border-color: white;
+    font-weight: 700;
+}
+
+/* Screen-reader-only utility */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ── Responsive ── */
+@media screen and (max-width: 768px) {
+    .carousel-viewport {
+        aspect-ratio: 4 / 5;
+        max-height: none;
+    }
+
+    .carousel-slide {
+        padding: var(--space-md);
+    }
+
+    .slide-content {
+        padding: var(--space-md);
+    }
+
+    .slide-title {
+        font-size: clamp(1.2rem, 4vw, 1.75rem);
+    }
+
+    .slide-teaser {
+        font-size: var(--font-size-sm);
+    }
+
+    .carousel-controls {
+        gap: var(--space-sm);
+        padding: var(--space-sm) var(--space-page-margin);
+    }
+
+    .carousel-btn {
+        width: 40px;
+        height: 40px;
+    }
+
+    .carousel-dot {
+        width: 32px;
+        height: 32px;
+        font-size: var(--font-size-xs);
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .slide-name {
+        font-size: var(--font-size-base);
+    }
+
+    .slide-title {
+        font-size: 1.15rem;
+    }
+
+    .slide-teaser {
+        font-size: var(--font-size-xs);
+    }
+
+    .slide-cta {
+        padding: 0.5em 1.2em;
+        font-size: var(--font-size-xs);
+    }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+    .carousel-slide {
+        transition: none;
+    }
+}

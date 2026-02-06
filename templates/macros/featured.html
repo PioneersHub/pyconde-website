@@ -1,0 +1,102 @@
+{#
+  Featured Content Spotlight Carousel
+  ────────────────────────────────────
+  Data-driven carousel that showcases keynotes, panels, talks, workshops.
+  Content comes from databags/featured.yaml — no template edits needed.
+
+  Usage:
+    {% from "macros/featured.html" import render_featured_carousel %}
+    {{ render_featured_carousel() }}
+#}
+
+{% macro render_featured_carousel() %}
+
+{% set items = bag('featured')['featured_items'] %}
+
+{% if items and items|length > 0 %}
+
+<section class="featured-carousel" aria-roledescription="carousel" aria-label="Featured speakers and sessions">
+
+  {# ── Slides ── #}
+  <div class="carousel-viewport" aria-live="polite">
+    <div class="carousel-slides" id="carousel-slides">
+
+      {% for item in items %}
+      <article
+        class="carousel-slide{% if loop.first %} active{% endif %}"
+        role="group"
+        aria-roledescription="slide"
+        aria-label="Slide {{ loop.index }} of {{ items|length }}: {{ item.name }}"
+        tabindex="0"
+      >
+
+        {% if item.image %}
+        <div class="slide-image-container">
+          <img
+            src="{{ item.image }}"
+            alt="{{ item.image_alt or item.name }}"
+            class="slide-image"
+            loading="lazy"
+          />
+          <div class="slide-image-overlay"></div>
+        </div>
+        {% endif %}
+
+        <div class="slide-content">
+          <span class="slide-badge slide-badge--{{ item.type }}">
+            {{ item.type|capitalize }}
+          </span>
+          <h3 class="slide-name">{{ item.name }}</h3>
+          <h2 class="slide-title">{{ item.title }}</h2>
+          <p class="slide-teaser">{{ item.teaser }}</p>
+          {% if item.link_url %}
+          <a href="{{ item.link_url }}" class="slide-cta">
+            {{ item.link_text or 'Learn more' }}
+          </a>
+          {% endif %}
+        </div>
+
+      </article>
+      {% endfor %}
+
+    </div>
+  </div>
+
+  {# ── Controls (only if more than one slide) ── #}
+  {% if items|length > 1 %}
+  <nav class="carousel-controls" aria-label="Carousel navigation">
+
+    <button class="carousel-btn carousel-btn--prev" aria-label="Previous slide">
+      <span aria-hidden="true">&#8592;</span>
+    </button>
+
+    <div class="carousel-dots" role="tablist" aria-label="Slide selection">
+      {% for item in items %}
+      <button
+        class="carousel-dot{% if loop.first %} active{% endif %}"
+        role="tab"
+        aria-label="Go to slide {{ loop.index }}: {{ item.name }}"
+        aria-selected="{{ 'true' if loop.first else 'false' }}"
+        data-index="{{ loop.index0 }}"
+        tabindex="{{ 0 if loop.first else -1 }}"
+      >{{ loop.index }}</button>
+      {% endfor %}
+    </div>
+
+    <button class="carousel-btn carousel-btn--next" aria-label="Next slide">
+      <span aria-hidden="true">&#8594;</span>
+    </button>
+
+  </nav>
+
+  {# Screen reader status #}
+  <div class="sr-only" aria-live="polite" aria-atomic="true" id="carousel-status">
+    Slide 1 of {{ items|length }}
+  </div>
+  {% endif %}
+
+</section>
+
+{% endif %}
+
+{% endmacro %}
