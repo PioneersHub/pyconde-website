@@ -1167,23 +1167,18 @@ a.newsletter.cta {
     position: relative;
     width: 100%;
     overflow: hidden;
-    aspect-ratio: 16 / 9;
-    max-height: 560px;
 }
 
 .carousel-slides {
     position: relative;
     width: 100%;
-    height: 100%;
 }
 
-/* Individual slide — stacked, crossfade via opacity */
+/* Individual slide — stacked, crossfade via opacity.
+   Active slide stays in flow to set container height;
+   non-active slides are absolutely positioned on top. */
 .carousel-slide {
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
-    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1193,35 +1188,29 @@ a.newsletter.cta {
     background: linear-gradient(135deg, var(--blue) 0%, var(--blue-light) 100%);
 }
 
+.carousel-slide:not(.active) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+}
+
 .carousel-slide.active {
+    position: relative;
     opacity: 1;
     visibility: visible;
     z-index: 2;
 }
 
-/* Background image + gradient overlay */
-.slide-image-container {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-}
-
+/* Headshot / session image — square, centered above text */
 .slide-image {
-    width: 100%;
-    height: 100%;
+    display: block;
+    width: 160px;
+    height: 160px;
     object-fit: cover;
     object-position: center top;
-}
-
-.slide-image-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        135deg,
-        rgba(55, 120, 190, 0.85) 0%,
-        rgba(0, 200, 225, 0.65) 100%
-    );
-    pointer-events: none;
+    margin: 0 auto var(--space-md);
+    border: 3px solid rgba(255, 255, 255, 0.5);
 }
 
 /* Slide content */
@@ -1413,9 +1402,9 @@ a.newsletter.cta {
 
 /* ── Responsive ── */
 @media screen and (max-width: 768px) {
-    .carousel-viewport {
-        aspect-ratio: 4 / 5;
-        max-height: none;
+    .slide-image {
+        width: 120px;
+        height: 120px;
     }
 
     .carousel-slide {
@@ -1452,6 +1441,11 @@ a.newsletter.cta {
 }
 
 @media screen and (max-width: 480px) {
+    .slide-image {
+        width: 100px;
+        height: 100px;
+    }
+
     .slide-name {
         font-size: var(--font-size-base);
     }
