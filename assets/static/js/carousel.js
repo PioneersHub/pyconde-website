@@ -1,44 +1,47 @@
 /**
- * Featured Content Spotlight Carousel
- * ────────────────────────────────────
- * Multi-item sliding carousel for the PyCon DE 2026 homepage.
+ * Reusable Carousel Component
+ * ────────────────────────────
+ * Multi-instance, dual-mode carousel for the PyCon DE 2026 website.
  *
- * Desktop (>768px): 3 cards visible, slides 1 item at a time
- * Mobile  (≤768px): 1 card visible, slides 1 item at a time
+ * Modes:
+ *   "multi"     — 3 cards on desktop (>768px), 1 on mobile, translateX sliding
+ *   "spotlight"  — 1 slide at a time, opacity crossfade
  *
- * - Auto-advances every 7 seconds
- * - Random initial position on page load
- * - Pauses on hover / focus, resumes on leave
- * - Keyboard navigation (← → Home End)
- * - Touch / swipe support
- * - Responsive: recalculates on window resize
- * - Respects prefers-reduced-motion
- * - Graceful degradation: exits silently if no carousel on page
+ * Set mode via data-carousel-mode attribute on the root element.
+ * Each carousel is identified by data-carousel-id (supports multiple on one page).
+ *
+ * Features (both modes):
+ *   - Auto-advances every 7 seconds
+ *   - Random initial position on page load
+ *   - Pauses on hover / focus, resumes on leave
+ *   - Keyboard navigation (← → Home End)
+ *   - Touch / swipe support
+ *   - Respects prefers-reduced-motion
+ *   - Graceful degradation: skips if no carousel elements found
  */
 
 (function () {
   'use strict';
 
-  var INTERVAL = 7000;       // ms between auto-advance
-  var SWIPE_THRESHOLD = 50;  // px minimum for a swipe
+  var INTERVAL = 7000;
+  var SWIPE_THRESHOLD = 50;
   var DESKTOP_VISIBLE = 3;
   var MOBILE_VISIBLE = 1;
-  var BREAKPOINT = 768;      // px — matches CSS media query
+  var BREAKPOINT = 768;
 
-  function FeaturedCarousel() {
-    this.el = document.querySelector('.featured-carousel');
-    if (!this.el) return;
+  // ── Constructor ──
 
-    this.track = this.el.querySelector('.carousel-slides');
-    this.slides = Array.prototype.slice.call(
-      this.el.querySelectorAll('.carousel-slide')
-    );
-    this.dots = Array.prototype.slice.call(
-      this.el.querySelectorAll('.carousel-dot')
-    );
-    this.prevBtn = this.el.querySelector('.carousel-btn--prev');
-    this.nextBtn = this.el.querySelector('.carousel-btn--next');
-    this.status = document.getElementById('carousel-status');
+  function Carousel(el) {
+    this.el = el;
+    this.id = el.getAttribute('data-carousel-id') || 'carousel';
+    this.mode = el.getAttribute('data-carousel-mode') || 'multi';
+
+    this.track = el.querySelector('.carousel-slides');
+    this.slides = Array.prototype.slice.call(el.querySelectorAll('.carousel-slide'));
+    this.dots = Array.prototype.slice.call(el.querySelectorAll('.carousel-dot'));
+    this.prevBtn = el.querySelector('.carousel-btn--prev');
+    this.nextBtn = el.querySelector('.carousel-btn--next');
+    this.status = document.getElementById('carousel-status-' + this.id);
 
     if (this.slides.length === 0) return;
 
@@ -52,26 +55,27 @@
     this._init();
   }
 
-  /** How many cards are visible at current viewport width */
-  FeaturedCarousel.prototype._visibleCount = function () {
+  // ── Visible count (mode-aware) ──
+
+  Carousel.prototype._visibleCount = function () {
+    if (this.mode === 'spotlight') return 1;
     return window.innerWidth > BREAKPOINT ? DESKTOP_VISIBLE : MOBILE_VISIBLE;
   };
 
-  /** Maximum value for this.current (leftmost visible index) */
-  FeaturedCarousel.prototype._maxPosition = function () {
+  Carousel.prototype._maxPosition = function () {
     return Math.max(0, this.slides.length - this._visibleCount());
   };
 
-  FeaturedCarousel.prototype._init = function () {
-    // Random start position
+  // ── Init ──
+
+  Carousel.prototype._init = function () {
     if (this.slides.length > 1) {
       this.current = Math.floor(Math.random() * (this._maxPosition() + 1));
-      this._update(true); // instant (no transition) on first render
+      this._update(true);
     }
 
     var self = this;
 
-    // Button listeners
     if (this.prevBtn) {
       this.prevBtn.addEventListener('click', function () { self.prev(); });
     }
@@ -79,26 +83,21 @@
       this.nextBtn.addEventListener('click', function () { self.next(); });
     }
 
-    // Dot listeners
     this.dots.forEach(function (dot, i) {
       dot.addEventListener('click', function () { self.goTo(i); });
       dot.addEventListener('keydown', function (e) { self._handleDotKey(e, i); });
     });
 
-    // Pause on hover / focus
     this.el.addEventListener('mouseenter', function () { self.pause(); });
     this.el.addEventListener('mouseleave', function () { self.resume(); });
     this.el.addEventListener('focusin',    function () { self.pause(); });
     this.el.addEventListener('focusout',   function () { self.resume(); });
-
-    // Keyboard navigation on the carousel region
     this.el.addEventListener('keydown', function (e) { self._handleKey(e); });
 
     // Touch / swipe
     this.el.addEventListener('touchstart', function (e) {
       if (e.touches.length === 1) self.touchStartX = e.touches[0].clientX;
     }, { passive: true });
-
     this.el.addEventListener('touchend', function (e) {
       if (e.changedTouches.length !== 1) return;
       var diff = self.touchStartX - e.changedTouches[0].clientX;
@@ -107,19 +106,20 @@
       }
     }, { passive: true });
 
-    // Recalculate on resize (clamp position if viewport changed)
-    var resizeTimeout;
-    window.addEventListener('resize', function () {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(function () {
-        if (self.current > self._maxPosition()) {
-          self.current = self._maxPosition();
-        }
-        self._update(true);
-      }, 150);
-    });
+    // Resize handler (multi mode recalculates visible count)
+    if (this.mode === 'multi') {
+      var resizeTimeout;
+      window.addEventListener('resize', function () {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(function () {
+          if (self.current > self._maxPosition()) {
+            self.current = self._maxPosition();
+          }
+          self._update(true);
+        }, 150);
+      });
+    }
 
-    // Start auto-advance
     if (!this.reducedMotion) {
       this._startTimer();
     }
@@ -127,21 +127,21 @@
 
   // ── Navigation ──
 
-  FeaturedCarousel.prototype.next = function () {
+  Carousel.prototype.next = function () {
     var max = this._maxPosition();
     this.current = this.current >= max ? 0 : this.current + 1;
     this._update();
     this._resetTimer();
   };
 
-  FeaturedCarousel.prototype.prev = function () {
+  Carousel.prototype.prev = function () {
     var max = this._maxPosition();
     this.current = this.current <= 0 ? max : this.current - 1;
     this._update();
     this._resetTimer();
   };
 
-  FeaturedCarousel.prototype.goTo = function (index) {
+  Carousel.prototype.goTo = function (index) {
     var max = this._maxPosition();
     this.current = Math.max(0, Math.min(index, max));
     this._update();
@@ -150,7 +150,7 @@
 
   // ── Timer ──
 
-  FeaturedCarousel.prototype._startTimer = function () {
+  Carousel.prototype._startTimer = function () {
     var self = this;
     this.timer = setInterval(function () {
       var max = self._maxPosition();
@@ -159,125 +159,131 @@
     }, INTERVAL);
   };
 
-  FeaturedCarousel.prototype._resetTimer = function () {
+  Carousel.prototype._resetTimer = function () {
     this.pause();
     if (!this.reducedMotion) this._startTimer();
   };
 
-  FeaturedCarousel.prototype.pause = function () {
-    if (this.timer) {
-      clearInterval(this.timer);
-      this.timer = null;
-    }
+  Carousel.prototype.pause = function () {
+    if (this.timer) { clearInterval(this.timer); this.timer = null; }
   };
 
-  FeaturedCarousel.prototype.resume = function () {
-    if (!this.timer && !this.reducedMotion) {
-      this._startTimer();
-    }
+  Carousel.prototype.resume = function () {
+    if (!this.timer && !this.reducedMotion) this._startTimer();
   };
 
-  // ── Update DOM ──
+  // ── Update DOM (mode-aware) ──
 
-  FeaturedCarousel.prototype._update = function (instant) {
+  Carousel.prototype._update = function (instant) {
+    if (this.mode === 'spotlight') {
+      this._updateSpotlight();
+    } else {
+      this._updateMulti(instant);
+    }
+    this._updateDots();
+    this._updateStatus();
+  };
+
+  /** Spotlight: toggle .active class, opacity crossfade */
+  Carousel.prototype._updateSpotlight = function () {
+    var idx = this.current;
+    this.slides.forEach(function (slide, i) {
+      if (i === idx) {
+        slide.classList.add('active');
+      } else {
+        slide.classList.remove('active');
+      }
+    });
+  };
+
+  /** Multi: translateX on track */
+  Carousel.prototype._updateMulti = function (instant) {
     var visible = this._visibleCount();
     var pct = (this.current * 100) / visible;
 
-    // Slide the track
     if (this.track) {
       if (instant) {
         this.track.style.transition = 'none';
         this.track.style.transform = 'translateX(-' + pct + '%)';
-        // Force reflow then restore transition
-        void this.track.offsetHeight;
+        void this.track.offsetHeight; // force reflow
         this.track.style.transition = '';
       } else {
         this.track.style.transform = 'translateX(-' + pct + '%)';
       }
     }
+  };
 
-    // Dots — highlight items that are currently visible
+  /** Dots: spotlight highlights 1, multi highlights visible range */
+  Carousel.prototype._updateDots = function () {
+    var visible = this._visibleCount();
     var start = this.current;
     var end = this.current + visible - 1;
-    var self = this;
+
     this.dots.forEach(function (dot, i) {
-      var isVisible = (i >= start && i <= end);
-      if (isVisible) {
+      var isActive = (i >= start && i <= end);
+      if (isActive) {
         dot.classList.add('active');
       } else {
         dot.classList.remove('active');
       }
-      dot.setAttribute('aria-selected', isVisible ? 'true' : 'false');
+      dot.setAttribute('aria-selected', isActive ? 'true' : 'false');
       dot.tabIndex = (i === start) ? 0 : -1;
     });
+  };
 
-    // Screen reader status
-    if (this.status) {
-      if (visible > 1) {
-        this.status.textContent =
-          'Showing items ' + (start + 1) + ' to ' + (end + 1) +
-          ' of ' + this.slides.length;
-      } else {
-        this.status.textContent =
-          'Slide ' + (this.current + 1) + ' of ' + this.slides.length;
-      }
+  /** Screen reader announcement */
+  Carousel.prototype._updateStatus = function () {
+    if (!this.status) return;
+    var visible = this._visibleCount();
+    if (visible > 1) {
+      this.status.textContent =
+        'Showing items ' + (this.current + 1) + ' to ' +
+        (this.current + visible) + ' of ' + this.slides.length;
+    } else {
+      this.status.textContent =
+        'Slide ' + (this.current + 1) + ' of ' + this.slides.length;
     }
   };
 
   // ── Keyboard ──
 
-  FeaturedCarousel.prototype._handleKey = function (e) {
+  Carousel.prototype._handleKey = function (e) {
     switch (e.key) {
-      case 'ArrowLeft':
-        e.preventDefault();
-        this.prev();
-        break;
-      case 'ArrowRight':
-        e.preventDefault();
-        this.next();
-        break;
-      case 'Home':
-        e.preventDefault();
-        this.goTo(0);
-        break;
-      case 'End':
-        e.preventDefault();
-        this.goTo(this.slides.length - 1);
-        break;
+      case 'ArrowLeft':  e.preventDefault(); this.prev(); break;
+      case 'ArrowRight': e.preventDefault(); this.next(); break;
+      case 'Home':       e.preventDefault(); this.goTo(0); break;
+      case 'End':        e.preventDefault(); this.goTo(this.slides.length - 1); break;
     }
   };
 
-  FeaturedCarousel.prototype._handleDotKey = function (e, index) {
+  Carousel.prototype._handleDotKey = function (e, index) {
     switch (e.key) {
       case 'ArrowLeft':
         e.preventDefault();
-        var prev = index === 0 ? this.dots.length - 1 : index - 1;
-        this.dots[prev].focus();
+        this.dots[index === 0 ? this.dots.length - 1 : index - 1].focus();
         break;
       case 'ArrowRight':
         e.preventDefault();
-        var next = (index + 1) % this.dots.length;
-        this.dots[next].focus();
+        this.dots[(index + 1) % this.dots.length].focus();
         break;
-      case 'Home':
-        e.preventDefault();
-        this.dots[0].focus();
-        break;
-      case 'End':
-        e.preventDefault();
-        this.dots[this.dots.length - 1].focus();
-        break;
+      case 'Home':  e.preventDefault(); this.dots[0].focus(); break;
+      case 'End':   e.preventDefault(); this.dots[this.dots.length - 1].focus(); break;
     }
   };
 
-  // ── Init on DOM ready ──
+  // ── Init all carousels on page ──
+
+  function initAllCarousels() {
+    var els = document.querySelectorAll('[data-carousel-id]');
+    for (var i = 0; i < els.length; i++) {
+      new Carousel(els[i]);
+    }
+  }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () {
-      new FeaturedCarousel();
-    });
+    document.addEventListener('DOMContentLoaded', initAllCarousels);
   } else {
-    new FeaturedCarousel();
+    initAllCarousels();
   }
 
 })();

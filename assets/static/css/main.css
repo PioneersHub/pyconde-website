@@ -1152,56 +1152,34 @@ a.newsletter.cta {
 }
 
 /* ──────────────────────────────────────────────────────────── */
-/* Featured Content Spotlight Carousel                          */
-/* Multi-item: 3 visible on desktop, 1 on mobile               */
+/* Reusable Carousel Component — Base Styles                    */
+/* Shared across all modes: controls, dots, badges, CTA         */
 /* ──────────────────────────────────────────────────────────── */
 
-.featured-carousel {
+.carousel {
     position: relative;
     width: 100%;
     background: linear-gradient(135deg, var(--blue) 0%, var(--blue-light) 100%);
     overflow: hidden;
 }
 
-/* Viewport clips the sliding strip */
 .carousel-viewport {
     position: relative;
     width: 100%;
     overflow: hidden;
 }
 
-/* Flex strip — items in a row, shifted via translateX */
-.carousel-slides {
-    display: flex;
-    transition: transform 400ms ease;
-}
-
-/* Each card takes 1/3 of viewport on desktop */
-.carousel-slide {
-    flex: 0 0 calc(100% / 3);
-    min-width: 0;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    background: transparent;
-}
-
-/* Slide content — compact card layout */
+/* Slide content — shared text + image base */
 .slide-content {
     width: 100%;
     text-align: center;
     color: white;
-    padding: var(--space-md) var(--space-sm);
 }
 
-/* Square image — compact for multi-item view */
 .slide-image {
     display: block;
-    width: 110px;
-    height: 110px;
     object-fit: cover;
     object-position: center top;
-    margin: 0 auto var(--space-xs);
     border: 3px solid rgba(255, 255, 255, 0.5);
 }
 
@@ -1236,21 +1214,19 @@ a.newsletter.cta {
     background-color: var(--orange);
 }
 
-/* Card title */
+.slide-badge--masterclass {
+    background-color: var(--red);
+}
+
 .slide-title {
-    font-size: clamp(1rem, 1.4vw, 1.35rem);
     font-weight: 700;
     line-height: 1.25;
-    margin: 0 0 var(--space-xs) 0;
     padding: 0;
     letter-spacing: -0.01em;
 }
 
-/* Teaser text */
 .slide-teaser {
-    font-size: var(--font-size-sm);
     line-height: 1.45;
-    margin: 0 auto var(--space-xs);
     opacity: 0.92;
     padding: 0;
 }
@@ -1274,7 +1250,7 @@ a.newsletter.cta {
     color: white;
 }
 
-/* ── Carousel controls ── */
+/* ── Carousel controls (shared) ── */
 .carousel-controls {
     display: flex;
     align-items: center;
@@ -1284,7 +1260,6 @@ a.newsletter.cta {
     background-color: var(--blue);
 }
 
-/* Prev / Next buttons */
 .carousel-btn {
     display: flex;
     align-items: center;
@@ -1316,7 +1291,6 @@ a.newsletter.cta {
     outline-offset: 2px;
 }
 
-/* Dot indicators */
 .carousel-dots {
     display: flex;
     gap: var(--space-xs);
@@ -1358,7 +1332,6 @@ a.newsletter.cta {
     font-weight: 700;
 }
 
-/* Screen-reader-only utility */
 .sr-only {
     position: absolute;
     width: 1px;
@@ -1371,32 +1344,71 @@ a.newsletter.cta {
     border: 0;
 }
 
-/* ── Mobile: 1 card visible ── */
+/* ──────────────────────────────────────────────────────────── */
+/* Carousel — "multi" mode                                      */
+/* 3 cards on desktop, 1 on mobile, translateX sliding          */
+/* ──────────────────────────────────────────────────────────── */
+
+.carousel--multi .carousel-slides {
+    display: flex;
+    transition: transform 400ms ease;
+}
+
+.carousel--multi .carousel-slide {
+    flex: 0 0 calc(100% / 3);
+    min-width: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    background: transparent;
+}
+
+.carousel--multi .slide-content {
+    padding: var(--space-md) var(--space-sm);
+}
+
+.carousel--multi .slide-image {
+    width: 110px;
+    height: 110px;
+    margin: 0 auto var(--space-xs);
+}
+
+.carousel--multi .slide-title {
+    font-size: clamp(1rem, 1.4vw, 1.35rem);
+    margin: 0 0 var(--space-xs) 0;
+}
+
+.carousel--multi .slide-teaser {
+    font-size: var(--font-size-sm);
+    margin: 0 auto var(--space-xs);
+}
+
+/* Multi — mobile (1 card visible) */
 @media screen and (max-width: 768px) {
-    .carousel-slide {
+    .carousel--multi .carousel-slide {
         flex: 0 0 100%;
     }
 
-    .slide-content {
+    .carousel--multi .slide-content {
         padding: var(--space-md);
     }
 
-    .slide-image {
+    .carousel--multi .slide-image {
         width: clamp(120px, 30vw, 200px);
         height: clamp(120px, 30vw, 200px);
         margin-bottom: var(--space-sm);
     }
 
-    .slide-title {
+    .carousel--multi .slide-title {
         font-size: clamp(1.2rem, 4vw, 1.75rem);
     }
 
-    .slide-teaser {
+    .carousel--multi .slide-teaser {
         font-size: var(--font-size-base);
         max-width: 500px;
     }
 
-    .slide-cta {
+    .carousel--multi .slide-cta {
         padding: 0.6em 1.6em;
         font-size: var(--font-size-sm);
     }
@@ -1408,23 +1420,104 @@ a.newsletter.cta {
 }
 
 @media screen and (max-width: 480px) {
-    .slide-title {
+    .carousel--multi .slide-title {
         font-size: 1.15rem;
     }
 
-    .slide-teaser {
+    .carousel--multi .slide-teaser {
         font-size: var(--font-size-sm);
     }
 
-    .slide-cta {
+    .carousel--multi .slide-cta {
         padding: 0.5em 1.2em;
         font-size: var(--font-size-xs);
     }
 }
 
-/* ── Reduced motion ── */
+/* ──────────────────────────────────────────────────────────── */
+/* Carousel — "spotlight" mode                                  */
+/* 1 slide at a time, opacity crossfade                         */
+/* ──────────────────────────────────────────────────────────── */
+
+.carousel--spotlight .carousel-slides {
+    position: relative;
+}
+
+.carousel--spotlight .carousel-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    opacity: 0;
+    transition: opacity 600ms ease-in-out;
+    pointer-events: none;
+}
+
+.carousel--spotlight .carousel-slide.active {
+    position: relative;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.carousel--spotlight .slide-content {
+    padding: var(--space-lg);
+}
+
+.carousel--spotlight .slide-image {
+    width: clamp(120px, 18vw, 280px);
+    height: clamp(120px, 18vw, 280px);
+    margin: 0 auto var(--space-sm);
+}
+
+.carousel--spotlight .slide-title {
+    font-size: clamp(1.3rem, 2.5vw, 2rem);
+    margin: 0 0 var(--space-sm) 0;
+}
+
+.carousel--spotlight .slide-teaser {
+    font-size: var(--font-size-base);
+    margin: 0 auto var(--space-sm);
+    max-width: 600px;
+}
+
+.carousel--spotlight .slide-cta {
+    padding: 0.6em 1.6em;
+    font-size: var(--font-size-sm);
+}
+
+/* Spotlight — mobile */
+@media screen and (max-width: 768px) {
+    .carousel--spotlight .slide-content {
+        padding: var(--space-md);
+    }
+
+    .carousel--spotlight .slide-image {
+        width: clamp(120px, 30vw, 200px);
+        height: clamp(120px, 30vw, 200px);
+    }
+
+    .carousel--spotlight .slide-title {
+        font-size: clamp(1.2rem, 4vw, 1.75rem);
+    }
+
+    .carousel--spotlight .slide-teaser {
+        max-width: 500px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .carousel--spotlight .slide-title {
+        font-size: 1.15rem;
+    }
+}
+
+/* ── Reduced motion (both modes) ── */
 @media (prefers-reduced-motion: reduce) {
-    .carousel-slides {
+    .carousel--multi .carousel-slides {
+        transition: none;
+    }
+
+    .carousel--spotlight .carousel-slide {
         transition: none;
     }
 }

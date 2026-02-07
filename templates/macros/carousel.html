@@ -1,25 +1,34 @@
 {#
-  Featured Content Spotlight Carousel
-  ────────────────────────────────────
-  Data-driven carousel that showcases keynotes, panels, talks, workshops.
-  Content comes from databags/featured.yaml — no template edits needed.
+  Reusable Carousel Component
+  ───────────────────────────
+  Data-driven carousel with two display modes:
+    - "multi"     → 3 cards on desktop, 1 on mobile (sliding)
+    - "spotlight"  → 1 slide at a time (crossfade)
 
   Usage:
-    {% from "macros/featured.html" import render_featured_carousel %}
-    {{ render_featured_carousel() }}
+    {% from "macros/carousel.html" import render_carousel %}
+    {{ render_carousel(
+        bag('featured')['featured_items'],
+        carousel_id='featured',
+        mode='multi',
+        section_label='Featured speakers and sessions'
+    ) }}
+
+  Item schema (all databags use the same format):
+    - id, type, name, title, teaser, image, image_alt, link_text, link_url
 #}
 
-{% macro render_featured_carousel() %}
-
-{% set items = bag('featured')['featured_items'] %}
+{% macro render_carousel(items, carousel_id='carousel', mode='multi', section_label='Carousel') %}
 
 {% if items and items|length > 0 %}
 
-<section class="featured-carousel" aria-roledescription="carousel" aria-label="Featured speakers and sessions">
+<section class="carousel carousel--{{ mode }}" aria-roledescription="carousel"
+  aria-label="{{ section_label }}" data-carousel-id="{{ carousel_id }}"
+  data-carousel-mode="{{ mode }}">
 
   {# ── Slides ── #}
   <div class="carousel-viewport" aria-live="polite">
-    <div class="carousel-slides" id="carousel-slides">
+    <div class="carousel-slides" id="carousel-slides-{{ carousel_id }}">
 
       {% for item in items %}
       <article
@@ -59,7 +68,7 @@
 
   {# ── Controls (only if more than one slide) ── #}
   {% if items|length > 1 %}
-  <nav class="carousel-controls" aria-label="Carousel navigation">
+  <nav class="carousel-controls" aria-label="{{ section_label }} navigation">
 
     <button class="carousel-btn carousel-btn--prev" aria-label="Previous slide">
       <span aria-hidden="true">&#8592;</span>
@@ -85,7 +94,8 @@
   </nav>
 
   {# Screen reader status #}
-  <div class="sr-only" aria-live="polite" aria-atomic="true" id="carousel-status">
+  <div class="sr-only" aria-live="polite" aria-atomic="true"
+    id="carousel-status-{{ carousel_id }}">
     Slide 1 of {{ items|length }}
   </div>
   {% endif %}
