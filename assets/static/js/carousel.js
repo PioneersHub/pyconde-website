@@ -1,13 +1,17 @@
 /**
  * Featured Content Spotlight Carousel
  * ────────────────────────────────────
- * Lightweight vanilla JS for the PyCon DE 2026 homepage.
+ * Multi-item sliding carousel for the PyCon DE 2026 homepage.
+ *
+ * Desktop (>768px): 3 cards visible, slides 1 item at a time
+ * Mobile  (≤768px): 1 card visible, slides 1 item at a time
  *
  * - Auto-advances every 7 seconds
- * - Random initial slide on page load
+ * - Random initial position on page load
  * - Pauses on hover / focus, resumes on leave
  * - Keyboard navigation (← → Home End)
  * - Touch / swipe support
+ * - Responsive: recalculates on window resize
  * - Respects prefers-reduced-motion
  * - Graceful degradation: exits silently if no carousel on page
  */
@@ -17,11 +21,15 @@
 
   var INTERVAL = 7000;       // ms between auto-advance
   var SWIPE_THRESHOLD = 50;  // px minimum for a swipe
+  var DESKTOP_VISIBLE = 3;
+  var MOBILE_VISIBLE = 1;
+  var BREAKPOINT = 768;      // px — matches CSS media query
 
   function FeaturedCarousel() {
     this.el = document.querySelector('.featured-carousel');
     if (!this.el) return;
 
+    this.track = this.el.querySelector('.carousel-slides');
     this.slides = Array.prototype.slice.call(
       this.el.querySelectorAll('.carousel-slide')
     );
@@ -44,35 +52,37 @@
     this._init();
   }
 
+  /** How many cards are visible at current viewport width */
+  FeaturedCarousel.prototype._visibleCount = function () {
+    return window.innerWidth > BREAKPOINT ? DESKTOP_VISIBLE : MOBILE_VISIBLE;
+  };
+
+  /** Maximum value for this.current (leftmost visible index) */
+  FeaturedCarousel.prototype._maxPosition = function () {
+    return Math.max(0, this.slides.length - this._visibleCount());
+  };
+
   FeaturedCarousel.prototype._init = function () {
-    // Random start
+    // Random start position
     if (this.slides.length > 1) {
-      this.current = Math.floor(Math.random() * this.slides.length);
-      this._update();
+      this.current = Math.floor(Math.random() * (this._maxPosition() + 1));
+      this._update(true); // instant (no transition) on first render
     }
 
-    // Button listeners
     var self = this;
 
+    // Button listeners
     if (this.prevBtn) {
-      this.prevBtn.addEventListener('click', function () {
-        self.prev();
-      });
+      this.prevBtn.addEventListener('click', function () { self.prev(); });
     }
     if (this.nextBtn) {
-      this.nextBtn.addEventListener('click', function () {
-        self.next();
-      });
+      this.nextBtn.addEventListener('click', function () { self.next(); });
     }
 
     // Dot listeners
     this.dots.forEach(function (dot, i) {
-      dot.addEventListener('click', function () {
-        self.goTo(i);
-      });
-      dot.addEventListener('keydown', function (e) {
-        self._handleDotKey(e, i);
-      });
+      dot.addEventListener('click', function () { self.goTo(i); });
+      dot.addEventListener('keydown', function (e) { self._handleDotKey(e, i); });
     });
 
     // Pause on hover / focus
@@ -82,9 +92,7 @@
     this.el.addEventListener('focusout',   function () { self.resume(); });
 
     // Keyboard navigation on the carousel region
-    this.el.addEventListener('keydown', function (e) {
-      self._handleKey(e);
-    });
+    this.el.addEventListener('keydown', function (e) { self._handleKey(e); });
 
     // Touch / swipe
     this.el.addEventListener('touchstart', function (e) {
@@ -99,6 +107,18 @@
       }
     }, { passive: true });
 
+    // Recalculate on resize (clamp position if viewport changed)
+    var resizeTimeout;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(function () {
+        if (self.current > self._maxPosition()) {
+          self.current = self._maxPosition();
+        }
+        self._update(true);
+      }, 150);
+    });
+
     // Start auto-advance
     if (!this.reducedMotion) {
       this._startTimer();
@@ -108,19 +128,22 @@
   // ── Navigation ──
 
   FeaturedCarousel.prototype.next = function () {
-    this.current = (this.current + 1) % this.slides.length;
+    var max = this._maxPosition();
+    this.current = this.current >= max ? 0 : this.current + 1;
     this._update();
     this._resetTimer();
   };
 
   FeaturedCarousel.prototype.prev = function () {
-    this.current = (this.current - 1 + this.slides.length) % this.slides.length;
+    var max = this._maxPosition();
+    this.current = this.current <= 0 ? max : this.current - 1;
     this._update();
     this._resetTimer();
   };
 
   FeaturedCarousel.prototype.goTo = function (index) {
-    this.current = Math.max(0, Math.min(index, this.slides.length - 1));
+    var max = this._maxPosition();
+    this.current = Math.max(0, Math.min(index, max));
     this._update();
     this._resetTimer();
   };
@@ -130,7 +153,8 @@
   FeaturedCarousel.prototype._startTimer = function () {
     var self = this;
     this.timer = setInterval(function () {
-      self.current = (self.current + 1) % self.slides.length;
+      var max = self._maxPosition();
+      self.current = self.current >= max ? 0 : self.current + 1;
       self._update();
     }, INTERVAL);
   };
@@ -155,34 +179,48 @@
 
   // ── Update DOM ──
 
-  FeaturedCarousel.prototype._update = function () {
-    var idx = this.current;
+  FeaturedCarousel.prototype._update = function (instant) {
+    var visible = this._visibleCount();
+    var pct = (this.current * 100) / visible;
 
-    // Slides
-    this.slides.forEach(function (slide, i) {
-      if (i === idx) {
-        slide.classList.add('active');
+    // Slide the track
+    if (this.track) {
+      if (instant) {
+        this.track.style.transition = 'none';
+        this.track.style.transform = 'translateX(-' + pct + '%)';
+        // Force reflow then restore transition
+        void this.track.offsetHeight;
+        this.track.style.transition = '';
       } else {
-        slide.classList.remove('active');
+        this.track.style.transform = 'translateX(-' + pct + '%)';
       }
-    });
+    }
 
-    // Dots
+    // Dots — highlight items that are currently visible
+    var start = this.current;
+    var end = this.current + visible - 1;
+    var self = this;
     this.dots.forEach(function (dot, i) {
-      var isActive = (i === idx);
-      if (isActive) {
+      var isVisible = (i >= start && i <= end);
+      if (isVisible) {
         dot.classList.add('active');
       } else {
         dot.classList.remove('active');
       }
-      dot.setAttribute('aria-selected', isActive ? 'true' : 'false');
-      dot.tabIndex = isActive ? 0 : -1;
+      dot.setAttribute('aria-selected', isVisible ? 'true' : 'false');
+      dot.tabIndex = (i === start) ? 0 : -1;
     });
 
     // Screen reader status
     if (this.status) {
-      this.status.textContent =
-        'Slide ' + (idx + 1) + ' of ' + this.slides.length;
+      if (visible > 1) {
+        this.status.textContent =
+          'Showing items ' + (start + 1) + ' to ' + (end + 1) +
+          ' of ' + this.slides.length;
+      } else {
+        this.status.textContent =
+          'Slide ' + (this.current + 1) + ' of ' + this.slides.length;
+      }
     }
   };
 

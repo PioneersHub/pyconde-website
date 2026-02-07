@@ -1153,6 +1153,7 @@ a.newsletter.cta {
 
 /* ──────────────────────────────────────────────────────────── */
 /* Featured Content Spotlight Carousel                          */
+/* Multi-item: 3 visible on desktop, 1 on mobile               */
 /* ──────────────────────────────────────────────────────────── */
 
 .featured-carousel {
@@ -1162,66 +1163,46 @@ a.newsletter.cta {
     overflow: hidden;
 }
 
-/* Viewport & slides */
+/* Viewport clips the sliding strip */
 .carousel-viewport {
     position: relative;
     width: 100%;
     overflow: hidden;
 }
 
+/* Flex strip — items in a row, shifted via translateX */
 .carousel-slides {
-    position: relative;
-    width: 100%;
-}
-
-/* Individual slide — stacked, crossfade via opacity.
-   Active slide stays in flow to set container height;
-   non-active slides are absolutely positioned on top. */
-.carousel-slide {
-    width: 100%;
     display: flex;
-    align-items: center;
+    transition: transform 400ms ease;
+}
+
+/* Each card takes 1/3 of viewport on desktop */
+.carousel-slide {
+    flex: 0 0 calc(100% / 3);
+    min-width: 0;
+    display: flex;
+    align-items: flex-start;
     justify-content: center;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 600ms ease-in-out, visibility 600ms ease-in-out;
-    background: linear-gradient(135deg, var(--blue) 0%, var(--blue-light) 100%);
+    background: transparent;
 }
 
-.carousel-slide:not(.active) {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-}
-
-.carousel-slide.active {
-    position: relative;
-    opacity: 1;
-    visibility: visible;
-    z-index: 2;
-}
-
-/* Headshot / session image — fluid square, centered above text */
-.slide-image {
-    display: block;
-    width: clamp(120px, 18vw, 280px);
-    height: clamp(120px, 18vw, 280px);
-    object-fit: cover;
-    object-position: center top;
-    margin: 0 auto var(--space-sm);
-    border: 3px solid rgba(255, 255, 255, 0.5);
-}
-
-/* Slide content */
+/* Slide content — compact card layout */
 .slide-content {
-    position: relative;
-    z-index: 3;
-    max-width: var(--content-width-default);
-    width: 90%;
+    width: 100%;
     text-align: center;
     color: white;
-    padding: var(--space-md);
+    padding: var(--space-md) var(--space-sm);
+}
+
+/* Square image — compact for multi-item view */
+.slide-image {
+    display: block;
+    width: 110px;
+    height: 110px;
+    object-fit: cover;
+    object-position: center top;
+    margin: 0 auto var(--space-xs);
+    border: 3px solid rgba(255, 255, 255, 0.5);
 }
 
 /* Type badge */
@@ -1231,9 +1212,9 @@ a.newsletter.cta {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    padding: 0.4em 1em;
+    padding: 0.3em 0.8em;
     border-radius: 2em;
-    margin-bottom: var(--space-sm);
+    margin-bottom: var(--space-xs);
     background-color: rgba(255, 255, 255, 0.2);
     color: white;
 }
@@ -1255,35 +1236,34 @@ a.newsletter.cta {
     background-color: var(--orange);
 }
 
-/* Talk title */
+/* Card title */
 .slide-title {
-    font-size: clamp(1.4rem, 3vw, 2.25rem);
+    font-size: clamp(1rem, 1.4vw, 1.35rem);
     font-weight: 700;
-    line-height: 1.2;
-    margin: 0 0 var(--space-sm) 0;
+    line-height: 1.25;
+    margin: 0 0 var(--space-xs) 0;
     padding: 0;
     letter-spacing: -0.01em;
 }
 
 /* Teaser text */
 .slide-teaser {
-    font-size: var(--font-size-base);
-    line-height: 1.5;
-    margin: var(--space-xs) auto var(--space-sm);
-    max-width: 600px;
-    opacity: 0.95;
+    font-size: var(--font-size-sm);
+    line-height: 1.45;
+    margin: 0 auto var(--space-xs);
+    opacity: 0.92;
     padding: 0;
 }
 
 /* CTA button */
 .slide-cta {
     display: inline-block;
-    padding: 0.6em 1.6em;
+    padding: 0.45em 1.2em;
     background-color: white;
     color: var(--blue);
     text-decoration: none;
     font-weight: 700;
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
     border: 2px solid white;
     transition: background-color 0.2s, color 0.2s;
 }
@@ -1300,7 +1280,7 @@ a.newsletter.cta {
     align-items: center;
     justify-content: center;
     gap: var(--space-md);
-    padding: var(--space-md) var(--space-page-margin);
+    padding: var(--space-sm) var(--space-page-margin);
     background-color: var(--blue);
 }
 
@@ -1309,14 +1289,14 @@ a.newsletter.cta {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     border: 2px solid rgba(255, 255, 255, 0.6);
     background: transparent;
     color: white;
     border-radius: 50%;
     cursor: pointer;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: bold;
     transition: border-color 0.2s, background-color 0.2s;
     padding: 0;
@@ -1339,7 +1319,7 @@ a.newsletter.cta {
 /* Dot indicators */
 .carousel-dots {
     display: flex;
-    gap: var(--space-sm);
+    gap: var(--space-xs);
     flex-wrap: wrap;
     justify-content: center;
 }
@@ -1348,15 +1328,15 @@ a.newsletter.cta {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border: 2px solid rgba(255, 255, 255, 0.5);
     background: transparent;
     color: white;
     border-radius: 50%;
     cursor: pointer;
     font-weight: 600;
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
     transition: border-color 0.2s, background-color 0.2s;
     padding: 0;
 }
@@ -1391,14 +1371,20 @@ a.newsletter.cta {
     border: 0;
 }
 
-/* ── Responsive ── */
+/* ── Mobile: 1 card visible ── */
 @media screen and (max-width: 768px) {
     .carousel-slide {
-        padding: var(--space-sm);
+        flex: 0 0 100%;
     }
 
     .slide-content {
-        padding: var(--space-sm);
+        padding: var(--space-md);
+    }
+
+    .slide-image {
+        width: clamp(120px, 30vw, 200px);
+        height: clamp(120px, 30vw, 200px);
+        margin-bottom: var(--space-sm);
     }
 
     .slide-title {
@@ -1406,23 +1392,18 @@ a.newsletter.cta {
     }
 
     .slide-teaser {
+        font-size: var(--font-size-base);
+        max-width: 500px;
+    }
+
+    .slide-cta {
+        padding: 0.6em 1.6em;
         font-size: var(--font-size-sm);
     }
 
     .carousel-controls {
         gap: var(--space-sm);
         padding: var(--space-sm) var(--space-page-margin);
-    }
-
-    .carousel-btn {
-        width: 40px;
-        height: 40px;
-    }
-
-    .carousel-dot {
-        width: 32px;
-        height: 32px;
-        font-size: var(--font-size-xs);
     }
 }
 
@@ -1432,7 +1413,7 @@ a.newsletter.cta {
     }
 
     .slide-teaser {
-        font-size: var(--font-size-xs);
+        font-size: var(--font-size-sm);
     }
 
     .slide-cta {
@@ -1443,7 +1424,7 @@ a.newsletter.cta {
 
 /* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
-    .carousel-slide {
+    .carousel-slides {
         transition: none;
     }
 }
