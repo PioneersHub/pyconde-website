@@ -11,8 +11,8 @@
  * Each carousel is identified by data-carousel-id (supports multiple on one page).
  *
  * Features (both modes):
- *   - Auto-advances every 7 seconds
- *   - Random initial position on page load
+ *   - Auto-advances every 5 seconds
+ *   - Random slide order on each page load (always starts at position 0)
  *   - Pauses on hover / focus, resumes on leave
  *   - Keyboard navigation (← → Home End)
  *   - Touch / swipe support
@@ -23,7 +23,7 @@
 (function () {
   'use strict';
 
-  var INTERVAL = 7000;
+  var INTERVAL = 5000;
   var SWIPE_THRESHOLD = 50;
   var DESKTOP_VISIBLE = 3;
   var MOBILE_VISIBLE = 1;
@@ -69,8 +69,25 @@
   // ── Init ──
 
   Carousel.prototype._init = function () {
+    // Shuffle slide order in the DOM (Fisher-Yates)
     if (this.slides.length > 1) {
-      this.current = Math.floor(Math.random() * (this._maxPosition() + 1));
+      var i = this.slides.length;
+      while (i > 1) {
+        var j = Math.floor(Math.random() * i);
+        i--;
+        this.track.insertBefore(this.slides[j], this.slides[i].nextSibling);
+        var tmp = this.slides[i];
+        this.slides[i] = this.slides[j];
+        this.slides[j] = tmp;
+      }
+      // Re-sync dot labels to match the new slide order
+      for (var d = 0; d < this.dots.length && d < this.slides.length; d++) {
+        var name = this.slides[d].getAttribute('aria-label') || '';
+        this.dots[d].setAttribute('aria-label', 'Go to slide ' + (d + 1) + ': ' + name.replace(/^Slide \d+ of \d+:\s*/, ''));
+      }
+    }
+
+    if (this.slides.length > 1) {
       this._update(true);
     }
 
