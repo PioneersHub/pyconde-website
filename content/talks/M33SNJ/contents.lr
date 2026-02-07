@@ -1,0 +1,74 @@
+title: Building Non-Biased Synthetic Datasets: What Actually Works (and What Fails)
+---
+created: 2025-12-29
+---
+code: M33SNJ
+---
+speaker_names: Shiva Banasaz Nouri
+---
+speakers:
+
+
+### Shiva Banasaz Nouri
+
+Shiva Banasaz Nouri is a Senior Data Scientist based in Berlin, Germany, working on applied machine learning with a focus on Python, NLP, computer vision, and generative AI. She builds production-grade AI systems across healthcare, legal, and enterprise domains using open-source technologies.
+
+She is the Berlin Chapter Lead of Women in AI, where she actively fosters community building, knowledge sharing, and inclusive participation in the AI and Python ecosystems.
+
+---
+abstract:
+
+Synthetic data is often presented as an easy fix for missing or sensitive datasets, but in practice, it can silently introduce bias, leakage, and misleading evaluation results. This talk presents a practical, end-to-end pipeline for creating synthetic datasets that are reproducible, task-aligned, and bias-aware. We will walk through design decisions that matter: template-based generation vs. free-form generation, entity balancing, controlling distributional skew, filtering failure cases, and validating dataset quality before training any model. The session emphasizes what actually works in real pipelines, common failure modes that look fine at first glance, and concrete best practices for Python developers to apply when building synthetic datasets for machine learning, NLP, or evaluation.
+---
+full_description:
+
+This talk focuses on the engineering side of synthetic dataset creation, treating data as a first-class artifact rather than a byproduct of modeling. It presents a concrete, reusable pipeline for building synthetic datasets that are reproducible, bias-aware, and suitable for evaluation.
+
+1. Why Synthetic Data Is Not Automatically “Safe”
+We begin by examining common assumptions about synthetic data. While synthetic datasets avoid privacy issues, they often introduce hidden bias, distribution collapse, or label leakage. This section highlights real-world failure modes and explains why many synthetic datasets perform well in benchmarks but fail in practice.
+
+2. What are the Main Properties of Synthetic Data
+		1. Simulated Data
+		2. Anonymized
+		3. Not Copied
+		4. Compliant
+		5. It is based on statistical property of real data.
+
+3. Defining the Task Before Generating Any Data
+A dataset pipeline must start with a clear task definition. We discuss how ambiguous task definitions lead to incoherent data and misleading results, and how to formally specify label semantics, constraints, and negative space before generation begins.
+
+4. Template-Based vs. Free-Form Generation
+This section compares controlled template-based generation with unconstrained LLM prompting. We show why decomposing generation into templates, placeholders, and curated value lists dramatically improves consistency, debuggability, and bias control.
+
+5. Bias Control by Construction
+Rather than detecting bias after the fact, we show how to prevent it during generation. Topics include balanced entity lists, randomized substitution, avoiding demographic collapse, and preventing unintended correlations between labels and surface patterns.
+
+6. Pipeline Architecture and Tooling
+We walk through a practical Python-based pipeline, covering modular generation stages, deterministic sampling, versioning, and reproducibility. Emphasis is placed on making dataset generation repeatable and auditable, just like code.
+
+7. Filtering, Validation, and Quality Gates
+Synthetic data must be filtered aggressively. This section covers structural validation, label consistency checks, distributional sanity checks, and lightweight heuristics that catch most generation errors before model training.
+
+8. Measuring Dataset Difficulty and Coverage
+We discuss simple, task-agnostic ways to estimate dataset diversity and difficulty, ensuring that synthetic data does not collapse into trivially easy examples or overly clean language.
+
+9. What Did Not Work (and Why)
+This section summarizes failed approaches, including direct JSON generation, inline annotation, and large one-shot prompts. Understanding these failures helps avoid repeating common mistakes.
+
+10. When Synthetic Data Is the Right Tool and When It Is Not
+We close with guidance on appropriate use cases for synthetic datasets, their limitations, and how they should complement, not replace, real data and human evaluation.
+---
+room: 
+---
+day: 
+---
+start_time: 
+---
+track: Generative AI & Synthetic Data
+---
+python_skill: None
+---
+domain_expertise: None
+---
+social_card_image: /static/media/social/talks/M33SNJ.png
+
