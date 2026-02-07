@@ -11,14 +11,22 @@
         bag('featured')['featured_items'],
         carousel_id='featured',
         mode='multi',
+        image_dir='featured',
         section_label='Featured speakers and sessions'
     ) }}
+
+  Parameters:
+    items         – list of item dicts (from a databag)
+    carousel_id   – unique ID for this carousel instance (default: 'carousel')
+    mode          – 'multi' (3 cards) or 'spotlight' (1 slide crossfade)
+    image_dir     – subdirectory under /static/media/ for images (default: 'featured')
+    section_label – accessible label for the carousel section
 
   Item schema (all databags use the same format):
     - id, type, name, title, teaser, image, image_alt, link_text, link_url
 #}
 
-{% macro render_carousel(items, carousel_id='carousel', mode='multi', section_label='Carousel') %}
+{% macro render_carousel(items, carousel_id='carousel', mode='multi', image_dir='featured', section_label='Carousel') %}
 
 {% if items and items|length > 0 %}
 
@@ -42,7 +50,7 @@
         <div class="slide-content">
           {% if item.image %}
           <img
-            src="/static/media/featured/{{ item.image }}"
+            src="/static/media/{{ image_dir }}/{{ item.image }}"
             alt="{{ item.image_alt or item.name }}"
             class="slide-image"
             loading="lazy"
