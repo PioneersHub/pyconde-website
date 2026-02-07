@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block title %}{{ this.title }}{% endblock %}
+
+{% block body %}
+<div class="subsite">
+  <div class="subsite-title">
+    <section class="content">
+      <h2>{{ this.title }}</h2>
+        <p>{{ this.notes }}</p>
+    </section>
+  </div>
+</div>
+
+<section class="subsite">
+  <ol class="masterclass-list">
+    {% for child in this.children %}
+    <li>
+      <a href="{{ child|url }}" class="content masterclass-item">
+        {% if child.tags %}
+        <div class="tags">
+          {% for tag in child.tags %}
+          <span class="tag">{{ tag }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+        <span class="masterclass-date">{{ (child.date) }}</span>
+        <h4 class="masterclass-title">{{ child.title }}</h4>
+        <p class="masterclass-trainer">{{ child.trainer }}</p>
+        <p class="masterclass-hours">{{ child.hours }} hours</p>
+      </a>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endblock %}
