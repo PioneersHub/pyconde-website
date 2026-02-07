@@ -35,7 +35,12 @@ def submission_to_talk(sub):
 
     if sub.track is not None:
         t["track"] = re.sub(r"(?i)(pycon|pydata|general): ", "", sub.track.name.en)
-    if sub.slot_count == 1 and sub.slots:
+
+    if sub.slot_count != 1:
+        raise ValueError(
+            f"Talk {sub.title} ({sub.code}) has {sub.slot_count} slots instead of 1!"
+        )
+    if sub.slots:
         t["room"] = sub.slots[0].room.en
         t["start_time"] = sub.slots[0].start.strftime("%H:%M")
         t["day"] = calendar.day_name[sub.slots[0].start.weekday()]
