@@ -20,15 +20,11 @@
     </section>
 
     {# ── Image reel (from promo_pics databag) ── #}
-    <section class="content-block about image-reel-section">
-            <div class="content">
-                <ul class="image-reel">
-                {% for image in bag('promo_pics')['promo_images'] %}
-                <li><img src="{{ image }}" alt="conference image"></li>
-                {% endfor %}
-                </ul>
-            </div>
-    </section>
+    {% from "macros/image-reel.html" import render_image_reel %}
+    {{ render_image_reel(
+        bag('promo_pics')['promo_images'],
+        section_label='Conference photos'
+    ) }}
 
     {# ── Featured content carousel (from featured databag) ── #}
     {% from "macros/carousel.html" import render_carousel %}
