@@ -1,0 +1,52 @@
+{#
+  Hero Statement + Motto Facets
+  ─────────────────────────────
+  Bold conference motto with colored value pills.
+
+  Usage:
+    {% from "macros/hero.html" import render_hero %}
+    {{ render_hero(bag('motto')) }}
+
+  Parameters:
+    motto         – full databag dict with headline, subline, facets
+    section_label – accessible label for the section (default: 'Conference motto')
+
+  Databag schema (motto.yaml):
+    headline: "We get things done."
+    subline: "One-line context..."
+    facets:
+      - text: "together"
+        color: "blue"
+      - text: "Responsible AI"
+        color: "pink"
+
+  Color values:
+    Must match a CSS variable name from the site palette
+    (blue, green, pink, orange, red, blue-light, yellow, etc.)
+#}
+
+{% macro render_hero(motto, section_label='Conference motto') %}
+
+{% if motto and motto.headline %}
+
+<section class="hero" aria-label="{{ section_label }}">
+  <div class="content">
+    <p class="hero__headline">{{ motto.headline }}</p>
+    {% if motto.subline %}
+    <p class="hero__subline">{{ motto.subline }}</p>
+    {% endif %}
+    {% if motto.facets and motto.facets|length > 0 %}
+    <div class="hero__facets" role="list" aria-label="Conference values">
+      {% for facet in motto.facets %}
+      <span class="hero__facet hero__facet--{{ facet.color }}" role="listitem">
+        We get things done: {{ facet.text }}
+      </span>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+{% endif %}
+
+{% endmacro %}

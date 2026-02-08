@@ -6,6 +6,28 @@ Components that render homepage sections are **data-driven** — content comes f
 
 ---
 
+## Hero Statement — `macros/hero.html`
+
+Bold conference motto with colored value pills. Displays the headline, a subline, and a row of facet badges — each linking the motto to a concrete value.
+
+**Usage:**
+
+```jinja2
+{% from "macros/hero.html" import render_hero %}
+{{ render_hero(bag('motto')) }}
+```
+
+**Parameters:**
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `motto` | *(required)* | Full databag dict with `headline`, `subline`, `facets` |
+| `section_label` | `'Conference motto'` | Accessible `aria-label` for the section |
+
+**Databag:** `motto.yaml`. Each facet has a `text` and a `color` (must match a CSS variable name from the site palette).
+
+---
+
 ## Carousel — `macros/carousel.html`
 
 Multi-instance carousel with two display modes. Renders slides from a databag with navigation controls, keyboard support, touch/swipe, auto-advance, and random slide order.
