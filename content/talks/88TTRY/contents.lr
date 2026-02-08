@@ -1,0 +1,59 @@
+title: Sentinel Values in Python: Semantics, Double Dispatch, and the Limits of Typing
+---
+created: 2025-12-18
+---
+code: 88TTRY
+---
+speaker_names: Florian Wilhelm
+---
+speakers:
+
+
+### Florian Wilhelm
+
+Florian is Head of Data Science & Mathematical Modeling at inovex GmbH, an IT project center driven by innovation and quality, focusing its services on ‘Digital Transformation’. He holds a PhD in mathematics, has more than 10 years of experience in predictive & prescriptive analytics use-cases and likes everything math 🤯
+
+---
+abstract:
+
+Python relies heavily on special values such as `None`, `NotImplemented`, `Ellipsis`, and `dataclasses.MISSING`. These values are not incidental: they encode language semantics, enable control flow between objects, and shape API design.
+
+This talk examines sentinel values as a first-class concept in Python. We will look at why None is often the wrong representation for absence, how NotImplemented enables double dispatch in rich comparisons, and where sentinel values appear throughout the standard library.
+
+A central focus is typing. While sentinel values are ubiquitous at runtime, Python currently has no standardized way to express them precisely in type hints. We will examine why Optional, overloads, and Literal fall short, what limited narrowing is possible today, and why creating a “real” custom sentinel with reliable type narrowing is still unsolved.
+
+Finally, we will discuss [PEP 661](https://peps.python.org/pep-0661/), i.e., the deferred proposal to standardize sentinel values and their typing semantics, and what its deferral means in practice. Using real-world examples, including Pydantic’s experimental missing concept, this talk provides a clear mental model for sentinel values and realistic guidance for using them in typed Python codebases today.
+---
+full_description:
+
+Sentinel values are a fundamental but under-documented part of Python’s design. They are used to represent absence, unsupported operations, incomplete state, and to coordinate control flow between objects. Yet, they are often treated as ad-hoc implementation details.
+
+This talk starts by clarifying what sentinel values are and why None is frequently semantically overloaded and incorrect for modelling “missing” or “unset” values. We then examine built-in sentinels such as `NotImplemented`, `Ellipsis`, and `dataclasses.MISSING`, with a detailed look at how `NotImplemented` enables double dispatch in equality and ordering operations.
+
+The second half of the talk focuses on typing, where sentinel values expose fundamental tensions between Python’s dynamic semantics and static type systems. We will discuss:
+
+* why Optional[T] does not mean “unset”
+* why Literal appears attractive for sentinels but rarely works in practice
+* what limited type narrowing is possible today and under which assumptions
+* why a fully reliable, user-defined sentinel with correct narrowing is currently not achievable in a portable way
+
+To ground this in practice, we will look at real-world patterns used in production code, including Pydantic’s experimental missing concept, and explain the trade-offs these designs make.
+
+Finally, we will examine [PEP 661](https://peps.python.org/pep-0661/), the proposal to standardize sentinel values and their typing semantics. We will explain what it would solve, why it was deferred, and what that deferral means for library and API authors today.
+
+The talk concludes with concrete, honest guidelines: when sentinel values are the right tool, how to design APIs around them, and how to communicate absence clearly in typed Python code without pretending the type system can do more than it currently can.
+---
+room: 
+---
+day: 
+---
+start_time: 
+---
+track: Programming & Software Engineering & Testing
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+social_card_image: /static/media/social/talks/88TTRY.png
+

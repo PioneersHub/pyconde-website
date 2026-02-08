@@ -1,0 +1,106 @@
+title: Beyond Kafka and S3: HTTP-Native Bytestreams for Python Data Pipelines
+---
+created: 2026-01-11
+---
+code: HP7DLX
+---
+speaker_names: Johannes Dröge
+---
+speakers:
+
+
+### Johannes Dröge
+
+Johannes holds a PhD in computer science, has developed open-source software, algorithms and statistic methods for genome data analysis, worked as a data scientist, and led a group of data engineers in a mid-size startup. He is currently bootstrapping SaaS infrastructure software projects with a focus on cross-organizational data sharing.
+
+---
+abstract:
+
+Real-time bytestreams between systems in different organizations or secured environments, whether for batch dataset delivery or continuous streaming, are surprisingly hard. Traditional solutions fall short: message brokers like Kafka use discrete messages, file storage like S3 works for batch exchange but lacks streaming and coordination, while HTTP client-server approaches require one side to host and expose server endpoints, introducing security and operational overhead.
+
+This talk introduces the ZebraStream Protocol: an open, HTTP-based bytestream protocol with coordination mechanisms that let you stream data—Parquet files, compressed archives, encrypted content—directly between decoupled systems using Python's file-like interface. No message framing, no server hosting, no exposed endpoints.
+
+We'll explore the design of a bytestream protocol for data sharing and integration that crosses the file-stream boundary, enabling seamless integration with pandas, DuckDB, and any Python library expecting file-like objects, supporting use cases from ETL pipelines to IoT data delivery, cross-org collaboration to home network automation.
+---
+full_description:
+
+Streaming data between systems—whether across organizations, from secured environments, isolated networks, or even home setups—remains a common challenge in modern data engineering and data sharing workflows. This talk introduces the ZebraStream Protocol: an open, HTTP-based bytestream protocol designed specifically for decoupled systems, where both sides act as clients—no server hosting, no exposed endpoints.
+
+### Talk Outline (45 minutes)
+
+**1. The Challenge: Data Sharing Between Decoupled Systems (5 min)**
+- Real-world scenarios: cross-org data exchange, secured environments, isolated networks, home automation, IoT deployments
+- Use cases: ETL pipelines, dataset delivery, continuous monitoring, exploratory data access
+- Current solutions and their limitations:
+  - Message brokers (Kafka): discrete messages, can't coordinate query-response without external notification
+  - File storage (S3/SFTP): batch-oriented, lacks streaming
+  - HTTP client-server: requires endpoint hosting, security overhead
+  - Webhooks: incomplete solution, still needs server hosting
+
+**2. ZebraStream Protocol Overview (6 min)**
+- Why HTTP? Interoperability, evolution (HTTP/2, HTTP/3), standardized infrastructure, firewall-friendly
+- Two-part protocol design:
+  - Data API: HTTP-based bytestream transfer (like UNIX pipes over HTTP)
+  - Connect API: Built-in coordination for push and pull patterns
+- Key properties: client-to-client via relay, zero-trust security model, ephemeral, direct data flow
+
+**3. Why Bytestreams Matter (8 min)**
+- Bytestreams vs. messages: continuous byte flow vs. discrete units
+- Native format streaming: Parquet, compressed archives, encrypted content
+- Supporting event patterns: JSON-lines, CSV within bytestreams
+- Python's file-like interface (`io.IOBase`) as universal abstraction
+- Live demo: Streaming Parquet directly into pandas/DuckDB
+- Live demo: Log streaming like `tail -f`
+
+**4. Coordination for Decoupled Systems (7 min)**
+- The "who initiates when?" problem
+- Symmetric push/pull patterns with same API
+- Coordination within `open()` call
+- Live demo: Event-driven pipeline activation
+
+**5. Python Integration: File-Like Interface (6 min)**
+- Why file-like objects matter: universal Python abstraction
+- Two dimensions of simplicity: language-agnostic HTTP + Python-specific interface
+- Examples: pandas integration, compression layering, encryption composition
+- Stream limitations: seekability and Unix pipe compatibility
+
+**6. Open Protocol Specification & Security Model (5 min)**
+- Open specification: Data API, Connect API, security model
+- Security: TLS transport, bearer token auth, ephemeral design, zero-trust with E2EE
+- End-to-end encryption patterns (application-layer, protocol-agnostic)
+- Comparison with alternatives: Kafka, S3, HTTP client-server (security dimensions)
+- Reference implementation: Python client (open source), ZebraStream.io (managed service)
+
+**7. Real-World Integration Examples (4 min)**
+- **Data engineering:** Cross-org Parquet ETL pipelines with token-based access control
+- **Privacy-preserving data exchange:** End-to-end encrypted datasets (healthcare, research, GDPR compliance)
+- **Operations:** Log streaming and event processing
+- **IoT & Home automation:** Raspberry Pi data delivery from home network without exposed endpoints
+- **Data science:** Ad-hoc dataset sharing for collaborative analysis
+- All examples demonstrated with reproducible Python code (open-source client SDK)
+
+**8. Design Trade-offs & Lessons Learned (3 min)**
+- Lessons from building and dogfooding the protocol in beta
+- Why bytestreams over messages: native format support vs. framing overhead
+- Why ephemeral over persistent: privacy by design, no storage footprint
+- Why HTTP over custom protocol: infrastructure reuse, firewall-friendly
+- Stream limitations: seekability requirement, Unix pipe compatibility rule
+- Future directions: protocol evolution, additional language implementations
+
+**9. Q&A (6 min)**
+- Technical deep-dives and audience questions
+---
+room: 
+---
+day: 
+---
+start_time: 
+---
+track: Data Handling & Data Engineering
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+social_card_image: /static/media/social/talks/HP7DLX.png
+

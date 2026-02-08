@@ -1,0 +1,60 @@
+title: Octopus AutoML: Extracting Signal from Small and High-Dimensional Data
+---
+created: 2025-12-19
+---
+code: 8YTYEN
+---
+speaker_names: Nils Haase, Andreas Wurl
+---
+speakers:
+
+
+### Nils Haase
+
+Nils is Lead Data Scientist at Merck KGaA, Darmstadt, Germany, where he builds and productionizes machine learning solutions in Python. He earned his PhD in Physics from Universität Augsburg and has his background in R&D and material development. This path allows him to bridge domain-heavy lab and engineering problems with modern ML tooling, turning complex industrial data into robust, deployable systems.
+
+### Andreas Wurl
+
+Lead Data Scientist at Merck Healthcare KGaA 
+Clinical Measurement Sciences, Biomarker development
+
+
+see Linkedin
+
+---
+abstract:
+
+Many machine learning tools assume abundant, independent data, rely on a single data split plus cross-validation, and leave test-set separation to the user.
+
+In application-driven domains such as industrial materials science and pharmaceutical development, data are scarce, high-dimensional, and often correlated, creating conditions under which standard ML pipelines frequently fail. Small datasets are highly sensitive to the random seed used for splitting, and common pitfalls such as feature selection before splitting or distributing correlated samples across train and test sets cause data leakage and inflated performance metrics.
+
+Octopus is an open-source Python AutoML library explicitly designed for small-data, high-dimensional regime. It enforces strict nested cross-validation for model and hyperparameter selection, quantifies performance variability across multiple splits, and tightly controls data leakage. Its modular architecture embeds an internal ML engine, several feature selection methods (e.g., MRMR, Boruta), and external AutoML solutions such as AutoGluon into a unified, rigorous validation framework, enabling systematic and fair comparison of methods on limited data. In addition, Octopus supports survival analysis, addressing time-to-event problems common in healthcare and materials science. This talk will use realistic small-scale datasets to illustrate how conventional pipelines can be misleading and how to obtain more reliable models when every sample matters.
+---
+full_description:
+
+Many machine learning tools are based on the quiet assumption that data is plentiful, independent, and identically distributed, and that a random training/testing split, plus a little cross-validation, is “good enough”. In application-driven domains such as pharmaceutical development and industrial materials science, however, this is often not the case. Synthesizing a new compound can take months and early phase clinical trials are small, so we often work with fewer than 1,000 samples and several thousands of features. In this context, standard AutoML practice can be dangerously optimistic.
+
+On small datasets, performance can vary significantly depending on the random seed used for splitting the data. Working with a single split exposes us to this randomness: with an unlucky seed we might prematurely abandon promising experiments, while a particularly favorable seed can lead to overestimating the true performance. Another major risk is data leakage, such as performing feature selection before splitting the data, or distributing correlated samples (e.g., repeated measurements from the same patient or material batch) across both training and test sets. Such leakage inflates evaluation metrics and produces models that fail to generalize to new data.
+
+Octopus is an open-source Python AutoML library designed specifically for small and high-dimensional datasets. Its core idea is simple: make statistically honest evaluation the default. Octopus enforces strict nested cross-validation, with an inner loop for model and hyperparameter selection and an outer loop that provides generalization performance estimates. Thanks to this nested setup, users also obtain an estimate of how much performance varies across multiple data splits; low variation increases trust in the reported results. Furthermore, because Octopus handles the entire data-splitting process and is carefully designed to avoid information leakage, the reported metrics are far less likely to be inflated.
+
+Our library provides a robust drop-in replacement for existing machine learning workflows, ensuring a principled implementation of nested cross-validation while leveraging advanced machine learning techniques in the background. Adopting a modular architecture, the library offers a dedicated, internally developed ML module, seamless integration of several feature selection methods (e.g., MRMR, Boruta), and support for external ML solutions such as AutoGluon. This modular design makes Octopus a powerful platform for benchmarking different methods and solutions on specific datasets and use cases, helping users systematically compare and select the most suitable approach for their problem
+
+Octopus also supports time-to-event (survival) problems, which are common healthcare (e.g. time to progression or death) and in materials science (e.g. time to failure or degradation). Survival models are evaluated using appropriate metrics within the same nested cross-validation framework. 
+
+This talk will demonstrate, using realistic small-scale datasets, how standard AutoML pipelines can report deceptively strong performance and how these metrics change when proper nested cross-validation and domain-aware splits are applied. Attendees will learn where typical mistakes originate and how Octopus establishes practical safeguards against them. The goal is straightforward: to produce better models and more reliable conclusions when data are scarce and every sample matters.
+---
+room: 
+---
+day: 
+---
+start_time: 
+---
+track: Machine Learning & Deep Learning & Statistics
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+social_card_image: /static/media/social/talks/8YTYEN.png
+

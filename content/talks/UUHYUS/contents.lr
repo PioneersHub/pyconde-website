@@ -1,0 +1,72 @@
+title: AsyncIO vs Threads: who survives in the No-GIL Era?
+---
+created: 2026-01-01
+---
+code: UUHYUS
+---
+speaker_names: Igor Anokhin
+---
+speakers:
+
+
+### Igor Anokhin
+
+I have been working with Python for over eight years, although I started programming back in school.
+
+I began with small personal projects, then worked with several startups, gaining hands-on experience with real-world systems.
+
+Since 2021, I have been part of the K2 Cloud development team, focusing on building and scaling production Python services in AWS-like cloud platform.
+
+---
+abstract:
+
+AsyncIO vs threads isn't about "which is faster" - it's about scheduling, memory, and the kind of load you run. We'll unpack what threads and asyncio do under the hood (OS scheduler vs event loop + epoll), run practical benchmarks, and show why many "async" libraries still rely on thread pools (aiofiles, Motor, Django bridges). Then we'll repeat the same tests on Python 3.14's free-threaded (no-GIL) build and discuss when an interpreter upgrade can beat an async rewrite.
+---
+full_description:
+
+Concurrency in Python is full of stereotypes: "threads are useless because of the GIL", "async is always faster", "just make everything async". This session replaces opinions with mechanics and measurements, and updates the story for Python 3.14's free-threaded (no-GIL) build.
+
+What we'll cover
+
+1) How things actually work under the hood
+- A Python thread is an OS thread (pthread_create/clone). The OS scheduler runs it like any other thread - the GIL only matters when Python bytecode executes.
+- asyncio is also scheduling: one OS thread, many Tasks, cooperative switching at await, and readiness notifications via epoll/select.
+
+2) Why IO-heavy workloads often look "equally fast" in threads and asyncio
+- both models hide IO latency by switching while waiting;
+- the real difference shows up in scalability and cost: per-thread memory/stack + OS limits vs lightweight Tasks.
+
+3) When "async" is secretly a thread pool
+- aiofiles delegates file operations to run_in_executor();
+- Motor (async MongoDB driver) runs the synchronous PyMongo core in a ThreadPoolExecutor;
+- frameworks like Django must bridge sync and async worlds (sync_to_async), adding overhead and sharp edges.
+
+4) Benchmarks that mirror real services
+- 100 / 1,000 / 10,000 concurrent IO waits: why "10k threads" fails but "10k tasks" is fine;
+- memory and CPU overhead comparison (what you pay for concurrency);
+- a microservice-style endpoint (FastAPI-like) in sync/threaded vs async mode.
+
+5) What changes with free-threading (no-GIL)
+- a high-level view of what CPython changes to make it possible;
+- rerunning the same benchmark with and without the GIL;
+- when an interpreter upgrade can deliver "async-rewrite-level" gains for mixed CPU+IO workloads.
+
+Takeaways
+- a practical checklist for choosing threading vs asyncio vs multiprocessing;
+- performance vs resource-usage intuition you can apply to real services;
+- guidance on how to read "async" claims in library docs.
+---
+room: 
+---
+day: 
+---
+start_time: 
+---
+track: Python Language & Ecosystem
+---
+python_skill: Intermediate
+---
+domain_expertise: Novice
+---
+social_card_image: /static/media/social/talks/UUHYUS.png
+

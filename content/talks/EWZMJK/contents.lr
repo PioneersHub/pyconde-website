@@ -1,0 +1,124 @@
+title: Don’t call your LLM too often! How to build your dialog graph with confidence and sleep at night.
+---
+created: 2025-12-21
+---
+code: EWZMJK
+---
+speaker_names: Evgeniya Ovchinnikova, Andrei Beliankou
+---
+speakers:
+
+
+### Evgeniya Ovchinnikova
+
+About
+I build solutions that make technology work for people. With experience in AI, data, and automation, I turn real needs into tools that make work faster and smarter.
+
+Trained as a physicist, I moved into data science and innovation to make a more direct impact on real-world problems. Since then, I’ve worked across telecommunications, energy, e-commerce, and insurance—helping teams create technology that delivers real value.
+
+One highlight was helping build a GenAI platform used by more than 48,000 people, saving over 2 million working hours every year. I also contributed to an intelligent system that helps over 20,000 employees share knowledge more easily and work together more effectively.
+
+I enjoy learning, improving, and working with others who want to make a difference. Let’s connect and explore new ideas together.
+
+### Andrei Beliankou
+
+
+
+---
+abstract:
+
+Keywords: **Explainable AI, enhanced RAG, GraphRAG, LLMOps, dialog system evaluation.**
+
+Designing reliable dialog flows for LLM-based systems remains challenging once conversations require branching, correction, or multi-step reasoning. Dialog graphs often evolve organically and accumulate structural issues: endless correction loops, dead subpaths, redundant validation steps, overly generic catch-all branches, or linear sequences that should be collapsed. Such phenomena raise operational costs, significantly increase TTFT and make the system answer less predictable and explainable.
+
+Many solutions try to introduce an all-fit generalized RAG retrieval solution. Contrary to this, we present our empirical learnings on how to enhance system speed, lower overall costs and offer a better dialog graph explainability through enhanced LLM call tracing and iterative enhancements for common dialog paths.
+
+We also show that more elaborated knowledge retrieval strategies like GraphRAG may drastically enhance overall response quality and shorten the dialog graph. We evaluate several approaches and give recommendations on how to leverage more complex document indexing phases for inference time benefits.
+
+Overall, the session argues that scalable conversational systems require not only better prompts, but explicit graph structures paired with rigorous tracing and data-driven optimization.
+---
+full_description:
+
+Building reliable dialog flows for LLM-based conversational systems remains difficult once interactions move beyond linear question–answer patterns. While early prototypes often rely on prompt chains, real-world systems quickly require branching, correction, clarification, and multi-step reasoning. At this stage, dialog logic implicitly turns into a graph, yet is still implemented and reasoned about as a sequence. This mismatch leads to structural problems that are hard to detect without explicit modeling and observability.
+
+Complex document retrieval systems are not born out of theoretical itch. We’ll exemplify practical problems framing them around the following practical use case from the area of electricity/power production.
+
+*Use Case: Aladdin and the Case of the Almost-Exploding Power Plant*
+
+Rick and Morty are operations engineers at a large electrical power plant. Every single day, they face the same heroic challenge: too many documents, too little clarity.
+
+The technical staff produces a constant stream of operational reports: free-text summaries describing the health and performance of steam generators. These reports are rich in knowledge, but poor in structure. Rick’s daily ritual is to read, compare, and summarize them, trying to predict which units will soon need maintenance. If he gets it right, the plant saves money by avoiding unnecessary service routines which are prescribed by regular maintenance guidelines. If he gets it wrong… well, let’s just say steam generators have a dramatic way of expressing dissatisfaction.
+
+But unstructured reports are only one part of the story. Alongside them exists a well-behaved, structured world: databases containing results of regular, non-invasive ultrasonic inspections of pipelines, used to track corrosion development over time. Morty has built a quantitative model that predicts the probability (and timing out of this probability) of a pipeline rupture based on these corrosion measurements.
+
+Naturally, Rick and Morty want everything. They want one system that can: 1) Understand messy human-written reports, 2) Reason over numerical corrosion models, and 2) Answer simple document questions without investing into unnecessary intelligence.
+
+
+Thus, the system Aladdin is born.
+
+Aladdin combines three very different subsystems:
+
+  - An agentic indexing component, which dynamically builds a search index for a GraphRAG over heterogeneous documents, given a pre-defined graph structure.
+  - An autonomous analytical agent, which evaluates pipeline failure probabilities using Morty’s quantitative corrosion model.
+  - A lightweight text-based RAG, backed by a vector index, for fast and simple document retrieval.
+
+But what is the challenge? Once these components start talking to each other, the dialog graph becomes unpredictable. Execution paths depend heavily on what information is actually present in the documents. And this is something that cannot be fully reasoned about in advance. Loops appear, branches explode, and theoretically “clean” dialog designs fail in practice.
+
+This use case illustrates why observability, tracing, and empirical optimization of dialog graphs are essential when building real-world document retrieval systems for industrial environments. Especially when Rick just wants a straight answer and Morty really doesn’t want another pipeline incident on his watch.
+
+Given this use case we will exemplify several structural pathologic cases in the dialog graph which we observed in the practice and for which we found curative approaches.
+
+**Non-ending loops in the dialog graph**
+A frequent failure mode is the emergence of endless circular dialog graphs. Typical examples include:
+  - correction loops (“Please rephrase your input” → user rephrases → validation fails again → same prompt),
+  - clarification cycles (“What do you mean by X?” → partial answer → same clarification),
+  - fallback loops where a generic catch-all path routes the conversation back to an earlier state without introducing new information.
+
+Such cycles are rarely intentional; they arise from local fixes applied over time and are difficult to identify by prompt inspection alone. In production, they manifest as stalled conversations, increased latency, rising token costs, and user frustration.
+
+Beyond circularity, several other structural pathologies commonly appear in document retrieval systems.
+
+**Dead subpaths after non-matching branching conditions**
+
+Dialog graphs often include branches guarded by semantic or data-dependent conditions, but changes in document structure, embeddings, or preprocessing can make these conditions unsatisfiable, creating dead subpaths that are never executed. These paths are dangerous because they give a false sense of coverage, increase maintenance and reasoning complexity, and in production often manifest as mysterious fallback behavior where the system always takes a default route instead of a specialized one.
+
+**Redundant validation and re-validation steps**
+
+Another common issue is redundant validation, where the same or equivalent checks are performed multiple times along a single dialog path. This often happens when validation logic is added defensively at multiple layers: once at input parsing, again before retrieval, and again before response generation. While each validation step may seem harmless in isolation, their combination leads to inflated dialog depth, unnecessary latency, and increased cognitive load when analyzing traces. Worse, slight inconsistencies between validation prompts can produce contradictory outcomes, for example, an input being accepted in one step and rejected in the next.
+
+**Overly generic catch-all branches**
+
+Catch-all branches are often introduced as a safety mechanism: a “default” path that handles unexpected input or retrieval failure. Over time, however, these branches tend to grow in scope and responsibility, eventually becoming overly generic handlers that do everything. Such branches blur the distinction between genuinely exceptional situations and routine cases. As more logic is added to the catch-all path, it becomes harder to reason about what the system is actually responding to. Specialized logic may be silently bypassed, while unrelated scenarios are forced through the same generic response strategy.
+
+**Linear sequences that should be collapsed**
+
+Many dialog graphs contain long linear chains of nodes with no branching, no state changes, and no observable side effects between steps. These sequences often originate from iterative prompt development, where small transformations are added one by one (“extract entities” → “normalize entities” → “rephrase query” → “check relevance”). While conceptually clean, such linear chains are rarely optimal. They increase token usage, latency, and the number of failure points, without adding expressive power. More importantly, they obscure the true logical structure of the system: what could be a single semantic transformation is spread across multiple opaque steps.
+
+An additional aspect of an overcomplicated dialog graph - especially baked by an autonomous agent - are barely predictable costs. Autonomous parts of the system need a very tight observability net to stay under control and not to burst cost prediction by an order of magnitude.
+
+Working within a specifically regulated environment of a power plant posts additional restrictions on the explainability of the results. Every fact must be trackable to the source of the information and model hallucinations must be recognized in the very early step. 
+
+All the above requirements result in a setup which is heavily based on an LLM Operating Platform like Langfuse. 
+
+When combined with dialog-oriented orchestration frameworks such as Langflow, experiment tracking extends from single calls to full conversational trajectories. Complete dialog traces expose path stability, node utilization, dead branches, fallback prevalence, and user-facing metrics such as turns to resolution or correction-loop repetition.
+
+Over time, this empirical evidence replaces design-time assumptions. Dialog paths are merged or removed based on observed execution rather than theoretical intent, with unreachable branches, redundant validations, and unstable loops revealed directly through trace analysis. Dialog graph optimization thus becomes a continuous, reproducible process grounded in measured behavior.
+
+This talk proposes an engineering-oriented approach that models conversational logic as explicit dialog graphs and treats execution traces as first-class data. Using Langfuse instrumentation, developers can analyze concrete execution paths—branch frequency, loop formation, latency hotspots—and compare alternative graph designs through aggregated metrics and A/B testing, enabling systematic optimization based on evidence rather than intuition.
+
+**To sum up:** using concrete production-oriented examples, the talk shows how graph-based dialog design improves multi-step retrieval, explainability, and robustness across languages. Endless correction loops are detected and eliminated, dead branches are pruned, and overly generic catch-all paths are replaced with targeted recovery strategies. The overall message is that scalable conversational systems require not just better prompts or larger models, but explicit dialog graphs combined with rigorous tracing and data-driven optimization.
+---
+room: 
+---
+day: 
+---
+start_time: 
+---
+track: Natural Language Processing & Audio (incl. Generative AI NLP)
+---
+python_skill: Novice
+---
+domain_expertise: Novice
+---
+social_card_image: /static/media/social/talks/EWZMJK.png
+

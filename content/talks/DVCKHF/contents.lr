@@ -1,0 +1,54 @@
+title: Personalized Restaurant Recommendations at Scale combining Transformer with Gradient-Boosted Ranking
+---
+created: 2025-12-19
+---
+code: DVCKHF
+---
+speaker_names: Marcel Kurovski
+---
+speakers:
+
+
+### Marcel Kurovski
+
+Senior Applied Scientist in Wolt's Personalization Team working on Venue and Item Ranking and Recommendation. Show Host of Recsperts - Recommender Systems Experts, the Podcast Show with industry and academia experts in Recommender Systems. Building Recommenders and Personalization Solutions with Python for various industries since 9+ years as well as creator and instructor of Python RecSys Training.
+
+---
+abstract:
+
+Wolt’s Universal Venue Ranker (UVR) is a large-scale, sequence-aware ranking model for personalized restaurant recommendations, deployed across more than 30 countries. UVR replaces three previously independent models—Neural Collaborative Filtering, a second-pass ranker, and a first-time-user model—by combining a transformer with a gradient-boosted decision tree for ranking.
+
+The model follows a two-stage design. In the first stage, an encoder-style transformer learns a personalized user state representation from historical restaurant purchase sequences enriched with spatiotemporal signals such as time and location. In the second stage, a CatBoostRanker uses the transformer output as an input feature alongside additional user-, venue-, user–venue-, and delivery-specific features to score and rank candidate venues.
+
+In this talk, we present the model and service architecture, the training and evaluation setup, and both offline and online results from a multi-country online A/B test, demonstrating significant improvements in global conversion rate and new venue trial rate. We also share practical lessons from deploying and operating a multi-stage ranking model under strict latency constraints at global scale.
+---
+full_description:
+
+Personalized restaurant ranking is a core machine learning problem in food delivery platforms, requiring models to balance relevance, exploration, latency, and robustness across highly heterogeneous markets. In this talk, we present UVR (Universal Venue Ranker), Wolt’s production ranking model for restaurant recommendations, currently deployed in more than 30 countries.
+
+UVR unifies the capabilities of three previously separate models—Neural Collaborative Filtering (NCF), a second-pass ranker, and a first-time-user (FTU) model—into a single, sequence-aware ranking approach. Beyond improving recommendation quality, this consolidation significantly reduced model complexity, operational overhead, and long-term maintenance cost.
+
+The model follows a two-stage architecture implemented using widely adopted Python-based machine learning technologies, including PyTorch, CatBoost, and Flyte. The first stage is an encoder-style transformer trained with a classification loss on a next-purchase prediction task. It learns a compact user state representation from historical restaurant purchase sequences enriched with spatiotemporal information, such as purchase time and user location. This stage outputs a personalized venue relevance score.
+
+The second stage is a CatBoostRanker, trained with a learning-to-rank loss on grouped venue requests. It combines the transformer-derived score with a rich set of additional features, including user-specific attributes, venue metadata, user–venue interaction features, and delivery-related signals. This separation of objectives—classification for representation learning and ranking for final scoring—proved critical for both model performance and training stability.
+
+We will walk through the end-to-end training and evaluation pipeline, covering feature construction, offline validation using ranking metrics, and a multi-country online A/B testing setup. UVR delivered significant and substantial improvements in global conversion rate and new venue trial rate, a key driver of long-term user retention. We will discuss how offline improvements translated into online gains.
+
+A dedicated section of the talk focuses on production and serving architecture, including low-latency inference and orchestration of training and deployment workflows using Flyte. We also share hard-earned lessons from training a multi-stage ranking model, such as preventing data leakage between models trained with different objectives and on different data as well as handling cold-start.
+
+Finally, we outline our roadmap toward extending UVR into a cross-domain ranking model for both restaurants and stores, enabling knowledge transfer across domains while preserving strong personalization guarantees.
+---
+room: 
+---
+day: 
+---
+start_time: 
+---
+track: Machine Learning & Deep Learning & Statistics
+---
+python_skill: Intermediate
+---
+domain_expertise: Advanced
+---
+social_card_image: /static/media/social/talks/DVCKHF.png
+

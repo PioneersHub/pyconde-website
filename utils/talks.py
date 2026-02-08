@@ -9,8 +9,8 @@ from string import Template
 from pydantic import BaseModel
 from pytanis import PretalxClient
 
-PYTHON_SKILL_ID = 4400
-DOMAIN_EXPERTISE_ID = 4399
+PYTHON_SKILL_ID = 6206
+DOMAIN_EXPERTISE_ID = 6205
 
 
 def submission_to_talk(sub):
@@ -28,17 +28,22 @@ def submission_to_talk(sub):
         t["speakers"] += speaker_to_markdown(speaker)
 
     for answer in sub.answers:
-        if answer["question"]["id"] == PYTHON_SKILL_ID:
-            t["python_skill"] = answer["answer"]
-        if answer["question"]["id"] == DOMAIN_EXPERTISE_ID:
-            t["domain_expertise"] = answer["answer"]
+        if answer.question.id == PYTHON_SKILL_ID:
+            t["python_skill"] = answer.answer
+        if answer.question.id == DOMAIN_EXPERTISE_ID:
+            t["domain_expertise"] = answer.answer
 
     if sub.track is not None:
-        t["track"] = re.sub(r"(?i)(pycon|pydata|general): ", "", sub.track.en)
-    if sub.slot is not None:
-        t["room"] = sub.slot.room.en
-        t["start_time"] = sub.slot.start.strftime("%H:%M")
-        t["day"] = calendar.day_name[sub.slot.start.weekday()]
+        t["track"] = re.sub(r"(?i)(pycon|pydata|general): ", "", sub.track.name.en)
+
+    if sub.slot_count != 1:
+        raise ValueError(
+            f"Talk {sub.title} ({sub.code}) has {sub.slot_count} slots instead of 1!"
+        )
+    if sub.slots:
+        t["room"] = sub.slots[0].room.en
+        t["start_time"] = sub.slots[0].start.strftime("%H:%M")
+        t["day"] = calendar.day_name[sub.slots[0].start.weekday()]
 
     return t
 
@@ -46,7 +51,6 @@ def submission_to_talk(sub):
 def speaker_to_markdown(speaker):
     s = {"name": speaker.name}
     s["biography"] = speaker.biography if speaker.biography is not None else ""
-    s["avatar"] = speaker.avatar
     tmpl = Template("""
 ### $name
 
@@ -127,12 +131,21 @@ def configure_pretalx_client():
 
     class PretalxBasicModel(BaseModel):
         api_token: str | None = None
+        api_version: str | None = None
+        api_base_url: str | None = None
+        timeout: float | None = None
 
     class PytanisBasicConfigModel(BaseModel):
         Pretalx: PretalxBasicModel
 
     cfg = PytanisBasicConfigModel.model_validate(
-        {"Pretalx": {"api_token": pretalx_api_key}}
+        {
+            "Pretalx": {
+                "api_token": pretalx_api_key,
+                "api_version": "",
+                "api_base_url": "https://pretalx.com",
+            }
+        }
     )
     return PretalxClient(config=cfg)
 

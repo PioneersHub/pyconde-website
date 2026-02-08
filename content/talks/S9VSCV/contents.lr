@@ -1,0 +1,105 @@
+title: Roll for Architecture: DungeonPy – A D&D Companion as Server + Thin Clients
+---
+created: 2025-12-18
+---
+code: S9VSCV
+---
+speaker_names: Francesco Conte
+---
+speakers:
+
+
+### Francesco Conte
+
+#### **Who am I?**
+I'm a scientific researcher with a PhD in astroparticle physics at the Heidelberg University with a strong will to get out of academia – but in my life I worked many jobs and each of them changed me somehow. I gave up trying to solve the puzzle.
+#### **What do I like?**
+I'm passionate about coding, gaming and cats – well, about many other things, actually. For a cat-loving nerd, I'm surprisingly at ease among people, and on a stage.
+#### **What makes me comfortable?**
+If it's about working, kind of everything? Be it coding (mainly Python, Julia, C++, Fortran, IDL, SQL), developing hardware prototypes, scouting for a publishing house, or working in a bookshop. If it's about life – listening to people talking at ease, and entertain them.
+#### **What makes me uncomfortable?**
+People saying that the AI will bring the world to an end. I'm positive that if it happens, it's more likely it'll be because of them rather than the AI.
+#### **Anything else?**
+I'm Italian, but it's not my fault.
+
+---
+abstract:
+
+### **DungeonPy** – an interactive Dungeon&Dragons app for remote campaigns
+As a matter of fact, tabletop RPGs are secretly distributed systems: one canonical world state, many clients, lossy links (players), and strict access control (“no peeking at the DM notes”). This talk introduces **DungeonPy**, which evolves a Python D&D companion from two local app – a Pygame battle map and a PySimpleGUI initiative/condition tracker – connected by lightweight TCP messages, into an authoritative server with multiple role-aware clients. The result is a fully real-time interactive setup, where the DM controls the full state and can reveal information selectively – under the hood it’s all about client intents, server validation, state updates, event broadcasting and periodic snapshots. We will cover protocol design (deltas vs snapshots, ordering/idempotency), server-side view projections (DM omniscience vs per-player truth and fog-of-war), UI-safe concurrency, and testing your homemade message bus without summoning race conditions. Expect patterns you can reuse in any stateful client/server app – just with more goblins.
+---
+full_description:
+
+## **Roll for Architecture: DungeonPy – A D&D Companion as Server + Thin Clients**
+Many tiny, personal projects reach a point where “it works on my machine” is no longer the interesting part, and it becomes more about making it *scale in structure*: clean boundaries, explicit state, testable behaviour and room for new features. This session is a case study of that journey using a D&D assistant for remote playing written in Python, that turned into something completely off-scale.
+The starting point is a few desktop clients:
+- a **Pygame** (battle) *map* (grid, tokens, map objects, movement), and
+- a **PySimpleGUI** *tracker* for initiative, HP and conditions, with a clear “active combatant” concept,
+
+initially synchronized with lightweight TCP messages.
+This already exposes real engineering questions: avoiding GUI thread violations, preventing feedback loops, and deciding what the “source of truth” is when both ends can initiate updates.
+The evolved version introduces an **authoritative server**. Players connect as clients and can interact in real time – moving tokens and manipulating shared objects – while the DM client keeps full visibility and control. Clients do not share state with each other: they submit *intents* (move here, end turn, toggle condition), the server validates, updates state, and broadcasts events plus periodic snapshots. The key architectural move is *role-scoped state*: the server owns the full truth and projects different “views” to each client (DM omniscience vs per-player information), so fog-of-war and hidden details are enforced by design. In other words:
+- **DM client**: full map + all combatants + hidden details.
+- **Player client**: a filtered view (only the player’s character sheet details, their token, and whatever the DM has revealed).
+
+The authoritative server runs on a small VPS with a public endpoint. Clients connect over secure WebSockets (wss://) on port 443, so players can join from anywhere without port forwarding. TLS is terminated by a standard reverse proxy, and the server speaks a small JSON message protocol (snapshots + events) over WebSocket frames.
+
+### **Open source software used**
+- `Pygame` (map rendering + input)
+- `PySimpleGUI` (initiative/conditions UI)
+- `asyncio` (multi-connection handling)
+- `websocket` (client/server transport)
+- (non-python) `NGINX` (reverse proxy, TLS)
+
+### **Detailed talk outline**
+1. - **Intro: D&D, remote play, and why am I doing this?**
+2. - **Setting up the table**
+        - PyGame
+        - PySimpleGUI
+3. - **State model and serialisation**
+        - Turning GUI objects into explicit data (combatants, map, doors, initiative order).
+        - JSON snapshots and versioning.
+4. - **Protocol design: events vs snapshots**
+        - Event messages for responsiveness (“token moved”, “condition added”).
+        - Snapshot sync for recovery and late joiners.
+        - Idempotency and ordering: simple sequence numbers, replay safety and conflict avoidance.
+5. - **Role-based filtering (the privacy boundary)**
+        - A single canonical server state.
+        -  Server-side “view projection”: DM view vs per-player view.
+        - Practical examples: hidden enemies, secret doors, private notes, fog-of-war style reveals.
+6. - **Concurrency and UI integration**
+        - Socket threads feeding GUI event loops safely (posting events into the GUI thread rather than touching widgets directly).
+        - Keeping the map smooth under network jitter: optimistic UI vs confirmed updates (and when not to).
+7. - **Testing strategy for a networked hobby project**
+        - Unit tests for pure state transitions (“apply damage”, “advance turn”, “illegal move rejected”).
+        - Protocol tests with simulated clients.
+        - Logging that helps during live play without drowning you in noise.
+8. - **Extensibility hooks**
+        - Adding new client types (spectator screen, mobile character sheet).
+        - Plug-in style rules (different systems, homebrew conditions).
+        - Future improvements: authentication for remote play, persistence, and reconnection.
+
+### **Takeaways**
+Attendees will leave with a practical blueprint for:
+- Designing a tiny, testable message protocol in Python.
+- Updating GUIs safely from background network threads.
+- Enforcing “who can see what” without duplicating logic everywhere.
+- More importantly, they’ll be given an example on how python can be used for highly non-standard tasks (like allowing remote role-playing gaming).
+
+### **Intended audience**
+Basic and intermediate Python developers comfortable with basic classes and modules, and curious about architecture and networking. This talk will be as much about *Python* as it will be about *nerd culture*: the goal is learning something while keeping a light heart.
+---
+room: 
+---
+day: 
+---
+start_time: 
+---
+track: Programming & Software Engineering & Testing
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+social_card_image: /static/media/social/talks/S9VSCV.png
+

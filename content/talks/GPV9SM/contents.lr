@@ -1,0 +1,61 @@
+title: Holistic Optimization: Implementing "Pipeline-as-a-Trial" HPO with Ray and Cloud Infra
+---
+created: 2025-12-20
+---
+code: GPV9SM
+---
+speaker_names: Abdullah Taha
+---
+speakers:
+
+
+### Abdullah Taha
+
+Data/MLOps Engineer at Zalando. During my career  I always worked along data scientists to build robust ML pipelines. I am very enthusiastic about designing and implementing scalable and robust systems.
+
+---
+abstract:
+
+Most hyperparameter optimization (HPO) stops at the model boundary. But what happens when your system relies on a complex chain of steps, a short-horizon model, a long-horizon model, ensembles, postprocesses etc? Tuning one piece in isolation often leads to sub-optimal global results.
+
+In this talk, we explore how we used Ray to move beyond simple model tuning. We’ll dive into a "Pipeline-as-a-Trial" architecture where Ray acts as the brain, triggering independent, scalable cloud workflows ( SageMaker Pipelines or Databricks Workflows) for every hyperparameter set.
+
+We will discuss:
+* The architectural shift from tuning models to tuning pipelines
+* How to build the DAG/pipeline on Sagemaker/Databricks using declarative configs
+* How to use Ray to orchestrate heavyweight remote jobs without bottlenecks.
+
+Attendees will learn how to optimize entire pipelines (in a scalable manner on cloud) to minimize global metrics like WAPE, rather than just local model loss.
+---
+full_description:
+
+As a data science team working on forecasting, we rarely rely on a single model to produce optimal results. Instead, we run composite pipelines: short and long-term models followed by ensemble strategies, granularity reconciliation, and post-processing. We found that optimizing the parameters of one model in isolation often degraded the performance of the final ensemble or the post-processed output. We needed to treat the entire pipeline as the function to optimize.
+
+This talk details how we implemented a "Pipeline-as-a-Trial" architecture utilising Ray with cloud infrastructure (Sagemaker + Databricks + custom solution).
+
+The solution architecture consists of 2 pieces:
+1. The driver notebook (the entrypoint, where the config of the experiment will be parsed and ray initiated). Ray hyperliner will run here and trigger trials for each set of hyperparameters
+2. The dag construction and run: each set of hyperparameters (trial) would create and run either a sagemaker pipeline or a databricks workflow. Which would save the results and return the WAPE of the pipeline to the driver notebook
+
+**Operational Challenges:**
+We will deep dive into the different trade-offs and hurdles of this implementation:
+* Trigger mechanism (how the configs trigger the pipeline?)
+* Warm pool support
+* Cost
+* debugging/monitoring
+* Infra limits
+---
+room: 
+---
+day: 
+---
+start_time: 
+---
+track: MLOps & DevOps
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+social_card_image: /static/media/social/talks/GPV9SM.png
+

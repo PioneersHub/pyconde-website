@@ -1,0 +1,105 @@
+title: 7 Anti-Lessons from Building a PydanticAI Agent: Mistakes We Made So You Don't Have To
+---
+created: 2025-12-19
+---
+code: RUSUYF
+---
+speaker_names: Joshua Görner
+---
+speakers:
+
+
+### Joshua Görner
+
+Platform Engineer by Day ⚙️  
+Product Engineer by Night 🌙  
+Ex-Data Scientist 📊  
+Online Tutor 📺   
+Husband to a gorgeous Wife 💍  
+Father of 100<sub>2</sub> kids 🐣
+
+---
+abstract:
+
+Life sciences compliance isn't forgiving. When your software helps companies navigate FDA regulations, ISO 13485, and EU MDR, "move fast and break things" isn't an option. Audit trails matter. Documentation is mandatory. Getting it wrong means regulatory findings, delayed product launches, or worse — patient safety risks.
+
+During the development of our AI Assistant we made every mistake in the most unforgiving environment possible. After more than a year building with PydanticAI, pydantic-evals, and Claude — nearly 3,000 commits and 20+ contributors — here are 7 anti-lessons so you don't have to repeat them:
+
+1. **"We need a multi-agent system"** — We built one. Then deleted it.
+2. **"Agents need sophisticated planning"** — A todo list beat our workflow engine.
+3. **"Give the agent lots of specific tools"** — Two high-level tools replaced dozens.
+4. **"Encode workflows in code"** — Markdown files the agent reads at runtime won.
+5. **"It works when I test it"** — Simple tests ≠ real user journeys. Realistic evals or you're blind.
+6. **"Automate everything"** — Human stays in the driver's seat, not the trunk.
+7. **"Apply what made you successful before"** — Your engineering instincts might hurt you here.
+
+Real code, real git commits, real mistakes from a domain where mistakes are expensive.
+
+**Come for the mistakes. Leave with shortcuts.**
+---
+full_description:
+
+## The Domain: Where Mistakes Are Expensive
+
+[Qualio](https://www.qualio.com/) builds quality management software for life sciences companies — the ones making medical devices, pharmaceuticals, and biotech products. Our customers navigate FDA 21 CFR Part 11, ISO 13485, EU MDR, and SOC 2. In this world, compliance isn't optional. Audit trails are mandatory. Documentation gaps mean warning letters, import bans, or product recalls.
+
+When we decided to build an AI agent to help users manage compliance gaps, create remediation plans, and handle documentation — we knew the stakes. An agent that hallucinates a regulatory requirement or skips an approval step isn't just annoying. It's a liability.
+
+So we built carefully with PydanticAI and Claude. And we still made every mistake possible. Here are 7 anti-lessons from the trenches.
+
+---
+
+### Anti-Lesson 1: "We need a multi-agent system"
+
+It seemed obvious: separate agents for documents, compliance, and events. Clean architecture. We built it, shipped it, and spent weeks debugging coordination failures and inconsistent responses. In a domain where consistency matters, multi-agent chaos was unacceptable. The fix? Delete it. One agent with dynamic capabilities. Simpler, faster, and — according to our evals — more accurate.
+
+### Anti-Lesson 2: "Agents need sophisticated planning"
+
+Compliance workflows are complex. Surely the agent needs workflow graphs, state machines, planning frameworks? We tried. The agent got confused, skipped steps, invented procedures. The fix? A todo list. Add a task, check it off, see what's next. In a regulated environment, simple and auditable beats clever and opaque.
+
+### Anti-Lesson 3: "Give the agent lots of specific tools"
+
+We built dozens of tools using PydanticAI's tool registration: `create_document`, `update_control`, `get_gap_details`, `list_frameworks`, `submit_for_review`... The tool descriptions bloated the context. The agent picked wrong tools. The fix? Two high-level tools: `call API` (with OpenAPI specs for the details) and `read instruction` (load a markdown file). Fewer tools, better results, easier to audit.
+
+### Anti-Lesson 4: "Encode workflows in code"
+
+How does the agent know how to remediate a compliance gap? How to create a controlled document? At first, it was buried in prompts and Python. The fix? Markdown files — like Claude's skills system. The agent reads them at runtime. Engineers can review them. Knowledge belongs in documents your compliance team can actually read.
+
+### Anti-Lesson 5: "It works when I test it"
+
+Our early tests passed. The agent handled every case we threw at it. Then real users arrived — and everything broke. The problem? Our test cases were simple, synthetic, and predictable. Real user journeys are messy, multi-step, and full of context we didn't anticipate. The fix? Realistic evaluation data. We capture actual user sessions, anonymize them, and run them through pydantic-evals with LLM-as-judge rubrics. Does the agent follow the procedure? Does it hallucinate requirements? Does it handle the weird tangents users take? A 95% pass threshold in CI means nothing if your test data doesn't reflect reality.
+
+### Anti-Lesson 6: "Automate everything"
+
+We built a fully automated feedback loop: user feedback creates a Jira ticket, a dev triages it, a Claude instance picks it up, raises a PR, responds to review comments. The dream? The fix: keep the human in the driver's seat. PydanticAI's `DeferredToolRequests` pattern lets our agent propose actions and pause for approval — the same principle applies to our dev workflow. In compliance software, someone is always accountable. The automation handles grunt work. Humans make decisions. Assisted development, not autopilot.
+
+### Anti-Lesson 7: "Apply what made you successful before"
+
+This is the meta anti-lesson. Good engineering habits — upfront design, comprehensive APIs, handling every edge case — _can_ slow you down with agents. The LLM will surprise you. Your assumptions will be wrong. The fix? Start scrappy, iterate fast, let evals tell you what's working. The hardest part isn't code. It's unlearning.
+
+---
+
+### Bonus: Scaling Agent Development with tmux
+
+How to run multiple agent experiments in parallel. Low-tech, high-leverage.
+
+---
+
+## Who Should Attend
+
+Developers building AI agents, especially in domains where accuracy and auditability matter. Familiarity with PydanticAI is helpful but not required — you'll see enough code to get started.
+---
+room: 
+---
+day: 
+---
+start_time: 
+---
+track: Autonomous Systems & AI Agents
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+social_card_image: /static/media/social/talks/RUSUYF.png
+

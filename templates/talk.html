@@ -15,11 +15,20 @@
       <h3 class="talk-subtitle">
         {{ this.speaker_names }}
       </h3>
-
-      <div class="track filter">
-          <a href="">
-          {{ this.track }}
-          </a>
+      <div class="talk-info-container">
+        <div class="track-container">
+          <span class="track">{{ this.track }}</span>
+        </div>
+        {% if this.python_skill or this.domain_expertise %}
+        <div class="python-skill-container">
+          <span class="python-skill-label talk-info-label">Python Skill</span>
+          <span class="levels">{{ this.python_skill }}</span>
+        </div>
+        <div class="domain-expertise">
+          <span class="domain-expertise-label talk-info-label">Domain Expertise</span>
+          <span class="levels">{{ this.domain_expertise }}</span>
+        </div>
+        {% endif %}
       </div>
     </section>
   </div>
@@ -37,20 +46,6 @@
       <div class="description">
           {{ this.full_description }}
       </div>
-
-      {% if this.python_skill or this.domain_expertise %}
-      <ul class="levels">
-          {% if this.python_skill %}
-          <li>
-              <a href="">{{ this.python_skill }}</a>
-          </li>
-          {% endif %}
-
-          {% if this.domain_expertise %}
-          <li>{{ this.domain_expertise }}</li>
-          {% endif %}
-      </ul>
-      {% endif %}
 
       <div class="authors">
         {{ this.speakers }}

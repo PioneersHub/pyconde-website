@@ -1,0 +1,98 @@
+title: Accuracy Is Overrated: Ship Stable Forecasts (Without Lying to Yourself)
+---
+created: 2025-12-20
+---
+code: B8KVNJ
+---
+speaker_names: Illia Babounikau
+---
+speakers:
+
+
+### Illia Babounikau
+
+Dr. Illia Babounikau is an accomplished data scientist with extensive expertise in machine learning and forecasting. He holds a Ph.D. in Physics from Hamburg University and initially pursued an academic career, focusing on large-scale data analysis and machine learning applications. His contributions have been instrumental in international scientific collaborations, including the CMS experiment at CERN’s Large Hadron Collider and the COMET project at J-PARC.
+
+For the past five years, Dr. Babounikau has been a Data Scientist at Blue Yonder and VOIDS, specializing in developing and fine-tuning advanced forecasting models for retail planning and inventory management. He leads the design and implementation of tailored machine-learning solutions, addressing complex challenges within supply chains across diverse industries.
+
+Dr. Babounikau is passionate about bridging the gap between data science and business strategy, ensuring machine learning models are aligned with business objectives to drive data-informed decision-making.
+
+---
+abstract:
+
+Forecasting talks love a clean ending: “and then we improved WMAPE by 3.7%.”
+Nice. Now put that model into production without suffering from instability.
+
+You retrain your model on a few new weeks of data and suddenly the one-year forecast jumps 15–20%. Planning teams redo decisions, trust erodes, and your “accurate” model becomes unusable. This talk is about forecast stability: how much forecasts change when you add new data and rerun the same pipeline.
+
+We run a simple experiment: train a model, forecast one year ahead, add recent data, retrain, and measure forecast-to-forecast change. We repeat this across common forecasting approaches including ETS/ARIMA, Prophet, XGBoost with lag features, AutoGluon ensembles, neural/global models, and TimeGPT-style APIs.
+
+You will see that high accuracy does not guarantee usable forecasts, and that some models are systematically more volatile than others. We then cover practical ways to stabilise forecasts without freezing them, focusing on reconciliation and ensembling (including origin ensembling).
+
+This talk is for forecasting practitioners who want models users actually trust, not just good metrics.
+---
+full_description:
+
+Forecasting talks love a clean ending: “and then we improved WMAPE by 3.7%.”
+Nice. Now put that model into production without suffering from instability.
+
+Because here is what users actually see: the forecast changes every week. The “one-year view” jumps 15 to 20 percent because you retrained on three extra Mondays. Planning teams redo decisions. Operations loses trust. Your model becomes an expensive random-number generator with excellent dashboards.
+
+This talk is about forecast stability: how much your future forecast moves when you add a small amount of new data, retrain, and run the same pipeline again. Not error versus actuals. Forecast versus forecast.
+
+You will see a simple but uncomfortable experiment: 
+
+- Taking a demand-style time series dataset with seasonality, promotions, and noise (Kaggle competition style).
+- Training a model and produce a one-year-ahead forecast.
+- Adding a few recent weeks of data, retrain, forecast again.
+- Measuring how much the overlapping horizon changed.
+
+We repeat this across model families people actually use:
+
+- Statistical baselines like ETS and ARIMA
+- Prophet
+- Feature-based ML with lag features such as XGBoost
+- AutoML and ensembles with AutoGluon TimeSeries
+- Neural and global models where relevant
+- And yes, what happens when you add an API model like TimeGPT into the mix (no hype, just behaviour under updates)
+
+You will see something totally "unexpected": a model can be “accurate” and still be operationally useless because its forecast revisions are chaotic. And you will see the opposite too: models with slightly worse headline accuracy that people actually trust, because next year does not get rewritten every week.
+
+This is not a philosophical debate. It is a measurable property of forecasting systems that most teams never track.
+
+So what do we do about it?
+We focus on techniques that improve stability without turning forecasts into fossils:
+
+1) Reconciliation
+Hierarchical and temporal reconciliation as a stabiliser, not just a coherence tool. If SKU-level forecasts panic while higher-level signals stay calm, reconciliation can prevent nonsense from propagating into decisions.
+
+2) Ensembling and origin ensembling
+Combining models is not only about accuracy. Averaging forecasts across models and across forecast origins dampens noise and makes forecast updates behave like signals instead of mood swings.
+
+Who this talk is for:
+
+Forecasting practitioners, data scientists working on demand forecasting, and anyone who has ever heard: “Your model looks good, but I don’t trust it.”
+
+What you’ll take away:
+
+- A methodology to measure forecast stability using forecast-to-forecast change.
+- A mental model for when forecast revisions are useful and when they are just noise.
+- Practical patterns you can implement immediately in Python to make forecasts calmer without hiding real change.
+
+If you optimise only accuracy metrics, you are grading homework.
+If you care about stability, you are building a forecasting product.
+---
+room: 
+---
+day: 
+---
+start_time: 
+---
+track: Machine Learning & Deep Learning & Statistics
+---
+python_skill: Novice
+---
+domain_expertise: Intermediate
+---
+social_card_image: /static/media/social/talks/B8KVNJ.png
+

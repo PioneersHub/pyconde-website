@@ -1,0 +1,87 @@
+title: Hierarchical Models in MMM: Can Structure beat data size?
+---
+created: 2025-11-25
+---
+code: EL7X8C
+---
+speaker_names: Mohamed Amine Jebari
+---
+speakers:
+
+
+### Mohamed Amine Jebari
+
+Mohamed Amine Jebari is a Lead Data Scientist based in Berlin, specializing in large-scale machine learning systems, Marketing Mix Modeling, and applied NLP. With extensive hands-on experience in Python and the scientific ecosystem, including pandas, NumPy, scikit-learn, PyMC, transformers, and Hugging Face. Amine builds end-to-end solutions that bridge rigorous statistical modeling with modern LLM-driven workflows.
+
+Working at a data-driven consultancy, he leads a team of data scientists while remaining deeply involved in technical development, from Bayesian modeling to production-grade pipelines on AWS. Their work often focuses on solving real-world business problems with interpretable, high-impact models.
+Curious to uncover the truth and being a big fan of puzzles, he is now heavily working on causal inference and marketing mix models, pulling one inch at a time, closer the the truth.
+
+---
+abstract:
+
+In every marketing project, teams strive to find more data, a longer timeframe, and more detailed splits, just to fix noisy channel attribution.
+
+But what if structure played a bigger role than size and volume? 
+In this talk, we try to prove this. Using a simple toolkit like Arviz and PyMC, we show you a simple hierarchical mix model, and how, by applying partial pooling, we can stabilize important KPIS like ROAS estimates across sparse channels- without the need for more data.
+We will go through the code, transformation, and the real-life practices that allow us to get as close to the truth, to be able to have a meaningful impact in the marketing world.
+The approach will be centered around marketing mix models, different transformations, and how useful it will be for the business.
+---
+full_description:
+
+## What we are going to show
+
+- Country-specific marketing Data that is, unfortunately, never good.
+- Function and Python transform like Adstock and saturation (with the tests so that you can see it in action).
+- Differentiation between pooled, unpooled, and partial pooling.
+- Meaningful diagnostics.
+- Wins and losses of hierarchical modeling.
+
+## Why this is interesting and relevant
+
+How do you model marketing effectiveness when you only have 12 months of data per country, some channels are interrupted for weeks, and your manager wants reliable ROAS estimates yesterday?
+Most teams think: "We need more data." But getting more data takes time, costs money, and sometimes isn't even possible (or the quality is bad).
+
+What if you could get better estimates by changing how you model the problem?
+This is where hierarchical modeling and partial pooling come in. Instead of treating each market as separate (unpooled) or pretending they're all identical (pooled), we let markets share information through partial pooling. Countries with thin data borrow strength from the group, while markets with strong signals pull away from the mean. You get stability where you need it and flexibility where the data supports it. We show this end-to-end in Python: from building testable transform functions (Adstock, saturation curves, lag effects) to assembling three different model architectures in PyMC, to evaluating which one gives you calibrated intervals and stable ROAS estimates. You'll see the good, the bad, and the ugly.
+
+## Main challenges
+- Making transforms reusable and testable_ Marketing transformations like adstock and saturation are usually hidden in modeling code. It is generally very difficult to imagine how they look, how they change the data. We pull them out as pure Python functions with clear signatures, unit tests (pytest), and property-based checks (hypothesis). This makes them composable, debuggable, and easy to understand and even improve.
+- Building fair model comparisons: We construct pooled, unpooled, and hierarchical models with identical priors where appropriate so the comparison isolates the effect of structure, not prior choice. We walk through the PyMC code, show how partial pooling works mathematically, and run short MCMC chains that still demonstrate the key differences.
+We go beyond "we reached 90% R2" to actual decision metrics:
+     * Posterior predictive checks: Does the model generate realistic data?
+     * ROAS stability: how much do channel estimates vary across groups?
+
+We use ArviZ throughout to visualize traces, compare models, and compute these metrics. You'll see exactly when hierarchical structure pays off and when it doesn't.
+
+## Practical lessons and the repo
+
+**We share what we learned building this:**
+- Data checks and control using Pydantic, so you catch errors before MCMC runs for hours
+- Test your transforms independently: Yes, for unit tests!
+- Use synthetic data with known ground truth to validate the whole pipeline
+- Calibration metrics matter more than posterior predictive RMSE alone
+
+**The repo will include:**
+- Typed transform functions (Adstock, saturation, lag) with unit tests
+- Three PyMC models with matching priors
+- ArviZ evaluation scripts (calibration, PPC)
+- A Typer CLI to run everything on a predefined CSV
+
+**When hierarchical lose (and what to do about it):**
+Partial pooling isn't magic. If your groups are genuinely wildly different and you have almost no data per group, hierarchical models can still produce overconfident nonsense. We show a scenario where this happens and discuss alternatives: stronger priors, splitting the hierarchy, or just admitting you don't have enough signal.
+The takeaway: structure beats volume in the right conditions. We help you recognize those conditions and build models that respect them.
+---
+room: 
+---
+day: 
+---
+start_time: 
+---
+track: Machine Learning & Deep Learning & Statistics
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+social_card_image: /static/media/social/talks/EL7X8C.png
+
