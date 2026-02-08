@@ -5,27 +5,39 @@
 
 {% block body %}
 
-    {# ── Intro: logo, conference name, dates, location ── #}
+    {# ── Hero: Full-viewport branded intro ── #}
     <section class="intro">
         <div class="content intro__content">
             <img src="/static/media/logo-white.png"
                  alt="PyConDE &amp; PyData Darmstadt 2026"
                  class="intro__logo"
-                 width="400" height="154" />
+                 width="480" height="185" />
             <div class="intro__details">
-                <p class="intro__location">darmstadtium, Darmstadt (Frankfurt).</p>
-                <p class="intro__date"><strong>{{ site.config.PROJECT.sprint_days }}</strong> <span>Sprints &amp; DjangoGirls</span></p>
-                <p class="intro__date"><strong>{{ site.config.PROJECT.conference_days }}</strong> <span>Three days of conference</span></p>
-                <p class="intro__date"><strong>{{ site.config.PROJECT.master_classes_days }}</strong> <span>Masterclasses</span></p>
+                <p class="intro__location">darmstadtium, Darmstadt</p>
+                <p class="intro__date"><strong>{{ site.config.PROJECT.conference_days }}</strong> &middot; Conference</p>
+                <p class="intro__date"><strong>{{ site.config.PROJECT.master_classes_days }}</strong> &middot; Masterclasses</p>
+                <p class="intro__date"><strong>{{ site.config.PROJECT.sprint_days }}</strong> &middot; Sprints &amp; Community Day</p>
             </div>
         </div>
+        <span class="intro__scroll-hint" aria-hidden="true">&darr;</span>
     </section>
 
-    {# ── Hero statement + motto facets (from motto databag) ── #}
+    {# ── Motto statement — bold on white ── #}
     {% from "macros/hero.html" import render_hero %}
     {{ render_hero(bag('motto')) }}
 
-    {# ── Featured content carousel (from featured databag) ── #}
+    {# ── Image reel (social proof — real photos) ── #}
+    {% from "macros/image-reel.html" import render_image_reel %}
+    {{ render_image_reel(
+        bag('promo_pics')['promo_images'],
+        section_label='Conference impressions'
+    ) }}
+
+    {# ── Numbers bar — key stats ── #}
+    {% from "macros/stats.html" import render_stats %}
+    {{ render_stats(bag('stats')) }}
+
+    {# ── Featured speakers carousel ── #}
     {% from "macros/carousel.html" import render_carousel %}
     {{ render_carousel(
         bag('featured')['featured_items'],
@@ -35,43 +47,32 @@
         section_label='Featured speakers and sessions'
     ) }}
 
-    {# ── Topics pills (from topics databag) ── #}
+    {# ── Topics pills ── #}
     {% from "macros/topics.html" import render_topics %}
     {{ render_topics(bag('topics')) }}
 
-    {# ── Numbers bar (from stats databag) ── #}
-    {% from "macros/stats.html" import render_stats %}
-    {{ render_stats(bag('stats')) }}
+    {# ── Why Attend ── #}
+    {% from "macros/why-attend.html" import render_why_attend %}
+    {{ render_why_attend(bag('why_attend')) }}
 
-    {# ── Masterclasses carousel (from masterclasses databag) ── #}
+    {# ── Masterclasses carousel ── #}
     {{ render_carousel(
         bag('masterclasses')['masterclass_items'],
         carousel_id='masterclasses',
         mode='multi',
         image_dir='masterclasses',
         section_label='Masterclasses',
-        header_title='Masterclass Tickets Available – Limited Seats',
-        header_teaser='Join in-depth, hands-on sessions in small groups and learn directly from leading experts.'
+        header_title='Masterclasses — Limited Seats',
+        header_teaser='Hands-on, small-group sessions with leading experts. One full day of deep learning.'
     ) }}
 
-    {# ── Why Attend (from why_attend databag) ── #}
-    {% from "macros/why-attend.html" import render_why_attend %}
-    {{ render_why_attend(bag('why_attend')) }}
-
-    {# ── Community spotlight (from community databag) ── #}
+    {# ── Community spotlight ── #}
     {% from "macros/community.html" import render_community %}
     {{ render_community(bag('community')) }}
 
-    {# ── Key Dates timeline (from keydates databag) ── #}
+    {# ── Key Dates ── #}
     {% from "macros/keydates.html" import render_keydates %}
     {{ render_keydates(bag('keydates')) }}
-
-    {# ── Image reel (from promo_pics databag) — compact strip ── #}
-    {% from "macros/image-reel.html" import render_image_reel %}
-    {{ render_image_reel(
-        bag('promo_pics')['promo_images'],
-        section_label='Conference photos'
-    ) }}
 
     {# ── Tickets CTA ── #}
     {% set section_1 = this.section_1 %}
@@ -91,7 +92,7 @@
     </section>
     {% endif %}
 
-    {# ── Sponsors (from sponsors databag via macro) ── #}
+    {# ── Sponsors ── #}
     <section class="sponsors content-block">
         <div class="content">
         </div>
@@ -100,7 +101,7 @@
         </div>
     </section>
 
-    {# ── Sponsoring CTA (below sponsors grid) ── #}
+    {# ── Sponsoring CTA ── #}
     <section class="content-block--pink-light content-block content-block--dark-text">
         <div class="content">
             <h3>Sponsoring</h3>
@@ -113,7 +114,7 @@
         </div>
     </section>
 
-    {# ── Newsletter CTA (from newsletter databag) ── #}
+    {# ── Newsletter CTA ── #}
     {% from "macros/newsletter.html" import render_newsletter %}
     {{ render_newsletter(bag('newsletter')) }}
 
