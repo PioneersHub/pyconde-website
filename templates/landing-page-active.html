@@ -5,30 +5,25 @@
 
 {% block body %}
 
-    {# ── Intro: conference name, dates, location (config-driven) ── #}
+    {# ── Intro: logo, conference name, dates, location ── #}
     <section class="intro">
-        <div class="content">
-            <h1>{{ site.config.PROJECT.name }}</h1>
-            <p class="location">darmstadtium, Darmstadt (Frankfurt).</p>
-            <p class="conference-date">{{ site.config.PROJECT.sprint_days }}<span class="conference-date description">: Sprints & DjangoGirls</span>.
-            </p>
-            <p class="conference-date">{{ site.config.PROJECT.conference_days }}<span class="conference-date description">: Three days of conference</span>.
-            </p>
-            <p class="conference-date">{{ site.config.PROJECT.master_classes_days }}<span class="conference-date description">: Masterclasses</span>.
-            </p>
+        <div class="content intro__content">
+            <img src="/static/media/logo-white.png"
+                 alt="PyConDE &amp; PyData Darmstadt 2026"
+                 class="intro__logo"
+                 width="400" height="154" />
+            <div class="intro__details">
+                <p class="intro__location">darmstadtium, Darmstadt (Frankfurt).</p>
+                <p class="intro__date"><strong>{{ site.config.PROJECT.sprint_days }}</strong> <span>Sprints &amp; DjangoGirls</span></p>
+                <p class="intro__date"><strong>{{ site.config.PROJECT.conference_days }}</strong> <span>Three days of conference</span></p>
+                <p class="intro__date"><strong>{{ site.config.PROJECT.master_classes_days }}</strong> <span>Masterclasses</span></p>
+            </div>
         </div>
     </section>
 
     {# ── Hero statement + motto facets (from motto databag) ── #}
     {% from "macros/hero.html" import render_hero %}
     {{ render_hero(bag('motto')) }}
-
-    {# ── Image reel (from promo_pics databag) ── #}
-    {% from "macros/image-reel.html" import render_image_reel %}
-    {{ render_image_reel(
-        bag('promo_pics')['promo_images'],
-        section_label='Conference photos'
-    ) }}
 
     {# ── Featured content carousel (from featured databag) ── #}
     {% from "macros/carousel.html" import render_carousel %}
@@ -39,6 +34,14 @@
         image_dir='featured',
         section_label='Featured speakers and sessions'
     ) }}
+
+    {# ── Topics pills (from topics databag) ── #}
+    {% from "macros/topics.html" import render_topics %}
+    {{ render_topics(bag('topics')) }}
+
+    {# ── Numbers bar (from stats databag) ── #}
+    {% from "macros/stats.html" import render_stats %}
+    {{ render_stats(bag('stats')) }}
 
     {# ── Masterclasses carousel (from masterclasses databag) ── #}
     {{ render_carousel(
@@ -51,52 +54,42 @@
         header_teaser='Join in-depth, hands-on sessions in small groups and learn directly from leading experts.'
     ) }}
 
-    {# ── Generic content sections 1–6 ──────────────────────────── #}
-    {#                                                               #}
-    {#  Each section renders only when its content is non-empty.     #}
-    {#  Colors are fixed by position:                                #}
-    {#                                                               #}
-    {#    1  green-light / green                                     #}
-    {#    2  pink-light  / pink                                      #}
-    {#    3  blue-light  / blue                                      #}
-    {#    4  red-light   / red                                       #}
-    {#    5  orange      / yellow                                    #}
-    {#    6  blue-lighter / blue                                     #}
-    {#                                                               #}
-    {#  To reorder homepage content, move text between               #}
-    {#  section_N fields in contents.lr — no template edits needed.  #}
-    {# ──────────────────────────────────────────────────────────── #}
+    {# ── Why Attend (from why_attend databag) ── #}
+    {% from "macros/why-attend.html" import render_why_attend %}
+    {{ render_why_attend(bag('why_attend')) }}
 
-    {% set section_colors = [
-        {'content': 'green-light', 'cta': 'green'},
-        {'content': 'pink-light',  'cta': 'pink'},
-        {'content': 'blue-light',  'cta': 'blue'},
-        {'content': 'red-light',   'cta': 'red'},
-        {'content': 'orange',      'cta': 'yellow'},
-        {'content': 'blue-lighter','cta': 'blue'}
-    ] %}
+    {# ── Community spotlight (from community databag) ── #}
+    {% from "macros/community.html" import render_community %}
+    {{ render_community(bag('community')) }}
 
-    {% for colors in section_colors %}
-        {% set n = loop.index %}
-        {% set section_content = this['section_' ~ n] %}
-        {% set section_cta = this['section_' ~ n ~ '_cta'] %}
+    {# ── Key Dates timeline (from keydates databag) ── #}
+    {% from "macros/keydates.html" import render_keydates %}
+    {{ render_keydates(bag('keydates')) }}
 
-        {% if section_content %}
-        <section class="content-block--{{ colors.content }} content-block">
-            <div class="content">
-                {{ section_content }}
-            </div>
-        </section>
-        {% endif %}
+    {# ── Image reel (from promo_pics databag) — compact strip ── #}
+    {% from "macros/image-reel.html" import render_image_reel %}
+    {{ render_image_reel(
+        bag('promo_pics')['promo_images'],
+        section_label='Conference photos'
+    ) }}
 
-        {% if section_cta %}
-        <section class="content-block--{{ colors.cta }} cta">
-            <div class="content">
-                {{ section_cta }}
-            </div>
-        </section>
-        {% endif %}
-    {% endfor %}
+    {# ── Tickets CTA ── #}
+    {% set section_1 = this.section_1 %}
+    {% set section_1_cta = this.section_1_cta %}
+    {% if section_1 %}
+    <section class="content-block--green-light content-block content-block--dark-text">
+        <div class="content">
+            {{ section_1 }}
+        </div>
+    </section>
+    {% endif %}
+    {% if section_1_cta %}
+    <section class="content-block--green cta">
+        <div class="content">
+            {{ section_1_cta }}
+        </div>
+    </section>
+    {% endif %}
 
     {# ── Sponsors (from sponsors databag via macro) ── #}
     <section class="sponsors content-block">
@@ -106,5 +99,22 @@
             {{ render_sponsors_list() }}
         </div>
     </section>
+
+    {# ── Sponsoring CTA (below sponsors grid) ── #}
+    <section class="content-block--pink-light content-block content-block--dark-text">
+        <div class="content">
+            <h3>Sponsoring</h3>
+            <p>Reach 2,000+ Python &amp; AI professionals. Sponsoring puts your brand in front of Europe's largest Python community.</p>
+        </div>
+    </section>
+    <section class="content-block--pink cta">
+        <div class="content">
+            <a href="/sponsoring">Explore sponsoring opportunities</a>
+        </div>
+    </section>
+
+    {# ── Newsletter CTA (from newsletter databag) ── #}
+    {% from "macros/newsletter.html" import render_newsletter %}
+    {{ render_newsletter(bag('newsletter')) }}
 
 {% endblock %}

@@ -1,0 +1,39 @@
+{#
+  Numbers Bar — Social Proof Stats
+  ─────────────────────────────────
+  Compact horizontal strip of key conference numbers.
+
+  Usage:
+    {% from "macros/stats.html" import render_stats %}
+    {{ render_stats(bag('stats')) }}
+
+  Parameters:
+    stats_data    – full databag dict with stats list
+    section_label – accessible label (default: 'Conference numbers')
+
+  Databag schema (stats.yaml):
+    stats:
+      - value: "2,000+"
+        label: "attendees"
+#}
+
+{% macro render_stats(stats_data, section_label='Conference numbers') %}
+
+{% if stats_data and stats_data.stats and stats_data.stats|length > 0 %}
+
+<section class="stats-bar" aria-label="{{ section_label }}">
+  <div class="content">
+    <div class="stats-bar__grid">
+      {% for stat in stats_data.stats %}
+      <div class="stats-bar__item">
+        <span class="stats-bar__value">{{ stat.value }}</span>
+        <span class="stats-bar__label">{{ stat.label }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endif %}
+
+{% endmacro %}

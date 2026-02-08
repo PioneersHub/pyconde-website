@@ -1,0 +1,17 @@
+{% macro render_keydates(data, section_label='Key dates') %}
+{% if data and data.dates and data.dates|length > 0 %}
+<section class="keydates" aria-label="{{ section_label }}">
+  <div class="content">
+    {% if data.section_title %}<h2 class="keydates__title">{{ data.section_title }}</h2>{% endif %}
+    <div class="keydates__grid">
+      {% for item in data.dates %}
+      <div class="keydates__item">
+        <span class="keydates__date keydates__date--{{ item.color }}">{{ item.date }}</span>
+        <span class="keydates__label">{{ item.label }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endmacro %}

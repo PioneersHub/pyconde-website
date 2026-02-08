@@ -1,0 +1,35 @@
+{% macro render_why_attend(data, section_label='Why attend') %}
+{% if data %}
+<section class="why-attend" aria-label="{{ section_label }}">
+  <div class="content">
+    {% if data.section_title %}<h2 class="why-attend__title">{{ data.section_title }}</h2>{% endif %}
+
+    {% if data.highlights %}
+    <div class="why-attend__highlights">
+      {% for h in data.highlights %}
+      <div class="why-attend__highlight">
+        <span class="why-attend__icon">{{ h.icon }}</span>
+        <span class="why-attend__value">{{ h.value }}</span>
+        <span class="why-attend__label">{{ h.label }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if data.testimonials %}
+    <div class="why-attend__testimonials">
+      {% for t in data.testimonials %}
+      <blockquote class="why-attend__quote">
+        <p>"{{ t.quote }}"</p>
+        <footer>
+          <strong>{{ t.author }}</strong>
+          {% if t.role %}<span class="why-attend__role">{{ t.role }}</span>{% endif %}
+        </footer>
+      </blockquote>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+{% endmacro %}

@@ -1,0 +1,41 @@
+{#
+  Community Spotlight
+  ───────────────────
+  Short section celebrating the volunteer-driven model.
+
+  Usage:
+    {% from "macros/community.html" import render_community %}
+    {{ render_community(bag('community')) }}
+
+  Parameters:
+    community_data – full databag dict with title, body, link_text, link_url
+    section_label  – accessible label (default: 'Community')
+
+  Databag schema (community.yaml):
+    title: "We Get Things Done: Together"
+    body: "Built by the community..."
+    link_text: "Meet the team"
+    link_url: /team
+#}
+
+{% macro render_community(community_data, section_label='Community') %}
+
+{% if community_data and community_data.body %}
+
+<section class="community" aria-label="{{ section_label }}">
+  <div class="content">
+    {% if community_data.title %}
+    <h2 class="community__title">{{ community_data.title }}</h2>
+    {% endif %}
+    <p class="community__body">{{ community_data.body }}</p>
+    {% if community_data.link_text and community_data.link_url %}
+    <a href="{{ community_data.link_url }}" class="community__link">
+      {{ community_data.link_text }}
+    </a>
+    {% endif %}
+  </div>
+</section>
+
+{% endif %}
+
+{% endmacro %}
