@@ -1,0 +1,88 @@
+title: Building Agentic Systems with Python, LangGraph, MCP, and A2A
+---
+created: 2025-11-26
+---
+code: JBFGCA
+---
+speaker_names: Holger Nösekabel
+---
+speakers:
+
+
+### Holger Nösekabel
+
+Holger Nösekabel has deep experience in data ecosystems, applied data science, and building production-grade systems with multidisciplinary teams. As CTO at TD Reply, he leads more than 20 engineers, data scientists, and visualization specialists in developing internal data products and delivering complex analytics projects for global Fortune 500 companies.
+
+Before taking on the CTO role, Holger served as Director of Technical Consulting, supporting engineering teams and advising major brands on data-driven strategy. He is also a Certified ScrumMaster and an advocate for practical, team-focused agile practices.
+
+Holger enjoys working at the intersection of data, product development, and real-world impact - bringing technical insights to diverse audiences and helping teams turn ideas into reliable, scalable solutions.
+
+---
+abstract:
+
+Building an agentic system that collects and evaluates company information in real time—without curated datasets—requires solving difficult challenges in data acquisition, quality control, and agent orchestration.
+
+This talk outlines the solution design for such a system, implemented with Python-based tooling including LangGraph, and emerging protocols such as A2A and MCP, within a multi-agent workflow. Because MCP and A2A are still new and lightly documented, we will share implementation lessons and a practical example of a hub-and-spoke architecture based on a recent real-world system.
+
+Attendees will learn architectural patterns for multi-agent systems, common pitfalls of using MCP/A2A in real-world scenarios, and strategies for maintaining data quality in agent-based workflows.
+---
+full_description:
+
+# What we are going to show
+
+- A live demo of a Python-based multi-agent system that retrieves, aggregates, and evaluates company information in real time.
+- The overall solution architecture: how LangGraph, MCP, A2A, and custom Python components fit together.
+- Key implementation lessons from building the system, covering both technical and business challenges.
+
+# What problem is our talk addressing
+
+AI analysis depends heavily on data. When systems cannot rely on pre-collected or curated datasets, developers must find, collect, and validate data of sufficient quality.
+
+At the same time, emerging technologies such as MCP, A2A, and LangGraph are evolving quickly, with limited documentation, occasional breaking changes, and examples that rarely scale beyond minimal tutorials. Applying these tools to real-world Python applications introduces challenges in design, orchestration, versioning, and error handling that are not yet widely discussed.
+
+# Why is the problem relevant to the audience
+
+Many Python developers and data practitioners will soon need to build systems that combine LLMs, external data sources, and multi-agent logic, without relying on static datasets. This talk provides practical guidance for designing such systems using open-source Python tooling.
+
+The presented solution is designed with a modular, scalable component approach. MCP and A2A protocols facilitate the connection between AI-related solutions, and this design demonstrates re-usable patterns for implementation.
+
+By sharing our approach, design choices, and implementation pitfalls, the talk equips attendees to anticipate challenges early, evaluate whether MCP/A2A are appropriate for their own projects, and build more robust agentic systems.
+
+# What is our solution to the problem
+
+Our solution has split responsibilities in several blocks, though the overall idea is to present with code examples a Python system that combines LangGraph, A2A and MCP:
+
+- Data access via MCP servers
+MCP servers retrieve data from multiple sources (e.g., LinkedIn APIs, web scraping endpoints, Perplexity research). Using MCP makes it easy to plug in new data sources and manage them consistently. We demonstrate how to build and connect MCP servers in Python.
+- Data processing via LangGraph agents
+A set of agents implemented in LangGraph handle tasks such as coordinating the workflow, collecting company data, calculating evaluation scores, and validating results. These agents operate in a hub-and-spoke pattern centered around a coordinator agent. We show how this is implemented in Python using LangGraph.
+- Inter-agent communication via A2A
+Agents exposes capability “cards,” which the coordinator aggregates into a registry. An intent-detection step determines which agents should be invoked to answer a user's request. We demonstrate how A2A can be applied in Python to orchestrate agents effectively.
+- Data validation agent
+A dedicated validation agent checks retrieved data against defined rules to ensure quality. While no internet-sourced data is perfect, this approach significantly increases reliability. We show how validation logic is implemented within the LangGraph flow.
+- Scalability through configuration and deployment
+A centralized configuration file and simple Docker-based deployment make the system easy to scale and adapt. We explain how environment variables and shared configuration patterns can coordinate the various Python components.
+
+# What are the main takeaways from our talk
+
+Attendees will learn:
+
+- How to design and implement a practical multi-agent architecture using Python, LangGraph, MCP, and A2A.
+- How to acquire and validate external data dynamically without relying on curated datasets.
+- Common pitfalls and lessons from using MCP and A2A in larger-scale systems.
+- How to structure agent roles, orchestration flows, and validation strategies for scalable, extendable AI systems.
+---
+room: 
+---
+day: 
+---
+start_time: 
+---
+track: Autonomous Systems & AI Agents
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+social_card_image: /static/media/social/talks/JBFGCA.png
+

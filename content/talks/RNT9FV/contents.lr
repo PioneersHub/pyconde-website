@@ -1,0 +1,46 @@
+title: PyTorch and CPU-GPU Synchronizations
+---
+created: 2026-01-10
+---
+code: RNT9FV
+---
+speaker_names: Tomas Ruiz
+---
+speakers:
+
+
+### Tomas Ruiz
+
+I am a research assistant at the Ludwig-Maximilian-University of Munich within Prof. Schwemmer’s Computational Social Science Lab. My research area is the intersection of Machine Learning and Social Media, particularly on multi-modal understanding. In previous jobs, I have worked as a software engineer in different corporations (Amazon, Allianz, BMW) and Startups. The projects ranged from optimization algorithms to backend-engineering.
+
+---
+abstract:
+
+CPU–GPU synchronizations are a subtle performance killer in PyTorch: they block the host, prevent the CPU from running ahead, and create GPU idle gaps. This talk explains what host-device synchronization is, how it’s triggered by subtle code patterns (dynamic-shapes), and how to diagnose it with NVIDIA Nsight Systems by correlating utilization gaps with long CUDA API calls. We’ll end with practical mitigation patterns, including unit testing for syncs via `torch.cuda.set_sync_debug_mode()` and when a small Triton kernel can help avoid syncs and fuse ops.
+---
+full_description:
+
+PyTorch gets its speed from asynchronous execution: the CPU launches operations quickly while the GPU executes them later. CPU–GPU (host-device) synchronizations break this pipeline by blocking the host until the GPU reaches a specific point. The result is often counterintuitive: even if kernels are fast, the GPU develops idle gaps, throughput drops, and latency rises because the CPU can no longer run ahead and keep the GPU fed with work.
+
+This talk builds intuition with a minimal loop that alternates a slow GPU operation with a quick “bookkeeping” operation, a pattern that resembles many inference and training pipelines. By adding a seemingly harmless action—such as printing a CUDA tensor—we’ll see how easily a synchronization can be introduced and why the slowdown can be disproportionate to what the code appears to do.
+
+We’ll then walk through a practical profiling workflow in NVIDIA Nsight Systems. The key technique is to correlate GPU utilization gaps with long CPU-side CUDA API calls (for example cudaStreamSynchronize) that indicate the host thread is waiting. Comparing a healthy trace to a sync-heavy trace makes it clear where the pipeline stalls and which code region triggers it.
+
+Beyond the usual suspects (.item(), printing device tensors, explicit device transfers), the talk highlights dynamic shapes as a common synchronization trigger. Patterns like boolean indexing with a GPU mask or slicing with a GPU-resident index can force PyTorch to fetch information back to the CPU to determine output sizes and allocations. We’ll discuss how to recognize these cases and how to restructure code toward shape-stable alternatives when possible.
+
+Finally, we’ll cover how to prevent regressions. Instead of relying on profiling alone, we’ll use PyTorch’s experimental API `torch.cuda.set_sync_debug_mode()` in unit tests to surface synchronizations early, while keeping production code unchanged. We’ll close with guidance on when a small Triton kernel is worth considering to avoid sync-inducing patterns and to fuse multiple small ops into a single, fully asynchronous kernel.
+---
+room: 
+---
+day: 
+---
+start_time: 
+---
+track: PyData & Scientific Libraries Stack
+---
+python_skill: Intermediate
+---
+domain_expertise: Advanced
+---
+social_card_image: /static/media/social/talks/RNT9FV.png
+

@@ -1,0 +1,87 @@
+title: Free T(h)r(e)ading: A Trading Systems Journey Beyond the GIL
+---
+created: 2026-01-09
+---
+code: NDZSSB
+---
+speaker_names: Tim Kreitner
+---
+speakers:
+
+
+### Tim Kreitner
+
+Tim Kreitner is a Senior Software Engineer at Vattenfall Energy Trading GmbH in Hamburg, Germany. With a background in Mechanical and Computational Engineering, Tim transitioned into the field of finance, leveraging various programming languages.
+
+At Vattenfall, Tim develops Algorithmic Trading Infrastructure applications. Including Order Routers, Market Data Servers, Exchange connections.
+
+---
+abstract:
+
+Python 3.13's free-threaded mode opens new territory for Python concurrency. We embarked on an experiment: could a trading algorithm benefit from true parallelism, and what would it take to get there? This talk documents our research journey from async/await to free threading—the hypotheses we tested, the benchmarks we designed, the unexpected behaviours we discovered, and the systematic approach we took to validating whether GIL-free Python could handle real-time market data. You'll see our experimental methodology, the data we collected, surprising findings about thread scheduling and memory patterns, and what our results suggest about Python's concurrent future.
+---
+full_description:
+
+The release of Python 3.13 with experimental free-threaded mode (PEP 703) represents a fundamental shift in Python's concurrency model. For decades, the Global Interpreter Lock has dictated how we write concurrent Python code, pushing developers toward async/await patterns for I/O-bound workloads and multiprocessing for CPU-bound tasks. But what happens when we remove that constraint?
+
+We designed a research experiment to answer this question empirically: take a production trading algorithm built on asyncio, migrate it to free threading, and measure everything. Trading systems make ideal subjects for this research—they're latency-sensitive, handle multiple concurrent data streams, perform both I/O and CPU-bound operations, and have clear, quantifiable performance metrics.
+
+This talk presents our complete research journey, from initial hypothesis to validated conclusions, sharing both our methodology and findings.
+
+Detailed Outline:
+1. Research Question & Motivation (3 minutes)
+
+The research question: can a trading algorithm benefit from true parallelism?
+Why trading systems make ideal experimental subjects
+Initial hypotheses about performance characteristics
+Baseline system: async architecture and performance profile
+
+2. Experimental Design (4 minutes)
+
+Migration approach
+Benchmarking framework
+Workload simulation
+Control variables and isolation of I/O vs. CPU-bound operations
+
+3. Migration Journey (5 minutes)
+
+Architectural transformation
+Key refactoring patterns and synchronization strategies
+Thread safety challenges
+Library ecosystem compatibility findings
+
+4. Results & Discoveries (8 minutes)
+
+Performance data: latency, throughput, and resource utilization
+Workload analysis: where free threading won, where async remained competitive
+Visual data presentation: charts and comparative analysis
+
+5. Practical Implications (4 minutes)
+
+Decision framework: when to choose free threading over async
+Migration best practices and lessons learned
+Production readiness assessment
+What this means for Python's concurrent future
+
+6. Q&A (5 minutes)
+
+Prerequisites - This talk assumes attendees have:
+
+- Strong understanding of Python's concurrency models (asyncio, threading, multiprocessing)
+- Familiarity with the GIL and its implications
+- Basic understanding of systems programming concepts (thread safety, synchronization)
+---
+room: 
+---
+day: 
+---
+start_time: 
+---
+track: Programming & Software Engineering & Testing
+---
+python_skill: Intermediate
+---
+domain_expertise: None
+---
+social_card_image: /static/media/social/talks/NDZSSB.png
+

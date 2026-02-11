@@ -1,0 +1,69 @@
+title: The Day the Agent Started Lying (Politely)
+---
+created: 2025-12-21
+---
+code: P8Y9TD
+---
+speaker_names: Asya Melnik
+---
+speakers:
+
+
+### Asya Melnik
+
+I started as a data scientist, building ML microservices and deploying models into production. I later moved into a consulting role, where I helped adapt ML models to real customer needs, translate business problems into measurable objectives, interpret results, and monitor model performance over time.
+
+Over the years, my work gradually shifted towards GenAI. I now design and build AI agents from scratch for internal process optimisation, support colleagues in adopting GenAI and agentic AI responsibly, and promote security-aware practices in solution development. A large part of my work focuses on evaluating and monitoring agent behaviour in real environments to ensure these systems remain useful, safe, and trustworthy after deployment.
+
+---
+abstract:
+
+You deploy an agent to automatically route incoming customer support tickets. At first, it is a clear win: response times improve, customers are happier, and support teams finally get some rest.
+
+Then time passes.
+
+Nothing crashes. Dashboards stay green. No alerts fire. Yet the agent’s decisions slowly degrade first slightly, then inconsistently, and eventually becoming confidently wrong.
+
+This is data drift.
+
+LLM-based agents in production operate in constantly changing environments. Products launch, outages happen, terminology evolves, and priorities shift. Unlike traditional ML models, LLMs can produce plausible, well-phrased outputs even when they are incorrect, making these failures difficult to detect.
+
+In this talk, we focus on practical techniques for continuously evaluating and monitoring LLM-based agents after deployment. Using a support-ticket routing agent as an example, we examine drift signals such as increasing classification uncertainty, spikes in fallback categories, shifts in embedding distributions, and growing disagreement with historical or human decisions.
+
+The emphasis is not on training or prompt tuning, but on operating agents safely over time: detecting silent failures early and knowing when intervention, retraining, or retirement is required before users notice.
+---
+full_description:
+
+In this talk, we will walk through a concrete production-style example of an LLM-based agent that automatically classifies and routes incoming customer support tickets. The agent takes raw ticket text as input, predicts a priority label, and routes the ticket to the appropriate support queue. A human override is possible but expected to be rare.
+
+At deployment time, the system performs well. Classification confidence is high, fallback usage is low, and manual corrections are infrequent. Over time, however, the environment changes: new products are launched, outages introduce new failure modes, terminology evolves, and internal definitions of ticket priorities shift. Nothing crashes, latency remains stable, and traditional service-level metrics stay green; yet the agent’s decisions slowly degrade.
+
+This talk focuses on how to observe, measure, and act on that degradation.
+
+Using recorded ticket data and a demo, I will show how to instrument an LLM-based agent with continuous evaluation signals, including:
+
+- Tracking class-probability entropy over time to detect increasing uncertainty
+- Monitoring the rate of “unknown” or fallback predictions as an early warning signal
+- Measuring embedding distribution drift between historical and recent tickets
+- Quantifying disagreement between current agent decisions and historical routing outcomes or human corrections
+
+I will demonstrate how these signals can be computed in rolling time windows, visualised on simple dashboards, and connected to alert thresholds. Rather than relying on a single accuracy number, the talk shows how multiple weak signals together reveal silent failure modes that would otherwise go unnoticed.
+
+The focus is deliberately not on training new models or tuning prompts. Instead, we concentrate on operating LLM-based agents safely after deployment. You will see how to build a continuous evaluation pipeline, how to distinguish normal variation from meaningful drift, and how to decide when intervention is required whether that means retraining, prompt changes, label redefinition, or temporary rollback to human routing.
+
+By the end of the talk, attendees will have a clear, practical blueprint for monitoring LLM-based agents in production and for detecting quiet, confident failure modes before they affect users or business operations.
+---
+room: 
+---
+day: 
+---
+start_time: 
+---
+track: MLOps & DevOps
+---
+python_skill: Novice
+---
+domain_expertise: Intermediate
+---
+social_card_image: /static/media/social/talks/P8Y9TD.png
+

@@ -1,0 +1,93 @@
+title: Offline Fallback for a Mobile LoRaWAN Gateway
+---
+created: 2025-11-19
+---
+code: 7JXYKH
+---
+speaker_names: Jannis Lübbe
+---
+speakers:
+
+
+### Jannis Lübbe
+
+2008 
+M.Sc. Physics and Computer Science at Osnabrück University
+
+2012 
+PhD in Physics at Osnabrück University
+
+2013 - now 
+Sensor Developer at ROSEN Group
+
+2020 - now 
+Volunteer operative in the Federal Agency for Technical Relief (THW, Germany)
+
+---
+abstract:
+
+LoRaWAN gateways typically depend on cloud-based network servers, creating a vulnerability during internet outages. This talk presents a hybrid solution: a Raspberry Pi-based mobile gateway that operates on The Things Stack Sandbox while simultaneously decoding all device messages locally.
+
+The system leverages existing network infrastructure for broad coverage during normal operation, while maintaining full local data access when connectivity fails. This is particularly valuable for emergency response scenarios and remote monitoring where sensor data must remain available regardless of network conditions.
+
+The implementation uses Python for gateway orchestration and API integration, while incorporating existing JavaScript libraries (`lora-packet` and device decoders) for LoRaWAN decryption and payload decoding. Data is stored locally in SQLite for reliability and easy access.
+---
+full_description:
+
+LoRaWAN (Long Range Wide Area Network) is widely used for IoT sensor deployments due to its long range and low power consumption. Operating at 868MHz across Europe, it's ideal for remote monitoring applications—from water level sensors to asset tracking and personnel location systems. However, traditional LoRaWAN deployments rely on cloud-based network servers, making them vulnerable to internet outages.
+
+**The Challenge**
+
+While networks like The Things Stack provide good geographic coverage, gaps remain—particularly in remote areas where emergency response units operate. A mobile gateway can close these gaps, but standard configurations still require internet connectivity. You could deploy a completely local network with your own network server, but this sacrifices the existing infrastructure's coverage. 
+
+**The Solution**
+
+This talk presents a hybrid architecture that combines cloud-based operation with local resilience. The system primarily operates through The Things Stack Sandbox, leveraging its network coverage. Simultaneously, a Raspberry Pi-based mobile gateway decodes all messages from your devices locally in parallel. During normal operation, you benefit from cloud features. When internet connectivity fails, your sensor data remains accessible locally on the gateway.
+
+**Technical Implementation**
+
+The solution consists of:
+
+1. **Raspberry Pi Gateway**: Configured as a mobile LoRaWAN gateway for The Things Stack Sandbox, suitable for vehicle deployment
+2. **Session Key Management**: Python service retrieving session keys for your devices via The Things Stack API
+3. **Local Message Processing**: Real-time decryption and decoding of LoRaWAN messages without internet dependency
+4. **Data Storage**: SQLite-based local storage for reliable data persistence
+
+**Python and JavaScript Integration**
+
+The core implementation uses Python for gateway orchestration, API integration, and data management. For LoRaWAN encryption/decryption and payload decoding, the system leverages existing JavaScript libraries—specifically `lora-packet` and community-maintained device decoders. This talk demonstrates practical patterns for Python/JavaScript interoperability.
+
+**Real-World Context**
+
+Drawing from volunteer emergency response experience, this solution addresses operational requirements where sensor data must remain available regardless of infrastructure status. The system ensures continuity of critical information during incidents.
+
+**What You'll Learn**
+
+- Designing resilient edge computing architectures for IoT
+- Integrating Python with JavaScript libraries
+- LoRaWAN security fundamentals (session keys, encryption)
+- Building offline-first systems with SQLite
+- API integration with The Things Stack
+
+**Open Source**
+
+Complete implementation available on GitHub, providing a reproducible setup valuable for volunteer organizations, research projects, and scenarios requiring IoT infrastructure that remains operational during connectivity disruptions.
+
+**Target Audience**
+
+Python developers interested in IoT and edge computing. No prior LoRaWAN experience required.
+---
+room: 
+---
+day: 
+---
+start_time: 
+---
+track: Infrastructure - Hardware & Cloud
+---
+python_skill: Intermediate
+---
+domain_expertise: Novice
+---
+social_card_image: /static/media/social/talks/7JXYKH.png
+
