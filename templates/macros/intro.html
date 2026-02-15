@@ -1,0 +1,53 @@
+{#
+  Intro Section — Full-viewport branded hero
+  ───────────────────────────────────────────
+  Logo + conference dates + scroll hint.
+  Dates come from site.config.PROJECT (single source of truth).
+
+  Usage:
+    {% from "macros/intro.html" import render_intro %}
+    {{ render_intro(bag('intro')) }}
+
+  Parameters:
+    intro_data    – full databag dict with logo, location
+    section_label – accessible label (default: 'Conference introduction')
+
+  Databag schema (intro.yaml):
+    logo_path: /static/media/logo-white.png
+    logo_alt: "PyConDE & PyData Darmstadt 2026"
+    logo_width: 480
+    logo_height: 185
+    location: "darmstadtium, Darmstadt"
+    show_scroll_hint: true
+#}
+
+{% macro render_intro(intro_data, section_label='Conference introduction') %}
+
+{% if intro_data %}
+
+<section class="intro" aria-label="{{ section_label }}">
+  <div class="content intro__content">
+    {% if intro_data.logo_path %}
+    <img src="{{ intro_data.logo_path }}"
+         alt="{{ intro_data.logo_alt }}"
+         class="intro__logo"
+         width="{{ intro_data.logo_width }}"
+         height="{{ intro_data.logo_height }}" />
+    {% endif %}
+    <div class="intro__details">
+      {% if intro_data.location %}
+      <p class="intro__location">{{ intro_data.location }}</p>
+      {% endif %}
+      <p class="intro__date"><strong>{{ site.config.PROJECT.conference_days }}</strong> &middot; Conference</p>
+      <p class="intro__date"><strong>{{ site.config.PROJECT.master_classes_days }}</strong> &middot; Masterclasses</p>
+      <p class="intro__date"><strong>{{ site.config.PROJECT.sprint_days }}</strong> &middot; Sprints &amp; Community Day</p>
+    </div>
+  </div>
+  {% if intro_data.show_scroll_hint %}
+  <span class="intro__scroll-hint" aria-hidden="true">&darr;</span>
+  {% endif %}
+</section>
+
+{% endif %}
+
+{% endmacro %}

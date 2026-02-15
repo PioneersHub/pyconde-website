@@ -479,12 +479,14 @@ a {
 .intro {
     background-color: var(--blue);
     color: white;
+    width: 100%;
     min-height: 100vh;
     min-height: 100svh;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
+    overflow: hidden;
 }
 
 .intro .content {
@@ -558,6 +560,54 @@ a {
 @keyframes gentle-bounce {
     0%, 100% { transform: translateX(-50%) translateY(0); }
     50% { transform: translateX(-50%) translateY(6px); }
+}
+
+/* ── Intro slideshow background ── */
+
+.intro__slideshow {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.intro__slide {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+}
+
+.intro__slide.active {
+    opacity: 1;
+}
+
+/* Semi-transparent brand overlay for text readability */
+.intro__slideshow::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: rgba(55, 120, 190, 0.65);
+    z-index: 1;
+}
+
+/* Ensure content sits above the slideshow + overlay */
+.intro__content {
+    z-index: 2;
+}
+
+.intro__scroll-hint {
+    z-index: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .intro__slide {
+        transition: none;
+    }
 }
 
 .intro-illustration .content {

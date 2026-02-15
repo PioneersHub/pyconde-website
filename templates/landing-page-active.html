@@ -6,7 +6,21 @@
 {% block body %}
 
     {# ── Hero: Full-viewport branded intro ── #}
-    <section class="intro">
+    <section class="intro" data-hero-slideshow>
+        {# ── Background slideshow images ── #}
+        {% set hero_images = bag('hero_images')['images'] %}
+        {% if hero_images %}
+        <div class="intro__slideshow" aria-hidden="true">
+            {% for image in hero_images %}
+            <img src="/static/media/hero_images/{{ image }}"
+                 alt=""
+                 class="intro__slide"
+                 loading="{{ 'eager' if loop.first else 'lazy' }}"
+                 decoding="async" />
+            {% endfor %}
+        </div>
+        {% endif %}
+
         <div class="content intro__content">
             <img src="/static/media/logo-white.png"
                  alt="PyConDE &amp; PyData Darmstadt 2026"
