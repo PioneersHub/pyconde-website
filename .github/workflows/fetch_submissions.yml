@@ -1,9 +1,9 @@
 name: Fetch submissions
 
 on:
-  # this workflow is disabled currently
-  # schedule:
-  #   - cron: "0 0 * * *"
+  # runs once per day at midnight
+  schedule:
+  - cron: "0 0 * * *"
   workflow_dispatch:
 
 jobs:
@@ -13,17 +13,17 @@ jobs:
       contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
-          token: ${{ secrets.PAT }}
-
+          persist-credentials: true
       - name: Setting up python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version-file: '.python-version'
-          cache: 'pip'
-      - run: pip install -r requirements.txt
-
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+      - name: Install project
+        run: uv sync --locked --all-extras
       - name: Run submissions fetcher
         run: make fetch-submissions
         env:

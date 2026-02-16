@@ -1,0 +1,73 @@
+title: Python Hates Being PID 1: Writing Container-Aware Code for Kubernetes
+---
+created: 2025-12-21
+---
+code: JJDCW3
+---
+speaker_names: Kavish Nareshchandra Dahekar
+---
+speakers:
+
+
+### Kavish Nareshchandra Dahekar
+
+Senior Dev at SAP by day, dad by night. Married to another dev. No code-reviews at dinner table. Latest stable release : baby girl. Average guitar player, above average guitar teacher. All my neighbours know I sing. Based in Berlin, fluent in Python, German still in beta.
+
+---
+abstract:
+
+On Kubernetes, your Python app runs in a hostile environment, fighting for resources in a straitjacket, bombarded with signals, and being killed and ruthlessly dragged back to life time and again. This is in stark contrast to the wonderful weather of a Linux web server or the blissful utopia of localhost. If not hardened properly, your Python app will find the burden of being containerized too hard to bear. And the result? Zombies!
+
+Whether you are a Kubernetes expert, or you just deployed your first containerized Hello World, we will together explore how the Python Interpreter, the Linux Kernel and Kubernetes interact with each other.
+
+We will uncover why Python struggles as an init process, how Kubernetes CPU-limits fight the Global Interpreter Lock (GIL) and why Python’s Garbage Collector cannot save you from sudden OOM kills. Most importantly, we will see how to identify, debug, and avoid containerized Python pitfalls. The goal of this talk is to help you stop treating your container like a server and learn to write Cloud-Native Python that knows exactly where it lives.
+---
+full_description:
+
+**The Problem** : The large-scale adoption of Kubernetes means more Python developers are now writing code that runs as a containerized workload on Kubernetes. However, most of us still write applications with a standard Linux server in mind. In a containerized environment, these assumptions are either untrue or dangerous. Python apps not hardened for a containerized environment lead to production failures that are notoriously hard to debug:
+- Unexplained Latency: API requests that stall for hundreds of milliseconds due to Linux CFS Quota throttling, even when monitoring shows low CPU usage.
+- Silent OOM Kills: Containers that vanish instantly without a traceback because they hit a Cgroup limit that the Python Garbage Collector cannot see.
+- Zombie Processes: Subprocesses that were never truly killed and are now exhausting the process table because Python ignores its duties as PID 1.
+
+**The Solution** : This talk will briefly get you up to speed with containerization before taking a technical deep dive into the interactions between Kubernetes, the CPython interpreter and the Linux container runtime. We will move beyond basic Dockerfile best practices and focus on hardening the application code itself to survive in a hostile Kubernetes environment.
+
+**Pre-requisites** : This talk is aimed towards intermediate to senior Python Developers and Data Engineers having basic familiarity with Docker. No advanced Kubernetes or Linux Kernel knowledge required, we will run through the foundational topics in brief.
+
+**Outline (30 Minutes)**
+1. Who am I? (2 mins)
+2. The Lie of the Container (3 mins)
+    - Understanding how the container runtime isolates your process and the resources it needs.
+3. The PID 1 Problem (4 mins)
+    - How the Linux kernel treats PID 1 processes and why the standard Python interpreter fails these duties.
+    - Present well established solutions to the problem (init: true, tini, etc) and common pitfalls.
+4. The CPU Quota & Memory Limit (8 mins)
+    - How container CPU limits in Kubernetes translate to Linux CFS (Completely Fair Scheduler) quotas. 
+    - Visualizing how the enforcement of CFS quotas interacts with the Python GIL to cause latency spikes.
+    - Python’s memory management and the dreaded OOM kill.
+5. Hardening your Python Code (8 mins)
+    - How to use the Cgroup file system or psutil to achieve true resource awareness.
+    - Strategies for avoiding CPU throttling and tuning numeric libraries (Pandas/Numpy) from attempting to use too many cores.
+    - Why `gc.collect()` is often insufficient and how to release memory before the OOM killer strikes.
+6. Conclusion & Checklist (5 mins)
+    - A "Production-Ready" checklist for Python on K8s.
+    - Q&A.
+
+**After this talk you will** :
+- Understand the lifecycle of a containerized Python app and handle shutdowns gracefully.
+- Fine-tune a containerized Python app for stability and avoid CPU throttling and OOM kills.
+- Look beyond the standard system calls to write truly resource aware Python apps.
+---
+room: 
+---
+day: 
+---
+start_time: 
+---
+track: Programming & Software Engineering & Testing
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+social_card_image: /static/media/social/talks/JJDCW3.png
+

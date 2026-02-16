@@ -1,0 +1,127 @@
+title: Escape the Hype: Teaching LLM Concepts Through an Interactive AI Factory Game
+---
+created: 2025-12-19
+---
+code: MS7AWK
+---
+speaker_names: Vadim Vlasov, Eric Glaser, Lisa Amrhein
+---
+speakers:
+
+
+### Vadim Vlasov
+
+I'm a Data Scientist based in Munich who believes AI should be understood, not feared. After earning my Master's at LMU Munich, I've spent the past four years turning complex ML challenges—from computer vision to agentic systems—into working solutions. But what really excites me is making AI click for others: whether through hands-on workshops or building interactive experiences that turn abstract concepts into "aha!" moments. When I'm not wrangling models, you'll find me exploring ways to gamify learning and bridge the gap between cutting-edge AI and everyday understanding
+
+### Eric Glaser
+
+I am a junior data scientist at Steadforce, building LLM and agent workflows with Python from cloud to edge. My current focus is AI literacy: helping teams understand what LLMs, RAG, and agents actually do beyond the hype. I co-designed “AI Factory,” a game where players break and fix AI systems to build real intuition.
+
+### Lisa Amrhein
+
+
+
+---
+abstract:
+
+Everyone talks about LLMs, RAG, and AI agents - but who truly understands them? Marketing promises magic while documentation assumes expertise. Recent research from Gartner reveals the consequences: only 8% of HR leaders believe their managers possess adequate AI competency, while companies that restructure work around AI achieve revenue goals twice as often as those who merely train employees. The problem isn't lack of information; it's the lack of genuine understanding through experience.
+
+We took a different approach. Instead of slides or tutorials, we built "AI Factory" - a non-profit educational platform in the form of escape room game where players learn by doing. Craft prompts under budget pressure. Watch guardrails fail in real-time. Break their own RAG pipeline. Each mistake teaches more than any documentation ever could. 
+
+In this talk, we'll share what we discovered while building and testing this game with real users: why failure-driven learning outperforms tutorials, how game mechanics create memorable "aha moments," and the surprising concepts that clicked only through play.
+---
+full_description:
+
+The AI Literacy Crisis: Why This Matters Now
+
+The gap between AI adoption and AI understanding has never been wider. Companies rush to integrate LLMs into products while developers copy-paste prompts without understanding why they work. Marketing materials promise magic; reality delivers confusion. And with the European AI Act now requiring organizations to ensure "a sufficient level of AI literacy among their staff," this isn't just an educational problem - it's becoming a compliance imperative.
+
+To address this gap, we developed "AI Factory," an interactive game-based platform for teaching LLM concepts through hands-on experience. We built it primarily as an internal tool to teach our own colleagues and to explore what makes technical education actually work. But first, let's examine why traditional approaches are failing:
+
+Traditional learning approaches are failing to close this gap:
+•	Documentation assumes ML backgrounds and drowns readers in technical jargon
+•	Tutorials oversimplify trivial examples that don't transfer to real problems
+•	Conference talks inspire but rarely build the intuition needed for day-to-day work
+•	Vendor marketing actively obscures how systems actually work
+
+What's missing is embodied learning - the kind where you touch the parameters, break the system, and feel the consequences. This is exactly what the developed educational platform provides: a safe space to fail, experiment, and build genuine understanding through direct experience.
+
+Why Games Work for Technical Education
+
+Games aren't just "fun ways to learn" - they're pedagogically powerful for specific, well-understood reasons:
+•	Intrinsic motivation replaces external pressure. When learners want to succeed in a game, they engage with material more deeply than when studying for an exam. The challenge becomes personally meaningful
+•	Immediate feedback accelerates learning cycles. In traditional education, you might wait days for assignment feedback. In a game, you see results in seconds. This tight loop between action and consequence is how humans naturally learn complex systems
+
+•	Failure becomes safe and instructive. Games normalize failure as part of the process. When a player's prompt gets injected or their RAG pipeline returns nonsense, they're motivated to understand why - not ashamed of not knowing. More importantly, experiencing these failures in a low-stakes environment builds pattern recognition: players who've watched an LLM leak "confidential" potion recipes in the game are far more vigilant about data exposure in production. They've seen how easily guardrails can be bypassed, how confidently LLMs hallucinate, how subtly prompt injections can hide in user input. Better to learn these lessons with fictional potion formulas than with actual customer data or proprietary information
+
+•	Concrete experience precedes abstract theory. Rather than explaining what temperature=1.0 means theoretically, players first experience its effects. The theory makes sense because they've already seen it in action
+
+•	Constraints create creativity. Budget limits, time pressure, and quality requirements force players to think strategically about tradeoffs - exactly the skill needed in production AI systems.
+
+These aren't speculative claims. Research in educational psychology consistently shows that game-based learning improves retention, transfer, and engagement compared to passive instruction. We've applied these principles specifically to LLM education.
+
+
+AI Factory: Our Approach
+
+"AI Factory" is an educational platform we built to teach LLM concepts, not a commercial product, but a teaching tool we developed for our own training needs and client workshops. Built with Python and Streamlit, it takes the form of an interactive game where players learn through hands-on challenges. Set in a magical potion factory (a metaphor for an AI-powered company), players take on the role of an apprentice who must master increasingly complex AI systems to succeed.
+
+What makes it different from typical AI tutorials:
+
+•	Real API calls, not simulations. The game connects to actual LLM APIs. When players adjust temperature from 0.3 to 0.9, they see real output changes. When they misconfigure guardrails, real prompt injections succeed. This authenticity ensures that skills transfer to production environments. The challenge - and the opportunity - of working with real LLMs is their inherent randomness. Each time a player tackles a level, the output can differ, offering new insights and teaching fresh strategies for effective model interaction.
+
+•	Budget-driven decision making. Every API call costs in-game currency. Players must balance quality, cost, and speed - exactly the tradeoffs faced in real AI deployments. This transforms abstract concepts like "token efficiency" into visceral resource management.
+
+•	Progressive complexity with no prerequisites. The game assumes zero AI background but the platform isn't just for beginners. While newcomers start with prompting basics, experienced practitioners consistently discover blind spots—guardrail tradeoffs they hadn't considered, RAG subtleties they'd glossed over, agent coordination patterns that surprised them. Each level includes optional technical deep-dives for those wanting more depth. Levels take 15-25 minutes each, allowing self-paced progression. An unexpected benefit: players with different backgrounds approach challenges differently, sparking rich discussions when played in teams
+
+•	Failure as the primary teacher. The game is designed so that players will fail - and learn from it. When a prompt injection succeeds, players don't just see "wrong answer." They see exactly how their system was compromised and must figure out how to defend against it.
+
+
+Design Decisions That Worked (And Didn't)
+
+Building this game taught us as much about AI education as playing it teaches about AI. In this talk, we'll share specific design decisions and their outcomes:
+
+•	The prompt injection plot twist. In one of the levels players configure an AI classifier. Unknown to them, one of the "batch reports" contains a hidden prompt injection. When their classifier gets tricked, the game reveals what happened. This "aha moment" consistently produces better security awareness than any lecture about injection risks.
+
+•	Budget constraints transform engagement. Early versions had unlimited API calls. Players clicked randomly until something worked. Adding budget constraints forced strategic thinking: "Is this prompt worth 5 coins? Should I iterate locally first?" Scarcity created engagement.
+
+•	Wrong answers need explanations. Simply showing "incorrect" frustrated players. Now, wrong answers include diagnostic information: "Your prompt produced 'PASS' but the batch contained contamination. Here's why the AI missed it..." Failure becomes education.
+
+•	What didn't work: Quiz-style challenges. Early prototypes included multiple-choice questions. Players gamed them by elimination rather than understanding. We removed all quizzes in favor of open-ended challenges with AI-evaluated responses.
+
+•	What didn't work: Too much text. Initial level introductions were walls of documentation. Players skipped them. We replaced text with brief narrative setup and let players learn by doing and AI generated short videos.
+
+•	What we struggled with: LLM non-determinism. Building an educational game on top of inherently unpredictable systems created unexpected challenges. The same prompt could produce different outputs, breaking our evaluation logic. We had to develop workarounds: structured output formats, temperature=0 for critical evaluations, multiple validation passes, LLM-as-a-judge, and designing challenges where variation was acceptable or even desirable. This struggle itself became a teaching moment - players learn that "same input, same output" isn't guaranteed with LLMs.
+
+What You'll Learn From This Talk
+
+This presentation goes beyond "look at our cool game." You'll leave with:
+
+•	A framework for gamifying technical education. The principles we applied - intrinsic motivation, tight feedback loops, progressive disclosure, authentic consequences - work for any complex technical domain, not just AI.
+•	Understanding of which AI concepts are hardest to teach. Based on player testing, we've identified where misconceptions cluster (RAG chunking, agent coordination, guardrail tradeoffs) and how to address them.
+•	Practical design patterns. Specific techniques: how to use budget constraints for engagement, how to make failure instructive, how to sequence concepts for progressive learning.
+
+The technical stack is based on Python 3.11+, uses Streamlit for the frontend, Azure OpenAI (GPT-5, GPT-4o-mini) and the OpenAI Agents SDK for AI capabilities, PostgreSQL for persistence, and Docker for deployment.
+
+Who Should Attend
+
+This talk is designed for multiple audiences:
+•	Educators and trainers looking for new approaches to teaching AI concepts
+•	Team leads who need to upskill their teams on LLM fundamentals
+•	Developers who want deeper intuition for AI systems (the game design reveals how concepts connect)
+•	Anyone interested in gamification as an approach to technical education
+No AI/ML background is required. Basic Python familiarity is helpful but not essential - the talk focuses on educational methodology, not implementation details.
+---
+room: 
+---
+day: 
+---
+start_time: 
+---
+track: Education, Career & Life
+---
+python_skill: None
+---
+domain_expertise: Novice
+---
+social_card_image: /static/media/social/talks/MS7AWK.png
+

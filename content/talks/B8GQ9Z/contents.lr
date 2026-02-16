@@ -1,0 +1,122 @@
+title: Compilerless Immediate-Mode Shader Generation in Pure Python
+---
+created: 2025-12-21
+---
+code: B8GQ9Z
+---
+speaker_names: Pavlo Penenko
+---
+speakers:
+
+
+### Pavlo Penenko
+
+I was born and raised in Kyiv, Ukraine.
+
+In 2000, I received a BSc in Computer Science from Taras Shevchenko National University of Kyiv.
+
+I started my career in game dev in Kyiv in the early 2000s, and continued it in Canada, moving to Vancouver in 2008 to render zombies at Capcom.
+
+Later, I worked on VR at AMD, content pipelines at Toonbox, Houdini Engine at SideFX, the Maya viewport at Autodesk and Redshift RT at Maxon.
+
+Currently, I'm Principal Software Developer at Autodesk, working on material and shading workflows in MaterialX and Hydra applications.
+
+---
+abstract:
+
+Discover how to build a GPU shader generator in pure Python, without having to write a compiler.
+
+We start by discussing how Pythonic embedded domain-specific languages (EDSLs) can help address the common challenges of shader programming.
+
+We then examine the architectural decisions shared by popular frameworks like Warp and Taichi and outline their limitations. In particular, their reliance on introspection means supporting only a subset of Python - a language within a language - while compiler-like backends necessitate complex implementations in languages like C++.
+
+The talk introduces an alternative architecture making it possible to overcome these limitations. Instead of introspection, we capture the program's logic by tracing execution with proxy objects at Python runtime, similar to JAX and PyTorch. Instead of building an IR, we emit target code eagerly, line-by-line, similar to how PyTorch Eager Mode launches computations. And because we don't implement a compiler, the implementation remains 100% Python.
+
+Attendees will leave with a toolbox of Python metaprogramming patterns empowering them to write a code generator in Python without having to implement a compiler.
+---
+full_description:
+
+The area of shader programming offers many tough problems to solve. The range of target platforms is vast: from CPU path-tracers to mobile GPUs - served by a zoo of incompatible languages: from GLSL to HLSL, from OSL to WGSL.
+
+ Common challenges include portability, managing specializations, and a lack of abstraction mechanisms. The solutions for these include the archaic C Preprocessor, templates/generics, visual graph frameworks, transpilers and, finally, embedded domain-specific languages (EDSLs).
+
+Python is an ideal host for Embedded Domain-Specific Languages (EDSLs). Warp, Taichi, Numba, and Triton evolved to target GPU compute. All of them share common architectural decisions. They capture the program's logic by inspecting the Python source code, generate an internal representation and compile that IR to the target format.
+
+The above approach comes with significant disadvantages. Only a subset of Python is supported, debugging with standard tools is impossible, integration with external Python code is limited, metaprogramming requires special syntax, and heavy compiler infrastructure needs to be implemented in a language like C++.
+
+This talk proposes an alternative architecture. Instead of introspection, we capture the program's logic by tracing execution with proxy objects at Python runtime, similar to JAX and PyTorch. Instead of building an IR, we emit target code eagerly, line-by-line, similar to how PyTorch Eager Mode launches computations. And because we don't implement a compiler, the implementation remains 100% Python.
+
+We discuss in detail how core elements of Python syntax can be overloaded to implement such an architecture:
+* Operator overloading to capture expressions.
+* Context managers to simulate C-like scopes.
+* `__setattr__`/`__getattr__` to capture variable names.
+* Function decorators to capture function signatures.
+
+Attendees will leave with a toolbox of Python mataprogramming patterns empowering them to write a code generator in Python without having to implement a compiler.
+
+# Outline
+## Introduction - why write shaders in Python? (5 min)
+
+* Platforms targeted by shaders
+* The variety of shading languages
+* Common challenges:
+   * Portability
+   * Permutation explosion
+   * Low level of abstraction
+* Existing solutions:
+   * C Preprocessor
+   * Templates/generics
+   * Visual graph frameworks
+   * Transpilers
+   * Embedded domain-specific languages (EDSLs) -> that's where we fit in.
+
+## Pythonic GPU EDSLs (5 min)
+
+* Warp, Taichi, Numba, and Triton
+* How do they work?
+    * Introspection: AST or byte code
+    * IR -> compilation
+* Limitations
+    * A subset of Python!
+    * Debugging
+    * Integration with other Python code
+    * Need to implement a compiler, meaning C++
+
+* Alternative architecture
+   * Tracing instead of introspection
+      * PyTorch and JAX analogy
+   * Immediate code emission
+      * PyTorch Eager analogy
+      * How correctness is maintained - the semantic model
+
+## Pythonic metaprogramming patterns making it all work (15 min)
+
+* Operator overloading to capture expressions.
+   * Tracer objects record math operations instead of performing them.
+   * Tracer objects are strongly typed and can enforce semantics better than the target language.
+* Context managers to simulate C-like scopes.
+   * The differences between the two and how to work around them.
+* How can capture variable names without introspection?
+   * `__setattr__`/`__getattr__` to on generator objects.
+   * How this helps composability with arbitrary Python code.
+* Function decorators to capture function signatures.
+
+## Proof-of-concept demo (5 min)
+
+* What actual generated shaders look like 
+* A demo 3D app with glTF PBR shaders implemented with our architecture
+---
+room: 
+---
+day: 
+---
+start_time: 
+---
+track: PyData & Scientific Libraries Stack
+---
+python_skill: Intermediate
+---
+domain_expertise: Novice
+---
+social_card_image: /static/media/social/talks/B8GQ9Z.png
+
