@@ -5,36 +5,9 @@
 
 {% block body %}
 
-    {# ── Hero: Full-viewport branded intro ── #}
-    <section class="intro" data-hero-slideshow>
-        {# ── Background slideshow images ── #}
-        {% set hero_images = bag('hero_images')['images'] %}
-        {% if hero_images %}
-        <div class="intro__slideshow" aria-hidden="true">
-            {% for image in hero_images %}
-            <img src="/static/media/hero_images/{{ image }}"
-                 alt=""
-                 class="intro__slide"
-                 loading="{{ 'eager' if loop.first else 'lazy' }}"
-                 decoding="async" />
-            {% endfor %}
-        </div>
-        {% endif %}
-
-        <div class="content intro__content">
-            <img src="/static/media/logo-white.png"
-                 alt="PyConDE &amp; PyData Darmstadt 2026"
-                 class="intro__logo"
-                 width="480" height="185" />
-            <div class="intro__details">
-                <p class="intro__location">darmstadtium, Darmstadt</p>
-                <p class="intro__date"><strong>{{ site.config.PROJECT.sprint_days }}</strong> &middot; Sprints &amp; Community Day</p>
-                <p class="intro__date"><strong>{{ site.config.PROJECT.conference_days }}</strong> &middot; Conference</p>
-                <p class="intro__date"><strong>{{ site.config.PROJECT.master_classes_days }}</strong> &middot; Masterclasses</p>
-            </div>
-        </div>
-        <span class="intro__scroll-hint" aria-hidden="true">&darr;</span>
-    </section>
+    {# ── Intro: Full-viewport branded hero ── #}
+    {% from "macros/intro.html" import render_intro %}
+    {{ render_intro(bag('intro')) }}
 
     {# ── Motto statement — bold on white ── #}
     {% from "macros/hero.html" import render_hero %}

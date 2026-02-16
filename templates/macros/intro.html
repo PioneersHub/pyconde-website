@@ -1,7 +1,7 @@
 {#
   Intro Section — Full-viewport branded hero
   ───────────────────────────────────────────
-  Logo + conference dates + scroll hint.
+  Logo + conference dates + optional background slideshow + scroll hint.
   Dates come from site.config.PROJECT (single source of truth).
 
   Usage:
@@ -9,7 +9,7 @@
     {{ render_intro(bag('intro')) }}
 
   Parameters:
-    intro_data    – full databag dict with logo, location
+    intro_data    – full databag dict with logo, location, hero_images
     section_label – accessible label (default: 'Conference introduction')
 
   Databag schema (intro.yaml):
@@ -19,13 +19,33 @@
     logo_height: 185
     location: "darmstadtium, Darmstadt"
     show_scroll_hint: true
+    hero_images:              # optional — omit for solid background
+      - photo1.jpg
+      - photo2.jpg
+    hero_image_dir: /static/media/hero_images
 #}
 
 {% macro render_intro(intro_data, section_label='Conference introduction') %}
 
 {% if intro_data %}
 
-<section class="intro" aria-label="{{ section_label }}">
+{% set has_slideshow = intro_data.hero_images and intro_data.hero_images | length > 0 %}
+{% set image_dir = intro_data.hero_image_dir | default('/static/media/hero_images') %}
+
+<section class="intro"{{ ' data-hero-slideshow' if has_slideshow }} aria-label="{{ section_label }}">
+
+  {% if has_slideshow %}
+  <div class="intro__slideshow" aria-hidden="true">
+    {% for image in intro_data.hero_images %}
+    <img src="{{ image_dir }}/{{ image }}"
+         alt=""
+         class="intro__slide"
+         loading="{{ 'eager' if loop.first else 'lazy' }}"
+         decoding="async" />
+    {% endfor %}
+  </div>
+  {% endif %}
+
   <div class="content intro__content">
     {% if intro_data.logo_path %}
     <img src="{{ intro_data.logo_path }}"
@@ -38,9 +58,9 @@
       {% if intro_data.location %}
       <p class="intro__location">{{ intro_data.location }}</p>
       {% endif %}
+      <p class="intro__date"><strong>{{ site.config.PROJECT.sprint_days }}</strong> &middot; Sprints &amp; Community Day</p>
       <p class="intro__date"><strong>{{ site.config.PROJECT.conference_days }}</strong> &middot; Conference</p>
       <p class="intro__date"><strong>{{ site.config.PROJECT.master_classes_days }}</strong> &middot; Masterclasses</p>
-      <p class="intro__date"><strong>{{ site.config.PROJECT.sprint_days }}</strong> &middot; Sprints &amp; Community Day</p>
     </div>
   </div>
   {% if intro_data.show_scroll_hint %}
