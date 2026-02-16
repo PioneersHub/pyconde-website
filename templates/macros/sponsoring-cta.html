@@ -1,0 +1,41 @@
+{#
+  Sponsoring CTA
+  ──────────────
+  Call-to-action section for sponsoring opportunities.
+
+  Usage:
+    {% from "macros/sponsoring-cta.html" import render_sponsoring_cta %}
+    {{ render_sponsoring_cta(bag('sponsoring_cta')) }}
+
+  Parameters:
+    data          – full databag dict with title, body, link_text, link_url
+    section_label – accessible label (default: 'Sponsoring')
+
+  Databag schema (sponsoring_cta.yaml):
+    title: "Sponsoring"
+    body: "Reach 2,000+ Python & AI professionals..."
+    link_text: "Explore sponsoring opportunities"
+    link_url: /sponsoring
+#}
+
+{% macro render_sponsoring_cta(data, section_label='Sponsoring') %}
+
+{% if data and data.body %}
+
+<section class="sponsoring-cta" aria-label="{{ section_label }}">
+  <div class="content">
+    {% if data.title %}
+    <h2 class="sponsoring-cta__title">{{ data.title }}</h2>
+    {% endif %}
+    <p class="sponsoring-cta__body">{{ data.body }}</p>
+    {% if data.link_text and data.link_url %}
+    <a href="{{ data.link_url }}" class="sponsoring-cta__link">
+      {{ data.link_text }}
+    </a>
+    {% endif %}
+  </div>
+</section>
+
+{% endif %}
+
+{% endmacro %}
