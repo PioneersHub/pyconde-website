@@ -1,0 +1,43 @@
+{#
+  Conference Topics — Pill/Tag Grid
+  ─────────────────────────────────
+  Renders conference topics as colored pills, answering
+  "Is this conference relevant to what I'm working on?"
+
+  Usage:
+    {% from "macros/topics.html" import render_topics %}
+    {{ render_topics(bag('topics')) }}
+
+  Parameters:
+    topics_data   – full databag dict with section_title and topics list
+    section_label – accessible label (default: 'Conference topics')
+
+  Databag schema (topics.yaml):
+    section_title: "What People Are Talking About"
+    topics:
+      - text: "AI Agents & Automation"
+        color: "blue"
+#}
+
+{% macro render_topics(topics_data, section_label='Conference topics') %}
+
+{% if topics_data and topics_data.topics and topics_data.topics|length > 0 %}
+
+<section class="topics" aria-label="{{ section_label }}">
+  <div class="content">
+    {% if topics_data.section_title %}
+    <h2 class="topics__title">{{ topics_data.section_title }}</h2>
+    {% endif %}
+    <div class="topics__grid" role="list">
+      {% for topic in topics_data.topics %}
+      <span class="topics__pill topics__pill--{{ topic.color }}" role="listitem">
+        {{ topic.text }}
+      </span>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endif %}
+
+{% endmacro %}

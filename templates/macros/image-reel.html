@@ -1,0 +1,47 @@
+{#
+  Image Reel Component
+  ────────────────────
+  Horizontally scrollable strip of conference photos.
+
+  Usage:
+    {% from "macros/image-reel.html" import render_image_reel %}
+    {{ render_image_reel(
+        bag('promo_pics')['promo_images'],
+        section_label='Conference photos'
+    ) }}
+
+  Parameters:
+    images        – list of image paths (from a databag)
+    section_label – accessible label for the section (default: 'Conference photos')
+    alt_text      – alt text applied to every image (default: 'Conference photo')
+
+  Databag schema (promo_pics.yaml):
+    promo_images:
+      - /static/landing-page/promo_images/photo1.jpg
+      - /static/landing-page/promo_images/photo2.jpg
+
+  Image guidelines:
+    - Landscape format, minimum 800px wide
+    - JPEG recommended for photos
+    - Place files in: assets/static/landing-page/promo_images/
+    - Reference as full path from site root: /static/landing-page/promo_images/filename.jpg
+    - Images render at min-width 400px with horizontal scrolling
+#}
+
+{% macro render_image_reel(images, section_label='Conference photos', alt_text='Conference photo') %}
+
+{% if images and images|length > 0 %}
+
+<section class="content-block about image-reel-section" aria-label="{{ section_label }}">
+  <div class="content">
+    <ul class="image-reel">
+      {% for image in images %}
+      <li><img src="{{ image }}" alt="{{ alt_text }}" loading="lazy" /></li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+
+{% endif %}
+
+{% endmacro %}

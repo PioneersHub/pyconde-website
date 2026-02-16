@@ -1,0 +1,127 @@
+{#
+  Reusable Carousel Component
+  ───────────────────────────
+  Data-driven carousel with two display modes:
+    - "multi"     → 3 cards on desktop, 1 on mobile (sliding)
+    - "spotlight"  → 1 slide at a time (crossfade)
+
+  Usage:
+    {% from "macros/carousel.html" import render_carousel %}
+    {{ render_carousel(
+        bag('featured')['featured_items'],
+        carousel_id='featured',
+        mode='multi',
+        image_dir='featured',
+        section_label='Featured speakers and sessions'
+    ) }}
+
+  Parameters:
+    items         – list of item dicts (from a databag)
+    carousel_id   – unique ID for this carousel instance (default: 'carousel')
+    mode          – 'multi' (3 cards) or 'spotlight' (1 slide crossfade)
+    image_dir     – subdirectory under /static/media/ for images (default: 'featured')
+    section_label – accessible label for the carousel section
+    header_title  – optional heading displayed above the slides
+    header_teaser – optional teaser line below the heading
+
+  Item schema (all databags use the same format):
+    - id, type, name, title, teaser, image, image_alt, link_text, link_url
+#}
+
+{% macro render_carousel(items, carousel_id='carousel', mode='multi', image_dir='featured', section_label='Carousel', header_title='', header_teaser='') %}
+
+{% if items and items|length > 0 %}
+
+<section class="carousel carousel--{{ mode }}" aria-roledescription="carousel"
+  aria-label="{{ section_label }}" data-carousel-id="{{ carousel_id }}"
+  data-carousel-mode="{{ mode }}">
+
+  {# ── Optional header ── #}
+  {% if header_title %}
+  <div class="carousel-header">
+    <h2 class="carousel-header__title">{{ header_title }}</h2>
+    {% if header_teaser %}
+    <p class="carousel-header__teaser">{{ header_teaser }}</p>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {# ── Slides ── #}
+  <div class="carousel-viewport" aria-live="polite">
+    <div class="carousel-slides" id="carousel-slides-{{ carousel_id }}">
+
+      {% for item in items %}
+      <article
+        class="carousel-slide{% if loop.first %} active{% endif %}"
+        role="group"
+        aria-roledescription="slide"
+        aria-label="Slide {{ loop.index }} of {{ items|length }}: {{ item.name }}"
+        tabindex="0"
+      >
+
+        <div class="slide-content">
+          {% if item.image %}
+          <img
+            src="/static/media/{{ image_dir }}/{{ item.image }}"
+            alt="{{ item.image_alt or item.name }}"
+            class="slide-image"
+            loading="lazy"
+          />
+          {% endif %}
+          <span class="slide-badge slide-badge--{{ item.type }}">
+            {{ item.type|capitalize }}
+          </span>
+          <h2 class="slide-title">{{ item.title }}</h2>
+          <p class="slide-teaser">{{ item.teaser }}</p>
+          {% if item.link_url %}
+          <a href="{{ item.link_url }}" class="slide-cta">
+            {{ item.link_text or 'Learn more' }}
+          </a>
+          {% endif %}
+        </div>
+
+      </article>
+      {% endfor %}
+
+    </div>
+  </div>
+
+  {# ── Controls (only if more than one slide) ── #}
+  {% if items|length > 1 %}
+  <nav class="carousel-controls" aria-label="{{ section_label }} navigation">
+
+    <button class="carousel-btn carousel-btn--prev" aria-label="Previous slide">
+      <span aria-hidden="true">&#8592;</span>
+    </button>
+
+    <div class="carousel-dots" role="tablist" aria-label="Slide selection">
+      {% for item in items %}
+      <button
+        class="carousel-dot{% if loop.first %} active{% endif %}"
+        role="tab"
+        aria-label="Go to slide {{ loop.index }}: {{ item.name }}"
+        aria-selected="{{ 'true' if loop.first else 'false' }}"
+        data-index="{{ loop.index0 }}"
+        tabindex="{{ 0 if loop.first else -1 }}"
+      >{{ loop.index }}</button>
+      {% endfor %}
+    </div>
+
+    <button class="carousel-btn carousel-btn--next" aria-label="Next slide">
+      <span aria-hidden="true">&#8594;</span>
+    </button>
+
+  </nav>
+
+  {# Screen reader status #}
+  <div class="sr-only" aria-live="polite" aria-atomic="true"
+    id="carousel-status-{{ carousel_id }}">
+    Slide 1 of {{ items|length }}
+  </div>
+  {% endif %}
+
+</section>
+
+{% endif %}
+
+{% endmacro %}

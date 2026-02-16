@@ -1,0 +1,41 @@
+{#
+  Tickets CTA
+  ───────────
+  Call-to-action section for ticket purchases.
+
+  Usage:
+    {% from "macros/tickets-cta.html" import render_tickets_cta %}
+    {{ render_tickets_cta(bag('tickets_cta')) }}
+
+  Parameters:
+    data          – full databag dict with title, body, link_text, link_url
+    section_label – accessible label (default: 'Tickets')
+
+  Databag schema (tickets_cta.yaml):
+    title: "Tickets"
+    body: "PyCon DE & PyData sells out..."
+    link_text: "Get your ticket"
+    link_url: /buy-ticket
+#}
+
+{% macro render_tickets_cta(data, section_label='Tickets') %}
+
+{% if data and data.body %}
+
+<section class="tickets-cta" aria-label="{{ section_label }}">
+  <div class="content">
+    {% if data.title %}
+    <h2 class="tickets-cta__title">{{ data.title }}</h2>
+    {% endif %}
+    <p class="tickets-cta__body">{{ data.body }}</p>
+    {% if data.link_text and data.link_url %}
+    <a href="{{ data.link_url }}" class="tickets-cta__link">
+      {{ data.link_text }}
+    </a>
+    {% endif %}
+  </div>
+</section>
+
+{% endif %}
+
+{% endmacro %}

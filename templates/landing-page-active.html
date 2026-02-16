@@ -5,135 +5,52 @@
 
 {% block body %}
 
-    <section class="intro">
-        <div class="content">
-            <h1>{{ site.config.PROJECT.name }}</h1>
-            <p class="location">darmstadtium, Darmstadt (Frankfurt).</p>
-            <p class="conference-date">{{ site.config.PROJECT.sprint_days }}<span class="conference-date description">: Sprints & DjangoGirls</span>.
-            </p>
-            <p class="conference-date">{{ site.config.PROJECT.conference_days }}<span class="conference-date description">: Three days of conference</span>.
-            </p>
-            <p class="conference-date">{{ site.config.PROJECT.master_classes_days }}<span class="conference-date description">: Masterclasses</span>.
-            </p>
-        </div>
-    </section>
+    {# ── Intro: Full-viewport branded hero ── #}
+    {% from "macros/intro.html" import render_intro %}
+    {{ render_intro(bag('intro')) }}
 
-    {#    <section class="intro-illustration">#}
-    {#        <lottie-player src="/static/snakes-horizontal.json" speed="1" loop autoplay async></lottie-player>#}
-    {#    </section>#}
-
-    <section class="content-block about">
-        <div class="content">
-            {{ this.about }}
-        </div>
-    </section>
-
-    <section class="content-block about image-reel-section">
-            <div class="content">
-
-                <ul class="image-reel">
-                {% for image in bag('promo_pics')['promo_images'] %}
-                <li><img src="{{ image }}" alt="conference image"></li>
-                {% endfor %}
-                </ul>
-            </div>
-    </section>
-
-    <section class="content-block about">
-        <div class="content">
-            {{ this.expect }}
-        </div>
-    </section>
-
-    <section class="content-block--green-light content-block">
-        <div class="content">
-            {{ this.tickets }}
-        </div>
-    </section>
-
-    <section class="content-block--green cta">
-        <div class="content">
-            {{ this.tickets_cta }}
-        </div>
-    </section>
-
-{#    <section class="content-block--blue-light content-block">#}
-{#        <div class="content">#}
-{#            {{ this.call_for_committee_members }}#}
-{#        </div>#}
-{#    </section>#}
-
-{#    <section class="content-block--blue cta">#}
-{#        <div class="content">#}
-{#            {{ this.call_for_committee_members_cta }}#}
-{#        </div>#}
-{#    </section>#}
-
-    <section class="content-block--pink-light content-block">
-        <div class="content">
-            {{ this.updates }}
-        </div>
-    </section>
-
-    <section class="content-block--pink cta">
-        <div class="content">
-            {{ this.updates_cta }}
-        </div>
-    </section>
-
-    <section class="content-block">
-        <div class="content">
-            {{ this.call_for_proposals }}
-        </div>
-    </section>
-
-    <section class="content-block--green cta">
-        <div class="content">
-            {{ this.call_for_proposals_cta }}
-        </div>
-    </section>
-
-    <section class="content-block--blue-light content-block">
-        <div class="content">
-            {{ this.financial_aid }}
-        </div>
-    </section>
-
-    <section class="content-block--blue cta">
-        <div class="content">
-            {{ this.financial_aid_cta }}
-        </div>
-    </section>
+    {# ── Motto statement — bold on white ── #}
+    {% from "macros/hero.html" import render_hero %}
+    {{ render_hero(bag('motto')) }}
 
 
-    <section class="content-block--red-light content-block">
-        <div class="content">
-            {{ this.sponsoring }}
-        </div>
-    </section>
+    {# ── Featured speakers carousel ── #}
+    {% from "macros/carousel.html" import render_carousel %}
+    {{ render_carousel(
+        bag('featured')['featured_items'],
+        carousel_id='featured',
+        mode='multi',
+        image_dir='featured',
+        section_label='Featured speakers and sessions'
+    ) }}
 
-    <section class="content-block--red cta">
-        <div class="content">
-            {{ this.sponsoring_cta }}
-        </div>
-    </section>
+    {# ── Why Attend ── #}
+    {% from "macros/why-attend.html" import render_why_attend %}
+    {{ render_why_attend(bag('why_attend')) }}
 
+    {# ── Community spotlight ── #}
+    {% from "macros/community.html" import render_community %}
+    {{ render_community(bag('community')) }}
+
+    {# ── Tickets CTA ── #}
+    {% from "macros/tickets-cta.html" import render_tickets_cta %}
+    {{ render_tickets_cta(bag('tickets_cta')) }}
+
+    {# ── Sponsors ── #}
     <section class="sponsors content-block">
         <div class="content">
-            {#            <h3>Our Sponsors</h3>#}
         </div>
-
         <div class="content">
             {{ render_sponsors_list() }}
         </div>
     </section>
 
+    {# ── Sponsoring CTA ── #}
+    {% from "macros/sponsoring-cta.html" import render_sponsoring_cta %}
+    {{ render_sponsoring_cta(bag('sponsoring_cta')) }}
 
-
-    <section class="content-block">
-        <div class="content">
-            {{ this.previous_editions }}
-        </div>
-    </section>
+    {# ── Newsletter CTA ── #}
+    {% from "macros/newsletter.html" import render_newsletter %}
+    {{ render_newsletter(bag('newsletter')) }}
 
 {% endblock %}

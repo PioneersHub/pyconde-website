@@ -11,8 +11,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ '/static/css/main.css'|url }}">
   <link rel="stylesheet" href="{{ '/static/css/custom.css'|url }}">
-  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-
   <title>{% block title %}{% endblock %}</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -41,8 +39,8 @@
   <meta property=“og:site_name“ content="PyConDE &amp; PyData" />
 
   <meta property=“og:image:type“ content="image/png" />
-  <meta property=“og:image:width“ content=“1200″ />
-  <meta property=“og:image:height“ content=“630″ />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@pyconde">
@@ -54,6 +52,40 @@
   {% else %}
   <meta name="twitter:image" content="{{ site.config.PROJECT.url }}{{ site.config.PROJECT.social_card|url }}">
   {% endif %}
+
+  <meta name="description" content="PyCon DE &amp; PyData 2026 — Europe's largest Python &amp; AI conference. April 14-17, darmstadtium, Darmstadt. 2,000+ attendees, 100+ talks, masterclasses, sprints. We get things done.">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    "name": "PyCon DE & PyData 2026",
+    "description": "Europe's largest Python & AI conference — where practitioners navigate change by doing the work.",
+    "startDate": "2026-04-14",
+    "endDate": "2026-04-17",
+    "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+    "eventStatus": "https://schema.org/EventScheduled",
+    "location": {
+      "@type": "Place",
+      "name": "darmstadtium",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Darmstadt",
+        "addressCountry": "DE"
+      }
+    },
+    "organizer": {
+      "@type": "Organization",
+      "name": "Python Software Verband e.V.",
+      "url": "https://python-verband.org"
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": "https://2026.pycon.de/buy-ticket/",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+  </script>
 
   {% block header %}
   {% endblock %}
@@ -86,24 +118,56 @@
   {% block body %}
   {% endblock %}
 
-  <section class="legal-links">
-    <div class="content">
-      <nav class="links">
-        <ul>
-          <li><a href="/code-of-conduct">Code of Conduct</a></li>
-          <li><a href="/privacy-policy">Privacy Policy</a></li>
-          <li><a href="/imprint">Imprint</a></li>
-        </ul>
-      </nav>
-    </div>
-  </section>
+  <footer class="site-footer">
+    <section class="footer-social">
+      <div class="content">
+        <nav class="footer-social-links" aria-label="Social media links">
+          <a href="https://x.com/PyConDE" target="_blank" rel="noopener noreferrer" aria-label="Follow us on X (Twitter)">
+            <img src="/static/media/social/twitter.svg" alt="X (Twitter)" />
+          </a>
+          <a href="https://www.linkedin.com/company/pyconde-pydata-berlin" target="_blank" rel="noopener noreferrer" aria-label="Follow us on LinkedIn">
+            <img src="/static/media/social/linkedin.svg" alt="LinkedIn" />
+          </a>
+          <a href="https://fosstodon.org/@pyconde" target="_blank" rel="me noopener noreferrer" aria-label="Follow us on Mastodon">
+            <img src="/static/media/social/mastodon.svg" alt="Mastodon" />
+          </a>
+          <a href="https://github.com/PYCONDE" target="_blank" rel="noopener noreferrer" aria-label="View our GitHub">
+            <img src="/static/media/social/github.svg" alt="GitHub" />
+          </a>
+        </nav>
+      </div>
+    </section>
 
-  {% if this.full_landing_page %}
-  {% else %}
-  <section class="footer-outro">
-    <img src="/static/feet-in-snakes.svg" alt="PyConDE 2025 in Darmstadt">
-  </section>
-  {% endif %}
+    <section class="footer-links">
+      <div class="content">
+        <nav class="footer-links__nav" aria-label="Site links">
+          {% for page in bag('links')['pages'] %}
+          {% if page.path %}
+          <a href="{{ page.path if page.type == 'external' else page.path|url }}" target="{{ page.target if page.target else '_self' }}">{{ page.name }}</a>
+          {% endif %}
+          {% endfor %}
+        </nav>
+        <hr class="footer-links__separator" />
+        <nav class="footer-links__legal" aria-label="Legal links">
+          <a href="/code-of-conduct">Code of Conduct</a>
+          <a href="/privacy-policy">Privacy Policy</a>
+          <a href="/imprint">Imprint</a>
+        </nav>
+        <hr class="footer-links__separator" />
+        <nav class="footer-links__editions" aria-label="Previous conference editions">
+          <span class="footer-links__editions-label">Previous Editions:</span>
+          <a href="https://2025.pycon.de/">2025</a>
+          <a href="https://2024.pycon.de/">2024</a>
+          <a href="https://2023.pycon.de/">2023</a>
+          <a href="https://2022.pycon.de/">2022</a>
+          <a href="https://2019.pycon.de/">2019</a>
+        </nav>
+      </div>
+    </section>
+
+  </footer>
+  <script src="{{ '/static/js/carousel.js'|url }}" defer></script>
+  <script src="{{ '/static/js/hero-slideshow.js'|url }}" defer></script>
 </body>
 
 </html>
