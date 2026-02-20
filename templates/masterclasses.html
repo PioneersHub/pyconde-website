@@ -2,34 +2,65 @@
 {% block title %}{{ this.title }}{% endblock %}
 
 {% block body %}
-<div class="subsite">
-  <div class="subsite-title">
-    <section class="content">
-      <h2>{{ this.title }}</h2>
-        <p>{{ this.notes }}</p>
-    </section>
-  </div>
-</div>
 
-<section class="subsite">
-  <ol class="masterclass-list">
-    {% for child in this.children %}
-    <li>
-      <a href="{{ child|url }}" class="content masterclass-item">
-        {% if child.tags %}
-        <div class="tags">
-          {% for tag in child.tags %}
-          <span class="tag">{{ tag }}</span>
-          {% endfor %}
+{# ── Header ── #}
+<section class="mc-listing-header">
+  <div class="content">
+    <h1 class="mc-listing-header__title">{{ this.title }}</h1>
+    {% if this.notes %}
+    <p class="mc-listing-header__subtitle">{{ this.notes }}</p>
+    {% endif %}
+  </div>
+</section>
+
+{# ── Card Grid ── #}
+<section class="mc-listing">
+  <div class="content">
+    <div class="mc-grid">
+      {% for child in this.children %}
+      <a href="{{ child|url }}" class="mc-card">
+
+        {% if child.social_card_image %}
+        <div class="mc-card__image-wrap">
+          <img
+            src="{{ child.social_card_image }}"
+            alt="{{ child.title }}"
+            class="mc-card__image"
+            loading="lazy"
+          />
         </div>
         {% endif %}
-        <span class="masterclass-date">{{ (child.date) }}</span>
-        <h4 class="masterclass-title">{{ child.title }}</h4>
-        <p class="masterclass-trainer">{{ child.trainer }}</p>
-        <p class="masterclass-hours">{{ child.hours }} hours</p>
+
+        <div class="mc-card__body">
+          {% if child.tags %}
+          <div class="mc-card__tags">
+            {% for tag in child.tags %}
+            <span class="mc-card__tag">{{ tag }}</span>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <h2 class="mc-card__title">{{ child.title }}</h2>
+          <p class="mc-card__trainer">{{ child.trainer }}</p>
+
+          {% if child.description %}
+          <p class="mc-card__desc">{{ child.description }}</p>
+          {% endif %}
+
+          <p class="mc-card__date">{{ child.date }}</p>
+          <p class="mc-card__hours">{{ child.hours }} hours</p>
+
+          <span class="mc-card__cta">Learn more →</span>
+        </div>
+
       </a>
-    </li>
-    {% endfor %}
-  </ol>
+      {% endfor %}
+    </div>
+  </div>
 </section>
+
+{# ── Tickets CTA (reuse homepage macro) ── #}
+{% from "macros/tickets-cta.html" import render_tickets_cta %}
+{{ render_tickets_cta(bag('tickets_cta')) }}
+
 {% endblock %}
