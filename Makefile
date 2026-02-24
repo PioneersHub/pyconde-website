@@ -22,6 +22,12 @@ fetch-submissions:
 	$(RUN) python utils/social_card_img_gen.py
 sponsor-pages:
 	$(RUN) python utils/sponsors.py
+	@new_files=$$(git ls-files --others --exclude-standard content/sponsors/); \
+	if [ -n "$$new_files" ]; then \
+		echo "Adding new sponsor pages to git:"; \
+		echo "$$new_files"; \
+		echo "$$new_files" | xargs git add; \
+	fi
 activate-conference:
 	$(RUN) utils/activate-conference
 disable-conference:

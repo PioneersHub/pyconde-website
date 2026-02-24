@@ -1,7 +1,27 @@
+import sys
+from collections import Counter
 from pathlib import Path
 from string import Template
 
 import yaml
+
+
+def validate_unique_ids(sponsor_types):
+    """Check that all sponsor ids are unique across all types. Exit with error if not."""
+    seen = []
+    for sponsor_type in sponsor_types:
+        for sponsor in sponsor_type.get("sponsors", []):
+            seen.append((sponsor["id"], sponsor["name"], sponsor_type["name"]))
+
+    id_counts = Counter(entry[0] for entry in seen)
+    duplicates = {id_ for id_, count in id_counts.items() if count > 1}
+
+    if duplicates:
+        print("ERROR: Duplicate sponsor ids found in databags/sponsors.yaml:")
+        for id_, name, type_name in seen:
+            if id_ in duplicates:
+                print(f"  id='{id_}' name='{name}' (in {type_name})")
+        sys.exit(1)
 
 
 def dict_to_lektor(sponsor):
@@ -52,6 +72,7 @@ def load_sponsors():
     with (Path(__file__).parents[1] / "databags/sponsors.yaml").open() as f:
         j = yaml.load(f, Loader=yaml.SafeLoader)
         sponsor_types = j["types"]
+    validate_unique_ids(sponsor_types)
     for sponsor_type in sponsor_types:
         sponsors += [
             json_to_dict(s, sponsor_type["name"], sponsor_type["id"])
