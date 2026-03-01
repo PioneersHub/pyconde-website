@@ -20,10 +20,15 @@
             {% endfor %}
         </ol>
 
+        <button class="faq-toggle-all" onclick="document.querySelectorAll('.faq-item').forEach(d=>d.open=!d.open)">Expand / Collapse All</button>
+
         {% for section in faq_data.sections|sort(attribute='order') %}
 
         {% if section.display %}
-        <h2 id="{{ section.id }}">{{ section.name }}</h2>
+        <div class="faq-section-header">
+            <h2 id="{{ section.id }}">{{ section.name }}</h2>
+            <button class="faq-toggle-section" onclick="this.closest('.faq-section-header').nextElementSibling.querySelectorAll('.faq-item').forEach(function(d){d.open=!d.open})">Expand / Collapse</button>
+        </div>
         {% if section.description %}
         <p>{{ section.description }}</p>
         {% endif %}
