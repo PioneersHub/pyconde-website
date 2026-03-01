@@ -11,15 +11,19 @@
 </div>
 
 <section class="subsite">
-  <ol class="blog-posts">
+  <div class="blog-card-grid content">
     {% for child in this.children %}
-    <li>
-      <a href="{{ child|url }}" class="content blog-post">
-        <span class="pub-date">{{ (child.pub_date|dateformat('medium')) }}</span>
-        <h4 class="title">{{ child.title }}</h4>
-      </a>
-    </li>
+    <a href="{{ child|url }}" class="blog-card">
+      <div class="blog-card__meta">
+        <time class="blog-card__date">{{ (child.pub_date|dateformat('medium')) }}</time>
+        {% if child.author %}
+        <span class="blog-card__author">{{ child.author }}</span>
+        {% endif %}
+      </div>
+      <h3 class="blog-card__title">{{ child.title }}</h3>
+      <span class="blog-card__read-more">Read more →</span>
+    </a>
     {% endfor %}
-  </ol>
+  </div>
 </section>
 {% endblock %}
