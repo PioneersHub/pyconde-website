@@ -11,6 +11,7 @@ from pytanis import PretalxClient
 
 PYTHON_SKILL_ID = 6206
 DOMAIN_EXPERTISE_ID = 6205
+KEYNOTE_SUBMISSION_TYPE_ID = 6780
 
 
 def submission_to_talk(sub):
@@ -23,6 +24,10 @@ def submission_to_talk(sub):
     t["created"] = sub.created.strftime("%Y-%m-%d")
     t["social_card_image"] = f"/static/media/social/talks/{sub.code}.png"
     t["speaker_names"] = ", ".join([speaker.name for speaker in sub.speakers])
+    t["submission_type_id"] = str(sub.submission_type_id)
+    t["is_keynote"] = (
+        True if sub.submission_type_id == KEYNOTE_SUBMISSION_TYPE_ID else False
+    )
 
     for speaker in sub.speakers:
         t["speakers"] += speaker_to_markdown(speaker)
@@ -88,6 +93,10 @@ start_time: $start_time
 ---
 track: $track
 ---
+submission_type_id: $submission_type_id
+---
+is_keynote: $is_keynote
+---
 python_skill: $python_skill
 ---
 domain_expertise: $domain_expertise
@@ -127,7 +136,8 @@ def submissions_to_json_file(submissions):
 
 
 def configure_pretalx_client():
-    pretalx_api_key = os.environ.get("PRETALX_API_KEY")
+    # pretalx_api_key = os.environ.get("PRETALX_API_KEY")
+    pretalx_api_key = '8a99inhtqkcvzgfr6d9wiwdltyha0e1fpsrpgnxztgumppj1uw7brhr4e2jjusly'
 
     class PretalxBasicModel(BaseModel):
         api_token: str | None = None
