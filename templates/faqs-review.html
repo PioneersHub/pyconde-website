@@ -20,40 +20,65 @@
             {% endfor %}
         </ol>
 
+        <button class="faq-toggle-all" onclick="document.querySelectorAll('.faq-item').forEach(d=>d.open=!d.open)">Expand / Collapse All</button>
+
         {% for section in faq_data.sections|sort(attribute='order') %}
 
         {% if section.display %}
-        <h2 id="{{ section.id }}">{{ section.name }}</h2>
+        <div class="faq-section-header">
+            <h2 id="{{ section.id }}">{{ section.name }}</h2>
+            <button class="faq-toggle-section" onclick="var h=this.closest('.faq-section-header');var s=h;while(s=s.nextElementSibling){if(s.classList.contains('faq-list')){s.querySelectorAll('.faq-item').forEach(function(d){d.open=!d.open});break;}}">Expand / Collapse</button>
+        </div>
         {% if section.description %}
         <p>{{ section.description }}</p>
         {% endif %}
 
-        <ul>
+        <div class="faq-list">
             {% for qa in section.qa|sort(attribute='order') %}
             {% if qa.display %}
-            <li class="qa" id="{{ qa.id }}">
-                <h3>{{ qa.question }} <a href="#{{ qa.id }}" class="anchor-link" title="Link to this question">🔗</a></h3>
-                {% if qa.answer.__class__.__name__ == 'list' %}
-                <!-- list -->
-                {% for item in qa.answer %}
-                <p>{% if item.startswith('<') %} {{ item | safe }} {% else %} {{ item }} {% endif %}</p>
-                        {% endfor %}
-                        {% elif qa.answer.startswith('<') %} <!-- HTML content -->
-                            {{ qa.answer | safe }}
-                            {% else %}
-                            {{ qa.answer | paragraphize | safe }}
-                            {% endif %}
-                            {% if qa.link %}
-                            <a href="{{ qa.link }}" target="_blank">{{ qa.link_display }}</a>
-                            {% endif %}
-            </li>
+            <details class="faq-item" id="{{ qa.id }}">
+                <summary class="faq-item__question">
+                    {{ qa.question }}
+                    <button class="faq-copy-link" title="Copy link to this question" onclick="var u=location.origin+location.pathname+'#'+this.closest('.faq-item').id;navigator.clipboard.writeText(u);this.textContent='✓';var b=this;setTimeout(function(){b.textContent='🔗'},1500)">🔗</button>
+                </summary>
+                <div class="faq-item__answer">
+                    {% if qa.answer.__class__.__name__ == 'list' %}
+                    {% for item in qa.answer %}
+                    <p>{% if item.startswith('<') %} {{ item | safe }} {% else %} {{ item }} {% endif %}</p>
+                    {% endfor %}
+                    {% elif qa.answer.startswith('<') %}
+                    {{ qa.answer | safe }}
+                    {% else %}
+                    {{ qa.answer | paragraphize | safe }}
+                    {% endif %}
+                    {% if qa.link %}
+                    <a href="{{ qa.link }}" target="_blank">{{ qa.link_display }}</a>
+                    {% endif %}
+                </div>
+            </details>
             {% endif %}
             {% endfor %}
-        </ul>
+        </div>
         {% endif %}
 
         {% endfor %}
     </div>
 </section>
+
+<script>
+(function(){
+    function openHash(){
+        var h = location.hash.replace('#','');
+        if(!h) return;
+        var el = document.getElementById(h);
+        if(el && el.tagName === 'DETAILS'){
+            el.open = true;
+            el.scrollIntoView({behavior:'smooth', block:'start'});
+        }
+    }
+    openHash();
+    window.addEventListener('hashchange', openHash);
+})();
+</script>
 
 {% endblock %}

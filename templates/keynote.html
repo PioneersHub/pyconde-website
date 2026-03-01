@@ -1,0 +1,111 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ this.speaker_name }} Keynote — {{ this.title }} | PyCon DE &amp; PyData 2026{% endblock %}
+
+{% block extra_head %}
+{# ── SEO Meta ── #}
+<meta name="description" content="{{ this.description }}">
+<link rel="canonical" href="https://2026.pycon.de{{ this|url }}">
+
+{# ── Open Graph ── #}
+<meta property="og:type" content="article">
+<meta property="og:title" content="{{ this.speaker_name }} Keynote: {{ this.title }}">
+<meta property="og:description" content="{{ this.description }}">
+<meta property="og:url" content="https://2026.pycon.de{{ this|url }}">
+<meta property="og:site_name" content="PyCon DE &amp; PyData 2026">
+
+{# OG/Twitter images handled by layout.html via social_card_image field #}
+
+{# ── Twitter Card ── #}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@pyconde">
+<meta name="twitter:title" content="{{ this.speaker_name }} Keynote: {{ this.title }}">
+<meta name="twitter:description" content="{{ this.description }}">
+
+{# ── JSON-LD Structured Data ── #}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Event",
+  "name": "Keynote: {{ this.title }}",
+  "description": "{{ this.description }}",
+  "startDate": "2026-04-14",
+  "endDate": "2026-04-16",
+  "location": {
+    "@type": "Place",
+    "name": "Darmstadtium",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Darmstadt",
+      "addressCountry": "DE"
+    }
+  },
+  "performer": {
+    "@type": "Person",
+    "name": "{{ this.speaker_name }}"{% if this.speaker_image %},
+    "image": "https://2026.pycon.de/static/media/keynotes/{{ this.speaker_image }}"{% endif %}
+  },
+  "organizer": {
+    "@type": "Organization",
+    "name": "Python Software Verband e.V.",
+    "url": "https://2026.pycon.de"
+  },
+  "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+  "offers": {
+    "@type": "Offer",
+    "url": "https://2026.pycon.de/buy-ticket/"
+  }
+}
+</script>
+{% endblock %}
+
+{% block body %}
+
+{# ── Subsite Header ── #}
+<div class="subsite">
+  <div class="subsite-title">
+    <section class="content">
+      <h2>Keynote</h2>
+    </section>
+  </div>
+</div>
+
+{# ── Speaker Hero ── #}
+<section class="keynote-hero">
+  <div class="content keynote-hero__inner">
+    {% if this.speaker_image %}
+    <div class="keynote-hero__image-wrap">
+      <img src="{{ ('/static/media/keynotes/' ~ this.speaker_image)|url }}"
+           alt="{{ this.speaker_name }}"
+           class="keynote-hero__image">
+    </div>
+    {% endif %}
+    <div class="keynote-hero__info">
+      <h1 class="keynote-hero__name">{{ this.speaker_name }}</h1>
+      {% if this.speaker_role %}
+      <p class="keynote-hero__role">{{ this.speaker_role }}</p>
+      {% endif %}
+      <h2 class="keynote-hero__title">{{ this.title }}</h2>
+      {% if this.description %}
+      <p class="keynote-hero__teaser">{{ this.description }}</p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{# ── Article Body (free-form markdown + inline HTML) ── #}
+<section class="subsite keynote-body-section">
+  <div class="content keynote-body">
+    {{ this.body }}
+  </div>
+</section>
+
+{# ── CTA Footer ── #}
+<section class="keynote-cta">
+  <div class="content">
+    <p class="keynote-cta__text">📅 PyCon DE &amp; PyData 2026 — April 14–16, Darmstadt, Germany</p>
+    <a href="{{ '/buy-ticket/'|url }}" class="keynote-cta__button">Get Your Tickets</a>
+  </div>
+</section>
+
+{% endblock %}

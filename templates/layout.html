@@ -89,6 +89,7 @@
 
   {% block header %}
   {% endblock %}
+{% block extra_head %}{% endblock %}
 </head>
 
 {% if this.full_landing_page %}
@@ -96,6 +97,21 @@
 {% else %}
 <body>
 {% endif %}
+    <header class="topnav" role="banner">
+      <a href="{{ '/'|url }}" class="topnav__logo" aria-label="Home">PyCon DE &amp; PyData 2026</a>
+      <nav class="topnav__links" aria-label="Primary navigation">
+        <a href="{{ '/talks/'|url }}">Talks</a>
+        <a href="{{ '/masterclasses/'|url }}">Masterclasses</a>
+        <a href="{{ '/sprints/'|url }}">Sprints</a>
+        <a href="{{ '/blog/'|url }}">Blog</a>
+        <a href="{{ '/faqs/'|url }}">FAQs</a>
+        <a href="{{ '/sponsors/'|url }}">Sponsors</a>
+        <a href="{{ '/venue/'|url }}">Venue</a>
+        <a href="{{ '/team/'|url }}">Team</a>
+      </nav>
+      <a href="{{ '/buy-ticket/'|url }}" class="topnav__cta">Get Tickets</a>
+    </header>
+
     <label class="hamburger-menu">
         <input type="checkbox" />
     </label>
@@ -166,6 +182,17 @@
     </section>
 
   </footer>
+  <button class="back-to-top" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+  <script>
+  (function(){
+    var btn = document.querySelector('.back-to-top');
+    if (!btn) return;
+    window.addEventListener('scroll', function() {
+      if (window.scrollY > 600) btn.classList.add('visible');
+      else btn.classList.remove('visible');
+    }, {passive: true});
+  })();
+  </script>
   <script src="{{ '/static/js/carousel.js'|url }}" defer></script>
   <script src="{{ '/static/js/hero-slideshow.js'|url }}" defer></script>
 </body>
