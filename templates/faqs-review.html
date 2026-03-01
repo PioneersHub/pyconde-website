@@ -39,7 +39,7 @@
             <details class="faq-item" id="{{ qa.id }}">
                 <summary class="faq-item__question">
                     {{ qa.question }}
-                    <a href="#{{ qa.id }}" class="anchor-link" title="Link to this question">🔗</a>
+                    <button class="faq-copy-link" title="Copy link to this question" onclick="var u=location.origin+location.pathname+'#'+this.closest('.faq-item').id;navigator.clipboard.writeText(u);this.textContent='✓';var b=this;setTimeout(function(){b.textContent='🔗'},1500)">🔗</button>
                 </summary>
                 <div class="faq-item__answer">
                     {% if qa.answer.__class__.__name__ == 'list' %}
@@ -64,5 +64,21 @@
         {% endfor %}
     </div>
 </section>
+
+<script>
+(function(){
+    function openHash(){
+        var h = location.hash.replace('#','');
+        if(!h) return;
+        var el = document.getElementById(h);
+        if(el && el.tagName === 'DETAILS'){
+            el.open = true;
+            el.scrollIntoView({behavior:'smooth', block:'start'});
+        }
+    }
+    openHash();
+    window.addEventListener('hashchange', openHash);
+})();
+</script>
 
 {% endblock %}
