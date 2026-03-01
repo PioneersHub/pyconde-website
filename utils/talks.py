@@ -136,8 +136,7 @@ def submissions_to_json_file(submissions):
 
 
 def configure_pretalx_client():
-    # pretalx_api_key = os.environ.get("PRETALX_API_KEY")
-    pretalx_api_key = '8a99inhtqkcvzgfr6d9wiwdltyha0e1fpsrpgnxztgumppj1uw7brhr4e2jjusly'
+    pretalx_api_key = os.environ.get("PRETALX_API_KEY")
 
     class PretalxBasicModel(BaseModel):
         api_token: str | None = None
