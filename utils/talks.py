@@ -11,6 +11,7 @@ from pytanis import PretalxClient
 
 PYTHON_SKILL_ID = 6206
 DOMAIN_EXPERTISE_ID = 6205
+KEYNOTE_SUBMISSION_TYPE_ID = 6780
 
 
 def submission_to_talk(sub):
@@ -23,6 +24,10 @@ def submission_to_talk(sub):
     t["created"] = sub.created.strftime("%Y-%m-%d")
     t["social_card_image"] = f"/static/media/social/talks/{sub.code}.png"
     t["speaker_names"] = ", ".join([speaker.name for speaker in sub.speakers])
+    t["submission_type_id"] = str(sub.submission_type_id)
+    t["is_keynote"] = (
+        True if sub.submission_type_id == KEYNOTE_SUBMISSION_TYPE_ID else False
+    )
 
     for speaker in sub.speakers:
         t["speakers"] += speaker_to_markdown(speaker)
@@ -87,6 +92,10 @@ day: $day
 start_time: $start_time
 ---
 track: $track
+---
+submission_type_id: $submission_type_id
+---
+is_keynote: $is_keynote
 ---
 python_skill: $python_skill
 ---
