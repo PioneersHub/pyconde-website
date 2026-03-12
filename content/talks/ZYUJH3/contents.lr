@@ -30,25 +30,11 @@ The session emphasizes concrete engineering trade-offs and operational realities
 ---
 full_description:
 
-- intro (8 min)
-  - a very quick summary of what our company does in a few words, necessary to set up the background for the technical challenge this talk is solving (3 min)
-  - a very high-level overview of our distributed systems architecture (5 min)
+Large-scale distributed systems rarely produce clean data streams. In practice, hundreds of services continuously emit overlapping updates, retries, corrections, and partial state. Turning that constant stream of noisy events into a reliable, searchable dataset in real time, while processing hundreds of billions of records per day, requires careful architectural choices. 
 
-- reducing the number of processed messages (5 min)
-  - basic Kafka consumer loop (1 min)
-  - message deduplication by converting a list of keys into a set (1 min)
-  - skipping recently processed keys by keeping a TTL-based buffer (3 min)
+This talk shares practical lessons from building a Kafka-based ETL pipeline that transforms massive volumes of events into a coherent dataset suitable for real-time search. After a brief overview of the system architecture, we focus on several key techniques: reducing redundant processing through key deduplication and short-lived buffers, defining when messages can be safely acknowledged without risking data loss, and keeping long-running ETL services healthy under heavy Kafka workloads.
 
-- avoiding data loss (8 min)
-  - process keys after evicting from buffer instead of when adding to it (3 min)
-  - when is it safe to acknowledge a message (5 min)
-
-- keeping ETL service healthy (5 min)
-  - avoiding Kafka timeouts
-
-- wrap up (4 min)
-  - final architecture (2 min)
-  - performance results (2 min)
+The session emphasizes concrete engineering trade-offs and operational realities rather than theory. Attendees will leave with practical patterns for building more reliable and efficient streaming pipelines.
 ---
 room: None
 ---
