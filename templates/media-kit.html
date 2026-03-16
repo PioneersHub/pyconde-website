@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+
+{% set faq_data = bag('mediakit_faq') %}
+
+{% block title %}{{ this.title }}{% endblock %}
+
+{% block body %}
+<div class="subsite">
+    <div class="subsite-title">
+        <section class="content">
+            <h2>{{ this.title }}</h2>
+        </section>
+    </div>
+</div>
+
+<section class="subsite content-block--blue">
+    <div class="content">
+        {{ this.body }}
+    </div>
+</section>
+
+<section class="subsite faqs content-block--blue">
+    <div class="content">
+        <h3>Frequently Asked Questions</h3>
+
+        {% for section in faq_data.sections|sort(attribute='order') %}
+        {% if section.display %}
+        <div class="faq-list">
+            {% for qa in section.qa|sort(attribute='order') %}
+            {% if qa.display %}
+            <details class="faq-item" id="{{ qa.id }}">
+                <summary class="faq-item__question">
+                    {{ qa.question }}
+                </summary>
+                <div class="faq-item__answer">
+                    {% if qa.answer is iterable and qa.answer is not string %}
+                    {% for item in qa.answer %}
+                    <p>{% if item.startswith('<') %} {{ item | safe }} {% else %} {{ item }} {% endif %}</p>
+                    {% endfor %}
+                    {% elif qa.answer.startswith('<') %}
+                    {{ qa.answer | safe }}
+                    {% else %}
+                    {{ qa.answer | paragraphize | safe }}
+                    {% endif %}
+                    {% if qa.link %}
+                    <a href="{{ qa.link }}">{{ qa.link_display }}</a>
+                    {% endif %}
+                </div>
+            </details>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</section>
+
+<script>
+(function(){
+    function openHash(){
+        var h = location.hash.replace('#','');
+        if(!h) return;
+        var el = document.getElementById(h);
+        if(el && el.tagName === 'DETAILS'){
+            el.open = true;
+            el.scrollIntoView({behavior:'smooth', block:'start'});
+        }
+    }
+    openHash();
+    window.addEventListener('hashchange', openHash);
+})();
+</script>
+
+{% endblock %}
