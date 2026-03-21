@@ -20,60 +20,43 @@ Weather and environmental data power analytics, ML, and operations—but APIs di
 ---
 full_description:
 
-Problem: Accessing weather data involves inconsistent APIs, formats, and units—slowing down data engineering and causing hard‑to‑reproduce pipelines.
+## Problem
+Accessing weather data means wrestling with inconsistent APIs, formats, and units—slowing down data engineering and making pipelines hard to reproduce.
 
-Solution: Wetterdienst unifies open weather data access behind a consistent Python API and CLI, returning Polars DataFrames by default for performance and ergonomics. It provides a declarative request pattern, robust caching, retries, and humanized parameter naming with unit conversion.
+## Solution
+Wetterdienst is a Python library providing a unified, Polars-first interface to multiple open weather services (DWD, ECCC, EA, NOAA/NWS, Geosphere Austria, IMGW, Eaufrance, WSV, and more). It standardizes request patterns, returns tidy long-format data in SI units, and handles caching, timezones, and retries—so teams can focus on analysis instead of plumbing.
 
-Core concepts:
-- Polars‑first: All new data operations use Polars (v1.15+); pandas supported for some IO.
-- Unified request pattern: Build a request (provider/network/parameters, time window), filter stations, fetch values; get tidy/long data by default.
-- Sensible defaults: UTC timestamps, SI units, and humanized parameter names.
-- Reliability: diskcache caching, stamina‑based retries, timezone handling.
-- Provider architecture: Consistent interfaces across DWD, ECCC, EA, NOAA/NWS, Geosphere, IMGW, Eaufrance Hubeau, WSV, etc.
-- Multiple interfaces: Python API, CLI, and an optional REST API.
+## Core concepts:
+- **Polars-first** — All data operations use Polars (v1.15+); pandas supported for some I/O
+- **Declarative request pattern** — Provider → stations → values; tidy/long output by default
+- **Sensible defaults** — UTC timestamps, SI units, humanized parameter names
+- **Reliability** — Disk-based caching via diskcache, stamina-based retries, timezone handling
+- **Provider architecture** — Consistent interfaces across DWD, ECCC, EA, NOAA/NWS, Geosphere, IMGW, Eaufrance, WSV, and more
+- **Multiple interfaces** — Python API, CLI, and REST
 
-Examples (live demo):
-- Station metadata: discovery and filtering by station id/region/parameter.
-- Timeseries retrieval: selecting daily/hourly parameters, time windows, and exporting.
-- Settings: toggling humanization and unit conversion; switching to wide vs. long shape when needed.
-- Integration: using CLI for quick fetches; REST API for cross‑language consumption.
+## Outline
+- Introduction
+- Journey — How Wetterdienst came to life
+- Wetterdienst — Architecture, concepts, and request patterns
+- Value — What wetterdienst offers you, me and everyone else
+- Demo — Live: station discovery, timeseries retrieval, station metadata, climate stripes and more via app
 
-Ecosystem & exports:
-- Extras for databases (DuckDB, PostgreSQL, MySQL, CrateDB), Pandas/Xarray/Zarr exports, plotting (matplotlib/plotly), and SQL querying.
-- Works well in ETL/ML: cache for speed, schema‑stable outputs, and consistent units.
-
-Performance patterns:
-- Prefer Polars transformations; leverage caching; batch requests per provider.
-- Use parallel processing where beneficial; handle slow/remote datasets with retries.
-
-Limitations & trade‑offs:
-- Some providers have rate limits or latency; caching and incremental retrieval recommended.
-- Not all providers expose identical parameters—Wetterdienst normalizes interfaces but respects data source constraints.
-
-Proposed Outline (30 minutes)
-- 0:00–3:00  The problem: fragmented weather APIs and inconsistent data
-- 3:00–7:00  Wetterdienst in 5 minutes: concepts, request pattern, settings
-- 7:00–17:00 Live demo: stations → values (Polars), caching, units, CLI/REST
-- 17:00–23:00 Integrations and exports (DuckDB/DBs, Pandas/Xarray, plotting)
-- 23:00–27:00 Performance patterns, pitfalls, provider nuances
-- 27:00–30:00 Q&A
-
-Target Audience
+## Target Audience
 Data engineers, scientists, and platform teams who need reliable weather data for analytics, ML, and operations.
 
-Prerequisites
+## Prerequisites
 Basic Python and DataFrame experience (Polars or pandas); familiarity with ETL/ML pipelines helpful.
 
-Key Takeaways
-- A unified, Polars‑first workflow to access and normalize open weather data.
-- Practical patterns for station discovery, timeseries retrieval, unit conversion, and caching.
-- How to integrate Wetterdienst via Python, CLI, and REST, and export to common formats and databases.
+## Key Takeaways
+- A unified, Polars-first workflow to access and normalize open weather data
+- Practical patterns for station discovery, timeseries retrieval, unit conversion, and caching
+- How to integrate Wetterdienst via Python, CLI, and REST, and export to common formats and databases
 
-Links
-- Repo: https://github.com/earthobservations/wetterdienst
-- Docs: https://wetterdienst.readthedocs.io/
-- REST API: https://wetterdienst.eobs.org/
-- Examples: https://github.com/earthobservations/wetterdienst/tree/main/examples
+## Links
+📦 Repo https://github.com/earthobservations/wetterdienst
+📖 Docs https://wetterdienst.readthedocs.io/
+🌐 App https://wetterdienst.eobs.org/
+💡 Examples https://github.com/earthobservations/wetterdienst/tree/main/examples
 ---
 room: None
 ---
