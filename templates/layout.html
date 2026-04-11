@@ -100,15 +100,9 @@
     <header class="topnav" role="banner">
       <a href="{{ '/'|url }}" class="topnav__logo" aria-label="Home">PyCon DE &amp; PyData 2026</a>
       <nav class="topnav__links" aria-label="Primary navigation">
-        <a href="{{ '/talks/'|url }}">Talks</a>
-        <a href="https://pretalx.com/pyconde-pydata-2026/schedule/" target="_blank">Schedule</a>
-        <a href="{{ '/masterclasses/'|url }}">Masterclasses</a>
-        <a href="{{ '/sprints/'|url }}">Sprints</a>
-        <a href="{{ '/blog/'|url }}">Blog</a>
-        <a href="{{ '/faqs/'|url }}">FAQs</a>
-        <a href="{{ '/sponsors/'|url }}">Sponsors</a>
-        <a href="{{ '/venue/'|url }}">Venue</a>
-        <a href="{{ '/team/'|url }}">Team</a>
+        {% for page in bag('links')['pages'] if page.topnav %}
+        <a href="{{ page.path if page.type == 'external' else page.path|url }}" {% if page.target %}target="{{ page.target }}"{% endif %}>{{ page.name }}</a>
+        {% endfor %}
       </nav>
       <a href="{{ '/buy-ticket/'|url }}" class="topnav__cta">Get Tickets</a>
     </header>
