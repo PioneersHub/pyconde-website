@@ -27,7 +27,8 @@ Automated deployment script for AWS Lambda.
 3. Validates all required variables are set
 4. Builds the SAM application
 5. Deploys to AWS with parameters from `.env`
-6. Displays API URL and next steps
+6. Sets `TOPIC_EMAILS` on the Lambda function (post-deploy)
+7. Displays API URL and next steps
 
 ### Parameters loaded from .env
 
@@ -38,5 +39,6 @@ Automated deployment script for AWS Lambda.
 - `EMAIL_RECIPIENT`
 - `EMAIL_SENDER`
 - `ALLOWED_ORIGINS`
+- `TOPIC_EMAILS` — JSON mapping of topics to recipient emails (set post-deploy)
 
 See [DEPLOY.md](../DEPLOY.md) for more details.

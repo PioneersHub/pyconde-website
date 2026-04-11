@@ -87,6 +87,11 @@ sam deploy --guided --template-file template-secure.yaml
 - `AllowedOrigins` - CORS origins (comma-separated)
 - `ApiKey` - **(Secure only)** Optional API key for extra security
 
+> **Note:** `TOPIC_EMAILS` (JSON mapping of topics to recipient emails) cannot be
+> passed via SAM `--parameter-overrides` because the JSON value contains spaces.
+> The `deploy.sh` script handles this automatically by setting it directly on the
+> Lambda function after deploy. See [Topic-based Email Routing](#topic-based-email-routing).
+
 ### Authentication Question
 
 During deployment, you'll see:
@@ -155,11 +160,13 @@ cp .env.example .env
 ```
 
 The script will:
+
 1. Load all parameters from `.env`
 2. Validate required variables
 3. Build the SAM application
 4. Deploy non-interactively
-5. Display the API URL and next steps
+5. Set `TOPIC_EMAILS` on the Lambda function (post-deploy)
+6. Display the API URL and next steps
 
 ### Redeploying After Changes
 
@@ -241,6 +248,46 @@ fetch(API_URL, {
   },
   body: JSON.stringify(formData)
 });
+```
+
+## Topic-based Email Routing
+
+Contact form submissions are routed to different email recipients based on the
+selected topic. This is configured via the `TOPIC_EMAILS` environment variable,
+a JSON string mapping topic names to email addresses:
+
+```bash
+TOPIC_EMAILS='{"Program":"program@example.com","Sponsoring":"sponsors@example.com"}'
+```
+
+Topics not listed fall back to `EMAIL_RECIPIENT`.
+
+**Keys must match `TopicEnum` values exactly:**
+Program, Tickets, Sponsoring, Financial Aid, Partnering, Other
+
+### Why TOPIC_EMAILS is set separately
+
+SAM CLI's `--parameter-overrides` splits values on spaces, which breaks JSON
+values containing keys like `"Financial Aid"`. The `deploy.sh` script works
+around this by setting `TOPIC_EMAILS` directly on the Lambda function via
+`aws lambda update-function-configuration` after the SAM deploy completes.
+
+To set it manually:
+
+```bash
+# Get current env vars, update TOPIC_EMAILS, and apply
+aws lambda get-function-configuration \
+  --function-name pyconde-contact-form-api \
+  --query 'Environment' --output json \
+| python3 -c "
+import sys, json
+env = json.load(sys.stdin)
+env['Variables']['TOPIC_EMAILS'] = '{\"Program\":\"prog@example.com\"}'
+print(json.dumps(env))
+" \
+| xargs -0 aws lambda update-function-configuration \
+    --function-name pyconde-contact-form-api \
+    --environment
 ```
 
 ## Local Development

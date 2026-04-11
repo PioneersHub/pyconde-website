@@ -346,12 +346,14 @@ aws cloudwatch put-metric-alarm \
 - Use AWS Systems Manager Parameter Store or Secrets Manager for secrets
 - Rotate API keys regularly
 - Use strong, randomly generated keys
+- Keep `TOPIC_EMAILS` in `.env` (gitignored) — contains internal email addresses
 
 ❌ **Don't:**
 
 - Commit `.env` files to git
 - Share API keys in plaintext
 - Reuse keys across environments
+- Commit email routing configuration (e.g. `topic_emails.yaml`) to the repo
 
 ### 2. CORS Configuration
 

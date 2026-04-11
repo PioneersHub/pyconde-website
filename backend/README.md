@@ -7,6 +7,7 @@ FastAPI backend service for the PyConDE website contact form with Google reCAPTC
 - ✅ **reCAPTCHA v3 Integration**: Bot protection with Google reCAPTCHA
 - ✅ **Serverless Ready**: Optimized for AWS Lambda deployment
 - ✅ **Email Delivery**: Mailgun integration with HTML templates
+- ✅ **Topic-based Routing**: Emails routed to specific recipients based on topic selection
 - ✅ **Honeypot Protection**: Additional bot detection
 - ✅ **CORS Support**: Configured for PyConDE domains
 - ✅ **Input Validation**: Comprehensive validation with Pydantic
@@ -77,6 +78,10 @@ EMAIL_SENDER=noreply@pycon.de
 MAILGUN_API_KEY=your_mailgun_api_key
 MAILGUN_DOMAIN=your_mailgun_domain.com
 MAILGUN_API_BASE_URL=https://api.mailgun.net/v3
+
+# Topic-based email routing (JSON)
+# Maps topics to specific recipient emails; unlisted topics fall back to EMAIL_RECIPIENT
+TOPIC_EMAILS='{"Program": "program@example.com", "Sponsoring": "sponsors@example.com"}'
 
 # CORS Configuration
 ALLOWED_ORIGINS=https://2026.pycon.de,https://pycon.de,http://localhost:5001
@@ -178,6 +183,7 @@ Submit a contact form message.
 {
   "name": "John Doe",
   "email": "john@example.com",
+  "topic": "Program",
   "subject": "Question about PyConDE",
   "message": "I have a question...",
   "recaptcha_token": "03AGdBq...",
@@ -255,6 +261,7 @@ For AWS Lambda, configure via SAM template parameters:
 - `EMAIL_RECIPIENT`
 - `EMAIL_SENDER`
 - `ALLOWED_ORIGINS`
+- `TOPIC_EMAILS` — JSON mapping of topics to recipient emails (set via `aws lambda update-function-configuration` after deploy, see [DEPLOY.md](DEPLOY.md))
 - `DEBUG=False`
 
 ## Testing
@@ -285,6 +292,7 @@ curl -X POST http://localhost:8000/api/contact \
   -d '{
     "name": "Test User",
     "email": "test@example.com",
+    "topic": "Program",
     "subject": "Test Subject",
     "message": "This is a test message with at least 10 characters.",
     "recaptcha_token": "test_token",

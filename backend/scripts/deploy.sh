@@ -159,9 +159,6 @@ if [[ -n "${RECAPTCHA_SITE_KEY}" ]]; then
     PARAMS+=("RecaptchaSiteKey=${RECAPTCHA_SITE_KEY}")
 fi
 
-# Join parameters with space
-PARAM_STRING=$(IFS=' '; echo "${PARAMS[*]}")
-
 # Deploy
 info "Deploying to AWS..."
 info "Stack name: pyconde-contact-form"
@@ -172,10 +169,37 @@ echo ""
 sam deploy \
     --config-file samconfig.toml \
     --config-env "$CONFIG_ENV" \
-    --parameter-overrides "$PARAM_STRING" \
+    --parameter-overrides "${PARAMS[@]}" \
     --no-confirm-changeset \
     --no-fail-on-empty-changeset \
     || error "Deployment failed"
+
+# TOPIC_EMAILS contains JSON with spaces (e.g. "Financial Aid") which SAM CLI's
+# --parameter-overrides cannot handle (it splits on spaces). Set it directly on
+# the Lambda function after deploy.
+if [[ -n "${TOPIC_EMAILS}" ]]; then
+    info "Setting TOPIC_EMAILS on Lambda function..."
+    # Read current env vars, merge TOPIC_EMAILS, and update
+    CURRENT_ENV=$(aws lambda get-function-configuration \
+        --function-name pyconde-contact-form-api \
+        --query 'Environment' --output json 2>/dev/null)
+
+    if [[ -n "$CURRENT_ENV" ]]; then
+        UPDATED_ENV=$(echo "$CURRENT_ENV" | python3 -c "
+import sys, json
+env = json.load(sys.stdin)
+env['Variables']['TOPIC_EMAILS'] = '''${TOPIC_EMAILS}'''
+print(json.dumps(env))
+")
+        aws lambda update-function-configuration \
+            --function-name pyconde-contact-form-api \
+            --environment "$UPDATED_ENV" \
+            --query 'Environment.Variables.TOPIC_EMAILS' \
+            --output text >/dev/null 2>&1 \
+            && success "TOPIC_EMAILS configured on Lambda" \
+            || warning "Failed to set TOPIC_EMAILS on Lambda — set it manually in AWS Console"
+    fi
+fi
 
 success "Deployment completed successfully!"
 echo ""
