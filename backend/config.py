@@ -1,5 +1,7 @@
 """Configuration settings for the contact form backend."""
 
+import json
+
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -23,6 +25,12 @@ class Settings(BaseSettings):
     email_recipient: str = "info26@pycon.de"
     email_sender: str = "noreply@pycon.de"
     email_subject_prefix: str = "[Website]"
+
+    # Topic-based email routing (JSON string)
+    # Maps contact form topics to specific recipient emails.
+    # Topics not listed fall back to EMAIL_RECIPIENT.
+    # Example: '{"Program": "program@example.com", "Sponsoring": "sponsors@example.com"}'
+    topic_emails: str = "{}"
 
     # Mailgun settings
     mailgun_api_key: str
@@ -48,6 +56,14 @@ class Settings(BaseSettings):
         """Parse comma-separated CORS origins from environment variable."""
         if isinstance(v, str):
             return [origin.strip() for origin in v.split(",") if origin.strip()]
+        return v
+
+    @field_validator("topic_emails", mode="after")
+    @classmethod
+    def parse_topic_emails(cls, v: str | dict) -> dict[str, str]:
+        """Parse JSON topic-to-email mapping from environment variable."""
+        if isinstance(v, str):
+            return json.loads(v)
         return v
 
 
