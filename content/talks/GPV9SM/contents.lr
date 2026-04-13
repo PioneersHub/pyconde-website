@@ -20,6 +20,7 @@ Most hyperparameter optimization (HPO) stops at the model boundary. But what hap
 
 In this talk, we explore how we used Ray to move beyond simple model tuning. We’ll dive into a "Pipeline-as-a-Trial" architecture where Ray acts as the brain, triggering independent, scalable cloud workflows ( SageMaker Pipelines or Databricks Workflows) for every hyperparameter set.
 
+
 We will discuss:
 * The architectural shift from tuning models to tuning pipelines
 * How to build the DAG/pipeline on Sagemaker/Databricks using declarative configs
@@ -29,18 +30,20 @@ Attendees will learn how to optimize entire pipelines (in a scalable manner on c
 ---
 full_description:
 
-As a data science team working on forecasting, we rarely rely on a single model to produce optimal results. Instead, we run composite pipelines: short and long-term models followed by ensemble strategies, granularity reconciliation, and post-processing. We found that optimizing the parameters of one model in isolation often degraded the performance of the final ensemble or the post-processed output. We needed to treat the entire pipeline as the function to optimize.
+Have you ever tuned a model to perfection, only to have it fail once integrated into your production pipeline? This is the "local optimization" trap: fixing a component while unintentionally breaking the complex system around it. 
+At Zalando, where we manage hundreds of forecasting models across 25 countries, local wins often lead to global failures.In this talk, we move beyond single-model tuning to explore Holistic Optimization. 
+We will detail how our team implemented a "Pipeline-as-a-Trial" architecture, 
 
-This talk tackles this Problem of "local optimization" in details and explains how we implemented a "Pipeline-as-a-Trial" architecture utilising Ray with cloud infrastructure 
+What We’ll Cover:
+* An explanation of what "local optimization" problem is, and how it appears everywhere from tech products to day-to-day life.
+* How we leveraged Ray’s distributed capabilities to manage high-concurrency Machine Learning workloads.
+* Infrastructure Comparison: A candid, battle-tested breakdown of running HPO across AWS SageMaker, Databricks, and Internal EC2/Metaflow clusters.
+* Operational Trade-offs: Real-world insights into the performance, cost, and traceability of different cloud implementations.
+*Configuration Driven Development: How an abstract library layer allows us to scale experimentation across hundreds of production models.
 
+Stop chasing local solutions. Join me to learn how to build a distributed HPO framework that optimizes for your global business objectives.
 
-
-**Key points:**
-In this talk will deep dive into: 
-* Definition of what is a "local optimization" problem ? and how it appears everywhere from real life to technical products
-* Technical solution design to this problem in the context of Machine learning and Hyperparameter Optimization. 
-* Technical details on the implementation using Ray with aws, sagemaker, and databricks
-* Insights to take home
+PS: if you are a "Rick and Morty" fan, definitely join to see how Rick fell into the local optimization problem!
 ---
 room: None
 ---

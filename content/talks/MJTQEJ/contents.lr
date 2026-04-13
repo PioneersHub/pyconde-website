@@ -18,20 +18,47 @@ Through his work at inovex GmbH, Simon has demonstrated expertise in specialized
 ---
 abstract:
 
-How do you teach a computer to understand the nuance of a territorial strategy game? Over the last year, driven by private interest and a Master’s degree in Computer Science, I set out to build an autonomous agent for Antiyoy—a minimalist yet strategically deep hexagonal game. This talk takes you through the entire journey, from the first line of environment code to a trained model capable of complex strategic play.
-The talk addresses a fundamental problem in modern AI: how do we translate complex, turn-based rules into a language a neural network can interpret? We will explore the architecture of a custom Reinforcement Learning environment, the mathematical elegance required to handle hexagonal coordinates, and the engineering behind a massive action space of over 17,000 possibilities. You will hear how we guided the agent through the "sparse reward" problem and what happened when a model was finally allowed to play against its own mistakes. Whether you are interested in the mechanics of PyTorch and PettingZoo or simply curious about the "brain" of a strategy bot, this session provides a practical roadmap for tackling high-dimensional problems in Python.
+What does it take to build an AI that learns to play strategy games from scratch? Over the past year, I chose to explore this question out of personal fascination with game AI — as a seminar project for college, but really as a hobby. The result was a complete reinforcement learning environment for Antiyoy, a turn-based strategy game played on hexagonal grids.
+
+The journey raised intriguing challenges: How do you represent hexagonal game boards for neural networks? What do you do when your AI has over 4,000 possible actions to choose from? How do you design rewards that teach strategy rather than just reward flailing in the right direction? This talk shares how these problems were approached using Python's modern ML ecosystem—Gymnasium, PyTorch, and PPO training—ultimately producing an agent that wins nine out of ten games against a random opponent. Whether that qualifies as "strategic play" is a question the agent and I still disagree on.
+
+Whether you're curious about building custom RL environments, interested in game AI, or just wondering what reinforcement learning actually looks like when it half-works, you'll leave with practical insights and a healthy dose of realistic expectations.
 ---
 full_description:
 
-This work began as a personal challenge to bridge the gap between a childhood love for strategy games and a fascination with deep learning. Developed over the course of a year within the context of a Master’s in Computer Science, the talk presents a methodological case study on creating a sophisticated game bot from scratch.
-Strategy games like Antiyoy present a unique hurdle for standard Reinforcement Learning: they aren't just about quick reflexes; they require long-term economic planning and spatial reasoning on a grid where every cell has six neighbors instead of four. The talk answers the question of how to move from a raw game engine to a standardized Python environment that stable learning algorithms can actually use.
-The presentation is divided into three thematic explorations:
-**Part 1: How do we translate a world of hexagons into a language of tensors?**
-The first challenge of any RL project is the interface. The talk describes the process of wrapping game logic into a Gymnasium-compatible environment. You will hear about the design decisions behind a 91-channel observation space—essentially "images" that encode everything from unit positions to economic health. We will also address the "spiral" mathematics of hexagonal grids: how do we efficiently map 2D coordinates to a discrete action space that a model can output?
-**Part 2: How can a model learn to navigate 17,000 possible choices?**
-With an action space significantly larger than that of Chess, a random agent will almost never find a winning move by accident. The talk explores how we use "action masking" to prevent the model from wasting time on illegal moves and how the architecture of the neural network—splitting its focus between predicting the "value" of a board and the "policy" of a move—allows it to develop a sense of strategy. We will discuss the trade-offs between lightweight models and deep residual networks when working with limited hardware.
-**Part 3: What does emergent strategy look like in a trained agent?**
-The final part of the talk focuses on the training process itself. How do we provide feedback to an agent when the only thing that truly matters is winning or losing thirty minutes later? You will hear about "hybrid reward shaping"—a way to give the agent small hints about territory and economy without distracting it from the ultimate goal. The talk concludes with an analysis of the results: identifying the moment the agent stopped making random moves and started demonstrating recognizable human-like tactics, as well as the limitations we discovered along the way.
+### Context and Motivation
+
+This talk emerged from a year-long journey that began with a simple curiosity: could I teach a computer to play strategy games by itself? It started as a college seminar project, but the topic was chosen purely out of personal interest in reinforcement learning and game AI — this was a hobby from the start. Rather than working with pre-built environments like CartPole or Atari games, the goal was to understand the entire pipeline—from implementing game mechanics to training a neural network that actually learns to win.
+
+The game chosen was Antiyoy, a minimalist turn-based strategy game where players control territories on hexagonal grids, build units and structures, manage resources, and compete for dominance. While the game is simple enough to understand, it presents genuine strategic depth—exactly the kind of challenge that makes reinforcement learning both difficult and rewarding.
+
+The talk walks through the complete development process, focusing not on implementation minutiae but on the fundamental questions and design decisions that anyone building similar systems would encounter. You won't see walls of code or detailed mathematical derivations. Instead, you'll hear about the thinking process, the challenges faced, and the solutions that emerged—all with the goal of demystifying what it actually takes to build a learning agent for complex games.
+
+---
+
+### What Will You Learn?
+
+The talk is structured around three core challenges that define this kind of project, presented as questions that the work had to answer:
+
+**How do you turn a game into something a neural network can understand?**
+
+Strategy games aren't naturally suited for machine learning. Antiyoy is played on hexagonal grids, uses discrete turn-based actions, and involves complex state information—territory ownership, unit positions, economic resources, and more. The talk explores how to bridge this gap: representing hexagonal coordinates in ways that computers can efficiently process, encoding complete game state into multi-channel observations similar to those used in AlphaZero, and designing observation spaces that preserve spatial relationships for convolutional networks. You'll hear about the choice between different coordinate systems, the challenge of maintaining game history for temporal reasoning, and how to normalize diverse information types (positions, money, turn counts) into a coherent input for neural networks.
+
+**How do you handle massive action spaces without overwhelming your AI?**
+
+When your agent has more than 4,000 possible actions at any given moment—moving units to different positions, building various types of units and structures, or ending the turn—training becomes a serious challenge. Most of these actions are illegal at any given time, yet a naive approach would force the agent to learn this the hard way. The talk discusses how action masking solves this problem by dynamically filtering the action space to only legal moves, dramatically improving learning efficiency. You'll understand why this technique is crucial for games with complex rules and how it fundamentally changes the training dynamics compared to environments where every action is always available.
+
+**How do you design rewards that actually teach strategy?**
+
+Perhaps the most subtle challenge in reinforcement learning is reward design. Give an agent only a +1 for winning and -1 for losing, and it may take forever to figure out what behaviors lead to victory. But add too many intermediate rewards, and you risk the agent exploiting shortcuts rather than learning genuine strategy. The talk shares the experimentation process: starting with sparse rewards as a baseline, carefully introducing intermediate signals for meaningful actions like territory expansion and economic development, and ultimately landing on a reward structure that accelerated learning while still encouraging strategic play. You'll see how reward shaping influenced training speed and final performance, and learn to think about reward design as a crucial part of the development process rather than an afterthought.
+
+---
+
+### What Are the Results and Takeaways?
+
+After training over several thousand episodes—which took about eight hours on a consumer-grade GPU—the agent learned to win approximately nine out of ten games against a baseline random opponent. To be precise about what that means: the baseline picks uniformly from legal moves, so the bar is not high. The trained agent makes progress through a game, expands territory, and occasionally does things that look like they could be intentional. It also makes plenty of moves that defy easy explanation. "Strategy" might be a generous word; "learned to flail more purposefully" is closer to the truth.
+
+The talk concludes by reflecting on what worked well and what proved unexpectedly difficult—and what is still unresolved. Action masking emerged as perhaps the single most impactful technique for managing complexity. The choice of observation space design—borrowing ideas from AlphaZero's approach to representing board games—turned out to be well-suited for the problem. Training infrastructure using MLflow provided invaluable insight into the learning process and made experimentation much more manageable. On the challenging side: reward design required multiple iterations and still produced an agent that plays competently but not strategically. The gap between "beats random" and "actually plays well" is humbling and, it turns out, enormous.
 ---
 room: None
 ---
