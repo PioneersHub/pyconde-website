@@ -838,10 +838,11 @@ button.pretix-widget-button[type="submit"] {
 
 .topnav__links {
     display: flex;
-    gap: var(--space-md);
+    gap: var(--space-sm);
     align-items: center;
-    flex-wrap: wrap;        /* safety net so extra items wrap instead of clipping */
-    row-gap: var(--space-xs);
+    flex-wrap: nowrap;       /* topnav must stay on one line */
+    white-space: nowrap;
+    min-width: 0;
 }
 
 .topnav__links a {
@@ -879,9 +880,10 @@ button.pretix-widget-button[type="submit"] {
     transform: translateY(-1px);
 }
 
-@media (min-width: 769px) {
+@media (min-width: 1024px) {
     .topnav {
         display: flex;
+        flex-wrap: nowrap;
     }
     .hamburger-menu {
         display: none !important;
@@ -1797,7 +1799,7 @@ section.subsite.team .content {
 }
 
 /* ── Consistent link styling in content areas ───────────── */
-.subsite .content a:not(.button):not(.slide-cta):not(.blog-card):not(.talk) {
+.subsite .content a:not(.button):not(.slide-cta):not(.blog-card):not(.talk):not(.archive-edition__subnav-link) {
     color: var(--blue);
     text-decoration: underline;
     text-decoration-thickness: 1px;
@@ -1805,7 +1807,7 @@ section.subsite.team .content {
     transition: color 0.15s ease;
 }
 
-.subsite .content a:hover {
+.subsite .content a:not(.archive-edition__subnav-link):hover {
     color: var(--text-primary);
 }
 
@@ -2976,6 +2978,39 @@ main:focus { outline: none; }
 .archive-pointer a {
   font-weight: 600;
   text-decoration: underline;
+}
+
+/* ── Archive edition sub-nav (Talks / Speakers) ────────────────────── */
+.archive-edition__subnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--neutral-200);
+}
+.archive-edition__subnav a.archive-edition__subnav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1rem;
+  background: var(--blue, #00c8e1);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.2;
+}
+.archive-edition__subnav a.archive-edition__subnav-link:hover,
+.archive-edition__subnav a.archive-edition__subnav-link:focus {
+  background: var(--text-primary, #111);
+  color: #fff;
+  filter: none;
+}
+.archive-edition__subnav-count {
+  font-weight: 500;
+  opacity: 0.85;
+  font-size: 0.85rem;
 }
 
 /* ── Footer Archive (previous editions) ────────────────────────────── */
