@@ -1,0 +1,151 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ this.name }}{% endblock %}
+
+{% block og_type %}profile{% endblock %}
+
+{%- set branding = bag('branding') -%}
+{%- set host = branding['canonical_host'] -%}
+{%- set is_archive = this.url_path.startswith('/archive/') -%}
+{%- set archive_year = (this.url_path.split('/')[2] if is_archive else site.config.PROJECT.year|string) -%}
+{%- set edition_id = (host ~ '/archive/' ~ archive_year ~ '/#event-' ~ archive_year) if is_archive else (host ~ '/#event-' ~ site.config.PROJECT.year|string) -%}
+{%- set talks_root = '/archive/' ~ archive_year ~ '/talks' if is_archive else '/talks' -%}
+
+{% block structured_data %}
+{# Cast Url-typed fields to plain strings so |tojson can serialise them. #}
+{%- set socials = [
+    this.homepage|string if this.homepage else '',
+    this.linkedin|string if this.linkedin else '',
+    this.github|string if this.github else '',
+    this.mastodon|string if this.mastodon else '',
+    this.threads|string if this.threads else '',
+    this.bluesky|string if this.bluesky else '',
+    this.twitter|string if this.twitter else '',
+] | reject('equalto', '') | list -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": "{{ host }}{{ this.url_path }}#person",
+  "name": {{ this.name|tojson }},
+  "url": "{{ host }}{{ this.url_path }}",
+  {%- if this.avatar %}
+  "image": "{{ host }}{{ this.avatar }}",
+  {%- endif %}
+  {%- if this.job_title %}
+  "jobTitle": {{ this.job_title|tojson }},
+  {%- endif %}
+  {%- if this.company %}
+  "worksFor": { "@type": "Organization", "name": {{ this.company|tojson }} },
+  {%- endif %}
+  {%- if this.biography %}
+  "description": {{ (this.biography|striptags|truncate(400))|tojson }},
+  {%- endif %}
+  {%- if socials %}
+  "sameAs": [
+    {%- for url in socials -%}
+    {{ url|tojson }}{{ "," if not loop.last }}
+    {%- endfor -%}
+  ],
+  {%- endif %}
+  "performerIn": [
+    {%- for code in this.talks -%}
+    { "@id": "{{ host }}{{ talks_root }}/{{ code }}/#event" }{{ "," if not loop.last }}
+    {%- endfor -%}
+  ]
+}
+</script>
+{% endblock %}
+
+{% block body %}
+{% if is_archive %}
+<aside class="archive-banner" role="note" aria-label="Archived speaker">
+  <div class="content">
+    <strong>Archive</strong> — speaker profile from the
+    <a href="/archive/{{ archive_year }}/">{{ archive_year }} edition</a>.
+  </div>
+</aside>
+{% endif %}
+
+<article class="speaker-article">
+  <header class="subsite">
+    <div class="subsite-title">
+      <section class="content speaker-header">
+        {% if this.avatar %}
+        <img src="{{ this.avatar }}" alt="Portrait of {{ this.name }}" class="speaker-avatar" loading="lazy" width="240" height="240">
+        {% endif %}
+        <div class="speaker-meta">
+          <h1 class="speaker-name">{{ this.name }}</h1>
+          {%- if this.pronouns %}<p class="speaker-pronouns">{{ this.pronouns }}</p>{% endif %}
+          {%- if this.job_title or this.company %}
+          <p class="speaker-role">
+            {%- if this.job_title %}{{ this.job_title }}{% endif -%}
+            {%- if this.job_title and this.company %} · {% endif -%}
+            {%- if this.company %}{{ this.company }}{% endif -%}
+          </p>
+          {%- endif %}
+          {%- if this.city or this.country %}
+          <p class="speaker-location">
+            {%- if this.city %}{{ this.city }}{% endif -%}
+            {%- if this.city and this.country %}, {% endif -%}
+            {%- if this.country %}{{ this.country }}{% endif -%}
+          </p>
+          {%- endif %}
+          {%- if this.is_first_time_speaker %}
+          <p class="speaker-badge">First-time speaker at PyCon DE &amp; PyData {{ archive_year }}</p>
+          {%- endif %}
+        </div>
+      </section>
+    </div>
+  </header>
+
+  <section class="subsite speaker-body">
+    <div class="content">
+      {% if this.biography %}
+      {{ this.biography|shift_headings }}
+      {% endif %}
+
+      {%- set socials_list = [
+        ('homepage', this.homepage|string if this.homepage else '', 'Homepage'),
+        ('linkedin', this.linkedin|string if this.linkedin else '', 'LinkedIn'),
+        ('github', this.github|string if this.github else '', 'GitHub'),
+        ('mastodon', this.mastodon|string if this.mastodon else '', 'Mastodon'),
+        ('threads', this.threads|string if this.threads else '', 'Threads'),
+        ('bluesky', this.bluesky|string if this.bluesky else '', 'Bluesky'),
+        ('twitter', this.twitter|string if this.twitter else '', 'X (Twitter)'),
+      ] | rejectattr(1, 'equalto', '') | list -%}
+      {% if socials_list %}
+      <ul class="speaker-socials" aria-label="Speaker links">
+        {% for slug, url, label in socials_list %}
+        <li class="speaker-social speaker-social--{{ slug }}">
+          <a href="{{ url }}" rel="me noopener noreferrer" target="_blank">{{ label }}</a>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  </section>
+
+  {% if this.talks %}
+  <section class="subsite speaker-talks">
+    <div class="content">
+      <h2>Sessions at PyCon DE &amp; PyData {{ archive_year }}</h2>
+      <ul class="speaker-talks-list">
+        {%- for code in this.talks -%}
+        {%- set talk = site.get(talks_root ~ '/' ~ code) -%}
+        {% if talk %}
+        <li>
+          <a href="{{ talk|url }}">
+            <span class="talk-list__title">{{ talk.title }}</span>
+            {% if talk.track %}<span class="talk-list__track">{{ talk.track }}</span>{% endif %}
+            {% if talk.youtube_id and not talk.do_not_record %}<span class="recording-badge">▶ Recording</span>{% endif %}
+          </a>
+        </li>
+        {% endif %}
+        {%- endfor -%}
+      </ul>
+    </div>
+  </section>
+  {% endif %}
+</article>
+{% endblock %}

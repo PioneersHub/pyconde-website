@@ -190,8 +190,9 @@ def submission_to_talk(sub, cfg: dict, year: str, audit: list | None = None) -> 
     t["do_not_record"] = bool(getattr(sub, "do_not_record", False))
 
     # Tags (Pretalx may return empty list for editions that don't use them).
+    # Lektor's `type = strings` expects newline-separated values.
     tags = getattr(sub, "tags", None) or []
-    t["tags"] = ", ".join(_tag_name(tag) for tag in tags if _tag_name(tag))
+    t["tags"] = "\n".join(_tag_name(tag) for tag in tags if _tag_name(tag))
 
     # Track + label cleanup.
     if sub.track is not None:

@@ -13,6 +13,19 @@
 {%- set archive_year = (this.url_path.split('/')[2] if is_archive else site.config.PROJECT.year|string) -%}
 {%- set super_event_id = (host ~ '/archive/' ~ archive_year ~ '/#event-' ~ archive_year) if is_archive else (host ~ '/#event-' ~ site.config.PROJECT.year|string) -%}
 {%- set event_status = 'EventCompleted' if is_archive else 'EventScheduled' -%}
+{%- set speakers_root = '/archive/' ~ archive_year ~ '/speakers' if is_archive else '/speakers' -%}
+{# Resolve the speakers who actually presented this talk. We iterate the
+   edition's speaker index and pick the ones whose `talks` list includes
+   this talk's pretalx code. #}
+{%- set speakers_index = site.get(speakers_root) -%}
+{%- set my_speakers = [] -%}
+{%- if speakers_index -%}
+  {%- for sp in speakers_index.children -%}
+    {%- if this.code in (sp.talks or []) -%}
+      {%- set _ = my_speakers.append(sp) -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
 <script type="application/ld+json">
 [
 {
@@ -47,9 +60,15 @@
   },
   "organizer": { "@id": "{{ host }}/#organization" },
   "performer": [
-    {%- for name in speaker_list -%}
-    { "@type": "Person", "name": {{ name.strip()|tojson }} }{{ "," if not loop.last }}
-    {%- endfor -%}
+    {%- if my_speakers -%}
+      {%- for sp in my_speakers -%}
+      { "@id": "{{ host }}{{ sp|url }}#person" }{{ "," if not loop.last }}
+      {%- endfor -%}
+    {%- else -%}
+      {%- for name in speaker_list -%}
+      { "@type": "Person", "name": {{ name.strip()|tojson }} }{{ "," if not loop.last }}
+      {%- endfor -%}
+    {%- endif -%}
   ]
   {%- if this.track %},
   "about": {{ this.track|tojson }}
@@ -117,7 +136,13 @@
           {% endif %}
         </h1>
         <p class="talk-subtitle">
-          {{ this.speaker_names }}
+          {%- if my_speakers -%}
+            {%- for sp in my_speakers -%}
+              <a href="{{ sp|url }}" rel="author">{{ sp.name }}</a>{{ ', ' if not loop.last }}
+            {%- endfor -%}
+          {%- else -%}
+            {{ this.speaker_names }}
+          {%- endif -%}
         </p>
         <div class="talk-info-container">
           <div class="track-container">
