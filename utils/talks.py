@@ -54,199 +54,23 @@ def talks_json_for(year: str, current_year: str) -> Path:
 META_DESCRIPTION_MAX = 155
 TRACK_PREFIX_PATTERN = re.compile(r"(?i)(pycon|pydata|general):\s*")
 
-# ── Bio → third-person conversion ─────────────────────────────────────
+
+# Speaker bios are imported verbatim. When a bio is written in the first
+# person (any standalone "I" pronoun or "I'm" / "I've" / "I'll" / "I'd"
+# contraction), the importer prepends a single framing line so the
+# first-person voice reads naturally on a third-party-authored page:
 #
-# Speakers regularly submit bios in the first person ("Hi, I'm X. I work
-# at Y."). Conference pages read more consistently when every bio is in
-# third person. The transformation here is conservative:
-#   * known greeting + self-intro openers are stripped (the speaker name
-#     is shown in the heading already)
-#   * "I am/I'm/I've/I have/I had/I'll/etc." are mapped to "{first} is/has/…"
-#     and a curated list of present-tense verbs get an -s suffix
-#   * possessive / object / reflexive pronouns shift to a configurable
-#     pronoun set (default singular they)
-#   * leftover bare "I" → first name on first occurrence, then subject
-#     pronoun afterwards
-# Output is left as-is when no pattern matches, so the function is
-# idempotent on bios that are already in the third person.
-# ──────────────────────────────────────────────────────────────────────
-
-_PAST_VERBS = {
-    "was", "did", "got", "joined", "started", "graduated", "moved", "founded",
-    "wrote", "built", "earned", "completed", "finished", "left", "received",
-    "served", "worked", "studied", "launched", "grew", "spent", "led",
-    "managed", "created", "developed", "designed", "taught", "researched",
-    "co-founded", "co-authored", "published", "decided", "moved", "spoke",
-    "gave", "took", "saw", "made", "ran", "wrote", "lived", "shared",
-    "presented", "contributed", "co-organized", "organized",
-}
-
-
-def _conjugate_3s(verb: str) -> str:
-    """Return the 3rd-person singular form of a base-form verb."""
-    if verb == "have":
-        return "has"
-    if verb == "do":
-        return "does"
-    if verb == "be":
-        return "is"
-    if verb == "go":
-        return "goes"
-    if verb.endswith("y") and not verb.endswith(("ay", "ey", "oy", "uy")):
-        return verb[:-1] + "ies"
-    if verb.endswith(("s", "ss", "sh", "ch", "x", "z", "o")):
-        return verb + "es"
-    return verb + "s"
-
-
-# All "I (+verb)" / "I'm" / "I've" / etc. patterns rolled into one regex so
-# we can rewrite each occurrence as a unit and switch between speaker-name
-# and pronoun in a single pass.
-_I_PATTERN = re.compile(
-    r"""\bI
-    (?:
-        (?P<contr>['’](?:m|ve|ll|d|re))
-        |\s+(?P<aux>am|have|had|will|can|could|would|should|might|must|do|does|did|was|were|been)\b
-        |\s+(?P<verb>[a-zA-Z][a-zA-Z'’-]*)\b
-        |\b(?P<bare>(?=[.,!?;:]|$))
-    )""",
-    re.VERBOSE,
-)
-
-
-def parse_pronouns(raw: str | None) -> dict[str, str]:
-    """Map a Pretalx "How should we address you?" answer into pronoun forms.
-
-    Defaults to singular they when no pronouns are recorded.
-    """
-    s = (raw or "").lower().strip()
-    if "she" in s or "her" in s:
-        return {"subj": "she", "obj": "her", "poss": "her", "refl": "herself"}
-    if "he/" in s or "/him" in s or "him/" in s or s.startswith("he") and "she" not in s:
-        return {"subj": "he", "obj": "him", "poss": "his", "refl": "himself"}
-    return {"subj": "they", "obj": "them", "poss": "their", "refl": "themself"}
-
-
-def to_third_person(bio: str, name: str, pronouns: dict[str, str] | None = None) -> str:
-    """Best-effort first-person → third-person conversion.
-
-    Args:
-        bio: speaker biography (markdown / plain text).
-        name: full name from Pretalx; the first token is used in subject
-            position so the bio reads as a natural rewrite.
-        pronouns: optional dict {subj, obj, poss, refl}; default they/them.
-    """
-    if not bio:
-        return bio
-    p = pronouns or {"subj": "they", "obj": "them", "poss": "their", "refl": "themself"}
-    first = name.split()[0] if name else p["subj"].capitalize()
-
-    text = bio
-
-    # Strip greeting + self-intro at the start ("Hi, I'm X.", "My name is X and",
-    # "I'm X!" etc.). The ### heading already shows the name.
-    intro_pattern = (
-        rf"^\s*(?:(?:Hi|Hello|Hey|Hiya|Greetings)[,!\.\s]+)?"
-        rf"(?:(?:my name is|I\'m|I am|I’m)\s+{re.escape(first)}[,!\.\s]+(?:and\s+)?)?"
-    )
-    m = re.match(intro_pattern, text, flags=re.IGNORECASE)
-    if m and m.end() > 0:
-        text = text[m.end():].lstrip()
-        if text and text[0].islower():
-            text = text[0].upper() + text[1:]
-
-    # Single-pass substitution. Each occurrence of "I (+verb)" chooses the
-    # right subject + verb conjugation in one step. The counter switches the
-    # subject from the speaker's name to the pronoun after the first hit so
-    # the bio doesn't repeat the name in every sentence.
-    is_singular_3rd = p["subj"] in {"he", "she"}
-    counter = [0]
-
-    def replace(match: "re.Match[str]") -> str:
-        counter[0] += 1
-        use_name = counter[0] == 1
-        subj = first if use_name else p["subj"]
-        # Pick the verb form: 3rd-singular for name (always) and for he/she;
-        # plural for singular "they" (which takes plural verb forms).
-        use_3s = use_name or is_singular_3rd
-
-        contr_raw = match.group("contr") or ""
-        contr = contr_raw.replace("'", "").replace("’", "")
-        aux = match.group("aux") or ""
-        verb = match.group("verb") or ""
-
-        # Contractions
-        if contr == "m":
-            return f"{subj} {'is' if use_3s else 'are'}"
-        if contr == "ve":
-            return f"{subj} {'has' if use_3s else 'have'}"
-        if contr == "ll":
-            return f"{subj} will"
-        if contr == "d":
-            return f"{subj} would"  # heuristic: could also be "had"
-        if contr == "re":
-            return f"{subj} are"
-
-        # Auxiliaries & irregulars
-        if aux == "am":
-            return f"{subj} {'is' if use_3s else 'are'}"
-        if aux == "have":
-            return f"{subj} {'has' if use_3s else 'have'}"
-        if aux == "had":
-            return f"{subj} had"
-        if aux == "was":
-            return f"{subj} {'was' if use_3s else 'were'}"
-        if aux == "were":
-            return f"{subj} were"
-        if aux == "do":
-            return f"{subj} {'does' if use_3s else 'do'}"
-        if aux == "does":
-            return f"{subj} does"
-        if aux == "did":
-            return f"{subj} did"
-        if aux == "been":
-            return f"{subj} been"  # rare standalone; usually after have/has
-        if aux in {"will", "can", "could", "would", "should", "might", "must"}:
-            return f"{subj} {aux}"
-
-        # Generic verb
-        if verb:
-            if verb in _PAST_VERBS:
-                v = verb
-            elif use_3s:
-                v = _conjugate_3s(verb)
-            else:
-                v = verb
-            return f"{subj} {v}"
-
-        # Bare "I" followed by punctuation
-        return subj
-
-    text = _I_PATTERN.sub(replace, text)
-
-    # Possessive / object / reflexive pronouns (no alternation).
-    text = re.sub(r"\bMy\b", p["poss"].capitalize(), text)
-    text = re.sub(r"\bmy\b", p["poss"], text)
-    text = re.sub(r"\bme\b", p["obj"], text)
-    text = re.sub(r"\bmyself\b", p["refl"], text)
-
-    # Capitalize the subject pronoun if it now sits at the start of a sentence.
-    text = re.sub(
-        rf"(^|[.!?]\s+)({re.escape(p['subj'])})\b",
-        lambda m: f"{m.group(1)}{m.group(2).capitalize()}",
-        text,
-    )
-
-    return text.strip()
-
-
-_FP_DETECTOR = re.compile(
-    r"\b(I am |I\'m |I’m |I\'ve |I’ve |I have |I had |I\'ll |I will |I do |I work|I run|I love)\b"
-)
+#     This is what {first_name} says:
+#
+#     {original bio, exactly as submitted to Pretalx}
+#
+# No paraphrasing, no person-shift, no gender-neutral rewrite — the
+# speaker's own words are preserved.
+_FP_DETECTOR = re.compile(r"\bI(?:\s|['’])")
 
 
 def looks_first_person(bio: str) -> bool:
-    """Return True if the bio still appears to be in first person."""
+    """Return True if the bio uses the first-person pronoun ("I"-form)."""
     return bool(_FP_DETECTOR.search(bio or ""))
 
 
@@ -408,11 +232,23 @@ def _tag_name(tag: object) -> str:
     return str(name) if name else ""
 
 
-def speaker_to_markdown(speaker, pronouns: dict | None = None, audit: list | None = None) -> str:
-    raw = speaker.biography or ""
-    bio = to_third_person(raw, speaker.name, pronouns)
-    if audit is not None and raw and looks_first_person(bio):
-        audit.append((speaker.code, speaker.name, bio[:140]))
+def speaker_to_markdown(speaker, audit: list | None = None) -> str:
+    """Render a speaker block in markdown.
+
+    Bios are preserved verbatim. When the bio uses the first person, a
+    framing line "This is what {first_name} says:" is prepended so the
+    voice reads naturally on the conference site without changing any
+    of the speaker's own wording.
+    """
+    raw = (speaker.biography or "").strip()
+    if raw and looks_first_person(raw):
+        first = speaker.name.split()[0] if speaker.name else "the speaker"
+        bio = f"_This is what {first} says:_\n\n{raw}"
+        if audit is not None:
+            audit.append((speaker.code, speaker.name, raw[:120]))
+    else:
+        bio = raw
+
     tmpl = Template("""
 ### $name
 
@@ -592,11 +428,9 @@ def main() -> None:
 
     if audit:
         print()
-        print(f"⚠️  {len(audit)} bios still look first-person after rewrite — manual review needed:")
-        for code, name, snippet in audit:
-            print(f"   - {code} · {name}: {snippet}…")
+        print(f"Framed {len(audit)} first-person bios with 'This is what … says:' intro.")
     else:
-        print("All bios converted cleanly to third person.")
+        print("No first-person bios — none needed framing.")
 
 
 if __name__ == "__main__":
