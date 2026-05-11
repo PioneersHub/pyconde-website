@@ -1,0 +1,37 @@
+# ──────────────────────────────────────────────────────────────
+# SEO & robots configuration
+# ──────────────────────────────────────────────────────────────
+#
+# Drives templates/robots.txt (Jinja template) and any other
+# crawler-policy decisions. Edit this file to change crawler
+# allowlists or sitemap-discovery without touching templates.
+# ──────────────────────────────────────────────────────────────
+
+robots:
+  # Per Phase-0 decision E-01: allow all AI/LLM crawlers.
+  ai_crawler_policy: allow
+  ai_crawlers:
+    - GPTBot
+    - ClaudeBot
+    - PerplexityBot
+    - Google-Extended
+    - CCBot
+
+  # Paths excluded from indexing. Applied to wildcard User-agent.
+  disallow_paths:
+    - /sponsoring/test.html
+    - /landing-page-inactive/
+
+  # Sitemap URL announced in robots.txt. Lektor builds an absolute
+  # path via canonical_host (see databags/branding.yaml).
+  sitemap_path: /sitemap.xml
+
+llms_txt:
+  enabled: true                       # generate /llms.txt
+  include_full_text: true             # additionally generate /llms-full.txt with talk abstracts
+
+# Helper pages that should carry <meta name="robots" content="noindex">.
+# Lektor templates check `this.url_path in bag('seo')['noindex_paths']`.
+noindex_paths:
+  - /sponsoring/test.html
+  - /landing-page-inactive/
