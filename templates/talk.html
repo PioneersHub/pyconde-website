@@ -1,8 +1,6 @@
 {% extends "layout.html" %}
 
-{% block title %}
-{{ this.title }}
-{% endblock %}
+{% block title %}{{ this.title }}{% endblock %}
 
 {% block og_type %}event{% endblock %}
 
@@ -57,56 +55,62 @@
 
 {% block body %}
 
-<div class="subsite">
-  <div class="subsite-title">
-    <section class="content">
-      <h1 class="talk-title">
-        {{ this.title }}
-        {% if this.is_keynote %}
-          <span class="keynote-label">Keynote</span>
-        {% endif %}
-      </h1>
-      <p class="talk-subtitle">
-        {{ this.speaker_names }}
-      </p>
-      <div class="talk-info-container">
-        <div class="track-container">
-          <span class="track">{{ this.track }}</span>
-        </div>
-        {% if this.python_skill or this.domain_expertise %}
-        <div class="python-skill-container">
-          <span class="python-skill-label talk-info-label">Python Skill</span>
-          <span class="levels">{{ this.python_skill }}</span>
-        </div>
-        <div class="domain-expertise">
-          <span class="domain-expertise-label talk-info-label">Domain Expertise</span>
-          <span class="levels">{{ this.domain_expertise }}</span>
-        </div>
-        {% endif %}
-      </div>
-    </section>
-  </div>
-</div>
-
-<section class="subsite talk">
-  <div class="content">
-      <div class="details">
-          {{ this.day }} {{ this.start_time }}
-          {% if this.room %}
-          in {{ this.room}}
+<article class="talk-article">
+  <header class="subsite">
+    <div class="subsite-title">
+      <section class="content">
+        <h1 class="talk-title">
+          {{ this.title }}
+          {% if this.is_keynote %}
+            <span class="keynote-label">Keynote</span>
           {% endif %}
-      </div>
+        </h1>
+        <p class="talk-subtitle">
+          {{ this.speaker_names }}
+        </p>
+        <div class="talk-info-container">
+          <div class="track-container">
+            <span class="track">{{ this.track }}</span>
+          </div>
+          {% if this.python_skill or this.domain_expertise %}
+          <div class="python-skill-container">
+            <span class="python-skill-label talk-info-label">Python Skill</span>
+            <span class="levels">{{ this.python_skill }}</span>
+          </div>
+          <div class="domain-expertise">
+            <span class="domain-expertise-label talk-info-label">Domain Expertise</span>
+            <span class="levels">{{ this.domain_expertise }}</span>
+          </div>
+          {% endif %}
+        </div>
+      </section>
+    </div>
+  </header>
+
+  <section class="subsite talk">
+    <div class="content">
+      <p class="details">
+        {% if this.start_time %}
+          <time datetime="2026-04-{{ ('14' if this.day == 'Tuesday' else '15' if this.day == 'Wednesday' else '16' if this.day == 'Thursday' else '17') }}T{{ this.start_time }}">
+            {{ this.day }} {{ this.start_time }}{% if this.end_time %}–{{ this.end_time }}{% endif %}
+          </time>
+        {% endif %}
+        {% if this.room %}
+          · in {{ this.room }}
+        {% endif %}
+      </p>
 
       <div class="description">
-          {{ this.full_description|shift_headings }}
+        {{ this.full_description|shift_headings }}
       </div>
 
       <div class="authors">
         {{ this.speakers }}
       </div>
 
-      <img src="{{this.social_card_image}}" alt="">
-  </div>
-</section>
+      <img src="{{ this.social_card_image }}" alt="">
+    </div>
+  </section>
+</article>
 
 {% endblock %}
