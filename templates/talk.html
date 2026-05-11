@@ -9,6 +9,10 @@
 {%- set host = branding['canonical_host'] -%}
 {%- set speaker_list = this.speaker_names.split(',') if this.speaker_names else [] -%}
 {%- set has_recording = this.youtube_id and not this.do_not_record -%}
+{%- set is_archive = this.url_path.startswith('/archive/') -%}
+{%- set archive_year = (this.url_path.split('/')[2] if is_archive else site.config.PROJECT.year|string) -%}
+{%- set super_event_id = (host ~ '/archive/' ~ archive_year ~ '/#event-' ~ archive_year) if is_archive else (host ~ '/#event-' ~ site.config.PROJECT.year|string) -%}
+{%- set event_status = 'EventCompleted' if is_archive else 'EventScheduled' -%}
 <script type="application/ld+json">
 [
 {
@@ -20,9 +24,15 @@
   "url": "{{ host }}{{ this.url_path }}",
   "image": "{{ host }}{{ this.social_card_image }}",
   "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
-  "eventStatus": "https://schema.org/EventScheduled",
+  "eventStatus": "https://schema.org/{{ event_status }}",
   "inLanguage": "en",
-  "superEvent": { "@id": "{{ host }}/#event-{{ site.config.PROJECT.year }}" },
+  {%- if this.slot_date %}
+  "startDate": "{{ this.slot_date }}{% if this.start_time %}T{{ this.start_time }}{% endif %}",
+  {%- if this.end_time %}
+  "endDate": "{{ this.slot_date }}T{{ this.end_time }}",
+  {%- endif %}
+  {%- endif %}
+  "superEvent": { "@id": "{{ super_event_id }}" },
   "location": {
     "@type": "Place",
     "name": "{{ branding['location']['venue'] }}",
@@ -83,6 +93,19 @@
 
 {% block body %}
 
+{%- set is_archive = this.url_path.startswith('/archive/') -%}
+{%- set archive_year = (this.url_path.split('/')[2] if is_archive else '') -%}
+
+{% if is_archive %}
+<aside class="archive-banner" role="note" aria-label="Archived talk">
+  <div class="content">
+    <strong>Archive</strong> — this talk is from the
+    <a href="/archive/{{ archive_year }}/">{{ archive_year }} edition</a>.
+    See the <a href="/talks/">current programme</a> for the upcoming conference.
+  </div>
+</aside>
+{% endif %}
+
 <article class="talk-article">
   <header class="subsite">
     <div class="subsite-title">
@@ -136,8 +159,9 @@
     <div class="content">
       <p class="details">
         {% if this.start_time %}
-          <time datetime="2026-04-{{ ('14' if this.day == 'Tuesday' else '15' if this.day == 'Wednesday' else '16' if this.day == 'Thursday' else '17') }}T{{ this.start_time }}">
-            {{ this.day }} {{ this.start_time }}{% if this.end_time %}–{{ this.end_time }}{% endif %}
+          <time datetime="{{ this.slot_date }}{% if this.start_time %}T{{ this.start_time }}{% endif %}">
+            {{ this.day }}{% if this.slot_date %}, {{ this.slot_date }}{% endif %}
+            {{ this.start_time }}{% if this.end_time %}–{{ this.end_time }}{% endif %}
           </time>
         {% endif %}
         {% if this.room %}

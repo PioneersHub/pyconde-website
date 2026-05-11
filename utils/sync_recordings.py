@@ -41,7 +41,7 @@ from dotenv import load_dotenv
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 RECORDINGS_CONFIG = REPO_ROOT / "databags" / "recordings.yaml"
-TALKS_CONTENT_DIR = REPO_ROOT / "content" / "talks"
+PRETALX_CONFIG = REPO_ROOT / "databags" / "pretalx.yaml"
 YOUTUBE_API = "https://www.googleapis.com/youtube/v3"
 REQUEST_DELAY_S = 0.4  # ~2.5 req/s — safely under YouTube's default
 MAX_PER_PAGE = 50
@@ -248,14 +248,31 @@ def write_lr_blocks(path: Path, blocks: list[tuple[str, str]]) -> None:
     path.write_text("\n---\n".join(parts) + "\n", encoding="utf-8")
 
 
-def apply_to_talk_file(code: str, video: dict, dry_run: bool = False) -> str:
-    """Write the discovered video fields into content/talks/{code}/contents.lr.
+def talks_dir_for_year(year: str) -> Path:
+    """Resolve where talks for the given year live in the content tree.
+
+    Mirrors utils/talks.py.talks_dir_for: current edition at /talks/,
+    historical editions under /archive/{year}/talks/.
+    """
+    current_year = ""
+    if PRETALX_CONFIG.exists():
+        with PRETALX_CONFIG.open(encoding="utf-8") as f:
+            cfg = yaml.safe_load(f) or {}
+        current_year = str(cfg.get("events", {}).get("current", {}).get("year", ""))
+    if year == current_year:
+        return REPO_ROOT / "content" / "talks"
+    return REPO_ROOT / "content" / "archive" / year / "talks"
+
+
+def apply_to_talk_file(code: str, video: dict, year: str, dry_run: bool = False) -> str:
+    """Write the discovered video fields into the talk's contents.lr.
 
     Skips and returns 'skip' if the talk is marked do_not_record.
     Returns 'updated' on successful write, 'unchanged' if values matched,
     'missing' if the talk dir does not exist.
     """
-    lr_path = TALKS_CONTENT_DIR / code / "contents.lr"
+    talks_dir = talks_dir_for_year(year)
+    lr_path = talks_dir / code / "contents.lr"
     if not lr_path.exists():
         return "missing"
     blocks = read_lr_blocks(lr_path)
@@ -345,7 +362,7 @@ def main() -> None:
 
     counts: dict[str, int] = {"updated": 0, "unchanged": 0, "skip": 0, "missing": 0, "would-update": 0}
     for code, video in sorted(code_map.items()):
-        result = apply_to_talk_file(code, video, dry_run=args.dry_run)
+        result = apply_to_talk_file(code, video, year, dry_run=args.dry_run)
         counts[result] = counts.get(result, 0) + 1
         if result in {"updated", "would-update", "skip", "missing"}:
             print(f"  {code}: {result}  {video.get('youtube_id','')}")

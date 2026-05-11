@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ this.title }} (Archive){% endblock %}
+
+{% block og_type %}website{% endblock %}
+
+{% block structured_data %}
+{%- set branding = bag('branding') -%}
+{%- set host = branding['canonical_host'] -%}
+<script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": "{{ host }}/#website",
+    "url": "{{ host }}/",
+    "name": "{{ site.config.PROJECT.name }}",
+    "publisher": { "@id": "{{ host }}/#organization" },
+    "inLanguage": "en"
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": "{{ host }}/#organization",
+    "name": "{{ branding['organization']['name'] }}",
+    "url": "{{ branding['organization']['url'] }}"
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    "@id": "{{ host }}{{ this.url_path }}#event-{{ this.year }}",
+    "name": {{ this.title|tojson }},
+    "description": {{ (this.body|striptags|truncate(300))|tojson }},
+    "startDate": "{{ this.date_from }}",
+    "endDate": "{{ this.date_to or this.date_from }}",
+    "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+    "eventStatus": "https://schema.org/EventScheduled",
+    "inLanguage": "en",
+    "url": "{{ host }}{{ this.url_path }}",
+    "location": {
+      "@type": "Place",
+      "name": "{{ this.location }}",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "{{ branding['location']['city'] }}",
+        "addressCountry": "{{ branding['location']['country'] }}"
+      }
+    },
+    "organizer": { "@id": "{{ host }}/#organization" }
+  }
+]
+</script>
+{% endblock %}
+
+{% block body %}
+<aside class="archive-banner" role="note" aria-label="Archived edition">
+  <div class="content">
+    <strong>Archive</strong> — this page documents the {{ this.year }} edition of PyCon DE &amp; PyData.
+    See the <a href="/">current edition</a> for the upcoming conference.
+  </div>
+</aside>
+
+<article class="archive-edition-article">
+  <header class="subsite">
+    <div class="subsite-title">
+      <section class="content">
+        <h1>{{ this.title }}</h1>
+        {%- if this.date_from %}
+        <p class="archive-edition__dates">
+          <time datetime="{{ this.date_from }}">{{ this.date_from }}</time>
+          {%- if this.date_to %} – <time datetime="{{ this.date_to }}">{{ this.date_to }}</time>{% endif %}
+          {%- if this.location %} · {{ this.location }}{% endif %}
+        </p>
+        {%- endif %}
+      </section>
+    </div>
+  </header>
+
+  <section class="subsite">
+    <div class="content">
+      {{ this.body|shift_headings }}
+    </div>
+  </section>
+</article>
+{% endblock %}

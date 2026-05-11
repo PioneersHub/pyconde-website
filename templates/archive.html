@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ this.title }}{% endblock %}
+
+{% block body %}
+<div class="subsite">
+  <div class="subsite-title">
+    <section class="content">
+      <h1>{{ this.title }}</h1>
+    </section>
+  </div>
+</div>
+
+<section class="subsite">
+  <div class="content">
+    {{ this.body|shift_headings }}
+
+    <ul class="archive-editions">
+      {%- for edition in this.children|sort(attribute='year', reverse=true) %}
+      <li>
+        <a href="{{ edition|url }}" class="archive-edition-card">
+          <h2 class="archive-edition__title">{{ edition.title }}</h2>
+          {%- if edition.date_from %}
+          <p class="archive-edition__dates">
+            <time datetime="{{ edition.date_from }}">{{ edition.date_from }}</time>
+            {%- if edition.date_to %} – <time datetime="{{ edition.date_to }}">{{ edition.date_to }}</time>{% endif %}
+            {%- if edition.location %} · {{ edition.location }}{% endif %}
+          </p>
+          {%- endif %}
+          {%- if edition.talk_count %}
+          <p class="archive-edition__stats">
+            {{ edition.talk_count }} talks
+            {%- if edition.recording_count %} · {{ edition.recording_count }} recordings{% endif %}
+          </p>
+          {%- endif %}
+        </a>
+      </li>
+      {%- endfor %}
+    </ul>
+  </div>
+</section>
+{% endblock %}

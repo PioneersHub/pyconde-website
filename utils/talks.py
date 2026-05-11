@@ -30,8 +30,26 @@ from pytanis import PretalxClient
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 PRETALX_CONFIG = REPO_ROOT / "databags" / "pretalx.yaml"
-TALKS_CONTENT_DIR = REPO_ROOT / "content" / "talks"
-TALKS_JSON_PATH = REPO_ROOT / "databags" / "talks.json"
+CONTENT_DIR = REPO_ROOT / "content"
+CURRENT_TALKS_JSON_PATH = REPO_ROOT / "databags" / "talks.json"
+
+
+def talks_dir_for(year: str, current_year: str) -> Path:
+    """Resolve the on-disk talks folder for a given edition year.
+
+    Current edition lives at /talks/ (top-level routing); historical
+    editions live under /archive/{year}/talks/.
+    """
+    if year == current_year:
+        return CONTENT_DIR / "talks"
+    return CONTENT_DIR / "archive" / year / "talks"
+
+
+def talks_json_for(year: str, current_year: str) -> Path:
+    """Where to write the JSON bag of talks for this edition."""
+    if year == current_year:
+        return CURRENT_TALKS_JSON_PATH
+    return REPO_ROOT / "databags" / f"talks-{year}.json"
 
 META_DESCRIPTION_MAX = 155
 TRACK_PREFIX_PATTERN = re.compile(r"(?i)(pycon|pydata|general):\s*")
@@ -169,6 +187,7 @@ def submission_to_talk(sub, cfg: dict, year: str) -> dict:
         t["room"] = room_name or ""
         if slot.start:
             t["start_time"] = slot.start.strftime("%H:%M")
+            t["slot_date"] = slot.start.strftime("%Y-%m-%d")
             t["day"] = calendar.day_name[slot.start.weekday()]
         if slot.end:
             t["end_time"] = slot.end.strftime("%H:%M")
@@ -231,6 +250,8 @@ room: $room
 ---
 day: $day
 ---
+slot_date: $slot_date
+---
 start_time: $start_time
 ---
 end_time: $end_time
@@ -279,25 +300,25 @@ def submission_to_lektor(sub, cfg: dict, year: str) -> str:
     return LR_TEMPLATE.substitute(talk)
 
 
-def remove_old_talks() -> None:
-    """Wipe content/talks/* so removed Pretalx submissions disappear."""
-    if not TALKS_CONTENT_DIR.exists():
+def remove_old_talks(talks_dir: Path) -> None:
+    """Wipe the given talks dir so removed Pretalx submissions disappear."""
+    if not talks_dir.exists():
         return
-    for entry in TALKS_CONTENT_DIR.iterdir():
+    for entry in talks_dir.iterdir():
         if entry.is_dir():
             shutil.rmtree(entry)
 
 
-def submission_to_lektor_file(sub, cfg: dict, year: str) -> None:
-    new_dir = TALKS_CONTENT_DIR / sub.code
+def submission_to_lektor_file(sub, cfg: dict, year: str, talks_dir: Path) -> None:
+    new_dir = talks_dir / sub.code
     new_dir.mkdir(parents=True, exist_ok=True)
     rendered = submission_to_lektor(sub, cfg, year)
     (new_dir / "contents.lr").write_text(rendered, encoding="utf-8")
 
 
-def submissions_to_json_file(submissions, cfg: dict, year: str) -> None:
+def submissions_to_json_file(submissions, cfg: dict, year: str, json_path: Path) -> None:
     talks = [submission_to_talk(sub, cfg, year) for sub in submissions]
-    TALKS_JSON_PATH.write_text(json.dumps({"talks": talks}, default=str), encoding="utf-8")
+    json_path.write_text(json.dumps({"talks": talks}, default=str), encoding="utf-8")
 
 
 def configure_pretalx_client() -> PretalxClient:
@@ -346,7 +367,15 @@ def main() -> None:
 
     cfg = load_pretalx_config()
     slug, year = event_for(cfg, args.year)
-    print(f"Importing from Pretalx event '{slug}' (year={year or 'unknown'})")
+    current_year = str(cfg["events"]["current"]["year"])
+    talks_dir = talks_dir_for(year, current_year)
+    json_path = talks_json_for(year, current_year)
+    is_archive = year != current_year
+
+    label = "archive" if is_archive else "current"
+    print(f"Importing from Pretalx event '{slug}' (year={year or 'unknown'}, target={label})")
+    print(f"  Talks dir: {talks_dir}")
+    print(f"  JSON bag:  {json_path}")
 
     client = configure_pretalx_client()
     _, submissions = client.submissions(slug, params={"state": ["confirmed"]})
@@ -354,12 +383,13 @@ def main() -> None:
     print(f"Fetched {len(submissions)} confirmed submissions")
 
     if not args.keep_existing:
-        remove_old_talks()
+        remove_old_talks(talks_dir)
 
+    talks_dir.mkdir(parents=True, exist_ok=True)
     for sub in submissions:
-        submission_to_lektor_file(sub, cfg, year)
-    submissions_to_json_file(submissions, cfg, year)
-    print(f"Wrote {len(submissions)} talks to {TALKS_CONTENT_DIR} and {TALKS_JSON_PATH}")
+        submission_to_lektor_file(sub, cfg, year, talks_dir)
+    submissions_to_json_file(submissions, cfg, year, json_path)
+    print(f"Wrote {len(submissions)} talks to {talks_dir} and {json_path}")
 
 
 if __name__ == "__main__":
