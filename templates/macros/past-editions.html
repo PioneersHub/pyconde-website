@@ -1,0 +1,49 @@
+{#
+  Past Editions — homepage promo block
+  ────────────────────────────────────
+  Compact card grid linking to /archive/{year}/ for every archived
+  edition. Data lives in databags/past_editions.yaml so curators
+  don't need to touch templates to update.
+
+  Usage:
+    {% from "macros/past-editions.html" import render_past_editions %}
+    {{ render_past_editions(bag('past_editions')) }}
+#}
+
+{% macro render_past_editions(data, section_label='Past editions') %}
+
+{% if data and data.editions %}
+<section class="past-editions content-block--white" aria-label="{{ data.section_label or section_label }}">
+  <div class="content">
+    {% if data.heading %}
+    <h2 class="past-editions__heading">{{ data.heading }}</h2>
+    {% endif %}
+    {% if data.subheading %}
+    <p class="past-editions__subheading">{{ data.subheading }}</p>
+    {% endif %}
+
+    <ul class="past-editions__grid">
+      {%- for edition in data.editions -%}
+      <li class="past-editions__item">
+        <a href="{{ edition.path }}" class="past-editions__card">
+          <span class="past-editions__year">{{ edition.year }}</span>
+          {% if edition.dates %}<span class="past-editions__dates">{{ edition.dates }}</span>{% endif %}
+          {% if edition.location %}<span class="past-editions__location">{{ edition.location }}</span>{% endif %}
+          <span class="past-editions__stats">
+            {%- if edition.talks %}<span>{{ edition.talks }} talks</span>{% endif -%}
+            {%- if edition.speakers %} · <span>{{ edition.speakers }} speakers</span>{% endif -%}
+            {%- if edition.recordings %} · <span>{{ edition.recordings }} recordings</span>{% endif -%}
+          </span>
+        </a>
+      </li>
+      {%- endfor -%}
+    </ul>
+
+    <p class="past-editions__cta">
+      <a href="/archive/" class="past-editions__cta-link">Browse the full archive →</a>
+    </p>
+  </div>
+</section>
+{% endif %}
+
+{% endmacro %}

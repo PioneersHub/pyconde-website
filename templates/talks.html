@@ -4,10 +4,20 @@
 
 {% block body %}
 
+{# Only the /talks/ root (current edition) gets the archive CTA;
+   archived editions show the archive-banner instead. #}
+{%- set is_current_talks = this.url_path == '/talks/' -%}
+
 <div class="subsite">
   <div class="subsite-title">
     <section class="content">
       <h1>{{ this.title }}</h1>
+      {% if is_current_talks %}
+      <p class="archive-pointer">
+        Looking for sessions from earlier conferences?
+        <a href="/archive/">Browse the talk archive (2018–2025)</a>.
+      </p>
+      {% endif %}
     </section>
   </div>
 </div>
