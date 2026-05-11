@@ -1,0 +1,99 @@
+{% extends "layout.html" %}
+{% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
+
+{% block title %}{{ this.name }}{% endblock %}
+
+{%- set is_archive = this.url_path.startswith('/archive/') -%}
+{%- set archive_year = this.year or '' -%}
+{%- set talks_root = ('/archive/' ~ archive_year ~ '/talks') if is_archive else '/talks' -%}
+{%- set talks_index = site.get(talks_root) -%}
+{%- set matching_talks = [] -%}
+{%- if talks_index -%}
+  {%- for t in talks_index.children -%}
+    {%- if t.track == this.name -%}
+      {%- set _ = matching_talks.append(t) -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+{%- set branding = bag('branding') -%}
+{%- set host = branding['canonical_host'] -%}
+
+{% block structured_data %}
+{{ super() }}
+{%- set crumb_trail = [] -%}
+{%- if is_archive -%}
+  {%- set _ = crumb_trail.append(('/archive/', 'Archive')) -%}
+  {%- set _ = crumb_trail.append(('/archive/' ~ archive_year ~ '/', archive_year)) -%}
+  {%- set _ = crumb_trail.append(('/archive/' ~ archive_year ~ '/tracks/', 'Tracks')) -%}
+  {%- set _ = crumb_trail.append((this.url_path, this.name)) -%}
+{%- else -%}
+  {%- set _ = crumb_trail.append(('/tracks/', 'Tracks')) -%}
+  {%- set _ = crumb_trail.append((this.url_path, this.name)) -%}
+{%- endif -%}
+{{ breadcrumb_jsonld(crumb_trail) }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "@id": "{{ host }}{{ this.url_path }}#track",
+  "url": "{{ host }}{{ this.url_path }}",
+  "name": {{ this.name|tojson }},
+  "description": "Talks in the {{ this.name }} track{% if is_archive %} at PyCon DE & PyData {{ archive_year }}{% endif %}.",
+  "isPartOf": { "@id": "{{ host }}/#website" },
+  "numberOfItems": {{ matching_talks|length }},
+  "hasPart": [
+    {%- for t in matching_talks -%}
+    { "@id": "{{ host }}{{ t|url }}#event" }{{ "," if not loop.last }}
+    {%- endfor -%}
+  ]
+}
+</script>
+{% endblock %}
+
+{% block body %}
+{%- set visible_trail = [] -%}
+{%- if is_archive -%}
+  {%- set _ = visible_trail.append(('/archive/', 'Archive')) -%}
+  {%- set _ = visible_trail.append(('/archive/' ~ archive_year ~ '/', archive_year)) -%}
+  {%- set _ = visible_trail.append(('/archive/' ~ archive_year ~ '/tracks/', 'Tracks')) -%}
+  {%- set _ = visible_trail.append((none, this.name)) -%}
+{%- else -%}
+  {%- set _ = visible_trail.append(('/tracks/', 'Tracks')) -%}
+  {%- set _ = visible_trail.append((none, this.name)) -%}
+{%- endif -%}
+{{ breadcrumb(visible_trail) }}
+
+<div class="subsite">
+  <div class="subsite-title">
+    <section class="content">
+      <h1>{{ this.name }}</h1>
+      <p class="tracks-intro">
+        {{ matching_talks|length }} talk{{ '' if matching_talks|length == 1 else 's' }}
+        {%- if is_archive %} from the {{ archive_year }} edition
+        {%- else %} in the current programme{% endif -%}.
+      </p>
+    </section>
+  </div>
+</div>
+
+<section class="subsite">
+  <ul class="talks">
+    {%- for talk in matching_talks|sort(attribute='title') %}
+    <li>
+      <a href="{{ talk|url }}" class="content talk">
+        <h2 class="talk-title">
+          {{ talk.title }}
+          {% if talk.is_keynote %}<span class="keynote-label">Keynote</span>{% endif %}
+          {% if talk.youtube_id and not talk.do_not_record %}<span class="recording-badge" title="Recording available on YouTube">▶ Recording</span>{% endif %}
+          {% if talk.transcript and not talk.do_not_record %}<span class="recording-badge" title="Full transcript available">📝 Transcript</span>{% endif %}
+        </h2>
+        <p class="talk-speakers">{{ talk.speaker_names }}</p>
+        {%- if talk.abstract %}
+        <p class="talk-abstract">{{ talk.abstract|striptags|truncate(220) }}</p>
+        {%- endif %}
+      </a>
+    </li>
+    {%- endfor %}
+  </ul>
+</section>
+{% endblock %}

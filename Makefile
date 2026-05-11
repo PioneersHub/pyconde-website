@@ -6,7 +6,7 @@ else
     RUN = PYTHONWARNINGS=ignore::ResourceWarning
 endif
 
-build: lektor-build pagefind
+build: redirects tracks lektor-build pagefind
 
 lektor-build:
 	$(RUN) lektor build -O site
@@ -14,6 +14,14 @@ lektor-build:
 pagefind:
 	@echo "Building Pagefind index..."
 	$(RUN) python -m pagefind --site site --output-subdir pagefind --quiet
+
+redirects:
+	@echo "Generating redirect pages + nginx/Caddy snippets..."
+	$(RUN) python utils/generate_redirects.py
+
+tracks:
+	@echo "Regenerating per-track content folders..."
+	$(RUN) python utils/generate_tracks.py
 
 clean-plugin-cache:
 	@echo "Clearing plugin and Lektor caches..."

@@ -1,10 +1,12 @@
 {% extends "layout.html" %}
+{% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
+{% from "macros/related-talks.html" import related_panel %}
 
 {% block title %}{{ this.title }}{% endblock %}
 
 {% block og_type %}event{% endblock %}
 
-{% block structured_data %}
+{# Top-level set statements are global across blocks. #}
 {%- set branding = bag('branding') -%}
 {%- set host = branding['canonical_host'] -%}
 {%- set speaker_list = this.speaker_names.split(',') if this.speaker_names else [] -%}
@@ -14,6 +16,7 @@
 {%- set super_event_id = (host ~ '/archive/' ~ archive_year ~ '/#event-' ~ archive_year) if is_archive else (host ~ '/#event-' ~ site.config.PROJECT.year|string) -%}
 {%- set event_status = 'EventCompleted' if is_archive else 'EventScheduled' -%}
 {%- set speakers_root = '/archive/' ~ archive_year ~ '/speakers' if is_archive else '/speakers' -%}
+{%- set talks_root = '/archive/' ~ archive_year ~ '/talks' if is_archive else '/talks' -%}
 {# Resolve the speakers who actually presented this talk. We iterate the
    edition's speaker index and pick the ones whose `talks` list includes
    this talk's pretalx code. #}
@@ -26,6 +29,8 @@
     {%- endif -%}
   {%- endfor -%}
 {%- endif -%}
+
+{% block structured_data %}
 <script type="application/ld+json">
 [
 {
@@ -87,7 +92,16 @@
   {%- set has_transcript = this.transcript and not this.do_not_record -%}
   {%- if has_transcript %},
   "subjectOf": { "@id": "{{ host }}{{ this.url_path }}#transcript" }
-  {%- endif %}
+  {%- endif -%}
+  {%- set crumb_trail = [] -%}
+  {%- if is_archive -%}
+    {%- set _ = crumb_trail.append(('/archive/', 'Archive')) -%}
+    {%- set _ = crumb_trail.append(('/archive/' ~ archive_year ~ '/', archive_year)) -%}
+    {%- set _ = crumb_trail.append(('/archive/' ~ archive_year ~ '/talks/', 'Talks')) -%}
+  {%- else -%}
+    {%- set _ = crumb_trail.append(('/talks/', 'Talks')) -%}
+  {%- endif -%}
+  {%- set _ = crumb_trail.append((this.url_path, this.title)) -%}
 }
 {%- if has_recording %},
 {
@@ -115,12 +129,21 @@
 {%- endif %}
 ]
 </script>
+{{ breadcrumb_jsonld(crumb_trail) }}
 {% endblock %}
 
 {% block body %}
 
-{%- set is_archive = this.url_path.startswith('/archive/') -%}
-{%- set archive_year = (this.url_path.split('/')[2] if is_archive else '') -%}
+{%- set visible_trail = [] -%}
+{%- if is_archive -%}
+  {%- set _ = visible_trail.append(('/archive/', 'Archive')) -%}
+  {%- set _ = visible_trail.append(('/archive/' ~ archive_year ~ '/', archive_year)) -%}
+  {%- set _ = visible_trail.append(('/archive/' ~ archive_year ~ '/talks/', 'Talks')) -%}
+{%- else -%}
+  {%- set _ = visible_trail.append(('/talks/', 'Talks')) -%}
+{%- endif -%}
+{%- set _ = visible_trail.append((none, this.title)) -%}
+{{ breadcrumb(visible_trail) }}
 
 {% if is_archive %}
 <aside class="archive-banner" role="note" aria-label="Archived talk" data-pagefind-ignore>
@@ -258,5 +281,7 @@
     </div>
   </section>
 </article>
+
+{{ related_panel(this, my_speakers, talks_root, speakers_root, archive_year if is_archive else '') }}
 
 {% endblock %}

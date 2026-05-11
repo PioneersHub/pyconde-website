@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
 
 {% block title %}{{ this.title }}{% endblock %}
 
@@ -29,9 +30,27 @@
   ]
 }
 </script>
+{%- set crumb_trail = [] -%}
+{%- if is_archive -%}
+  {%- set _ = crumb_trail.append(('/archive/', 'Archive')) -%}
+  {%- set _ = crumb_trail.append(('/archive/' ~ archive_year ~ '/', archive_year)) -%}
+  {%- set _ = crumb_trail.append((this.url_path, 'Speakers')) -%}
+{%- else -%}
+  {%- set _ = crumb_trail.append((this.url_path, 'Speakers')) -%}
+{%- endif -%}
+{{ breadcrumb_jsonld(crumb_trail) }}
 {% endblock %}
 
 {% block body %}
+{%- set visible_trail = [] -%}
+{%- if is_archive -%}
+  {%- set _ = visible_trail.append(('/archive/', 'Archive')) -%}
+  {%- set _ = visible_trail.append(('/archive/' ~ archive_year ~ '/', archive_year)) -%}
+  {%- set _ = visible_trail.append((none, 'Speakers')) -%}
+{%- else -%}
+  {%- set _ = visible_trail.append((none, 'Speakers')) -%}
+{%- endif -%}
+{{ breadcrumb(visible_trail) }}
 {% if is_archive %}
 <aside class="archive-banner" role="note" aria-label="Archived edition">
   <div class="content">

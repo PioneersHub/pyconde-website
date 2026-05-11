@@ -1,8 +1,15 @@
 {% extends "layout.html" %}
+{% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
 
 {% block title %}{{ this.title }}{% endblock %}
 
+{% block structured_data %}
+{{ super() }}
+{{ breadcrumb_jsonld([(this.url_path, 'Archive')]) }}
+{% endblock %}
+
 {% block body %}
+{{ breadcrumb([(none, 'Archive')]) }}
 <div class="subsite">
   <div class="subsite-title">
     <section class="content">

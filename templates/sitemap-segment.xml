@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+{%- from "macros/sitemap-url.html" import url_entry -%}
+{%- set seo = bag('seo') -%}
+{%- set noindex_paths = seo['noindex_paths'] -%}
+{#- Segment name is derived from the URL path: /sitemaps/{name}.xml -#}
+{%- set segment = this.url_path.rstrip('/').split('/')[-1].replace('.xml', '') -%}
+
+{%- macro keep(p) -%}
+  {%- if p.url_path in noindex_paths -%}{%- elif p['_hidden'] -%}{%- else -%}
+    {%- set path = p.url_path -%}
+    {%- if segment == 'talks-current' and path.startswith('/talks/') and path != '/talks/' -%}yes
+    {%- elif segment == 'talks-archive' and '/archive/' in path and '/talks/' in path and path != '/talks/' and path.endswith('/') and (path.count('/') == 5) -%}yes
+    {%- elif segment == 'speakers-current' and path.startswith('/speakers/') and path != '/speakers/' -%}yes
+    {%- elif segment == 'speakers-archive' and '/archive/' in path and '/speakers/' in path and path != '/speakers/' and path.endswith('/') and (path.count('/') == 5) -%}yes
+    {%- elif segment == 'tracks' and (path.startswith('/tracks/') or '/archive/' in path and '/tracks/' in path) -%}yes
+    {%- elif segment == 'blog' and path.startswith('/blog/') and path != '/blog/' -%}yes
+    {%- elif segment == 'pages' -%}
+      {%- if not (path.startswith('/talks/') or path.startswith('/speakers/') or path.startswith('/blog/') or path.startswith('/tracks/')) -%}
+      {%- if not ('/archive/' in path and ('/talks/' in path or '/speakers/' in path or '/tracks/' in path)) -%}
+      {%- if not path.startswith('/sitemaps/') and path != '/sitemap.xml' -%}yes{%- endif -%}
+      {%- endif -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endif -%}
+{%- endmacro -%}
+
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+  {%- for page in [site.root] if page != this recursive %}
+  {%- if keep(page)|trim %}
+  {{ url_entry(page) }}
+  {%- endif %}
+  {{- loop(page.children|sort(attribute='path')) }}
+  {%- endfor %}
+</urlset>

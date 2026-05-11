@@ -1,0 +1,32 @@
+{#-
+  Shared <url> entry macro for sitemap segments. Emits the location, lastmod,
+  image:image (for talks/speakers/keynotes), and video:video records.
+-#}
+{%- macro url_entry(page) -%}
+  <url>
+    <loc>{{ page|url(external=true) }}</loc>
+    {%- set lastmod = page['pub_date'] or page['created'] -%}
+    {%- if lastmod %}
+    <lastmod>{{ lastmod }}</lastmod>
+    {%- endif %}
+    {%- if page['social_card_image'] %}
+    <image:image>
+      <image:loc>{{ site.config.PROJECT.url }}{{ page['social_card_image'] }}</image:loc>
+      <image:title>{{ page['title']|striptags|e }}</image:title>
+    </image:image>
+    {%- endif %}
+    {%- if page['youtube_id'] and not page['do_not_record'] %}
+    <video:video>
+      <video:thumbnail_loc>{{ page['video_thumbnail'] or ('https://i.ytimg.com/vi/' ~ page['youtube_id'] ~ '/maxresdefault.jpg') }}</video:thumbnail_loc>
+      <video:title>{{ page['title']|striptags|e }}</video:title>
+      <video:description>{{ (page['abstract'] or page['description'] or '')|striptags|truncate(2000)|e }}</video:description>
+      <video:content_loc>{{ page['video_link'] or ('https://www.youtube.com/watch?v=' ~ page['youtube_id']) }}</video:content_loc>
+      <video:player_loc allow_embed="yes">https://www.youtube-nocookie.com/embed/{{ page['youtube_id'] }}</video:player_loc>
+      {%- if page['video_published_at'] %}
+      <video:publication_date>{{ page['video_published_at'] }}</video:publication_date>
+      {%- endif %}
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
+    {%- endif %}
+  </url>
+{%- endmacro -%}
