@@ -1,0 +1,163 @@
+title: Practical Python/Rust: Building and Maintaining Dual-Language Libraries
+---
+description: Building performant Python often means reaching for C extensions. This talk explores an alternative: leveraging Rust to create blazing-fast Python modules…
+---
+created: 2025-01-05
+---
+code: CUJMCD
+---
+slug: practical-python-rust-building-and-maintaining-dual-language-libraries
+---
+speaker_names: Ben Brandt
+---
+speakers:
+
+
+
+### Ben Brandt
+
+Ben has been identifying as a Rustacean since 2018. With a background in UI/UX, he's excited to use Rust to make products that are faster, more resilient, and delightful for his users. He's currently a Staff Engineer at Aleph Alpha, where he uses Rust to make AI applications easier to build and operate.
+---
+abstract:
+
+
+Building performant Python often means reaching for C extensions. This talk explores an alternative: leveraging Rust to create blazing-fast Python modules that also benefit the Rust ecosystem. I will share practical strategies from building `semantic-text-splitter`, a library for fast and accurate text segmentation used in both Python and Rust, demonstrating how to bridge the gap between these two languages and unlock new possibilities for performance and cross-language collaboration.
+---
+full_description:
+
+
+Building performant Python often means reaching for C extensions. But what if you could achieve similar performance with Rust, while also creating a library usable directly within the Rust ecosystem? This talk explores how Rust can be a powerful ally, creating blazing-fast Python modules that benefit both communities. I will share the strategies I use while building and maintaining my package, `semantic-text-splitter`, used for fast and accurate text segmentation, which sees significant usage in both Python and Rust ecosystems.
+
+Some key challenges arise when integrating these two languages, such as bridging the gap between Rust's generics and Python's dynamic typing, managing data representation and memory across the Python/Rust boundary, and maintaining type hints and documentation across both languages.
+
+But with practical maintenance strategies, these challenges can be overcome. Moreover, you contribute to a growing ecosystem of high-performance Python tools powered by Rust. Join me to learn how to build and maintain dual-language Python/Rust libraries, and discover how this approach can unlock new possibilities for performance and cross-language collaboration.
+---
+room:
+---
+day: Friday
+---
+slot_date: 2025-04-25
+---
+start_time: 14:00
+---
+end_time: 14:30
+---
+slot_id:
+---
+track: Rust
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url: https://github.com/benbrandt/text-splitter
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/CUJMCD.png
+---
+youtube_id: _BtTtpaPbOM
+---
+video_link: https://www.youtube.com/watch?v=_BtTtpaPbOM
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/_BtTtpaPbOM/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:09]_
+
+So, yeah, today I'll, like, basically when you all are doing Python development, sometimes it is helpful to go down to native code. Rust is becoming a popular way to do that, and, you know, it can provide better performance and you can still maintain a nice simple Python interface. And today I just kind of want to talk through some strategies I've learned as I've attempted to do this that I think will help benefit you, not just make your code faster, but also expose your logic to a larger community. So first a little bit about me. I'm Ben. I'm currently a staff engineer at Aleph Alpha. And probably more important to know for this talk is I'm definitely a Rust engineer. So I'm coming at this from the Rustation side, but I hope that I can translate some of my experience to all the Pythonistas out there, and maybe I can also learn from you on how to do better Python interfaces. But yeah, I think that there's a really cool intersection happening between these two languages where I think from the Rust side, we get access to a really big community building really awesome stuff. And also from all of you, from the Rust side, we get a lot of benefit in terms of better AI and data pipelines and all of these sorts of tooling that I think the Rust ecosystem needs more of as well. So yeah, basically this talk is based around this repo I have called TextSplitter. And it's a Rust crate that also has Python bindings. And the point of this crate is to try and find, like, good splitting points when you're sticking text in front of an LLM. With larger context windows, maybe this is less of an issue these days. But sometimes for retrieval or whatever, you might want more precision, smaller chunks. And so this library is just trying to do that as fast as possible with hopefully a decent way of chunking. There's lots of ways to chunk. So this may or may not work for your chunking needs, but hopefully it serves as an example of how to put Python and Rust together. And if I go too deep on the Rust side, feel free to check this out and look at the code yourself later if I can't get to you in the questions. All right. So why Rust? There's some crazy Rust syntax up here, but what this allowed me to do is there's some lifetimes in there, there's some traits, but why Rust? For me, this allowed me to basically chunk strings without allocating new strings. So with the Rust compiler and lifetimes, I could prove to the compiler that I'm only accessing references, slices of the string at the right times, so that I'm not accessing memory when I shouldn't be, which meant that I could return chunks without having to allocate new strings. Tokenization, usually you want to tokenize the text to see how long it is. This adds lots of allocations. But at least for my part, I could be kind of very efficient with the memory allocations that I had. But obviously there's way more people doing chunking stuff in Python, so I also wanted to expose the same library, the same functionality with Python bindings. And how I did this, if you're interested in this, this is where a lot of people get started. Py03. It's a really cool project where you can scaffold out a project in Rust and it can do all of the FFI stuff for you and help with the packaging and expose all of these bindings. And the talk, like today's talk, I'll be, I'm using PyO3, so a lot of the stuff will be based, the examples will be based off PyO3. But I actually think a lot of these strategies work even if you're doing manual CFFI functions yourself, as I know some people like to do. I think overall it's roughly the same idea. Okay. Let's take a step back. And when I see people first getting started with Rust in their Python projects, I kind of see a typical journey, which it works. I don't want to say it doesn't work, but it can lead to some difficulties. So even I see it in some popular packages you might have heard of. So first you want to speed up your Python code. You maybe have some loop or something that you want to make faster or something that's ridiculously parallel, and Russ' ability to do multithreading would really help you out and you don't have to worry about the gill, and you would benefit from this. And I also want to stop here and say, sometimes moving to Rust doesn't actually make your code faster, because you do have to pay some costs for going over foreign function interfaces. So it's worth doing an experiment, see if it's actually going to help you before you go down this route. But maybe you've identified the perfect spot where this happens. You then do the hello world of PyO3, and you get your first Rust file, and you move part of your code base to Rust. And what you end up having here is then your entry point to your new library is this file. And there's some stuff in here, like macros, that are like PyModule, PyMethods. This takes this Rust code and basically exposes it as classes, modules, just like you would normally do. And so then, once you build this, you will have a Python package that you can import these things from. So, it's written in Rust, but in terms of how you access this code, you will access it from Python. And, yeah. There you go. Hopefully it worked. You got through the PyO3 docs. Everything works on your first try and something's faster. Mission accomplished. For a lot of projects, like, great, I'm actually super happy. Somehow you used Rust and it made your code faster. And you should pat yourself on the back. It's not always easy to get started with this. Where I'm kind of targeting is once you do your next project. You are doing your next Python project. You hit the same performance wall. You want to speed it up. You want to replicate your previous success. And then you maybe, like, the previous library you built, it, like, really helped encapsulate some knowledge. And then you're building the next thing, and it would be nice to pull that in. Oh, shoot. I only exposed it over Python bindings. So now I can't actually call it. And like technically there is a way with PyO3 to call back into Python which will then go into Rust and then you end up in this weird circle. But it's not going to be very efficient and that's the whole reason you're doing this in the first place. And so, yeah, like ultimately you wanted your package available in Python. But now you're writing more Rust code and you want your Rust code to be accessible to you again. So how can we avoid this? Basically how can you take your domain expertise and make it accessible in both languages? And so basically what I'm proposing is that there's a target picture like this. Rather than one library that kind of has all of your Rust and Python bindings mixed together, that you separate out your core logic into its own Rust crate, and then import that into a separate crate that is solely focused on the bindings, and then you can access it from both ways. Basically what is a library? A library is a way for us to encapsulate our domain knowledge and make it accessible to developers, even yourself, to build on top of. And since you're already writing this as Rust code, why not make it accessible from both languages? The first tip is super easy, but one that I forgot to do. Check the package name. I didn't realize that there was already one called TextSplitter on PyPi, so then I had to come up with another name. So when you're coming up with your cool name, check crates.io and PyPy and make sure that you have a nice name together, because this has caused some confusion for me. So learn from my mistakes. All right. Tip number two. When you're using Rust, you're going to use a package manager called cargo. And cargo is pretty awesome. And it has this idea called workspaces. And since you're basically working on the same library or just exposing it in two ways, I really like to use workspaces because that means I can have two crates in the same repo and Cargo makes sure that it handles all of the stuff for me of how that hooks together. But then I can have all the code together if I need to make a change in one that affects the other. Then I can do it together without having to jump between repositories. Yeah. All right. Then my tip for you is to then, once you have that set up, start with the Rust one. And just do a plain Rust crate. No PIO3, no bindings. Just express, like, the domain logic you want to do. So in my case, this is, like, defining what kind of splitting logic do I want. How would I calculate the size of a chunk? Because maybe I want different methods of doing that. I need the configuration. And on the Rust side, I can do stuff in here like have generics or traits and all this stuff in lifetimes. And I can't have this in Python. But from the Rust side, this makes it super nice because it makes it flexible. And I can pull this in to other ways. Maybe it makes it more efficient. And you can really take advantage of these things here because once you expose it to Python, you kind of lose these abilities. So from your Rust library you can make it nicer to build on top of later. Now you eventually want to go and put your Python code somewhere. How I structured it, lots of people have different opinions on how to structure your code. So just take it as a suggestion. But I have like a source, this source folder is where like my core Rust library is. And then I have this bindings folder with a Python one. And mainly because I have hopes, though I haven't gotten around to it, of exposing the same logic in JavaScript or WebAssembly or something. But, you know, if you're only going to do Python, you can maybe unnest it a bit. But basically just the idea here is put it in two separate places. With cargo and Rust, you can depend on a path, like a relative path, so you can, like, have your crates depend on each other easily enough. All right. Now that you have this folder, basically isolate all PyO3. This should be the only folder that has PyO3 in there because PyO3 has lots of types, especially around what is a Python exception or if you need to deal with the string still residing in Python memory or FFI or whatever, all this binding stuff that you need. Don't let these types leak into your core library because it's going to make it weird when you want to reuse the Rust code later. And now you have a spot, though, that if you have your core Rust library and now you get to define this module is where you get to define what your Python interface is. So this is where you get to, like, really think about what classes do you want to offer, what methods, what types. Because they may not be exactly the same. And now this module, like, this module's entire purpose is to encapsulate the knowledge of translating your Rust code into Python code. Yeah. So you're going to want to do a translation step and this is where you're going to have to come up with decisions, which I'll go into a little bit later on like what to do with those generics. Probably like your Python code can't pass a generic into Rust code. So which concrete types are you going to offer to your user and translate that into your library? All right. Depending on how far you've gotten into Rust so far, there's this thing called traits. And these traits are like, I don't know, protocols in Python, right? You get to define an interface and you have multiple implementations of them. And this is super nice and rust because you can have your code be generic over anything that has that interface and then at compile time it will build like an optimized version for that concrete instance. But since you lose this ability once you expose it to Python, it makes it a little hard. You have to have like a concrete thing that you tell the compiler which version of the a generic are you going to use? And maybe like at runtime, you might want to allow like your class to be constructed in multiple ways. And in Rust this is easy. You just like instantiate it with different generics. But now you need a way to do it in Python. So there's this idea in Rust called dynamic dispatch, which is you take your trait, which in this case I have a chunk sizer, and then you can like put it in a box, which means it goes on the heap. And then you put this little dyn keyword in front. And now you have, like, you can basically tell the compiler, I have something. I don't know how big it's going to be. But that's okay. It's on the heap now instead of the stack. And you can still reference the methods on this trait. And there's some workarounds you have to do because it's, like, technically the compiler would let you put, like, my text splitter where it has a sizer at the bottom here. You could put all this boxed in stuff inside of there. And I think it's possible. I just haven't figured out exactly what to type to make the compiler happy. So I wrapped it in another struct. And then the compiler was happy, which sometimes is what you have to do. But then basically I just, like, wrap a struct around, like, this dynamic thing. Implement the trait one more time for this where I'm just referencing the member inside of that struct. And now when I can, like, create, like, here's the Python side. I can create multiple class methods to construct my class. And I can construct my class in multiple ways. And behind each of these is basically a box new of some concrete type. So eventually I tell Rust, okay, yes, build a text splitter over a Hugging Face tokenizer or a TikToken tokenizer. And these are behind a box. So then the compiler is happy. I can like at runtime swap out a concrete implementation, which otherwise you wouldn't be able to do because I can't give the compiler at runtime which type it should use. All right. Another thing to think about, I'm going to use one example, is like when you're doing your Rust library versus your Python library, there's often idiomatic ways to do things. And one example is like byte offsets versus char offsets. In Rust, when you're dealing with strings, strings are all byte indexed. So if you want to index into a string, you're using byte offsets. And so most libraries offer byte offsets when you do, like, a split or whatever. Like any of these string operations, you get, like, maybe the string plus a byte offset. But then this is, like, useless to a Python developer because, well, what are they going to do with this byte offset? It's tied to how Rust represents strings. And then you want a character to index into the streams. So there's some extra work I have to do, but I can put this all in the bindings. So from the Rust side, actually in this case, I actually offered another version that had character indices from the Rust side because, I don't know, maybe a Rust developer also cares about character offsets instead of by offsets. Then I just only use that one on the Python side. So it's like a great, again, you have your core logic, and then you can just think, how How do I translate my Rust library to what a Python developer wants? Yeah. Next, PyO3 doesn't currently have a way, unless I missed it in recent releases, but I don't think so, to generate type annotations. But people love type annotations when they're typing in VS code. They want the nice popup of what is this method, what arguments does it take? And you get it from the doc strings. Pio3 lets you generate doc strings. But if you also want the type annotations, you can stick this PYI file in the root of your project. This also gets shipped with your package. And then VS Code picks this up. And then all of a sudden, your autocomplete looks nice and shiny. And so then you can basically provide the type hints you need in addition to the doc strings. And then my final tip is I actually found pdoc was nice in that it kind of like somehow merged my doc strings plus the type annotations. Try it out. Maybe your normal Python doc generator works better for what you're doing. But just as a point, I found this one to be nice with working with Pyro 3 projects. Hopefully those tips were somewhat helpful, or you can go back and look at them later whenever you run into an issue, but I also want to address some challenges because not everything is nice and sunny when you're working with Rust. Once you split into two libraries, okay, no, actually, this one's just like, I just said use type hints. The problem is that in Pile 3, you can put a doc string on your Rust code, and this turns into a doc string in Python, which is awesome. And then if you use any of the normal doc methods in Python, these things show up. But then, like I said, this stuff doesn't show up in the autocomplete, in your editor by default. So then you add the type annotation. But if you just do the type annotation without the doc strings, at least in my experience, VS Code doesn't merge these together. So then you have to copy over your doc string from your Rust code into the PYI file, which just kind of sucks. And I haven't found a way to automate this yet. If you have ideas, I'm happy to hear them, because I often forget to update both. But basically it's like I do the extra work because I want the developers to have a nicer experience in VS Code, but also, you know, it's nice to have the docstring available like normal Python code, so I just put it in both places. The other challenge is now you have two libraries, and so you probably want documentation for both users. Rust side and the Python side. And they might want slightly different things. And so, like, there's, like, high-level concepts of how does your library work and this might need to be duplicated. And I think even I look today, I think I forgot to put something in the Python docs that's in the Rust docs that should be there. So this is, like, another maintenance burden that you kind of have to deal with. I've been playing around with, like, maybe I can have a dedicated website on GitHub that kind of lets the user choose between the languages, but I haven't quite sorted this out yet. And maybe people really like reading it in the readmes and the package managers. So maybe I'll always have something in between. But for me, it's always like, okay, how can I provide the right information to the developer at the right time? And sometimes this means extra work. Like by exposing it in two languages, you have some extra work. And other challenges, like my library allows you to pass in stuff like a tokenizer or like there's a code splitter so you can pass in a tree sitter language. And these are libraries that have bindings themselves to native extensions. And then now I'm like taking, they're passing an object from Python that is backed by a native extension into my native extension. And then maybe I need to like go through the pointers and out and it can cause some weirdness. But again, I'm like trying to think through what would a Python developer want. And they probably just want to pass me this class or something. They don't, you know, so I'm trying to make it nicer for them, but it can be a bit challenging. Like this native extension thing comes with some downsides, especially once you're trying to talk to another package that is also using a native extension. And maybe there's some extra serialization you have to pay. Hopefully your library is fast enough that makes up for it, but just something to watch out for. And probably the biggest thing once you go into native extensions is there's a lot of wheels to build. And especially if you, like, want to link against specific versions of Python, you need, like, 50 of these things. I personally target the C API so that I just need, like, one. I'd say, like, it has to be 3, 9, and above. And then I only have to build one meal for each architecture. But it's still, like, I don't know, 10 or 11. And yeah. It is, like, a lot. So you have to deal with it. But yeah, and if you're, if you're, my project is mostly dealing with strings, so I just kind of say, yeah, it's probably not going to get that optimized, but maybe you're doing with something more complicated and you would benefit from really targeting different Python versions and then, well, you'll get a nice big matrix in GitHub. All right. Even with all these challenges, I have found the extra work to be really worth it. I think, like, for me, the biggest thing is that you, your next library or someone else's library can leverage your domain expertise. Your library is probably encapsulating something that only you know about or that you've really wrestled with and have provided a nice abstraction. And now, by offering it in both languages, the next person writing their native extension can build on top of your library. They can still expose it in Python, but they can have low-level access to the code that you wrote and build something really cool on top of it. The other thing that's nice is if you happen to work in a place like I do, where we use both Rust and Python on the backend or in client code or whatever. By going this approach, you offer in both places, like, multiple teams can utilize your library and expect the same behavior, whether they're calling it from Python or Rust. So this, I think, is really cool. And probably the biggest thing and what I'm kind of asking is, like, this access to a wider audience. So you are, as you can see, I get, like, the most downloads from Python. lots of people in Python but I still get a decent amount from Rust and more so than downloads I actually get really cool feature requests contributions bug reports yeah whatever you name it from both communities and they're they're often different they have different different things they care about and I feel like the library has has improved a lot from having access to both communities. And I also say as a Rust engineer, there's a lot of domain expertise that all of you Python engineers have that I think the Rust community would benefit from and would allow us to build even cooler things. And so I also think that there's just a lot of great exchange that can happen as you engage with this. And so selfishly, I also want your cool library available to me, yeah, and that's about it, I, yeah, I, I hope this was somewhat helpful, happy to take any questions if I breeze past something or, yeah, definitely check out the repo if you want to look at like exact code examples, yeah.
+
+**Speaker 2** _[23:46]_
+
+Yeah, thanks, Ben. So there are currently a few questions. You can also upload questions if you like and add more questions. Have you tried out PyO3 stub gem? It can auto-generate stub files from Rust code.
+
+**Speaker 1** _[24:01]_
+
+I have not. Check it out.
+
+**Speaker 2** _[24:05]_
+
+Okay, next one. What's your approach to sharing logic to API test code between bindings for different languages Rust included?
+
+**Speaker 1** _[24:17]_
+
+So, I guess, like, I'm not exactly sure what this is asking, but I guess, like, how I approach it is I usually test at different levels. So if I'm really testing the core logic, I'm usually doing this in Rust in, like, a unit test or even an integration test there. Because it's just easier. It's closer to the actual implementation. But then usually on my Rust code I also have, like, an integration test at the top level So I can test drive what does this interface feel like in terms of writing code on top of my library. And then I also write actual Python tests, like I write Python tests run with PyTest where I like make sure that the bindings are all working as expected. And so I have like usually a test.py file and then I run this.
+
+**Speaker 2** _[25:05]_
+
+Yeah, that's new words for me. Would you still use pio3 when exposing your rust lips through FFI? To many languages not just bison
+
+**Speaker 1** _[25:16]_
+
+Pile 3 is definitely focused on just Python. There are some other bind gen ones. I think there's one for Mozilla that allows you to do multiple. But I think if I tackle WASM or JavaScript or Node, there's some specific ones for Node.js. There's some for WASM. I usually use the bind gen for whatever language that is. And that's why I would have multiple directories. And then I want to provide an idiomatic interface to each language. So that's why I wanted an own module, so I can define what would the JavaScript interface to my library be like. Because it might look different than the Python one.
+
+**Speaker 2** _[25:59]_
+
+Then, in a producer-consumer scenario, with many-Python, rust-Python interaction, what's a good approach to exchange data between the two worlds?
+
+**Speaker 1** _[26:11]_
+
+I wonder, I'm not sure if this question is asking like within like the same function call going between Python and Rust or going between services. But if it is like within the same function, like py03 can call back out to Python. It often leads to some interesting scenarios. Like maybe a question would be like can you maybe return from the Rust code and then pass it to Python from Python? I'm not sure. I'd probably have to look at the scenario to see what would be the best option.
+
+**Speaker 2** _[26:50]_
+
+Okay, with rust build times and many wheels to build, what are your strategies to optimize it?
+
+**Speaker 1** _[26:57]_
+
+If you want to look at my CI job, I use a lot of caching, and especially there's a really cool... It's like SWAT and then you can do an extra key. By default it has a pretty good key, but then you can, for all the matrices, add in the target tool chain you're using, and then you can basically have one cache per architecture, and then the builds actually only take a couple minutes, maybe less. So they go pretty fast. It's an awesome action. You kind of just need to throw the one line in there with an extra key, and then you're usually good.
+
+**Speaker 2** _[27:32]_
+
+What's your tip for debugging calls into native FFI extensions from a Python process?
+
+**Speaker 1** _[27:41]_
+
+Yeah, this would be interesting. Yeah, I mean, ultimately you're now going over an FFI interface and then you'd have a breakpoint in your Rust code. These things don't always work well. I mean, I usually use the debug macro in Rust. I use it a fair amount. So then at least this would print out in the standard out or something. but like it depends like is the issue something in your lower level library in which case I would just this is why I think it's also beneficial to have it exposed as just a rust library you could recreate the same scenario calling your rust library and and like debug just within rust but if it's actually something with the bindings then then like so I guess like isolate the is it like a bug in your core logic then then debug it in the rust library if it's actually the bindings then you're kind of like testing that binding layer anyway. Yeah, I don't really have a good solution. I would just try and isolate where is the bug that you're trying to debug and see if you can debug it closer to there.
+
+**Speaker 2** _[28:48]_
+
+Okay, we come to the last question. When and how do you track test coverage across languages?
+
+**Speaker 1** _[28:55]_
+
+Yeah, I have, like, a good coverage checking for the Rust side. And then, yeah, I don't, like, check across languages. Most of, like, the complicated logic is all in the Rust library. So I spend the extra, like, CI time and effort, like, checking the coverage on the Rust one. And I don't necessarily have, like, a coverage tracker on the Python side. Because, I mean, ultimately there's, like, not really that much Python code, right? It's It's just this binding layer. And yeah, I just checked the line coverage on the Rust library.
+
+**Speaker 2** _[29:30]_
+
+Okay, there was one again chiming in, so we have time. How do you profile CPU time in Python and Rust code?
+
+**Speaker 1** _[29:38]_
+
+So, with Rust, I spend most of my benchmarking on just the core Rust library, again, because that's usually where I'm making the optimizations. And so, with cargo, there's, like, a nice cargo bench command. And then you can use... There's, like, Criterion. I like one called Devon. There's some other ones. But then you can, like, set up a benchmark in your Rust code, and they're, like, pretty sophisticated. I even have mine checking, like, how many allocations it's doing and this sort of thing. So that's, and it's, like, built into Cargo. It's super nice. I would like to do some more benchmarking on, like, what is, like, if I want to optimize the bindings, there's, like, some options I have. And this one I haven't set up yet. Like, I don't know. Maybe you can tell me what your favorite way to benchmark Python code is because I would like to do some benchmarking on the Python side to see, like, if I change out from a stable ABI to, for example, linking against a specific interpreter, do I actually benefit from those optimizations? and it would be super helpful.
+
+**Speaker 2** _[30:38]_
+
+So yeah, thanks all also for your question and I think that's some applause again for Ben
+---
+transcript_status: auto
+---
+transcript_language: en

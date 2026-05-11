@@ -1,0 +1,179 @@
+title: Mastering Demand Forecasting: Lessons from Europe's Largest Retailer
+---
+description: Ever craved your favorite dish, only to find its key ingredient missing from the store? You're not alone - stock outs can have significant consequences…
+---
+created: 2024-12-21
+---
+code: NNGWGC
+---
+slug: mastering-demand-forecasting-lessons-from-europe-s-largest-retailer
+---
+speaker_names: Moreno Schlageter, Yovli Duvshani
+---
+speakers:
+
+
+
+### Moreno Schlageter
+
+_This is what Moreno says:_
+
+Machine Learning Engineer at Schwarz IT, Germany, where I'm passionate about harnessing the power of AI to revolutionize the retail industry
+
+### Yovli Duvshani
+
+_This is what Yovli says:_
+
+Versatile data scientist with 3+ years of experience building AI-products at the service of the industry. I believe that the key for success revolves around embracing shared best practices, upholding high quality standards for code development and having a team composed of complementary skill sets.
+---
+abstract:
+
+
+Ever craved your favorite dish, only to find its key ingredient missing from the store? You're not alone - stock outs can have significant consequences for businesses, resulting in frustrated customers and lost sales. On the other hand, overstocking can lead to wasted storage costs and potential write-offs. The replenishment system is responsible for striking the right balance between these opposing risks.
+The key to successful replenishment is making accurate predictions about future demand. 
+
+This presentation takes a deep dive into the intricate world of demand forecasting, at Europe's largest retailer. We will demonstrate how enhancing simple machine learning methods with domain knowledge allows to generate hundreds of millions of high-quality forecasts every day.
+---
+full_description:
+
+
+This talk will provide an in-depth look at the forecasting engine, the heart of Lidl's replenishment system.
+
+Each day at Lidl, hundreds of millions of various products journey from suppliers to warehouses before reaching the shelves. Our so-called forecasting engine helps to automate the supply chain at every step along the way. 
+Even with the vast amount of data at our disposal, the problem is still extraordinarily intricate. Each item, store or warehouse has unique demand patterns influenced heavily by a wide range of factors, such as holidays. While most of the effects are quantifiable, others remain unavailable and a certain degree of stochasticity is inherent to the process. The objective of our demand prediction may also vary based on their usages. Accuracy on the day level typically matters for short-term predictions, while it doesn't for long-term predictions. 
+
+We'll present our pragmatic modeling methodology on a simplified version of the problem at hand: The warehouse forecasting of single items. 
+
+We explain the rationale for training separate models for each item-warehouse combination and go into the reasons why we opted for using a LGBM model and why we believe it is best suited for our application. In addition to outlining our high-level modeling approach, we demonstrate how business and domain expertise are integrated into the modeling process through the use of sample and feature weighting and examine the impact of this integration on prediction quality. Following the base model, extensions are introduced that enable the incorporation of higher-level information at the finest level of granularity. This is achieved through decomposition and recomposition of the time-series at hand. In detail, we will present uplift decomposition for different use-cases, which include handling of promotions and holidays.
+
+To conclude, we will give an overview of how all the presented methods synergize in delivering reliable forecasts for happy customers, so that you will hopefully never find yourself in front of an empty shelf!
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2025-04-23
+---
+start_time: 16:10
+---
+end_time: 16:40
+---
+slot_id:
+---
+track: Machine Learning & Deep Learning & Statistics
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Novice
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/NNGWGC.png
+---
+youtube_id: 7DjU7pTawKQ
+---
+video_link: https://www.youtube.com/watch?v=7DjU7pTawKQ
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/7DjU7pTawKQ/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+All right, great. Thanks for the introduction, and welcome, everyone. I'm glad so many of you could make it to our talk today. Before we get started, who are we? We are my colleague Jovly and I. We are both ML engineers at Schwarz IT, and Schwarz IT is a daughter company of the Greater Schwarz Group, and so are both retail giants Lidl and Kaufland. Today, we will take a deep dive into the forecasting. We do at Lidl. We will go into the reasons why we are doing forecasting in the first place, place, and most importantly, and likely the reason why you're here today, is how we are doing it. So let's get started, and we'll first start with a small motivation. Imagine yourself as a store manager at Lidl, and it's time for you to read our bananas for next week. And you ask yourself, how much should you order? Ordering too little, and you end up with unhappy customers, you will lose out on sales, and your customers might even go to the competition instead. Ordering too much, on the other hand, you will end up throwing out bananas that went bad on the shelf, this of course also means money on the train. And such ordering has been a manual process for quite a long time, however as we all know manual processes are slow, they are expensive and also error prone. So what we instead want to do is, we want to come to this decision in a more data driven way. We want to use our historic sales and get a good estimate of our future demand. Then we can make an informed decision on how much we should order. not only improves customer satisfaction, reduces waste, but in the end, it also increases our profits. To understand where we can actually leverage these forecasts, let's take a look at a crudely simplified supply chain at Lidl. On the far right-hand side, you have our customers. Here, we want to ensure that our goods are always available. However, the customers are also the biggest source of uncertainty. Customer behavior at its core is stochastic. Just think about how different your shopping cart might look from one day to the other, or how a promotion might affect your shopping. So all the previous steps have to account accordingly. So the store has to stock enough goods which can only be delivered from the warehouse. And this has to then, in the first place, been ordered from the supplier. And actually, in all of these use cases and positions in the supply chain, we can make use of forecasts. So on the far left-hand side, at the supplier, we can use our forecasts to aid in the ordering decision, to aid in optimizing logistic processes. And this requires quite long-term forecasts with a rough granularity. On the other hand, closer to the customer, we can actually also optimize processes in our stores. One such example is our bake-off stations. Here we optimize how much and what to bake off to ensure that our goods are always fresh and available. This requires quite short-term horizons with a high granularity. Lastly, in the middle is one of our biggest use cases, the so-called automatic dispositions. Here forecasts are used to automate the ordering and also the disposition from the goods to the warehouse and stores respectively. Both of those use cases use daily forecasts, so a forecast is generated for every single day, and the warehouse requires roughly four weeks in advance, where the store only requires a single week. To really remind of this talk, we will focus on this warehouse level use case, so all the plots you will see are on the warehouse level. However, everything we say basically holds for the other use cases as well, with just minor tweaks and adjustments to account for the differences. Now this was all a bit theoretically, let's now take a look at a more concrete example. You can see the normalized sales for a single item in a warehouse. These are the sales for banana throughout the year 2024 in a warehouse in Austria. And our time series that we are faced with have a few certain properties. So first of all, it's quite apparent that we have a super regular weekly pattern. This is what we also refer to as week easy. On top, you can see that we also have more long-term patterns, so yearly patterns where you see that we sell less bananas in the summer, likely because maybe strawberries are also available while we sell a lot in the winter. This would also repeat throughout several years. Besides these regularities, we also see some irregularities. So here you can see that we, for example, have a big spike in our sales, which was caused by promotion. Our modeling approach thus has to be able to also account for such regularities. And lastly, we are faced with a lot of different time series. So the time series for each store, for each warehouse, and especially between each item, varies quite a bit. So our modeling approach has to be quite flexible in that regard as well. Now analyzing time series is nice and well, but how can we actually model the time series and how can we predict? And there's quite a few options to do so, and it has quite a long and rich history. Early on, time series forecasting has been dominated by more traditional statistical approaches such as order regression or even moving averages. The focus of research has shifted. More recently, their focus is way more on deep learning, and their everything from simple MLPs or LSTMs all the way to transform models has been explored. However, there is one approach that has been proven to be super effective in industry, and this is treating this forecasting problem as a tabular regression. How we can do this? You just take each data point in time series, and it becomes a single row in your table. What advantages does it yield? You can rely on any traditional tabular method, and these are super well explored and well established. Additionally, you can actually easily extend your data set with additional features such as engineering features based on the time or adding external information about promotions, for example. Now let's make it more concrete regarding our modeling strategy and here I want to talk about two concepts, which is training granularity and training level. Training granularity basically refers to how granular or how small are the predictions our model makes and thus what do we train on. By training level referring to the scope that one model has to cover. So how much data do we pool for one model? For the training granularity, you can see we make predictions on the item store day level. That is almost the lowest granularity in all the dimensions. This has multiple reasons, the first being our downstream processes require these low granularities, so it makes sense for us to model on these as well. But we also can make use of these lower level forecasts aggregate them up and get really high accuracy in even higher aggregation levels while being in line with the lower aggregation level. For training level we train a single model per item warehouse combination. So a single model only is responsible for predicting the forecasts or the demand for a single item but it does so for all the stores in a warehouse. This yields the advantage that we do not or we can make sure that our model does not explain the demand or predicted demand based on the history of a different item we're still having cross-learning between stores so a newly introduced store could still have good predictions right when we get go. Now I've already introduced modeling time series forecasting as a tabular regression but there's still a lot of options. We actually choose to use a tree based gradient boosting method and I think most of you might be familiar with LightGBM and there are a lot of reasons why to use light GBM, but I will go into the four most important ones for us. The first one is of course its cost. We train hundreds of thousands of models based on our training level regularly, so the training but also the predictions has to be cheap and fast. And this of course why it's offering good prediction quality. Along those lines with scalability we can't We can't oversee all of our models, we can't oversee all of the predictions we do. So we have to make sure that our model training and predictions are quite stable. This is also the case for LyGBM. The next point goes more towards the implementation. So we all know LyGBM is well established and LyGBM is open source, which I think is always great, and it's actively maintained. So we know that support can be guaranteed. Lastly, and I think that's a super important point to drive home here, tree-based methods are more easily explainable so first of all that means that if we see that a model is off we can look at the historic sales of an item and we understand why the model predicts as it does and how we can avoid it in future and how we can prove our approach but also we can explain to the stakeholders to the business how the model works this allows them to understand the capabilities but also the limitation of our models and this just saves a lot of headache. Now no model is complete without its feature set, and our features can be categorized into roughly five groups. And each feature group actually contains a collection of features, continuous, discrete, and all the categorical ones. The first one are calendar features. I've talked earlier about some regularities, patterns that we see. These calendar features are engineered to best represent these seasonalities so the model can correctly understand those. The second group is also called calendar features, however these are now related to holidays. Here it's super important to understand that a model should not learn the effect of holiday based on the date alone. This can especially be hurtful if you think about moving holidays, such as Easter, because then the model could overfit and overpredict even though there is no holiday in that specific Next up, you've seen how big of an impact promotions have. They cause huge spikes in sales and demand, so we have dedicated feature groups to best model the effect of promotions. We train our models on warehouse level, so a single model has to predict for multiple different stores. Stores are quite different. Just think about how a store at the beach might behave compared to a store in a mountain resort. Thus, we have some store physics features to better differentiate those. Lastly, this is quite common practice when treating time series forecasting as a tabular regression are lag features. Lag features are just incorporating information of preceding days. For example, one could imagine the sales two weeks ago as a feature. This way, the model has an easier time to recognize certain sales pattern and even helps in differentiating different stores. With that, that already sums up our quite basic base modeling approach, and I'll hand over to my colleague Jovli, who will show you how well does such a basic approach work, how to increment it, where are its limitations, and finally, how we end up at our forecasting engine.
+
+**Speaker 2** _[11:01]_
+
+Thanks a lot, Moreno. Let's now apply everything that we've learned so far on our banana item. So for that, we go back to the sales of the banana item for the year 2024. And additionally, we add the sales, we add the predictions in gray. What you can observe at first glance is that generally, the predictions of the model actually match relatively well the sales, especially true seasonality patterns that Moreno mentioned earlier. pattern and the yearly pattern, the fact that for the banana the sales are generally lower during the summer and higher in the winter, are very well captured. There are two time periods, especially in the time series, where the model simply fails to capture correctly the pattern of the sales. And not completely coincidentally, these periods are full of holidays. This is the reason why in the second part of our talk we will show and explain to you why we evolved from a relatively basic modeling approach to a much more complex one, especially using the example of holiday. Now if we zoom in into one of these periods to understand a bit more why the prediction failed to capture the sales so well. We first start by displaying the holiday events here. You can see that there are links to zero sales. That means on these days likely all of the stores for the warehouse were actually closed. And you can imagine thinking about your own behavior that what would happen is that simply the sales would get redistributed to the days nearby. What we in turn observe is that generally the predictions of the model in gray, they completely fail to achieve the level of the sales. And even worse than that, if you actually compare the predictions to the week following the holiday events and preceding the holiday events, actually the predictions are not so much higher, which is definitely contrary to our expectations. Lastly, not completely coincidentally as well, we see that after these holiday periods we have one day with very low sales that cannot really be explained by a low demand because it's just simply too low and likely here we make we can make the assumption that because of the systematic underestimation that happened around the holidays then simply the supply chain was overwhelmed and they ended up not delivering enough goods to the store so far we only talked about the banana item you can imagine that's the way the mall struggles with holiday is actually much more generic and what we'll do next is try to understand why Why do malls struggle so much with holidays? For that, let's try to explain what are holidays about in general. So each country has a certain set of holidays, like Easter, like Christmas. Generally they have about 10 holidays. If you're living in Bavaria, potentially you have up to 14 holidays, but generally it is around 10. If you now consider that we train on about half a decade of our models, then we end up by having about 100 holiday events that any model could use to actually understand the holiday pattern. This is quite limited, and thus the holiday events are quite sparse. This would, on its own, not be a problem if, at the same time, holidays would not be very diverse. So no holiday is actually exactly similar as the holiday previously. We've identified up to 10 factors that influence heavily the effect of holidays. Among these 10, two are quite important. So first, the day of the holiday, is it Easter, is it Christmas, and secondly also the day on which the holiday falls. So you can imagine if the holiday falls on a Saturday, then the sales will get much more distributed to the days nearby than if it actually falls on a Tuesday, where the sales are relatively lower generally. In that case, the, sorry, so taking these two factors into account, we actually see that the combination, so the cannality of the combination set for these two factors already attained about the amount of samples that we have in our training set. That means that generally all machine learning world would potentially even using only these two features already struggle to capture properly the effect of these two features. Now additionally to this complexity in modeling holidays in general, we have also some restrictions that are forced onto us by our modeling approach. So again, we train one model per item warehouse. What this means is that generally the information of the doughnut, as an example, as an item, cannot be used to predict the holiday effect of the item croissant. The direct implication of it is that items with low histories or newly introduced items have potentially a couple of months of history, they either lack the data for predicting holiday properly or they will even not predict holidays as well. In the same direction, items with strong sales shift, and that is rather due to the nature of tree algorithm, will also fail to do so. Lastly, our time series on the store or warehouse level are quite noisy and the mall may struggle to actually recognize that the high sales pack, as an example, is due to holiday effects or is simply due to some noise. We made back then these observations and decided to improve on them. And what we first did is we introduced two specific features to our model. First, we introduced feature contribution. Feature contribution, what is it? It is a specific feature or hyperparameter of the light GPM that helps us to weight certain features higher than other ones. This is generally also a concept that could be used in much more modeling approach. Why does it make sense is that potentially some items just simply like the data and some expert knowledge could actually help the model explain better the sales data. The implication for our modeling approach is that basically by using feature contribution we use it on holiday features and in turn this leads the model to generally predict holidays using previously seen holidays that are relatively similar to the model. This is, again, especially relevant for items with a shorter history, because for them, the model will just simply lack the ability of explaining data properly. Secondly, we have also sample weighting, which is a much more common technique in machine learning. There, what this is about is that simply samples that are underrepresented get multiplied so that the model decides to explain them in more details. Let's now go back to our previous example of the banana item, and we will add on top of the sales and the prediction of a light GBM baseline model, we will add the prediction of this newly trained model, the LyGBM-Tunes, that contains the feature contribution and the sample weighting features. What you can observe at first glance is that while it is a step in the right direction, so it seems like the forecast actually increased, the pattern is still not properly captured, and also the model still fails quite heavily at predicting the holiday. So we considered that this was also unsatisfactory in general. At this point, we decided to completely change our modeling approach and go with something that is much more complex. We introduced the so-called holiday uplift model. What is the holiday uplift model? It's a model that makes the assumption that generally the effect of the holiday is multiplicative and that tries to capture it. We train a single model for the entire world also to not be subjected to the four limitations that we presented to you earlier. And our hope is that in that case, this holiday uplift model can actually come up with better uplift or impact of the holiday forecast than what our base IGBM model would do. To be a bit more concrete here, and to make sure that you have understood what the model is about, as an example, our model would be capable of predicting that on the 23rd of December, so one day before Christmas, there is, in comparison to a reference week, potentially 30% uplift. Now, the question still remains, even if we have some relatively accurate predictions of the uplift due to a holiday, holiday, how do we use them to improve the demand predictions of our model? For that, we rely on the so-called decompose-recompose approach. What happens is that we decompose the time series that goes into our baseline GBML, meaning that the sales around holiday get divided very concretely by the uplift factors. So the baseline GBML is not expected anymore to actually predict much of the holiday effects. And then the forecasts are generated, and the holiday effect is re-added by multiplying the uplift factor by the predictions of the base model. You can guess the next step. We will again go back to our prediction of the different models in the cells. And this time, I don't top the predictions for the banana item of this new model. Here you can see that actually for the banana item, the improvement is quite significant in that case, and that the predictions relatively well match the cells. There is still some gap, though, that can be either explained by either just the lack of data or some randomness potentially for the events or even some potential for improvements in the approach. So far, we've only presented to you one item, the banana item, so that we can convey as much as possible the intuition behind it. But this is in no case mathematical proof that these models are better. That's why to finish the evaluation in our talk, let's extend it to the complete item scope for Austria for the entire year 2024, and here we're only evaluating the days in the proximity of a holiday. In that case, it's not possible anymore to just simply compare time series of sales and forecasts to get an intuition what model performs better. We need to rely on metrics. In that case, we decided or we selected a relatively common metric in the context of time series, which is the mean absolute percentage error that we compute on the aggregated sales of all the items and all the stores we also compare the value of each model to the value of the lgbm baseline model here for those of you that are maybe not too familiar with these metrics or with time series in general an intuition behind it or what it measures generally this metric would be how well does the model is able to capture the holiday effect on the highest level now if we compare our model we see that the first situation that we made actually already represent quite some improvements so six percent improvement for this metric and the second model that we tested really was a complete game changer and then going from 100 percent into 75 percent for this metric uh was a gigantic deal for us and definitely justified implementing it let's sum up what we did so far first we started by presenting to you our base light gbm model which represents the backbone of all our modeling approach and is generally a very effective way of generating forecasts that are quite reasonable and that are able to capture most of the effects that one can find in time series properly. Afterwards, we identified together that this model lacked the ability of properly predicting holiday and showed that, in that case, making use of the holiday uplift model actually improved the performance of the forecast quite significantly. and you can imagine that holiday effects are also not the only ones where potentially the base model struggle and where some higher level modelization can actually improve the performance. So here also I imagine maybe not as a surprise in our whole modeling pipeline we not only have the holiday-optic model, we have different so-called modeling capabilities that can be seen as model specialists that are targeted to predicting certain behaviors much better than the base like GPM model. Developing all these models is also quite some effort, so they are generally built around the same template, and very importantly, they actually build through a unified feature engineering to make their development faster. Now to the last part, once we have all these capabilities, and you already saw it with the example of the holiday, we need to combine them, to piece them together, to create the highest value forecast. And these forecasts, they will then flow into multiple use cases that may have certain expectations around the forecast. That is why we also have a post-processing step that is specific to each use case. Maybe to give you here a concrete example, in the supply chain, it may be that the suppliers require actually some upward trends on the forecast to reduce the risk of having underestimation. And currently, we are only serving a couple of use cases in the supply chain, but our long-term plan or vision is that actually this forecasting engine is able to provide forecasts to the whole SPAD group and there improve the business process there wherever it is necessary. With these final words, we're arriving to the end of our talk and would happily answer all the questions you may have related to this topic.
+
+**Speaker 3** _[23:53]_
+
+Yeah, so thank you a lot for your talk. We have a lot of questions. We will not be able to answer them all, but maybe you can come to the front after the talk and ask the speakers directly. So the first question is, how often do you have to retrain your model to adjust for data drift caused by current trends?
+
+**Speaker 1** _[24:11]_
+
+So our models are retrained weekly, so each week we do retraining for all the models available.
+
+**Speaker 3** _[24:20]_
+
+And how do you handle new products?
+
+**Speaker 2** _[24:24]_
+
+So, new products, the hope is that they can already be covered already by the existing forecasting engine. If they have some specific requirements related to the forecast, for example, then maybe they have as an example a different item set. Maybe we're not talking about the supply chain directly for the stores, but maybe we're talking about the online shop as an example, that we need to adapt some components of our engine to actually provide this forecast for a much bigger scope.
+
+**Speaker 3** _[24:50]_
+
+And do you also have a, can store managers also override the decision of the model if they think they know better?
+
+**Speaker 2** _[25:00]_
+
+So not store managers directly, because you can imagine at Lidl, Lidl is quite a giant, and we produce then millions of forecasts every day, so they cannot check every forecast and every store manager cannot do so. But what happens is that on the warehouse, they are able to check through some monitoring tools, generally the global quality of the forecast, and accordingly potentially set some high-level trends on the forecast. But otherwise, everything is automated.
+
+**Speaker 3** _[25:26]_
+
+Have you also considered using some monetary metrics to optimize, for example, incorporating financial effect of over or under stock in your predictions?
+
+**Speaker 2** _[25:37]_
+
+so we would like to do so the the issue is that the this will require also potentially to conduct some a B test if we want to do that properly and at the end the stock data is also not entirely reliable so generally we just shied away and it is also quite hard to access at you
+
+**Speaker 1** _[25:55]_
+
+Mm-hmm.
+
+**Speaker 3** _[25:57]_
+
+Another question was how do you avoid unwanted feedback loops for example if you have too little sales forecast that you don't Stock enough products you have lower sales because of that and then you even have lower sales forecasted
+
+**Speaker 1** _[26:10]_
+
+Yeah, usually I would say we do not have like an automated way, but we get direct feedback from the countries They can tell us if our focus are so off that we actually see these negative effects But I think we really got that feedback So so far we do not have a need to do so
+
+**Speaker 2** _[26:28]_
+
+And also, maybe to add here, what can be said is that generally the out-of-stock situations are relatively limited. So it would be rare if an item will have, as an example, 80% of its data set polluted with out-of-stock situation that would not really represent then the demand per se.
+
+**Speaker 3** _[26:44]_
+
+And then we have time for one last question. What were the downsides of training one global model, so including all categories and stores, compared to training many local models?
+
+**Speaker 1** _[26:54]_
+
+That's a good question, because that would be the different route. So what we now did is we kind of exported one capability to the global model. But, of course, we could have also said that we do it for the whole model. Then, of course, we get a whole new set of challenges. We have items with a lot of history, some with higher business impact, some with lower business impact. And that, of course, requires a lot of testing, a lot of discussion with the business itself, and might even have some challenges that could not be solved that easily. As our base forecasts are quite stable and we are quite happy with how they work, the best course of action for us was to just move this one capability outwards. On top of that, of course, it also means a big shift in paradigm, even bigger than what we've done now, as we have to change our whole infrastructure, our entire code. This is also, of course, a consideration with costs.
+
+**Speaker 3** _[27:49]_
+
+Thank you. Unfortunately, we don't have time to ask more questions. We have many, many questions. So you don't have a booth here, as I saw correctly, but you will be around in the next few days. So I think you can ask them directly if you have more questions. For now, I want to thank you. And yeah, thank you for the talk.
+
+**Speaker 1** _[28:07]_
+
+Thanks a lot. Thanks.
+---
+transcript_status: auto
+---
+transcript_language: en

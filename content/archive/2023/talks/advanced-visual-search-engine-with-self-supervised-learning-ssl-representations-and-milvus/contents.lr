@@ -1,0 +1,99 @@
+title: Advanced Visual Search Engine with Self-Supervised Learning (SSL) Representations and Milvus
+---
+description: Image retrieval is the process of searching for images in a large database that are similar to one or more query images. A classical approach is to…
+---
+created: 2023-01-04
+---
+code: TCWCVV
+---
+slug: advanced-visual-search-engine-with-self-supervised-learning-ssl-representations-and-milvus
+---
+speaker_names: Antoine Toubhans, Noé Achache
+---
+speakers:
+
+
+### Antoine Toubhans
+
+_This is what Antoine says:_
+
+Python developer and Data-Scientist, I am Head of Science at Sicara since 2018.
+
+I am also the organizer of the [Paris Computer Vision Meetup](https://www.meetup.com/Meetup-Computer-Vision-Paris/).
+
+Speaker at PyConUS22 and PyDataBerlin22.
+
+### Noé Achache
+
+Noé is a lead data scientist at Sicara, and worked on various AI and data engineering related projects.
+Speaker at the [Paris Computer Vision Meetup](https://www.meetup.com/Meetup-Computer-Vision-Paris/).
+---
+abstract: Image retrieval is the process of searching for images in a large database that are similar to one or more query images. A classical approach is to transform the database images and the query images into embeddings via a feature extractor (e.g., a CNN or a ViT), so that they can be compared via a distance metric. Self-supervised learning (SSL) can be used to train a feature extractor without the need for expensive and time-consuming labeled training data. We will use DINO's SSL method to build a feature extractor and Milvus, an open-source vector database built for evolutionary similarity search, to index image representation vectors for efficient retrieval. We will compare the SSL approach with supervised and pre-trained feature extractors.
+---
+full_description:
+
+[Image Retrieval](https://en.wikipedia.org/wiki/Image_retrieval) consists in searching in a large database for the most similar images to one or more query images. It has many applications in various fields, e.g., to validate whether a person's photo is contained in your database of people's photos; to build a visual recommendation system; or to create a video deduplication system.
+
+Huge progress in Computer Vision in the deep learning era highlighted [Content-based Image Retrieval](https://en.wikipedia.org/wiki/Content-based_image_retrieval) (CBIR) techniques that use the image contents (features, colors, shapes, etc) rather than metadata (keywords, tags). This gets rid of time-consuming, costly and error-prone human annotations to produce the metadata.
+
+A classic CBIR approach consists of three steps:
+
+1. A deep neural network called **the feature extractor** (typically a CNN, or a [ViT](https://arxiv.org/pdf/2010.11929.pdf)) computes a representation of each image of the database in the form of an embedding vector.
+2. The same *feature extractor* is used to compute an embedding of a query image.
+3. The search is performed by retrieving the **closest** representations in this vector space using a distance metric (cosine, L1, or more complex ones).
+
+Thereafter, two main challenges arise:
+
+- **Quality of image representations** - the embeddings should capture the visual features that are relevant to your searches/tasks. For instance, if you intend to do face recognition, embeddings should encode eye/hair color, skin texture, nose position, etc. 
+Traditionally, the feature extractor is trained in a supervised way. Therefore, the relevance of the representations hugely depends on 1) how close is the training dataset from the searched query images 2) the potential visual biases in the annotations (see a [famous example here](https://medium.com/hackernoon/dogs-wolves-data-science-and-why-machines-must-learn-like-humans-do-41c43bc7f982)).
+- **Speed of search in the representation space** - comparing each query image to every single image in the searched database in near real-time is challenging and expensive with large datasets.
+
+In this talk, we will build a [Visual Search Engine](https://en.wikipedia.org/wiki/Visual_search_engine):
+
+- We will introduce **[Self-Supervised Learning](https://en.wikipedia.org/wiki/Self-supervised_learning) (SSL)** in the context of computer vision and the [data2vec](https://arxiv.org/pdf/2202.03555.pdf) approach. Labelling data can be a time-consuming and expensive process, especially if it requires specialized knowledge or expertise. SSL does not require labelled training data to learn good representations, hence it allows to lower the cost and time to build a model producing good representations for our visual search engine.
+- As a concrete example for this talk, we will use the [DINO](https://arxiv.org/pdf/2104.14294.pdf)'s SSL method to build a feature extractor.
+- We will compare the DINO feature extractor with supervised pre-trained feature extractors. We will show the main differences between the obtained representations: SSL ones are generally richer (more visual features are in the representation) whereas supervised learning introduces a natural semantic bias in the representations. In addition, we will present practical tools to understand the visual features encoded in the embeddings (activation maps, grad-cams, self-attention maps for transformers).
+- We will present [Milvus](https://milvus.io/), a vector database built for scalable similarity search: it’s an open-source search engine tool (14.5k stars on Github) that is suitable for production use cases as it can be easily scaled and managed. Milvus uses [Approximate Nearest Neighbors (ANN) methods](https://milvus.io/docs/v2.0.x/index.md#Selecting-an-Index-Best-Suited-for-Your-Scenario) to build vector indexes that improve retrieval efficiency by sacrificing accuracy within an acceptable range.
+- We will use the Milvus Python API to index the image representation vectors: as a result, the images the most similar to a query image can be retrieved in a split second, even for datasets containing millions of vectors. 
+
+By the end of the session, participants will have learned how to build a Visual Search Engine using Milvus with pre-trained self-supervised and supervised models.
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2023-04-19
+---
+start_time: 10:00
+---
+end_time: 10:45
+---
+slot_id:
+---
+track: Computer Vision
+---
+tags:
+---
+submission_type: talk_long
+---
+submission_type_label: Talk (Long)
+---
+submission_type_id: 2520
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/TCWCVV.png

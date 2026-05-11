@@ -1,0 +1,203 @@
+title: Duplicate Code Dilemma: Unlocking Automation with Open Source!
+---
+description: "Don't Repeat Yourself" – a phrase that we have all heard many times. In this talk, we will have an overview how to deal with code duplication and how…
+---
+created: 2024-12-16
+---
+code: KZKT9W
+---
+slug: duplicate-code-dilemma-unlocking-automation-with-open-source
+---
+speaker_names: Raana Saheb-Nassagh
+---
+speakers:
+
+
+
+### Raana Saheb-Nassagh
+
+_This is what Raana says:_
+
+Hey, I am Raana!
+
+Some days, I am a Data Scientist with a passion for patterns, and other days, I am a Data Engineer with a love for code refactoring. I am also interested in methods for team building.
+
+Besides the nerdy stuff, I enjoy board games, bouldering, and singing in a choir!
+---
+abstract:
+
+
+"Don't Repeat Yourself" – a phrase that we have all heard many times. In this talk, we will have an overview how to deal with code duplication and how open-source template libraries such as Copier can assist us in managing similarly structured repositories. Furthermore, we will explore how code updates can be automated with the help of open-source libraries like Renovate Bot. By the end of this session, you will gain insights into these solutions while also questioning whether they truly eliminate repetition or merely contribute to another cycle of automation.
+---
+full_description:
+
+
+“Don’t Repeat Yourself” (DRY) is one of the first principles that every programmer encounters in the early stages of their coding journey. Some of us even had to learn it the hard way. We promised ourselves to avoid repetitive code to never again deal with the extensive refactoring required for every small change.
+
+This simple principle has found a fundamental place in every programmer's heart. It may also be the reason why, from time to time, every programmer doubts their code and begins to refactor it in the early stages of coding.
+
+This talk provides an overview of different solutions for preventing code repetition. We will start with the most common solutions, such as using git commands, and then explore more intermediate approaches for managing similarly structured repositories with the help of open-source template libraries such as Copier and Cookiecutter. Finally, we will address a more complex problem and examine how to automate updates using open-source tools like Renovate Bot.
+
+As a takeaway, participants will gain insights into various solutions and a glimpse into the usability of each open-source library. Participants are also encouraged to reconsider the entire process: Are these solutions truly preventing repetitive code, or are we merely caught in an endless cycle of automation?
+---
+room:
+---
+day: Thursday
+---
+slot_date: 2025-04-24
+---
+start_time: 14:20
+---
+end_time: 14:50
+---
+slot_id:
+---
+track: Programming & Software Engineering
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/KZKT9W.png
+---
+youtube_id: x6UptDWh7_k
+---
+video_link: https://www.youtube.com/watch?v=x6UptDWh7_k
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/x6UptDWh7_k/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:08]_
+
+So, hello, everybody. Yeah, duplicated code. Maybe some lines that are similar to each other, something from copy and pasting. I think all of us know what we are talking about right now. To have an interactive start, and it's after the lunch break, so how about to just stand up? And I want to see everyone. I can see you. You still okay, so please sit down if you have never ever seen duplicated code Please sit down if you have once fixed a duplicated code Have you also fixed the duplicated code? Okay, it's fine. It's fine. Okay. So we have all seen duplicated code. We have all once fixed duplicated code. Please put your hands up if you still are struggling with duplicated code. Yeah. I assumed that. Thank you. Yes. This was also a question that I had many months ago, and I just started, like, searching around Stack Overflow. What are the relevant questions that are in Stack Overflow? Like you can find questions around, hey, why is copy and paste dangerous, then, like, how to convince others, hey, duplication is bad. Then you have like questions, how can I detect code duplication, and if you see these are more old questions, but if you look like for the newest question, you also see like I have duplicated code, how can I find it in like tool A, Visual Studio, PyCharm, and so on. So it's something that the community is still talking about, maybe a little bit different. And that made the whole thing more interesting for me. When did this all thing start, like the DRY principle, don't repeat yourself? So let's have a catch-up in the history. It was 1999, in the beautiful book, The Pragmatic Programmer, where we for the first time heard about the evils of duplication. And here, there was also the DRY principle, don't repeat yourself. 2008, there was another book, Clean Code. I think many of you have, you know it, I'm sure. Still duplication was the root of all evil in software. And here we had some cool design patterns, like how to deal with duplicated code, with abstraction, and so on. And after that, we had some other idea. It was in a Ruby conference, 2014, yes, where Sandy Metz had a talk, and she had some other perspective. Duplication is bad, but if you just abstract everything and just functionalize, it's not always a solution. You can also have wrong abstraction, which is worse than duplicated code. And right now, it's 2025, and I, I mean, I code, and I still struggle with duplication, and I just think, what are we missing? So this is the motivation why I am standing right now here, just to talk about this topic again with you all because I think there is something still missing and we need to talk about this more. So I have brought some examples for you from my daily life. So you might ask who am I to talk about this? What am I doing? That's a good question. So short. My name is Rana Saheb Nasar. In my normal life, I love board games and I sing in a choir. And in my nerdy life since 2020, I'm an official data scientist right now, data scientist, data engineer at the dmTech company. And at dmTech, we have, like, a lot of data products, and for each data product, we have a pipeline, we have some validation set, so it's like you have a lot of microservices. And it happens a lot that when you need to fix something, you just need to fix it everywhere, because they are like different things and run on different data and so on. So that's why I am still dealing with duplication, but not only at the EmTech, but also in the other companies that I was. So I brought for you some examples. We start with really simple ones, and then in each step we make them a little bit more complex. I invite you to just think about how would you solve these problems. So let's start. With an easy task, an easy ticket, I think some of you know, you have in one Git repo an old requirement somewhere, PyProject.com or whatever, and this is in many other repos. So if this example, if you don't know this example, it's fine. Think about maybe a wrong comment, a wrong function that is repeated everywhere. How would you solve this? So some ideas. I hope you have some ideas right now in your head. And I also gave this thought, like, what would be different strategies, different ways of dealing with this problem. You could do it yourself with some nice script which works. You can do it in a really fast way if you just want to fix it. You can maybe check out the latest libraries or technologies to do that, or maybe you're like me, an automation freak and like to automate everything from the beginning on. So let's see and start the journey with some simple things. I mean, it's not a complex problem. How would a do-it-yourself enthusiast do it? Somehow we have some Git repos, and then we need just to make some requests, somehow find these requirements with rejects or whatever, and merge it. And this is all possible if you just play around with some Python built-in libraries, and like PyPy libraries, like the request Python library, and so on, and you can just Save your changes in some temp files and then merge it so you can build your own script. I mean It's nothing complicated and you have the most flexibility that you want and by using the script Maybe it's a little bit hard to maintain it. But hey it works For this simple example, so let's take a further step and make this example a little bit harder What if we're not talking about only one line? but a bunch of files that are repeated in a lot of Git repos. So, yeah, you cannot, maybe you can write a lot of rejects and hope to find all these files and make the changes. It's a little bit complicated. So let's see what can we do here. Mostly we want to do it really fast. So let's have a look how can we do it fast. I think the first idea that comes to mind is like mind is like, yeah, just do it. Why are you thinking about it? So let's do it. You pull the main branch, create a new branch, make the change of the file, hopefully you have some test on linter, then commit the change, push it, hopefully some CI CD pipeline will run and then you give it to a nice colleague for review and you're ready to go and merge the change. I mean, it's fast, it works, and if you like, you can do it for all the other repos, and if you like, you can also do it, like, for a lot of files, but you see the complexity, so it's like, it's fast if you have only one, a couple of repos, but it gets much more complicated if you have, like, a lot of repos. So if you want to be a clever quick fixer, how can we do it? If you're good with Git and you're not afraid of rebasing or so on, I mean, you can just Git fetch the last changes from a remote branch and just cherry pick the last changes and apply it to all of them, and there's also some comments in Git like format patching which helps you to do it much more efficient and easy. If you don't like to go so much into Git, there are some nice open source libraries that are exactly doing this for you, like Multigitter and GitxArgs, which have the main idea, but you don't have to deal so much with, like, Git commands. How does it look if you, like, use GitxArgs? You just need to install it once with, like, pip. Then you have your GitxArgs. You add a bash file where you can add all your repositories and all the things and the files that need to be changed, and it creates all the match requests that you want. So yeah, nice way to do it really fast if you have exactly the same files. So we started with a simple line, then we had, like, simple files. make it more interesting. What if we have a lot of repos with the same structure, but every time you want to make a change, it isn't always the same file? So you might want to change some files that are repeated, but in each repo there is something else that might change. So there you cannot use this open source library so easily, and you need something else. If we have a look around, like, what bigger companies do or what, like, technologies libraries you have, I think the first thing that you will find is the idea of having, like, a template. Like the main idea is, like, somehow I have a lot of Git repos with the same structure, And I just need to have a template repo where all these other repos are cloned from. Nice idea. You can do it yourself, like creating a template repo and all the other repos are cloned. But the best way is to also use some template libraries. For example, copier, cookie cutter, yeoman, and so on. If you're more into Python, I believe you are, copier and cookie cutter would be good options to go with. Most of them are based on ginger engines, copier mostly works with YAML files, cookie cutter with JSON files, and they have both the same idea, just create this template so every other repo can be cloned from. Copier is a little bit easier if you have still updates going on in this template and you want to have the updates still in the other repos, but otherwise they're really similar. If you're more into web application, Java, JavaScript, TypeScript, Yeoman would be a good option to go. Let's have an example of copier. So the main idea is to create a template. We are working with YAML files. We want to have the same structure everywhere and just have variables that might be different in each repo. That looks like this, like you have a copier YAML file where you can use variables that might change in each repo, like the project name, project description. And for example, if you have different repos with different AI models, then you just have a variable that is for these AI models to have to somehow control this different code. How can you use these variables in your code? Easily by just using the postfix copier, .copier, and then the variables are set into, like, PyProject Hummel or even in your Python code, you can use these variables directly and somehow manage of what is changing actually and what is not changing every time you clone. So this is the main idea of the templating. So if you go back to our problem, we have a lot of repos, a lot of similar structure. Then hopefully we have some variables that say what is changed and what not. go to each repo and say, hey, update the template, update the template, and update the template. It works. And here we come to maybe the last question. Should we do all these duplicated comments, really go into each repo, say, please, please, update the news version? It's still some duplication, maybe not on the code level, but it's still a duplication. So here at the end with last and one to find a solution with some automation. I think some of you have already an idea how this will work. I mean, go back. We have this super template, and we changed something inside that, and we hope that everything else, like all the other repos, will also be changed. So here there are a lot of bots, there are called bots that you can use, and it depends really what are you working on. If you only like struggling with dependency and versioning updates, Dependabot, also open source, would be a good option. It's really simple and easy and you don't have to think about other stuff. If you're more like someone that wants to control everything, all the tasking, scheduling, to save all these things in a database and so on, Solary could be a good option. It's a little bit more complicated, but you can do the scheduling thing with it. And if you like both of the worlds, like having some dependency updates automatically and also the flexibility, Renovate Bot would be a good option to go. Again, let's see some example of Renovate Bot. If you pull the main branch of Renovate Bot, then you need to just add a Renovate JavaScript file that extends the base configuration and then you can have all the variables that you need like when should be the scheduling every day when should it happen like every time maybe the copier version the template changes what exactly should be changed to so we have like this update should I also like check versions a version update packages and so on and you have all the other other variables for like configuration. And yeah, then you have your problem solved. So either is it a simple thing to go on or a more complex thing. We just started with a simple example and saw different ways how to deal with it. And also a lot of open source libraries that you can use. And still, I mean, I'm doing that, I'm struggling. I feel like we find a bug, we fix it, then we automate it and are happy for a short time. And then it happens again and again and again. And somehow you're struggling in this whole cycle. So what I personally miss is, like, I think we are more dealing with duplicated code, But not thinking so much where this duplication comes from or what leads to this duplication. This is many times forgotten. So if it's a duplication, like, really small, not much important, yeah, build it yourself. Make it with some nice Git commands. You can deal with it. Is it more on a structural level, like you have really similar repos, maybe it's time to go with a template. Are you not struggling with duplicated code but more duplication in manual things, like every time you need to write a comment or so on, then it's time to think about a bigger automation. And maybe it's all of them, so, okay, let's build something that has all of these abilities. And sometimes it's none of them. And I think if you believe, like, you don't have an option or you have tried everything, Then maybe it's time to really go to the sources, check out what leads to this duplication, and start a conversation. Because what I have seen in many companies is like we're doing stuff, but sometimes it's like just repeating. And I think we, whatever you call yourself, data engineers, software engineers, data scientists, sometimes need to take responsibility and tell the project owner or the team lead or whoever is leading the project that it's time not to release the next feature release, but go back and see what is wrong, what it can be a wrong decision maybe. It can be, I don't know, because of the environment change, whatever, there are many reasons. And I think this time, to have this time, is really hard, and it's our responsibility to do. So if we have a look back where we started, the history of, like, duplicate code, bad code, and so on, and what is missing right now, if I want to add really personally something, I just want to add the sentence that we need to go to the issues that lead to the duplication. I think we all are too much stuck with just fixing duplicated code. And it's time to sometimes take a step aside and just check out where does it come from and find the right tools to do it. So I hope with this next time when I ask you if you're still dealing with duplicated code, Maybe you have a little bit of a better view of how to deal with it, or maybe you just by the first question, you just all sit down and you don't deal with the application. So I hope this helps you. At the end, I just want to say thank you. Thank you for listening, for DMTech, for supporting, for my friends that helped me, and my partner for stress handling. Thank you.
+
+**Speaker 2** _[19:40]_
+
+Well, thank you Rana, well within time, congratulations. There are a couple of questions on Slido. As a person that never used templates before, why would you have a template? Shouldn't you package often reused code into a library or a module?
+
+**Speaker 1** _[20:03]_
+
+That's a good answer. I think it has to do with the architecture that you're working in and how you deal with it. The other best way is to have libraries for each functionality. As I said, for an example, at DM Tech right now, we work really like on different data products with different pipelines, and it's like microservices that are going on. And if you even try your best, sometimes you need this cut, and you cannot have, like, central place where you have the best libraries or so on sometimes it happens and at some other companies for the clients it's also really important that they have their own code so you have like maybe sometimes repeated code for many clients and you cannot have the center place so it depends on your scenario
+
+**Speaker 2** _[20:51]_
+
+Thank you, another question, at my job even discovering code application in a repo is a problem, can you suggest tools to measure and visualize code application in an entire Repo.
+
+**Speaker 1** _[21:06]_
+
+Yeah, this is possible. I mean, a lot of IDEs have this already. I myself use PyCharm. And I think you just need to, I think, make a tick somewhere. And then all the duplicated code is shown. And what is duplicated exactly? A lot of IDEs support that. I myself know PyCharm. But it's possible. I even saw some open source libraries that go through your code and do that. So maybe you can check it out, or we can also talk about it later, but I also saw that on open source libraries. So yeah, it's possible.
+
+**Speaker 2** _[21:41]_
+
+Another question, are there any code patterns that you think helps avoiding code duplication?
+
+**Speaker 1** _[21:41]_
+
+Okay. Reading.code duplication
+
+**Speaker 2** _[21:58]_
+
+Are there any code patterns that you think help avoiding code duplication?
+
+**Speaker 1** _[22:02]_
+
+Avoiding code duplication, there are a lot of design patterns, the ones with encapsulation, like even for classes the single pattern responsibility would be a good one if you work with a lot of classes but I think the most useful is this extraction of methods and put them somewhere like the question before I think it's called a extraction method and extraction class which helps you always to have like the repeated code away from the other part but I would also refer to the code clean a book there are a lot of design patterns that you might use
+
+**Speaker 2** _[22:51]_
+
+Thank you. Another question, how would you convince a team member who thinks co-duplication is faster to take a better approach?
+
+**Speaker 1** _[23:02]_
+
+I think maybe I would, yeah, I think I would, if there is a change and the code is duplicated everywhere, I would give the story, the task to this person and say, okay, let's make the change everywhere and see, like, how long it takes or we would do it together. I think if someone does it one time to go to all the repos to all the places and just that even a small thing needs time, they would have another opinion, and if not, we will work on it. So, yeah. Okay.
+
+**Speaker 2** _[23:41]_
+
+How would you merge a fix from one project back into a template repo?
+
+**Speaker 1** _[23:50]_
+
+a merch fix from
+
+**Speaker 2** _[23:52]_
+
+From one project back into a temporary one.
+
+**Speaker 1** _[23:54]_
+
+Into a template repo. Ah, into a template repo. Ah, okay. So you have fixed it in the... Interesting. I mean, the best way would be to fix it actually in the template repo and from there you do it. But if you have this scenario, I would just cherry pick maybe the last change and apply it to the template repo and then apply it to everywhere. It depends a little bit what you have changed, but it's better to change it in the template repo, so my suggestion, but yeah.
+
+**Speaker 2** _[24:22]_
+
+Are Dependabot and Renovabot not only for dependency bumping but also for co-duplication?
+
+**Speaker 1** _[24:31]_
+
+Dependabot is for versioning and seeing changes in a lot of places. Renovatebot can be used for both of them. If you have a code somewhere that is duplicated, it can be also added. Renovatebot can also check this. You just need something that Renovatebot checks. If you're working with a template, it can be the version of the template. It can be there maybe when was the last change. Renewitbot needs a variable to know when was the change due to apply the scheduling thing. But it's possible with Renewitbot to, I think, check all the changes.
+
+**Speaker 2** _[25:12]_
+
+So, and here's a, well, I think, well, interesting question. Is function programming the solution?
+
+**Speaker 1** _[25:19]_
+
+I mean, I myself love function programming, but, I mean, it doesn't, it isn't important what I love or what you love, it's important what the company that you work on or where you're working, what are the structures, I mean, you cannot do everything yourself and sometimes you cannot do everything in your function because of a lot of reasons that might be there because of how the data product is built, because of microservices and so on. You cannot always do it in your own way, but it can be a solution if you can.
+
+**Speaker 2** _[25:57]_
+
+I think you covered this actually in your talk. What is the difference between copier, cookie cutter and yeoman? And what are advantages and disadvantages of each?
+
+**Speaker 1** _[26:06]_
+
+Yes, I mean you can use all of them if you're into Python. As I said, Yeoman is really specific into web application and more for languages like TypeScript. It has some features that the others don't have. Between Copier and Cookie Cutter, they're really similar. I would go for Copier because in Copier it's also easy that if you have once a template and have a change in this template to have like updates in all the other repos. This is a little bit more complex than cookie cutter and you need also another library for cookie cutter to make this possible. So there are small differences and you just have to check which one would work for you.
+
+**Speaker 2** _[26:50]_
+
+Okay, any advice on how to test templates?
+
+**Speaker 1** _[26:55]_
+
+Test template.
+
+**Speaker 2** _[26:56]_
+
+Test templates.
+
+**Speaker 1** _[26:56]_
+
+Test template. This is actually a really good question. Because we had this, I mean, you can start to write scripts to be sure that each time that the template is created, you have some written code somewhere. But yeah, good question. I think I mostly did it until now manually because the template is once and you just check it once. But if you want, you can test it by creating a cloned repo from this template and check when the lines are set, the variables are set. I think even one person in our team did this, so you can also automatically do this. It's a little bit more work, but it's possible.
+
+**Speaker 2** _[27:42]_
+
+Okay, well, this was the last question. Thank you very much, Rana, and this is the end of the session. We'll see you back either here or in the next session. Thank you very much.
+---
+transcript_status: auto
+---
+transcript_language: en

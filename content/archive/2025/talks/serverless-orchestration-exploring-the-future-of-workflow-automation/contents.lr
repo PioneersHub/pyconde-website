@@ -1,0 +1,158 @@
+title: Serverless Orchestration: Exploring the Future of Workflow Automation
+---
+description: Orchestration is a typical challenge in the data engineering world. Scheduling your data transformation jobs via CRON-jobs is cumbersome and error-prone.…
+---
+created: 2024-12-06
+---
+code: AGY8CT
+---
+slug: serverless-orchestration-exploring-the-future-of-workflow-automation
+---
+speaker_names: Tim Bossenmaier
+---
+speakers:
+
+
+
+### Tim Bossenmaier
+
+Tim is a Data Engineer at Cloudflight, based in Innsbruck. There he architects and builds modern data infrastructures in customer projects, ranging from streaming ETL pipelines to data catalogs and entire data platforms. His focus areas include software engineering, cloud technologies, data platform engineering, and DataOps. Tim is also a passionate Open Source contributor, actively working on projects like Apache StreamPipes and DataHub, among others.
+---
+abstract:
+
+
+Orchestration is a typical challenge in the data engineering world. Scheduling your data transformation jobs via CRON-jobs is cumbersome and error-prone. Furthermore, with an increasing number of jobs to manage it gets in-oversee able. Tools like Apache Airflow, Dagster, Luigi, and Prefect are known for addressing these challenges but often require additional resources or investment. With the advent of serverless orchestration tools, many of these disadvantages are mitigated, offering a more streamlined and cost-effective solution.
+
+This session provides a comprehensive overview of combining serverless architecture with orchestration. We will start by defining the core concepts of orchestration and serverless technologies and discuss the benefits of integrating them. The talk will then analyze solutions available in the cloud vendor space. Attendees will leave with a well-rounded understanding of the tools and strategies available in serverless orchestration.
+---
+full_description:
+
+
+Orchestration is a typical challenge in the data engineering world. Scheduling your data transformation jobs via CRON-jobs is cumbersome and error-prone. Furthermore, with an increasing number of jobs to manage it gets in-oversee able. Tools like Apache Airflow, Dagster, Luigi, and Prefect are known for addressing these challenges but often require additional resources or investment. With the advent of serverless orchestration tools, many of these disadvantages are mitigated, offering a more streamlined and cost-effective solution.
+Beyond data engineering, serverless orchestration holds substantial potential for classical software engineering, especially as organizations explore serverless approaches for optimizing efficiency and reducing overhead.
+
+In this talk you will explore:
+* Basic Introduction to Serverless Orchestration: 
+      - What is orchestration about?
+      - What is serverless about?
+      - Why combining the two of them?
+* Offerings from Major Cloud Vendors:
+      - Analyzing solutions from leading cloud providers in the realm of serverless orchestration
+* Patterns and Solutions for Serverless Orchestration in Software Engineering:
+      - Exploring how serverless orchestration can be applied within classical software engineering contexts
+
+Participants will leave this session equipped with a comprehensive understanding of the serverless orchestration landscape and its applications across different engineering disciplines.
+---
+room:
+---
+day: Thursday
+---
+slot_date: 2025-04-24
+---
+start_time: 10:55
+---
+end_time: 11:25
+---
+slot_id:
+---
+track: Programming & Software Engineering
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Novice
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/AGY8CT.png
+---
+youtube_id: KgyZrqzKSZg
+---
+video_link: https://www.youtube.com/watch?v=KgyZrqzKSZg
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/KgyZrqzKSZg/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+All right. Yeah, thank you, Cody, for kicking up the session. Yeah, serverless orchestration. I think it was around two years ago when I self stumbled upon or in this topic when we were looking at work for a really lightweight approach how to work or how to deal with orchestration. And since then, or this has sparked my interest in the serverless paradigm, and I have familiarized myself even more within the time, and this is also the motivation for this talk, so I hope I can spark the same interest in your heads as well. Having that said, today's talk is really, let's say, introductory talk. I want to introduce to the concept, to the ideas behind it, and to some potential use cases where you can apply it best. I won't give you a very detailed dive into the topic. I won't give you an exhaustive overview of Tool Landscape. So just to spark your interest and to make you familiar with the topic. Before we dive in the content, let's quickly introduce myself. I'm Tim. I'm working as a data engineer in CloudFlight. And I live in the mountainous city of Innsbruck in Austria. And whenever weather does not allow me to be in the mountains, I also contribute to open source. Namely, Apache Stream Pipes and DataHub. Yeah, but now let's dive into the talk. I have a pretty simple and lean agenda. I want to familiarize you with the terms of orchestration and serverless and why it might be a good idea to combine them. I want to give you a short introduction and tools that are out there that allow you to do or to use serverless orchestration. And then I want to give some, Let's say real-world use cases where you can apply them and where you can realize what the strength of serverless orchestration is. And lastly, I will give a short wrap-up and give you the main thoughts I want you to take from this talk. Okay. I would like to start with defining both concepts. So what is orchestration actually? Orchestration is all about coordinating the execution of multiple computer systems, application tasks or services. So you try or you tie multiple tasks in an overarching process and want to have it automated in a reliable and in an automated manner. And orchestration is different to automation to the extent that automation is about caring about one task that is run in an automated fashion, whereas orchestration is about really tying multiple tasks together and taking care of dependencies and having everything in the right order and in the right place. Orchestration is particularly relevant in areas like service-oriented architectures, in virtualization, provisioning, and also in data and AI workflows. And the target is always to optimize and rationalize the execution of your workflows to save time, increase your efficiency and reliability, and remove redundancies. There are a lot of different types of orchestration. I have brought you four, which kind of give a good overview of for what purpose orchestration can be used. So in the area of container orchestration, it's usually about the whole automation and coordination of containers in the context of Docker and Kubernetes and stuff like that. It's about the lifecycle management of all these containers, resource provisioning. And in the area then of workflow automation, we think of typical tasks we chain together and we want to have achieved that span across multiple business applications and need to be kept in sync and well aligned. Then we also can think about orchestration in terms of application, where orchestration then is about synchronizing different business applications so that they share the same state and can operate on a common ground. And lastly, we can also think about service orchestration. This is typically tied to microservice environments where we think about the whole spawning of microservices, how they communicate with each other. And as the title already said, we are going to focus on workflow orchestration today. And we have brought you some typical tools that you might already or you probably already know some of them. I have put Cron here, although it's not a real orchestration tool. It's basically an automating tool. But since Cron is so widespread, a lot of people use it when they make their first steps towards orchestration. Okay, now it's time to think about serverless. So what is serverless? Serverless is a cloud native development model or paradigm that separates application development from the infrastructure the application runs on. To make this a bit more tangible, let's have a look on the different, let's say, abstraction levels of compute you can have. So imagine you're building a Python application and now you want to run it somewhere. Usually you start running it on your computer, so you have a physical hardware that lays on your table with a specific set of hardware specifications like a RAM or your CPUs. If you think that in a larger scale, for example in a company, then you have some server rack in the cellar or whatsoever. But it always has in common that you have a fixed set of resources you need to take care of, you have to be sure that all hardware components are running smoothly, so you have everything under your control, but you also have to take care of everything, and you limit it to the actual hardware you have bought, so you make kind of a strong commitment. Going one level higher in the abstraction, then you can go to the cloud, and you say to a vendor, okay, I need this amount of resources, this amount of RAM or CPUs, where I can run my application, and the cloud provider provides you those resources, and you're going to be built for them. And now we can even go one level further, where you say, okay, I just want to have this code run somewhere. I don't care how many resources it consumes to some extent. Just make it work for me. And that's then the serverless step. So of course, there are still servers in place, but you as a developer or operation guy, you You just don't need to care anymore because you just say, I want this code to be executed and then the cloud or the vendor takes care of it and only builds you for the resources your code has or your application has consumed. I bet you all know serverless applications to some extent. I think this logo is pretty common. It's the logo of AWS Lambda. It's an offering from Amazon Web Services which allows you to run small Python or any other programming language applications in a function as a service manner. So you just provide your software artifact and then AWS takes care about running it and automatically manages the compute resource also in a scalable manner and stuff like that. Lambda stands out to that extent that it is available since 2014, so since almost a little bit more than 10 years, and it's kind of the first mainstream implementation that really defined and popularized the modern serverless paradigm. And it's pretty, pretty common. So last year, to the 10-year anniversary, AWS published some stats, and Lambda is every month executed tens of trillions of times. So I would say that's really, really fast adoption. Okay. So now that you're familiar with both concepts, you might wonder, why should I combine them? So first point in my view is resilience. When you need to think about orchestration and you decide for a dedicated tool, then you introduce another tool in your system landscape which you need to keep running, which you need to maintain, which you need to take care of. So there's another point of failure in the system landscape. And in terms of serverless orchestration, you're freed from that. So you don't have anything you need to keep up running. The other one is cost efficiency. For serverless orchestration tools, you only pay for execution, so you have no overhead costs for the tool if you don't use it. And lastly, with serverless orchestration, scalability is built in naturally, so you don't have to take care about that, and it's already built in or it's available on default. Now I want to give you some tools at hand which you might use, which you can use if you want to dive into serverless orchestration. I've brought you the offerings from the three major cloud provider, AWS, Azure, and GCP. For AWS, it's step functions. For Azure, you actually have two competing offerings, Azure Logic Apps and Azure Durable Functions. For this comparison, I decided to go with Logic Apps, but depending on your use case, Durable Functions would be the more fair comparison. And then lastly, GCP Workflows. I've compared them on a very high level according to these four categories, and I'd like to start with the price, because I think the price is really what stands out for these offerings across all. So when you think about your workflow, you have tasks chained together. And what all of these offerings do is they build you on the transitions from one task to the next. And at the example of AWS Step Functions, you have every month 4,000 of these transitions for free, and an additional 1,000 transitions costs you a quarter of a cent. So that are really low costs, and this is the same for all these three vendors. They all have the same pricing model. GCP Workflows is even a little bit cheaper than AWS, and Azure Logic has exactly the same price than AWS Step Functions, but they charge an additional fee for their connectors, which brings me to the next point. BigApps really stands out with their library of collectors. They have around 400 collectors, which allow you to integrate your workflow with third-party offerings like ERP systems, CRM systems, social media platforms whatsoever. And yeah, there's a set of connectors that is available, and you can easily integrate your workflow with them. But as I said, they come in at a little additional cost. The other two offerings fell a little bit behind here. Connections is also something that brings me to the next point, developer experience. So I have to admit that the developer experience for all of these tools is for a real technical person not really great. So they are all a UI, they all follow a UI-based, let's say, no-code, low-code approach. So they have a UI editor where you can drag and drop your workflows together. They all are defined in a JSON statement in the background. And you can use this JSON statement to then terraform it or use whatever other framework you want to. Again, if you know how this JSON file is built, you can also modelize it and make it a little bit more sophisticated management. But I think that's a point that is a little bit of pity in this area. For step functions, it's kind of a little bit easier than for the other two. But I think for all of them, it's not really amazing how you can handle that as a developer. And then, lastly, feature set here, again, step functions stands a little bit out compared to the others because I think they are the most feature-rich offering and have some advanced features like callbacks and human loop offerings. If you see now this comparison, you might wonder, are there only hyperscaler solutions? Do I want to sell you hyperscaler specifically? No, of course not. There are also open source solutions. Just to name one, Argo Workflow is also a great solution here. But they all come at a cost. You have to some extent, again, care about infrastructure. Because you have to run these open source frameworks somewhere. In case of workflows, typically on a Kubernetes cluster, so you need to get a Kubernetes cluster somewhere. If you're in a large corporate environment where you already have your Kubernetes cluster, great. You can run it there. But then you probably have a team taking care of that infrastructure. So yeah, you have, again, this infrastructure component, just to have it mentioned here. But there are also great open source solutions. So now let's dive into some real world use cases. And the first one I'd like to show you is the Serverlesspresso. That's a demo case of AWS. They built a coffee shop at one of their fairs. And you can order your coffee with your mobile phone. And the whole process behind coffee ordering, so collecting the offers, managing the state of the orders, and then the barista finishes the coffee and completes it, so the customer can get their coffee. All of this is handled within Step Functions, so it is a pretty easy and lightweight solution built for this problem, and you see it works quite nicely. Besides this, let's say, more illustrative example, I have also brought some more real-world examples. So, when you think about companies working in the cloud, you usually want to give your teams a certain degree of autonomy. So, you might allow them to create custom permission sets. But in the end, mostly, there is some entity, some IT admin, some administration governance officers that need to approve these policy sets or at least want to review it. And for this example, you can come up with a great this is a great example for serverless orchestration. So whenever such a rule set is defined, you can think of this as an event, which then triggers one of our workflows where the policy is validated and temporarily revoked until it's reviewed. And then here a real cool feature of Stepfunctions comes into place. They have this ask user step, which allows you to get a human into the loop. And what you do basically here is you send the policy to an IT admin for review via e-mail or any other notification system you might have in place. And then the workflow pauses and keeps the state until the IT person has reviewed the policy and gives their approval or denial. And in this case, then policy would be applied. But I think the most important part is that the whole state management and the waiting time until the user has reviewed is completely taken care of by the serverless orchestration tool. What's really great, you don't pay until you wait for the response. So because you only pay for the transitions, it doesn't matter how long you need to wait for the IT person to answer the request, you don't pay anything for the waiting time. Which is, I think, pretty cool because in a non-serverless environment, you would still require compute effort to keep that state and therefore require resources for it. And another example, typical data pipelines, that's how I came into serverless orchestration. So we had the problem that, or the problem, the challenge, so to say, that we have a bunch of data pipelines we want to run on a regular cadence, in our case on a daily use case, but we don't want to really introduce another software or tool that runs continuously. And in our case, it just needs to run once per day. And then our workflow spins up our analytics environment. All our data tasks are orchestrated in the order they need to be executed. And then in the end, you have maybe some maintenance tasks and take care of that everything runs out smoothly, sends some alerts, and then stop the analytics environment anymore. Stop the analytics environment in the end. And yeah, the cool thing is so you only pay for the execution, so once per day. In our use case for, I would say, a medium-sized data platform, we didn't pay any cent for orchestration. We only used the free tie-off from AWS, which is, I think, a cool thing. And then the last use case I have brought you is about event-based customer insights. So when you think about a large project portfolio and maybe some web shop, you might think how or you might be interested in how your products perform in the wild and how customers think about it. And here you can come up with a pretty simple workflow that is triggered by social media postings. And here I realized the example using Azure Logic Apps. And here the connectors from Logic Apps come into play. So you could choose some of their social media connectors for any platform of your choice, like Instagram, X, Blue Sky whatsoever, LinkedIn maybe. And then you can also use a pre-built task to detect the sentiment of the social media posts, so whether it's a positive or a negative tone, and the customer like or dislikes it. And then you also want to know probably which product it belongs to. And here we then would use a custom implemented function that does the product recognition and you can then bring the results directly in a Power BI dashboard, for example, and persist it in the data lake for further analysis. All right. That already brings me to my conclusion. What I want you to take from this talk is basically four aspects. So serverless orchestration is really great in the aspect that it really brings down the operation effort you have to spend on orchestration. It is a great solution to build at low cost, and it perfectly fits for event-based workflows, and it really integrates well with them also in terms of scalability. In the title of my talk, I promised you that serverless orchestration is the future for workflow automation. And here I want to question it a little bit more, because I don't think that serverless orchestration is the future for workflow automation, because as a, so I showed you three examples of cloud providers, so of course this comes at the cost of vendor log in, right? And there are also plenty of really tailored tools, especially in the data landscape, that offer you features that you don't have in the serverless orchestration world. So you might use a dedicated tool for your use case. But I think serverless orchestration is a great extension of our developer's toolbox because it allows us to use orchestration easily at a really low or no cost. And yeah, it makes it pretty easy to get started. Yeah, in the end, I would like to thank you all for your attention. And I'm happy to answer any question you might have about serverless orchestration. Thank you all.
+
+**Speaker 2** _[20:57]_
+
+thank you so much we have questions coming up so yeah the first question is extra orchestration needed if each AWS lambda can work independently with input output and queues
+
+**Speaker 1** _[21:16]_
+
+It depends on your use case, I would say, so if your lambdas are just independent from each other, then not. But if your lambdas are to some extent dependent on each other, like I have showed in the example with the IT security workflow, I think then, yeah, of course, you can say I built something custom with cues or something like that. But I think the step function gives you a really handy framework around that then also just frees you from, for example, building your own cues. Yeah.
+
+**Speaker 2** _[21:58]_
+
+Okay, the next question is I have heard of about lambda functions has limitations of execution time Maximum 15 minutes or something. So what is maximum execution times for individual functions?
+
+**Speaker 1** _[22:12]_
+
+Yeah, so I think for AWS the maximum execution time is a year, something like that, so it keeps up to a year. It allows you to run one execution, for example, keeps the state in a waiting task. So that's quite long, so it's not as limiting as, for example, in serverless compute with the example of AWS Lambda, yeah.
+
+**Speaker 2** _[22:37]_
+
+Okay, so the next question is, what about traceability of these orchestrators? From experience, it was rather a challenge.
+
+**Speaker 1** _[22:48]_
+
+Yeah. So they all have some kind of UI where you can really trace or can see which steps have been performed, which was the input and output. But what's challenging about them is to really pipe the input and output really through them and to really get your head behind the actual input and output design of all these workflows, especially when your workflow is getting more complex. It's really a challenge and a part of the rather steep learning curve at the beginning, I would say.
+
+**Speaker 2** _[23:25]_
+
+Okay, great. So the next question, how dependent are you on the choice of serverless vendor? That is, can you easily change from AWS to another vendor?
+
+**Speaker 1** _[23:36]_
+
+That's the real bad thing about them, you're completely dependent to them. So you completely build on products of the vendor, so yeah it's not really possible to switch vendors without implementing your workflow from scratch. There then really something like Argo Workflows is pretty valuable, where you just hop to the next Kubernetes cluster and you're ready to start again.
+
+**Speaker 2** _[24:02]_
+
+okay the next question is how do you deal with python environments and dependencies on serverless nodes
+
+**Speaker 1** _[24:12]_
+
+So, orchestration itself or the orchestration tools are completely different, completely independent from your compute environment. So, your compute environment would then be defined in something like your AWS Lambda or your Azure function. So, yeah, that's up to there then or your EMR Spark cluster or whatsoever.
+
+**Speaker 2** _[24:33]_
+
+Okay, one last question. So do you thought of using kubernetes cluster instead of kubernetes jobs?
+
+**Speaker 1** _[24:43]_
+
+I'm not really sure where the question targets, but, yeah, you could use a Kubernetes cluster to run, for example, Argo workflows or use, yeah, as the question suggests, Argo jobs, Kubernetes jobs directly, but I'm not sure. If the person is in the room, maybe you can clarify the question, otherwise, just reach out to me if you want to have a better answer to that.
+
+**Speaker 2** _[25:12]_
+
+Okay, that's all we got. Thank you so much for your valuable insights, Tim. Thank you, everyone.
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -1,0 +1,148 @@
+title: Building a Self-Hosted MLOps Platform with Kubernetes
+---
+description: Many managed MLOps platforms, while convenient, often fall short in providing flexibility, requiring complex integrations, and causing vendor lock-in. In…
+---
+created: 2024-12-22
+---
+code: 3CYZUH
+---
+slug: building-a-self-hosted-mlops-platform-with-kubernetes
+---
+speaker_names: Josef Nagelschmidt
+---
+speakers:
+
+
+
+### Josef Nagelschmidt
+
+_This is what Josef says:_
+
+I'm Josef, an econometrician turned ML engineer. With a strong background in statistics and causal inference, I have developed my skills through rigorous work at institutions such as the University of Bonn and UC Berkeley, but also through the design and implementation of ML solutions at the Rewe Group. My passion lies in reducing model and ecosystem complexity, enhancing interpretability, and bridging the gap between academia and production settings in the context of machine learning. I believe that if we do not establish reliable machine learning systems, we risk failing to harness the immense potential they offer for humanity.
+---
+abstract:
+
+
+Many managed MLOps platforms, while convenient, often fall short in providing flexibility, requiring complex integrations, and causing vendor lock-in. In this talk, we’ll share our experience transitioning from managed MLOps tools to a self-hosted solution built on Kubernetes. We’ll focus on how we leveraged open-source tools like Feast, MLflow, and Ray to build a more flexible, scalable, and customizable platform that is now in use at Rewe Digital. By migrating to this self-hosted architecture, we gained greater control over our ML pipelines, reduced our dependency on third-party services, and created a more adaptable infrastructure for our ML workloads.
+---
+full_description:
+
+
+Many managed MLOps platforms, while convenient, often fall short in providing flexibility, requiring complex integrations, and causing vendor lock-in. In this talk, we’ll share our experience transitioning from managed MLOps tools to a self-hosted solution built on Kubernetes. We’ll focus on how we leveraged open-source tools like Feast, MLflow, and Ray to build a more flexible, scalable, and customizable platform that is now in use at Rewe Digital. By migrating to this self-hosted architecture, we gained greater control over our ML pipelines, reduced our dependency on third-party services, and created a more adaptable infrastructure for our ML workloads.
+
+Talk Outline: 
+
+1. Introduction (5 minutes):
+- The challenges of using managed MLOps platforms: vendor lock-in, integration complexity, and lack of flexibility.
+- Why transitioning to a self-hosted solution on Kubernetes can be beneficial.
+
+2. Proposed Solution (10 minutes):
+- Why Kubernetes for MLOps?
+- How open-source tools like Feast, MLflow, and Ray come together to form the core of a robust self-hosted MLOps stack.
+- Benefits of building a flexible, scalable platform that fits your needs.
+
+3. Building the Platform (10 minutes):
+- Practical steps for setting up and configuring Feast, MLflow, and Ray on Kubernetes.
+- Integration strategies and how to manage pipelines, model tracking, and feature storage.
+
+4. Lessons Learned and Q&A (5 minutes):
+- Challenges and takeaways during the migration process
+- Q&A
+---
+room:
+---
+day: Thursday
+---
+slot_date: 2025-04-24
+---
+start_time: 16:15
+---
+end_time: 16:45
+---
+slot_id:
+---
+track: MLOps & DevOps
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/3CYZUH.png
+---
+youtube_id: ZAW99CCc6Ok
+---
+video_link: https://www.youtube.com/watch?v=ZAW99CCc6Ok
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/ZAW99CCc6Ok/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:08]_
+
+We are going to talk a little bit about our machining platform at Reva Digital in the following 30 minutes. Before I go into the details, I want to give a little bit of context. I don't want to bore you with details, but I want to give you some understanding of our context. So, yeah, which domains our company is operating on and why we faced issues before building up this machine learning platform. So I guess most of you are familiar with stationary retail. Rave is a large retailer in Germany and across Europe. We have supermarkets all over the place. But what you might not know is that there's a huge supply chain backbone behind all of that, which provides the goods and services to supermarkets, but also to third parties. And more recently, we've also started a last mile delivery lever service in Germany. Maybe you have noticed some of the workers and drivers across the cities delivering groceries to our customers directly to their homes. But we have many more domains including pet supplies, home improvements, doors and also travel services and each of these domains is already supported by machine learning applications. As of today we have more than 150 machine learning engineers, data scientists working in an analytics department in Germany running these models and also many IT engineers bringing those into production and all of these domains actually bring unique challenges concerning machine learning you can imagine if client a customer visits our web web store they want a unique experience like they want a fast response let's say they have a basket where they shop something and the machine learning model is already calculating in the background how long the delivery person needs to deliver this then it needs a low latency to answer that right in the backbone a retail backbone optimality is more important and efficiency for this logistics so maybe you don't need a response within a few milliseconds but you need a good solution in stationary retail we have thousands of articles in the stores and there are complex interaction effects between these articles and consumer choice and substitution effects so complex modeling is required here and then our numerous applications come from different domains as you can see but also from different eras so we are not working on that only since yesterday but we have some solutions especially in the retail backbone that are from they have been around for decades and this has led actually to many point solutions across our company with hundreds of repositories that unfortunately sometimes lack standardization and as you know machine learning applications are also mostly software there are software applications they need maintenance and so all the things that are relevant for software applications are also relevant for machine learning applications especially the natural tendency of software to become more chaotic over time so as soft solutions mature let's say we have several teams working on independent solutions here over time the entropy increases of the code bases. As Michael Paulson once put it, all code bases tend towards chaos unless you've got Linus at the top who's not compromising about quality. And of course companies are aware of this problem and they have special roles and processes in place to keep this, to preserve the order. For example software architects, team leads and also refactoring budget and so on. But as we heard earlier in the keynote from Isabel, machine learning brings unique challenges to the place. For example, feature drift is something that usually don't have in software applications. But also the problem with machine learning is often there's no industry standards yet in many domains. Like at some point the team started with point solution, use scikit-learn maybe and or tensorflow and used TensorFlow serving to serve the model in the end. And another team used XGBoost, maybe. And all of these teams built their own point solutions to bring the model into production. They couldn't rely on a unified, let's say, spring framework like what you have in Java for the back-end, if you're in the Java world. And the field also evolves quickly. So this has led to error-prone and point solutions in this abstract space here where the teams drift away from each other and the processes behind that are often leaky also, like you throw notebooks to a production engineer and tell the person to run the model but the tooling is actually missing to operate this in a sustainable way. We don't have the same tooling sometimes, the mature tooling like software engineers for machine learning. So that was really urgent for our company to consolidate a bit and we started two years ago to work on our ML platform to give engineers the tools actually to make production ready and machine learning applications but not to limit them like we still wanted them to give them flexibility and to continue using these frameworks for example. So then the natural question was, should we build it ourselves or should we go to a managed ML platform? And since we are in the Google Cloud, the obvious solution was Vertex AI to look at. That's the Google solution for ML platform. But pretty soon when experimenting with it, we realized that it's not flexible enough. It has several drawbacks for us. Sometimes it is like a black box, these components, you cannot debug and go into it because it's managed and you have no access to the internals also you cannot integrate it easily with our rest of our core infrastructure so the back ends and front ends of the software engineering stack is usually in kubernetes in our case and also the monitoring stack that we have running there cannot easily integrate with vertex AI hosted and machine learning applications it was also not flexible enough for the range of projects as our company that you saw earlier we have diverse domains and all these domains have different libraries and tools that are necessary and this didn't map easily to Vertex AI. It was sometimes unpredictable because Google also has their focuses and especially now on Gen AI we have many traditional machine learning applications and some of the services or components were discontinued actually and it's a no-go for future proof platform, machine learning platform. It's also expensive and we also have the advantage that our core infrastructure team actually has already a lot of components managed as a self-service, for example, managed GKE clusters with custom tooling on it or customization like monitoring stack that we can draw on. So we can be a client ourselves with our machine learning platform and get managed GKE clusters with a core stack already for us. And that's a little bit of a spoiler already because, I mean, we use Kubernetes as the backbone of our machine learning platform. So some quick examples why Vertex AI is not flexible enough. Let's say we want to build an ensemble model. So this is a common serving pattern for machine learning. We have various models giving a prediction together. and this is not easily doable in Vertex AI. What you would need to do for that is either you go the left way which is a simple web app that encapsulates all of the handling but also the machine learning model but this problem then is this doesn't usually scale well because some of the components are input output or network bounded like the handling the other part of machine learning model might be compute bounded because yeah depending on the complexity of the model and on the other side if you go the micro service route then you go into different problems you could do some of the pre-processing and post-processing in the web app but then this interface between the web app and the model server who only focuses on the machine learning model and is compute bound becomes hard to maintain and to stay in sync because the interface is usually very constrained just sending tensors between the model and the web app and if you put the pre-processing into the model server then at some point it becomes IO bounded or network bounded again because you want to communicate maybe with a feature store. So this becomes complex pretty fast with Vertex AI or these serving patterns and that's why we built our own platform on Kubernetes. We followed a few core principles here I want to go quickly over, which is modular architecture. So the ML field is developing quickly. We want to not build a fixed sculpture for our users. We want to build modules that they can use easily and that we can also swap out with minimal disruption and also independently develop those over time. The problem then is maybe you need still a lot of glue code to bind together all of these components if you do it in a modular fashion. But there is Kubernetes coming in as a backbone because this is a unified control plan that we have to bind all these things together. If you do it Kubernetes native, you get the things like deploying things, lifecycle of services, networking, security, and observability basically for free or easily set up between these modules. And what we also followed was a MVP approach with fast, iterative evolution. We wanted feedback from users and teams that actually use these modules and see which ones make sense and which don't. And we also always paid attention to emerging standardization efforts, which is one example would be Ray, which is becoming more and more kind of an industry standard as an open source library for distributed compute in the machine learning world. And we had to look. We always paid attention that we don't build custom solutions are outdated tomorrow yeah so how did we set it up we start with a core infrastructure so we have a layered structure on the left is what our core infrastructure teams provide which is managed kubernetes clusters with some customization on top and manage databases less like Postgres and on top of that we are a client with our machine learning platform and we chose a few of these core components we wanted to start with, which is a feature store, modern registry, ML compute engine, I already hinted at it, we use Ray for that, and observability component. And on top of that, this is more like the physical layer, we wanted also something for the users to have an easier life, to bring machine learning apps to production. We didn't want to bind them like to abstract everything away and then they need to learn the abstraction but tomorrow the abstraction is broken because ML is developing quickly so we only focused on lightweight components like our orchestration tool of choices airflow we give them custom operators to interact with these physical components there on top and also reusable components like decorators to quickly built maybe fast API backed ingresses for a machine learning application for these serving patterns that we had before like when you have several models as an ensemble and you don't want to write this a glue code to bind those together even you use ray or something you need something like an ingress on top so then on the other side we have the teams that build machine learning apps and they should have the flexibility still to use all of these to make all models in these cases like regression classification but also discrete optimization for warehouses for route planning maybe this should be supported by our platform and in the middle there's a gap which is community support so we draw heavily on open source so we don't want to waste our efforts to build our own feature store from scratch and do what others have done better before maybe, so we basically implement these open source libraries like Feast or MFLow on Kubernetes to make them production ready and the users then can also interact with these libraries for their machine learning apps like PyTorch. So that's along the lines of this diagram, we are somewhere in the middle here, so between more control and less control we are in the center where we have off-the-shelf open-source software but we do in-house operations like self-hosted kubernetes or sorry self-hosted MFL for example on infrastructure as a service the architecture I don't know if it's easily visible there but this is a rough and rough architecture sketch of our platform. Currently the feature store has moved already into the Kubernetes domain there, into the Kubernetes cluster, but that was an early sketch. So when the data leaves our data lake house it actually goes through the feature store into our training pipelines and the training pipelines create models in the model registry which is then used to do servings and we have also scheduler which is Airflow on the left we have artifact registry for code and code artifacts and we will zoom in a little bit now I don't want to go into detail into some of these core components so first of all let's look at the model registry for those who are not familiar with it I will give a really quick recap what it is we implement MLflow basically for that and model registry is basically in versioned artifact registry not for code but for machine learning models so you get version control for the models that you trained before and you know exactly where they currently are are they in staging and dev still in experimentation or in production you got also lit you get lineage so all the parameters metadata and metrics you collect during the training you can add as metadata to the model registry when after you train the model or also during it so you get a lot of introspection there into the process and you have auditability from a platform perspective that's crucial to see who and when the model was who registered a model when the model was registered and to give us some control over that so how did we then set it up? Well that was actually pretty easy for MLflow on Kubernetes you just need a relational database we use Postgres for that for all these metadata components here on the left you need a bucket like object store like GCS for the artifacts and the core of it is actually then just a MLflow server which is a deployment on Kubernetes that's scalable and we built a production ready image for that and the hard part here was actually just to find in the MLflow documentation which environment variables are all supported because it's so chaotic this documentation but after that you get a basic running version of a model registry in kubernetes and then of course you have security considerations role-based access control monitoring and so on but this is also easily solvable with infrastructure as code so we use Terraform modules for that that we wrote to implement these additional layers on top of the MLflow server. So that was a low-hanging fruit definitely for our platform it made the life of users much easier and when you want to do GitOps and follow the GitOps and DevOps principles you need version control for the whole machine learning process and the model registry is just at the center of this process actually and we also plan to extend the model registry for automated testing of leaks maybe in our machine learning models that can be built on top of that after a model has been registered then the next thing is a feature store feature store also quick recap is basically just an abstraction layer on top of physical data that you have maybe you already have a data catalog or something similar in snowflake or big query whatever but when it comes then to the machine learning training pipelines and serving it's handy to have an additional abstraction layer on top of that I will give an example later that indicates a little bit why it makes sense to have this additional abstraction but just quickly to give some high-level points it is basically a centralized feature management for your teams the single source of truth so people can also collaborate on features they can reuse features you can also control which users have access to which features and you have consistency between offline sorry between model training and model serving so you know always that the same features are used during training as in production when they are served and they can be served pretty low latency with a feature store implementation which layers are there in a feature store we implement the feature store based on feast so open source library. Feast has these layers here which is the management layer, the data layer, service, security and client layer. The interesting part here is the service layer so you have several micro services that you deploy in your Kubernetes cluster that take care of the registry where the features are actually registered upon creation, single point of truth registering then the thing in a Database and then you have a server that serves those Informations and then you have offline and online store servers So during training you might need a large chunk of slow data like of training data you would contact the offline store server and During serving you would contact the online source server for the last Last version of a certain feature to get it really quickly with low latency back to you And the nice thing is Feast supports like a security layer with role-based access control or OIDC when clients talk to the service layer. And they do it in a safe fashion. Well, a quick example why it can make sense, this abstraction. Maybe you'll see then some of the advantages. Here we have a simple example of an entity, which is orders. So we have to do with a lot of orders at Raver. Each order has several features which are in this case just region and items So each order is assigned to a region in Germany and has a number of items This is a count actually here and you see there's a data type for each feature and also description And you see at the bottom that there's also a source Which is big query source When you define this feature view, this is the abstraction that the Feast library offers you on top of the physical data. And then when you use it for training or for serving, you define the so-called feature services here on the bottom, which is a collection, a set of features in a versionized form that you can use in the same way in training and serving. And Feast has APIs to give you these features, also features across different tables that can be joined in a point-of-time-safe way, so you have no leakage of future values, and you don't need to implement this yourself. And the nice thing is all of this metadata here on the top, which are tags, we defined this as a pidentic class, when you train a model, after the model is trained, these are also dumped as metadata into the model registry that we saw earlier. So when you serve the model, the serving has access to this and can automatically maybe generate a pedantic request model for fast API, for example. So when a request comes in, the model already knows, here, I expect these features with these types. If they're deviating the request, I will return an error response. Or also for Prometheus you can think of generating feature drift metrics automatically, dynamically based on these metadata. So this is just one example where this abstraction is interesting. And finally at the core of our platform is our compute engine Ray. Ray deserves its own talk here, but just quickly point out why we think this is really a game changer for us. from first of all from a user side user perspective it can unify the training pipelines that we had before where you oftentimes when you have large data you start with spark or something to do pre-processing then you move it to another framework for hyper op maybe for tuning and in the end for serving you need maybe tens of flow serve for serving something like this and this is all abstracted or unified and the rave framework which is let's skip a little bit here which is a unified and distributed computing framework in its core that is Python native so you have a Python interface you can write your custom normal Python code but in the background Ray takes care of this doesn't matter on your local machine or in the cloud to parallelize this and also has high level APIs like for the whole chain of the end-to-end machine learning pipeline like for pre-processing the data for training tuning and serving and the nice thing from a platform perspective is it's a really lightweight integration like it's just an operator that you install into kubernetes the operator manages three custom op resource definitions which is a ray job ray cluster and ray service and the users can then start these ray drops with their Python scripts easily and the platform just needs to run this one operator actually that bundles this domain specific knowledge from Kubernetes with the domain specific knowledge of parallel compute. Yeah and this really was a game changer for us and many companies it seems to be becoming kind of industry standard Spotify and Reddit have been migrating ML platform from Kubeflow to Array. This is a good signal maybe and we have been very happy with this. And one last thing to the lightweight SDK that I talked about earlier. We provide not heavy abstractions but just a few of these tools that were often coming up as custom implementations by our teams. They built this from scratch every time, like every team had their own solution that we wanted to centralize. For example, Airflow operators to interact with Ray on Kubernetes or with the feature store. Or also decorators for the standardized serving patterns, like a multi-model ANGRIS we provide. And some templates for monitoring, for drift detection, because there's no standard yet for drift detection. We built a solution there for the teams to iterate. And with that, I want to conclude and give space for a few questions.
+
+**Speaker 2** _[26:03]_
+
+and thank you very much for this talk I think there are several questions so the first one did you consider cube flow if so what were the reasons for deciding against it
+
+**Speaker 1** _[26:17]_
+
+Good question. We considered Kubeflow. We felt the abstractions they chose, in particular the abstraction of this pipeline-based workflows, so you define Kubeflow pipelines as a base entity, was not as flexible as abstractions that Ray offered with their unified and simple interfaces, which are Python native. So we didn't want orchestrating of orchestrators, but we wanted actually the simple interfaces that Ray offered and this was provided much more flexibility and also speed like yeah it felt local the development with Ray whereas with Kubeflow you needed to build a whole component dockerize it and then run it just for a simple maybe daytime operation
+
+**Speaker 2** _[27:09]_
+
+Okay, the next question. How many data or how many engineers were required to build the platform and how long did the whole endeavor take?
+
+**Speaker 1** _[27:18]_
+
+Yeah, we are just actually a small team piloting this thing here with four people for two years And it's now becoming more and more Integrating into the foundational layer like the core infrastructure layer Not all teams have yet have already migrated to this pilot project But we are already hosting like a handful of teams that have given positive feedback and now Rave is considering putting this in the core infrastructure stack.
+
+**Speaker 2** _[27:52]_
+
+Next question. How do you drive adoption of your platform? So, for example, in case teams spinning up their own ML flow or building own customized solution for the problem at hand?
+
+**Speaker 1** _[28:04]_
+
+Yeah, we have various teams already that have built MLflow in the past and still using it. And we try to drive adoption by showing the integrations that we provide also this lightweight layer that I showed at the end makes it much faster actually to go from experimentation to production. We have several cases already where it dramatically decreased the time from weeks to several days just and Yeah, then we try it out with the teams. They're usually happy to get support actually
+
+**Speaker 2** _[28:40]_
+
+Okay, next question. As you decided Kubernetes to be the computing backbone of your platform, why did you choose Airflow instead of Kubernetes equivalents such as Argo workflows?
+
+**Speaker 1** _[28:50]_
+
+Yeah, good question. We were already working with Airflow in the past. We had a hosted solution, Cloud Composer, and we have a lot of custom code there and custom operators. So we are thinking about migrating this as well to a Kubernetes native solution. Unfortunately, Airflow doesn't have multi-tenancy as of today. Yeah, but it's a thing of the future that we are considering, yeah.
+
+**Speaker 2** _[29:20]_
+
+Okay, thank you. Unfortunately, the time is over, but there are a lot of open questions, so I invite to ask him directly, and then see you for the next talk.
+---
+transcript_status: auto
+---
+transcript_language: en

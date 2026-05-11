@@ -1,0 +1,198 @@
+title: Design, Generate, Deploy:  Contract-First with FastAPI
+---
+description: This talk explores a contract-first approach to API development using the OpenAPI generator, a powerful tool for automating API generation from a…
+---
+created: 2024-12-19
+---
+code: ZACM3E
+---
+slug: design-generate-deploy-contract-first-with-fastapi
+---
+speaker_names: Dr. Evelyne Groen, Kateryna Budzyak
+---
+speakers:
+
+
+
+### Dr. Evelyne Groen
+
+_This is what Dr. says:_
+
+Hello! My name is Evelyne Groen and I am a Senior Machine Learning engineer at Malt. A long time ago I studied physics in Amsterdam, after which I moved to Berlin to discover the world of data science. Currently I'm working at Malt as a machine learning engineer exploring the boundaries between devops and data.
+
+### Kateryna Budzyak
+
+Kat is a Senior Machine Learning Engineer at Malt, the freelancer marketplace, where she works in the relevancy and matching team. She has a background in bioinformatics and passionate about beautiful code.
+---
+abstract:
+
+
+This talk explores a contract-first approach to API development using the OpenAPI generator, a powerful tool for automating API generation from a standardized specification.  We will cover (1) what would you need to run to have a standard implementation of the FastAPI endpoints and data models; (2) how to customize the mustache templates that are used to generate the API stubs; (3) share some ideas how to customize the CLI and (4) how to maintain the contract and how to handle breaking changes to the contract. We will close the session with a discussion of the challenges of implementing the OpenAPI generator.
+---
+full_description:
+
+
+Let me share a story with you about two developers working at a Malt, Europe's leading freelance management system & marketplace. 
+
+Dev-1: Hi there! We have an issue on production. It seems that a request was sent where “company id” is not given. 
+Dev-2: Oops! But I thought we agreed on an anonymous mode?
+Dev-1: That’s actually a great idea. You mean that company id is not required? 
+Dev-2: Exactly!
+Dev-1: Thanks! I will update the data model and push the changes! 
+
+As the conversation above suggests, sending data between two applications can easily fail if the requirements are not defined up front. Even for simple requests a lot of decisions have to be made: are the fields optional or mandatory? What about the returned payloads and their data types? Do we need default values? If we are not clear what we will expect (from the request) and what we will return (in the response), in the worst case, the request will fail and we spend time debugging, like above.  
+
+To overcome this issue, we decided to move to a contract-first approach, where we define the exact request and response and generate the endpoints and data models from there using the OpenAPI generator. The OpenAPI generator is a powerful tool that allows you to automatically generate API client libraries, server stubs, documentation, and configuration from an OpenAPI specification, or a “contract” between two applications. This contract forms the basis for generating the endpoint stubs for our python applications but also for the client models and code. Starting with the contract can significantly speed up the development process and improve the consistency of your API implementations.
+
+During this talk we will address the following topics: 
+- The vanilla implementation that generates endpoints and data models: what would you need to run to have a first version of the FastAPI endpoints. If the setting allows for it, we would show a short demonstration. 
+- How to use customisable templates: we customised the mustache templates that generated the endpoints and data models so we could generate our custom FastAPI app. Also we added examples to the generated data models as these were not available in the default implementation. 
+- How to customise the CLI tool and ideas for setting up your CI pipeline: we will share some ideas how to customise the CLI and how we used it in our CI pipeline to prevent discrepancies between the contract and the generated stubs.
+- how to maintain the contract and how to handle breaking changes to the contract
+We will close the session with a discussion of the challenges and benefits of implementing the OpenAPI Generator. While it offers standardisation and best practices, it can introduce additional complexity, especially with the tool still in beta. We'll share our experiences navigating this trade-off.
+---
+room:
+---
+day: Thursday
+---
+slot_date: 2025-04-24
+---
+start_time: 10:15
+---
+end_time: 10:45
+---
+slot_id:
+---
+track: MLOps & DevOps
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/ZACM3E.png
+---
+youtube_id: 7x1cGhyjv7c
+---
+video_link: https://www.youtube.com/watch?v=7x1cGhyjv7c
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/7x1cGhyjv7c/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:08]_
+
+So, thank you for joining our talk. My name is Eveline. With me here is Katerina. And we'll be talking about the contract-first approach using FastAPI. But before diving into the details, Katerina will tell you some of the details.
+
+**Speaker 2** _[00:21]_
+
+Thanks, Evelyn, and hello, everybody. Let me first share a few words about MALT. So we are the freelancing marketplace leader in Europe with more than 800,000 freelancers where freelancers and companies make the perfect match. So the core problem of the data science team is to make that perfect match happen either through a more manual search or via automatic matching. So please welcome our team. So the data science team at MALT is divided into machine learning engineers who mainly focus on our matching algorithms. Then we have our dear machine learning researchers who explore new algorithms, especially since Jenny Aiboom. The MLOps team who provide and maintain the infrastructure of our data science apps and who introduced the contract-first approach to us. And last but not least, our data scientists, among other things, work on gender bias studies of our matching algorithms. So what to expect in this talk? First, we will start with the basics. What is an API actually in the role of data models? So we are, like, on the same page. You will see an example of code-first approach using FastAPI and the challenges we experienced. And then Evelyn will guide you through the contract-first approach of API development with the tool, the OpenAPI generator. And in the end, we will show the key takeaways for choosing the right strategy. So let's have a look at our matching service at Malt. As a client, you can send a project request, and one of our algorithms behind will recommend the best freelancers for this project based on skills or experience level. how can the client actually communicate with our service well, therefore you need a web API. So an API is an interface between two applications. Here the API digests the input from the client and sends it to the matching service in order to get the valid response and in our case our clients are the backend engineers who maintain the platform and utilize our data science applications. So So they send a request with the project description and required data in JSON format. So concretely they interact with the resources by using dedicated endpoints, the URL, using standard HTTP methods. And then our matching service does it magic and sends the retrieved and ranked freelancer as a response also in JSON back. used like REST API because of the loose client-server coupling, for example, the client application can be written in Java or Kotlin and our service can live in the Python world. So once running, everything is fine, but you also need to be able to adapt to changes. For example, what if you want to add some localization functionality to filter out freelancer far away from the project? What usually happens is that you create some Jira tickets, you communicate through Slack, but it's really challenging to keep track of those changes. What is really desirable is to align on one source of truth for both teams, like one file which can be processed by different teams, and this is what we call an API contract here. We will come to this later. first see an example so you can see a toy example in swagger UI at the top you see the endpoints which connects to the server resources so when the client arrives to find the freelancer like the post route can be called with all required in force about the project like required skills and the body like adjacent format and then also get the response with the freelancer at the bottom. Let's have a look at the code first approach using FastAPI in Python. So we use FastAPI because it's really efficient in terms of speed and it comes also with a bunch of features like decorators and support for typing. So decorator here defines it as an endpoint which its client can call with a POST method. And inside the function definition, we instantiate the matching service where we can predict the best freelancer. And let's assume we get this code freelancer as this list of dicts. So FAST API automatically converts it to JSON. So at this point, pretty simple, but we need, of course, a validation step because we want to make sure the client doesn't sense data in the wrong format. For example, the project should be, like, fixed length. Because even you provide type hints, like in function signature, it's Python is still very flexible, but it's also, like, a weakness when it comes with, like, handling APIs. This is an example how you should not do it, like implement some if-else statements. Because what you really want to use is the Pydantic library and its data models. So Pydantic is the most used data validation library for Python. And the primary use case is that you define the request and the response schemas using Pydantic data models or data classes as shown above. Because the base model has a lot of important and useful methods, like for serialization to JSON and also transformation functions, like converting strings to bool. And that would look something like this. So as you can see here, we define the request and the response as pydentic base model. You can also use nesting and also inheritance. And here the examples are also quite important, so the user can already have, like, first documentation and can start right away using your API. So here you just import your defined models and FastAPI uses those models to automatically validate the request and response and would also raise the right error. So you don't need to handle this. It does it for you and it also does the automatic serialization of the request to your defined types and to JSON. And please also note, the more you define in the route and PIDENTIC model, the more detailed your interactive documentation will be, which helps a lot. Right. Let's do a little recap before we continue. So I introduced to you what a REST API is, which is defined by a set of rules and HTTP methods, how FastAPI is helping us achieve that through the decorators, and I also showed you how fast API uses PyIdentic to serialize and deserialize from objects to JSON. But there's one piece of puzzle we did not share with you, and that is the Open API specification. Evelyn, can you tell us more about that? Yes.
+
+**Speaker 1** _[07:45]_
+
+So I will be telling you a bit about the open API specification and for that I will take you back to the figure that Kata really showed you a bit earlier in this slide Actually fast API is using the type hints that you created with Pydentic to Generate or to power the Swagger UI you see here in this figure Can I see maybe a raise of hands who use the Swagger UI to interact? Yeah, I guess a lot not everybody But you can basically use the Swagger UI to interact with your API So, you see again here the endpoints and you see the request and the response. But what you can also do is you can click on that little blue link you see on the top OpenAPI.json, and this will take you to the OpenAPI specification. And here you can see, for example, when we look at that first get freelancer endpoint, so it will just retrieve a freelancer from our database, and you see that also in the In the JSON of the open API specification, there is again, under path, a freelancer endpoint, and if everything goes okay, then we get our freelancer response, again, the same what we see on the right. So essentially, the open API specification is like a blueprint or a standardized way that it sort of combines all your endpoints and your data models. So let's have a look at how it looks like in YAML, because it's a bit better readable. So again, you see under paths, you see your endpoints, and then you see in the components, you see your data models defined. And what God shared with you, what you can do with your data models, like inheritance, like putting restrictions on string length, et cetera, the same thing you can all do in this open API specification. You can inherit properties from other base models, et cetera. Also what I want to share with you is if you're interested in applying the contract-first approach yourself, we created this little toy model, PyCon Match and Surface, so you can go to the Git repository and you can see the code that we used throughout this presentation and then you can apply, yeah, the contract-first approach yourself. I will show it later also in the presentation. But why am I talking about the OpenAPI specification, right? So so far we've been discussing the code-first approach. So we think, okay, these are the endpoints that we need, these are the data models that we require, so our response and our, sorry, request and response model. And from there, FastAPI generates the OpenMBI specification, which in turn used to power the Swagger UI, but we don't actively use it per se. And actually, we encountered some issues when we tried to make changes to our API. So at MALT, we have an engineering team, and they are the main consumers of our matching service. And, I don't know, we made a change, we added a new filter, for example, so we added a country filter, and then we were not super clear on the specification beforehand, so we forgot to mention it was required. These discussions took place maybe in a year ticket, maybe on Slack. So we implemented something, didn't really work, we had to iterate again, so it was not the perfect the perfect approach then we thought okay why not use the open API specification right it comes out it's like a complete definition of our API we give this to our back-end team and they can work with that but as it turned out apparently the open API specification generated by fast API was not standard enough to be used by the Kotlin back-end of our engineering team so then we had to look for a completely other way and this turned out to be the design first or the contract-first approach. So, key slide of the presentation. So, in the contract-first approach, you start with the OpenAPI specification, so we discuss with the engineering team how our API should look like, and from there, we use the tool OpenAPI Generator that automatically generated the endpoints and the data models. Yeah, so let's have a look. So, before I will show you in detail how the OpenAPI Generator works, I just want to show you how this would look when you would use it. So you would need to install it. And then you would run, I hope it's visible, but the other access screen. So there you run the command that you see here on the top, it's an open API generator, generate minus I. There you put the contract, which is our open API specification. Then you choose your generator. In our case, it's a Python Fest API, but you could choose other, you know, if you have a Flask application, there's also a generator from there. And then you put in a customized template. I will come back to that later. And then when you run this code, you would first see in your, I don't know, favorite IDE, you would see in the terminal all the files that you are creating, so that would be your endpoints, your data models, and also all the files that you are ignoring. I'm ignoring quite a bunch of files, like Docker files, et cetera, because I was not so interested in them for the purpose of this presentation. So let's have a look, oh, I have to now move, I click, ah, thank you. So you see I'm running the code on the bottom, everything is generated, I refresh the directory and now I see that there are two extra directories created. One is with APIs, which contains the complete, yeah, new endpoint stubs with the request and a response body as defined in an OpenAPI specification, and then in our models, for example, you find our Freelancer model. Wow. Great. Everything done. But how does it really work? So let's look into a bit of detail. So we start here on the left with our OpenAPI specification. So if you're new to this, the OpenAPI specification itself looks maybe a bit, I don't know, unfamiliar or something, I would recommend for the first time applying is to look at the specification of a project that you already know, or you can use the toy example that we have here in this talk. Then you run the OpenAPI generator itself, and then, yeah, you would get something like here your main .py as you see to the right. There, by the way, there are other generators that you could use. We chose this one because it was already in use by our back-end team. But how does it now really work? So under the hood, it uses something like moustache templating. So can I see a raise of hand those familiar with moustache? Ah, quite some of you. So I was not before where I started this project. It's a logic-less templating language, so there are no for loops. no if-else statements, and just a template that you populate with the data, and the data is your OpenAPI specification. So here on the left, you see the specification. And then you see here in the middle a mushesh template. So I hope it's all readable. But you can see the curly brackets. So this is, I guess, where the name is coming from. And there are basically a lot of placeholders in there. So I highlighted something like app name, app description, and app version that comes directly from the specification sheet to the left. You can also configure, when you run the generator, you can figure some parameters like the source folder or the name of the folder where the APIs are going to land in, et cetera. And you combine these two things, or that's what the generator does, and then, again, you land into your main.py. Then there is one little detail that I did not share yet. There is like the actual implementation, and this is something you would still need to add, right? So what the generator does is it generates the endpoints, so the get freelancer, it is like a stub, so it just generates the name of your endpoint, the expected request, and the expected or the response body. you defined any, but the actual logic, so the fact that your endpoint is going to make a request through your database, retrieves the freelancer profile, and then returns it to you, this is the one line of code you would need to implement, so you need to import your favorite database client, or, I mean, the database standard you're using, and then write a little query that actually would retrieve the freelancer profile, or in our case where we have like a matching surface, we call our model and we let it predict the best freelancers for the job that we were interested in. And with that, we're ready to deploy. So what happens when we deploy? So so far we were talking about the surface side only. So we have our open API specification, we run a generator, we get our endpoints, and we have our data models. That's on the Python side. But now actually also on the client side, so our engineering team also uses our contract and generates the client and the data models. So it's really crucial that everything is in sync. And we, yeah, had a sort of... So we did two things to make sure that everything was in sync all the time. So the first was that we said, okay, the contract now itself is a single source of truth. We put that in our repository, in our Git repository, and we're the ones maintaining it. So that means if there was a request coming, no matter from where, we would make sure that we made the changes and communicate it to the engineering team so that they could also test regenerating the client and the data models on their side before deploying. What we also did is that we added a step in our CI-CD pipeline. So what we simply did is we took the open API or the new open API specification that we checked in, regenerated the endpoint and the data models from there, and then compared those files that we checked in, so only if they were exactly the same, we could deploy. Yeah, this already takes me to my last slide. So what's our take? Yeah, so obviously we were really happy with the fact that it streamlined a lot of the The discussions we had around the contract, a lot of bugs because we did not define a parameter as required or something, you know, everything was sort of set in stone because we had now this contract as a base for our discussions. As a really nice side effect of using this generator is now that our applications all are standardized. There's one folder structure, there's one way we define our data models, there's one way we define our endpoints, et cetera. There's no more, you know, one developer has a slightly other idea how to implement a data model or something. Right? It doesn't happen anymore. So that will facilitate onboarding. Also, there's a lot less coding to do because you just have to implement, you know, the logic of your app, like the fun part, and not think about, did I add the restrictions in my data models or something. And then there was one thing I want to share with you, and that's regarding customization. It's not per se a pro, I would say. But we did not, for example, have the standard fast API app, but we had a little wrapper around the fast API that contains some logging, and we could adjust the templates in such a way that it would generate our own custom fast API app. Also the open API generator is at the moment still beta, and we found a little issue with the current... It was there still last week. We opened a ticket also on their site, and they're looking into it. But the issue was that the examples that you provided in the OpenAPI specification were not by true to the Podendic data models generated by the OpenAPI generator. So if I would provide an example like I had a freelancer location, city Amsterdam, then Amsterdam was not visible in my Swagger UI, which is really a shame, because this is, You know, you want to have, or I personally would really like to have like this full example that I can test my API, just press, click, and then it works. So we adjusted the templates to make sure that all the examples were in. This was a bit cumbersome to do. If you don't want to do it, you can look on a repo and you can take maybe not the best implementation of Moveslash templating, but it will work. So these were some challenges. Obviously, I mean, I mentioned it already, so it's still in beta, so maybe the current OpenAPI generator is not, I mean, there could be another issue that we have not found. What is also a bit challenging is that you have to learn a bit how to use OpenAPI generator, maybe get into mustache templating, especially if you don't want to have the vanilla implementation as is given to you by the OpenAPI generator itself. And I think this is also the main, yeah, challenge that we have, actually, is there's now a little bit of maintain it, right? You have to maintain extra tool. And if you do something with the templates, you have to maintain the templates as well. But despite the shortcomings, we're really happy with, yeah, the speed of, yeah, how we can deploy new apps in a standardized way quickly. And it's, like, reducing the amount of bugs I think we had significantly. Yeah, that's already the end. Thank you so much for joining. I hope you, yeah, were convinced a little bit about the Controvers approach, and we hope we can answer any questions you have or approaches later. Thank you.
+
+**Speaker 3** _[22:01]_
+
+so much like we have many questions coming up so to get started with what are your strategies if the externally defined open ai definition is updated while you are still developing
+
+**Speaker 1** _[22:13]_
+
+Yeah, we didn't experience that yet, so I guess we would test it first and then update it. We have quite some custom templates at the moment because of this, the fact that we have our own little wrapper about the FAST API and we added these examples, yeah, but I guess with any other tool we will try it and if it works we go forward.
+
+**Speaker 3** _[22:42]_
+
+Okay, okay. So the next question is, is there a way for consumers to select specific endpoints so that the code generator only create code for those endpoints reducing unnecessary overhead?
+
+**Speaker 1** _[22:57]_
+
+Yeah, you could just cut them from your open api specification right also from
+
+**Speaker 2** _[23:02]_
+
+Also from moustachefile That template probably
+
+**Speaker 1** _[23:06]_
+
+Yeah, but not for it, because it will fill out the name. So you would have to cut it out. But I'm not sure I understand the use case of this. Maybe that person can approach me later.
+
+**Speaker 3** _[23:19]_
+
+Okay, so another question, how do you do API versioning, like folder structure, deprecations and all?
+
+**Speaker 1** _[23:26]_
+
+Yeah.
+
+**Speaker 3** _[23:27]_
+
+Yeah.
+
+**Speaker 1** _[23:27]_
+
+That's also a good question. So it's especially interesting when you make changes to the API, for example, that you change a required parameter or something like this. So what the strategy is of the engineering team, and we will probably also apply, is that they will first try to make a change that both versions exist together, and when When everything is working, they will remove, I don't know, the part that is no longer needed. And with the versioning itself, I mean, since we checked everything into Git, we made minor changes. We bumped it, like, with a minor version, another with more.
+
+**Speaker 2** _[24:10]_
+
+Also, the first time I used the OpenAPI generator Evelyn provided, it was like the first time I make also like different commits and I have like the circle CI-CD pipeline failing and I was like, oh, okay, I committed files which were already deprecated because now I have like another model and so it's like adding this to the CI-CD step is really important to compare what you commit and what is generated.
+
+**Speaker 3** _[24:40]_
+
+okay great so just to continuation like similar question how do you handle multiple api versions in code and deployment
+
+**Speaker 2** _[24:50]_
+
+Multiple APIs?
+
+**Speaker 3** _[24:52]_
+
+Multiple API versions in code and in deployment.
+
+**Speaker 1** _[24:56]_
+
+I don't think we really do that.
+
+**Speaker 2** _[24:59]_
+
+yeah so what we do on our data science like on API side we have like our changelog and then a toml file and then we just pump your version each time you like wanted to merge
+
+**Speaker 3** _[25:14]_
+
+Okay, one last question. How can you begin the transfer transition from code first to a contract first API?
+
+**Speaker 1** _[25:22]_
+
+Yeah. So I would start with just taking the specification that is generated from your Vesta API app. So you can, I don't know, so you saw how you can access it through as a JSON format. You can also use it in JSON, but you can also make it into a Yama file to be better readable. Yeah. And just look at examples of other specifications for any kind of input. Yeah. Yeah.
+
+**Speaker 3** _[25:52]_
+
+Thank you so much to both of you for delivering such an insightful session. Thank you everyone for your valuable questions and interactiveness. Thank you. Thank you everyone.
+---
+transcript_status: auto
+---
+transcript_language: en

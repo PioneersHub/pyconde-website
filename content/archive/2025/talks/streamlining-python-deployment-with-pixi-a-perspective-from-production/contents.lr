@@ -1,0 +1,168 @@
+title: Streamlining Python deployment with Pixi:  A Perspective from production
+---
+description: In our quest to improve Python deployments, we explored Pixi, a tool designed to enhance dependency management within the Conda ecosystem. This talk…
+---
+created: 2024-12-19
+---
+code: BLKYGU
+---
+slug: streamlining-python-deployment-with-pixi-a-perspective-from-production
+---
+speaker_names: Dennis Weyland
+---
+speakers:
+
+
+
+### Dennis Weyland
+
+_This is what Dennis says:_
+
+Hey there! I'm Dennis Weyland, and I've been part of the Blue Yonder team for the last five years. I kicked off my career as a Data Scientist but soon found my groove in Data Engineering. Python has been my go-to language for the past seven years, and I love diving into project setups to make everything run smoothly. Before diving into my professional career, I studied Physics at KIT, where I completed my master's thesis and discovered my passion for Python software development and machine learning.
+
+Outside of work I'm passionate about running, diving, and climbing.
+---
+abstract:
+
+
+In our quest to improve Python deployments, we explored Pixi, a tool designed to enhance dependency management within the Conda ecosystem. This talk recounts our experience integrating Pixi into a setup used in production. We leveraged Pixi to create lockfiles, ensuring consistent builds, and to automate deployments via CI/CD pipelines. This integration led to greater reliability and efficiency, minimizing deployment errors and allowing us to concentrate more on development. Join us as we share how Pixi transformed our deployment process and offer insights into optimizing your own workflows.
+---
+full_description:
+
+
+In modern software development, managing dependencies effectively is crucial for ensuring that applications run smoothly across various environments. This talk explores our journey to optimize Python deployments by integrating Pixi into our workflow. As a tool that enhances the Conda ecosystem, Pixi offers a reliable and efficient solution to the common challenges in dependency management. While concepts such as consistent builds, reproducibility, and automated deployments are well-established, Pixi simplifies their implementation within a Conda-based environment, making these practices more accessible and manageable.
+
+The talk will cover
+- DevOps Concept
+  Introducing concepts like lockfile, reproducible environments and CI/CD pipeline to set out a good
+  baseline for deploying python code productively
+- Conda vs Pypi comparison
+  Considering the tradeoffs between isolation and development comfort
+- Pixi introduction
+  An introduction to the philosphy of pixi and how it compares to other conda tooling.
+  This also covers how Pixi streamlines the implementation of DevOps concepts
+- Implementing DevOps concepts using pixi
+  
+This talk is designed for professional software developers who prioritize a robust setup for deploying Python code as services into production. While familiarity with the Conda ecosystem is beneficial, it is not a prerequisite for this session.
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2025-04-23
+---
+start_time: 17:50
+---
+end_time: 18:20
+---
+slot_id:
+---
+track: MLOps & DevOps
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/BLKYGU.png
+---
+youtube_id: ScxPMrIMahY
+---
+video_link: https://www.youtube.com/watch?v=ScxPMrIMahY
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/ScxPMrIMahY/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+Thank you for being here and yeah despite this being so late so really awesome that so many people are still awake and yeah so that's the talk title so let's jump right into it and it's called the perspective from production so let's start with this perspective. So, hi, my name is Dennis. I'm working for five years at BluYonda now. And one of my tasks is to manage Python templates, which I use for multi-repositories. So instead of one large monorepository, we have multiple smaller ones. And they are basically for creating services, which are deployed to the cloud using Docker images. We're using those templates for around 30 developers, and we started this whole thing like four years ago, and I would say during this time we had like two major milestones. First one was switching to the Condor ecosystem two years ago, and the second one was like being inside the Condor system, switching to Pixy as project manager, which we are now using for nine months and that's probably like the last clue you got that you know okay I'm talking here about yet another Python package manager yes I know we have quite a lot already in the Python ecosystem and probably you're already typing the question okay why don't you use UV why don't you use poetry so like we have enough of those right and so what spring pixie new to the table. And I would say if you look at Pixy and each of the features individually, actually it's not that revolutionary. However, if you consider that you are inside the conda environment, so like if you really love the conda ecosystem and you want to have a really good Python packet manager, which basically is an all-in-one solution, like you may be experienced with UV recently, then Pixy is I guess the perfect fit for you and I think and today I'm trying to yeah prove that or basically pitch that to you. Okay so what we're gonna talking today so I already said it's about Conta so we are doing a quick Conta versus PyPy comparison then I will introduce Pixy, highlight some features and show what we had before. Then we go a bit into the DevOps direction, so talking about GitHub actions, log files, Docker images and so on. And lastly we wrap this up with some of the experience we made during this nine months of actually using it. Okay, so when I say Conda, then I would say I always get two kinds of reactions. So the first reaction comes from the fans, so they know what Conda is, They like the ecosystem and they see their value and the second one is basically said. Oh, no, I must not use conda I'm gonna get sued. So there's a whole lawsuit in coming. Please go away and this whole anaconda trauma is Yeah, I would say a bit weird in terms of documentation Communication, but I would say like the people who made prefix The Prefix guys made a really good blog post about this whole topic. So if you want to know the details, here's the link, please check it out. So in short, we have the company Anaconda and it's providing channels for the Anaconda ecosystem, so-called default channels, and they're basically curated by Anaconda. They provide commercial support, and depending on the type of organization, they might charge you for it. On the other hand, we have ContaForge. This is completely open source. It's paid by sponsors, feel free to contribute, so everyone can use it. It's hosted mainly on Anaconda, so if your company might block everything with Anaconda inside the URL, you might need to use mirrors, but there are many available, so you also don't have a single point of failure here and then of course you have the installer so obviously if you go to anaconda page getting the anaconda distribution you get the default channels which are from anaconda but for example if you're using pixi pixi comes with conda forge sets as default so if you're using pixi you probably won't get into any legal troubles there okay so So but why finally use conda in the first place and probably takes another conference to get all the benefits what you can get with conda and the many reasons many people use it but I can only dive in what our reason was and that was basically the level of isolation. So everybody knows Python virtual environments so there you have your pip fields you can install them they cover all of your Python dependencies but they actually don't cover for example your Python interpreter they don't cover maybe the libraries your Python dependency actually depends on so and this is bit of a problem if you really want a self-contained environment which behaves the exact same way locally and inside the cloud. So our first approach was basically going to the right side and using just Docker images everywhere. So not just on the cloud but also locally. So if you want tests, we build a Docker image and run tests within it. If you want to develop, we build a Docker image, connect our local IDE to the remote interpreter inside the image and try to to develop with that setup and there you really have a nice level of isolation but it's really pain to develop for because docker images are not the fastest technology connecting your IDE to the image getting the path mapping right so that you can actually do debugging that's actually not that nice and that's why two years ago someone pitched to us kind of environments and And since those are multi-language dependencies, so you can include your Python interpreter because it's just another dependency in your content environment, you can include something like glibc, which is also just another environment. So it actually is pretty self-contained. Of course, you have some dependencies to outside of your environment, but they kept to a minimum. But since it's just another virtual environment, it's locally on your PC. You can just install it. It's quite fast and really you have all the developer-friendliness which you would have with pip packages. So you get a little bit drop of isolation, I would say, but it's really worth it because the developer experience is really nice. Okay, that means we were sold to the content environment. So how did we set up a template? And basically we needed a bunch of tools to set this up. this up so we need a resolver to install and resolve all our dependencies so that was mamba we also wanted to have one single log file to get all those multi platforms in there that was conda log of course we had some kind of linting linting tools which we wanted to execute on the spot there we used pre-commit but actually that was not the only task we wanted to do so we actually had bunch of other tasks we wanted to somehow web and therefore we used makefile because yeah why not and when I heard first of pixie I did go to the feature and basically it took some time but then I realized actually I can just use all those tools and just use pixie instead and that was really an eye-opener to me because like it's not just those tools right so like you have to make them work together you have to build like the scripts and the clue code so that it somehow works and with pixie now I just have a package manager which all which just does do that like normal documented features so like I'm not misusing here anything and that was really nice so let's talk about pixie so pixie is a conda package manager solution it's really easy to install only one line you don't need any prerequisites or you don't need any pre-installed Python interpreter I think it was inspired by cargo and yarn today you would probably would say it's very similar to UV but I think they started around the same time so they could not be that inspired by each other it has one log file for multiple environments and platforms. It does support task execution, it also supports PyPI on top of Conta but it basically uses UV for that and since it's written in Rust it's really lightning fast in resolving and installing environments so for people who use UV right now it's basically the same experience all right then let's dive into the log file so here I have example how the structure of the log file looks like and the really nice thing is so the log file stays always up-to-date with your manifest file and that could be either PI project tumble or pixie tumble and when you're doing something like a task execution it actually checks if your manifest is up to date with your log file if that isn't the case it will update your log file and then it also checks if your log file is up to date with your environment and if the environment is out of date it will reinstall your environment so basically if you run a task with pixie your environment is always up to date and you literally never need to manually install your environment because pixie is taking care of that also a feature I really like is the multiple environments and basically there I have two use cases so the first I call it hierarchical environments so let's say you have like your production code here we have fast API in our application you have then on top a testing framework like pytest and And you maybe have some dependencies you only need locally for debugging, in this case, IPython. And, of course, you want them to be resolved together, meaning the fast API version inside my pod environment needs to be the exact same fast API version inside my dev environment. And, actually, you can do that. So, on the top, we are defining the features here. And on the bottom, we are mapping for each environment the features. So prod gets the prod feature, test gets the prod and the test feature, and the default one gets prod test and dev features. And with this single, and then with the solve group, so calling this the same solve group, actually tells Pixie, yes, this needs to be resolved together. And that's why all those shared dependencies inside this environment will be the exact same ones. But you maybe have an additional use case. So let's, for example, we have this fast API app. And we want to have some very complicated step to set things up locally. So you really need to do some fancy workflows. And for some weird reasons, you need an Airflow doc which executes all this local setup. That means you need Airflow. And of course, we could put Airflow to our dev dependencies. However, Airflow itself also has lots of dependencies and some of these dependencies might impact your port dependencies because they are solved together. So I really like my Airflow to be somewhere in the corner where it doesn't affect every other thing and that's simply possible by just having a separate feature and putting it in its own environment. It doesn't have the same solve group, so it's treated completely differently, can have different versions, but everything is still resolved together, just independently inside the same log file, and then you can just run pixi runs.airflow, and your complicated pre-configuration step gets done. Okay, now we're talking about DevOps and here I like to shout out to Pavel Sveshke because he wrote several tools around Pixy which makes my life as a template maintainer so much easier. And the first example I have here is Setup Pixy. So that's GitHub Action which basically installs Pixy, makes it available in the namespace and installs the environment and therefore like writing a test action is kind of straightforward. You just check out your repository, you install Pixy, install your test environment and then next step you can just run Pixy run test. It's also quite fast because it uses caches so for my use cases I think this step only ever takes below 10 seconds, but of course it depends on the size of your environment. One other feature I really like is this reviewing log files feature, so log files are great, but basically if you update them, so like if you resolve them, they're really a pain to review, because log files can be multiple thousand lines of code, you get the diff, of the time it's way too big to render actually inside github and you don't know as a reviewer what to do with it and yeah there's basically another two tools so I put the code up there so called pixie diff and pixie diff to markdown and this essentially summarize the changes in the log file so it's order them by whether it's an explicit dependency or implicit one and also showcase the type of chain so is it's a major upgrade where there are might introduce paying changes or is it just a patch upgrade where you have a big chance that everything going fine and you can just put acknowledge to it so I really love this because before that we had nothing like this and yeah I mean you reviewed log files before white so like it's a pain okay then speaking of Docker files so good thing is pixie comes with image with pre-installed pixie image so I think it's in this case Debian based and what you can do is you can copy over your application code and run a so-called shell hook so a shell hook is basically a script which activates the environment for you so in In this case, I'm using the shellhood to get my pod environment so that I can run it inside the script. On the second line, I add the comment to run my application code. And the cool thing is now, at the bottom, I don't need Pixy anymore to run that thing. So I can just use a bin bash and one app, and I don't need Pixy anymore for that. So like if you are the type of person who really likes multi-stage Docker files and keeping your Docker file as minimal as possible. So basically you can basically use this Pixie Docker file to build your application, copy over the environment and your application code inside a much smaller Docker file and basically use that to ship it to production. So, in this case, we actually don't do this because, like, Pixy is only, like, 30 megabytes big. So, we basically prefer the build speed and the less steps you have inside the Dockerfile, the faster it goes. And we're doing here a bit of caching trick. So we copy over first the manifest and the log files during the shell hook and then after that copy over the editable application code and the reasoning behind it is as long as my manifest and the log file doesn't change, multiple builds can basically have here the same layers and we save like a bit of space in our code. container registry okay and yeah that's all i have on devops and of course now the important question is how we made everything on so how did we migrate there and how did it go so basically i obviously i'm a fan of pixie so i convinced my colleagues to let's use that in our template and basically i got through with it merged the template reserved a lot of time because hey I'm currently changing like the developer workflow for 30 developers so stuff will break and they will be angry at me so I blocked a bit of time in my calendar and yeah and then let's see what feedback I got yeah so that's actually not a mistake I really got nothing so I just merged it and like they didn't say anything so I pounded them and they asked hey yeah there's pixie now what you think so what's your experience and then I actually got feedback? Yeah, it's a bit of anti-climatic, but I have to say, like, again, we are changing the template, so it was visible change, and nobody complained, so I have to say I'm working with Germans, right, so, like, nobody complaining is, like, a really high praise there, and I was kind of amazed because, like, I just get through with it, so, like, it was nice. Of course, we made some real experience down the road during the nine months and basically I put this like from two perspectives so for me as a template maintainer I can say that the template cost code was drastically reduced mainly because it was less tools we used I didn't need to somehow weirdly put them all together because like now I was like using standard feature like that we intended to use like that's big thing which also means like I didn't have to write documentation for it because standard features are documented on the pixie page and since it was less code for me there was also less issues also nice thing and it actually improved tooling because like like the summary of the log file that was something we had didn't have before so that's basically just a statement of how so how much cool things are there within the Pixie community. Of course, something to consider is that Pixie is not yet at version 1.0, which means so they basically can introduce breaking changes, but so far I would say it's very stable. So we had, I think, one occasion where they introduced something where we said, okay, we need to adapt our template and then we can say to our users, okay, it's safe to go to the most recent Pixy version again, but so far it seems like they want to avoid this and it was very smooth. From a user perspective, we witnessed that onboarding was so much quicker because now we did only have one single thing to install globally, features are officially documented, So less documentation is better documentation, at least if you don't need more documentation. Also the install speed of environments was pretty nice, so of course the big change comes when you are resolving dependencies, however that's like a GitHub action we do once a week most of the time, so that's nothing the usual user would normally do. It's also easier to contribute now to our template because everything is just a bit easier and easier to understand. So also very nice that we have now more people doing that. And of course, from time to time, I actually had to do some troubleshooting, but yeah, it was most of the time pretty straightforward. So I think like over 90% of the problems we could simply solve by cleaning the cache, delete the .pixi folder, and then reinstalling everything again. All right, I think that was already the last slide, so thank you for listening, and happy to take any questions.
+
+**Speaker 2** _[21:59]_
+
+Thank you so much. We have many questions coming up. So let's start it with how does Pixie, how does it play with custom Python package registries like Artifactory or Code Artifact, DevPay, something?
+
+**Speaker 1** _[22:14]_
+
+Yeah, that's a good question. So we also use a defectory in our company So it basically has a lot of support for all those authentication methods So for our use case most of the time we're using net as if files and there's pixie support for it and if you're using the setup pixie pixie get up action like Your logins and URL from the other factory are basically just inputs. You can additionally put in there Thank you.
+
+**Speaker 2** _[22:44]_
+
+Okay, so the next question is combination of questions. Can we use Pixy with virtual environments instead of Conda? And the second part is, is there anything that you don't like about Pixy?
+
+**Speaker 1** _[22:58]_
+
+yeah so the first one is so instead or on top side
+
+**Speaker 2** _[23:03]_
+
+virtual environments can we use a pixie with virtual environments instead of conda venvs yeah
+
+**Speaker 1** _[23:12]_
+
+So I would say like PIXI is a conda package manager, so normally you set up a project and you don't set up your environment like totally independent of the project. But again, so like PIXI is utilizing the conda ecosystem. So I'm just referring here to conda as an installer and there you can use it. There's also the PIXI global feature where you can globally install tools. So if you need something globally, like maybe pre-commit, so that's totally possible.
+
+**Speaker 2** _[23:47]_
+
+okay the second question what do you do oh sorry yeah pixie
+
+**Speaker 1** _[23:51]_
+
+Yeah, I mean, it's quite new, so there's nothing I would say I dislike, which is already there. Of course, you always have some stuff on the roadmap, which you look into it. So I'm very interested, for example, in the Pixie build feature. So that's something which probably will be interesting, for example, that you really can do this template, not for hosting services but for providing libraries which then outputs pip wheels and conda packages side-by-side. I also would like to replace the technology we have in our big mono repository with Pixy so I think the workspace feature needs more refinement there but yeah so it's basically more like stuff I'm looking forward to and I don't really have that at major complaint points.
+
+**Speaker 2** _[24:48]_
+
+okay next question is specifically about docker file example which you have used why does the user with id uh 1100 have the have to be the owner of the application code does it need to write access and if so why
+
+**Speaker 1** _[25:04]_
+
+let's go in there I think yeah so I'm saying I'm using dude yeah so now that's I think something from within my company that we don't want to use the root root root user when running the docker image so that's why I'm changing users here but it has not anything to do with the pixie image PC
+
+**Speaker 2** _[25:28]_
+
+Okay, so the next question is does pixie understand dependencies between multiple local development modules that are not pushed to an artifact repo.
+
+**Speaker 1** _[25:38]_
+
+That's a good question. I think it gets introduced with pixie build. Yeah, okay. Thanks Yeah, so I think it gets introduced, but I would say it's still in Preview feature, so I'm not really sure about that. So probably check out the pixie webpage for that
+
+**Speaker 2** _[25:57]_
+
+okay one last question for the day so is the resolver speed faster or comparable to mamba
+
+**Speaker 1** _[26:06]_
+
+That's a good question. So basically, thanks. So the short answer is faster. The long answer is that basically Pixie is built by Prefix. It's a company which is founded by the person who wrote Mamba. And yeah, so basically Mamba was written in C++. Thus, Pixy was written in Rust with the experience they had with writing Mamba. So obviously, Pixy is faster because it's the newer iteration.
+
+**Speaker 2** _[26:39]_
+
+Yeah, that's all we got. With that, thank you once again, Dennis, for sharing your valuable insights. Thank you, everyone, for interactively making this session more interactive. Thank you, everyone.
+---
+transcript_status: auto
+---
+transcript_language: en

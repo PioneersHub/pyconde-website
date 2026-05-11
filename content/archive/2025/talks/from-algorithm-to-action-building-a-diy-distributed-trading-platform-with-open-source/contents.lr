@@ -1,0 +1,243 @@
+title: From Algorithm to Action: Building a DIY Distributed Trading Platform with Open Source
+---
+description: In this talk, we'll explore how you can implement your own distributed system for algorithmic trading leveraging the power of open source without being…
+---
+created: 2024-12-14
+---
+code: BR3D83
+---
+slug: from-algorithm-to-action-building-a-diy-distributed-trading-platform-with-open-source
+---
+speaker_names: Eugen Geist
+---
+speakers:
+
+
+
+### Eugen Geist
+
+Seasoned Software & Data Engineering Professional with extensive experience in high-frequency trading systems, data warehousing, and cloud solutions. Expert in optimizing mission-critical systems and implementing engineering best practices. Specialized in Python, SQL and cloud technologies.
+
+Currently working as a Freelance Developer focusing on software and data engineering.
+
+Skilled in developing distributed systems, data pipelines, and performance optimization, consistently delivering solutions that maximize business value.
+---
+abstract:
+
+
+In this talk, we'll explore how you can implement your own distributed system for algorithmic trading leveraging the power of open source without being dependent on trading bot providers.
+
+We will discuss different challenges occurring in HFT inter alia processing massive amounts of data with low latency and reliable risk control and how to solve them. Furthermore we will touch on the topic of regulatory requirements in trading.
+
+These challenges will be addressed through a distributed system implemented in Python, utilizing Kafka for real-time data streaming and PostgreSQL for persistent storage. We will examine approaches to decouple the components to re-use and scale them across different markets.
+
+Cryptocurrency markets are used as a proving ground for the PoC due to easy availability for everyone.
+---
+full_description:
+
+
+## Who is this talk for
+
+This talk is ideal for all software engineers interested in financial technology, quantitative developers looking to understand modern trading infrastructure, and technical architects exploring distributed systems in high-stakes environments.  
+This talk will NOT discuss specific trading strategies or give any financial advice.
+
+## Outline
+
+* Motivation  
+* Fundamental trading concepts and market mechanics  
+* Market data ingestion and processing  
+* Order management and execution  
+* Implementation of trading strategies  
+* Data storage  
+* Outlook
+
+## Motivation
+
+The landscape of financial trading has undergone a dramatic transformation over the past decades. What was once the exclusive domain of institutional players on physical trading floors has evolved into a digitized, accessible marketplace where individual traders can participate from anywhere in the world. The emergence of commission-free trading apps and cryptocurrency exchanges has brought market participation to millions of new retail traders.  
+This enables everyone to participate with their own trading system in global markets.
+
+In this talk, we'll explore how you can implement your own distributed system for exchange trading leveraging the power of open source without being dependent on trading bot providers. While we won't be able to cover every aspect in depth, we'll address the most essential elements.
+
+Cryptocurrency markets are used as a proving ground for the PoC due to easy availability for everyone.
+
+## Fundamental Trading Concepts and Market Mechanics
+
+We'll begin by exploring essential trading concepts:
+
+* Order book dynamics  
+* Orders, Trades and Positions  
+* Different types of orders and their implications for system implementation  
+* Regulatory requirements  
+* Performance of strategies
+
+These lead to different considerations in system design and architecture:
+
+* De-coupling of exchange interfaces and trading strategies to use same strategy for different markets by using adapter pattern  
+* Horizontal scaling to handle data load  
+* Need of low latency components and their communication to properly react to market  
+* Need of streaming data for real-time risk management  
+* Need of persistent storage for regulatory data and post-trading-analysis  
+* Need of order action recording and post-trading analysis for performance evaluation
+
+## Market Data Ingestion and Processing
+
+The foundation of any trading system is its ability to efficiently process market data. This includes a Python component responsible for real-time normalization and standardization of multi-venue data:
+
+* Efficient market data representation and storage structures  
+* Techniques for handling high-throughput data without compromising latency  
+* Market data recording for post-trading analysis using Kafka
+
+## Order Management and Execution
+
+Critical components for managing the trading lifecycle. This includes a Python component responsible for normalization and standardization of multi-venue order interfaces:
+
+* Order action handling (placing orders, modifying orders) and keeping track of orders  
+* Global real-time position tracking and risk calculation using Kafka  
+* State recovery and system restart procedures  
+* Audit trail implementation and transaction logging using Postgres
+
+## Implementation of Trading Strategies
+
+We'll explore the practical aspects of implementing trading strategies in Python using the previously discussed system components:
+
+* Usage of provided market data  
+* Placing orders and keeping track of positions  
+* Fast communication with market data and order components using Kafka with msgpack
+* Recording of strategy internals for post-trade analysis
+
+## Data storage
+
+We will take a closer look to:
+
+* What kinds of data exist in a trading system (live vs. post-trade)
+* Approaches to storing the different data kinds
+
+## Outlook
+
+At the end we will have a brief outlook what other challenges might occur e.g.:
+
+* Other market types (Finance/Equity/ETF and Energy)  
+* Latency considerations  
+* Taxes
+---
+room:
+---
+day: Thursday
+---
+slot_date: 2025-04-24
+---
+start_time: 16:55
+---
+end_time: 17:40
+---
+slot_id:
+---
+track: Programming & Software Engineering
+---
+tags:
+---
+submission_type: talk_long
+---
+submission_type_label: Talk (Long)
+---
+submission_type_id: 5092
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: None
+---
+supporting_material_url: https://github.com/e-geist/ddtp
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/BR3D83.png
+---
+youtube_id: ZgjI0AV5eKA
+---
+video_link: https://www.youtube.com/watch?v=ZgjI0AV5eKA
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/ZgjI0AV5eKA/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+And yeah, let's start. A few words about me. Although I got already a short introduction, I have about five years in exchange trading only as a software engineer, a few more years in other industries. And if you want to contact me, feel free. After the talk, I'm also here tomorrow. And yeah short description what we'll go through. It's quite a lot, but you can find it later on in the repo What's the motivation if you want to build an? Trading system by your own if you fundamental trading concepts We will need if talking about a trading system and then some requirements because We want to structure our approach how we implement actually trading strategies, how we make our components communicate with each other, a little bit about market data, a little bit about placing orders and data storage and last but not least an outlook how you can take this live or what you should think about going live with this. So first of motivation of course trading you want to make money then the access to markets is actually now easier than ever especially to crypto you have more control and flexibility than if you use some bot providers platform it's actually a quite interesting exercise because there are different technical challenges that we will go through and there are a lot of job opportunities I don't know whether you know it but the biggest paychecks you can receive are actually from high-frequency trading companies but also it's quite hard to get in and of course self-made is always better than just using somebody else software so some fundamental trading concepts what is trading it's the activity of buying and selling things. This can mean that you buy apples and pay in pairs, that you sell stocks for money or that you buy Ethereum coin for Bitcoin. What's an exchange? An exchange is actually a physical or electronic platform or location that you can use for trading. So for example it's also called market and examples are weekly markets in the city center, a stock exchange or a crypto exchange. Algorithmic trading is trading on international stock exchanges using computers that have been programmed to buy or sell according to fixed rules. These fixed rules are your algorithms of course. It's not only about stock exchanges but also used for trading crypto or commodities for example electricity usually orders and order books are used for trading okay so what are these order book is actually an electronic list of buy and sell orders and for a specific instrument organized by price level okay let's go through it bit by bit an order is an offer to buy or sell something and you can think about it a little bit like if you also have somewhere whiteboard up and you just put up that you want to sell something and you put a price for one unit and how many actually you want to sell and the order book is actually the whole whiteboard for one specific good order book level will be important in a little bit but for now just memorize okay it's the aggregated quantity of all orders for one price and I have here an order book example it's unfortunately a little bit small but yeah but if you look at it so this is buying this is selling and this is a Bitcoin order book and you can see here that somebody wants to sell 200 coins and the price for one coin would be this 80 something K and the important thing is here you don't know how many people are behind this order book level because it's aggregated to this price so there might be one person sell buying these 200 or five people and remember order book is only about the offer of buying and selling so So if you find somebody that actually wants to execute your order, this is a trade. So somebody else matched your order and you actually bought or sold the thing you wanted to buy or sell. And also very important, the accumulation of all trades. So if you buy and sell a round, you get a position. How much do you actually own of this thing that you bought or sold? And a short summary to have it all in one place. so order is selling or buying an offer an order book is just a list of some orders for one specific good a trade is that actually your order was accepted by somebody or you accepted somebody's order a position is how much you have of this good and just to stop calling it good usually we talk about instruments so financial instruments or crypto instruments functional and non functional requirements so what do we want to do actually we want to be able to trade instruments with different algorithms on an exchange because we might have a few ideas how we want to trade we want to get insights about how we trade it and we want to improve our trading systematically these are our functional requirements. The non-functional requirements that we actually need to fulfill for trading is okay we just said we want to trade on different exchanges this means we need to stay kind of extensible and also scalable. We want to trade multiple instruments probably if you're trading you're usually not only interested in Bitcoin but also Ethereum or other stuff and we might want to use different approaches because we don't have that one algorithm but multiple other approaches we want and also have two recordings about our performed actions due to transparency and compliance reasons and we need to be sufficiently fast to trade properly there's usually an offset something about like if you trade smart you don't need to be fast or if you trade fast you don't need to be smart but there are certain thresholds you need to meet usually the technical requirements that arise from this are usually or in this case okay for trading I need an API to receive market data to know what's happening on the market I need an API to send orders because I want to put I want to trade I need an API to receive feedback about what I send as an order and also about the trades I made and I want to structure my components independently to connect them in multiple ways so this is about what I said using different algorithms on different exchanges and also for different trading instruments to have records about the performed actions I need to store what I did somewhere I I need to store what my actions triggered so the outcome these can be trades or that orders were cancelled for some reason and I need to store what happened on the market and to be sufficiently fast I want to structure my component somehow to be able to scale them independently you might have markets with a little bit more volume you might have markets with a little bit less volume so be keeping them independently helps here usually pick fast technologies whatever that means and pick a location as close as possible to the exchanges so this means really the hosting this can be quite difficult as a normal person for example if you want to trade finance because you won't get as a private person into the data center of Xetra but for crypto it's actually doable quite nice and now the architecture if we think about all these actually non-functional requirements that we come up with is something like this and now in the next steps we'll go step by step through this architecture and how we might implement it. Short disclaimer, this is a proof of concept. So it demonstrates the typical architecture that I saw in some places and that also a lot of companies implement. Of course, in this proof of concept, I'm, for example, using Python with bigger teams and more resources. You probably would do things differently. you would pick other technologies and yeah for the proof of concept a crypto exchange was chosen in this case Kaken futures and most exchanges have some kind of simulation environment so you can run your software there for testing purposes okay let's start with the trading strategies because this is your basic idea that you have right you have some approach in mind and this is the part we're talking now about what are trading strategies so or what they do they based on a signal make a decision and that they want to act on a specific market they yeah the most important signals that they react to are usually market data so what's happening on the market the feedback that they get to their own order so a trade happened or nothing happened the own position they have they know how much they can sell or buy and for derivatives so stuff like futures the data of the underlying asset if you're trading an electricity future you might won't be interested in the actual electricity price and yeah of course this trading strategy needs to be able to execute the wanted actions on on the market and this means that there should be some kind of order actions for the implementation itself it makes most of the time sense to separate what you trade per instrument so that you have really one instance of a trading strategy that only goes to one order book because they are separate per instrument orders are usually also sent per trading instrument so you cannot buy BMW stocks in a Volkswagen order book and what a strategy has to keep in mind to make actually decisions of course the market data or the order book of the traded instrument for this it needs to get the actual exchange and do some book building and what are the own orders that the strategy is currently on the market because maybe it shouldn't act multiple times if it still has some active orders on the market the own position so how much Bitcoin for example do I have do I want to buy more do I want to sell maybe something and also this of course if you think about Bitcoin if the price goes down and I own 50 bitcoins also my risk is quite high to lose a lot of money and we need again an interface to send order actions so for this purpose for the strategy itself implemented or in general in the proof of concept I used a lot of separate functions of course you cannot shoot where appropriate use object oriented programming but I went mostly with quite some functions and also I used a lot of multiprocessing so the queues that you see here are usually multiprocessing queues and yeah for the strategy I provided just a single function that has the signature and it does something what it does we'll get into and we have an interface to send some orders so this means that the strategy actually can call this function to send some new order it provides all the data that is needed the price you want to buy or sell actually do you want to buy or sell and the amount and then you can also modify what you actually have already on the market or cancel your orders and then you want also to get information about what is happening with my own orders on the market and yeah here I also have a subscription function. I keep these very raw because you can have a look at the repo afterwards otherwise time-wise it gets hard and also because it's important of course to get a for our strategy as we talked about this middle part it's important to know okay how do we get actually all the information because this is still communication in our system and to allow for redundancy so if some components fail I decided here to go with horizontal scaling and this requires communication via network. If you go for vertical scaling so in the same system you can of course use Unix sockets this is probably the fastest way to make your software communicate on a single machine. And to send something via network as we need it here we need to serialize the data. And serialization is basically converting something into bits and bytes or back into the original object and of course there are some possibilities we everybody in the room here knows probably JSON then there are protocol buffers also called protobuf. There are flat buffers which are just like the newer protobuf. Then there's message pack and of course Python pickle or some proprietary serialization that you can think about. Of course there are a lot more possibilities but these are just a few ideas. And if we have now serialized our data we want to send it via network. So how do we send it over The network to the other components and there we have also a few possibilities for example some proprietary TCP TCP protocol some proprietary UDP or even UDP multicast I Would recommend highly against it only if you really need the performance because it's really a pain to debug UDP multicast Wasted a lot of hours of my life to that You could use REST via HTTP, you can of course use gRPC but this requires a protobuf as a serialization. You can use some message broker like Kafka or RabbitMQ or of course you can just make your software communicate via database. For example Postgres, MySQL, you have one component inserting, the other one retrieving. And, of course, here again there are also a few more possibilities. Now what I went with in this system is sending and receiving message pack via Kafka. Why Kafka? It's fast if you have a proper Kafka setup. I just heard from somebody that they have a Kafka where they have a latency of 10 seconds, which is weird because we had a system sending Kafka messages from Australia to Frankfurt Within like a second two seconds maximum via some dark fiber So Kafka gets really fast if you make it go fast It's quite established. So there's support in all big programming languages You can program consumers and producers and pretty much every programming languages. I use here the library Kafka Python You can also book it as a managed service so you don't have to operate it and there are many people who have experience with it so it's easier to hire if you for example are a company that's using it it's quite resilient because you have it's a distributed system so if one broker fails there is still a mechanism for fail overs messages can be replayed which will come to later why this is important and really useful and it's scalable so you You have end producers that just produce your messages, you have another count of consumers, and this allows us, for example, for the data recording to store the messages that the components are sending around with a separate consumer. And this allows us also to have multiple producers on the same channel if we want to have a system that fails automatically over. And it doesn't require a specific serialization in contrast, for example, to gRPC. And of course, there are a few disadvantages. So sometimes it's or often it's very useful to know in a distributed system whether the counterpart is gone, so failed or something. There's no built-in mechanism to know whether there are no consumers or producers on the other side. So you have to implement something by hand. And it has to be operated as a separate service. So with gRPC, you just have, like, you're both components communicating here. It's really a separate thing that has to run. There are also a little bit more in-depth reasons in the GitHub repo. You can have a look afterwards if you want to. Why MessagePack as a serialization? So it allows the conversion of any objects to bytes and back. It's schema-less. Whereas with Protobuf, for example, you really need to define beforehand what you want to serialize for sending and receiving. It's fast if you compare it to JSON, for example, and also if you compare the size to JSON. It's quite established, so there are also libraries in every big programming language here in this prototype I used or message pack which is I think has an underlying implementation in rust so it's really fast and it's backed and used by really big products like red is fluent deep Pinterest and also here a little bit more is a little bit more in-depth discussion in the github repo if you want to have a look and this is actually the system we get out of it if we put Kafka in. Market data. So this is the part where we get the input for our strategies and in general market data is also called public data. Like I mentioned there is one order book per traded instrument so they are all separate. It's essential because only with market data a trading strategy can know the Prices and quantities that counterparts are willing to trade Mostly they or market data exists as a unique directional data stream With crypto, it's often web sockets for electricity It's also often web sockets in the finance world It's usually TCP or even UDP which cost depends on the speed you get or what you also buy There are different types of market data, so the smallest, yeah, the most non-detailed version, let's call it like this, that you can get is the level one market data. You only get for buy and sell the best prices, so you get the lowest sell price and the highest buy price. Then there's level two data, so you get the top N levels. if you think about I'll show it in the image after the on the next slide again so you get the top I know 10 20 levels so the best actually 10 prices for each side and there's level 3 where I mentioned if you have the level data then you don't know how many people are behind us with level 3 or tick by tick or order by order data you really get the orders from the other people so it's the most detailed but of course it has the highest volume but yeah can be useful if you want to really trade in depth and usually also you get information about trades so you get something like okay there was a quantity of 200 traded and the order book changed like this so this is usually separate information provided and as I mentioned level 3 data has the highest volume but usually you also have to pay the most money to get it and if we look here again then if you think about level 1 data so this would be for sell only this price for buy only this price if you think about level 2 data then it would be like this list for example and also on the top this whole list and if If we think about level three data, then basically each entry here opens up a dimension where you get to know, okay, is behind this quantity of 200, are there five people, ten people, or only one person that wants to trade. So how can we use this market data? As we mentioned, we want to trade with our strategies on different exchanges, and usually different exchanges they have different protocols so we want to decouple it and pretty common is just the adapter pattern where we normalize the incoming market data from some external to an internal format and for this we have the component that I showed you already on the on the architecture diagram the market data adapter where there are separate operations some are per exchange so you can implement some kind of plug-in functionality for example in some common functionalities and for example it's usually separate mechanisms how you actually receive the data so you want to keep the separate different subscription types etc then also there's the format the market data comes in as also perks change differently so you normalize the market data to some internal representation and then comment to all exchanges you want to forward this normalize market data to your trading strategy and if we look a little bit more into detail about the exchange we picked here then we subscribe to the market data for different instruments we get the data by exchange the exchange sends us JSON we use our JSON for fast parsing and we get level 2 market data so we get the order book levels and on connect a snapshot is provided so we get like a snapshot is the whole order book and then the consecutive messages are just deltas so we get what changes in the order books just because if you would get every time the snapshot of course it's a lot of data but if you get the snapshot at the beginning and then deltas you do the so-called book building where you keep track of the order book yourself and yeah basically this market data adapter it receives the market data it processes it and sends it to strategies but in this case we do not only keep do not only transform but the market data adapter itself keeps also track of the order book so already here some book building done not only in the strategies just to have some recovery mechanism because if our strategy fails we don't want to have to restart our market data adapter so every internally in our system we see sent every n minutes a snapshot to the strategies so the strategy can process or ignore it and yeah how this looks like is this is what we get from the the exchange this is just the snapshot some Jason for this is aetherium US dollar order book and some sequence number the timestamp and then the both sides of the order book and this is the outcome that I modeled with pidentic in Python and if we look at the Delta message it's a lot smaller because really we really only get the information okay on the sell side for this price this is the new quantity this means if the price already exists in the order book we change the quantity if the price doesn't exist previously in the order book there is a new level and if a level disappears then in this case in this protocol the quantity is set to zero so we know remove it from the other book and this is how the entire representation looks like now we also want to send orders with our strategy and sending orders what does it mean okay we want our strategy to be able to send orders to different exchanges here again different exchanges have different protocols and you might come up with the same approach use adapter pattern and if you general words about order execution or sometimes it's also called yeah just order interface usually it's called private data because you send privately only the exchange can see what you send and you also get only information about the orders you'll send not about the other parties orders it's usually bi-directional you either send and receive via the same or separate channels this can be it depends again on the domain what's common so for finance TCP is pretty common then for a crypto or electricity for example the input via HTTP and then the feedback via web socket is pretty common and we introduce the other execution engine so basically this is the counterpart in the market data adapter but on the back side of the strategies or on the outgoing side we use again also the adapter pattern and what happens is we receive a normalized order action so just some internal representation of something we want to do from the strategy and then there are again operations that are done differently per exchange so you can implement again something like a plug-in where each exchange is a different plug in that you can put in your application and then for each exchange there's some conversion to the actual exchange format from your internal format is done then the actions sent to the exchange and if we receive feedback from the exchange again this feedback is normalized back into some internal representation and this internal representation is sent back to our strategy so the strategy knows what happened and yeah the order actions a few words about them they depend really on the market what's possible and the feedback can be quite different and the most common ones that are used for order book trading that you can do is just place a new order modify the price or the quantity of an active order if you change your mind or to cancel the order again if you use some different type of order than limit orders usually there are a lot more operations and the common feedback you can get is just some confirmations so So your new order was placed successfully, modify was successful or your cancel was successful. Then you can get trades. These are usually called fills, so because your order was fulfilled and an order, so you want to sell a quantity of two, it can be a partial fill, so somebody buys from you quantity of one or it can be fulfilled so somebody buys the whole quantity and there are sometimes cancellations by the exchange for different reasons you get them they have a market outage there are some compliance reasons you hit a rate limit whatever now if we look to the exchange used in the proof of concept then we see okay the placement of orders is done via REST. There are different endpoints for different actions and JSON is expected as input or as I noticed also URL encoded works and the feedback you can get either by a WebSocket subscription or by pulling some REST endpoints or also for the I don't have it on the slide but you get also some first feedback via the REST response but I chose to keep it simple the WebSocket because you subscribe you get updates and the WebSocket endpoint that's used here is also the same as the one for the market data adapter but just the subscription change and you get also a snapshot on the subscription and then you get deltas which in this case mean means you get at the beginning a snapshot of all the orders that are currently open and that you have open already on the exchange and also a snapshot for a certain amount of time of all the fields that happened which I didn't use here but can be useful and yeah basically the order actions are received from the strategy and then forward to the exchange and the same for the feedback but vice versa feedback is received from the exchange is normalized and forwarded to the strategies and if we look at actually at what we sent so here we have again some order actions defined as pedantic models and then how the request can look like either as URL encoded parameters or as Jason sent to the exchange. This is for a new order that you sent and then this is a fill response message that gets sent to us via WebSocket and you see here some username you get. You get also an indication what you actually got from your subscribed feed and then there is a list of fills which I modeled like this because I process the fills separately so yeah. There are a few problems with orders, so order actions can fail for various reasons because you have to imagine you're communicating with a different system, everything is happening at once, so if you want to cancel an order, it could be already filled, but the response didn't arrive on your side yet. If you want to modify an active order, it could be already filled, but response didn't arrive on your side it could have been cancelled by the exchange and yeah strategies might react too late or too early to stuff you do low latency helps here but you have to factor that in if you implement your strategy actually yeah we had also some strategies that we implemented that were just reacting too fast so the market couldn't keep up and we really had bad trading results because we got some problems we wanted to modify but the market didn't send us yet that we got already. Then there are some restrictions regarding rate limits so most of the times your actions per time are limited and you're punished or you cannot act if you violate them there are often ways to pay more to get higher rate limits or use multiple accounts or often you even have the combination for example in finance if you buy higher rate limits usually you have to put a second account and this makes really handling complicated because because you then only can trade the orders from your separate accounts with that and yet to proactively do something against it of course your order execution engine can at least keep track of the order so it doesn't send cancels for already filled orders that keeps tracks of the rate limits and yeah data storage so there are basically two different types of data if you really think about it there is during live trading and outside of live trading and due to time I have to speed up here a little bit but basically during live trading this is something that you need to know when you trade usually it's the most recent data and the volume is quite low because you You don't have to keep a book of so much stuff. And an example could be the currently active orders. Outside of live trading, for analysis purposes, usually you have quite a lot of historical data. The data doesn't change anymore, and stuff or examples are market data for backtesting. Live trading data, of course, you can use some database management system like Postgres to keep track of it, Write the most recent states, retrieve them, and yeah, it's one more service in our context here to operate. You can also use Kafka where you publish your most recent state regularly, and then if something fails, you can read it back again, and yeah, retrieval might get finicky because you have to locate, okay, what's my latest message. For the POC, I didn't implement any of them because, unfortunately, scope got a little bit bigger after POC so bear with me but in this case I would probably implement the Kafka approach outside of live trading we have to think about that our types of consumers and the analysis systems they are they can be quite different so the format that we choose must some be something independent of the language there are different types of data so it must be flexible we have a big volume of data so it must support compression of course everybody Probably knows you what comes next parquet is the thing to choose and there was really a nice talk yesterday about parquet I don't quite remember the name, but you have to look it up But it's basically the standard for big data volumes and it's supported by all big analysis systems What you have to think about if you implement this in in production, you have to keep the retention time of your Kafka topics, of course, really high enough to draw the data from there. And you can, for example, schedule just data dumpers to dump data regularly from your Kafka topics so you get all the information. This was the advantage that I mentioned that we get if we really take Kafka here. And I will skip here ahead a little bit to the Outlook. So there are a few things we have to consider. Technically, of course, we have to implement that our POC is configurable, because I hard-coded the plugins. There are no tests in the proof of concept yet. And you should test, because you can lose a lot of money really fast. There is Knight Capital, which was a big trading company that lost quite a lot of money very fast. You should implement logging and alerting. You should think about where to host it. Like I mentioned, finance, mostly on-prem. Crypto is actually mostly in cloud, so you could choose a cloud close to them, close to the exchange, and how to handle emergencies, so how to keep risk and manage it, and keep in mind it's often better not to trade if you're unsure than to trade wrong, and fine-tuning depending on markets like timing and latency I mentioned, and also how much data you need to store. and business-wise understand the markets that you're using because otherwise you probably won't interpret your data and your strategy will not perform. There are different types of traders and grades of professionalization that also reflects on the behavior on the market, different latencies, and there are also different compliance requirements depending on the market because if you trade finance really professionally, maybe Baofeng comes around and wants to talk to you. Yeah, thanks for listening. And this is the way forward. And I think I have 30 seconds, so maybe I will use them before we start with the questions because we can have a short look whether we can get the software to trade. And it's too big, right? Okay, no, you can check it out in the repo
+
+**Speaker 2** _[39:44]_
+
+So thank you for the talk. Thanks. There are several questions The first one is how high does your trade frequency needs to be to hit rate limits of the exchange?
+
+**Speaker 1** _[39:58]_
+
+It depends on the it depends really on the type of trades because we saw With so we saw in some trading systems really that 360 actions per minute are already rate limited then and this you can easily achieve with Python and sometimes we saw that we had rate limits of 8,000 actions per minute, which we had a hard time to hit with even c++ so it depends really on the market and on the broker because yeah they want to get paid to fulfill your actions
+
+**Speaker 2** _[40:36]_
+
+So, okay, thanks. So the next question, what's more lucrative, code a trading board for yourself, hopefully making your money or work as a coder for a high frequency trading company receiving paychecks?
+
+**Speaker 1** _[40:49]_
+
+If you if you have if you if you're technically really good, I think at the really Good companies like what are they called Jane Street or something in the u.s? 800 K is possible as a developer, but it's it's impossible to get in But if you have a good trading idea about is usually a good idea. I don't have good trading ideas. So I'm more concerned about the technical details
+
+**Speaker 2** _[41:14]_
+
+Okay, so next question, how do the strategies that themselves materialize in code? Is there a DSL for expressing them?
+
+**Speaker 1** _[41:22]_
+
+Most of the times I saw actually people implementing the strategies just in Python or C++. So usually there was some abstract strategy class and then they had an on-market data and then there was stuff done. So there's no DSL, at least not in this system. Of course there are bot providers that probably provide a DSL.
+
+**Speaker 2** _[41:48]_
+
+Can a trading platform be profitable against major high frequency hedge funds with cutting-edge hardware optimized co-location and direct market access?
+
+**Speaker 1** _[41:58]_
+
+It depends what you mean with lucrative because like I mentioned somewhere If you're really a high high frequency trader usually they usually they use FPGAs FPGAs so they are really fast, but maybe not smart and But crypto for example only really got professional in the last few years So I think in the last few years it was still quite possible And I know from a person who just click trades so really at his broker But he has an idea how to trade some stuff and he's slow and he's still leading a company. So If you have a good idea, okay
+
+**Speaker 2** _[42:42]_
+
+Okay, so how do you manage to be physically close, reduce latency to a crypto exchange?
+
+**Speaker 1** _[42:50]_
+
+You can find out for a lot of exchanges in which cloud they are hosted and then Was it Binance? I'm not sure some some clouds are for example in AWS Ireland. So you choose of course this as your region and then You hope that you get close to them and there are a few approaches And usually you can find out where they are hosted
+
+**Speaker 2** _[43:16]_
+
+Okay, I think the next question is basically the same. So let's skip it. So do you have a good suggestion on how to work with options data given the odd nature of options, change in strikes, open interest, creaks, etc.?
+
+**Speaker 1** _[43:32]_
+
+To be honest, not from the top of my head because you have to keep, yeah, keep track of so much, like you said. I know actually that when we implemented options at one of the companies, it was really pain and we sat there with like five people who had experience in some market data protocols of different exchanges and it was still pain.
+
+**Speaker 2** _[43:56]_
+
+So there's one minute left for one last question. Just for a scale, what is the amount of computing power needed to run some examples of popular trading algorithms?
+
+**Speaker 1** _[44:10]_
+
+It depends what your strategy keeps in its head, right? Because usually you want to react fast, so you keep everything possible in RAM. So, yeah, and then I think the highest volume that you get is from market data, and then, yeah, there are approaches that you can run really a few algorithms just on a 4-gigabyte machine because they don't keep anything in their brain, in their arm, And there are approaches where we had just, yeah, 100, 200 trading strategies running on a 200 gigabyte machine and it was still not enough. So, yeah, it depends.
+
+**Speaker 2** _[44:53]_
+
+okay thanks one last question yes or no so are you a millionaire now no so let's thank him again thank you for the talk
+---
+transcript_status: auto
+---
+transcript_language: en

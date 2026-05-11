@@ -1,0 +1,197 @@
+title: Using Python to enter the world of Microcontrollers
+---
+description: So you've happily used the Raspberry Pi for your homelab projects, of course with Python based solutions as we all do. You've been down the rabbit hole…
+---
+created: 2025-01-05
+---
+code: DSHASE
+---
+slug: using-python-to-enter-the-world-of-microcontrollers
+---
+speaker_names: Jens Nie
+---
+speakers:
+
+
+
+### Jens Nie
+
+_This is what Jens says:_
+
+A physicist currently tackling the development of embedded devices at Rosenxt for various use cases. My journey with Python began a long, long time ago, when the interpreters version string said 1.4.
+
+Besides my current efforts I can rely on great experience from various other roles in my prior career as a scientist, technology manager and department head.
+---
+abstract:
+
+
+So you've happily used the Raspberry Pi for your homelab projects, of course with Python based solutions as we all do. You've been down the rabbit hole with everything about temperature and humidity measurements, energy and solar tracking, video recording and time-lapse photography, object detection and security surveillance.
+
+You don't just buy these things of the shelve. You want to deeply understand what it takes to create such a thing, and you've been quite happy with your results so far, learned a lot. 
+
+But for many simple applications ... the power draw! Yes, it's just 5 Watts you say for using a Raspberry Pi. Not a big deal in terms of cost. But you'll always need a power adapter and a free socket.
+
+You've heard of these guys using microcontrollers that run on batteries or even solar, for days, weeks, even months.
+
+That's exciting, but there's also a catch. These people write code in C-like languages, they build firmware to make their projects run. And it's all bare metal! That seems very different. That'll be a steep learning curve to take ... Or is it?
+
+Well, there's MicroPython to the rescue. Let me take you with me on a journey to make a simple microcontroller based application to read a Power Meter and send the readings over WiFi for more in depth processing somewhere else.
+---
+full_description:
+
+
+Over the past years Python became available on more and more platforms, both software and hardware ones. From MacOS and Linux to Windows. From Desktop Computers and SoC Platforms such as the Raspberry Pis to Data Centers. And even on the smallest side Python is available today.
+
+MicroPython implements our beloved language for direct use on embedded platforms built on top of popular microcontrollers, such as the original PyBoard using an STM32 microcontroller, the  ESP32 platform and the Raspberry Pi Picos.
+
+In this talk we'll have a look at how MicroPython feels compared to the fully fledged Python implementations, by "porting" a simple application that initially was built to run on a Raspberry Pi to an ESP32 based Microcontroller. 
+
+The application was used to retrieve Power Meter Readings via its internal Infrared LED using a small photo transistor based circuit connected to the Raspberry Pi and calculate current power draw from these readings to send them somewhere else for further processing.
+
+We'll see what it takes to make such an application work on a Microcontroller running just on batteries.
+---
+room:
+---
+day: Friday
+---
+slot_date: 2025-04-25
+---
+start_time: 10:55
+---
+end_time: 11:25
+---
+slot_id:
+---
+track: Embedded Systems & Robotics
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/DSHASE.png
+---
+youtube_id: rmcWbJgUCfg
+---
+video_link: https://www.youtube.com/watch?v=rmcWbJgUCfg
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/rmcWbJgUCfg/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+So for the motivation for this, using Python to enter the world of microcontrollers, I'm just curious, who of you is working with IT-related things here, like monitoring and sensor data, streaming, aggregation? That's quite a lot of you. So that is probably the motivation, if you're dealing with all these nice solutions at work to do the very same thing at home, right? But that could get very expensive in the very end, Because, you know, you will use real hardware for that, that you pay for yourself. And attaching centers, playing around with these things, bare metal, that can pretty much break things. And that can get quite expensive. And even the electricity bill is a thing. Probably not at work. Hardly anyone of you has noticed what your employer is paying for electricity. But at home you do. So you might consider these things. so using microcontrollers what exactly is a microcontroller well it's pretty simply a combination of cpu memory storage and i.o and that's all on the same die so if you have these things in the computers regular components aggregated in some way this time it's all on a single die in a single controller and it's very energy efficient it's cheap and it's quite powerful these days as we see in a minute. A few words about the history, so to the left is the first available CPU, the famous Intel 4004 from 1971, and to the right the Texas Instruments, the TMS 1000 from 1976, which is already already that very mentioned combination of a 4-bit CPU at 400 kilohertz and some ROM and some ROM and some I.O., like counters, registers, timers, these things. And today we have quite powerful platforms, so quite capable resources. The typical scaler to use compared to the beforehand, which was the K for kilobytes or kilohertz, is now the M for megahertz and megabyte. We have some examples here. The probably most used microcontrollers in the maker scene, the ESP32 family, quite capable, 32-bit single or even multi-core CPU, 160 to 240 megahertz, already has megabyte range of RAM and ROM, quite capable of extending these platforms, there is a large variety of models on the market. And in the middle there is the SDM32 platform, this especially is the Pi board, where all the MicroPis and stuff originated from in the project Cortex-M7 CPU, 260 megahertz also in the megabyte range of RAM and ROM and loads of I.O. and to the right, one of the most capital platforms currently on the market for the price, the Raspberry Pi 2350 here, it's just the single chip there and here placed on the commercially available Pico 2W even with Wi-Fi. And that already has dual cortex M33 and at boot time you can decide if you would like to use the ARM platform or RISC-V platform to execute. dedicated I.O. and also the same range, all in megahertz and megabyte. And there's also blurry lines here when you compare to the normal computers and micro controls on the low end and things get kind of blurry currently because we have the Raspberry Pi, small-sized computer actually, but there's a spin-off, the Compute Module 5, and it has pretty much the idea of a micro controller actually. It's a board with the computer and a GPU and RAM and Wi-Fi attached, I.O. attached. It's not on the same die, but it's a small factor you can integrate somewhere else. So it's no longer that hard line between these platforms. And down below there is, from DFRobot, the UniHiker, the M10, which is comparable to a Raspberry Pi, has a lot of hardware on it, a Rockchip CPU display, some sensors for an IMU, loads of I.O., also in the megabyte range from the performance pretty much comparable to a Raspberry Pi 3, and a pretty well-done infrastructure around it. So if you buy these things, you can attach it to a computer. It already configures you a network interface via USB-C. It has a Jupyter notebook running, you can directly attach to it and just play around with everything. Documentation is quite good on these things. It's a lot of fun. If you want to see one of these devices, I have one with me, you can have a look at it later on. To the right there is the smaller version of it, the ESP32 base, this microcontroller platform, but pretty much the same idea. These platforms should look very comparable and they have different price ranges. The left one is around 100 euros, the right one is in the 30 euros range. So what it actually was doing coding for microcontrollers, so the hardware-wise it was a very simple system, like in the good old computer days with the C64, who has used the C64s, who is as old? Oh, my dear. And with this very, very limited resources, they have to be carefully managed. where that scalar to use was the K, like in kilobytes and kilohertz. It had the ability to just run a single task. There was no multitasking thing around. It's just that one thing that you execute, nothing else. And coding was done in low-level languages like assembly language and see who is familiar with assembly language programming. Yeah, they're very much. The experience level necessary for having fun was very skilled and expert or senior level at that time. So why that, you ask? Well, actually, it is all about ensuring real-time capabilities. You have to guarantee things to happen at a specific time or exactly periodically, absolutely always. And that is not something you do on regular computers. There's just you think it will happen at some point in time and near that very point in time, it is going to happen, but not exactly then. And for microcontroller applications like used in the automotive industry, that is not a thing. It has to happen exactly at that point. So we have to take care of these things. And you have to mimic multithreading because, you know, you have just that single task that you can execute. But there are many other works, work packages to be done on that microcontroller. So we have to find a way how to do this on that single call that you can use. And that is by mimicking multi-threading, so allowing different things to happen concurrently by interleaved execution of chunks of algorithms. And that is really top-notch corner of capabilities for software engineers. So how does it look like? So to the left is a simple algorithm, all done in Python, with a very simple task. Who has an idea of what that algorithm is doing, where this is going? No one, so be patient. And to the right one, so it's just having some number, spending some iterations on calculating a formula, squaring that number, adding the original number, and then after some iterations, look if this will pass a certain threshold. If that's the case, stop it and take care of the number of durations and maybe go on with other numbers to see how they behave. There are quite some numbers with some interesting behavior behind it. To the right is an excerpt how you would do it on the microcontroller. If you were to guarantee real-time capabilities, then you have to take care of how long an execution really takes and how much of the execution of the algorithm you can do in a time cycle and that's what I'm trying to simulate here. So see you have some RAM available like the registers that I prepared and there is a program counter that's the main thing a computer uses to run your code, it's increasing the program counter and it looks what's up next to do. And then I'm reformulating that algorithm to the left in an endless loop and looking and where I am currently with the program counter, just execute parts of my algorithm, like just load the variables from register that I can use them, and then the next time cycle I'm assigning that variable to another temporary variable, and the next cycle I'm doing the squaring, and the next cycle I'm doing adding the original number, and then I do compare and comparing means actually to, as a reference to one of the other well done talks that we have with the exceptions who are sophisticated Go tools, that is actually how it really works here in this mimicking assembly language where you decrease the program counter to get in the state where you have been once before to mimic that loop behavior. So you're at the point that you should repeat things, and how can you repeat things? Well, change the state to a state that you were in before, and then things repeat. And if that's not the case, then you can bail out and have the very same thing. But with this approach, you can really guarantee that these things happen at the very specific time point, because it's just that one time cycle that you have for executing that job. So what it kind of gets these days, it's a very complex piece of hardware with easy access, quite capable resources, remember we're talking megabytes and megahertz these days, microcontrollers are no longer really bare metal, they have an operating system, although most people don't notice, because no one is, if it has a Wi-Fi chip on it, no one is programming the registers of the Wi-Fi chip to get the connection, it's just you have a command set that enables your Wi-Fi and then you're happy and using Wi-Fi and that's it. And that's what operating systems on microcontrollers really do for you. They are multi-threading capable and coding is done in high-level languages like C++ or Rust. There are dedicated IDs available which support you in implementing that very complex behavior so that you don't need really to take care of. And it's often provided by the vendor. But there might be a vendor login down the road. But that's a different story. It addresses entry level and average users. So Arduino paved the way here. And even no code development platforms exist. On your browser you're just moving blocks around and have you loose and get things done. And machine learning is coming to the microcontroller. That's already a tough thing. And Python is here. So what MicroPython offers, it's very simple to learn, we have very much the same feeling for use on the microcontroller than we have on the regular computer, high level functionality is available, like requests, there's even NumPy available on the microcontroller so you can do vector math on it, matrix multiplications to your liking, there's SciPy, there's OpenCV for simple machine learning tasks or image recognition tasks that will work, tens of flow is there, and there is CircuitPython, well, big shout out to Adafruit, they made a whole ecosystem around all these chips that are available that make it so easy to connect to your microcontroller and MicroPython, just use them, and it lets you focus on the problem, not the implementation, that's the Python thing, I guess, the most important thing that you can think about your problem, not how to formulate things, because, you know, it's Preferably, only just one way to do it. So the difference to computers and microcontrollers, computers designed for multi-user multitasking usage always need to be ready for unforeseeable usage, and energy saving is usually done by clocking down your CPU. And on the microcontroller, they are just focusing on a single task, really. They can enter sleep modes when not in use, and that is a huge potential for energy saving. So it changes the way you need to think in implementing periodical tasks. How would that look like? So on a computer the usual thing and very simple formulation is forever read from a sensor, do something with the sensor like sending it somewhere and then sleep some time. And that sleeping some time allows other applications to run and do things. And on the microcontroller it's really different. The whole formulation gets my microcontroller in some sleep state and it wakes up, it boots and at boot time it reads the sensor, does something with it and configures a way to get to sleep and wake up again by setting an interrupt, timer based, say for 10 seconds and then it goes in a deep sleep mode. And after that, an interrupt gets fired, it wakes up again, does the same thing. completely changes the way your for loop or your while loop is really working and it is working just because it has just this one single task to work on and that is ideal for battery usage because that really these deep sleep modes and microcontrollers allow you to get down to micro ampere level of usage and then with the single battery that thing can run for months. So let's start on On recoding, the hello world for microcontrollers, no actually we're not going to do this today. That is usually the blinking LEDs example and where you can get it. If you come from the Raspberry Pi, it's pretty much the same thing. It's using a GPI, turning it on, turning it off, getting a high state, low state, that makes your LED blink, boring. But regarding performance, the famous thing, will it actually run, and you probably know know where this is going, if you know my talks, actually, it's kind of run calculation of the Mandelbrot set. And that is actually the example that we've seen earlier in the code. That is exactly what was happening there for each and every pixel. So for those who are not familiar with that, there's the complex plane of numbers, and you can choose any number, do that very calculation on it, like squaring it, adding the original number, and then see where the result goes to. If it bails out very quickly, so it hardly takes any iterations, you would color it, coloring with, in this example, an A, for example, or a B if it takes a bit longer, or a C if it takes even longer, and the white parts in the very middle is where you can't decide because funny things happen. You should do it in your head or with your computer, implementing is quite fun. And that is a quite compute-intensive task, actually, and these days microcontrollers can just do it in no piece of time. This takes you hardly a tenth of a second to compute. And that's because microcontrollers are very small things, really, but they're very capable these days. So the microcontrollers we're talking today have the performance of Pentium's computers years back. And that is quite a thing. We're talking 200 megahertz, megahertz. That's a lot. So home lab tasks, I had an interest getting back to the very beginning for the motivation to do these things that we do at work at home and for me it was monitoring power usage or gas usage for heating or temperature controls and all these things and or even solar revenue and what I, there are some ways to do this like directly measure the solar inverter or at a special power monitoring device like the Shelly Pro or use the infrared interface of the main power meter. Let's have a look at that. So here to the right is my old power meter. So that's a typical setup. It's not a smart one, although many people call it already smart because it's digital. That's a typical digital power meter. No longer, sadly, no longer the old Ferraris effect based old analog meters, but the digital one. And to the right top corner there is this famous infrared eye. So it's an optical interface which talks to you, if you know how it talks to you. And in this way, this model talks the D0 protocol. It's really just a serial interface you can attach to. You just need a photoresistor and a phototransistor and a resistor, attach the resistor to supply voltage and the phototransistor to your ground and the optical interface properly placed will then switch the transistor on and off which gives you the data stream that you can read from your Siri interface. That's quite simple. And below that photo is what you get. And that looks complicated, although it really isn't, the D0 protocol is well documented, and the simple things we want to look at are clearly visible to the human. It's the part at the bottom, these numbers, it's the OBIS protocol that you can see this Object Identification System language and we would be looking for the 10181 part of it and there is this 40,000 ish value and that's the value in kilowatt hours at that very specific point in time So all you need to do is really like match these patterns regular expression or search for it And then pass it and then have it done with a time step. That's it And then they replaced it At the very end of the march, and I've got the new one, and there you can see how that really looks like, a 3D print, and just that photo transistor and the resistor, that's really all you need to have. But that thing talks a different language, and it was a lot more challenging. To the left is what it looks like now. So there's hardly any human readable thing, but not all is lost. There is structure in it. There's a byte stream of 1Bs and 01s, and that already gives you a hint. So if you're working these things a bit, if you work yourself into these things, then you see that this might be a hint for what protocol is used. And this time, it's the SML language, and the SML language can be worked on. So the SML protocol is basically a list of messages, and there is an opening and a closing sequence, so the list of the four 1Bs and the four 1s, that's really the opening sequence, and four 1Bs and the one A, that shows you that you have the closing sequence. And anything in between is a byte stream that you can pass. And this byte stream always starts with a single byte that shows you what data type to expect next and the size of it. And that can be a list, so a list of more messages, and it tells you how many items that are on the list, and then it tells you that what type to expect, like a string or an integer, unsigned or signed or whatever, and what size that thing is. And then you can go on. Write a parser for this, probably a recursion-based parser would be the neatest thing to do. That's what I actually did, and the output of this looks like this. And there is that one sequence that is really key, where the same value can be found that was we looking for with the old power meter and there we had a list entry with seven entries to process and there is a byte string at the very beginning to look for to match really and that is again the identifier of the OBIS value this time in binary as a byte stream and then there are some fitting bytes and then there's the value 30 as a byte that indicates that we have the unit of watt hours to expect and then there is a value of three that gives you the scalar so whatever value is really there needs to be multiplied by 10 to this very number to the power of three so a thousand and the value was 22 so we are 22 kilowatt hours and then we're done again it's just add the timestamp and then you can do the very same things so how does it look like this is for the old power meter readings because the new power meter reading has a causal resolution currently you can increase it yourself if you have a good provider that tells you the pin then you use your some headlight or something to really get this into your system optically by blinking and then you can reconfigure the power meter it's a great interface really me and my provider we are not at that point currently we take we tackling about this very curious so this is the old thing and in the very middle between 9 and 12 o'clock you can see a straight line at zero and that's the typical german behavior you have a balcony power plant then your usage drops down to zero although you are already back feeding but you don't get any revenue for this and you don't save anything it's just that you have no power usage and down is the energy over the course of the day and to the right is the costs behind it so in a probably March day was two and a half euros and for my electricity bill for the day and with a plateau in the middle I can start fiddling around with numbers to see if a battery would make sense for me in the very end yeah so now we are near the end the key takeaways for this Python applications can easily be transferred from microcontroller thanks to micro Python it's just all the same if you're very familiar and simple concepts and Python you're good to go on a microcontroller in case of course and size of the device is key, this can be quite trivial, copy, use it. When energy saving is the main goal, then the way to handle loops is key, you have to rethink how you do your work, so that you can send that device to sleep whenever possible and keep it there as long as possible and wake up by events like timers, device movement, pin state changes, these things and have a close look at at using Wi-Fi because reconfiguring Wi-Fi frequently costs a lot of energy so if you let your device go to sleep and your aim is reading a sensor and then sending the data over Wi-Fi to some server to process then you have to reconfigure your Wi-Fi for this every time and that really costs you a lot of energy and this is why devices like the ESP32 have dedicated ways to keep your wi-fi in some sort online where the rest is going to sleep so it always pings after a few seconds that it's still there to keep that connection alive and that really doesn't cost you a lot of energy and the rest of the chip is going down in deep sleep mode then we are not really at microamps anymore but still it's milliamps anymore um pay attention to monitoring battery voltage But yeah, if you have a battery-based device, then batteries drain. At some point they enter. You want to be monitoring this when it's a good time to replace these things. And there are even vendors who take care of it, has bad ideas for this, sadly, by just using a set of resistors in series and in the middle pin you can really grab the voltage level then and monitor this with the ADC that you have on the microcontroller. But this series of resistors drains the battery. That's a really sad story really because the idea was right and it was just one transistor missing to get it really correctly. But here we are. With this, I'm at the end of my talk. And just can you leave you with questions, and thank you for your time.
+
+**Speaker 2** _[25:55]_
+
+Thank you, Jens. That was an amazing talk, and I'm sure the audience has so many questions for you. Please post your questions in Slido, and yeah, we have still plenty of time to look at the questions. Please. So we have one question from Anonymous. How is the analog phototransistor output converted to bytes? Thank you.
+
+**Speaker 1** _[26:26]_
+
+Okay, so what you're using is the photo transistor in series with the resistor, attach the resistor to the supply voltage, 3.3 volts usually, and the rest is going to ground. And then the photo transistor, if it receives light, will pull that pin down. And if there's no light anymore, then it will pull up again. And this pulling down, pulling up is giving you the bits that make the byte stream that you can really read on the serial interface so consider that the the other side is just having a serial interface and instead of connecting electrically it's doing this by an infrared LED
+
+**Speaker 2** _[27:10]_
+
+Another question is, is the protocol of the second device not open publicly?
+
+**Speaker 1** _[27:16]_
+
+Publicly. Oh, it's totally open. Actually, the BSI has written a document with hundreds of pages on it. And it's linked in the talk. The talk is on my GitHub.
+
+**Speaker 2** _[27:28]_
+
+another question is is there an alternative to Wi-Fi? I can't connect to anything in my basement someone is saying
+
+**Speaker 1** _[27:39]_
+
+When it comes to long-range in-house, it can be difficult not to use Wi-Fi. So the usual suspects is Bluetooth. That won't help you really for long distances. Another alternative is LoRa. That will work in-house probably and also out of the house with not a lot of data to be transferred. There are options. Else, repeaters, I guess. power line bridges
+
+**Speaker 2** _[28:15]_
+
+Okay. What can you say about the compatibility of MicroPython with modern mainstream microcontrollers?
+
+**Speaker 1** _[28:22]_
+
+controllers with modern mainstream microcontrollers like those that i have shown that would be perfectly compatible because of the way they the micropython is developed on these things they are more powerful probably used on in professional areas and well there's a broad range really of capabilities have a look at the micropython home page there's a huge list list of microcontrollers that just work. The documentation is complete for getting in touch with these things, how to start, how to get MicroPython on that very microcontroller. It's darn simple these days really to get it done. And probably the Pi code W, the Raspberry Pi version is by far the easiest thing. You can't break it. You attach it to your computer. It shows up as a mass storage device, you copy the firmware, the MicroPython firmware on it, afterwards it will reboot and then you have a MicroPython device. And then there is another tool called MP Remote and that is your bridge from your computer to that very microcontroller. You can mount your local file system on the microcontroller so you don't even have to transfer all the libraries for the development cycle to that microcontroller, just use it and play around with it that is a fantastic world to play interactively and develop
+
+**Speaker 2** _[29:55]_
+
+Great. Is there also a MicroPython implementation for PC so you can write 100% compatible code there?
+
+**Speaker 1** _[30:03]_
+
+Absolutely.
+
+**Speaker 2** _[30:03]_
+
+Absolutely.
+
+**Speaker 1** _[30:04]_
+
+Yeah, you can even run MicroPython bare metal on the Raspberry Pi. That is possible. Yeah. Okay. There are subtle differences, really. So it's Python. And not all of the standard library is covered, though. So all the very exotic and hardware-consuming things in the Python standard library are probably missing. There might be simple implementations. The API is very, very comparable. And I think magic things can still happen using MicroPython. Optimizing for a microcontroller involves, again, the old thinking to handle resources.
+
+**Speaker 2** _[30:48]_
+
+Good. We still have two more questions, or three, because we still have plenty of time. Can you combine the Python code for the ease functionality of more complex computations with the microcontroller code for battery efficiency?
+
+**Speaker 1** _[31:06]_
+
+Can I combine these?
+
+**Speaker 2** _[31:08]_
+
+Can you combine the Python code for the ease of functionality of more complex computations with the microcontroller code for battery efficiency?
+
+**Speaker 1** _[31:20]_
+
+Yes, so battery efficiency is all about saving compute power, so doing computation intensive
+
+**Speaker 2** _[31:20]_
+
+Yes.
+
+**Speaker 1** _[31:26]_
+
+things is possible in a microcontroller, but you should do that suddenly, so not very often. Else the microcontroller wouldn't be the right choice, then if it's compute heavy, if it's compute intensive, what you're up to be doing, then Raspberry Pi, real computer, or separate the tasks. So sensor, readout, microcontroller, send the data to some device that is always online at your home, at your lab, virtual machine, some things, let it do the compute there and use the microcontroller just for the simple things. And else is do your compute intensive tasks and get the microcontroller to sleep again as long as possible. So for example, with my new power meter would be, it's sending these data, the new time tags every second but with that resolution it hardly makes sense to look every second to receive the same number again so in this case I would really change that code of monitoring to not continuously watch my theory interface but just give just have one data tag and go down to sleep for another minute or even five minutes and then come back and see what what changed and that for this device and this configuration is good enough a solution for the old one that wouldn't be a different story because the resolution would have been better like what hours not kilowatt hours
+
+**Speaker 2** _[32:58]_
+
+Good thing we can take one more question. What typical optimization steps can I take for loops?
+
+**Speaker 1** _[33:08]_
+
+So, if it comes to battery usage, then it's not using for loops, but do your task, get to sleep, set a timer for rebooting, so that makes your loop. And if you want to really have a more efficient loop, then you have to think a bit different. Like we are used to have, for example, in a for loop, the range generator, which generates each and every number one in a row which is very efficient because it's not having that large list of numbers in memory that you can work on, just generates that number and on the microcontroller it's funnily the opposite. It's the better idea to generate the list of numbers and iterate on them because this is faster and faster in that case can be more efficient. So if you have room for storing all your numbers, do it and just call them. Range works, but list range would be the better idea.
+
+**Speaker 2** _[34:11]_
+
+Great. We don't have any more time for more questions. Can you please thank Jens one more time?
+---
+transcript_status: auto
+---
+transcript_language: en

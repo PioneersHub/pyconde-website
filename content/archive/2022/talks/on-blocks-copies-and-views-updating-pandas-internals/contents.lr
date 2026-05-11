@@ -1,0 +1,89 @@
+title: On Blocks, Copies and Views: updating pandas' internals
+---
+description: a.k.a. “Getting rid of the SettingWithCopyWarning” Pandas’ current behavior on whether indexing returns a view or copy is confusing, even for experienced…
+---
+created: 2022-01-16
+---
+code: XJMXFK
+---
+slug: on-blocks-copies-and-views-updating-pandas-internals
+---
+speaker_names: Joris Van den Bossche
+---
+speakers:
+
+
+
+### Joris Van den Bossche
+
+_This is what Joris says:_
+
+I am a core contributor to Pandas and Apache Arrow, and maintainer of GeoPandas. I did a PhD at Ghent University and VITO in air quality research, worked at the Paris-Saclay Center for Data Science. The last years, currently I work at Voltron Data, contributing to Apache Arrow, and am a freelance teacher of python (pandas) at Ghent University.
+---
+abstract:
+
+
+a.k.a. “Getting rid of the SettingWithCopyWarning”
+
+Pandas’ current behavior on whether indexing returns a view or copy is confusing, even for experienced users. But it doesn’t have to be this way. We can make this aspect of pandas easier to grasp by simplifying the copy/view rules, and at the same time make pandas more memory-efficient. And get rid of the SettingWithCopyWarning.
+---
+full_description:
+
+
+Users of pandas probably have run into the infamous “SettingWithCopyWarning”. Several lengthy blog posts and popular stack overflow questions go into the details on what it is and how to deal with it. At the core of this, pandas’ current behavior on whether indexing returns a view or copy is confusing.  Pandas’ internals will, for most users, be kind of a black box, and it is hard to reason about how the column’s memory is stored. Even for experienced users, it’s hard to tell whether a view or copy will be returned.
+
+But it doesn’t have to be this way. We can simplify the rules and let any indexing operation or method that returns a new DataFrame always behave as it is a copy (and thus never modifies the original DataFrame when itself being mutated). Using the concept of copy-on-write, we can make this aspect of pandas easier to grasp, and at the same time make pandas more memory-efficient. 
+
+In this talk, I will give a brief background on the current internals of pandas related to copies and views and why we have the SettingWithCopyWarning. Then, I will explain the proposal to greatly simplify the rules around copy and view semantics in pandas, and how we can get rid of the SettingWithCopyWarning.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: PyData & Scientific Libraries Stack
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 1702
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: some
+---
+domain_expertise: some
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/XJMXFK.png
+---
+youtube_id: aBeEN2klZQE
+---
+video_link: https://www.youtube.com/watch?v=aBeEN2klZQE
+---
+video_published_at: 2022-05-06
+---
+video_duration_iso: PT30M18S
+---
+video_thumbnail: https://i.ytimg.com/vi/aBeEN2klZQE/maxresdefault.jpg
+---
+recording_available: yes

@@ -31,7 +31,7 @@
   {%- set same_track = [] -%}
   {%- set talks_index = site.get(talks_root) -%}
   {%- if talk.track and talks_index -%}
-    {%- for sibling in talks_index.children -%}
+    {%- for sibling in talks_index.children if sibling['_model'] != 'redirect' -%}
       {%- if sibling.track == talk.track and sibling.code != my_code -%}
         {%- if (same_track|length) < 6 and sibling not in by_speaker -%}
           {%- set _ = same_track.append(sibling) -%}
@@ -44,7 +44,13 @@
   {%- set seen = (by_speaker + same_track) -%}
   {%- set also_in = [] -%}
   {%- if talks_index -%}
-    {%- for sibling in talks_index.children|sort(attribute='title') -%}
+    {%- set valid_siblings = [] -%}
+    {%- for sibling in talks_index.children -%}
+      {%- if sibling['_model'] != 'redirect' -%}
+        {%- set _ = valid_siblings.append(sibling) -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {%- for sibling in valid_siblings|sort(attribute='title') -%}
       {%- if sibling.code != my_code and sibling not in seen and (also_in|length) < 4 -%}
         {%- set _ = also_in.append(sibling) -%}
       {%- endif -%}

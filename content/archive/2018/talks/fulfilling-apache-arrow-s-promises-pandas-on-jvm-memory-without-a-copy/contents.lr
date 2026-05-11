@@ -1,0 +1,87 @@
+title: Fulfilling Apache Arrow's Promises: Pandas on JVM memory without a copy
+---
+description: Apache Arrow's promise was to reduce the (serialization & copy) overhead of working with columnar data between different systems. Using the latest Pandas…
+---
+created: 2018-05-27
+---
+code: PSG873
+---
+slug: fulfilling-apache-arrow-s-promises-pandas-on-jvm-memory-without-a-copy
+---
+speaker_names: Uwe L. Korn
+---
+speakers:
+
+
+
+### Uwe L. Korn
+
+Uwe Korn is a Senior Data Scientist at the German RetailTec company Blue Yonder. His expertise is on building scalable architectures for machine learning services. Nowadays he focuses on the data engineering infrastructure that is needed to provide the building blocks to bring machine learning models into production. As part of his work to provide an efficient data interchange he became a core committer to the Apache Parquet and Apache Arrow projects.
+---
+abstract:
+
+
+Apache Arrow's promise was to reduce the (serialization & copy) overhead of working with columnar data between different systems. Using the latest Pandas release and Arrow's ability to share memory between the JVM and Python as ingredients, we demonstrate that Arrow can fulfill this bold statement. The performance benefits of this will be shown using a typical data engineering use-case that produces data in the JVM and then passes it on to a Python-based machine learning model.
+---
+full_description:
+
+
+Apache Arrow established a standard for columnar in-memory analytics to redefine the performance and interoperability of most Big Data technologies in early 2016. Since then implementations in Java, C++, Python, Glib, Ruby, Go, JavaScript and Rust have been added. Although Apache Arrow (`pyarrow`) is already known to many Python/Pandas users for reading Apache Parquet files, its main benefit is the cross-language interoperability. With feather and PySpark, you can already benefit from this in Python and R/Java via the filesystem or network. While they improve data sharing and remove serialization overhead, data still needs to be copied as it is passed between processes.
+
+In the 0.23 release of Pandas, the concept of ExtensionArrays was introduced. They allow the extension of Pandas DataFrames and Series with custom, user-defined typed. The most prominent example is `cyberpandas` which adds an IP dtype that is backed by the appropriate representation using NumPy arrays. These ExtensionArrays are not limited to arrays backed by NumPy but can take an arbitrary storage as long as they fulfill a certain interfaces. Using Apache Arrow we can implement ExtensionArrays that are of the same dtype as the built-in types of Pandas but memory management is not tied to Pandas' internal BlockManager. On the other hand Apache Arrow has a much more wider set of efficient types that we can also expose as an ExtensionArray. These types include a native string type as well as a arbitrarily nested types such as `list of …` or `struct of (…, …, …)`.
+
+To show the real-world benefits of this, we take the example of a data pipeline that pulls data from a relational store, transforms it and then passes it into a machine learning model. A typical setup nowadays most likely involves a data lake that is queried with a JVM based query engine. The machine learning model is then normally implemented in Python using popular frameworks like CatBoost or Tensorflow.
+
+While sometimes these query engines provide Python clients, their performance is normally not optimized for large results sets. In the case of a machine learning model, we will do some feature transformations and possibly aggregations with the query engine but feed as many rows as possible into the model. This will lead then to result sets that have above a million rows. In contrast to the Python clients, these engines often come with efficient JDBC drivers that can cope with result sets of this size but then the conversion from Java objects to Python objects in the JVM bridge will slow things down again. In our example, we will show how to use Arrow to retrieve a large result in the JVM and then pass it on to Python without running into these bottlenecks.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track:
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 10
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: expert
+---
+domain_expertise: some
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/PSG873.png
+---
+youtube_id: xW7IOaQvDsU
+---
+video_link: https://www.youtube.com/watch?v=xW7IOaQvDsU
+---
+video_published_at: 2018-11-05
+---
+video_duration_iso: PT26M18S
+---
+video_thumbnail: https://i.ytimg.com/vi/xW7IOaQvDsU/maxresdefault.jpg
+---
+recording_available: yes

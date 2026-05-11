@@ -1,0 +1,178 @@
+title: Getting Started with Bayes in Engineering: Implementing Kalman Filters with RxInfer.jl
+---
+description: Bayesian methods are not commonly seen in Civil Engineering and Structural Dynamics. In this talk we explore how RxInfer.jl and the Julia Programming…
+---
+created: 2024-12-21
+---
+code: U9KHNA
+---
+slug: getting-started-with-bayes-in-engineering-implementing-kalman-filters-with-rxinfer-jl
+---
+speaker_names: Victor Flores Terrazas
+---
+speakers:
+
+
+
+### Victor Flores Terrazas
+
+_This is what Victor says:_
+
+I’m a data scientist and consultant specializing in Bayesian modeling in Civil Engineering, currently focusing on applying machine learning to anomaly detection in mechanical systems. My work also explores how machine learning and Bayesian methods can provide clearer insights in engineering applications. When I’m not working with data, you’ll probably find me swimming, cooking, or listening to anything from black metal to Japanese jazz.
+---
+abstract:
+
+
+Bayesian methods are not commonly seen in Civil Engineering and Structural Dynamics. In this talk we explore how RxInfer.jl and the Julia Programming Language can simplify Bayesian modeling by implementing a Kalman filter for tracking the dynamics of a structural system. Perfect for engineers, researchers, and data scientists eager to apply probabilistic modelling and Bayesian methods to real-world engineering challenges.
+---
+full_description:
+
+
+Bayesian methods are renowned for their ability to incorporate domain knowledge and quantify uncertainty, making them valuable across various engineering and data science fields. However, finding practical examples of these methods in civil engineering, especially within structural dynamics, can be challenging.
+
+This talk aims to make Bayesian inference accessible to engineering practitioners by demonstrating how RxInfer.jl, a Julia package for probabilistic programming, can be used to implement a Kalman filter for tracking the dynamics of a structural system. The session covers:
+
+1. Bayesian Modelling in Python and Julia: A brief comparison of probabilistic programming languages, highlighting Python and Julia
+2. State Space Modelling of Structural Dynamical Systems: A brief introduction to state space models and their use in structural dynamics
+3. Linking State Space Modelling to Finite Element Modelling: Making the connection between FEM and SSM
+4. A Simplified Overview of Bayesian Filtering and Kalman Filters for Dynamical Systems
+5. Bayesian Filtering Made Simple with RxInfer.jl: a step-by-step guide to setting up a user-friendly and readable Bayesian filter using Rxinfer.jl
+6. Full Workflow Example
+7. Interpreting the Results and Next Steps
+8. Connections to Julia, Python and Open-Source Ecosystems: exploring integrations with tools like FreeCAD and other open-source platforms
+
+By the end of the talk, attendees will have a clear understanding of how to start using Bayesian methods in their engineering projects, supported by reproducible and open-source code.
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2025-04-23
+---
+start_time: 17:10
+---
+end_time: 17:40
+---
+slot_id:
+---
+track: Research Software Engineering
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Intermediate
+---
+supporting_material_url: https://vflores-io.github.io/posts/20241219_rxinfer_structuraldynamics/rxinfer_structural_dynamics/
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/U9KHNA.png
+---
+youtube_id: w1EU-B5Gzoo
+---
+video_link: https://www.youtube.com/watch?v=w1EU-B5Gzoo
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/w1EU-B5Gzoo/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+Thank you. Thank you very much. Good afternoon, everyone. Thank you very much for being here. My name is Victor. I'm a data science consultant and a civil engineer, and today I would like to talk about how to get started with Bayes in engineering problems, where I will try to condense some years of experience in applying Bayesian methods for engineering tasks in a few minutes, so let's see how that goes. And I hope that this will be of particular interest if If you're an engineering practitioner and you wonder about how to incorporate Bayesian methods, which is this buzzword going around, how to incorporate that into your own workflows. And hopefully, if you've been curious about this or have been wondering where to even start, this will lower that entry barrier for you a little bit and encourage you to do these things. So why do Bayesian methods matter in engineering? Now when we hear the terms Bayesian methods or Bayesian approach or Bayesian inference, oftentimes and more often than not, these are referring to applications in business problems or data science problems. Things like financial forecasting or recommending systems, Bayesian neural networks, what have you. But engineering tasks are a different type of problem. Certain tasks, they tend to be very dynamic, as they evolve over time rapidly, and they are usually underpinned by governing physics, and there are also many sources of uncertainty. But what I mean by this is there's uncertainty in how you model things from the real world into a mathematical model. There is some uncertainty there, nothing is perfect, we know that. There might be uncertainty in the form of noise in the sensors that you're using to observe some engineering system and so on so some examples of these engineering tasks are predicting equipment failure structural health monitoring chemical processes robotics autonomous driving etc now how do we even handle that uncertainty well this is where bayesian methods come into place because they allow us to handle that uncertainty and do something with it In other words, we can quantify it and propagate it. So today's goal is to make Bayesian inference feel more practical, intuitive, and more than anything, useful for practitioners. And the way that we're going to do that today is I'll talk a little bit about Bayesian methods, what the Bayes is. I'll show you an example of how to model a dynamical system and how to make it Bayesian. and finally how to interpret results that we get from Bayesian analysis and Bayesian methods. So let's start with how to model uncertainty with code, which this has been a problem that was really my biggest entry barrier into this. Once you start understanding the concept is one thing, but how do you put that thing in the computer? This just baffled me for a while. Okay, let's start with what Bayes' theorem is. Probably you've seen this many, many times. I'll still just go over it very quick. Bayes' theorem is, in a sense, a paradigm that allows us to update our belief about a system, about an event, a phenomenon, based on the data that you observe on this phenomenon, right? And this is how it looks like mathematically, where we have a prior probability, which is what you believe or what you know about the system that you're trying to model. And there's the evidence, which is just the overall probability of this data that you're collecting about that system to exist in the universe. We also have the likelihood, which is how likely that data is to exist if your assumptions or your hypotheses are correct. And finally, what we're actually trying to compute or to understand is the posterior probability, which is your updated belief about the system after you have observed something about it. So let's go through a one-on-one example, which I really like. So let's suppose that you make an initial guess about the fairness of a coin, and you say, it's 50-50. Now, this is your prior belief. And the age-old question, where does the prior belief come from? Well, it can come from anywhere. It can be just a guess. It can be an informed guess or an uninformed guess. Maybe somebody you really trust told you that these coins are 50-50. Or maybe you work at a coin plant and you know that these are designed to be very fair. It doesn't matter. You have some knowledge or some guess about this thing that you want to compute. now would that belief change at all if you flip the coin and it lands heads probably not or probably yes you know but probably not would it change at all if you flip it twice and it lands heads twice in a row would your belief change maybe not if there's not enough data but you might start getting suspicious right maybe somebody's trying to scam you with you know this game of flipping the coin. What would happen if you flip it a thousand times and 750 times it lands heads? Well you would probably be more than suspicious. You would probably update your own belief about this 50-50 and say hey I don't think this is 50-50 because the data is telling me that it's not right and mathematically or you know graphically this is how it looks like. The more data that you're observing about the thing that you care about the more you're updating your belief, and also because we're working with probabilities, we are narrowing down that uncertainty about it, right? So you get this very nice part when you work with Bayesian statistics. Now here's another example, one that most practitioners might be very familiar with, which is a linear regression model. Now in a classical model on the right, what you're trying to do is you're trying to fit the data with a model that you chose it to be the equation of a line right and you have the intercept and the slope your alpha and beta right what you get there is a point estimate for each of these parameters which is going to give you a line which allow you to explain the data and make predictions on new data okay now on the left here we see a Bayesian model and the difference is that you start by applying some prior knowledge on these parameters that you want to that would you want to compute and especially what the result that you get is that you compute full probability distributions over those possible regression lines so you get along with it some measure of uncertainty right on top of that if you want to make any predictions well you can also quantify how sure can you be of this prediction that you're making. This is the power of Bayesian statistics. They allow you to inform your own decisions and to understand how sure you can be of the things that you're predicting and the things that you're modeling. So the way to estimate parameters, the Bayesian way, again, you are working with probability distributions. And now, to get a little bit more nitty-gritty with this, is how do you estimate those parameters, probability distributions? Well, you can use analytical solutions, which are rare, are very nice, but they are rare. You can use something else like grid search, which is some sort of optimisation in a way, but this is very valid for toy problems. You can use variational inference, which is scalable, but it's an approximation. Or you can use Markov chain Monte Carlo sampling methods, which are very powerful, but very expensive. So depending on your problem, you can choose some of these or some other methodology. And once you pick your flavor, you could always code it yourself, and you're done, right? So you could code something like this, call it a day, go home, but it doesn't really feel very practical or intuitive, especially if you're beginning to use these things, right? So yeah, that's not great news. This was kind of my face when I started doing these things, like, okay, well, that doesn't look very intuitive now, does it? But thankfully, now we have very modern tools that allow us to do these things very easily. So here's an example of how we can write a Bayesian model using this Julia programming language package called RxInfair. It's just an example where you have your Bayesian model on the right, for example. And you set your priors, and this is just, it's very expressive and very elegant, and I call it what you see is what you type. So you have your priors, and your likelihood, and you have your model. And that's it. Really, that is it. Everything else, all of that soup of code is taken care of by these tools in the backend or under the hood. Now, on the other hand, how do we go from the physics to a probabilistic model? Again, this was also a gap that it took me a little bit to bridge it, but once it did, everything clicked. So one way of doing this and dealing with dynamical models is state-space models. And these are mathematical frameworks that allow us to estimate a state of the system as it evolves with time using observations on that system. I'll talk about what a state is in a moment. The reason we might want to use these is because oftentimes with a dynamical engineering system or mechanical system, we can observe some things about them, but these things that we can observe might not be the things that you care about. So they are not directly observable. So a quick example, if you're trying to track a drone, maybe this drone only has accelerometers inside and maybe inclination meters, inclinometers, but what you really want is to know where this thing is. You don't care about whether it's accelerated or not, you want to know where it is, but for some reason it doesn't have a GPS. So how do you track that? Okay. Then this becomes an estimation problem. Now, I won't bore you with a lot of mathematics. I'll just tell you that state-space models consist of two equations. The first one is the state equation so what the state equation tells us is how the state the hidden state that you want to estimate is evolving over time now when i say the state it can be things that you cannot directly observe but you really want to estimate for example a displacement in a bridge that's what you really care about when you're monitoring a bridge or you want to estimate the trend in a signal right in a time series or something and the state depends on three things mostly the state at this point in time depends on the state on the previous point in time it depends on any inputs to the system like forces you know gravity or uh i'm i'm talking about structural systems because that's my that's my background so you might you might uh consider these inputs to be forces for example and lastly it depends greatly on those underpinning governing physics and they are embedded in these a B matrices now if you're a practitioner you should know that what's inside these matrices the numbers that go inside these matrices will depend entirely on your task and with your domain knowledge this is where you apply your domain knowledge okay now Now the other part of the state-space model is the observation equation, and the only thing that this is doing is mapping out the hidden state to the things that you can observe. It's done mathematically, but this is what it's doing, really. So this is how you can fuse the data that you observe, and additionally you have some error terms, which is how you capture the uncertainty in your system. Okay, so there are many examples of state space modeling, like structural health monitoring, as I said, that's my own background. But it can be used for drone tracking or chemical processes or acoustic engineering, which is not my background, but I really enjoy. So you can use these things to model these types of dynamical systems, and they're very powerful. Now, I'll talk about structural dynamics, because this is what I know a little bit more of. Okay, So, we know that structures, they tend to change over time, especially when there are some excitations to the system. When I say excitation, when a car is passing a bridge, for example. It's exciting. So, it changes over time. But often, the things that we really care about, these measurements that we care about, are not directly available. Like it's very difficult to measure the displacement up and down of a bridge or a beam or a building. Maybe you want to know the velocities for some reason, or strains, right? But even in the cases where you do have access to some of the things that you care about, like strains, how these materials are changing shape in a way, even if you have access to they might not be accessible everywhere in your system. So again, with the example of a bridge, you might have access to three acceleration meters. What happens to the rest? How can you estimate what is going on where you're not observing things, right? Again, this is becoming an estimation problem. So from a probabilistic perspective, we talked about the state-based model well it turns out that you can give it a twist and give it a probabilistic flavor to your sit to your model so this is how it looks like our state equation now becomes a state equation that tells you what the probability distribution of the state is at each point in time which again depends on your previous point in time it depends on any excitation to your system and it depends on those physics that are captured by a and B but then you also have uncertainty there. This is why it's a probability distribution. The same applies to the observation, and in the case of the observation, a good example is that that uncertainty comes from noise in your accelerometers or your sensors, right? Now, since we're talking about distributions, that means that we can apply Bayes theorem, right? And here I'm just showing these very nice lovely equations. There's books written about how to get to these but I'll just tell you that in order to make estimations in time using what's called the Bayes filter you would use these equations where you start with some prior belief about that state and then you incorporate the data and you make an an update to that belief in this way, right? Simple. So it turns out that the closed-form solution to those equations is called the Kalman filter. And it looks like this, which, yeah, you can just type this in, call it a day, go home, right? Well, no. How do you actually do that thing, right? This baffled me for a while. So let's see an example on how to make your problem Bayesian. Now, first things first, I will show you an example using that package called RxInfair, and I just want to mention why RxInfair, well, because I really like it, because its syntax is very beginner-friendly, as I showed you, and also it's suitable for dynamical systems so that you can set up everything in state space, it's very nice for that. Still, the key takeaways of this still apply to PyMC or non-Pyro or Turing or other fantastic tools. I really like PyMC, but I think RxInfer is more suitable for dynamical systems like this. Okay, so let's look at an example use case. Let's suppose that you have a four-story building and you want to track its dynamical behavior when you're exciting it with some force. and the problem here is that you don't know what that force is, right? You have an uncertain model because, well, while that looks like a hopefully nice diagram, it's very far from what an actual building looks like. So there is some information lost there. There is some uncertainty associated with modeling your building with that sheer diagram, right? And on top of that, you're assuming that you have sparse and noisy sensor measurements. So there's a lot of uncertainty. How do you deal with that? Well, one way of doing that, I'm not saying this is the only way, is to apply a Kalman filter because you want to estimate these things. Now, when you're doing this type of problem, there are some things that you know and some things that you want to estimate. And the things that you know in this particular case, which appeals to my field of knowledge, is the structural matrices, mass matrix, damping matrix, stiffness matrix. If I'm losing you a little bit here, that's fine. This is where you would apply your own domain knowledge and expertise. So if you're not a structural engineer, that's perfectly fine. It's actually better because it will show you how you can do these things quite easily. Now, to go from the physics to the Kalman filter, we in the structural dynamics realm we start with newton sequin law hopefully most of us remember that i keep forgetting it all the time so i have to refer to you know books so we need to convert this model that tells us about the dynamics of anything really into the state space model and the way we do this is that we take those physics those structural matrices and we kind of rearrange them in a way so that you can have your very nice A and B and C and D matrices. That's what we do. So once we have this already in place, you can use your Kalman filter. Just a technical tidbit. I'm not gonna go too long on this, but we also don't know the input force. So in order to do that, you can include your input force into the things that you don't know and you want to estimate. So in a sense you augment your state that you want to estimate. Let's not pay too much attention for that. This is just for completeness. Let's not delve into that. Yeah, it's an augmented Kalman filter technically. So this is how it looks like. Again, we have our prior, we have our state, we have our observation equations. We have our state space model with a probabilistic twist right so how do we do that in code it would look something like this we have our prior we have our state and we have our observation equation it's simple as that okay now this is just a part of the model but what about the rest I mean you cannot just put this into your you know vs code and run it you need some other stuff but the whole point is this this is how the Bayesian part, the probabilistic part, looks like. That's it. So up there on the top, I put there this is where your domain knowledge goes in. Setting up your model is the hardest part. This is where you probably spend years and years studying stuff to know the ins and outs of that stuff. The probabilistic part is really the fun part. And you just need to set up your probabilistic model. Quite simple. You need to set up maybe some additional variables for that specific package that you might be using, which, again, it's not very difficult to understand it. You initialize it with some priors, run inference, and that's it. And really, that is it. Again, the domain knowledge is the hard part. Now, this is yet another thing that it took me a little bit to come to terms with, like, How does Bayesian inference results look like? So let's look at an example. So we had our measurements in our model, right? So on the top plot, we see our estimation for how the first floor is accelerating. Now in the first floor, we had a theoretical accelerometer there. So we are receiving data from this part of the system, right? So it makes sense that you can be pretty certain about how this thing is moving because you are observing it, right? But what happens in the other floors where you have no accelerometers, you're doing a full estimation in the context of a lot of uncertainty. So this is why, in this case, we can visualize our estimation alongside an uncertainty ribbon, right? And this is why it looks like this. So the bottom plot would be the accelerations that you estimate alongside how sure you can be about that estimate, wherever you're only making estimations without any data seen. So the takeaway here is, why should we even go Bayesian? Well, again, in some cases, or I would argue probably in most cases, you might want to handle uncertainty. You might want to take these things into account because you're allowed to make more informed decisions if you know how certain you can be about whatever you're estimating or computing or calculating. And the other really, really strong point that I wanted to make here is that the domain knowledge is really the hardest part. This is what takes years and years to really hone in. Also, well, to get started with Bayesian methods, you don't need to have a PhD in Bayesian statistics at all just grasping the concept is a very good starting point to get started with this yes in the long run you will be more familiar with these things and you will be understanding them better but to just get started just knowing the concept of what it is to have a prior knowledge about something and incorporating data is more than good enough thankfully we have some tools like rx and fair and pi mc that will allow you to just focus on applying bayesian methods which is is what really matters rather than implementing them having that cat face like before but now you can have this cat face right yay okay so my final thoughts uncertainty really is everywhere but thankfully applying Bayesian methods will allow us to make sense of them and navigate them and thankfully as well there are some modern tools that allow your life to be easier if you want to really jump into Bayesian inference. So why not start making your task Bayesian today? Thank you very much.
+
+**Speaker 2** _[24:31]_
+
+thank you very much thanks so we have some time left for uh the q a i'll have a look if there are already questions in there maybe you need some time to digest it um please use slido if you don't have it uh you don't have slido okay then i'll make an exception and give you the microphone so basically my question is why these are x in inferior
+
+**Speaker 1** _[24:56]_
+
+Yes, sorry Of course, so the way that this is designed from the ground up up. I don't I Just really like that package by the way. I'm not I advocate for them because I really like them I'm not a developer or anything. So the way that it's designed from the ground up is to apply base and inference in almost real time and The way that the syntax and the modeling works for that specific package is is aimed at being able to do this state-space formulation very well. Now, I know that PyMC, for example, is experimenting with the state-space modeling as well. And while it might work great, the problem with PyMC is that it relies on Monte Carlo sampling methods. So they take a long time. I would argue that it would be probably difficult to have some real-time implementation of them. It doesn't mean it doesn't work for them. It's just it might not be the right tool for state space modeling.
+
+**Speaker 2** _[26:05]_
+
+Thank you, and next question is a bit more technical The question is asking what happens if the sensors noise can't be modeled as normal noise systematic bias for example, okay
+
+**Speaker 1** _[26:20]_
+
+Okay, in this particular case with modeling the noise, in this example, what I'm actually doing is I'm assuming that I already quantified the noise parameters, right? But if you don't even have that, then there are some other ways to quantify what the noise parameters are in your sensors, for example. It can be via calibration, it can be via some other Kalman filters that you can use to estimate these things. you can also estimate them in real time because these vary as well so yeah I mean dealing with noise is a whole other thing so yes I hope that that answered the question the question
+
+**Speaker 2** _[27:03]_
+
+I don't know, but the questioner can always ask a follow-up question via Slido if you want to. So maybe I also have a question, but I'm really not that deep into that topic. But I was wondering when you made that bridge example, and if you start modeling that bridge and you try to forecast in which state it might be in the future, did I get that right? How do you handle very extreme cases? So, if you look at the German bridge, which might crash to some scenario, how does bass come into play here?
+
+**Speaker 1** _[27:40]_
+
+Okay, wonderful question.
+
+**Speaker 2** _[27:40]_
+
+Okay.
+
+**Speaker 1** _[27:43]_
+
+So the way I would go about that, if you just want to simulate some situation, right, where you have an earthquake or something that can cause really great loads on your bridge or your structure, what I would do is I would simulate the input to that system and see how it behaves, right? Now, if you have an actual bridge and you have some sensors, then what you can do is you can use your past data to understand the dynamics and the actual physics because they do differ from the formulas that we use with Newton's second law with actual parameters. So, I mean, it is a bit more involved answer than I would like it to be. But yeah, I guess simulation would be a good way to go.
+
+**Speaker 2** _[28:32]_
+
+Okay. Yeah. Right. We have two more questions. Good. The first one is, when would you suggest using an extended or unscented Kalman filter? And can they be implemented in your framework?
+
+**Speaker 1** _[28:47]_
+
+Great question. So that is very technical. So when you would use extended or unscented Kalman filters or particle filters is usually when you have nonlinear systems. In this case, thankfully for civil engineers like me, we deal mostly with linear systems or we can linearize them. I know this answer is a bit technical, but yeah, you would use those types of filters to account for nonlinearities in the system itself. So, yeah, that's when I would use those.
+
+**Speaker 2** _[29:20]_
+
+And then the last question for today and this session. Can this be used to integrate ML forecasts into measurements?
+
+**Speaker 1** _[29:28]_
+
+Can this be used to integrate ML forecasts into measurements? I'm not sure if I follow the question correctly.
+
+**Speaker 2** _[29:36]_
+
+correctly to integrate I guess machine learning for us into into measurements
+
+**Speaker 1** _[29:43]_
+
+OK, I'm just going to go out on a limb here and make an assumption about what the question is about. So again, if you wanted to implement machine learning methodologies, you really want to inject them in there. Probably you can use that to simulate those worst case scenarios, right? But what you're doing there is you're putting two problems together in a very nice way. And that connection between these two problems, your machine learning problem, which trying to predict a typhoon or an earthquake or something like this, you do that as the result of that would be the input to this type of problem that I just talked about right now. So that would be one way of implementing machine learning methods with something that is more Bayesian in nature.
+
+**Speaker 2** _[30:30]_
+
+Thank you very much. Thank you. Maybe also another thank you from the applause.
+
+**Speaker 1** _[30:33]_
+
+Thank you.
+
+**Speaker 2** _[30:34]_
+
+Thank you.
+
+**Speaker 1** _[30:34]_
+
+Thank you very much.
+---
+transcript_status: auto
+---
+transcript_language: en

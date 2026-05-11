@@ -1,0 +1,134 @@
+title: Filling in the Gaps: When Terraform Falls Short, Python and Typer Step In
+---
+description: Not all resources in today’s cloud environments have native Terraform providers. That’s where Python’s Typer library can step in, offering a flexible,…
+---
+created: 2024-12-22
+---
+code: CZXBEP
+---
+slug: filling-in-the-gaps-when-terraform-falls-short-python-and-typer-step-in
+---
+speaker_names: Yuliia Barabash
+---
+speakers:
+
+
+
+### Yuliia Barabash
+
+_This is what Yuliia says:_
+
+Over the last five years living in Germany, during which I have gained a diverse range of experiences in the tech industry. My expertise spans from developing web applications in Python to constructing AWS cloud solutions. I have a good understanding of design patterns, Object-Oriented Programming (OOP), event-driven architecture, and microservices architectures, REST API design and database technologies. I have hands-on experience with creating a web application as part of Cloud Foundation framework to manage and secure AWS accounts and creating a lightweight web application to quickly generate and provide results to users.
+---
+abstract:
+
+
+Not all resources in today’s cloud environments have native Terraform providers. That’s where Python’s Typer library can step in, offering a flexible, production-ready command-line interface (CLI) framework to help fill in the gaps. In this session, we’ll explore how to integrate Typer with Terraform to manage resources that fall outside Terraform’s direct purview. We’ll share a real-life example of how Typer was used alongside Terraform to automate and streamline the management of an otherwise unsupported API. You’ll learn how Terraform can invoke Python scripts—passing arguments and parameters to control complex operations—while still benefiting from Terraform’s declarative model and lifecycle management. We’ll also discuss best practices for defining resource lifecycles to ensure easy maintainability and consistency across deployments. By the end, participants will see how combining Terraform’s robust infrastructure-as-code approach with Python’s versatility and Typer’s user-friendly CLI can create a powerful, cohesive strategy for managing even the trickiest resources in production environments.
+---
+full_description:
+
+
+In this session, we’ll address a common challenge in managing resources and APIs that lack native Terraform providers but still need to integrate seamlessly into your CI/CD pipeline. I’ll demonstrate how Python’s Typer library can help bridge this gap by offering a straightforward yet powerful command-line interface (CLI). I’ll explain how to create and configure Typer applications, pass parameters, and integrate these scripts with Terraform. 
+
+1. Problem Statement (Managing APIs or resources with incomplete Terraform provider support) - 5 mins
+2. Typer (Key components, advantages, and how to use in production enviroment) - 10 mins
+3. Terraform resources that can execute CLI and how to work with them - 10 mins
+4. Conclusion - 2 mins
+---
+room:
+---
+day: Friday
+---
+slot_date: 2025-04-25
+---
+start_time: 10:55
+---
+end_time: 11:25
+---
+slot_id:
+---
+track: Infrastructure - Hardware & Cloud
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Novice
+---
+supporting_material_url: https://typer.tiangolo.com/
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/CZXBEP.png
+---
+youtube_id: HYc_51nYKQ0
+---
+video_link: https://www.youtube.com/watch?v=HYc_51nYKQ0
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/HYc_51nYKQ0/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+So today, I would like to talk about Terraform and some cases when Terraform was not enough and we helped to bridge the gap between our implementation by using Python and Typer. So as it was mentioned that I am Yulia Barabas, I work on a daily basis with Python, AWS, and Terraform, so pretty much I'm aware of this topic. and today I would like to share some of my experience that we came through in our project. As we know as I'm already in the IT for five years and during these five years I was in small project I was in big projects and which usually in big projects where you learn the most because in big projects you have big code base in it you need to learn how to handle everything and manage everything for example if you have a lot of repositories you need to have a way how to maintain everything you don't want to use a lot of technology so you try to use what you have if you cannot manage everything it means that github goes will come after you will go we'll hide you until you do not fix everything so we have to learn how to manage everything that's why people came up with automation because automation is like nice tool according to the books which helps to speed up your delivery and decrease your decrease your maintenance according to the books but sometimes in real life we also maintain pipelines because they always failings we always have problems with them this why also people come out with continuous integration continuous delivery because we want to be sure that our code is tested styled and we always have good delivery and we always deploy to our prod environment, int environment, stage environment and good time to ensure that our environment is provided. One of the tools that use for deployment is basically Terraform. It's open source tool. I think here a lot of people knows about a lot about Terraform and basically it's tools that we use to manage infrastructure. We also use Terraform, as I mentioned, is to provision our infrastructure, is to manage our infrastructure, it has a lot of benefits because we can have a lot of different environments with the same setup. And one of the examples of just simple code, I prepare that how we can create simple resource. For example, in case we want to create S3 bucket, what we need to specify, we just need to specify the resource we need to specify name of the bucket we need to specify some properties name of the bucket so type of the resource as three bucket after it we specify some properties of it for example that it's the name of the bucket and the versioning and it's enough to create a resource but in Terraform is also possible to provide some behavior attached to our source For example, you can specify lifecycle, you can specify provisioner and triggers. Lifecycle and provisioner usually we can specify with any resource. Triggers we can just specify with no resources. And for us it was quite useful. For example, in case of here, we specify for a source S3 bucket that we prevent our destroy. so in case of deployment fail something will get drunk we will not destroy our s3 bucket and we will ensure that it will stay in production and how terraform basically knows what to do as I mentioned terraform is like use declarative language so with declarative language we specified what kind of resources we want to use, but providers are basically who will do the main job. It means that it's kind of the plug-in that will pass our code, it's written in Go, it will translate to specific APIs calls, and will execute against some specific API. In our case, for example, AWS. Most of the time there's a lot of providers, right now there's more than 400 different four thousand different providers so it has to cover also it's open source a lot of people contribute every day changing something but here we have our use case in our use case we thought it would be nice to extend our implementation it would be nice that it would be possible to serve something like data to the users for example people can go to our websites and they can use search engine It means that we need to extend our implementation. We need to host open search index for open search index We would like to use terraform and we started to think Think what we can use it so we can use terraform for managing in the instances we can use for Security access and we thought okay, we can also use for indexes in index templates Everything was smooth We deploy it we run it we tested it was good So, we were extremely happy. Time passed, came new feature, we want to extend new feature. It means for extension of new features, we have to update our index, we need to update our index in place, in production, also in int, and it's any database if you want to change like properties on your database. example properties of some field you had string you want to have bullet you cannot just do it you need to destroy it you need to recreate it you need to put you need to put import your data and after that it will be good in this case is open search it was the same it means we need to destroy our index we need to recreate it we need to import all data what it means for us it means downtime it's very not happy moment when you have downtime you need to tell your users it will be not accessible and we always try to avoid this that's why we came this idea that there should be some simplest process the process is clear that we know that we need to create an index we need to re-index our data from old index to the new one Therefore, we need to reindex our data from the old index to the new index, after that mark our index as ready to use, and destroy the old index. It's quite easy, process is simple, however, Terraform doesn't support this. That's why we fought to divide the responsibility between Terraform and Python, because in Terraform you can still check and use your index templates, so Terraform can still take responsibility of the serving index templates. Meanwhile, Python can basically take responsibility of the index, because it can track all indexes, create all indexes, and re-index your data from the old one. But for this, we need to have a nice wrapper that it's possible to run from Terraform and to be sure that it's easy to use, it's easy to maintain. That's why we thought about Typr because Typr can be a nice tool that's used for CLI that we can create and maintain and basically entry point to our code. and it has pretty much simple functionality for example in case you want to create application is very index very very simple for example for creation of application you just need to define type of the type of instance and after that uses as decorator together with command and register specific function specific function for example the index and after that you can just call from your command line for example here we have Python main dot pipe and after that we put the name of the our command and after that we specify some parameters users here I use Python made at pi because I run from the script we need to specify script where is our silly I tool is located but in case of the production time or you want to use locally you can just add to the path and you can use it from there with this is also very simple to use index it's very easy to pass arguments and also very easy to pass options for example to define arguments you just need to specify index and type of it will be type of argument and type will understand it pass it it will be very easy to use in case of arguments there's two types of variables that you can pass inside so there's arguments and there's options with arguments they're always required if you specify on the first place it always has to be in the first place if you specify on the second place it always has to be on second place and it's a requirement field also there's possible to have some like helpers that people will understand types you can use for the validation another one is options where you can just pass like a tag it's not required it's optional and for it you don't need to keep the location before using you just specify the target and it will be very easy to use like like for example we have here again we want to call our command we just call it like the index after that we specify our parameter the first argument is users we don't use here any flag because it's requirements field after that we use flag target and specifies it our second parameter it's optional user to in case you want to index your data in another place. It's the easiest and what you need to set up your tools, simple CLI command. In case you want to have something more complicated and what I like typer it can pass your environment variables. It can be useful in case you also want to use in github pipelines where you don't want to reveal your secrets but you want to retrieve it from environment variables you don't need to pass for example user as password to anymore to your variables you just need to specify in the options that n var username and var password and it will retrieve from your environment variables another thing that you can notice here that we also specify here callback it's quite important because callback is basically callback is basically will be like entrance point to your tool to your CLI tool for example before execution of another sub command we always will execute callback it means that it will be the first pointer in your execution of the code, of the application. For example, in case you want to connect to database and you want to always be ensure that you have connection to your database, you don't want always to later discover that your database is not working. That's why callback is important because it will be just act as a first entry to your code and you can just execute it so we will execute during our during our execution of the script one of other things it's very important that we also can use context for example with the the context, we can perceive the state between different commands. For example, in case you want to have connection, you again want to establish your connection, you can just store it in the context. After callback, you will execute another command, for example, the index. You will just retrieve from the context, and it's ready to use. So you do not pass your credentials everywhere, you just, as entry point, you retrieve this from your context that will be shared across different comments and sub-comments. Another thing is that it's important how basically we found a way how to combine it. So as I mentioned, Typr, we have already nice command line interface that we can use it and we run it. And we have Terraform that we want to run during our deployment. And one of the strategy was to use is basically, as I mentioned, is to try to use Provisioner. provisioner is where it has local execute where you can execute scripts locally before after successful creation of your resources and what of the examples of it for example null resource because with null resource we don't you don't create any resources but you can specify provisioner that we will execute For example, we specify just simple command, we specify that we want to use our command line interface, and execute it, after that we call our command reindex and specify index. Additionally, we can specify our environment variable, like username and password. And after it was successful, it was executed. Additionally, as we want to be sure that we trigger our script on changes, it's also possible to specify triggers. Usually triggers will trigger creation of resource, depends how it's changing. For example, with index settings, we specify that always trigger when index settings is changing. It means during this time, we'll execute this resource. It will create a new index, it will re-index everything, and it will be ready to use. And it's how we, it's help us to avoid downtime to handle all our implementation. implementation edition is quite nice to use because in case you Have a WS artifacts you have private reposito Rappel register a private registry for your libraries. You can just run pip install install your CLI tool and it will be easy to use the same for github pipelines it was also quite easy to use and conclusions that it really will avoid us to Avoid house downtime to lose our data. Also, we can execute some additional functionality for Terraform. It will help us avoid some problems because it was not nice when you lose your data during deployment. And it was nice a lot of features, for example, getting environments variables, good printing. We can log all our information that we need. Easy to declare comments, easy to declare arguments, and it's quite easy to use. And that's all, and thank you for your attention.
+
+**Speaker 2** _[17:38]_
+
+Thank you, Julia, for your talk. We do have one question in Slido, so feel free to add more. One person asked, is there an architectural difference between time series and non-serialized data in regards to the position of a row or column?
+
+**Speaker 1** _[17:53]_
+
+What do you mean? I don't know. Who asked this?
+
+**Speaker 2** _[18:01]_
+
+wait sorry probably thank you sure so this one is related because it mentions terraform I didn't get the problem of reindexing in terraform can you repeat it once
+
+**Speaker 1** _[18:18]_
+
+The thing is that with the indexes in case you have a big instance you store your data in indexes and usually with open search you have two types how to map your data inside index because for example it has like it can decide that on its own how to index data sometimes you want to decide index template it usually index to play it will try to match types of your fields with the data that you inserted so it's like schema for your indexes and in case with open search and also with terraform how it works it does not update your index in place instead it will just in case you will just change some properties of your index even you don't just change like mapping of your fields it will destroy it and it will recreate it and you lose your data and it was not it's quite fragile solution for us because in case you just change it you deploy it it will destroy a lot of of stuff. That's why we decided to have this separation. So we just during with Terraform we create index templates where you put information how to map our fields, how to properties of the indexes and with Terraform we create index and means when we create index open search try to find appropriate index template and map data correctly.
+
+**Speaker 2** _[20:03]_
+
+Thank you. One more. Was this approach tested on Terraform Cloud or only local execution of Terraform?
+
+**Speaker 1** _[20:09]_
+
+of Terraform? It was on AWS cloud.
+
+**Speaker 2** _[20:15]_
+
+Do you have any experience in integrating Ansible with Terraform? There are a lot of Ansible modules for stuff like re-indexing databases.
+
+**Speaker 1** _[20:29]_
+
+basis. No, unfortunately, no.
+
+**Speaker 2** _[20:33]_
+
+Any more questions from the audience? If not, then thank you, Julia. And maybe one more round of applause.
+---
+transcript_status: auto
+---
+transcript_language: en

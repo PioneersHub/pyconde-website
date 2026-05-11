@@ -1,0 +1,190 @@
+title: Reinforcement Learning Without a PhD: A Python Developer’s Journey
+---
+description: Reinforcement Learning (RL) has shown superhuman performance in games and is already delivering value in Big Tech. But despite its potential, RL remains…
+---
+created: 2024-12-20
+---
+code: TQLGA8
+---
+slug: reinforcement-learning-without-a-phd-a-python-developers-journey
+---
+speaker_names: Jochen Luithardt
+---
+speakers:
+
+
+
+### Jochen Luithardt
+
+_This is what Jochen says:_
+
+I'm the Co-Founder of pi_optimal, where we're working to democratize reinforcement learning and make it usable for real-world decision-making. My passion lies in building AI systems that don't just work in theory, but actually solve meaningful problems in practice.
+
+Before that, I was Lead Data Scientist at Stellwerk3 GmbH, where I led the development of a model-based reinforcement learning project for campaign control. I also had the chance to represent the company at Cyber Valley Incubator events and build a strong, collaborative data team.
+
+My academic journey brought me to the Max Planck Institute for Intelligent Systems, where I focused on challenges in autonomous learning — from sparse rewards in model-free RL to structured world models and graph networks in model-based approaches. Earlier on, I also worked in digital advertising technology at Gruner + Jahr, developing deep learning models for ad click prediction.
+
+Across all these experiences, one thing has stayed the same: I love taking complex machine learning concepts and turning them into impactful, real-world applications.
+---
+abstract:
+
+
+Reinforcement Learning (RL) has shown superhuman performance in games and is already delivering value in Big Tech. But despite its potential, RL remains largely inaccessible to most developers. Why? Because real-world RL is hard—it demands data, infrastructure, and tools that are often built for researchers, not practitioners.
+
+This talk shares the journey of applying RL to a real-world use case without having a PhD. It’s a story of figuring things out through hands-on experimentation, trial and error, and building what didn’t exist. We’ll explore what makes RL powerful, why it’s still rare in practice, and how you can get started. Along the way, you’ll learn about the key challenges of production RL, how to work around them, and how the open-source toolkit pi_optimal can help bridge the gap. Whether you're just RL-curious or ready to dive in, this talk offers practical insights and a demo to help you take your first steps.
+---
+full_description:
+
+
+Reinforcement Learning (RL) has made headlines for beating humans at Go and StarCraft, and it’s already being used by companies like Google, Amazon, and Lyft to optimize real-world systems. But outside of big tech and research labs, RL is still rarely applied. Why? Because even though RL is powerful, it's also complex, resource-intensive, and hard to implement without the right tools.
+
+In this talk, we explore what it really takes to bring RL into production—without a PhD, a research team, or unlimited infrastructure. I’ll share the story of how we applied RL to a real-world business problem: optimizing digital campaign management in a fast-changing environment. We faced all the classic challenges—limited data, no simulator, and no out-of-the-box tools that actually worked for our use case.
+
+We’ll look at how we built a training environment from historical data, dealt with uncertainty using ensemble models, and iterated through a long cycle of trial, error, and learning. That experience eventually led us to create pi_optimal, an open-source toolkit designed to make RL more accessible to Python developers and data scientists.
+
+You’ll walk away with a clear understanding of:
+- Why RL is powerful, but rarely applied in practice
+- What makes real-world RL so challenging
+- How we got a working RL system off the ground without a PhD in RL
+- How pi_optimal helps lower the barrier to entry
+- How you can get started with RL, either through theory or hands-on practice
+
+Whether you're RL-curious or looking to apply it in your own projects, this talk offers practical insights and a live demo to help you take your first steps.
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2025-04-23
+---
+start_time: 14:30
+---
+end_time: 15:00
+---
+slot_id:
+---
+track: Machine Learning & Deep Learning & Statistics
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Novice
+---
+supporting_material_url: https://www.piwheels.org/project/pi-optimal/
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/TQLGA8.png
+---
+youtube_id: ZIJUyf5bcww
+---
+video_link: https://www.youtube.com/watch?v=ZIJUyf5bcww
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/ZIJUyf5bcww/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+I'm Jochen, and I'm one of the co-authors of PerOptimo, an open source package for reinforcement learning. And over the last four years, I was working on bringing reinforcement learning to an actual real-world application. And today I would like to take you a little bit on the journey, on my personal journey, into reinforcement learning. On the one side, to show you or a little bit explain why I'm so excited about reinforcement learning and why we think this is a very, very important technology for the future. And on the other side, to give you some tools and learnings that we had along the way at your hands that you can actually get started faster with reinforcement learning. So let's take it step by step. Overall, I would start with making a short introduction about the motivation, why SRL, why it's super cool. then we'll have a very brief high-level overview about the theory of reinforcement learning and then we'll come to the core how to do actual reinforcement learning if you don't have a PhD which none of me and my team members had back then and as I said finally we come to the point where it's about you so how could you get started with reinforcement learning if you're curious so let's start the story where it actually started and this is around nine years ago I was scrolling through YouTube, and I was getting sucked by this video. Some sort of algorithm was playing Super Mario. At the beginning, it was incredibly bad. It was failing very early in the level. But you can see actually how the algorithm is learning over time and improving and getting better and better and better. And then finally just speedrun the whole level. And I remember, okay, there's a bit missing. I remember seeing this was for me really, really exciting Because, back then, I didn't know that this is some sort of reinforcement learning algorithm, but what I saw was a system that is learning by itself, and in the end, end up with very, very complex behavior. And I found it super interesting, and actually that leads, in my case, to the decision to actually switch my career path. Back then, I was studying something with psychology and with business, and I then switched in a way that I started learning coding myself with R, bought some books about machine learning and Python, and slowly moved into this field of artificial intelligence and data science. Now, while I was progressing into this direction, also the field was moving forward. And I brought two examples. The one is about AlphaGo, and the other one is AlphaStar. Those are both two algorithms, two reinforcement learning algorithms, which were trained to play, on the one side, Go, the board game, and the other side, StarCraft, the real-time strategy game. And why did I brought those two algorithms? Because they are a very great example of the power of reinforcement learning. Because both of them were able to beat the best human players in the world in those games. And this is very impressive, because both of the human players were training since they were five years old in those games, and still they got beaten by this AI system. Now why did I tell you that? Because I think it highlights the most exciting thing, at least for me, about reinforcement learning. reinforcement learning can actually go beyond what is trained on. It could go beyond what we humans are used to. It finds new strategies. Actually in the games when they were analyzed by experts they figured out that the algorithms were using strategies nobody had thought before of and I think this is a really great power. Now this is just reinforcement learning in games but what about the real world? And also there we could see some applications. For example Google is using it to cool their data centers, and they save 40% of energy costs, which is incredibly large. Amazon is using it, and they were able to cut their stock levels by 12% without somebody didn't get their Amazon package. And also Lyft is using it to match their driver with the rider more effectively and have much more additional rides each year. This is super cool and very, very impressive, while at the same time when I was reading it, and I was back then a very novice, like not really experienced in reinforcement learning, I was asking myself, why don't we see it everywhere? I mean, it's such a powerful technology. So think about how would our world look like if we have something like a superhuman, goal-playing reinforcement learning algorithm, but who's actually controlling how much food we order? That we, on the one side, never run out of stocks, but on the other side, also not have a lot of food waste. Think about how our world looks like if we have production processes where it can produce the same amount of goods but with a quarter of the energy because we're utilizing the machines that we have more efficiently. Or even in healthcare where people, at the moment, at least in Germany, sometimes have to sleep on the floor because there are not enough beds or the beds are poorly allocated. Back then I didn't know the answer, but I was very fascinated by this idea of what reinforcement learning could actually do in the world. And while I was very early in my career, in my pathway, way, back then I had to make a decision. I was doing an internship in AI, and I had to decide if I continue with this practical pathway, which is just like taking packages and try to solve real-world solutions, or go more the theoretical pathway, go back to stool, do a master's degree, and continue on that path. Now, as it is with life decisions, often they were made for you. So back then, actually, corona hit, and the job opportunity was gone, so I decided to study in university. And I did my master's in cognitive science, which which is basically a lot of computer science, a lot of machine learning, and a hell lot of math. And during that time, I also learned more about how reinforcement learning is actually working in theory, and that is what the next chapter is about. So what is reinforcement learning? How does it work? The idea of reinforcement learning is that you learn from feedback. So like in this nice picture here, you're trying out a lot of different things and then see which of the actions, or in this case the keys, actually opens the chest, so which one gives you a high reward. And from this signal, you are learning, compared to supervised learning, where you just get an input and an output, and the algorithm just tries to find the best mapping between those two things. The impressive thing, if you do this in the limit, so you just give very long feedback, then you can actually emerge at the superhuman capabilities. Let me give you a short example of the supermarket. So in a supermarket example, imagine you're a supermarket manager. As I said before, you don't want to order too much every day because then you have to throw away a lot of stuff and have a lot of food waste on the other side. You don't want to order too little because then customers get frustrated very strongly. Now how could we frame that as a reinforcement learning problem? We have two components. We have an agent and an environment. The environment in our case is a supermarket, so it's the stock level that we have, it is the customer demand that we are having, or the supplier schedules. The environment provides a state of the system, which in our case is, for example, how much stock is in each shelf. The agent takes the state and makes a decision. For example, how much food, milk, or bread should I order? The environment finally judges how good this action is. So basically, at the end of the day, you see how much did I run out of stock, or how much food do I have to throw away, how much of my products did I sold? And this in the end gives you the reward signal. And as I said before, if you do this over and over and over again, your algorithm is trying to learn, is learning optimal behaviour. And you can prove that actually mathematically, that the algorithms that are developed in reinforcement learning in the limit, so you have infinite amount of compute and infinite amount of data, you will find the optimal solution. Now, we have all this stuff in theory, but still I was wondering, why don't we see it in reality? If it works so great in the limit and we find the optimal solution, why isn't it out there? And to find an answer, we have to go to the next chapter, which is actually trying to do reinforcement learning in the real world without having a PhD. And this story actually started simultaneously when I was starting my master's degree. So I was starting at a company, and my job description was as follows. We have a lot of data. You know something about machine learning, just do something. Maybe some of you know that job description. So as I was super curious about reinforcement learning, it didn't take a long time until I was like, wait a minute, there's something where we can maybe use reinforcement learning. And we just thought back then, me and my colleague, yeah, we try it out for a couple of weeks and then it will work and everything because, I don't know, we had no idea of what we were doing. And it ended up in a three to four year project where we really tried to bring this technology into the real world. But let's take it step by step. So what was the actual problem? The problem was in a marketing agency and it's called campaign management. What is it? In a marketing agency, you have a whole department which is responsible that the campaign that you sell to a customer reach actually the performance that you're selling to a customer. So those people are going every day online to Google or to Facebook, check how the campaigns are going, and then adjust small parameters. Now, what is the problem? It is super time-consuming. It is very repetitive work. And the decisions are very suboptimal because they are done by gut feeling and guesswork. Therefore, I was like, wait a minute, this is something for reinforcement learning. We have this game-like structure, remember, go alpha star, so you have this feedback loop, we have optimisation over time, and we want that the system improves over and over again and gets better and better and better. Now, cool idea, but we very fastly stumble into some obstacles, and I will go over the the three main obstacles. So the first one was, where do you actually train a reinforcement learning agent? So the question is, what is the environment? And there you have multiple options. The first option would be the real world, which is maybe not the optimal solution, as I would have to go to my boss and tell, yeah, I mean, you know, the first 100,000 campaigns, they will be really shitty, but afterwards, we will converge to a suboptimal campaign manager. And he would not agree with that. So there was not a feasible option. We had to find another way. And we decided to go with a simulator. So the idea of a simulator is that you create something that is simulating the real world, which allows for safe exploration. That's a cool idea. The question is, how do you come up with a simulator? And there are two pathways. The first one is expert knowledge. So think about robotics. In robotics, when you create a simulator, you have some physicists who know the physics of the real world, and then they put this knowledge into a simulator, and then the robots can train in the simulator how to learn, how to run, or how to do fancy stuff like backflips. The problem for us was we don't have a mathematical formula of the online market in Google or in Facebook or in TikTok. So we don't have... Maybe it probably doesn't exist, but even if it exists, we didn't have the knowledge. So that was not an option. On the other side, we can try to learn the simulator from data. And that was very feasible because we actually had data. We had data from past advertising campaigns on a high temporal resolution, which represents the state of the campaign, so how a campaign is doing, the impressions, what budget it has, as well as the actions that were taken by the campaign manager. So we have state, we have actions, and this allowed us to learn from the environment. Now, the question is how to create the simulator if you have the data. And the answer here was that you have some sort of machine learning algorithm which you train in a supervised fashion. So you input to the algorithm the current state and the current action, and it predicts the next state. And that didn't sound really fancy, but what you can do then is you can take the prediction of the next state and plug it back in and use the action of the next time step. And then you get a whole rollout, as you can see here. So you can simulate from state four what will happen in the next four time steps as I do a certain action sequence. Okay. Yeah. That's nice. You can give the action sequence and you get in the end to know where you will end up. That's cool. But, yeah, why is it really cool? It's really cool because you cannot try out one action sequence, but you can just iterate over how many action sequences you want. That's super cool because you can actually leverage the historical data that you have about your environment, while at the same time having a system that's actually debuggable. That's a big problem in reinforcement learning, because the algorithms are not really... you can't debug them. If they fail, you don't normally know why they fail. And with this approach, we can actually see what the simulator is predicting and why it makes certain decisions, because we can actually see, ah, it makes this decision because it actually was thinking the system evolves in a certain direction. Now, building this whole thing took us two years. And you might now ask, but why does this take two years? I mean, it's just some supervised learning problem. It's not super difficult. And the reason for that is that simulator is not reality. There's always a gap. You will always have prediction errors. And around the time when we were at the finish line of this project, I was doing a research internship at a reinforcement learning group and figured out that what we were actually doing is called model-based reinforcement learning. And in model-based reinforcement learning, you're not really focusing on training the agent, that's the second path, but the first thing that you are focusing on is training a model of the environment, and then you can use this model either to plan or to train then your agent within, in that. And also we figured out that the problem we had, the simulation to reality gap, is actually the main problem in the field, and that is called prediction error. So, as I said before, your model will never be perfect, but in our case, the problem is even bigger because the prediction that you output has some small error at the first time step, and then you feed the error back into the system, so the error gets larger and larger and larger the longer you want to look into the future. And that's called accumulating error problem. And this problem gets even more worse if you don't have a lot of data. If you're Google or Amazon, you have hundreds of millions of data points, so you can make your model very complex and constrain it with the data. But if you're just having, like us, 10,000 campaigns, it's just not enough. It is hallucinating very strongly. And that was a very big problem that we discovered back then. So now we had the simulator and we didn't really know how to move forward. The solution came actually also by looking into the literature. And it was called uncertainty estimation. So the idea is that you not use one simulator, but you use multiple simulators. And then you can see, for a specific action sequence, how much are the simulations differing. And if you see they are very strongly disagreeing, so there's a high distance between those models, then the models or the simulators are very uncertain. So you should be very, very careful when you apply those actions to the real world. On the other side, when the disagreement is low, so they're close together, the uncertainty is also low, so you can be certain that, OK, probably the models know how the actions will impact the system. And actually, by implementing that into our code base, we also start making it fly. So that was the secret sauce that make it work. The last part is infrastructure. So if you want to build a system like that, you have to build a lot of infrastructure. You have to build a method to collect data regularly, you have to find a method to actually change the settings that your algorithms suggest in the system. You have to find a way to retrain it, for example, weekly and do hyperparameter tuning. Then you have to deploy this whole thing on, for example, like Kubernetes, that automatically scales up and down depending on how much campaigns you want to control. And you finally have to monitor the whole thing. What was the solution to that? In the end, it was just very sad and very true. This whole thing took us a year, by the way, to build it, and in the end, we have to build everything ourselves. There was not an out-of-the-box solution that you can just use and have some deployment retraining pipeline ready. So let me briefly summarize. The challenges that we had first, where do we train the agent? The solution was in a simulation, and we learned a simulation by learning from data. The second problem was the prediction error. Our simulation is never perfect. There will be always a gap between simulation and reality, and the solution was there to use uncertainty estimation methods to, even if we are not certain, make sure that our algorithm stays in a range where it could be certain. Finally, the infrastructure. And that was just a lot of work, and the end of the solution was to build it ourselves. I mean, if you have any questions, we maybe can talk about it later, but this whole how how we did the infrastructure thing is a whole other talk. Now about what happened in the end. So what was the impact of our solution? And it was actually really cool. We were really happy as a team when we saw what our algorithm was doing. It was actually able to reduce the cost by 30% and also put a lot of this very nasty manual work away. So only very difficult campaigns had to be controlled by a campaign manager. I think the really cool thing about this was that those 30%, when we were looking at the actions that the agent was taking, we were actually seeing that it was doing actions that nobody has tried before. And it was actually figuring out strategies that we didn't thought was possible, and we actually saw, yeah, the campaigns are still running really well if you do it in a certain way with certain settings. That was also, I think, for us seeing this in our own project, very, very interesting. Now, still, we also slowly start realizing why maybe we are not seeing reinforcement learning in all those applications, because, I mean, this took us three to four years. We had luck that the management was supporting us back then in doing this very experimental work, but in most places, it's just not... You don't have the time. You have maybe one month or two months or a project, not a couple of years. Okay. And does that mean we should not care about reinforcement learning? I would say it is the opposite. I think we need reinforcement learning much, much more. Why? Because we humans are limited. We are limited in dealing with complexity, dealing with uncertainty, and we have actually technology who is able to deal with that. And as I said before, maybe implementing it for marketing and making campaigns a bit more efficient is not world-changing, but think about the supermarket use case. Like how much waste you can save by actually utilising this technology. Or in energy systems, or in healthcare. So there is a huge potential of this technology. So now the question is how you can get started. And there are basically two pathways. A theoretical and a practical pathway. The theoretical, I will not go into detail, that's basically the path we took. So you just go to university or you go to books, there are great online courses, there's really great research, and if you have done all of that, then you can use the open source package that are available, which are actually built for this people who have gone through the research. On the other side, there's a practical pathway. And I remember back then when we started our project, we were actually searching for something like that, because we knew when we do it ourselves, it will take a very, very long time. So we were searching for something like a scikit-learn for reinforcement learning, which is Debuggable, because we didn't want to waste three months and then see it's not working, and which works with very little data. And the thing we came up with was creating PowerOptimal. So the idea was, now let's take all the learnings that we had from the three years that we invested and put that into an open-source package that other people can use that and apply reinforcement learning in their field. Now, what is PowerOptimal? As I said, it's an open-source project. It is focusing exactly on working with little data that you can actually see what is going on and debug the system. It is built in a way that it feels very similar to, for example, scikit-learn, so you just get started, and we are working at the moment on building production tools that you can very fast from your first prototype move also to production. On a very high level, it is basically you come with your data frame, you plug it in, PyOptimal creates for you a simulation, and then you can either plan with the simulation or you train an agent within. So let's sum it up. Motivation, why RL is cool, because it can go beyond what we humans know. It can discover new strategies. We looked at the theory of RL, which is learning from feedback. We looked at through the real world case, where we experienced that RL is really tough. It takes a lot of time. There are a lot of challenges you have to solve. And in the end, I explained the two pathways, either theoretical pathway or a more practical pathway of the Power Optimal package. Now, thank you very much for your attention. If you are curious, you have an idea where you want to apply reinforcement learning, feel free to reach out. And for those of you who are more like hands-on, we actually open sourced two weeks ago our package where you have a bunch of notebooks where you can use it. And we are super happy for some feedback. So thanks for your attention. I'm Jan from Foptimal. And we want to democratize reinforcement learning.
+
+**Speaker 2** _[22:12]_
+
+Thank you so much, Jochen. We have a Slido where you can ask questions. The link is in the Discord. But since we're not so many people here, we can also do it with the microphone, I think. Are there any questions?
+
+**Speaker 1** _[22:37]_
+
+Thank you for the presentation and the question that I had is did you try supervised learning as well and how do you think would it compare to your solution? How would you apply supervised learning in that setting?
+
+**Speaker 2** _[22:52]_
+
+of, let's say, tree-based models.
+
+**Speaker 1** _[22:52]_
+
+a tree-based model, something like that? I'm not sure about the time-based things, but in the usual things, not with reinforcement learning? I think if you look at the architecture, what we built with the simulator, it is basically a supervised approach. So the simulator itself is fully supervised. So you have your historical states and actions, and you try to predict the next state. So this is trained and supervised, and that is also why it's so sample-efficient, why it needs so little data. So that works actually quite great. If you then want to train reinforcement learning on top in the simulator, then you are more in the RL field. But the basic core, which is also the basic problem of reinforcement learning, comes up with the simulator that is trained in a supervised manner.
+
+**Speaker 2** _[23:38]_
+
+thanks for the talk from my experience
+
+**Speaker 1** _[23:41]_
+
+experience.
+
+**Speaker 2** _[23:41]_
+
+experience with reinforcement learning because I thought it was too complicated two years ago how did you handle the basically the reward function because I was
+
+**Speaker 1** _[23:53]_
+
+I was kind of struggling because you still kind of...
+
+**Speaker 2** _[23:55]_
+
+because you still kind of come up with a kind of.
+
+**Speaker 1** _[23:57]_
+
+You kind of say, okay, it optimizes itself, but then you give a function and then just hope that it works.
+
+**Speaker 2** _[24:02]_
+
+works. And then if not, okay, I'll wait another
+
+**Speaker 1** _[24:03]_
+
+I'll wait another week and see how it turns out. So how did you handle that? Yeah, that's a good question. I think overall, the applications that we see are more focused on the business area, where, for example, in campaign management, we don't have a lot of metrics. We want to have certain KPIs. We put them in a reward function. We rate them towards each other. And actually, you're right. That could be quite challenging to design the right reward function. What our approach would was be to make this process simple So in the end what you're doing is for every row in your pandas data frame You basically create a new column which is called reward and then just say how good is this row and this is in the end You're how you design the reward, but you're right. This is probably where in the end a lot of work is going in
+
+**Speaker 2** _[24:52]_
+
+Any further questions? We have a little bit more time. Maybe I can ask a question. Are there situations where you would recommend going for the PhD into the academic path? Or is there always a disparity between the theory and actually practical side of things?
+
+**Speaker 1** _[25:18]_
+
+I mean, none of us has a PhD in reinforcement learning, but I think at least working on those methods and also doing some research in some labs was actually necessary if you want to develop a method. So if you want to push the boundaries of what is possible in reinforcement learning, I would definitely say you have to do a PhD, or at least have a lot of research experience. But I think if you're more on the practical side, I would really recommend to get started with the high-level packages.
+
+**Speaker 2** _[25:45]_
+
+Cool. Thanks a lot. So a question over there.
+
+**Speaker 1** _[25:53]_
+
+You mentioned you stumbled upon model-based reinforcement learning as opposed to just training an agent. How would you choose between the two? How would you go about saying, okay, let's first train a model or just do an agent or both? Yeah. The decision for model-based reinforcement learning was mainly driven by two things. The first one was sample efficiency. So as I said before, we don't have abundance of data, and model-based algorithms are known that they're supersample efficient because you can train them in a supervised manner. And the second reason was that model-based algorithms are more explainable, because you have your simulator, which you really can see what the model is actually predicting, so you can really understand what is going on. And it was, for us, super important, because doing those projects is always a bet. So you want to ensure as soon and as fast as possible, will this turn out good or will this turn out bad? So therefore, designing a whole black box Model-3 algorithm and seeing after a couple of months if it will work and then even can't say why it's not working was too dangerous for us. So that was the reason why we started Model-Based RL. Yes.
+
+**Speaker 2** _[27:08]_
+
+You showed a slide where you show where you can
+
+**Speaker 1** _[27:09]_
+
+Thank you. show where you quantified the uncertainty yes and i was wondering how do you trade off between uncertainty and the positive or negative expectations yeah that is that is a very very tricky question and the implementation that we have now right now online you just have a term for example in research the space the action space we just have a term that we're penalizing if we're very uncertain but defining this term is extremely critical so the research that we do at the moment the idea is that we are and it seems to work quite well that we are switching so we have for example an ensemble of 10 models and then we when we are trying planning we are switching them randomly and therefore you have implicitly the uncertainty embedded so you don't have to quantify it because in the end the idea is it should work with any pandas data frame you come with any pandas data frame with any continuous discrete stuff and it should work and therefore defining this generally is very difficult. So that's probably the solution. At least we see some hints in our research.
+
+**Speaker 2** _[28:13]_
+
+Is there a final question here? I think we're good. Jochen, thanks so much for your very interesting talk. Let's give him a hand again.
+---
+transcript_status: auto
+---
+transcript_language: en

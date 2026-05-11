@@ -1,0 +1,113 @@
+title: Heat: scaling the Python scientific stack to HPC systems
+---
+description: Python’s scientific stack (NumPy/SciPy) is often confined to single-node execution. When datasets exceed local memory, researchers face a steep learning…
+---
+created: 2026-01-09
+---
+code: K9LCNQ
+---
+slug: heat-scaling-the-python-scientific-stack-to-hpc-systems
+---
+speaker_names: Claudia Comito, Thomas Saupe
+---
+speakers:
+
+
+### Claudia Comito
+
+_This is what Claudia says:_
+
+I work in the Large-Scale Data Science division at the Jülich Supercomputing Centre (JSC), and I lead the development of Heat, an open-source distributed tensor framework designed for high-performance data analytics. My work focuses on scaling scientific Python applications across multi-node, multi-GPU clusters.
+
+My background is in astrophysics, I joined JSC in 2018 to co-design distributed analytics for scientific domains including aerospace and Earth system modeling. Since 2021, I have led the Heat project, focusing on technical user support, community growth, and project dissemination.
+
+### Thomas Saupe
+
+_This is what Thomas says:_
+
+I do research and software engineering at Jülich Supercomputing Centre. My interests are primarily doing numerics with Python, but I accept that I have to be interested in ML now as well.
+---
+abstract:
+
+Python’s scientific stack (NumPy/SciPy) is often confined to single-node execution. When datasets exceed local memory, researchers face a steep learning curve, typically choosing between complex manual distribution or the overhead of task-parallel frameworks.
+
+In this talk, we introduce [Heat](https://github.com/helmholtz-analytics/heat), an open-source distributed tensor framework designed to bring high-performance computing (HPC) capabilities to the scientific Python ecosystem. Built on PyTorch and mpi4py, Heat implements a data-parallel model that allows users to process massive datasets across multi-node, multi-GPU clusters (including AMD GPUs) with minimal code changes.
+
+We will discuss the design and architecture enabling "transparent distribution":
+
+- Heat’s distributed n-dimensional array for data partitioning and communication under the hood;
+- The synergy of PyTorch as a high-performance compute engine and MPI for efficient, low-latency communication;
+- Scaling efficiency, encompassing both strong and weak scaling for memory-intensive operations;
+- Fundamental building blocks—from linear algebra to machine learning—re-implemented for distributed memory space.
+
+Attendees will learn how to leverage the cumulative RAM of supercomputers without leaving the familiar NumPy-like interface, effectively removing the "memory wall" for large-scale scientific analytics.
+---
+full_description:
+
+**Memory bottleneck in scientific computing (4 minutes)**
+ - Limitations of single-node libraries
+ - Complexity of existing workarounds: trade-offs between manual MPI programming (high developer effort) and task-parallel frameworks 
+ - The data-parallel alternative: performing uniform operations on distributed slices of a global tensor.
+
+**Architecture and implementation (8 minutes)**
+- The DNDarray structure: Technical breakdown of the distributed n-dimensional array, which provides a global logical view while managing local physical storage across MPI ranks.
+- The split axis concept: How data is partitioned along specific dimensions (e.g., rows or columns) to optimize communication for different mathematical operations.
+- Backend synergy: 
+  - PyTorch as the compute engine for high-performance local tensor operations and GPU acceleration.
+  - mpi4py for communication in cluster environments.
+- Hardware interoperability: Transparent execution across CPUs and GPUs, including NVIDIA (CUDA) and AMD (ROCm) accelerators.
+
+**Algorithmic building blocks for distributed memory (8 minutes)**
+- Communication-aware linear algebra: Distributed matrix-matrix multiplication and its communication costs. Advanced matrix decomposition methods, such as hierarchical and randomized SVD (hSVD), for massive datasets.
+- Scalable machine learning and statistics: Example: clustering (K-Means) and Principal Component Analysis (PCA) on distributed arrays.
+- Temporal analysis using Dynamic Mode Decomposition (DMD) on large-scale scientific data like global wind speeds.
+
+**Performance and scaling efficiency (7 minutes)**
+- Scaling methodologies: strong scaling (speedup for a fixed problem size) and weak scaling (efficiency as both problem size and resources grow).
+- Memory wall removal: Utilizing the cumulative RAM of many cluster nodes to process datasets that are otherwise impossible to load.
+- Case studies: Reviewing performance results from large-scale runs
+
+**Summary and project roadmap (3 minutes)**
+- Key takeaways
+- Upcoming features
+- Open-source community
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2026-04-15
+---
+start_time: 17:35
+---
+end_time: 18:05
+---
+slot_id:
+---
+track: PyData & Scientific Libraries Stack
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 6779
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url: https://github.com/helmholtz-analytics/heat
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/K9LCNQ.png
