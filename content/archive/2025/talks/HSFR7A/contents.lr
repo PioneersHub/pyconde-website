@@ -129,3 +129,246 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/1F_G0q3HrVk/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:08]_
+
+So I'm gonna talk about scraping just like for first how many of you know what scraping means or have you tried it yeah I guess okay and how many of you tried it like recently since LLMs started to you know became a big thing okay so we gonna start with some you know introduction stuff to build up the thing so scraping is basically you you know we consume the web and we try to put it into structured data to use it for something of course big corporations don't really like this because they think that something which is available on the internet is theirs which is you know i'm pretty against it or you know information or binary data on the internet if it's if it's available then we can build something with it for sure like just small stuff about me i'm doing scraping and a lot of reverse engineering for the past 12 years did a lot of mobile application reverse engineering and for some some time i needed to get a lot of data which was not really easily available let's say so i started to i started to work as a full stack engineer since since covid because it's a bit easier to do but when chat gbt3 came out open ai released a pretty cool thing called operator i don't know how much how how many of heard about it it's basically an ai controlled agentic browser and since then the whole scraping game changed quite quite a bit so i need to need to start the talk with this my lawyer told me to do so so there's a it's a pretty gray area let's say especially in the eu because since gdprp processing user data or personal information is like tricky let's say we shouldn't do that and we should respect the robots txt for the web and web admins sake of life but in the u.s it's a pretty different game because in the u.s we can sell this information they don't really care about it and yeah it's uh you need to know that if something is for free then we are paying with our data and our profiling information and stuff like this so how it started like 10 years ago 20 years ago we need to needed to use xpats css selectors and pretty old-school archaic stuff which was easy to easy to break if you know some front-end engineer changed the the layout of the website then we needed to rewrite it this whole scraping field is very cat and mouse game Anyway, but in the older times it was even more than nowadays. Yeah, just some stuff like what we used in the old school times, like expert CSS selectors, some regex, and then when JavaScript heavy sites started to happen, especially React and, you know, Vue and Shadow DOM, we started to use headless browsers. How many of you saw or know Puppeteer and this kind of stuff? Yeah. So that was the solution for JavaScript heavy sites to load the DOM content and then to use the browser as an API, basically. So we can control the data, the events, and just read it programmatically. And, of course, I'm going to mention the evasion techniques is one of the biggest fields in scraping, which requires a lot of extra talks. It's a very deep topic, but I'm going to mention it later on, what you can do about it nowadays. But one big thing is proxies, of course. I'm going to show you some cool proxy solutions soon. So in 2017, Google released, I mean, not Chromium, but I think that's when Puppeteer happened. So we started to use it pretty heavily. then Playwright came, it's from Microsoft, it's basically the same, it's like a wrapper over multiple browsers and we can use it so we can with just one code we can either run Chrome, Firefox or Edge or whatever we want to do and yes it was a big big thing since last year and then the new era came which is agentic browsing or using LLMs to consume the internet. And the traffic nowadays over the internet, like 60% of it is scraping or heavy use of agentic browsers and agents to collect data because CAPTCHAs are not really a thing anymore. And yes, we can put a loop. If some of you know these land-graph-based or graph-based agentic systems, we can create a self-heeding loop. So if we hit a capture or if a selector is missing or there's something new, it tries to solve it until it actually solves it. Some few mentions about what to do to evade companies. Rotating proxies is a big thing. That's the number one. we can either use data centers or or the biggest thing nowadays is to use 5g or mobile mobile mobile phones basically old android phones you can route it you make a small cluster you drop it in different zones of the world and proxy through them with a small golang or python web server let's say so you don't need to pay the hyenas of proxy companies that's the biggest thing If you start to scrape in millions of data points per day, then definitely you need to rotate IPs because they will ban you. This is the cat and mouse game that I'm talking about. If you imagine there's a lot of skyscraper or kiwi.com or trip.com, they are scraping the big airline sites, and they are doing this on an insane scale. And they are using a lot of rotating proxies. So this cluster method is pretty cool. It works fine. I'm using it for a few years now. And if I manage to collect five or ten phones, I just drop it somewhere at a friend's place or something and pay the electric bills. There are also capture solvers. Not many people know about them. Like there are actual humans, mostly in India or Africa, and they just sit behind a few computers and you can hook an api into your scraping code and once the captcha hits it based on an event they get the either the text version of it because there's usually a text or a sound version of the captcha and they just solve it it's it's crazy fast and uh one capture costs like 0.2 cents or something so it's most of the time it's worth it but everyone decide on their own and also fingerprint fingerprinting is one of the nowadays is the most common thing with what we need to look for it's fingerprinting is a whole big field it depends on a lot of stuff that's the most i'm going to show you later on like a few tricks how you can launch chrome to try to avoid fingerprinting there are a lot of packages open source packages for puppeteer let's Puppet Illustrastat, which try to do various techniques, but the problem with this is that this is open source, so the cat and mouse game, they're going to check it and they're going to try to fill in the gaps. So you cannot really use it, for example, to scrape TikTok in millions of videos per day. And there's going to be a small video. It's based on a prompt and browser use. How many of you heard about BrowserUse? Nice. So BrowserUse is an agentic... It's basically an open source operator, what ChatGPT, OpenAI built recently, and we gave it a prompt to buy groceries. And what you can see on the screen is a headless browser, 50 or 60 lines of python code and the prompt basically a very detailed prompt with step one two three like which site to visit and what what you know what is my diet and and it buys it how it works is that this chromium instance is hooked into an llm call and it tries to bound box the elements based on visual like image processing and it just selects those parts of the screen and this is scraping nowadays it's pretty fast and we don't really need to write expect selectors anymore we just need to write prompts and And the more detailed and more step-by-step the prompt is, the more dynamic it can be. So it just depends on how you can prompt. And as you can see it, yeah, it got delivered. And you can imagine that you can automate a lot of things with this. So I'm going to show you now. I just recently created a complete LinkedIn automation stuff for salespeople. And they were mind blown that they don't really need to work anymore. Just write a few detailed prompt. I'm not sure if I already jumped to the next one or not. So, this is going to be another showcase of this kind of scraping, I hope. This is sending CVs to remote jobs. The prompt was also, as you could see, it was just like three or four lines and the CV file, and it's sending and writing and basically bulk applying for jobs. As you can see, it also works, and it's quite easy to create something. You can also create these automatic scrapers or agents via agents, so you can go deep down. Yes, one of my favorite quotes nowadays is, where people dig gold, you sell a pickaxe. In the age of LLMs, data is getting more and more valuable because if you provide more structured and more high quality data to LLMs or to the training data set, let's say, they are getting more and more accurate. So scraping is, is and always was a very profitable industry or part of software engineering. just always in the gray zone and area and that's about it you can have the side after it so there's gonna be some live scraping so I'm gonna show you like an old scraper with an old method I don't know how easy is to see it but this is a this is with play right and you know you can see these selectors it It takes like 30 minutes to get all of LEGO's dataset from the original site, so that's why I'm not going to run it, but I'm going to show you the AI version. So it creates basically, it produces a CSV file with the product IDs of LEGO, the URLs, and all of the metadata which is needed to resell LEGO products. context for this project was one of my friends started to create a webshop for for lego but lego is not providing data for them like they are not giving the you know this this metadata so they started to write it manually and i said to them like yo man i can do this for you so i i just did it and he was he was super happy uh and i got some some nice lego sets and yeah this is an old traditional uh scraper it's using script scrape i i think scrappy i don't know how to say it and yeah you can see it's a lot of code you know you need to handle everything these expats are pretty like it's hard to find a good one you know you need to test it a lot of times you need to open the developer developer tools in Chrome and and try it on yourself like it's just ugly you know and if it's something changes or they put a new element or a new wrapper on the UI or something you need to you need to jump in and you lose the context so it's it's just pain in NDS. But the new version is basically just this prompt. I'm going to zoom in. I cannot, of course. I cannot zoom in. So basically this is a new framework called Firecrow. It's It's a combination of a few tools, like an operator, Chromium, like an agent, a browser, proxies built in, and an AI agent, like a LandGraph agent on top of this. You just write a prompt to it, and that's it, and you run it. I just don't know how to zoom into the terminal, but I already tested it, so it will run for like two minutes and it scrapes everything basically just based on that prompt. So it changed the game quite a lot. Here you can see, this will run in the background, I will just get back to it. This is a bit more complex scraper or automator. This is for LinkedIn to make it automatic to send direct messages and search for people. You can see it's just a matter of prompting. I cannot really run this now because I need to close all the other Chrome instances if I want to run it locally. But believe me, this works. And here are a few hacky things to avoid fingerprinting. So one of the things that you can do, there are a lot of arguments to launch Chrome. And you need to play with these flags. And you can visit, there are a lot of fingerprinting sites over the Internet. just you just trial and error it like they're gonna tell you if it's probably a bot or probably a user try to fingerprint you and one of the biggest uh helps is the sandbox the web security disabling and yeah some bling features and you can also create user scripts which i'm not sure if i put here but it was not needed but these tools is still running so this fire claw tool what i'm using here it's also capable of solving easy captures so captures which don't require you to to like move these elements just to click on like how many hats or how many cars there are it's it's able to solve it so you don't even need to use cert word countries to do it for you And since it's still running, there's a gist I created with a lot of tools and mentions of stuff that I was telling you about. And I'm going to update that after this, based on the Q&A, if there's going to be any questions or something. let's get back to the lego data scraping so we're gonna wait here until it's happening i mean if you know if there's some questions i'm happy to answer them now because yeah
+
+**Speaker 2** _[17:59]_
+
+Okay. Yeah. So we do have a few questions already. Oh, okay. Let's just go. Yeah. So how do companies react to LLM scraping? Do they shut down public data presenting sites or do some moves towards open APIs to avoid the traffic overhead?
+
+**Speaker 1** _[18:15]_
+
+Sorry, can you repeat? Sorry, I didn't hear.
+
+**Speaker 2** _[18:16]_
+
+So how do companies react to LLM scraping? Do they shut down public data presenting sites or do some move towards open APIs to avoid the traffic overhead?
+
+**Speaker 1** _[18:28]_
+
+Yeah, so since it's a cat-and-mouse game what it means is that they are trying to Trying to make our lives harder by requiring logging logging in like authentication Which is quite easy to to solve or like blocking IPs. So nowadays you need rotating proxies proxies Proxies solve everything. So I mean that's my question That's my answer. Yeah
+
+**Speaker 2** _[18:55]_
+
+Are you aware of bricklink.com? The what? Are you aware of bricklink.com?
+
+**Speaker 1** _[19:01]_
+
+Yeah, it's the open Lego data set. Yeah, I'm aware, but it's not the same
+
+**Speaker 2** _[19:01]_
+
+Yeah, yeah, yeah. All right, how reliable are the LLM based scrapers in terms of their ability to scrape all the metadata on the website?
+
+**Speaker 1** _[19:15]_
+
+It's very reliable and you can control it by trial and error like setting the temperature of the of the models I mean for me based on my experience the best model for for this kind of scraping is GPT-4, 4.0 Like any model which which supports function calling is good is good for this kind of applications And Gemini is getting crazy good especially the flash versions of the Gemini models so yeah you can try it out yourself it's quite quite fast to get this stuff get these things running it's just a few lines of code and one python install so that's it
+
+**Speaker 2** _[19:58]_
+
+All right, what's the approximate cost?
+
+**Speaker 1** _[20:00]_
+
+Yes, for example, for the food ordering, it was two cents. All right. Yeah, for like a whole LinkedIn automation flow, let's say when you try to, like lead generation, you know, you try to search for companies or people and like fetching pictures or profiling someone and then sending a customized message, it's like half a dollar maximum. So like half a euro, yeah.
+
+**Speaker 2** _[20:30]_
+
+Do you still face issues with requests from the same hardware? Are there solutions to conceal this in the context of fingerprinting?
+
+**Speaker 1** _[20:40]_
+
+Yes, so that's a good question. So this is running locally, as you see, but there's also a pretty nice tool, or like, wait, it was here, Chrome. So like browser, I think I added it to the GIST, but basically it's a web browser agent. Like you can just connect to it via WebSockets, and they are running the headless browser for you. you can spin up multiple like millions or hundred thousands of chromium instances and just use them for your own sake but also you can also self-host something like this you just need a powerful cpu heavy machine in any cloud and just trying to you know like create a proxy in front of it and just connecting to it yeah web sockets because these these ai i'm not going to move the the MacBook. So these AI scrapers, they are connecting to the browser via web sockets, via remote ports, and that's it. You just need somewhere a Chrome instance running. But you can run it headlessly, headless, through, without the UI, and that's it.
+
+**Speaker 2** _[21:58]_
+
+Can you show the QR code again?
+
+**Speaker 1** _[22:01]_
+
+Which one at the end? Yeah, I think
+
+**Speaker 2** _[22:03]_
+
+Yeah, I think you're just yeah
+
+**Speaker 1** _[22:05]_
+
+Yeah, sure. I'm gonna leave it.
+
+**Speaker 2** _[22:08]_
+
+I'm going to wait for 10 seconds for everyone to scan it.
+
+**Speaker 1** _[22:13]_
+
+Dun, dun, dun.
+
+**Speaker 2** _[22:23]_
+
+Let's count the phones. All right. No more phones. Wait. There was someone. All right. OK, how long is, well, yeah, so how long, I guess in time, is the debugging pipeline? I mean, does it take quite long?
+
+**Speaker 1** _[22:37]_
+
+Well, it depends on your skills, but, like, not really. It's quite easy to, you know, you can also tell the agent if something is wrong. He tries to debug it for you or, like, say it nicely or print out nicely what probably went wrong. And also you can take screenshots with it or export it to PDF and stuff. So the same thing applies like with Puppeteer or these old school browser instances. So I think it's easy to debug. You can put a lot of layers into this. So you can still fall back to old school scraping if you want. You can instruct the agents to write old school X spots. So if they cannot solve it visually, they try to solve it like programmatically. So it's infinite. Thank you.
+
+**Speaker 2** _[23:35]_
+
+Right. Another question about the QR code. How did you make it look so nice?
+
+**Speaker 1** _[23:39]_
+
+It's with AI, of course.
+
+**Speaker 2** _[23:43]_
+
+There's some weird text rendering down there.
+
+**Speaker 1** _[23:46]_
+
+Yeah, yeah, yeah. And still cannot make the, you know, so it doesn't produce texts on these generated images. But most of the stuff you see here is generated via mid-journey.
+
+**Speaker 2** _[24:00]_
+
+Hey, what LLM are you using for this demo? Sorry? What LLM are you using for the demo? It was GPT-40
+
+**Speaker 1** _[24:04]_
+
+GPT-4-0 from open AI.
+
+**Speaker 2** _[24:08]_
+
+All right will scraping libraries like scrapy scraps this train Become obsolete even with their whole feature set with the advent of the LLM scraping Do you think that they will adapt these techniques?
+
+**Speaker 1** _[24:23]_
+
+I'm not sure I cannot comment on it for the past one or one and a half years I haven't used these older packages so most of the time nowadays I'm using this kind of advanced automations but still let's say if you want to scrape millions of tick-tock videos per day you cannot reliably use these things you need to reverse engineer so reverse engineering is is not dead yet so for very heavy use of scraping you you need reverse engineering or these old methods.
+
+**Speaker 2** _[25:00]_
+
+all right what are the costs for proxy services and i'm especially interested in the service that you're using yourself with the phones and the
+
+**Speaker 1** _[25:07]_
+
+Well, it's just my cost, so it's not a lot.
+
+**Speaker 2** _[25:07]_
+
+well it's
+
+**Speaker 1** _[25:11]_
+
+I have a lot of phones because I used to break phones for a living, so I collected a lot of them. But you need to buy eSIM cards. You can find digital nomad eSIM cards and just hotspot them in the cluster or buy multiple ones. It depends on your use case or setup, but a lot cheaper than using rotating proxy services. they are quite expensive so usually like one gigabyte of traffic is like five dollars or something which you can imagine is like super expensive it can get super expensive especially if you're scraping videos or or heavy heavy heavy data site
+
+**Speaker 2** _[25:57]_
+
+Right. Do you really need your own hardware, for instance with the NAT cluster? Or is it possible to scrape at scale on cloud without a high failure or block rate?
+
+**Speaker 1** _[26:07]_
+
+You don't really need your own hardware, but you definitely need hardware to run these headless browsers. But you can always rent someone else's computer, so everything what you see here can run locally on your MacBook or machine or whatever. But it's much better if it's running on the cloud, because they usually take care of everything infrastructure, like scaling. At the end of the month, it comes cheaper if you use someone else's computer, like in scraping, in the scraping field.
+
+**Speaker 2** _[26:45]_
+
+All right, what are your main issues with this new method?
+
+**Speaker 1** _[26:50]_
+
+Good question. I'm still trying to figure that out.
+
+**Speaker 2** _[26:56]_
+
+Okay, how can we validate the results of LLM-based scrapers? I think we had that before, but especially in terms of hallucinations and the completeness of the data.
+
+**Speaker 1** _[27:06]_
+
+of the data yeah you can ask them after after the first extraction to to produce like an old school version with selectors because at that point they already run through the the dom and then you run both of them and you know just like compare the results
+
+**Speaker 2** _[27:23]_
+
+How do you scrape embedded PDFs from various sources that is no direct URL or URL behind the captcha?
+
+**Speaker 1** _[27:32]_
+
+Like, you can solve the CAPTCHA, but let's say you don't do that. Like, by embedded URL, you mean like to download e-books or PDFs from sites, I guess. Well, with Chromium, you can export any page to PDF. So that's solved. And you can consume these or process these PDFs with Gemini. Gemini is quite amazing by itself to process PDFs. PDFs, like the one or two million context window is enough for like two Bibles almost. So it's, yeah, by creating your custom data processing pipeline, it's quite easy to do. So to scrape, like the other thing is that you can always use Tor and, you know, or use gray or black area things. So like anything is possible. never hidden if somehow you can access it by typing in by like humanly then it's possible to automate it so
+
+**Speaker 2** _[28:37]_
+
+All right, your use case sounded like an ethical scraping usage. How many ethical scrapers are there, or what's your estimate?
+
+**Speaker 1** _[28:45]_
+
+Ethical scrapers, that's a good question. Like a few times I needed to combine police like wanted lists in Europe, that was ethical, I think, because it was open source and like you know like a police agency has to to get a big data set of wanted people, which was already available without logging in to sites. but it's like as I said it's a gray area so it's I think there's not a lot of ethical scrapers like most of the internet traffic is either you know emails yeah NSFB stuff and scraping so
+
+**Speaker 2** _[29:36]_
+
+Yeah, okay, so let's just expand this. What's the legality of scraping or scrapping captures in the EU?
+
+**Speaker 1** _[29:43]_
+
+Yeah, I'm not a lawyer, I need to say. But I consult a lot with Chad GPT and Claude, especially, because Claude has some morale, let's say. At least Anthropix has it. So in the EU, as far as I know, what is available on the internet without logging in is okay. If you need to log in, then it depends on the terms of service of the site. So you need to check that but I usually ask myself like how do like how would they know like it depends on what you do with the with the with the data itself if you just want to process it aggregated and like like make make it inspire you or something I think then it's okay if you sell the data. that's another topic, you know, you you you should try not to do that in the EU because it's it's pretty harsh here. But in the US, it's the wide West. So in the US, they collect data on like massive scale aggregates and sell it to big companies like, you know, fast fashion brands or skin care brands. They they scrape the whole tick tock for like whole tick tock Instagram and just create like machine learning models based on the influencers and yeah like they are targeting people almost directly so yeah it's a it's a deep topic you you should consult your lawyer not not me
+
+**Speaker 2** _[31:18]_
+
+Is the grocery shopper in your git asking for a friend?
+
+**Speaker 1** _[31:24]_
+
+for a friend not yet but i can i can put it into the gist if you want it's really just a few lines of prompt so you can try it with amazon or whatever it works quite quite well
+
+**Speaker 2** _[31:36]_
+
+All right, are the LLM hosts good at blocking certain usage?
+
+**Speaker 1** _[31:43]_
+
+No, jailbreaking LLMs is quite easy. So even though they put some system prompts and barriers between harmful questions, it's quite easy to break them and make them tell you everything and anything. So no, it's not really.
+
+**Speaker 2** _[32:05]_
+
+Alright, do LLM scrapers also use image recognition models to solve the CAPTCHA or do they still need CAPTCHA solving services like the human click forums as mentioned?
+
+**Speaker 1** _[32:16]_
+
+You know captures are getting quite hard nowadays, I think because of this So for example, if if you know Binance or these crypto exchange They have so hard captures that I cannot solve it easily So you need to like there's a slider then you need to check something or rotate something It's not that easy to solve by a vision model yet. I mean like at this time but it's a cat and mouse stuff so they will get there I think in like a month then they will do some even crazier captures like 3d rotation or something I don't know
+
+**Speaker 2** _[32:55]_
+
+It's a reverse capture, so if you can solve it, you're not a human.
+
+**Speaker 1** _[32:57]_
+
+Yeah, yeah, yeah.
+
+**Speaker 2** _[32:58]_
+
+Yeah, yeah, yeah. All right, we got a comment love the pirate attitude free internet content
+
+**Speaker 1** _[33:04]_
+
+Uh, hey.
+
+**Speaker 2** _[33:08]_
+
+Alright, I mean on the side of that's it basically is there anyone with a question or comment still in the audience? You technically have Ten minutes to think about this ask your question. You can sit around Contemplate take photos
+
+**Speaker 1** _[33:28]_
+
+Yeah, I can go back to that.
+
+**Speaker 2** _[33:30]_
+
+Yeah, how about the actually how about the latest craving it's still running
+
+**Speaker 1** _[33:34]_
+
+No, I think... Ah, I remember why it doesn't. So I wanted to show that, you know, this code, it doesn't output anything. I just realized what's happening. Because nowadays I'm trying to automate coding, too. So let's try it out. Add some... So write the data to a JSON file and also print it out. okay yeah this is cursor and what you saw was like a whisper flow or something I'm just recently testing it out, if I push a button it will just write what I'm saying because I don't really like to write, not even prompts I'm super lazy so So it created this. I remember now, because I wanted to show you how to code, how to automate code, but I forgot it. So yeah, if you want, I can talk about these setups of LLM workflows, like how to use them for developing. So this is Courser. I don't know how many of you heard about it or are using it. It's okay, but there are better stuff, like, for example, RAW. I highly suggest everyone to try out RAW. It's a visual code extension where you can hook into any LLM provider. It's using the API directly. There's a lot of experimental features. And row, this extension, is developed and written by row itself. So it's pretty nice. And basically you can create tasks. Like a task is just, you know, like a prompt. It has different modes. Architecture, code. You can ask something about the code or debug. It works quite good. Like we can ask it to debug this if we want. I don't think we have that much time, though. but it's basically a low level version of Coursor you can customize it for yourself you can add MCP servers you can automate writing prompts and creating subtasks and do like it's pretty nice and yeah if you run eventually at one point I hope I don't know how to put it back the view because I just started to use it a day ago. Does anybody know how to put the tree view back? No? Command B. No. I have no idea. I just clicked the API key. I have I don't know but it's already scraped it once so this this was the output of the the run and it managed to collect or scrape the most important metadata and when I tried I think it was like three minutes to get 200-ish LEGO sets from the site. With the old school Scrapey, I don't know the name, it was like half an hour because I needed to handle sleeping, otherwise I got blocked. Because in FireBase, not FireBase, Fireclaw, there's some built-in rotating proxies so it handles it for you and yeah, I think it will still run so let's say that thank you for listening
+
+---
+transcript_status: auto
+---
+transcript_language: en

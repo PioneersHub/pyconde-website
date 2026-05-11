@@ -96,3 +96,214 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/yXpHtgXsMz0/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+All right, thank you so much for coming here, despite the not-so-catchy title, I guess. So, yeah, I'm Annalisa, I'm a data scientist with GIZ Data Lab, and this is Raha, she is a co-developer on our project, which we are going to talk about, and also a data lead at Endeffect Data Solutions. And with that, let's get right in, so I'm not sure who of you is actually able to see the slides or not, but we are going to give you some context on the UN global treaty negotiations on plastic pollution so that you know what the use case is going to be like. Then Raha will walk you through the process of how we chose the different application or the different components of the application, and then I will come back with some insights of what it means to develop something with GIZ. So GIZ, for those of you who don't know, is a German international development corporation. So we are a federal company that is working on behalf of the BMZ and other ministries but also on EU level to actually implement sustainable development projects and with this we have a lot of cooperation partners worldwide in over 120 countries and me personally I'm part of the data lab so there we are a think and do lab that is actually allowed to make experiments of what technology could be useful for international development and we focus on data for development but since the past two years we actually also have a focus on machine learning, so this is what brings us here today. And now to the disaster of plastic pollution. I guess you all have heard about it, it's a little bit inescapable, but just to get you up to speed on the facts, so there's 4.8 to 12.7 million tons of plastic that enter the ocean each year, which is a huge problem and it's supposed to be tripling by 2060. And this is especially a problem because this relies on fossil fuels and toxic additives, which are harmful to human and animal health and the environment and can now be also found in unborn babies. So it's very concerning. And the UN said, okay, we're going to do something about that. So they started negotiations with around 180 countries who all are on board to have a legally committing and binding a treaty that they can implement and the key demands include global bans on harmful chemicals, worldwide regulations, a funding mechanism to actually like work on this and then also monitoring ongoing progress and we went live to the negotiations so if you see the slides this is what you see in the lower part of the slide at the negotiations live and then to make it a bit more specific for you the user challenges so 180 countries everybody comes with their national agenda then there's research institutions who also submit different texts and all of this creates an overwhelming and complex negotiation structure but also a lot of unstructured texts and not great access to it so basically our idea was okay we will build a rack system that actually allows people to use natural language to find the stuff that they are looking for to also save them time so finding relevant information is time-consuming and error-prone and this is where we get in and actually try to make it better so which design principles did we identify in creating a trusted application for international negotiations well we came up with negotiate AI and on the slides you have the screenshots from the application and the interface that we created and also there's quite good filtering system so because people have those filters in the head like I'm working to this topic which is only polymers of concern so then they go okay polymers of concern this is what I'm searching for and then they get a generated answer but also with the links so this was like a very important part with the trusted this is where it comes in you have to be able to look up how the answer was generated and if there's no sources to be generated from it has to tell you okay there's no answer I can give you that was super important and also for users that are not so acquainted with different applications like this we made up some sample questions so at the end of the presentation there will be the link if you want to test it for yourself even if you're not a professional negotiator you'll be able to come up with some nice questions for that. And with this, I'm going to give to Rahat for the technical part.
+
+**Speaker 2** _[05:15]_
+
+All right, so now that you have seen what negotiated AI does, let's take a look at how we actually build it under the hood. So here you can either see the architecture or not, depending on if you have your slides. But at the heart of our setup, we have our AI framework K-Stack. And it connects the database, it performs the retrieval, and it also communicates with the LLM. Just beneath that, we use Quadrant as our vector database. It's where all of our documents and the knowledge are stored. And on top of everything, we have a simple streamed UI that ties it all together. This whole application sits in a Hugging Face-based application. Now, I could walk you through every single component in this architecture and explain you everything in detail, but I'm pretty sure that most of you are already familiar with the REC system. So instead, I want to take you on a different kind of journey today. over the next few minutes I will share five stories with you with decisions we made and challenges we faced while building our application. And each of these stories touches on a key part of our architecture. So let's kick things off with document stores. One of the first and most foundational decisions we had to make. Now if you're looking into options for document stores you will quickly run into a whole zoo of possibilities. We have vector libraries like PHYs in memory stores built into some AI frameworks like Haystack or Lama Index. Then we have vector-based databases like Quadrant, full-text search engines like Elasticsearch, and last but not least, vector-capable SQL and NoSQL solutions. And each of them come with a different strength. Some are fast, some are built for scale, and others are optimized for vector search. So how do we decide which one to go with? We actually had a few practical constraints, and that helped us to choose a suitable document store. So let's go quickly over these requirements. First of all, we had budget constraints. We couldn't build any additional infrastructure or manage our own database. And secondly, we were also limited by the deployment. As I said, the app was hosted on Hugging Face Spaces, which is what the GitHub Datalab usually uses for experimental applications. The problem with Spaces, there is not really an option for a custom back end. So this excluded for us all of the self-managed options. Nevertheless, you can see we still have the full range of document stores available, as most types offer fully managed services. So moving to our next requirement, We also needed a vector search, because we wanted to use semantic search for the retriever. And that eliminated full-text search for us. Technically, full-text search still works. But it's traditionally built for keyword-based queries. And we therefore decided that this is not the best solution for us. But technically, of course, you can also use still full-text search. And the third important factor was metadata filtering. We didn't need any complex relational queries. We just needed basic filters like filtering for countries or negotiation rounds. And this ruled out two options for us. First of all, vector libraries, because they do not support filtering out of the box. And Haystack, our AI framework, didn't offer the workaround at that time. And second, we have also eliminated SQL and no SQL solutions, because they were just overkill. Great if you have complex queries, but too much complexity for our use case. So what we were left with were two main options, one in-memory store and fully managed vector databases. We actually had two versions of our application. And in our first prototype, we started with an in-memory store. That was perfect for testing on small data sets, but then we wanted something more future-proof. And since we didn't know how much data we're going to end up with in the next negotiation rounds, we went with a vector database, namely, Quadrant. Now, why Quadrant? It gave us a really smooth starting point with our budget constraints in mind. Quadrant has a really nice, free, fully managed tier. It comes with one gigabyte of storage. That's perfect for now, but still with the option to scale up later if we need that. Also, no request limits, so no worrying about hitting quotas with the free version. And you can even choose the cloud provider, So this might be relevant for you if you have any data protection reasons and this is a more personal opinion I think that quadrant also has a really clean and intuitive UI It's simple without being overwhelming and you can set up a vector database in minutes So to summarize quadrant offered the easiest and most budget-friendly way without having overhead in terms of infrastructure or complex carrying or search With the document store in place, our next task was to look for a suitable AI framework. Now pretty similar with document stores, the AI framework space is a rabbit hole. If you Google for differences between AI frameworks, you will quickly end up with hundreds of tabs full of comparisons and also sometimes very different opinions on these frameworks. But here's the thing. Once you zoom out, most of these frameworks actually do the core same thing. They all help you to ingest and preprocess your data. You can do chunking, you can do preprocessing, and you can do also indexing of data. And you can also connect to all common document store providers and LLM providers. It allows you also to customize your prompts and the retriever, so actually you can get the job done with all of them. Now when you zoom back in, you start to see where they differ, and depending on your use case, those differences can matter. This is by far not a complete list, which I have on the slide. They differ in their customization degree. They also have some specific tools. For example, longchain has a really good semantic chunker. Llama index has a nice advanced parse, a llama parse, you may have heard of that. And also the architecture philosophy differs. index is more revolved around indexes and query engines, while Haystack has a more pipeline structure. And also the deployment options and enterprise supports differ. So which one did we pick? Our requirements were actually super, super simple. We didn't need anything fancy like custom agents or advanced training logic. We just needed basic REC. And in the end, we picked the framework our developer team was already familiar with, which was Haystack. And actually that was totally fine. To wrap that up, I think if you have a complex system, then it's really worth it to dive deeper into these frameworks. But for a lot of use cases, I don't think that you need to overthink this decision. All right. Now let's talk about the final piece in our little rec puzzle, which is the LLM. And specifically, I wanted to show you one issue we run into around the output length. So if you see the slides, you will see the response, which has three sections. The first is an answer section with some inline references, then we have a short note with a disclaimer, and a list of references at the end that link back to the original PDFs. And in our first attempt, we tried to create all the sections with the LLM. So we passed the document ID for the references, the links in the prompt template, and also So this disclaimer. And yeah, then we quickly reached the token limits. That was because long URLs are extremely token heavy. Now how do we handle this? Our solution was to split up the responsibilities a bit. So we only let the LLM generate the core answer, so the first section of our response. And after that, programmatically, we attached the disclaimer, and we also matched then the reference numbers to the correct documents and then printed the references with clickable links but not generated with the LLM, just programmatically. I also brought you a picture of my prompt template, you can can see it right maybe, but on this prompt template we have first of all instructed the LLM to generate the inline references and then in the context part of the template we passed the document ID in this template. And by doing so we were able to minimize the use of tokens which means more room for detailed answers and context and in general also our output was much more stable and gave us much more control over the formatting of the responses. Alright so now that we have covered the core building blocks our challenge was to get actually good results. In general a REC flow is pretty straightforward, right? But to get really good results it helps pause and think about where we actually have influence in this flow. So let's walk through a REC and I'll show you where we had the biggest levers for optimization. Let's start with the user question. In the user question we have low control. We can guide users with examples and hints to design better queries but in the end we cannot predict what users gonna ask and And we have to deal with whatever comes into our rack flow. Now coming to the retrieval part of the rack, which is in the middle of the flow, we have a high control territory. First regarding the data, we can decide what data goes in. We can decide how to chunk it. There are plenty of methods for chunking. And we can also attach, for example, metadata to make the quality of the chunks better. So actually, the quality of the step makes and breaks your retrieval. a classic garbage in garbage out situation. Speaking of retrieval we're still in high control it's deterministic so the responses are going to stay the same every time and we can pick different strategies for retrieving like keyword search, semantic search or any hybrid approaches. And depending on the strategy you can also choose a suitable embedding model or even fine-tune them. So we can tune and evaluate this part actually quite precisely. Now lastly we have the generative part of the rack and in the generative step I would say we have medium control over the prompts we can craft some solid prompts and that definitely help you for good answers but in the end of the day it's a generative AI model and sometimes you will get unexpected responses and finally we have the generated response where we're back to low control generative AI models are stochastic and you can tweak parameters like the temperature but it won't guarantee you perfect answers every time and responses are gonna be different and that also makes evaluation more complex. So what's the takeaway? It's nothing new but always to keep in mind to focus your energy where it counts and in my opinion if you have a good retriever that's half the game of Rec. Good now with the backend sorted there was one final challenge building an interface that people actually wanted to use. For this project we used Streamlit. Now Now StreamIt isn't a traditional front-end framework and it's definitely not meant to replace it, but if you're building a Python-only application and you want to move fast, it's surprisingly powerful. So our goal was to create a user-friendly and clean interface with as little complexity as possible. And StreamIt has built some fantastic extensions for that. For example, we used the extra StreamIt component that allowed us to create a tab bar for our landing page and it was giving us much more control over the layout and styling. Also you can use a lot of custom CSS and a bit of HTML hacking. I need to be honest here, you really need to dive deeper into the components and it was definitely a bit of fiddling but it's worth it in the end because we got exactly the look and feel we wanted to have. We also made sure that our interface is intuitive, so our main users were delegates involved in the UN negotiations. They're experts in the field, but not necessarily familiar with the technical details of a REC. And in order to give our users a better orientation, we choose the step-by-step approach. So we first instructed the users to select mandatory filters before they can even ask questions. The delegates don't need to understand why this needs to be applied, but it helps in the end to narrow down the database, and that will improve the quality of your Rack system. Alright, I want to end the technical part with just a quick words on code structure, even though it does not really fit into my storyline, but I think it's worth to mention. So we had to update things during the negotiations, like uploading new documents and adjust small things in the UI based on the feedback, and we also needed to connect several knowledge basis and built two separate applications. And to do so we built our code structure in such a way that we separated all of the components so that when we need to do changes we don't need to touch the core logic of the application. And also our streaming application followed similar structure known to traditional frameworks to make changes quickly and add new views. In addition, we also used centralized settings and pedantic settings for secret management so that we could switch easily between local environment and production environment. That's nothing fancy, but it saved us a lot of headache when things had to move quickly. And with that, I give back. I think we don't have so much time anymore, right?
+
+**Speaker 1** _[19:26]_
+
+So, yeah, very quickly to the coding for the public sector, what makes that specific and special. So, how did we tackle the challenges that come traditionally with working with the public sector? You've all heard about it. Data protection is a super important topic. Please don't roll your eyes. And social responsibility, because for us, actually, this means that we can fulfill ethical standards so that it's a non-negotiable. Our recommendation, talk to the data officer, protection officer from the beginning. It will save you a lot of headache and ensure that your application can actually be used in the end. Then for integration difficulties, another challenge that maybe not everybody is used to using certain applications. So for this we recommend to involve stakeholders and work with co-creation in order to make sure that you build an application that can be used by different skill levels. Maybe you will see later on the suggested questions for example that we put in that were like a low-key help for people then there is transparency requirements and highest ethical standards so here you should balance performance and transparency because for people to understand what is happening in the application they are using is super important to have that trust otherwise the best you can build the best product but people will not use it because they don't trust what's happening. Then another factor is, especially for GIZ, German Development Corporation and also for other actors, the suggestion is that you might follow national interests or you might just follow company interests if this is where you come from. So in order to still render your solution usable and for people not to say well it's great but actually it's one-sided so I'm not going to use it, get the political buy-in, do the co-creation, work with the stakeholders from the beginning to the end and have several touch points more than you would usually have and also make political situationing a part of your requirements and like something that you have very visible as a very important part of your project. Then this is a bit of a like I guess sneaky trick in a way build pilots because if you say okay I have a pilot and this is something that we are developing, we are improving upon, and also it is still changeable, which then it also has to be, just for you to know, then it's easier to get the political buy-in because people have this ownership and this control of the finished product, and you have the kind of insurance that they will be using it afterwards. And also, personally, I think, slightly biased, I guess, GIZ Data Lab is like one of the institutions or like one of the units within an international organization you would like to work with because we have more flexibility because we are experimenting and this is also my last sentence I'm seeing thank you so much and any questions welcome and yeah hope to hear from you
+
+**Speaker 3** _[22:41]_
+
+Yes, thank you from my side as well. We have indeed a couple of questions I just read them in order they appeared the first one is why did you choose haystack and quadrant? I think you already said it during the talk, but maybe you can Give us one one or two sentences more net
+
+**Speaker 2** _[22:59]_
+
+Yeah, sure. So we choose Haystack simply because our developer team was already familiar with it and we had really a basic rack system So it really doesn't matter if you use Lama index or whatever other framework and for that specific case That might be different if you have more complex use case and quadrant because they have a really nice free version so and we had some budget constraints and and they don't have request limits and we weren't sure about how many requests we're gonna get during negotiations and that's why we went with Quadrant.
+
+**Speaker 3** _[23:33]_
+
+Very good. Second one, can you elaborate on how well just asking the LLM to provide references worked? Did it hallucinate something here often?
+
+**Speaker 2** _[23:45]_
+
+Yeah, it did. So the problem was we had these inline references based on the document IDs, and then it was hallucinating some other numbers, random numbers, in the link part, and that's why we went with this approach that we generated them programmatically afterwards so that we can just bypass this hallucination. And also there was a difference between GPT-3 and 4, so we also changed it to 4 because Because GPT-3, at some point, it started to hallucinate more. I don't know why that happened.
+
+**Speaker 3** _[24:21]_
+
+Very good. Next one. How was the data available to the rack system selected by the users? Could it handle multiple languages?
+
+**Speaker 2** _[24:32]_
+
+Yeah, it could handle multiple languages because we used a sentence transformer model for the embedding part and the semantic search, which was a multi-language model. And we used also, I mean, we used GPT, so yeah, it can read multiple languages. And there was a first question. I didn't get that. It was a first part. What was that?
+
+**Speaker 3** _[24:55]_
+
+Oh, I just archived it
+
+**Speaker 2** _[24:55]_
+
+Oh, I just.
+
+**Speaker 3** _[24:59]_
+
+How was the data available to the rack system selected by the users could it handle multiple languages
+
+**Speaker 1** _[25:06]_
+
+I mean, the selection is basically not really a selection because there's the nation states that select for us because they have the submissions of their position papers, which of course you have to include. And then we chose to try to have a non-comprehensive list of additional research from research institutes or NGOs.
+
+**Speaker 3** _[25:26]_
+
+There is a follow-up question on that how did you instruct the users to apply the filters and to select the data?
+
+**Speaker 2** _[25:35]_
+
+You can ask. You can answer.
+
+**Speaker 1** _[25:38]_
+
+I think it's less of an instruction, right? Because people, the filters we used are actual components of what they are negotiating about. So basically they know what am I interested in or which country I'm interested in and then they will be going to search for that specifically.
+
+**Speaker 3** _[25:54]_
+
+Then, how did you evaluate the rack system?
+
+**Speaker 2** _[25:58]_
+
+That was when I was talking about this control thing so we evaluated mostly the retriever part and checked what the retriever just give back like what the context is and then we didn't do like proper evaluation in the generative part and I think there are some methods for REC systems but we didn't use them we just trusted on the retriever because I mean at the end the LLM just summarizes the stuff right so we're just coming there in the context and I think it's pretty good in doing that so which is why we just focus on the retrieval part and evaluate that manually
+
+**Speaker 3** _[26:32]_
+
+We have a couple more questions and I think there's a break now like lunch break So feel free to stay and we answer the questions
+
+**Speaker 2** _[26:42]_
+
+Sure. That's fine.
+
+**Speaker 3** _[26:44]_
+
+What part of the RAC system is most crucial for guaranteeing political neutrality?
+
+**Speaker 2** _[26:51]_
+
+That's a tricky question I'm not sure like really to answer like how to answer that because I think it depends maybe also on the model like on the LLM so maybe on like GPT or whatever model you use and I think that they also like mitigate how Like how political neutral that is and I mean
+
+**Speaker 1** _[27:16]_
+
+It's a
+
+**Speaker 2** _[27:16]_
+
+political, I mean it's a political field the documents are in political fields I don't think that we can guarantee that
+
+**Speaker 1** _[27:22]_
+
+I think also I called it neutrality because we had to seem neutral in what we are doing, but the submission papers are not, right? They are like really the stance of a country, like Saudi Arabia says, no, like we want another name or we think there's a different branding or we have different research, and then the next country, Malaysia, is coming in and saying, well, we see it a different way. So it had to mirror that. So I guess the importance in the system was that it actually exemplifies the diversity, true to what different states submitted.
+
+**Speaker 3** _[27:56]_
+
+then did you have any verification steps during the rack system?
+
+**Speaker 2** _[28:04]_
+
+No, we didn't like we just
+
+**Speaker 1** _[28:07]_
+
+It doesn't have memory, like you can only give one query and then you go again, because this is also ensuring that you cannot detect the negotiation strategy of a specific country, which is something that would risk our neutrality stance.
+
+**Speaker 3** _[28:25]_
+
+I think I slightly understood the question differently. Maybe it was asked in the REC part of the system. Did you have a look at the answers, check them, and maybe did a second retrieval step or a third retrieval step to ensure?
+
+**Speaker 2** _[28:41]_
+
+Oh, you mean like ranking or something? Something like that. No, no, we didn't. We just use really a basic semantic search approach and then just get the first top five answer, I think, and then we just use them.
+
+**Speaker 3** _[28:54]_
+
+then could you share some example use cases of the app I think you talked about it also but was it already used in some real cases
+
+**Speaker 1** _[29:04]_
+
+Yes, so fun fact, it was used last November during the negotiations in South Korea. And we improved it since then, and it will again be in use for the negotiations in August. There's going to be the plastic treaty negotiations in Geneva, fun fact, in case anybody asks you. And then also we are going to try to work with the delegates and actually reuse the system for other applications. because now it's of course for the plastic treaty negotiations like very centered on this and then you would have to change it to something else to for instance work for climate negotiations.
+
+**Speaker 3** _[29:42]_
+
+Very good, and I'm seeing we're getting some last-minute questions. Thank you to the audience for that and being so engaged We have one that is asking. How did the filters affected the retrieval part?
+
+**Speaker 2** _[29:55]_
+
+A lot, because we had like a thousand documents, I think, something like that. And without filtering, it was really hard to get good results, which is why we also, that was one of the decisions why we said, okay, we wanted to have these filters mandatory. Because without having the country filter, we attached it in the chunks. But even without them, it was really hard to get good results. And it was sometimes just always taking the same chunks and that was like really difficult. So without filters It wasn't good
+
+**Speaker 3** _[30:32]_
+
+Very good. Have you tried other LLMs like Mistral or Claude?
+
+**Speaker 2** _[30:38]_
+
+We didn't for those specific to use cases but I think it's in discussion I would say to switch to open source models because I think they can also do the job. We just took GPT because it's easy and we have an API and it was like the easiest way to go for the first prototypes but we're gonna for sure check open source models.
+
+**Speaker 3** _[31:04]_
+
+Very good, how accurate are the answers?
+
+**Speaker 2** _[31:11]_
+
+You know what the delegates
+
+**Speaker 1** _[31:14]_
+
+I mean, I think generally, of course, there's no, like, delegates don't see it the way that they're like, oh, this is 90% correct. Like, I think what people really appreciate is that, yes, they get the summary, but then they can go into the links and they can actually check them and check the sources. So, for those delegates who are more seasoned, I guess, and who know the papers a little bit better because they've been around longer, they were happy with it, and there actually we got user feedback which was more in terms of how the app looks like or to have many more functionalities which would be so much cooler.
+
+**Speaker 3** _[31:55]_
+
+Okay, it's still a lot of questions coming How did you handle different naming conventions in general for chemical classes? Did you provide a matching table? Which chemicals are considered plasticizers?
+
+**Speaker 1** _[32:13]_
+
+Okay.
+
+**Speaker 2** _[32:14]_
+
+Can you repeat the question again?
+
+**Speaker 3** _[32:16]_
+
+How did you handle different naming conventions?
+
+**Speaker 2** _[32:21]_
+
+We didn't really specifically handle them. We just trusted on the LM to handle that, I would say. We had these different draft categories, and there it's already a bit sorted, I would say. There's this one zero draft you get at the UN negotiations, and there are different draft categories where they have different topics, like different chemicals and stuff like that, And then you can filter it with them, but we didn't handle it explicitly.
+
+**Speaker 1** _[32:53]_
+
+I mean, also politically, that's not really possible, right? Because, like, the specific naming is something that people negotiate about, like, what falls in what category. So this is also something you would just have the diversity displayed within the links.
+
+**Speaker 3** _[33:09]_
+
+then when would be the right timing on creating a full front-end application?
+
+**Speaker 2** _[33:16]_
+
+You want to answer that?
+
+**Speaker 1** _[33:19]_
+
+I mean, like, the thing was that we were really short on time, because it's really like a very dynamic development, the dates of negotiations can be changed and so on. So as I said, we are not really done with the project, but I cannot give you super specific things about that yet, so stay tuned for it. You have the QR code, so you'll be able to be updated.
+
+**Speaker 3** _[33:44]_
+
+Very good, and now we reached the last question and final question. How did you use the embeddings? Just parts of the document or the complete doc
+
+**Speaker 2** _[33:54]_
+
+We first of all had the documents and then we chunked it and then we used the embeddings of that.
+
+**Speaker 3** _[34:01]_
+
+Perfect. Thank you very much. Thank you to the audience.
+
+---
+transcript_status: auto
+---
+transcript_language: en

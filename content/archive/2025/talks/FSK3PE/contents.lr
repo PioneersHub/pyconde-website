@@ -90,3 +90,170 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/VwoGSrqh364/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+Nice to see you all, thanks for coming to this talk, yeah, it's the first time at PyCon, so this way is better? No? What's going on? Can you help me with this? Okay, now it should be better. Sorry for this. Oh, yeah. Okay. Let's start again. Yeah. So I'm very happy to see you all coming to listen to my talk. It's the first time at PyCon and also speaker. And, yeah, today I'm going to talk about testing and how we do SQL testing in our data science team at Lighthouse. Oh, wait, what's going on? I think it's the wrong thing. Yeah, before I dive into the topic, I want to say a few words about Lighthouse. It's previously known as ODA Insight. And we are developing a platform for hotels so that they can make smarter data-driven decisions and to know more about their competitors' pricing, their market demand, and pricing strategies. And, yeah, at this moment, about 70,000 hotels are using our product all over the world. It's 185 countries, and we are proud to collaborate with major brands like Hilton and Marriott, Hyatt. And, yeah, as you can see, we work with data, and data is the key in our company. And, yeah, I am a data scientist, and we, in our team, we maintain data transformation by plans for many products, and those include pricing comparison, determining pricing strategies, calculating market demand, occupancy forecasts. We also conduct data research and analysis on the request for other teams, and there There are some machine learning projects we have, and in our team we train and deploy those models, and we also ensure data quality. Yeah, and I want to share the story how it started. We started as a rather small team when I joined. We were three people, it was four years ago, and, yeah, our data was stored in BigQuery. BigQuery is quite efficient with working with large data sets, and, yeah, there's cost optimization, it's well integrated with other Google Cloud services, and, yeah, it made a lot of sense for us to write BigQuery SQL queries, template them, and fill in with Python wrappers, then execute it with Python and store the produced data in BigQuery, and then it could be further exported to other databases or monitoring tools or dashboards like Looker. was orchestrated with Rundeck, with Kubernetes, but, yeah, the company grew, and we also had more and more projects, new features, and complexity grew as well, and we felt the need that we need to optimize our pipeline, and we switched to Airflow at some point, and And we also started to use Jinja templating. And yeah, it's also later we had more machine learning projects, and for that, we used ML flow as a model registry to manage and deploy models. So of course, there was still quite some legacy code from the beginning, and at this point, we actually transformed really a lot of data. So there is 165 terabytes of just raw data processed daily that includes pricing and occupancy and different market demand indicators, and also all our pipelines process more than petabytes of data daily, and that's a lot. And yeah, our SQL pipelines are used in so many products. We use SQL not just for data transformation, but also for machine learning and monitoring. We perform data quality checks just with SQL and, yeah, data exploration and research, and there were so many challenges, of course, with this approach. We have many heavily templated queries and complex logic that actually makes it hard to onboard new people on the projects. It takes more time to understand all the code base, and, yeah, we work with large data sets and costs just multiply whenever you do iterations in the development. Yeah, and with the complexity, the major problem here is that when you make a small change, it can have unexpected outcomes in the end of the pipelines. And moreover, we are not always aware where our process data is used in the end. For example, several projects can use the same SQL code, and if you change it in one project then suddenly data changes in another one and maybe that's not intention and we end up with faulty data that's not a good thing and yeah then the question of how to ensure SQL reliability becomes a question and yeah Yeah, you all know the answer that we should do it with testing. And yeah, testing is all about the efficiency. It will help to find bugs at early stages, develop new features faster. It helps to write better code and debug easier and verify the code logic. And yeah, as you may already heard about this phrase, a test is the first user of your code And, yeah, it's nice to, before you expose your data to the user, it's good that you check it first, and testing will help with that. And also one important note about testing data application, sometimes it's also overlooked with testing data application, we need to distinguish between testing code and actually testing data. And for testing code, we can write unit tests to test individual units, we can write integration tests to ensure that units work together, and there is also end-to-end testing for the overall system. But for testing data, it's more about data quality, and it can be just a general data quality checks on the data set produced, can be more granular checks. For example, yeah, when we produce data and want to verify what users see and compare it to the previous, how the data looked a week ago, then we detect outliers this way. There is also data profiling for understanding data characteristics and getting some insights. And in this talk, I will mostly focus on testing codes, not testing data, because testing data is another big topic. And yeah, in our team, in data science team, we had quite many challenges, and testing is often the prioritized. We first focus on data, and then we write tests. And that's normal, because before, first of all, you want to have a meaningful data before writing tests and not multiply your work. There are legacy code constraints, as I was talking about, and this makes it hard to adopt new solutions, so we have to find some workarounds. There are long pipelines that are just difficult to test end-to-end and complex workflows with lots of templating and dependencies, the large datasets can be an issue, and in combination with long pipelines, then you need to have a reference dataset for each step, which is a lot of work. And yeah, there are also challenges with external databases, such as BigQuery, and I will talk about it in more detail. And first, I just want to say a few words about this unit test in SQL and in other programming languages unit tests should verify a single specific functionalities isolated from other units so it can be just testing a single query or testing a schema that can be considered as a unit test in SQL and when we talk about SQL we can split it in the process in four parts it will consist of input data and And there, that's where Python tools can be leveraged, so in our team, we use PyTest as main testing framework, and yeah, for input data set, it makes sense to use mocking in many cases. For example, if you have some other external data sets, it can be easier to mock the value instead of establishing connection, and also running tests on small and well-chosen input data subsets is much better than using a large data set. Yeah, SQL query itself is the SQL code. In our case, it's templated, and that's where we can use a lot of PyTest features such as fixtures and parameterization. There are also more nice packages in Python such as hypothesis that will help to identify edge cases and generate randomized input. For example, it can be combined with Pandas and generate randomized Pandas data frame. For the engine itself, there are two approaches. We can either use PyTest features to establish connection, or use in-memory engines as well, such as DuckDB, and yeah, I will talk more about this in a minute. And yeah, for the final output, that's where we check the results, compare it with the expected values. To do that, it's possible to use a reference data set, or sometimes it makes more sense just to check data for nulls or duplicates or count rows. And yeah, at this step, we also should ensure the schema of the return table to avoid any unpredicted changes. And yeah, challenges with BigQuery, that's a separate topic. There are some limitations with local emulator, at least with the one we tried, they were missing many BigQuery functions. And the same with in-memory engines like DuckDB, they miss specific BigQuery syntax that can run into issues, so that's why when we run a test with, for BigQuery, we have to establish connection and to check the correctness of the query. Yeah, because consideration, we should avoid querying large data sets, as it can be very expensive. CICD integration can be difficult for me as a data scientist with my background. I always ask for help for our operations team to help with that, but once it's done, yeah, it can be, you can work with it. And so we came up with a trade-off solution. We run one-time tests in BigQuery just before the merge. This This way it will help to minimize cost and keep the syntax that we use. And just for more detail how we establish that connection, yeah, for we use fixtures for anyone who didn't have experience. It's reusable components for setting up and doing down resources to test data. And for example, we use fixtures to set up the project ID for BigQuery and also pass it as an argument to another fixture that actually creates BigQuery client. For the schema validation, we also use PyTest regressions library with data regression fixtures. It helps a lot, it automatically generates a YAML file with a schema and compares with the table output, the actual table schema, and this way you can ensure that it works as expected and data is aligned. And another thing about data, it's not always deterministic, and then it becomes quite challenging to test it, but actually, tests help to detect this non-deterministic behavior, because you run tests multiple times, and then it's, yeah, each time the different results return, and Then we just need to investigate if it's an issue or it's just expected. And it can be just a precision issue or some non-deterministic functions as a percentile or count distinct on a large data set that just don't return the same result. It's not always a problem, as you can see, but, yeah, hard to test, and instead of comparing the exact output, we can set tolerances or just test aggregation, like averages, instead of actual data points in this case. And in PyTests, we can use Aprox to see whether the data is in the right ballpark. And for the large dataset, as I said, it's always better to create a fixed, small, and reproducible subsets of the source data, for that we have a separate testing data set, we never query production data set, and there is also a script that just regenerates the source data if it's needed, usually it's run once, but if there are some changes in production And, yeah, we can just update the source data this way. And then for each step of the pipeline, we validate data. Most often we use just some basic checks for rows, nulls, duplicates, averages. And don't create reference data set for each step. And that brings us to integration testing of SQL pipelines. And I want to describe how we do it because, yeah, we have long pipelines, which consists of different queries. For example, you have a first query that produces first table, which then will be used as source in the second query and so on. And with PyTest, we can actually reproduce the same logic for tests and then just execute the test query. It will produce the test table. Then this test table will be used in the second test query and so on. And that's how it can be done. So as you can see, there is a first table, there is a fixture for the first table that actually created with running first query, and then this fixture is then used in the second table and passed as an argument to the second fixture. And this way, these queries are changed, and we can also maintain the correct order of the execution the same way as we have it in our pipeline. And after that, we can just validate query output, and these integration tests are integrated to CI-CD pipeline and then run on every merge. And then I want to conclude that I listed, I mentioned many challenges that we face in the team. And yeah, as the tests are often deprioritized, but it still makes sense to start early as possible as soon as you have a meaningful data pipeline, so it's time to write tests. And for the legacy code, the many tests are missing, and then whenever we do a change to the legacy code, we write a test for it if it's not there, it's always a good practice. Then for the complexity with templates and dependency, we leverage Python testing frameworks, use parameterization, fixtures for large data sets that we deal with, we test it on small but meaningful data sets and never use production data for that. And for long pipelines, we can reproduce the pipeline logic with integration tests and automate these test runs on CI-CD on every merge. This is just the way how we do that because of some constraints. possibly better solution which you can use for your products so yeah this way we help to ensure data quality of our sql queries and yeah quality of data thank you thank you for your attention
+
+**Speaker 2** _[22:27]_
+
+Thank you so much, Anna. That was amazing. And can we please just give her another hands of applause for delivering such an amazing presentation. Okay, so we are going to go to Slido to see what questions the audience have for you. I think we still have plenty of time for you to look at some of these questions. so the first question is have you considered using dbt if so why did you choose not to
+
+**Speaker 1** _[23:00]_
+
+Yeah, I expected this question. As I said, we have lots of legacy code that makes it hard to adopt new solutions and DBT. And it will take quite some effort for us to move to DBT. I don't say that we're not going to do that in the future, but we were looking for some other workarounds that will help us to work with the code that we already have but yeah from what I heard dbt is a good tool and it's a good tool to work with
+
+**Speaker 2** _[23:42]_
+
+The second question is, should we do schema checks during runtime, during tests or both?
+
+**Speaker 1** _[23:54]_
+
+yeah I think it depends yeah we in our case we do schema checks also just before merge request just once yeah for us it's just for the tests depends on your project thing
+
+**Speaker 2** _[24:22]_
+
+Okay. How can one include SQL tests into the overall test coverage?
+
+**Speaker 1** _[24:30]_
+
+I think, yeah, for that there are other Python libraries, but I must be honest, for that I asked the operation team to do that for me and to incorporate it to CICD integration. But yeah, there are Python packages for that.
+
+**Speaker 2** _[24:58]_
+
+All right Do you use hypothesis directly on pandas dataframes or are you also? Use pandora
+
+**Speaker 1** _[25:09]_
+
+The second, can you repeat?
+
+**Speaker 2** _[25:10]_
+
+Do you use hypothesis directly on Pandas data frames? Or, I mean, the person maybe was supposed to mean, or you also use Pantera? I don't know if Pantera is like a framework.
+
+**Speaker 1** _[25:21]_
+
+I don't know what it's been there.
+
+**Speaker 2** _[25:23]_
+
+Anybody ask this question? Can you expand? Yeah, so regarding hypothesis testing, do you mean the concept?
+
+**Speaker 1** _[25:33]_
+
+And do you mean the concept or hypothesis as the library? Hypothesis as the library. And do you use it directly on the panel?
+
+**Speaker 2** _[25:38]_
+
+directly on the panel's data frame,
+
+**Speaker 1** _[25:39]_
+
+DataFrame, or do you use Pandora as a
+
+**Speaker 2** _[25:41]_
+
+and DERA as well for data frame validation.
+
+**Speaker 1** _[25:43]_
+
+On Pandas DataFrames, directly, it's just, I don't use it for unit testing, it's mainly for the development and it's called property-based testing, but indeed, hypothesis package allows you to create Pandas DataFrame, which then can be passed to the query.
+
+**Speaker 2** _[26:13]_
+
+All right Another question is you mentioned schema checks as part of your tests. What do you use to check the schema of a query result?
+
+**Speaker 1** _[26:25]_
+
+The question is why.
+
+**Speaker 2** _[26:27]_
+
+What do you use to check the schema of a query result? Because the person inside you mentioned schema checks as part of your tests.
+
+**Speaker 1** _[26:36]_
+
+Yeah, there was this regression, PyTest regression, data regression fixture, that's what we use to check the schema and compare it to the reference.
+
+**Speaker 2** _[26:54]_
+
+Okay, we still have time for more questions So what approach do you use or recommend to identify an appropriate test data set? Just go for a random selection from production or something more like can you elaborate on this?
+
+**Speaker 1** _[27:08]_
+
+Yeah, indeed, random selection will work if your dataset is very large, and we use random selection indeed. For example, in our dataset we have hotels as a key, so we select, let's say, a hundred or thousand hotels from the whole subset randomly, and then run tests on that subset.
+
+**Speaker 2** _[27:50]_
+
+Okay Using a separate test data means having predefined anomalies or data errors how often to how often should We update this data set
+
+**Speaker 1** _[28:06]_
+
+Yeah, it may depend on the seasonality, I think, if this seasonality is, like, weekly, monthly. Yeah, for the monthly, maybe it makes sense to update it monthly, but I think for the code testing, maybe it's not that relevant, because with the code testing, we're more specified that our query returns the correct results, but for the data quality, we actually do checks on a daily basis.
+
+**Speaker 2** _[28:51]_
+
+Okay, let's look at two or three more questions Do you run the tests against a temporary data base? If yes, are you afraid that the database will behave differently than the productive one like the SQL dialect?
+
+**Speaker 1** _[29:09]_
+
+Oh, I missed the first part.
+
+**Speaker 2** _[29:12]_
+
+Do you run the tests against a temporary database? If yes, are you afraid that the database will behave differently than the productive one?
+
+**Speaker 1** _[29:24]_
+
+It's not a temporary database, we just take a sample from the production from the same subset, from the same production data set, so it remains stable. It's not a temporary table.
+
+**Speaker 2** _[29:48]_
+
+Okay. Another question is, did you code everything yourself? Like, missing a lot of popular tools like DBT, SQL love, grid expectation, SODA, et cetera?
+
+**Speaker 1** _[30:01]_
+
+Yeah, for many tests we have written some custom checks, but using those tools, I think
+
+**Speaker 2** _[30:01]_
+
+Yeah.
+
+**Speaker 1** _[30:11]_
+
+it might be good as well. For example, when you want to do some basic checks for row count or duplicates, using great expectations and SODA may work. Those are good tools to use, but for DBT, as I already explained, at this moment it's pretty difficult to adopt it.
+
+**Speaker 2** _[30:42]_
+
+I guess you didn't add tests to all legacy code at once. How did you decide which parts of legacy code to prioritize?
+
+**Speaker 1** _[30:51]_
+
+We don't, yeah, as I said, we just add tests whenever we do changes on the legacy code. As long, yeah, if it's missing. But what we also do in our team, we have clean code days. And on those days, we try to cover more legacy code with tests as well. But, yeah, normally we just add tests whenever we do a change.
+
+**Speaker 2** _[31:29]_
+
+Okay. Another question is how do you separate in your repository your unit tests from your integration tests?
+
+**Speaker 1** _[31:37]_
+
+Yeah, good question, actually those are not really separated. We run both unit tests and integration tests on merge, and yeah, they're just not separated in our case. Because I know that it's a good practice to run unit tests on every commit, but in our case if we have to re-establish connection each time, it will take too long to run all of them. That's why we came to this trade-off solution, we do it on every merge instead, or run them manually also if we need to check
+
+**Speaker 2** _[32:28]_
+
+Okay, your last question, why not use Airflow BigQuery check operators instead of recreating the pipeline logic in PyTest?
+
+**Speaker 1** _[32:43]_
+
+I honestly don't really know. I should try that maybe.
+
+**Speaker 2** _[32:53]_
+
+Good recommendation. Thank you so much, Anna. Can we still give it up for Anna?
+
+---
+transcript_status: auto
+---
+transcript_language: en

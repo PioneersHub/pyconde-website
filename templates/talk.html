@@ -84,6 +84,10 @@
   "recordedIn": { "@id": "{{ host }}{{ this.url_path }}#video" },
   "workFeatured": { "@id": "{{ host }}{{ this.url_path }}#video" }
   {%- endif %}
+  {%- set has_transcript = this.transcript and not this.do_not_record -%}
+  {%- if has_transcript %},
+  "subjectOf": { "@id": "{{ host }}{{ this.url_path }}#transcript" }
+  {%- endif %}
 }
 {%- if has_recording %},
 {
@@ -103,7 +107,10 @@
   {%- endif %}
   "publisher": { "@id": "{{ host }}/#organization" },
   "isPartOf": { "@id": "{{ host }}{{ this.url_path }}#event" },
-  "inLanguage": "en"
+  "inLanguage": "{{ this.transcript_language or 'en' }}"
+  {%- if has_transcript %},
+  "transcript": "{{ host }}{{ this.url_path }}#transcript"
+  {%- endif %}
 }
 {%- endif %}
 ]
@@ -201,6 +208,25 @@
       <div class="authors">
         {{ this.speakers }}
       </div>
+
+      {% if this.transcript and not this.do_not_record %}
+      <section id="transcript" class="talk-transcript" aria-labelledby="transcript-heading">
+        <details class="talk-transcript__details">
+          <summary class="talk-transcript__summary">
+            <span id="transcript-heading">Transcript</span>
+            {% if this.transcript_status and this.transcript_status != 'none' %}
+            <span class="talk-transcript__status">({{ this.transcript_status }})</span>
+            {% endif %}
+          </summary>
+          <p class="talk-transcript__note">
+            Auto-generated from the recording. Speaker labels (<em>Speaker 1</em>, <em>Speaker 2</em>) reflect diarization, not identity. Timestamps refer to the recording.
+          </p>
+          <div class="talk-transcript__body">
+            {{ this.transcript }}
+          </div>
+        </details>
+      </section>
+      {% endif %}
 
       <img src="{{ this.social_card_image }}" alt="">
     </div>
