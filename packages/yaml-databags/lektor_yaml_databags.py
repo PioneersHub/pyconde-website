@@ -11,11 +11,55 @@ import yaml
 from lektor.context import get_ctx
 from lektor.databags import Databags
 from lektor.pluginsystem import Plugin
+from markupsafe import Markup
 
 if TYPE_CHECKING:
     from lektor.environment import Environment
 
 YAML_EXTENSIONS = (".yaml", ".yml")
+
+# Match <h1>...</h1> through <h5>...</h5> with any attributes.
+# Used by the shift_headings filter to demote body-markdown headings
+# so they never compete with the template-level page <h1>.
+_HEADING_RE = re.compile(r"<(/?)(h[1-5])([^>]*)>", re.IGNORECASE)
+
+
+def shift_headings(html: object, by: int = 1) -> Markup:
+    """Demote all <h1>..<h5> tags in an HTML fragment by `by` levels.
+
+    Default `by=1` turns h1 -> h2, h2 -> h3, ..., h5 -> h6 (capped at h6).
+    Used in templates that render Markdown body content alongside a
+    template-emitted <h1>, so author-written # headings in content
+    files do not break the heading hierarchy.
+
+    Accepts plain strings or any object exposing __html__ (Lektor's
+    Markdown field, Markup, etc.). Always returns Markup so Jinja's
+    autoescape leaves the HTML alone.
+
+    Args:
+        html: HTML fragment or Markdown-rendering object
+        by: number of levels to shift down (1..4)
+
+    Returns:
+        Markup-wrapped HTML with shifted heading levels
+    """
+    if html is None:
+        return Markup("")
+    # Lektor's Markdown / Markup objects expose __html__()
+    text = html.__html__() if hasattr(html, "__html__") else str(html)
+    if not text:
+        return Markup("")
+    if by < 1:
+        return Markup(text)
+    cap = 6  # h6 is the deepest level; anything past stays h6
+
+    def _sub(match: "re.Match[str]") -> str:
+        closing, tag, attrs = match.group(1), match.group(2).lower(), match.group(3)
+        level = int(tag[1])
+        new_level = min(level + by, cap)
+        return f"<{closing}h{new_level}{attrs}>"
+
+    return Markup(_HEADING_RE.sub(_sub, text))
 
 
 def markdown_inline(text: str) -> str:
@@ -129,6 +173,9 @@ class YAMLDatabagPlugin(Plugin):
         # Register markdown filters for Jinja templates
         self.env.jinja_env.filters['markdown_inline'] = markdown_inline
         self.env.jinja_env.filters['paragraphize'] = paragraphize
+        # Demote body-markdown headings so they never collide with the
+        # template-level <h1>. Used in talk/blog/markdown body templates.
+        self.env.jinja_env.filters['shift_headings'] = shift_headings
 
         # Call the databag setup
         self._setup_databags()
