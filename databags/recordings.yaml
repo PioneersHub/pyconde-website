@@ -1,0 +1,43 @@
+# ──────────────────────────────────────────────────────────────
+# YouTube recording mapping
+# ──────────────────────────────────────────────────────────────
+#
+# Per-edition YouTube playlist IDs (filled in by Conference team
+# when recordings are uploaded), plus an explicit override map
+# for pretalx_code -> youtube_video_id.
+#
+# utils/sync_recordings.py reads this file:
+#  - If YOUTUBE_API_KEY is set in env: walks the playlists and
+#    matches each video to a Pretalx code by hashtag in the
+#    description (e.g. "#LPUC9T"). Overrides take precedence.
+#  - If YOUTUBE_API_KEY is unset: runs in override-only mode,
+#    using just the entries below. Useful before the API key
+#    is provisioned, or for one-off manual fixes.
+#
+# Set api_enabled: false to disable the API call entirely even
+# when a key is present (e.g. to reduce quota usage).
+# ──────────────────────────────────────────────────────────────
+
+api_enabled: true
+
+# YouTube playlist IDs grouped per edition / channel.
+# PyConDE and PyData are separate YouTube channels — most editions
+# publish to both.
+playlists:
+  "2026":
+    pyconde: ""        # filled in by Conference team after the event
+    pydata: ""
+  "2025":
+    pyconde: ""
+    pydata: ""
+  "2024":
+    pyconde: ""
+    pydata: ""
+  "2023":
+    pyconde: ""
+    pydata: ""
+
+# Manual overrides — wins over API matching.
+# Format: <pretalx_code>: <youtube_video_id>
+overrides:
+  # 333HDN: dQw4w9WgXcQ

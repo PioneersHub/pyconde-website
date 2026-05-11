@@ -8,7 +8,9 @@
 {%- set branding = bag('branding') -%}
 {%- set host = branding['canonical_host'] -%}
 {%- set speaker_list = this.speaker_names.split(',') if this.speaker_names else [] -%}
+{%- set has_recording = this.youtube_id and not this.do_not_record -%}
 <script type="application/ld+json">
+[
 {
   "@context": "https://schema.org",
   "@type": "Event",
@@ -49,7 +51,33 @@
     "name": "Python skill: {{ this.python_skill or '—' }} · Domain expertise: {{ this.domain_expertise or '—' }}"
   }
   {%- endif %}
+  {%- if has_recording %},
+  "recordedIn": { "@id": "{{ host }}{{ this.url_path }}#video" },
+  "workFeatured": { "@id": "{{ host }}{{ this.url_path }}#video" }
+  {%- endif %}
 }
+{%- if has_recording %},
+{
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  "@id": "{{ host }}{{ this.url_path }}#video",
+  "name": {{ this.title|tojson }},
+  "description": {{ (this.abstract or '')|striptags|truncate(300)|tojson }},
+  "thumbnailUrl": "{{ this.video_thumbnail or ('https://i.ytimg.com/vi/' ~ this.youtube_id ~ '/maxresdefault.jpg') }}",
+  "contentUrl": "{{ this.video_link or ('https://www.youtube.com/watch?v=' ~ this.youtube_id) }}",
+  "embedUrl": "https://www.youtube-nocookie.com/embed/{{ this.youtube_id }}",
+  {%- if this.video_published_at %}
+  "uploadDate": "{{ this.video_published_at }}",
+  {%- endif %}
+  {%- if this.video_duration_iso %}
+  "duration": "{{ this.video_duration_iso }}",
+  {%- endif %}
+  "publisher": { "@id": "{{ host }}/#organization" },
+  "isPartOf": { "@id": "{{ host }}{{ this.url_path }}#event" },
+  "inLanguage": "en"
+}
+{%- endif %}
+]
 </script>
 {% endblock %}
 
@@ -86,6 +114,23 @@
       </section>
     </div>
   </header>
+
+  {% if this.youtube_id and not this.do_not_record %}
+  <section class="talk-recording">
+    <div class="content">
+      <figure>
+        <iframe
+          src="https://www.youtube-nocookie.com/embed/{{ this.youtube_id }}"
+          title="Recording: {{ this.title }}"
+          loading="lazy"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allow="accelerometer; clipboard-write; encrypted-media; picture-in-picture; web-share"
+          allowfullscreen></iframe>
+        <figcaption>Session recording on YouTube</figcaption>
+      </figure>
+    </div>
+  </section>
+  {% endif %}
 
   <section class="subsite talk">
     <div class="content">

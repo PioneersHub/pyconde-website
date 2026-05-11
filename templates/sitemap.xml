@@ -17,7 +17,8 @@
 {%- set seo = bag('seo') -%}
 {%- set noindex_paths = seo['noindex_paths'] -%}
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
   {%- for page in [site.root] if page != this and page.url_path not in noindex_paths recursive %}
   <url>
     <loc>{{ page|url(external=true) }}</loc>
@@ -30,6 +31,22 @@
       <image:loc>{{ site.config.PROJECT.url }}{{ page['social_card_image'] }}</image:loc>
       <image:title>{{ page['title']|striptags|e }}</image:title>
     </image:image>
+    {%- endif %}
+    {%- if page['youtube_id'] and not page['do_not_record'] %}
+    <video:video>
+      <video:thumbnail_loc>{{ page['video_thumbnail'] or ('https://i.ytimg.com/vi/' ~ page['youtube_id'] ~ '/maxresdefault.jpg') }}</video:thumbnail_loc>
+      <video:title>{{ page['title']|striptags|e }}</video:title>
+      <video:description>{{ (page['abstract'] or page['description'] or '')|striptags|truncate(2000)|e }}</video:description>
+      <video:content_loc>{{ page['video_link'] or ('https://www.youtube.com/watch?v=' ~ page['youtube_id']) }}</video:content_loc>
+      <video:player_loc allow_embed="yes">https://www.youtube-nocookie.com/embed/{{ page['youtube_id'] }}</video:player_loc>
+      {%- if page['video_published_at'] %}
+      <video:publication_date>{{ page['video_published_at'] }}</video:publication_date>
+      {%- endif %}
+      {%- if page['video_duration_iso'] %}
+      <video:duration>{{ page['video_duration_iso']|replace('PT','')|replace('H',':')|replace('M',':')|replace('S','') }}</video:duration>
+      {%- endif %}
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
     {%- endif %}
   </url>
   {{- loop(page.children|sort(attribute='path')) }}
