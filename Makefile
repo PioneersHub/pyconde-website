@@ -6,8 +6,14 @@ else
     RUN = PYTHONWARNINGS=ignore::ResourceWarning
 endif
 
-build:
+build: lektor-build pagefind
+
+lektor-build:
 	$(RUN) lektor build -O site
+
+pagefind:
+	@echo "Building Pagefind index..."
+	$(RUN) python -m pagefind --site site --output-subdir pagefind --quiet
 
 clean-plugin-cache:
 	@echo "Clearing plugin and Lektor caches..."

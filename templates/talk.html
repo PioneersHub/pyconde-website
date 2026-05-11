@@ -123,7 +123,7 @@
 {%- set archive_year = (this.url_path.split('/')[2] if is_archive else '') -%}
 
 {% if is_archive %}
-<aside class="archive-banner" role="note" aria-label="Archived talk">
+<aside class="archive-banner" role="note" aria-label="Archived talk" data-pagefind-ignore>
   <div class="content">
     <strong>Archive</strong> — this talk is from the
     <a href="/archive/{{ archive_year }}/">{{ archive_year }} edition</a>.
@@ -132,7 +132,33 @@
 </aside>
 {% endif %}
 
-<article class="talk-article">
+{%- set year_label = archive_year or site.config.PROJECT.year|string -%}
+{%- set format_label = 'keynote' if this.is_keynote else 'talk' -%}
+<article class="talk-article" data-pagefind-body>
+  {# Pagefind meta + filters. Each filter is a separate hidden element because
+     duplicate attributes on a single tag get collapsed by the HTML parser. #}
+  <meta data-pagefind-meta="kind" content="Talk">
+  <meta data-pagefind-meta="title" content="{{ this.title }}">
+  <meta data-pagefind-meta="speakers" content="{{ this.speaker_names or '' }}">
+  {%- if this.track %}
+  <meta data-pagefind-meta="track" content="{{ this.track }}">
+  {%- endif %}
+  <meta data-pagefind-meta="year" content="{{ year_label }}">
+  <meta data-pagefind-meta="image[src]" content="{{ this.social_card_image }}">
+  <span data-pagefind-filter="year:{{ year_label }}" hidden></span>
+  <span data-pagefind-filter="kind:Talk" hidden></span>
+  <span data-pagefind-filter="format:{{ format_label }}" hidden></span>
+  {%- if this.track %}
+  <span data-pagefind-filter="track:{{ this.track }}" hidden></span>
+  {%- endif %}
+  <span data-pagefind-filter="recording:{{ 'yes' if (this.youtube_id and not this.do_not_record) else 'no' }}" hidden></span>
+  <span data-pagefind-filter="transcript:{{ 'yes' if (this.transcript and not this.do_not_record) else 'no' }}" hidden></span>
+  {%- if this.python_skill %}
+  <span data-pagefind-filter="python_skill:{{ this.python_skill }}" hidden></span>
+  {%- endif %}
+  {%- if this.domain_expertise %}
+  <span data-pagefind-filter="domain_expertise:{{ this.domain_expertise }}" hidden></span>
+  {%- endif %}
   <header class="subsite">
     <div class="subsite-title">
       <section class="content">

@@ -1,0 +1,149 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ this.title }}{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="/pagefind/pagefind-ui.css">
+<style>
+  /* Search page-specific overrides on top of Pagefind defaults. */
+  :root {
+    --pagefind-ui-primary: var(--blue, #00c8e1);
+    --pagefind-ui-text: var(--text-primary, #111);
+    --pagefind-ui-background: #fff;
+    --pagefind-ui-border: var(--neutral-200, #e2e6ea);
+    --pagefind-ui-tag: var(--neutral-50, #f6f7f8);
+    --pagefind-ui-border-width: 1px;
+    --pagefind-ui-border-radius: 0;
+    --pagefind-ui-image-border-radius: 0;
+    --pagefind-ui-image-box-ratio: 3 / 2;
+    --pagefind-ui-font: inherit;
+  }
+  .search-page {
+    max-width: var(--content-width, 72rem);
+    margin: 0 auto;
+    padding: var(--space-xl, 2rem) var(--space-page-margin, 1.5rem);
+  }
+  .search-page__intro {
+    margin-bottom: 1.5rem;
+    color: var(--text-secondary, #555);
+  }
+  .pagefind-ui__form {
+    margin-bottom: 1rem;
+  }
+  .pagefind-ui__search-input {
+    font-size: 1.2rem !important;
+  }
+  .pagefind-ui__result-link {
+    text-decoration: none !important;
+    color: var(--text-primary, #111) !important;
+    font-weight: 600;
+  }
+  .pagefind-ui__result-link:hover {
+    color: var(--blue) !important;
+  }
+  .pagefind-ui__result-tags {
+    gap: 0.4rem !important;
+  }
+  .pagefind-ui__filter-name {
+    font-weight: 700;
+  }
+</style>
+{% endblock %}
+
+{% block structured_data %}
+{{ super() }}
+{# Tell crawlers about the in-site search action — appears in SERP as the Sitelinks Search Box. #}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": "{{ bag('branding')['canonical_host'] }}/#website",
+  "url": "{{ bag('branding')['canonical_host'] }}/",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "{{ bag('branding')['canonical_host'] }}/search/?q={search_term_string}"
+    },
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+{% endblock %}
+
+{% block body %}
+<section class="subsite">
+  <div class="content search-page">
+    <h1>Search</h1>
+    <p class="search-page__intro">
+      Find talks, speakers, and transcripts across every edition of PyCon DE &amp; PyData
+      (2018, 2019, 2022, 2023, 2024, 2025, and the upcoming 2026 programme).
+      The transcripts of 2025 recordings are indexed in full — search for a topic, library,
+      or phrase you heard in a talk.
+    </p>
+
+    <div id="pagefind-search"></div>
+  </div>
+</section>
+
+<script src="/pagefind/pagefind-ui.js"></script>
+<script>
+  (function () {
+    var ui = new PagefindUI({
+      element: '#pagefind-search',
+      showImages: false,
+      showSubResults: true,
+      showEmptyFilters: false,
+      excerptLength: 40,
+      resetStyles: false,
+      pageSize: 10,
+      translations: {
+        placeholder: "Search talks, speakers, transcripts…",
+        clear_search: "Clear",
+        load_more: "More results",
+        search_label: "Search this site",
+        filters_label: "Refine by",
+        zero_results: "No results for [SEARCH_TERM]. Try a different keyword or remove a filter.",
+        many_results: "[COUNT] results for [SEARCH_TERM]",
+        one_result: "1 result for [SEARCH_TERM]",
+        alt_search: "No results for [SEARCH_TERM]. Showing results for [DIFFERENT_TERM] instead.",
+        search_suggestion: "No results for [SEARCH_TERM]. Try one of the following searches:",
+        searching: "Searching for [SEARCH_TERM]…"
+      }
+    });
+
+    // Allow URL ?q=... to prefill (so the SearchAction JSON-LD works).
+    var params = new URLSearchParams(window.location.search);
+    var q = params.get('q');
+    if (q) {
+      ui.triggerSearch(q);
+    }
+
+    // Keyboard shortcut: "/" anywhere on the page focuses the input.
+    document.addEventListener('keydown', function (e) {
+      if (e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey &&
+          document.activeElement.tagName !== 'INPUT' &&
+          document.activeElement.tagName !== 'TEXTAREA') {
+        var input = document.querySelector('.pagefind-ui__search-input');
+        if (input) {
+          e.preventDefault();
+          input.focus();
+        }
+      }
+    });
+
+    // Pagefind renders filter headings from the raw key name (e.g. "python_skill"
+    // → "Python_skill"). Replace underscores with spaces so headings look human.
+    function tidyFilterNames() {
+      document.querySelectorAll('.pagefind-ui__filter-name').forEach(function (n) {
+        if (n.textContent && n.textContent.indexOf('_') !== -1) {
+          var t = n.textContent.replace(/_/g, ' ').toLowerCase();
+          n.textContent = t.charAt(0).toUpperCase() + t.slice(1);
+        }
+      });
+    }
+    new MutationObserver(tidyFilterNames).observe(document.body, { childList: true, subtree: true });
+    tidyFilterNames();
+  })();
+</script>
+{% endblock %}

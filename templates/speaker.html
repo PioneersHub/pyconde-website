@@ -59,7 +59,7 @@
 
 {% block body %}
 {% if is_archive %}
-<aside class="archive-banner" role="note" aria-label="Archived speaker">
+<aside class="archive-banner" role="note" aria-label="Archived speaker" data-pagefind-ignore>
   <div class="content">
     <strong>Archive</strong> — speaker profile from the
     <a href="/archive/{{ archive_year }}/">{{ archive_year }} edition</a>.
@@ -67,7 +67,19 @@
 </aside>
 {% endif %}
 
-<article class="speaker-article">
+{%- set year_label = archive_year or site.config.PROJECT.year|string -%}
+<article class="speaker-article" data-pagefind-body>
+  <meta data-pagefind-meta="kind" content="Speaker">
+  <meta data-pagefind-meta="title" content="{{ this.name }}">
+  <meta data-pagefind-meta="year" content="{{ year_label }}">
+  {%- if this.company %}
+  <meta data-pagefind-meta="company" content="{{ this.company }}">
+  {%- endif %}
+  {%- if this.avatar %}
+  <meta data-pagefind-meta="image[src]" content="{{ this.avatar }}">
+  {%- endif %}
+  <span data-pagefind-filter="year:{{ year_label }}" hidden></span>
+  <span data-pagefind-filter="kind:Speaker" hidden></span>
   <header class="subsite">
     <div class="subsite-title">
       <section class="content speaker-header">
