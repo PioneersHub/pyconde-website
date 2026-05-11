@@ -4,6 +4,7 @@ import logging
 from contextlib import asynccontextmanager
 from enum import Enum
 
+from cert_api import router as cert_router
 from config import settings
 from email_service import EmailServiceError, send_contact_email
 from fastapi import FastAPI, HTTPException, Request, status
@@ -49,6 +50,9 @@ app.add_middleware(
     allow_methods=["POST", "OPTIONS", "GET"],
     allow_headers=["*"],
 )
+
+# Mount cert share endpoints (/api/certs/{uuid}, /api/cert-images/{uuid})
+app.include_router(cert_router)
 
 
 class TopicEnum(str, Enum):
