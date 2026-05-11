@@ -113,6 +113,7 @@ def fetch_video_details(video_ids: list[str], api_key: str) -> dict[str, dict]:
             out[vid] = {
                 "duration_iso": item.get("contentDetails", {}).get("duration", ""),
                 "thumbnail": best.get("url", f"https://i.ytimg.com/vi/{vid}/maxresdefault.jpg"),
+                "published_at": sn.get("publishedAt", ""),
             }
         time.sleep(REQUEST_DELAY_S)
     return out
@@ -159,7 +160,19 @@ def build_code_to_video_map(cfg: dict, year: str, api_key: str | None) -> dict[s
                 }
 
     # 2) Explicit overrides — always applied last so they win.
-    for code, vid in (cfg.get("overrides") or {}).items():
+    # Supports year-keyed (overrides.{year}.{code}) and legacy flat
+    # (overrides.{code}) layouts so the YAML can evolve without
+    # breaking older entries.
+    raw_overrides = cfg.get("overrides") or {}
+    year_block = raw_overrides.get(year) or raw_overrides.get(str(year)) or {}
+    flat_block = {
+        k: v for k, v in raw_overrides.items()
+        if not isinstance(v, dict) and k not in {str(y) for y in range(2000, 2100)}
+    }
+    overrides = {**flat_block, **year_block}  # year-keyed wins over flat
+
+    override_video_ids: list[str] = []
+    for code, vid in overrides.items():
         if not vid:
             continue
         code_map.setdefault(code, {}).update(
@@ -169,6 +182,27 @@ def build_code_to_video_map(cfg: dict, year: str, api_key: str | None) -> dict[s
                 "video_thumbnail": f"https://i.ytimg.com/vi/{vid}/maxresdefault.jpg",
             }
         )
+        override_video_ids.append(vid)
+
+    # If the API key is available, fetch contentDetails for override-derived
+    # IDs too (otherwise duration / upload_date stay empty). One API call per
+    # 50 videos — well within quota even for the full 2024+2025+2026 set.
+    if api_enabled and api_key and override_video_ids:
+        print(f"  Fetching details for {len(override_video_ids)} overridden videos…")
+        details = fetch_video_details(override_video_ids, api_key)
+        # Reverse-lookup vid -> code to attach details.
+        vid_to_code = {data["youtube_id"]: code for code, data in code_map.items() if data.get("youtube_id")}
+        for vid, d in details.items():
+            code = vid_to_code.get(vid)
+            if not code:
+                continue
+            code_map[code].update(
+                {
+                    "video_duration_iso": d.get("duration_iso", ""),
+                    "video_thumbnail": d.get("thumbnail", code_map[code].get("video_thumbnail", "")),
+                    "video_published_at": (d.get("published_at") or "").split("T")[0] if d.get("published_at") else code_map[code].get("video_published_at", ""),
+                }
+            )
 
     return code_map
 
