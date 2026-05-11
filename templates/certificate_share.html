@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+{% block title %}{{ this.title }}{% endblock %}
+{% block extra_head %}
+<meta name="robots" content="noindex,nofollow,noarchive,nosnippet,noimageindex">
+{% endblock %}
+{% block body %}
+<header class="cert-header">
+    <div class="content">
+        <p class="cert-header__eyebrow">{{ this.conference }}</p>
+        <h1 class="cert-header__title">{{ this.title }}</h1>
+    </div>
+</header>
+
+<section class="cert-section">
+    <div class="content">
+        <div class="cert-card cert-card--share">
+            {% if this.image %}
+                {% set img = this.attachments.images.get(this.image) %}
+                {% if img %}
+                    <img class="cert-card__image" src="{{ img.url_path|url }}" alt="Certificate of Attendance for {{ this.full_name }}">
+                {% else %}
+                    <img class="cert-card__image" src="{{ this.image|url }}" alt="Certificate of Attendance for {{ this.full_name }}">
+                {% endif %}
+            {% endif %}
+
+            <dl class="cert-meta">
+                <div class="cert-meta__row">
+                    <dt>Awarded to</dt>
+                    <dd>{{ this.full_name }}</dd>
+                </div>
+                <div class="cert-meta__row">
+                    <dt>Conference</dt>
+                    <dd>{{ this.conference }}</dd>
+                </div>
+            </dl>
+
+            <div class="cert-share">
+                <h2 class="cert-share__heading">Share your certificate</h2>
+                <ul class="cert-share__list">
+                    <li><a class="cert-share__link cert-share__link--linkedin" target="_blank" rel="noopener"
+                        href="https://www.linkedin.com/sharing/share-offsite/?url={{ this.share_url|urlencode }}&summary={{ this.share_text_linkedin|urlencode }}">LinkedIn</a></li>
+                    <li><a class="cert-share__link cert-share__link--x" target="_blank" rel="noopener"
+                        href="https://twitter.com/intent/tweet?text={{ this.share_text_x|urlencode }}">X</a></li>
+                    <li><a class="cert-share__link cert-share__link--mastodon" target="_blank" rel="noopener"
+                        href="https://mastodonshare.com/?text={{ this.share_text_mastodon|urlencode }}">Mastodon</a></li>
+                    <li><a class="cert-share__link cert-share__link--whatsapp" target="_blank" rel="noopener"
+                        href="https://wa.me/?text={{ this.share_text_whatsapp|urlencode }}">WhatsApp</a></li>
+                    <li><a class="cert-share__link cert-share__link--telegram" target="_blank" rel="noopener"
+                        href="https://t.me/share/url?url={{ this.share_url|urlencode }}&text={{ this.share_text_telegram|urlencode }}">Telegram</a></li>
+                    <li><a class="cert-share__link cert-share__link--email" target="_blank" rel="noopener"
+                        href="mailto:?subject={{ this.title|urlencode }}&body={{ this.share_text_default|urlencode }}">Email</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
