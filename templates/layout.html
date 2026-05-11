@@ -70,37 +70,43 @@
   <meta name="twitter:image" content="{{ site.config.PROJECT.url }}{{ site.config.PROJECT.social_card|url }}">
   {% endif %}
 
+  {#-
+    Structured data — every page emits the baseline (WebSite + Organization
+    so the Knowledge-Graph links the publishing entity once) and per-template
+    overrides extend or replace the array. Use stable @id values
+    ({host}/#organization, {host}/#website, {host}/#event-2026) so other
+    schemas in the same page can reference them via @id.
+  -#}
+  {% block structured_data %}
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Event",
-    "name": "PyCon DE & PyData 2026",
-    "description": "Europe's largest Python & AI conference — where practitioners navigate change by doing the work.",
-    "startDate": "2026-04-14",
-    "endDate": "2026-04-17",
-    "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
-    "eventStatus": "https://schema.org/EventScheduled",
-    "location": {
-      "@type": "Place",
-      "name": "darmstadtium",
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Darmstadt",
-        "addressCountry": "DE"
-      }
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": "{{ branding['canonical_host'] }}/#website",
+      "url": "{{ branding['canonical_host'] }}/",
+      "name": "{{ site.config.PROJECT.name }}",
+      "publisher": { "@id": "{{ branding['canonical_host'] }}/#organization" },
+      "inLanguage": "en"
     },
-    "organizer": {
+    {
+      "@context": "https://schema.org",
       "@type": "Organization",
-      "name": "Python Software Verband e.V.",
-      "url": "https://python-verband.org"
-    },
-    "offers": {
-      "@type": "Offer",
-      "url": "https://2026.pycon.de/buy-ticket/",
-      "availability": "https://schema.org/InStock"
+      "@id": "{{ branding['canonical_host'] }}/#organization",
+      "name": "{{ branding['organization']['name'] }}",
+      "url": "{{ branding['organization']['url'] }}",
+      "sameAs": [
+        "{{ branding['social']['twitter_url'] }}",
+        "{{ branding['social']['linkedin_url'] }}",
+        "{{ branding['social']['mastodon_url'] }}",
+        "{{ branding['social']['github_url'] }}",
+        "{{ branding['social']['youtube_pyconde'] }}",
+        "{{ branding['social']['youtube_pydata'] }}"
+      ]
     }
-  }
+  ]
   </script>
+  {% endblock %}
 
   {% block header %}
   {% endblock %}

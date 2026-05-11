@@ -4,6 +4,39 @@
 {{ this.title }}
 {% endblock %}
 
+{% block og_type %}article{% endblock %}
+
+{% block structured_data %}
+{%- set branding = bag('branding') -%}
+{%- set host = branding['canonical_host'] -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "@id": "{{ host }}{{ this.url_path }}#post",
+  "mainEntityOfPage": "{{ host }}{{ this.url_path }}",
+  "headline": {{ this.title|tojson }},
+  "url": "{{ host }}{{ this.url_path }}",
+  {%- if this.description %}
+  "description": {{ this.description|tojson }},
+  {%- endif %}
+  {%- if this.social_card_image %}
+  "image": "{{ host }}{{ this.social_card_image }}",
+  {%- endif %}
+  "datePublished": "{{ this.pub_date }}",
+  "dateModified": "{{ this.pub_date }}",
+  {%- if this.author %}
+  "author": { "@type": "Person", "name": {{ this.author|tojson }} },
+  {%- else %}
+  "author": { "@id": "{{ host }}/#organization" },
+  {%- endif %}
+  "publisher": { "@id": "{{ host }}/#organization" },
+  "inLanguage": "en",
+  "isPartOf": { "@id": "{{ host }}/#event-{{ site.config.PROJECT.year }}" }
+}
+</script>
+{% endblock %}
+
 {% block body %}
 <div class="subsite">
     <div class="subsite-title">

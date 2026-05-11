@@ -4,6 +4,57 @@
 {{ this.title }}
 {% endblock %}
 
+{% block og_type %}event{% endblock %}
+
+{% block structured_data %}
+{%- set branding = bag('branding') -%}
+{%- set host = branding['canonical_host'] -%}
+{%- set speaker_list = this.speaker_names.split(',') if this.speaker_names else [] -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Event",
+  "@id": "{{ host }}{{ this.url_path }}#event",
+  "name": {{ this.title|tojson }},
+  "description": {{ (this.abstract or '')|striptags|truncate(300)|tojson }},
+  "url": "{{ host }}{{ this.url_path }}",
+  "image": "{{ host }}{{ this.social_card_image }}",
+  "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+  "eventStatus": "https://schema.org/EventScheduled",
+  "inLanguage": "en",
+  "superEvent": { "@id": "{{ host }}/#event-{{ site.config.PROJECT.year }}" },
+  "location": {
+    "@type": "Place",
+    "name": "{{ branding['location']['venue'] }}",
+    {%- if this.room and this.room != 'None' %}
+    "containedInPlace": { "@type": "Place", "name": {{ this.room|tojson }} },
+    {%- endif %}
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "{{ branding['location']['city'] }}",
+      "addressCountry": "{{ branding['location']['country'] }}"
+    }
+  },
+  "organizer": { "@id": "{{ host }}/#organization" },
+  "performer": [
+    {%- for name in speaker_list -%}
+    { "@type": "Person", "name": {{ name.strip()|tojson }} }{{ "," if not loop.last }}
+    {%- endfor -%}
+  ]
+  {%- if this.track %},
+  "about": {{ this.track|tojson }}
+  {%- endif %}
+  {%- if this.python_skill or this.domain_expertise %},
+  "audience": {
+    "@type": "Audience",
+    "audienceType": "Developers, Data Practitioners",
+    "name": "Python skill: {{ this.python_skill or '—' }} · Domain expertise: {{ this.domain_expertise or '—' }}"
+  }
+  {%- endif %}
+}
+</script>
+{% endblock %}
+
 {% block body %}
 
 <div class="subsite">

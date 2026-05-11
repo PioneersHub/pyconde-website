@@ -4,6 +4,60 @@
     {{ this.title }}
 {% endblock %}
 
+{% block og_type %}event{% endblock %}
+
+{% block structured_data %}
+{%- set branding = bag('branding') -%}
+{%- set host = branding['canonical_host'] -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": ["Course", "EducationEvent"],
+  "@id": "{{ host }}{{ this.url_path }}#course",
+  "name": {{ this.title|tojson }},
+  "url": "{{ host }}{{ this.url_path }}",
+  {%- if this.description %}
+  "description": {{ this.description|tojson }},
+  {%- endif %}
+  {%- if this.social_card_image %}
+  "image": "{{ host }}{{ this.social_card_image }}",
+  {%- endif %}
+  "provider": { "@id": "{{ host }}/#organization" },
+  "instructor": { "@type": "Person", "name": {{ this.trainer|tojson }} },
+  "inLanguage": "en",
+  "location": {
+    "@type": "Place",
+    "name": "{{ branding['location']['venue'] }}",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "{{ branding['location']['city'] }}",
+      "addressCountry": "{{ branding['location']['country'] }}"
+    }
+  },
+  "superEvent": { "@id": "{{ host }}/#event-{{ site.config.PROJECT.year }}" },
+  "hasCourseInstance": {
+    "@type": "CourseInstance",
+    "courseMode": "Onsite",
+    "courseWorkload": "PT{{ this.hours }}H",
+    "startDate": "{{ branding['dates']['end_iso'] }}",
+    "location": {
+      "@type": "Place",
+      "name": "{{ branding['location']['venue'] }}, {{ branding['location']['city'] }}"
+    }
+  },
+  "offers": {
+    "@type": "Offer",
+    "url": "{{ host }}/buy-ticket/",
+    "availability": "https://schema.org/InStock",
+    "category": "Masterclass Ticket"
+  }
+  {%- if this.tags %},
+  "keywords": {{ this.tags|tojson }}
+  {%- endif %}
+}
+</script>
+{% endblock %}
+
 {% block body %}
     <div class="subsite">
         <div class="subsite-title">

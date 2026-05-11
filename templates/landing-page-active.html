@@ -3,6 +3,70 @@
 
 {% block title %}{{ this.title }}{% endblock %}
 
+{% block structured_data %}
+{%- set branding = bag('branding') -%}
+<script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": "{{ branding['canonical_host'] }}/#website",
+    "url": "{{ branding['canonical_host'] }}/",
+    "name": "{{ site.config.PROJECT.name }}",
+    "publisher": { "@id": "{{ branding['canonical_host'] }}/#organization" },
+    "inLanguage": "en"
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": "{{ branding['canonical_host'] }}/#organization",
+    "name": "{{ branding['organization']['name'] }}",
+    "url": "{{ branding['organization']['url'] }}",
+    "sameAs": [
+      "{{ branding['social']['twitter_url'] }}",
+      "{{ branding['social']['linkedin_url'] }}",
+      "{{ branding['social']['mastodon_url'] }}",
+      "{{ branding['social']['github_url'] }}",
+      "{{ branding['social']['youtube_pyconde'] }}",
+      "{{ branding['social']['youtube_pydata'] }}"
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    "@id": "{{ branding['canonical_host'] }}/#event-{{ site.config.PROJECT.year }}",
+    "name": "{{ site.config.PROJECT.name }}",
+    "description": "{{ branding['claim']['en'] }}",
+    "startDate": "{{ branding['dates']['start_iso'] }}",
+    "endDate": "{{ branding['dates']['end_iso'] }}",
+    "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+    "eventStatus": "https://schema.org/EventScheduled",
+    "inLanguage": "en",
+    "url": "{{ branding['canonical_host'] }}/",
+    "image": "{{ branding['canonical_host'] }}{{ site.config.PROJECT.social_card }}",
+    "location": {
+      "@type": "Place",
+      "name": "{{ branding['location']['venue'] }}",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "{{ branding['location']['address'] }}",
+        "addressLocality": "{{ branding['location']['city'] }}",
+        "addressRegion": "{{ branding['location']['region'] }}",
+        "addressCountry": "{{ branding['location']['country'] }}"
+      }
+    },
+    "organizer": { "@id": "{{ branding['canonical_host'] }}/#organization" },
+    "offers": {
+      "@type": "Offer",
+      "url": "{{ branding['canonical_host'] }}/buy-ticket/",
+      "availability": "https://schema.org/InStock",
+      "category": "Conference Ticket"
+    }
+  }
+]
+</script>
+{% endblock %}
+
 {% block body %}
 
     {# ── Intro: Full-viewport branded hero ── #}
