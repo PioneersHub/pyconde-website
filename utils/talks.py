@@ -54,6 +54,201 @@ def talks_json_for(year: str, current_year: str) -> Path:
 META_DESCRIPTION_MAX = 155
 TRACK_PREFIX_PATTERN = re.compile(r"(?i)(pycon|pydata|general):\s*")
 
+# ── Bio → third-person conversion ─────────────────────────────────────
+#
+# Speakers regularly submit bios in the first person ("Hi, I'm X. I work
+# at Y."). Conference pages read more consistently when every bio is in
+# third person. The transformation here is conservative:
+#   * known greeting + self-intro openers are stripped (the speaker name
+#     is shown in the heading already)
+#   * "I am/I'm/I've/I have/I had/I'll/etc." are mapped to "{first} is/has/…"
+#     and a curated list of present-tense verbs get an -s suffix
+#   * possessive / object / reflexive pronouns shift to a configurable
+#     pronoun set (default singular they)
+#   * leftover bare "I" → first name on first occurrence, then subject
+#     pronoun afterwards
+# Output is left as-is when no pattern matches, so the function is
+# idempotent on bios that are already in the third person.
+# ──────────────────────────────────────────────────────────────────────
+
+_PAST_VERBS = {
+    "was", "did", "got", "joined", "started", "graduated", "moved", "founded",
+    "wrote", "built", "earned", "completed", "finished", "left", "received",
+    "served", "worked", "studied", "launched", "grew", "spent", "led",
+    "managed", "created", "developed", "designed", "taught", "researched",
+    "co-founded", "co-authored", "published", "decided", "moved", "spoke",
+    "gave", "took", "saw", "made", "ran", "wrote", "lived", "shared",
+    "presented", "contributed", "co-organized", "organized",
+}
+
+
+def _conjugate_3s(verb: str) -> str:
+    """Return the 3rd-person singular form of a base-form verb."""
+    if verb == "have":
+        return "has"
+    if verb == "do":
+        return "does"
+    if verb == "be":
+        return "is"
+    if verb == "go":
+        return "goes"
+    if verb.endswith("y") and not verb.endswith(("ay", "ey", "oy", "uy")):
+        return verb[:-1] + "ies"
+    if verb.endswith(("s", "ss", "sh", "ch", "x", "z", "o")):
+        return verb + "es"
+    return verb + "s"
+
+
+# All "I (+verb)" / "I'm" / "I've" / etc. patterns rolled into one regex so
+# we can rewrite each occurrence as a unit and switch between speaker-name
+# and pronoun in a single pass.
+_I_PATTERN = re.compile(
+    r"""\bI
+    (?:
+        (?P<contr>['’](?:m|ve|ll|d|re))
+        |\s+(?P<aux>am|have|had|will|can|could|would|should|might|must|do|does|did|was|were|been)\b
+        |\s+(?P<verb>[a-zA-Z][a-zA-Z'’-]*)\b
+        |\b(?P<bare>(?=[.,!?;:]|$))
+    )""",
+    re.VERBOSE,
+)
+
+
+def parse_pronouns(raw: str | None) -> dict[str, str]:
+    """Map a Pretalx "How should we address you?" answer into pronoun forms.
+
+    Defaults to singular they when no pronouns are recorded.
+    """
+    s = (raw or "").lower().strip()
+    if "she" in s or "her" in s:
+        return {"subj": "she", "obj": "her", "poss": "her", "refl": "herself"}
+    if "he/" in s or "/him" in s or "him/" in s or s.startswith("he") and "she" not in s:
+        return {"subj": "he", "obj": "him", "poss": "his", "refl": "himself"}
+    return {"subj": "they", "obj": "them", "poss": "their", "refl": "themself"}
+
+
+def to_third_person(bio: str, name: str, pronouns: dict[str, str] | None = None) -> str:
+    """Best-effort first-person → third-person conversion.
+
+    Args:
+        bio: speaker biography (markdown / plain text).
+        name: full name from Pretalx; the first token is used in subject
+            position so the bio reads as a natural rewrite.
+        pronouns: optional dict {subj, obj, poss, refl}; default they/them.
+    """
+    if not bio:
+        return bio
+    p = pronouns or {"subj": "they", "obj": "them", "poss": "their", "refl": "themself"}
+    first = name.split()[0] if name else p["subj"].capitalize()
+
+    text = bio
+
+    # Strip greeting + self-intro at the start ("Hi, I'm X.", "My name is X and",
+    # "I'm X!" etc.). The ### heading already shows the name.
+    intro_pattern = (
+        rf"^\s*(?:(?:Hi|Hello|Hey|Hiya|Greetings)[,!\.\s]+)?"
+        rf"(?:(?:my name is|I\'m|I am|I’m)\s+{re.escape(first)}[,!\.\s]+(?:and\s+)?)?"
+    )
+    m = re.match(intro_pattern, text, flags=re.IGNORECASE)
+    if m and m.end() > 0:
+        text = text[m.end():].lstrip()
+        if text and text[0].islower():
+            text = text[0].upper() + text[1:]
+
+    # Single-pass substitution. Each occurrence of "I (+verb)" chooses the
+    # right subject + verb conjugation in one step. The counter switches the
+    # subject from the speaker's name to the pronoun after the first hit so
+    # the bio doesn't repeat the name in every sentence.
+    is_singular_3rd = p["subj"] in {"he", "she"}
+    counter = [0]
+
+    def replace(match: "re.Match[str]") -> str:
+        counter[0] += 1
+        use_name = counter[0] == 1
+        subj = first if use_name else p["subj"]
+        # Pick the verb form: 3rd-singular for name (always) and for he/she;
+        # plural for singular "they" (which takes plural verb forms).
+        use_3s = use_name or is_singular_3rd
+
+        contr_raw = match.group("contr") or ""
+        contr = contr_raw.replace("'", "").replace("’", "")
+        aux = match.group("aux") or ""
+        verb = match.group("verb") or ""
+
+        # Contractions
+        if contr == "m":
+            return f"{subj} {'is' if use_3s else 'are'}"
+        if contr == "ve":
+            return f"{subj} {'has' if use_3s else 'have'}"
+        if contr == "ll":
+            return f"{subj} will"
+        if contr == "d":
+            return f"{subj} would"  # heuristic: could also be "had"
+        if contr == "re":
+            return f"{subj} are"
+
+        # Auxiliaries & irregulars
+        if aux == "am":
+            return f"{subj} {'is' if use_3s else 'are'}"
+        if aux == "have":
+            return f"{subj} {'has' if use_3s else 'have'}"
+        if aux == "had":
+            return f"{subj} had"
+        if aux == "was":
+            return f"{subj} {'was' if use_3s else 'were'}"
+        if aux == "were":
+            return f"{subj} were"
+        if aux == "do":
+            return f"{subj} {'does' if use_3s else 'do'}"
+        if aux == "does":
+            return f"{subj} does"
+        if aux == "did":
+            return f"{subj} did"
+        if aux == "been":
+            return f"{subj} been"  # rare standalone; usually after have/has
+        if aux in {"will", "can", "could", "would", "should", "might", "must"}:
+            return f"{subj} {aux}"
+
+        # Generic verb
+        if verb:
+            if verb in _PAST_VERBS:
+                v = verb
+            elif use_3s:
+                v = _conjugate_3s(verb)
+            else:
+                v = verb
+            return f"{subj} {v}"
+
+        # Bare "I" followed by punctuation
+        return subj
+
+    text = _I_PATTERN.sub(replace, text)
+
+    # Possessive / object / reflexive pronouns (no alternation).
+    text = re.sub(r"\bMy\b", p["poss"].capitalize(), text)
+    text = re.sub(r"\bmy\b", p["poss"], text)
+    text = re.sub(r"\bme\b", p["obj"], text)
+    text = re.sub(r"\bmyself\b", p["refl"], text)
+
+    # Capitalize the subject pronoun if it now sits at the start of a sentence.
+    text = re.sub(
+        rf"(^|[.!?]\s+)({re.escape(p['subj'])})\b",
+        lambda m: f"{m.group(1)}{m.group(2).capitalize()}",
+        text,
+    )
+
+    return text.strip()
+
+
+_FP_DETECTOR = re.compile(
+    r"\b(I am |I\'m |I’m |I\'ve |I’ve |I have |I had |I\'ll |I will |I do |I work|I run|I love)\b"
+)
+
+
+def looks_first_person(bio: str) -> bool:
+    """Return True if the bio still appears to be in first person."""
+    return bool(_FP_DETECTOR.search(bio or ""))
+
 
 def load_pretalx_config() -> dict:
     """Load and validate the year-keyed Pretalx mapping from YAML."""
@@ -127,7 +322,7 @@ def submission_type_slug(sub_type_id: int | None, type_map: dict) -> str:
     return ""
 
 
-def submission_to_talk(sub, cfg: dict, year: str) -> dict:
+def submission_to_talk(sub, cfg: dict, year: str, audit: list | None = None) -> dict:
     """Map a pytanis Submission to the flat dict used in talks.json / .lr files."""
     questions = cfg["question_ids"].get(year, {})
     type_map = cfg["submission_type_ids"].get(year, {})
@@ -152,9 +347,11 @@ def submission_to_talk(sub, cfg: dict, year: str) -> dict:
     t["submission_type_label"] = type_labels.get(type_slug, "")
     t["is_keynote"] = type_slug == "keynote"
 
-    # Speaker rendering (markdown blob, preserved for legacy template).
+    # Speaker rendering. Pretalx pronouns aren't on SubmissionSpeaker — they
+    # live on the Speaker object via a separate fetch. Default to singular
+    # they so the conversion stays grammatically safe.
     for speaker in sub.speakers:
-        t["speakers"] += speaker_to_markdown(speaker)
+        t["speakers"] += speaker_to_markdown(speaker, audit=audit)
 
     # Submission-level answers driven by year-keyed question IDs.
     answers = sub.answers or []
@@ -211,16 +408,17 @@ def _tag_name(tag: object) -> str:
     return str(name) if name else ""
 
 
-def speaker_to_markdown(speaker) -> str:
+def speaker_to_markdown(speaker, pronouns: dict | None = None, audit: list | None = None) -> str:
+    raw = speaker.biography or ""
+    bio = to_third_person(raw, speaker.name, pronouns)
+    if audit is not None and raw and looks_first_person(bio):
+        audit.append((speaker.code, speaker.name, bio[:140]))
     tmpl = Template("""
 ### $name
 
 $biography
 """)
-    return tmpl.substitute(
-        name=speaker.name,
-        biography=speaker.biography or "",
-    )
+    return tmpl.substitute(name=speaker.name, biography=bio)
 
 
 LR_TEMPLATE = Template(
@@ -289,8 +487,8 @@ social_card_image: $social_card_image
 )
 
 
-def submission_to_lektor(sub, cfg: dict, year: str) -> str:
-    talk = submission_to_talk(sub, cfg, year)
+def submission_to_lektor(sub, cfg: dict, year: str, audit: list | None = None) -> str:
+    talk = submission_to_talk(sub, cfg, year, audit=audit)
     # string.Template requires all keys present; defaultdict('') already covers it,
     # but normalize booleans to "yes"/"no" so Lektor reads them correctly.
     talk["is_keynote"] = "yes" if talk["is_keynote"] else "no"
@@ -300,6 +498,13 @@ def submission_to_lektor(sub, cfg: dict, year: str) -> str:
     return LR_TEMPLATE.substitute(talk)
 
 
+def submission_to_lektor_file(sub, cfg: dict, year: str, talks_dir: Path, audit: list | None = None) -> None:
+    new_dir = talks_dir / sub.code
+    new_dir.mkdir(parents=True, exist_ok=True)
+    rendered = submission_to_lektor(sub, cfg, year, audit=audit)
+    (new_dir / "contents.lr").write_text(rendered, encoding="utf-8")
+
+
 def remove_old_talks(talks_dir: Path) -> None:
     """Wipe the given talks dir so removed Pretalx submissions disappear."""
     if not talks_dir.exists():
@@ -307,13 +512,6 @@ def remove_old_talks(talks_dir: Path) -> None:
     for entry in talks_dir.iterdir():
         if entry.is_dir():
             shutil.rmtree(entry)
-
-
-def submission_to_lektor_file(sub, cfg: dict, year: str, talks_dir: Path) -> None:
-    new_dir = talks_dir / sub.code
-    new_dir.mkdir(parents=True, exist_ok=True)
-    rendered = submission_to_lektor(sub, cfg, year)
-    (new_dir / "contents.lr").write_text(rendered, encoding="utf-8")
 
 
 def submissions_to_json_file(submissions, cfg: dict, year: str, json_path: Path) -> None:
@@ -386,10 +584,19 @@ def main() -> None:
         remove_old_talks(talks_dir)
 
     talks_dir.mkdir(parents=True, exist_ok=True)
+    audit: list[tuple[str, str, str]] = []
     for sub in submissions:
-        submission_to_lektor_file(sub, cfg, year, talks_dir)
+        submission_to_lektor_file(sub, cfg, year, talks_dir, audit=audit)
     submissions_to_json_file(submissions, cfg, year, json_path)
     print(f"Wrote {len(submissions)} talks to {talks_dir} and {json_path}")
+
+    if audit:
+        print()
+        print(f"⚠️  {len(audit)} bios still look first-person after rewrite — manual review needed:")
+        for code, name, snippet in audit:
+            print(f"   - {code} · {name}: {snippet}…")
+    else:
+        print("All bios converted cleanly to third person.")
 
 
 if __name__ == "__main__":
