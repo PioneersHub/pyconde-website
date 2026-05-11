@@ -1,0 +1,23 @@
+{%- set seo = bag('seo') -%}
+{%- set branding = bag('branding') -%}
+{%- set policy = seo['robots']['ai_crawler_policy'] -%}
+User-agent: *
+Allow: /
+{%- for path in seo['robots']['disallow_paths'] %}
+Disallow: {{ path }}
+{%- endfor %}
+
+# AI / LLM crawlers — policy: {{ policy }}
+{% for bot in seo['robots']['ai_crawlers'] %}
+User-agent: {{ bot }}
+{%- if policy == 'allow' %}
+Allow: /
+{%- else %}
+Disallow: /
+{%- endif %}
+{%- for path in seo['robots']['disallow_paths'] %}
+Disallow: {{ path }}
+{%- endfor %}
+
+{% endfor %}
+Sitemap: {{ branding['canonical_host'] }}{{ seo['robots']['sitemap_path'] }}

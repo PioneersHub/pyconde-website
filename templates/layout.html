@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 {%- set branding = bag('branding') -%}
+{%- set seo = bag('seo') -%}
 {%- set page_lang = self.html_lang() -%}
 {%- set page_description = this.description or branding['default_description'][page_lang] or branding['default_description']['en'] -%}
+{%- set is_noindex = this.url_path in seo['noindex_paths'] -%}
 
 {% if this.full_landing_page %}
 <html lang="{% block html_lang %}en{% endblock %}" class="full-landing-page">
@@ -17,6 +19,7 @@
   <title>{% block title %}{% endblock %}</title>
 
   <link rel="canonical" href="{{ branding['canonical_host'] }}{{ this.url_path }}">
+  {% if is_noindex %}<meta name="robots" content="noindex, nofollow">{% endif %}
 
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
