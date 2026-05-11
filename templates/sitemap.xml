@@ -1,16 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  {%- for page in [site.root] if page != this recursive %}
+{#-
+  Sitemap renders every discoverable page in the content tree once,
+  excluding the sitemap node itself. hreflang block is intentionally
+  omitted — the site has no real DE/EN translation pairs yet, and
+  emitting identical URLs under different hreflang values is a
+  documented Google anti-pattern (audit: P1-02). Re-add when /faqs-de
+  becomes a true language alternate.
+
+  lastmod is pulled from whichever date field the model exposes
+  (pub_date for blog posts, created for talks). Omitted otherwise —
+  better than emitting a stale or fabricated date.
+
+  Talk/masterclass/keynote/sponsor pages contribute <image:image>
+  records for Google Image Search (social card or speaker photo).
+-#}
+{%- set seo = bag('seo') -%}
+{%- set noindex_paths = seo['noindex_paths'] -%}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  {%- for page in [site.root] if page != this and page.url_path not in noindex_paths recursive %}
   <url>
-      <loc>{{ page|url(external=true) }}</loc>
-  <xhtml:link
-    rel="alternate"
-    hreflang="de"
-    href="{{ page|url(external=true) }}" />
-  <xhtml:link
-    rel="alternate"
-    hreflang="en"
-    href="{{ page|url(external=true, alt="en") }}" />
+    <loc>{{ page|url(external=true) }}</loc>
+    {%- set lastmod = page['pub_date'] or page['created'] %}
+    {%- if lastmod %}
+    <lastmod>{{ lastmod }}</lastmod>
+    {%- endif %}
+    {%- if page['social_card_image'] %}
+    <image:image>
+      <image:loc>{{ site.config.PROJECT.url }}{{ page['social_card_image'] }}</image:loc>
+      <image:title>{{ page['title']|striptags|e }}</image:title>
+    </image:image>
+    {%- endif %}
   </url>
   {{- loop(page.children|sort(attribute='path')) }}
   {%- endfor %}
