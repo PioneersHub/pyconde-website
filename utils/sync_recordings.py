@@ -124,6 +124,67 @@ def extract_pretalx_code(text: str) -> str | None:
     return m.group(1) if m else None
 
 
+_TITLE_NORM_RE = re.compile(r"[^a-z0-9]+")
+
+
+def normalize_title(text: str) -> str:
+    """Lower-case, strip non-alphanumerics, collapse — a stable matching key."""
+    if not text:
+        return ""
+    # Drop leading "PyConDE — " / "PyData …" channel-tag prefixes the YouTube
+    # team often adds. The pretalx title is the canonical truth.
+    stripped = re.sub(r"^(pycon\s*de|pyconde|pydata)[^a-z0-9]*", "", text.lower())
+    return _TITLE_NORM_RE.sub("", stripped)
+
+
+def load_pretalx_titles(year: str, current_year: str) -> dict[str, str]:
+    """Return {pretalx_code: normalized_title} for the local talks of an edition.
+
+    Reads the talks.json bag the importer wrote so we don't re-hit Pretalx.
+    """
+    bag_path = REPO_ROOT / "databags" / ("talks.json" if year == current_year else f"talks-{year}.json")
+    if not bag_path.exists():
+        return {}
+    import json as _json
+    data = _json.loads(bag_path.read_text())
+    out = {}
+    for talk in data.get("talks", []):
+        code = talk.get("code")
+        title = talk.get("title")
+        if code and title:
+            out[code] = normalize_title(title)
+    return out
+
+
+def fuzzy_match_by_title(video_title: str, pretalx_titles: dict[str, str]) -> str | None:
+    """Match a YouTube title to a Pretalx code by normalized-title equality.
+
+    First tries an exact normalized match. Then falls back to substring
+    containment (either direction) — useful when the YouTube title prepends
+    "Speaker Name — Talk Title" or appends a track tag.
+    """
+    norm_video = normalize_title(video_title)
+    if not norm_video:
+        return None
+    # Exact-normalized match
+    for code, norm in pretalx_titles.items():
+        if norm and norm == norm_video:
+            return code
+    # Substring containment (one direction in either)
+    candidates: list[tuple[int, str]] = []
+    for code, norm in pretalx_titles.items():
+        if not norm:
+            continue
+        if norm_video in norm or norm in norm_video:
+            # Score by length of the shorter side (better signal than overlap).
+            candidates.append((min(len(norm), len(norm_video)), code))
+    if candidates:
+        # Return the longest-overlap match — most distinctive.
+        candidates.sort(reverse=True)
+        return candidates[0][1]
+    return None
+
+
 def build_code_to_video_map(cfg: dict, year: str, api_key: str | None) -> dict[str, dict]:
     """Combine API-discovered videos and explicit overrides into one map."""
     code_map: dict[str, dict] = {}
@@ -132,7 +193,8 @@ def build_code_to_video_map(cfg: dict, year: str, api_key: str | None) -> dict[s
     api_enabled = cfg.get("api_enabled", True)
     playlists = (cfg.get("playlists", {}) or {}).get(year, {}) or {}
     if api_enabled and api_key:
-        seen_videos: list[dict] = []
+        seen_videos: list[tuple[str, dict, str]] = []  # (code, video, match_type)
+        unmatched_videos: list[dict] = []
         for channel, playlist_id in playlists.items():
             if not playlist_id:
                 continue
@@ -142,13 +204,36 @@ def build_code_to_video_map(cfg: dict, year: str, api_key: str | None) -> dict[s
                     video["title"]
                 )
                 if code:
-                    seen_videos.append((code, video))
+                    seen_videos.append((code, video, "hashtag"))
+                else:
+                    unmatched_videos.append(video)
             time.sleep(REQUEST_DELAY_S)
 
+        # Fuzzy fallback for old editions where YouTube descriptions don't
+        # carry a Pretalx hashtag — match the video title against the
+        # importer's talks.json. Same-edition only; no cross-year matching.
+        if unmatched_videos:
+            current_year = ""
+            pretalx_path = REPO_ROOT / "databags" / "pretalx.yaml"
+            if pretalx_path.exists():
+                pcfg = yaml.safe_load(pretalx_path.read_text())
+                current_year = str(pcfg.get("events", {}).get("current", {}).get("year", ""))
+            pretalx_titles = load_pretalx_titles(year, current_year)
+            matched_codes = {c for c, _, _ in seen_videos}
+            fuzzy_hits = 0
+            for video in unmatched_videos:
+                code = fuzzy_match_by_title(video["title"], pretalx_titles)
+                if code and code not in matched_codes:
+                    seen_videos.append((code, video, "fuzzy"))
+                    matched_codes.add(code)
+                    fuzzy_hits += 1
+            if fuzzy_hits:
+                print(f"  Fuzzy-title matched {fuzzy_hits} of {len(unmatched_videos)} hashtag-less videos.")
+
         if seen_videos:
-            video_ids = [v["videoId"] for _, v in seen_videos if v["videoId"]]
+            video_ids = [v["videoId"] for _, v, _ in seen_videos if v["videoId"]]
             details = fetch_video_details(video_ids, api_key)
-            for code, v in seen_videos:
+            for code, v, _match_type in seen_videos:
                 vid = v["videoId"]
                 d = details.get(vid, {})
                 code_map[code] = {
