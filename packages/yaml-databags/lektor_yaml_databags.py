@@ -62,6 +62,148 @@ def shift_headings(html: object, by: int = 1) -> Markup:
     return Markup(_HEADING_RE.sub(_sub, text))
 
 
+# Patterns used by the `social_url` filter to recognise pre-normalised forms.
+_URL_RE = re.compile(r"^https?://", re.IGNORECASE)
+# Mastodon webfinger handle: @user@server.tld (or user@server.tld without the @)
+_MASTODON_WEBFINGER_RE = re.compile(r"^@?([\w.-]+)@([\w.-]+\.[a-z]{2,})$", re.IGNORECASE)
+# `server.tld/@user` shape some users paste in
+_MASTODON_PATH_RE = re.compile(r"^([\w.-]+\.[a-z]{2,})/@([\w.-]+)$", re.IGNORECASE)
+# Bluesky bare handle (e.g. user.bsky.social)
+_BLUESKY_HANDLE_RE = re.compile(r"^@?([\w.-]+\.bsky\.social)$", re.IGNORECASE)
+# Plain identifier (alpha/num/_/-/.)
+_BARE_HANDLE_RE = re.compile(r"^@?([A-Za-z0-9_.-]+)$")
+
+
+def social_url(value: object, kind: str) -> str:
+    """Normalise a stored social-media value to a canonical full URL.
+
+    Speaker contents.lr files were imported over multiple years with
+    inconsistent shapes — bare handles ("hendorf"), at-prefixed handles
+    ("@hendorf"), full URLs ("https://twitter.com/hendorf"), mastodon
+    webfinger handles ("@hendorf@fosstodon.org"), and path-style entries
+    ("fosstodon.org/@hendorf"). This filter turns every recognised form
+    into the same outbound URL so templates (the visible links, the
+    JSON-LD `sameAs[]`, and the OpenGraph tags) all agree.
+
+    Returns the canonical URL on success, or an empty string when the
+    value is blank / a placeholder / unparseable. Templates should
+    treat the empty string as "no profile".
+
+    Recognised `kind` values: twitter, x, mastodon, bluesky, threads,
+    github, linkedin, homepage.
+
+    Args:
+        value: stored field value (Lektor `Url` types pass through
+            `str()` cleanly)
+        kind: profile type so we know which canonical host to use
+
+    Returns:
+        Canonical URL or empty string
+    """
+    if value is None:
+        return ""
+    s = str(value).strip()
+    if not s or s in {"-", "—", "n/a", "N/A", "none", "None"}:
+        return ""
+
+    kind = (kind or "").lower()
+
+    # Already a full URL — return verbatim (don't try to rewrite the host).
+    if _URL_RE.match(s):
+        return s
+
+    # Schemeless host with a path, like "twitter.com/hendorf" or
+    # "www.linkedin.com/in/foo/". Prepend https://.
+    if "/" in s and "." in s.split("/", 1)[0]:
+        return "https://" + s.lstrip("/")
+
+    # Bare host like "adrin.info" (used as homepage for some speakers).
+    if kind == "homepage" and "." in s and " " not in s:
+        return "https://" + s
+
+    if kind in {"twitter", "x"}:
+        m = _BARE_HANDLE_RE.match(s)
+        if m:
+            return f"https://x.com/{m.group(1)}"
+        return ""
+
+    if kind == "mastodon":
+        m = _MASTODON_WEBFINGER_RE.match(s)
+        if m:
+            user, server = m.group(1), m.group(2)
+            return f"https://{server}/@{user}"
+        m = _MASTODON_PATH_RE.match(s)
+        if m:
+            server, user = m.group(1), m.group(2)
+            return f"https://{server}/@{user}"
+        return ""
+
+    if kind == "bluesky":
+        m = _BLUESKY_HANDLE_RE.match(s)
+        if m:
+            return f"https://bsky.app/profile/{m.group(1)}"
+        m = _BARE_HANDLE_RE.match(s)
+        if m:
+            # Assume bsky.social if user didn't include the server suffix
+            handle = m.group(1)
+            if "." not in handle:
+                handle = f"{handle}.bsky.social"
+            return f"https://bsky.app/profile/{handle}"
+        return ""
+
+    if kind == "github":
+        m = _BARE_HANDLE_RE.match(s)
+        if m:
+            return f"https://github.com/{m.group(1)}"
+        return ""
+
+    if kind == "linkedin":
+        m = _BARE_HANDLE_RE.match(s)
+        if m:
+            # LinkedIn doesn't allow inferring vanity vs. company URLs
+            # from a bare handle. Assume personal (`/in/`).
+            return f"https://www.linkedin.com/in/{m.group(1)}/"
+        return ""
+
+    if kind == "threads":
+        m = _BARE_HANDLE_RE.match(s)
+        if m:
+            user = m.group(1).lstrip("@")
+            return f"https://www.threads.net/@{user}"
+        return ""
+
+    return ""
+
+
+def social_label(value: object, kind: str) -> str:
+    """Return a short, screen-friendly display label for a social URL.
+
+    Strips scheme, www., and obvious path noise so screen-reader and
+    visible captions don't render the entire URL. Falls back to the
+    raw value if no shortening applies.
+    """
+    if value is None:
+        return ""
+    s = str(value).strip()
+    if not s:
+        return ""
+    s = re.sub(r"^https?://", "", s, flags=re.IGNORECASE)
+    s = re.sub(r"^www\.", "", s, flags=re.IGNORECASE)
+    s = s.rstrip("/")
+    if kind in {"twitter", "x"} and s.startswith(("x.com/", "twitter.com/")):
+        return "@" + s.split("/", 1)[1]
+    if kind == "github" and s.startswith("github.com/"):
+        return "@" + s.split("/", 1)[1]
+    if kind == "linkedin" and "linkedin.com/in/" in s:
+        return s.split("linkedin.com/in/", 1)[1].rstrip("/")
+    if kind == "bluesky" and "bsky.app/profile/" in s:
+        return "@" + s.split("bsky.app/profile/", 1)[1]
+    if kind == "mastodon" and "/@" in s:
+        server, _, user = s.partition("/@")
+        return f"@{user}@{server}"
+    return s
+
+
 def markdown_inline(text: str) -> str:
     """Convert inline markdown syntax to HTML.
 
@@ -176,6 +318,11 @@ class YAMLDatabagPlugin(Plugin):
         # Demote body-markdown headings so they never collide with the
         # template-level <h1>. Used in talk/blog/markdown body templates.
         self.env.jinja_env.filters['shift_headings'] = shift_headings
+        # Normalise social-media handles / URLs to canonical full URLs and
+        # short display labels — handles the mixed shapes ("hendorf",
+        # "@hendorf", "https://twitter.com/hendorf") in speaker contents.lr.
+        self.env.jinja_env.filters['social_url'] = social_url
+        self.env.jinja_env.filters['social_label'] = social_label
 
         # Call the databag setup
         self._setup_databags()

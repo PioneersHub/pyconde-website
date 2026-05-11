@@ -13,15 +13,21 @@
 {%- set talks_root = '/archive/' ~ archive_year ~ '/talks' if is_archive else '/talks' -%}
 
 {% block structured_data %}
-{# Cast Url-typed fields to plain strings so |tojson can serialise them. #}
+{#- Normalise each social field to a canonical URL. Speaker data was
+    imported across years with mixed shapes: bare handles, @-handles,
+    full URLs, mastodon webfinger ids, etc. The `social_url` filter
+    converts each recognised form to https://… or returns '' when the
+    value is blank / unparseable. The same filter is used below for
+    the visible <ul class="speaker-socials"> so what users see and
+    what crawlers see always match. -#}
 {%- set socials = [
-    this.homepage|string if this.homepage else '',
-    this.linkedin|string if this.linkedin else '',
-    this.github|string if this.github else '',
-    this.mastodon|string if this.mastodon else '',
-    this.threads|string if this.threads else '',
-    this.bluesky|string if this.bluesky else '',
-    this.twitter|string if this.twitter else '',
+    this.homepage|social_url('homepage'),
+    this.linkedin|social_url('linkedin'),
+    this.github|social_url('github'),
+    this.mastodon|social_url('mastodon'),
+    this.threads|social_url('threads'),
+    this.bluesky|social_url('bluesky'),
+    this.twitter|social_url('twitter'),
 ] | reject('equalto', '') | list -%}
 <script type="application/ld+json">
 {
@@ -139,19 +145,27 @@
       {% endif %}
 
       {%- set socials_list = [
-        ('homepage', this.homepage|string if this.homepage else '', 'Homepage'),
-        ('linkedin', this.linkedin|string if this.linkedin else '', 'LinkedIn'),
-        ('github', this.github|string if this.github else '', 'GitHub'),
-        ('mastodon', this.mastodon|string if this.mastodon else '', 'Mastodon'),
-        ('threads', this.threads|string if this.threads else '', 'Threads'),
-        ('bluesky', this.bluesky|string if this.bluesky else '', 'Bluesky'),
-        ('twitter', this.twitter|string if this.twitter else '', 'X (Twitter)'),
+        ('homepage', this.homepage|social_url('homepage'), 'Homepage'),
+        ('linkedin', this.linkedin|social_url('linkedin'), 'LinkedIn'),
+        ('github', this.github|social_url('github'), 'GitHub'),
+        ('mastodon', this.mastodon|social_url('mastodon'), 'Mastodon'),
+        ('threads', this.threads|social_url('threads'), 'Threads'),
+        ('bluesky', this.bluesky|social_url('bluesky'), 'Bluesky'),
+        ('twitter', this.twitter|social_url('twitter'), 'X (Twitter)'),
       ] | rejectattr(1, 'equalto', '') | list -%}
       {% if socials_list %}
       <ul class="speaker-socials" aria-label="Speaker links">
         {% for slug, url, label in socials_list %}
         <li class="speaker-social speaker-social--{{ slug }}">
-          <a href="{{ url }}" rel="me noopener noreferrer" target="_blank">{{ label }}</a>
+          {#- rel="me" only on mastodon/bluesky which actually support it;
+              other platforms ignore it. Use noopener/noreferrer everywhere. -#}
+          <a href="{{ url }}"
+             rel="{% if slug in ('mastodon', 'bluesky') %}me {% endif %}noopener noreferrer"
+             target="_blank"
+             title="{{ url }}">
+            <span class="speaker-social__label">{{ label }}</span>
+            <span class="speaker-social__handle">{{ url|social_label(slug) }}</span>
+          </a>
         </li>
         {% endfor %}
       </ul>
