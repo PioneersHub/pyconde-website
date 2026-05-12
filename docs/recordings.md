@@ -1,6 +1,9 @@
 # YouTube recordings
 
-Linking session recordings from a YouTube playlist into the matching talk pages. The sync is one-way (YouTube → repo) and idempotent.
+Two flows:
+
+1. **Link** existing YouTube videos to talk pages — one-way YouTube → repo, idempotent.
+2. **Download** the audio of every linked video so the audio can be fed into the transcription pipeline ([docs/transcripts.md](transcripts.md)).
 
 ## Inputs
 
@@ -60,3 +63,31 @@ Talks with `do_not_record: yes` are skipped — no video, no transcript section,
 | Video in YouTube but not on the talk page | Run `--year YYYY` again; check the unmatched-videos report at the end |
 | Title spelling diverges from Pretalx, fuzzy match misses | Bump confidence threshold via `--fuzzy-cutoff 0.8` (default 0.6) or add an explicit override |
 | Pre-roll / outro got merged into a single video covering multiple talks | Out of scope — add overrides per talk pointing to YouTube `&t=` deep-link timecodes manually |
+
+## Audio downloads for the transcription pipeline
+
+After the YouTube sync has populated `youtube_id` fields, the audio of every linked recording can be batch-downloaded as m4a for the transcription pipeline.
+
+```bash
+uv run python utils/download_audio.py --year 2023
+uv run python utils/download_audio.py --year all          # every archived edition
+uv run python utils/download_audio.py --year 2023 --dry-run
+```
+
+Defaults:
+
+- Destination: `~/Documents/Claude/{year}-audio/` (mirrors the convention the transcription pipeline already reads).
+- Filename: `{CODE}-{slug}.m4a` — `{slug}` is the talk's frozen slug from `contents.lr`, or a freshly slugified title if no slug field is present.
+- Format: `bestaudio[ext=m4a]/bestaudio` — picks the m4a-native stream YouTube serves; falls back to the best audio-only stream if m4a isn't on offer.
+
+Behaviour:
+
+- Talks with no `youtube_id` or `do_not_record: yes` are skipped silently.
+- Existing files are skipped — re-running the script resumes only failed or new downloads.
+- A `_download_log.txt` is appended in each year's audio folder.
+- Per-talk failures are reported at the end with the error tail; the script exits non-zero so CI / wrappers can react.
+- `ffmpeg` is not strictly required (m4a-native streams transfer as-is). If yt-dlp needs to merge formats and ffmpeg is missing, the script logs a hint at startup; install ffmpeg or pass a stricter format selector.
+
+Size estimate: ~15–25 MB per 30-minute talk. A full edition runs 1–3 GB and 1–3 hours wall-clock depending on network — start in the background or pick a specific year.
+
+Once a year's audio is on disk, hand the folder to the transcription pipeline; the outputs land back under `~/Documents/Claude/{year}-transcripts/` for [docs/transcripts.md](transcripts.md) to ingest.
