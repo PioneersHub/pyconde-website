@@ -11,7 +11,10 @@ Talks without a `youtube_id`, with `do_not_record: yes`, or whose audio file
 already exists are skipped. Re-running the script is therefore resumable —
 only new or previously-failed downloads are attempted.
 
-Requires `yt-dlp` (declared as a dev dependency in pyproject.toml).
+Requires `yt-dlp` on PATH (e.g. `brew install yt-dlp`). The script shells
+out to the binary rather than importing it as a Python module, so the
+system install is always used and stays up-to-date independently of the
+project's Python dependencies.
 """
 
 from __future__ import annotations
@@ -19,12 +22,11 @@ from __future__ import annotations
 import argparse
 import re
 import shutil
+import subprocess
 import sys
 import unicodedata
 from dataclasses import dataclass
 from pathlib import Path
-
-import yt_dlp
 
 REPO = Path(__file__).resolve().parent.parent
 
@@ -87,50 +89,53 @@ def collect_jobs(talks_dir: Path) -> list[Job]:
     return jobs
 
 
-def download_one(job: Job, dest_dir: Path, format_id: str, dry_run: bool) -> tuple[str, str]:
+def download_one(job: Job, dest_dir: Path, format_id: str, ytdlp: str, dry_run: bool) -> tuple[str, str]:
     """Run yt-dlp for a single job. Returns (status, detail)."""
     out_path = dest_dir / f"{job.stem}.m4a"
     if out_path.exists() and out_path.stat().st_size > 0:
-        return ("skip-exists", str(out_path.name))
+        return ("skip-exists", out_path.name)
     if dry_run:
         return ("would-download", f"{job.youtube_id} → {out_path.name}")
 
-    # yt-dlp options. We ask for the best m4a-compatible audio-only stream
-    # and disable post-processing extraction (no ffmpeg dependency) — m4a
-    # is shipped as-is by YouTube for most videos.
-    opts = {
-        "format": format_id,
-        "outtmpl": str(dest_dir / f"{job.stem}.%(ext)s"),
-        "quiet": True,
-        "no_warnings": True,
-        "noprogress": True,
-        "ignoreerrors": False,
-        # Replace illegal filename chars rather than refusing to download
-        "restrictfilenames": False,
-        # Don't write metadata sidecar files
-        "writeinfojson": False,
-        "writethumbnail": False,
-        # Cap retries on a bad stream — fail fast and report
-        "retries": 3,
-        "fragment_retries": 3,
-    }
     url = f"https://www.youtube.com/watch?v={job.youtube_id}"
+    # Output template uses %(ext)s so yt-dlp picks the actual file extension
+    # served (almost always m4a for bestaudio[ext=m4a]).
+    out_tmpl = str(dest_dir / f"{job.stem}.%(ext)s")
+    cmd = [
+        ytdlp,
+        "-f", format_id,
+        "-o", out_tmpl,
+        "--no-progress",
+        "--no-warnings",
+        "--retries", "3",
+        "--fragment-retries", "3",
+        url,
+    ]
     try:
-        with yt_dlp.YoutubeDL(opts) as ydl:
-            ydl.download([url])
-    except yt_dlp.utils.DownloadError as e:
-        return ("fail", str(e).splitlines()[-1] if str(e) else "download error")
-    except Exception as e:  # noqa: BLE001
-        return ("fail", f"{type(e).__name__}: {e}")
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except FileNotFoundError:
+        return ("fail", f"yt-dlp not found at {ytdlp}")
 
-    # yt-dlp may pick an alternate extension if m4a isn't available; verify.
-    if not out_path.exists():
-        # Look for sibling with same stem but different extension
-        candidates = list(dest_dir.glob(f"{job.stem}.*"))
-        if candidates:
-            return ("ok-other", candidates[0].name)
-        return ("fail", "output file not produced")
-    return ("ok", out_path.name)
+    if result.returncode != 0:
+        # Last non-empty line of stderr is usually the actionable bit
+        tail = next(
+            (line for line in reversed(result.stderr.splitlines()) if line.strip()),
+            "yt-dlp exited non-zero with no output",
+        )
+        return ("fail", tail)
+
+    if out_path.exists():
+        return ("ok", out_path.name)
+    # Format selector picked a non-m4a stream; find what it actually wrote.
+    candidates = list(dest_dir.glob(f"{job.stem}.*"))
+    if candidates:
+        return ("ok-other", candidates[0].name)
+    return ("fail", "output file not produced")
 
 
 def main() -> int:
@@ -152,8 +157,29 @@ def main() -> int:
         default="bestaudio[ext=m4a]/bestaudio",
         help="yt-dlp format selector (default: bestaudio[ext=m4a]/bestaudio)",
     )
+    p.add_argument(
+        "--ytdlp",
+        default=None,
+        help="Path to the yt-dlp binary. Default: first match on PATH.",
+    )
     p.add_argument("--dry-run", action="store_true")
     args = p.parse_args()
+
+    ytdlp = args.ytdlp or shutil.which("yt-dlp")
+    if not ytdlp and not args.dry_run:
+        print(
+            "yt-dlp not found on PATH. Install with `brew install yt-dlp` "
+            "(macOS) or your platform's equivalent, then re-run.",
+            file=sys.stderr,
+        )
+        return 2
+    if shutil.which("ffmpeg") is None and not args.dry_run:
+        print(
+            "Note: ffmpeg is not on PATH. The default format selector still works "
+            "for m4a-native streams; if you hit 'requires ffmpeg' errors, install "
+            "ffmpeg or pass --format 'bestaudio[ext=m4a]'.",
+            file=sys.stderr,
+        )
 
     if args.year == "all":
         years = sorted(
@@ -194,7 +220,7 @@ def main() -> int:
         print(f"-- {year}: {len(jobs)} talks with audio → {dest_root}")
         ok = skip = fail = 0
         for i, job in enumerate(jobs, 1):
-            status, detail = download_one(job, dest_root, args.format, args.dry_run)
+            status, detail = download_one(job, dest_root, args.format, ytdlp or "yt-dlp", args.dry_run)
             line = f"  [{i:3}/{len(jobs)}] {status:<14} {job.code}  {detail}"
             print(line)
             if log_fh:
@@ -225,11 +251,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    if shutil.which("ffmpeg") is None:
-        print(
-            "Note: ffmpeg is not on PATH. The default format selector still works for "
-            "m4a-native streams; if you hit 'requires ffmpeg' errors, install ffmpeg or "
-            "pass --format 'bestaudio[ext=m4a]'.",
-            file=sys.stderr,
-        )
     sys.exit(main())

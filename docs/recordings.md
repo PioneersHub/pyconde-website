@@ -68,6 +68,14 @@ Talks with `do_not_record: yes` are skipped — no video, no transcript section,
 
 After the YouTube sync has populated `youtube_id` fields, the audio of every linked recording can be batch-downloaded as m4a for the transcription pipeline.
 
+Requires `yt-dlp` on PATH:
+
+```bash
+brew install yt-dlp        # macOS
+```
+
+The script shells out to the system binary so it stays up-to-date independently of the project's Python deps.
+
 ```bash
 uv run python utils/download_audio.py --year 2023
 uv run python utils/download_audio.py --year all          # every archived edition
