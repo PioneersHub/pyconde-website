@@ -93,3 +93,186 @@ video_duration_iso: PT31M37S
 video_thumbnail: https://i.ytimg.com/vi/Y4HQQPfyzwo/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:06]_
+
+Hi, everyone. I'm Mark, and with my colleague Kat, we're glad to be here today to talk to you about our journey into the marvelous world of generative AI. Since we wouldn't have enough time to cover everything we've been exploring during that journey, we decided to focus on a specific text classification use case we had at Malt last year. First, a few words about MALT, so we're the leading freelancing platform in Europe with more than 700,000 freelancers. And we allow freelancers and companies to make the perfect match. So that's one of the main duties of the data science team is to make that perfect match happen. So either through more manual search or automatic matching. Today we're not going to talk about matching, but we're going to talk about a side use case which is predicting your job category. Maybe we have some freelancers in the audience, or maybe some got evicted, and maybe you're not already registered on Malt, and my five-second speech convinced you to actually register. On Malt, when you register as a freelance, or when you actually declare a project, we're we're going to ask for a job category. So that's what you would see. But to ease that process, because there's more than 100 categories at Malt, we're going to ask you for a job title. And based on that job title, we're going to call a model. We're going to try to predict the best category for you at Malt. So here you've got an example. We had a model in production for a long time. So here you've got an example. It's a classification pipeline with two stages. The first stage is a custom Word2vec that we train in-house. And the second one is a LSTM-based classifier. The problem is that these pipelines were monolingual. So we had to develop and maintain one pipeline for every language that we support at MOTS. And you can already see there's a huge problem, because it's really hard to maintain. So you've got several complex pipelines with dependencies, and the situation is only getting worse every time you add a new language. The other problem is evolution. When you need to support a new language, it means you need a new Word2vec, but also a new LSTM classifier. And by definition, when we open a country, we don't have freelancers in that new language, so we have no labels to actually deal with that. So we were at the beginning of 2023, so roughly a year ago, and we knew we were going to have to change the job categories. We were expanding into a strategy consultant, and we knew we were going to have to support new languages. So it was a real nightmare for us. And at the same time, you could read everywhere that generative AI could solve everything, all NLP tasks, including text classification. And it was going to be the end of a specialized model. So we said, yeah, why not try it? I mean, we've got some labels. The cost of trying it is not going to be high. And yeah, so I just talked about generative AI. And we hear about generative AI all the time. But Kat, what do we mean exactly by generative AI here?
+
+**Speaker 2** _[03:34]_
+
+Thanks, Mark, for your question. So when deep learning was an image processing at human level, there also have been attempts to adapt deep learning to text data with, for example, SCM. But first, with attention mechanism and evolving transformers in 2017, deep learning was actually suitable for NLP tasks. And while the performance was accelerated, but mainly two reasons, first the investment and scaling of number of parameters, and the second the availability to the public through chatbots such as ChatGPT or Gemini. And what we call generative large language models are like all large language models which is based on transformers and they are trained in auto regression and the main objective is to generate text. So their performance was getting better and better to the point that people, a lot of people believed generative large language models should solve narrow use cases and zero shot without training. So that's why we thought about trying this and we choose Palm 2 as our first try because our app was running on GCP so we had already agreement privacy set up and because it was able to handle multiple languages. In order In order to use GenAI as a text classifier, we feed the model a prompt, as you can see here, and ask the model to assign the most probable category. We also use keywords like must, only, and strictly, and we have evaluated our approach by choosing 10,000 profiles within multiple languages, and compared the selected category by the freelancer and the model predicted. So as you can see here, we have a quite high drop in accuracy, in average accuracy, and the main reason is because LLMs are not designed for text classification. And the second, the generative LLMs hallucinate, of course, so we had to recover the output by post-processing step, and also, what else, while, I mean, the average accuracy, we have a huge drop, but still we saw in between the languages quite okay results. Let's go back here. The 60% can also be translated into impact on the user experience, so it means like two out of ten freelancers need to adjust their category manually, and also their response time has of course an impact on their UX. And you see the difference is enormous. What else? We also evaluated the yearly costs, and as you can see, the prices are kind of similar, but we also need to be careful while comparing this, because our legacy system is kind of a fixed cost, because you pay for a cluster, and pound to price as a service, and you never know how this is going to change in the future. Environmental costs. So at MALT we are interested in environmental costs and we were disappointed that Palm II, their technical report of Palm II did not mention any carbon footprint or even the number of parameters. So we tried to estimate this as a proxy, like we tried to estimate number of parameters and also like flops. And our results are that the Bound2 model, the number of parameters are 10,000 times higher than our legacy system. So we need more storage and also you need more storage and run the computation on multiple clusters of GPU or DPU, whereas our legacy system runs on a small CPU virtual machine. So to summarise the first results, we have some limitation, as you see, but we were surprised how well Palm II was able to handle new languages, and also without further training, and also it was able to deal with new categories because you just adjust the prompt. So we discovered that generative large language models is maybe not the best choice for text classifiers in our case, but is there something else we can do, Mark?
+
+**Speaker 1** _[09:14]_
+
+Yeah, thanks Scott. Let's take a look at this language model landscape. So it's a bit outdated, especially in the language model field where sometimes a week feels like a year. But the point is still valid. We can see that there's a wide range of architectures and they are good or more or less good at several tasks. They have strengths and weaknesses. But if we focus on the strengths, we can see a pattern emerging where the family, where the model are trained in autoregressive fashion, it means that you only see the beginning of the sentence during training, next word prediction, are better at conversation and content generation, while the model of the auto-encoding, so you have the whole sequence when you're training, are better at text classification and information extraction. We did not start on the right foot because most of the generative LLM models are part of the autoregressive family. So maybe we should look in the big other family. That's why we ended up with that architecture. So we have a frozen, pre-trained, multilingual language model. So I'm going to deep dive after into the frozen and multilingual part. But what we get from that, from that sentence transformer, is we get embeddings. And on top of that, we just had a really simple three-layer classifier. The nice thing here is that it's super light. We only have 220,000 trainable parameters. And since the sentence transformer is frozen during the training, we can precompute the embedding at the beginning and reuse them during the epochs. So even though that model is a bit bigger than the legacy model that we had, we're still 1,000 times smaller than POM2. So now let's talk about the multilingual aspect. So the latent space, basically where the embedding leaves, there's two properties that we're looking for. The first one is that we want the latent space to be organized. So similar things if you've got example of L lines from freelancers. So you want similar concept to be close to each other in the latent space. And the other thing that we're looking for, and that's the multilingual aspect, is that a given context in several languages should be roughly in the same location in the latent space. But beware, because not all latent space are like that. If you don't have explicitly something in your training task to actually have this property, there's no reason and no guarantee that you will end up with that. In our case, we're fine, saved, because the the sentence transformer that we used was explicitly trained on similarity. So that means that we're going to have that nice layout of our concept, and the thing that happened is the language were aligned. So explicitly during training, the embeddings in different languages are aligned. So that's the reason why in the previous step I said that we're freezing the sentence transformer is because we don't want to lose that alignment. If we were to release these parameters during training, we would screw up that. So language alignment, it's great, because you can deal with people mixing languages. That happens a lot at Malt. But it's also great because you can do training with only one language. So here it's French, for example. What you see is the Latin space, and the line is basically the classifier, and we're asking him to speak the space for the different job category. And by doing that, you would get actually decent performance of course in French, but also in the other languages. And the reason is just because of that language alignment. You can see that it's not perfect. Of course English and Spanish here, the score are lower. The main reason is that since we didn't have labels at training, some sort of the micro-boundaries. So here you've got an example with Diseñador Grafico, which has not been categorized well. But what we can do, when we can, is add even more data. And oh, no surprise, if you do that, of course you improve the performance, the accuracy in the languages where you add the labels, but we also improved French here, so probably due to a regularization effect. If we step back and look at the result overall, what we can see is that the new model is actually on par with the legacy one for languages where we have a lot of data, and if we look at languages where we have fewer data, it's actually better, and again, this is thanks to the backbone that has that language alignment. Now, response time. So it's not, I mean, hard. We're a thousand or a hundred times faster than Palm 2, but we're even three times faster than the legacy model. But as Kat said earlier, at Malt, we like to make sure that we don't use more resources than needed, and after all, we're just talking about like a really simple classification use case, and I'm just wondering if we could go faster and use less resources, Kat.
+
+**Speaker 2** _[15:22]_
+
+nice question. So there are a bunch of inference run times out there which aims to optimise the inference time and also to use less resources. So they are all written in high performance programming languages such as C or C++ but they also offer API for other languages such Python. So, a lot of optimisation techniques they use, and we will cover now two of them. And you also need to know that each of the inference runtime requires its own format of the model and also target different hardware architectures. So first of all, there's graph optimisation because deep learning are commonly abstracted as computational graphs and that's why you can optimise them. There are basic graphic optimisation which goes from basic like redundant node elimination more complex one like node fusion as you can see here, you go from two layers, you merge them into one, and there are also extended graph optimisations which are specific to hardware and all the neural network. The second optimisation technique is quantisation, where you basically convert the floating point representation into a lower precision, typically an 8-bit integer, and by doing that you quantise the training parameter of your model, and the quantisation is not just a dumb mapping, because the parameters follow a normal distribution, and what you do is you clip off details and and then just quantise the values which are like in the distribution mass. And by doing that, you can see right here, you can go from, you can reduce by half your response time only by using the graph optimisation, and at MALT we used ONIX inference runtime, And by using the quantization we can even reduce by three. And the model size, the smaller model size, resulting smaller model size itself has already an impact on the response time and also on the required storage resources. And the best thing is that your accuracy stays stable. it looks like in production, because this one is kind of theoretical, you can see a huge drop of the memory consumption and also the response time when the new model was deployed. It's really nice. The yearly cost, so we can be four times cheaper than our legacy system, So it's a very good fact. To summarise all in all, we are able to deal with new languages with a dedicated model Mark showed you and with inference runtime. We can go much faster and also lower the cost and have also an impact on the environmental costs while remaining the accuracy. Our main struggling point is how to handle new categories, but since now we have only one model, we need to retrain once and don't need labels for all of the languages. So since we saw that GenEI maybe not the best thing for text classifier, can we just say it's useless for classification.
+
+**Speaker 1** _[19:32]_
+
+Yeah, thanks Scott. So I think there's at least two use cases where JNI can be useful for text classification. We're pretty similar One is evolution as we've seen is still where we struggle a bit and over one is bootstrap So when you have no labels at all So here we're back on the same example and let's say we want to add a new job category surprise prompt engineer I'm not sure if that's a job, but let's say it's a job and What we're gonna do is we're gonna ask a generative LLM to generate data points for us and We're gonna train a new model on that The nice thing as Kat said When we do that in our case, we only need two labels to generate labels for English Because it's usually where LLM are the strongest and thanks to the language alignment. We're know we're gonna go we're gonna be okay in the other languages Yeah, so depending on the performance on the generative LLM, the zero-shot performance, you can either use the labels as is, or you can manually curate them, which is what we did, or even use a tool like Prodigy, if we want to name a local solution. And at some point, you can start to have real data points, and even further, at some point, You can even remove all the generated data, and you end up back to the original situation. Just by doing that hybrid approach, we kind of have a best of both worlds, and the only thing that we did not manage here is actually to improve the accuracy of the legacy model, But they were already pretty good, so we're pretty happy in the end. Just to conclude, that's a recap of our journey. And what we can say is that, at least for now, so that might change in the future, but in the industrial settings where there's not just the accuracy but other factors such as cost or the environmental footprint, generative AI is not a good solution, or probably not a good solution, but it can still be a valid solution to generate training data when you don't have some. And thanks. That's all.
+
+**Speaker 3** _[22:06]_
+
+Thanks a lot for an amazing presentation. I've never seen so many questions. I'm very sorry. I don't think we can take all of these questions. There are more than 16. So I'm trying to cover as much as possible.
+
+**Speaker 1** _[22:25]_
+
+So if you please.
+
+**Speaker 3** _[22:26]_
+
+please whoever have asked the questions if your question don't feature it i am not moderating it we don't have the time to take them so you can take so the first one how did you estimate or measure the environmental impact
+
+**Speaker 1** _[22:43]_
+
+Okay, so basically if you look at the technical report of PALM2, like they don't give the parameter count, they just say that it was lower than PALM1, which was 500 billions. And there's a leaked document at some point, so it's not guaranteed, but say that PALM2 was actually 400,000, and that's the estimate we used to actually have that diagram where we say it's 10,000 bigger.
+
+**Speaker 2** _[23:10]_
+
+And while having the numbers of parameters, you already know how many operations you need to take, and then you just calculate those by, you know, there's an equation with the number of cores and stuff like that.
+
+**Speaker 1** _[23:21]_
+
+and stuff like that. Yeah, it's a good proxy for how much electricity or much water you're gonna use in the end.
+
+**Speaker 3** _[23:29]_
+
+Which transformer structure you used for your embedding? BERT, ROBERT?
+
+**Speaker 1** _[23:34]_
+
+It's a sentence BERT, so a sentence BERT is basically a BERT model, but there's been a pooling operation on top of that, and that pooling operation is trained on similarity, so it works well on sentence. For our use case, the latent space is way better than just taking a BERT.
+
+**Speaker 3** _[24:01]_
+
+How accurate does the language model work with non-latin character languages like Mandarin, Japanese?
+
+**Speaker 1** _[24:08]_
+
+We did not check. So as I said, we're the Leading marketplace in Europe again like a bit of a that so we only have languages in Europe So we don't have right now. I would say like uncommon character set and Yeah, so we did not test
+
+**Speaker 3** _[24:28]_
+
+Was your first attempt with a 16% drop with a zero-shot approach, or have you also used some prompt engineering?
+
+**Speaker 1** _[24:36]_
+
+Engineering. Oh, yeah. Yeah. Yeah. Yeah. I mean that's like the best thing we did like I mean we did not deep dive we actually tried to recover also some of the label because sometimes the Generated class is not actually one of the class we asked the prompt so we have a lot of mechanism and that's like I'm not even sure the one we showed is actually the version of the With the best course but actually the scores that we show is like the last iteration with the best result we could get
+
+**Speaker 3** _[25:06]_
+
+Have you tried to use LLM simply as a translator? You could translate, use your legacy classifier and then with the output category translate it back.
+
+**Speaker 1** _[25:16]_
+
+Okay, so actually two years ago, I mean not for that but for matching at something we tried It did not work really well, and it was also really painful to maintain like all the translation pipeline You had a lot of latency. It's really hard to maintain so that's why we didn't want to go back that route
+
+**Speaker 3** _[25:35]_
+
+Do you think that me as a potential freelancer on the MALT platform would be okay with my full profile being uploaded to Palm for scoring?
+
+**Speaker 1** _[25:45]_
+
+So, we don't upload your full profile to Palm. We only upload the job title. And we actually, we don't never use actually Palm for the matching. So, for the matching, we only use in-house model that are hosted at Malp.
+
+**Speaker 3** _[26:03]_
+
+Do you have a negative class to filter out trash and also to discover new merging jobs that may not fit your existing categories?
+
+**Speaker 1** _[26:12]_
+
+Yes, by default at Malt there is a category like that which is MISC or default, I don't
+
+**Speaker 3** _[26:13]_
+
+Yes.
+
+**Speaker 1** _[26:18]_
+
+remember the name, but by constriction we have that class in the product and from time to time like we review that to see like what's in it and we see there's a need to actually create the new job category.
+
+**Speaker 3** _[26:30]_
+
+One question from Benedict Mangold. Synthetic data, can that work as new job titles are typically outside the training horizon?
+
+**Speaker 1** _[26:42]_
+
+Yeah, I mean I would say that what we did for the new job category is kind of synthetic data I mean the knowledge distillation from the the genelein But then it's hard to actually But just tweaking I mean there's over approach where you can like take an existing sentence and like tweak it. We did not go that way
+
+**Speaker 3** _[27:05]_
+
+Have you tried not freezing the embeddings and fine-tuning them while training the MLP classification head?
+
+**Speaker 1** _[27:14]_
+
+No, we did not because what I was gonna happen is what I just said here is like if you're not freezing the the the backbone you're gonna screw up the language alignment and probably the language on which like you have the more the link the language for which you have the more data is going to skew the Latent space toward it and the over under representative language are going to have a bad accuracy
+
+**Speaker 3** _[27:39]_
+
+Have you tried another LLM models like CharGPT, Gemini?
+
+**Speaker 1** _[27:46]_
+
+No, we did not for the reason we said is that even though we were just sending the the job description like We were actually not allowed in our company to use chat GPT for a legal reason And I don't think Jimmy Knight did not exact at the time Trying to be
+
+**Speaker 3** _[28:14]_
+
+What do you mean by accuracy?
+
+**Speaker 1** _[28:17]_
+
+Yeah, I did not. I went really fast. Sorry, sorry, sorry. So here, it's one of the funnels. So here you've got five results, but we've got another funnel when you create a project and we only display the top three results and we look at the accuracy at three. It means that in the top three results that I'm showing here is the right category that is going to to be picked by the freelancer in that set. Does that make sense? So it's really tied to the project. It's like the user experience.
+
+**Speaker 3** _[28:56]_
+
+We'll try to take two more questions Have you compared your own sentence transformer? against multilingual embedding models like Ada from open AI
+
+**Speaker 1** _[29:08]_
+
+I don't want to say something stupid, but I think that Ada is that is it a not I'm not sure is it I don't remember if it's an auto regressive or auto encoding one most of the auto Regressive languages, and I don't want to say something to it, but I think they don't have any language alignment They can be multilingual, but I don't think like most of them They had the constraint to have the language alignment So you wouldn't be able to do that kind of trick and plus you would be back with like using a really huge model On which you have no control
+
+**Speaker 3** _[29:42]_
+
+Why not just align the word-to-vec embeddings in a common space? This is a very good question.
+
+**Speaker 1** _[29:47]_
+
+very good question. Yes, so the reason we gave up on Word2Vec is actually there's over limitation, so Word2Vec is not context-dependent, there's no attention mechanism and we did some trials, we actually have an international Word2Vec, but yeah it was not on par with the transformer version with the sentence transformer.
+
+**Speaker 3** _[30:11]_
+
+I want to take the last question on fairness. Is the model fair, meaning its accuracy on less represented job titles is not much worse than more represented ones?
+
+**Speaker 1** _[30:22]_
+
+ones okay I mean I'm we didn't have time to go over it but when we do the evaluation actually we do the evaluation by job category and and yeah we were we did not downgrade the experience on the like the lower represented category you want to last last one
+
+**Speaker 3** _[30:46]_
+
+Okay, the last question. What frozen transformer did you use? I think it will be short.
+
+**Speaker 1** _[30:52]_
+
+Yeah, as I said, it's a sentence transformer. I don't, is it like, I want to say, all net. E5. No, the E5 is for the matching, for that one we don't use E5. Yeah, I'm sorry, I don't remember the exact, but it's a sentence transformer, which is multilingual, I think on like 15 languages, which one? No, I think it's all multilingual something.
+
+**Speaker 3** _[31:21]_
+
+I think that's a good point for a conversation for coffee.
+
+**Speaker 1** _[31:22]_
+
+Oh.
+
+**Speaker 3** _[31:26]_
+
+So that brings me to end this session. Thank you all. And I would like to applaud.
+
+---
+transcript_status: auto
+---
+transcript_language: en

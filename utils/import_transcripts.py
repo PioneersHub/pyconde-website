@@ -28,8 +28,9 @@ REPO = Path(__file__).resolve().parent.parent
 TALKS_ROOT = REPO / "content" / "archive" / "2025" / "talks"
 DEFAULT_SRC = Path.home() / "Documents" / "Claude" / "2025-transcripts"
 
-# Pretalx codes are 6 chars, [A-Z0-9]
-CODE_RE = re.compile(r"^([A-Z0-9]{6})(?:-|$)")
+# Pretalx codes are 6 chars, [A-Z0-9]. Source folders come in shapes like
+# "{CODE}", "{CODE}-{Speaker Names}", "{CODE} 2" (de-dup suffix), etc.
+CODE_RE = re.compile(r"^([A-Z0-9]{6})(?:[-_ .]|$)")
 
 # YAML front-matter at the very top, between two '---' lines
 FRONT_MATTER_RE = re.compile(r"\A---\n.*?\n---\n", re.DOTALL)
@@ -169,10 +170,33 @@ def main() -> int:
         print(f"source not found: {args.src}", file=sys.stderr)
         return 2
 
-    existing_codes = {p.name for p in talks_root.iterdir() if p.is_dir()}
+    # Build a CODE -> talk-folder lookup by reading each talk's `code:`
+    # field. After the slug migration the folder name no longer equals the
+    # code, so a name-based lookup would miss every talk. Redirect siblings
+    # (named by code) get skipped because they have _model: redirect.
+    code_to_folder: dict[str, Path] = {}
+    for p in talks_root.iterdir():
+        if not p.is_dir():
+            continue
+        lr = p / "contents.lr"
+        if not lr.exists():
+            continue
+        text = lr.read_text(encoding="utf-8", errors="ignore")
+        if "_model: redirect" in text:
+            continue
+        # Find the `code:` line
+        for line in text.split("\n"):
+            if line.startswith("code:"):
+                val = line.split(":", 1)[1].strip()
+                if val:
+                    code_to_folder[val] = p
+                break
+
     imported = 0
     skipped_no_md = 0
+    skipped_dup: list[str] = []
     orphans: list[str] = []
+    seen_codes: set[str] = set()
 
     for entry in sorted(args.src.iterdir()):
         if not entry.is_dir():
@@ -180,7 +204,15 @@ def main() -> int:
         code = extract_code(entry.name)
         if not code:
             continue
-        if code not in existing_codes:
+        if code in seen_codes:
+            # Two source folders share the same code (e.g. "ABC123" and
+            # "ABC123 2"). Take the first only; flag the rest so the
+            # operator can investigate.
+            skipped_dup.append(entry.name)
+            continue
+        seen_codes.add(code)
+        target_folder = code_to_folder.get(code)
+        if target_folder is None:
             orphans.append(entry.name)
             continue
         transcript_md = entry / "transcript.md"
@@ -188,13 +220,16 @@ def main() -> int:
             skipped_no_md += 1
             print(f"  skip: no transcript.md in {entry.name}", file=sys.stderr)
             continue
-        print(f"  import: {code} ← {entry.name}")
-        import_one(talks_root / code, transcript_md, args.status, args.language, args.dry_run)
+        print(f"  import: {code} ({target_folder.name}) ← {entry.name}")
+        import_one(target_folder, transcript_md, args.status, args.language, args.dry_run)
         imported += 1
 
     print()
     print(f"imported:   {imported}")
     print(f"no-md:      {skipped_no_md}")
+    print(f"duplicate:  {len(skipped_dup)}")
+    for d in skipped_dup:
+        print(f"  - {d}")
     print(f"orphans:    {len(orphans)}")
     for o in orphans:
         print(f"  - {o}")

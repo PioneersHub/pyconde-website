@@ -135,3 +135,362 @@ video_duration_iso: PT1H27M43S
 video_thumbnail: https://i.ytimg.com/vi/Wdzo8Xyml6M/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:05]_
+
+Okay, so let's configure this screens real quickly here Thank you. Thank you.
+
+**Speaker 2** _[01:08]_
+
+So as he sets up, I'm going to do a couple of announcements. So O'Reilly sent us 20 copies of the book, and we are going to do a book signing, but I don't know when. So the organizers are probably going to communicate that maybe tomorrow. All right, so somewhere I'm going to be sitting, and we're going to give away 20 copies of Fluent Python. And the second thing that I want to say is, O'Reilly, for a while, not O'Reilly, Amazon was selling fake copies of Fluent Python. How many people here have a copy of Fluent Python? Just out of curiosity, yeah. So I'm going to ask you to go home and see if your book has URLs or not. Because a pirate bought the online PDF that's available from ebooks.com and printed and put it on for sale on Amazon and Amazon made them the default vendor so but it's a very sad story because Amazon will not tell already even how many books of that kind were sold and they won't take responsibility so the only thing that we can do is to complain right so you as consumers go home and check if your book doesn't have so the book has more than a thousand URLs and they are shortened with fpy.li this is a domain that i have if your book doesn't have urls at all it's a fake copy and you should ask amazon to to give you a real copy if they say it's it has been too long you can tell them that you actually have your in your on your hand evidence of a crime so it It doesn't matter their policy. Their law is above their policy. So they must give you an original copy of the book. So I'm sorry to have to talk about that, but it's the only thing that we can do because O'Reilly cannot sue Amazon because Amazon could break them in a month. So yeah, interesting times.
+
+**Speaker 1** _[03:24]_
+
+Okay, so on that cheerful note, let me, I'm sorry, we were tweaking the presentation up to the last minute, I wish we had more, better prepared for two displays and everything, So I'm just going to share the screen, I think it's easier, mirror, yes, okay, yeah, okay. So and now for the presentation itself, yes, yes.
+
+**Speaker 2** _[04:15]_
+
+So there's a, we created a short link for the repository, it's bit.ly slash pi.com.de lowercase dash metaclass.
+
+**Speaker 1** _[04:15]_
+
+So. Here we go.
+
+**Speaker 2** _[04:34]_
+
+bit.ly slash pycon.de dash metaclass.
+
+**Speaker 1** _[04:42]_
+
+everything's more caps
+
+**Speaker 2** _[04:44]_
+
+All small caps.
+
+**Speaker 1** _[04:45]_
+
+I'm going to show it bigger, don't worry, just a second.
+
+**Speaker 2** _[04:59]_
+
+Metaclass. Metaclass? That's it. Okay.
+
+**Speaker 1** _[05:03]_
+
+Yes, I'm gonna show it bigger in just a second. I just need to
+
+**Speaker 2** _[05:03]_
+
+Nice. Yeah.
+
+**Speaker 1** _[05:08]_
+
+Push everything I have here to git so that you can actually access this Because we were tweaking like this until like five minutes ago And I'm saying like too many times Okay, so git Let's just add everything and
+
+**Speaker 2** _[05:31]_
+
+But the repo is already there.
+
+**Speaker 1** _[05:33]_
+
+Yeah, the repo is already there, but so that you can see what we have here, okay, so It's there As soon as it pushes Of course if you are accessing the Wi-Fi at the same time, I cannot push it. I'm just joking But yeah If it doesn't work, I'm going to share the Wi-Fi from my cell phone. Oh, it's going. Okay, so now I can start presenting, okay, so make run, oh, it's already, okay, so if it's already, yeah, so it means that this thing here should work, okay. Okay. Let's go to the beginning of the meta classes. What are they for? Where do they live? How do they reproduce? The bit.ly link should be here. Why is it not here? No. Is it working? Oh, okay. So can you read the bit.ly link over there? the way there in the back? I'm going to move it to the front one. It should be here. If If I save it, it should reload. Well, anyway, it's there. I'm going to push it later then. So not this one. Okay, so as our announcer mentioned, Luciano Romaglio wrote Fluent Python. I was a technical reviewer for it. And while reviewing it, I thought, well, this subject of meta classes is super cool. And I think I have an approach that should be able to teach it for people that have just a little bit of knowledge of Python. if they have done the Python tutorial, they should be able to understand metaclasses if I explain it the way I'm thinking about explaining it. Except that because I had been technical reviewer, there's a bunch of stuff that I knew already that when I started actually trying to explain, I said, oh, damn, now I've got to explain about a third of the book. And if you have seen Fluent Python, it's about yay thick, right? So I'll have to explain about a third of the book before I explain metaclasses. But let's try to get this through. So first thing, if you've done a Python tutorial, if you have created classes in Python, you might have seen that there are two kinds of methods in Python. One is the normal methods that you call with object.method and then you invoke with a parenthesis, and then special methods that you declare with double underscores, which we usually called Dunder, and which the Python interpreter itself uses to give special effects to instances of your class, right? So if I go to the Jupyter notebook, I think it's active, let me make sure that the Jupyter notebook is act actually active so Okay. Everyone can read in the back? Also, you can use the view, toggle header, yeah. Okay. So this, I have here two classes, right? And one has, like, normal methods that I forgot to translate from Portuguese to English. It means double. And a subclass of it has the dunder wrapper method which provides a representation for Python objects, right? So if I create an instance of the class and an instance of the subclass, I can call the normal method which is wrongly named here, so... And it is doubling the value of the attribute that was declared in the class. trivial stuff. I can assign an attribute, and I'm gonna have to fix everything because we forgot to fix this part, and it will then calculate according to the new attribute value the second class has a different value for X so the same method that was declared in the superclass while working on the subclass takes into account the new attribute and here I have the standard representation of one instance, and here is the slightly different representation of the instance of the subclass. Because I declared in the subclass that it should have this special representation, right? So here we see the normal method, dobrar, and the special method, which is providing a special representation right so python has these two kinds of methods that you can provide your classes and they have these two distinct uses let me just make it easy for me to alternate between these two things, okay. So and here is all different kinds of methods, special methods you can give to your class to make it behave like a number. So if you give it a dunder nag method, then you can call minus your instance, and whatever you return from dunder nag will be the result of minus your instance, and you can teach your the instances of your class to be comparable, to be multiplied, augmented assignments and everything that you can usually do with a number, you can teach an instance of a class that you created to behave like these different aspects of a number yourself.
+
+**Speaker 2** _[14:14]_
+
+Yeah, one of the first things that I could like to create in classes is the bender Bender EQ so then there is how we pronounce and the score and the score X and the score in the score, right? So the bender EQ is useful for testing because then you can easily assert that X equals Y
+
+**Speaker 1** _[14:34]_
+
+And if you don't implement dunderack, Python gives one for you, but this default one only asserts that one object is exactly the other. Unless your instance is from a class that derives from one of the standard Python classes that already have different EQ methods, like if you derive from an integer or a list, right? and here is a table where you have all the kinds of special methods that give your class instances of your class other special characteristics they're not related to pretending to be a number like you can teach your class to how to be represented or printed in different contexts fspath is a particularly funny one because you can make your class pretend to be a path element for the for the path standard library conversion number emulating collections this is pretty well used like you can make your class pretend to be a dictionary by implementing getItem the under getItem
+
+**Speaker 2** _[15:45]_
+
+So then people can use square brackets, right, to reach into the class.
+
+**Speaker 1** _[15:51]_
+
+and so on and so forth. So how do these attributes and methods get looked up then? So when you do your instance dot something, first it's looked up as an attribute in your instance. Then if it's not found there as an attribute of the instance itself, It's looked up in the class and from there on into the super class of that class and although the other the basis or other super classes of the class and so on so forth until it gets to object which is the Primary super class or class or super super class of every class you created in Python, right? So So let me dismiss this. Here if I assign dunder call to the class I created before, I'm saying self.x plus other is the definition of this call. I can even assign it, this is a monkey patch, so I can make an instance, this is actually next to the other slide, I make an instance be callable like it was a function by defining a dunder call to it, right? So, suppose I have a classic, this is actually from the following slide about runtime. I thought I had a demonstration of, well, actually what we had before was a demonstration of yeah, so like here, M2 is an instance of subclass which inherits from my class, right? So the X assigned to M1 here was looked at first on the instance, then on the class. So before, we had the full 42, and then we assigned 7, right? So first Dobra came up with an 84 result, and then with a 14 result. So this goes to the resolution order that we see here. First you look up an attribute on the instance, then on the class, then the superclass. So for normal attributes and normal methods, actually for normal attributes, first you look up on the instance, then the class, then the superclass. If you have an attribute that's named the same as a method on your class, it hides that method, so you need to be careful to not override things on your class that you need with things that you put in the instance, right? Now for special methods, it's never looked up on the instance. There's no point in assigning a Dunder call directly to an instance to try to make it callable. That's not going to work. To make an instance callable, the class needs to declare a Dunder call. To make an instance pretend to be a dictionary, the class must have Dunder get item, not the instance because whenever Python looks for a special method to treat an instance specially, it looks up directly on the class. If it doesn't find there, it looks on the superclasses, right? So we have these two classes of methods, normal methods and normal attributes and special methods and two slightly different lookup mechanisms. The special ones go straight to the class. This will be important later. But coming back, in Python, you might have heard this expression, everything is an object, Right? What does that mean exactly that everything is an object in Python? So... Yes? Scroll down, please. Thank you. So the fact that everything is an object means that you can assign everything to variables. So, usual variables, you have lists, you can append to them, you can see their values. And because I aliased B to A here, the fact that I appended to B meant that AA also has for elements because A and B are not boxes containing a list that when I assign a variable to another, I'm copying these values. What means is that A and B are labels that I assign to a single existing object. So when I modify one, the value accessed by one variable, I'm modifying the same value access by another variable, right? And when we say everything is an object, it means that classes themselves are objects. So here I had the my class that was declared not here but here right my class my subclass these things they exist in Python as variables so I can actually assign them to other variables and use them as other variables so here instance two is an instance of my class right and if I even though I instantiated it by calling my class two and if I assign none to the variable my class which which came to existing because of the class call that happened in the module, I can no longer instantiate it through the old name, but I can still instantiate it through the new name. Because class in Python is a value, is an object that I can assign to variables, is an object that I can put inside dictionaries and everything. Speaking of dictionaries, the contents of modules themselves are stored inside dictionaries inside the module. So here, slide one more time. Oh yes, I didn't run this yet. So because this is a value, one thing that comes with it is the fact that all these class declarations and everything, They happen at runtime. A class is not some magical thing that happens when you're editing the file. It gets created during runtime in Python, right? So I should have done this before. So imagine this module here, right? I create this pause function here, which pauses before, which prints the value and pauses before every point. I'm declaring a constant here, then I'm declaring a class, then declaring methods inside the class, right? So, and because I already ran it out of order, I'll have to do a slightly different thing here. sys of slide one runtime, okay, sys.modules, okay, so when I import, let me put this here, When I import slide one runtime, before I declare the constants, the only things in the global namespace are certain building things, and then the pause function that I created here, right? So when I type enter, before the class globals, the constant has already been declared, but But there's no duck in this namespace anywhere here, right?
+
+**Speaker 2** _[25:23]_
+
+So the point here is to show that Python is actually reading the source code from top to bottom as it imports the file and things are happening in that order.
+
+**Speaker 1** _[25:36]_
+
+So, here I am at the start of the class declaration, which is here, and still there is no duck class in the namespace. But there is the constant and there is the pause function that was declared before. By the end of the class declaration here, there's still no duck.
+
+**Speaker 2** _[26:00]_
+
+because that's because that's indented so it's part of the body of the class
+
+**Speaker 1** _[26:05]_
+
+right? So everything here is inside the body of the class. These pauses, they are happening during the class declaration, but you haven't got to the end of the class declaration yet. So if you go here, after the class globals, where is after the class globals? Okay, yeah, after the class. The globals here include duck, the class right so now that the module has been completely imported one important detail is that it's not going to execute that again unless i delete the module again because modules are only imported once no matter in in the names in the memory space of python no matter how many times you import it but on the on first import it is actually executing the file top to bottom. And it's declaring the class top to bottom. So when I then try to instantiate it, you can see that during init, I put a pause here. And now this part is paused inside the init of the class. And then I have a duck instance that I can make quack. And here I have another pause with quack, and then I see that pause constant and duck, they are still there in the global namespace, right? So everything is an object, and every time in Python is runtime. Sometimes you hear things saying, oh, this is happening at import time, not during run time. But import time is also run time. It's just a run time that happens at the beginning of the execution of your code when you're importing a module. It still is a useful abstraction to have because the things that happen at import time inside a module, they will only ever happen once, at the beginning of run time, but only once. imports of the module will not execute the module line by line again. They will just take the names of the modules and make it available in the namespace of a new module. So everything is an object means that the class declarations, they happen at runtime and they are creating the class and then assigning them to variables. And this means that I can reassign them to other variables like is shown here and all these things they exist inside the namespace of a module which also which is also a Python dictionary if I look at here eliminating all the dunder names from the module I see that pause is a function constant has a value and duck is the class that that we declared in the module, this module here, right? Pause, constant, and duck, right? So the fact that everything is an object, let's see. Yeah, here I was talking about how this is from Fluent Python, pictures from the Fluent Python book. When we assign variables, we're not putting things in boxes. We are assigning labels to things. So instead of saying, I assign this value to a variable, it's more useful to say, I bound this variable to this object. Because in essence, that's what's happening. I create the variable first, and then I put a label on it.
+
+**Speaker 2** _[30:02]_
+
+Like a post-it note. You create the object first and then the variable.
+
+**Speaker 1** _[30:06]_
+
+Do you want to listen?
+
+**Speaker 2** _[30:07]_
+
+Do it for us.
+
+**Speaker 1** _[30:08]_
+
+So, we create the value first, which is the object, and then we assign the label to it. The assigning of the label happens later. Because this is just a label, just like I modified and appended a 4 on there, if I'm modifying one, I'm modifying the other, right? But it also means that anything that is a value, I cannot only assign to variables or or bind to variables, which is the better term, I can also put inside lists, I can put inside dictionaries, I can put inside any kinds of containers and then fetch them out of containers and use them like that, including classes. Classes are values too. So the fact that everything is an object has some interesting implications. As I mentioned, the class keyword in Python, in fact, has two responsibilities. The first is to create the class value, the class object. And the second responsibility is assigning the class object to the variable that comes in the name of the class. Def that defines a function also does the same thing. It has double duty. The first duty is to create the function as a value and then bind it to the variable named after the function declaration. So when you say class duck, I'm creating the class duck but also assigning it to a variable called duck. So the other interesting thing about the fact that everything is an object is that everything has a class. So here I have a module much like the other module. And then I create an instance of it. I can call double, this one is correctly translated. And I have an add, where did add go? Well, it has an attribute add. But it has an attribute class. So if the class itself is a value, and everything in Python is an object, that means that classes themselves have classes, right? And what is the class of a class? The usual class of a class is type. The same thing we use to figure out what is the class or types of things. So here, since class is just a statement that is creating dynamically the class at that point and assigning it to a variable, that means that I can create classes inside functions. So here I'm dynamically creating a new class or creating a function that dynamically creates a new class by specifying what class level X attribute it should have. So I can create my other subclass using this function class builder here, right? And when I call double on it, it's 54 because the original value for it was 27, right? And I'll remove this because I forgot to create the add method. The basis of this subclass here are myClass and myMixing because that's how I declare them here. And it has a name called myDynamicSubclass because that's the name it had assigned to a variable inside the def, the function definition. So that's not the only way to dynamically create a class. How do I create an instance in Python? By invoking, by calling the class as if it was a function, right? So if classes have a class called type, logically, a way to create an instance of this type class, which is a new class, is by calling type. So I can create a class dynamically, not only by defining it inside a function like this, but by calling type directly. When type is called with three arguments like this, the first one being the class name, the second one being the basis, and the third one being a dictionary of attributes for the class, I'm creating the class dynamically, a completely new class. I can even include methods in it. So I can do my really dynamic subclass instance equals my, I'm just going to complete it. How are you? It's missing a required position argument because it likes to have a value for x, 3. So, I created a new class completely dynamically here. I didn't use the class statement, I invoked type to do it, right? So everything is an object, means I can create classes dynamically. But we saw object and we saw type, and what is the relationship of these things? So m1 that we saw before is an instance of my class, m2 is an instance of my subclass. My subclass inherits from my class, which inherits from object. And all these three classes are instances of type, right? Clear so far? So.
+
+**Speaker 2** _[36:52]_
+
+The trickiest part, because we are used to thinking of classes as very separate from objects, and this is where things get complicated because, oh, OK, but classes are also in.
+
+**Speaker 1** _[37:04]_
+
+also instances. So, the fact that classes usually begin with an upper score character is just convention. There are many classes in Python that begins with lower scores. For instance, the class.
+
+**Speaker 2** _[37:37]_
+
+It's an annoying feature of Python that has always existed that it's not very consistent in that term There are many classes that are lowercase Historically, the reason is the classes that were implemented in C have lowercase names But this doesn't apply anymore because there are some classes that were originally written in Python and were rewritten in C that have uppercase names the type function. Yes. And then the
+
+**Speaker 1** _[38:24]_
+
+Yes. So type is kind of special, but you'll see later that you can implement this separate behavior of it being used just as a function versus it being used to create a new instance of something. But type begins special because the one parameter invocation of type tells what the class of something is. The three parameter invocation of type is used for creating new classes, right? So it has these two behaviors, right? So the three parameter version of it is treating type as a class rather than as a function, right? But in both ways, you're doing the same thing, which is to call it as a callable, right? Even regular classes that you create with class to create an instance of it, you just call it as a callable, you call it as a function. So you don't have a new keyword in Python like you have in JavaScript or Java or whatever. You just call the class to have it, to have it create an instance. And that's because all classes, like my class, they have a dunder call method. So if you want to make your instance callable, you give dunder call to its class, right? And classes, they have a dunder call, right? But well, functions are also callable, right? That means they have a dunder call. But dunder call is a method, right? So it's callable. Does dunder call have a dunder call? Yes? And does it have a dunder call, then? Yes? turtles all the way down at some point here it's the same call so it's just pointing to itself so there's not an infinite amount of calls oh yeah so we are about halfway through yes The reason not to create a class dynamically using type, it's because it's not really convenient. It's much convenient to say class something. But sometimes you will, sometimes some frameworks do create classes dynamic like that because they want to take user inputs to decide the name of the class, for instance, right? An example from Python itself is the named tuple function. It's effectively creating a subclass of tuple where you pass the name to it, right? So named tuple is an example of a function that creates classes dynamically. By doing the equivalent of calling type directly. So let's move, because we are running out of time. So what is a metaclass then? We finally got to the title of the and it only took half the time we have. A metaclass is a name we give to the class of the class. By default, type is the metaclass. Type is the class of all classes. With one parameter, it returns the class of an object, but with three parameters, it actually creates new classes, right? But if type is a thing that exists in the Python namespace, right, what is the type of type? Well, type of type is type. What is basis of type? It's object. All classes inherit from object, directly or indirectly, right? So type being a class itself also inherits from object. So type and object, they have a peculiar relationship. Object is an instance of type, right? Oops. Where is it going? So object is of type type. The type of object is type. The class of object is type because object is a class. So object is an instance of type. Type is a subclass of object. Type is an instance of itself. And object is a subclass of nothing. So object, we can do like object dot basis. And see that it's empty. Right? So let me open the next notebook, which is part two, because we're going to use the next exercises. So, that's the peculiar relationship between type and object, and only the Python interpreter itself creates this relationship. You cannot create this loopy kind of relationship with your own objects. This comes, this flows out from, when the Python interpreter starts, this relationship is already there, and you cannot create one like it. Yes? So is object in some way the stepping stone for the turtles all the way down? Well, there are no turtles all the way down here because object has no basis. Exactly, so that's the final turtle. Object is the final turtle in the hierarchy of classes, usually, yes. And type is an instance of itself, so the turtles all the way down for what is the class of the class of the class is type. Type is the class of itself. And you cannot do this yourself. You cannot really make a class that is a class of itself in Python. Only type has that. So if class, if type is a class, which is a class of other classes, can you inherit from type? Yes, you can inherit from type to create other classes that inherit from type. If type is the meta class of object, you can inherit from type to create other meta classes, right? And let's show that here. Here we see that my class and my mixing that we had before. And here we have the better rep type. It's a class that I'm creating inherited from type. Why am I creating this class? So if I override, if I declare init in a class, what I'm saying, I'm saying that I have this function that when I'm instantiating, it's the instance will be called before that so that I can help customize it. And here, what I'm doing is I'm creating a rep function that I'm injecting in the namespace of the class before the class gets passed on to whoever is using it. But also, I'm declaring rep for the use by the class itself. This is kind of confusing until we start using it. So here I have a subclass that I'm instantiating dynamically the same way I instantiated dynamically with the type function by passing the name, the basis, and the underneath that I want to be there. And this is my subclass. You can see that it represents slightly different from class foo that I create here. You see that the representation here is different. This one has done their main.foo. And here, I changed the representation of this class to present its superclasses, right? I did that here. I created a representation for the class itself. But also, instances of my class with rep. My class, my subclass with rep. And I need to pass it a parameter. three, they have this representation that comes from this method here, where I put all the values and names from the dictionary instance so that they can be seen here. This is a better representation than what I would get from a regular class, from a regular instance, which is just this thing here with x or decimal numbers. So this meta class here, it created a representation for the instances that is assigned dynamically when the class is created. So it's creating a rep for the class of the instances that will be created from this metaclass, and also a rep to be used by classes of this metaclass itself.
+
+**Speaker 2** _[49:25]_
+
+Make it bigger. Can you just?
+
+**Speaker 1** _[49:28]_
+
+Yep, just a second.
+
+**Speaker 2** _[49:29]_
+
+Yeah. Yeah, I think this is, because then you can see that there's the dunder wrapper inside the dunder init, and what the dunder init is doing is initializing the class, not instances, not regular instances, right? This is the tricky part. You have to start thinking, okay, some of these things are affecting a new class, and some of them will affect the instances of that class. And so the dunder wrapper inside the dunder in it is something that will affect the instances of the class because it's It's a part of the machinery of the class that you are creating But this dunder wrapper outside is actually It's going to affect the way that the class itself is represented not its instances
+
+**Speaker 1** _[50:24]_
+
+Remember in the beginning when I showed the slides that special methods are only ever looked up on a class. So if I want to change the representation of an instance, I need to have a dunder wrap on the class of that instance. If I want to change the representation of a class, I need to have a dunder wrap on the class of the class, which is the metaclass, right? But here, I created this metaclass dynamically by calling betterRapType, which inherits from type, right? Which sounds like awfully complicated. But here is the representation of all the things that we created so far, right? I forgot to translate this one. My subclass with rep is a subclass of my class, which is a subclass of object. But my subclass with rep is an instance of better rep type, instead of being an instance of type directly. Remember this other diagram here, right, where every class was an instance of type. In this case here, my subclass with rep is an instance of better rep type, which by itself is a subclass of type. Can I see a metaclass in that diagram, like what you call the metaclass? JORGE FELIPE GONZALEZ- Everything on the top row is the metaclasses. So type itself is the metaclass that comes with Python. and BetaRepType is a metaclass that inherits from type. So the top row is metaclasses. The middle row is classes. And the bottom row is instances. Of course, everything here is also instances. So yes? My brain hurts a bit. I feel you. Correct me if I'm wrong, but I thought the default wrapper was on object, not on, is the default wrapper on object? So, object has a default wrap that affects instances of classes unless these classes have their own wrap. Okay, so the default one comes from object, right? Yes. Okay, so what I expected clearly wrongly was that if I were to find a better default wrapper it would somehow be clearly related to objects and not with typing yes
+
+**Speaker 2** _[53:13]_
+
+But that's because what we're doing here is defining a wrapper for a class, not for instances.
+
+**Speaker 1** _[53:20]_
+
+So you are right the default rep comes from object, but type defines its own rep distinct from the rep from object So remember that rep remember the type is a subclass of object so type overrides the rep of object to its own rep and then we can override then we can subclass type to create our own rep that overrides the rep of type that overrides the rep of object
+
+**Speaker 2** _[54:04]_
+
+Yeah, just for to be more concrete there the standard wrapper that comes from object is the one that shows the between angle brackets the Instance what's class? Yeah
+
+**Speaker 1** _[54:18]_
+
+This is the object wrap.
+
+**Speaker 2** _[54:20]_
+
+rep yes
+
+**Speaker 1** _[54:21]_
+
+Right?
+
+**Speaker 2** _[54:26]_
+
+Yes. So the one, yes, that's the one, that one is from type.
+
+**Speaker 1** _[54:31]_
+
+Yes, this is the rep type, this is the rep from type, this is the rep from object.
+
+**Speaker 2** _[54:38]_
+
+Yes
+
+**Speaker 1** _[54:44]_
+
+Exactly. M is here. Where is it? Yeah. M is here, right? It's M2 here. I put M, but it should be M2. Okay, so then wasn't that wrapper in the code? Maybe I just lost it. So then the out 10, was it not generated by the better wrapper? The wrapper inside the init inside the class better wrapper? Yes, exactly. So this representation here was generated by this rep here. Okay, I think it still hurts, but less. Can you define maybe one more time the metaclass, what is called the metaclass? So, metaclass is just a name we give to the class of a class. But metaclasses are just classes. They just happen to be classes that inherit from type instead of object. So if we go back to this diagram here, so metaclass is first row.
+
+**Speaker 2** _[55:57]_
+
+I put a funny picture in the book right at the end, when it's the last chapter that talks about this, where I have these machines that look like factories. So a class is a factory of objects, right? And a metaclass is also a factory of objects, but the objects that it creates are also factories. That's the difference. It's a factory of factories, not just a factory.
+
+**Speaker 1** _[56:20]_
+
+So, if you can see, the meta class is a factory that generates factories, and this factory generates instances.
+
+**Speaker 2** _[56:27]_
+
+Yes.
+
+**Speaker 1** _[56:28]_
+
+Yes. I don't know if there's a more funny picture.
+
+**Speaker 2** _[56:33]_
+
+And there's another one before, but it's okay.
+
+**Speaker 1** _[56:36]_
+
+Before?
+
+**Speaker 2** _[56:36]_
+
+Before? It's OK.
+
+**Speaker 1** _[56:39]_
+
+Yeah, let's let's not go through the whole book. Yeah, so because we have 26 minutes So everybody with me so far Kind of yes We'll talk about this later I will yes You cannot force your subclass of type on the other objects Because by the time you do that the other the other classes have already been created Exactly so You so if a class already exists by the time you're doing something It's already done. You cannot go. I'm wondering if you can override it in built-ins But no other than my head I don't know of a way where you can replace type before you import a module and then everybody else is following the other type Maybe it is possible If you're right if you overwrite in built-ins But I'm not sure because I think each module has its own access to built-ins. We'll have to check I don't know how to answer your question completely, but I believe not. I believe it's not possible, but I'm not sure. Python is very dynamic, as you can see. So anything is possible. Yeah, actually there is a request to stream the session, and it's nice if you repeat it. Yeah, I forgot. I'm sorry to repeat the question. So the question was, can we override the type with a subclass of type before other classes are created so that we can magically insert special effects on them. And my answer is I'm not sure, but I think not. If maybe we override the type in built-ins, that could work, but it would have to test. I'm not sure. But doing this, creating subclasses by calling the meta type that I created like this is kind of inconvenient. Is there a more convenient way to use metaclasses to create classes? Yes. The more convenient way is to use the metaclass keyword into the class statement. Remember how in functions you can have keyword arguments to functions, right? So there's a metaclass keyword argument to the class. And when you do that, you're saying create this class, but the metaclass of this class will not be type. The metaclass of this class will be this one that I'm telling you to use here, right? So there's a to-do here that I forgot.
+
+**Speaker 2** _[59:41]_
+
+I
+
+**Speaker 1** _[59:42]_
+
+So, let's go to the exercises of using metaclasses in normal classes. So, here I have an import of my class, the better rep type that we used before. And here I'm creating my subclass with rep2 by passing the metaclass instead of invoking better rep type. This is the normal way of creating a class that has a metaclass, right? So when I do it here, I can see that this class has my special representation for classes. And instances of this class, m2, 2, equals the of 5, m2, 2, it has the special representation for instances of the metaclass. Right? So, this is how you use metaclasses in normal classes. But what are they good for after all? Why would I use metaclass? Like I said, like we said in the beginning, like this slide that I told, this is going to be important. methods or special methods can only be used for an object if they are defined in that object's class. So if you need to give special attributes, if you want your class to behave specially, you need to do it in the meta class. If you want your class to behave like a dictionary or like a Boolean, you need to do it in the meta class. If you want your class to behave like a number, why would you want a class to behave like a number? You do it in the metaclass for the class. So the whole point of metaclass, of creating a class for instantiating other classes with, is to give them magic methods. And if you remember that slide, yes, so that's basically, that's the primary use of metaclasses, is to give special methods to classes themselves. And we have exercised this with the rep for metaclasses. We can also use that to override behavior of classes. For instance, classes are callable. But what if you want all the classes that inherit from a certain special class of yours to intercept their call and do something special with it. Then you override the Dunder call on the metaclass of that class. And why would you do that? Because you create instances by invoking the class. So if you declare Dunder call on your metaclass, you can intercept the creation of instances of the class, because you're intercepting the call of the metaclass. So, but that's not the only good things you can use with metaclasses. You can also prepare the dictionary of the class before it's actually used, before things are declared inside the class. You can intercept, register, and customize the class creation itself. You can manipulate methods and attributes of the class during their creation. And as I said, by overriding the call, you can intercept the instance creation of the classes of your metaclass. So that's what metaclasses are for. What they are not good for, once an instance of a classic is created, the metaclass cannot do anything about the instance because it's just too far away. Remember the slide about method resolution order? It goes from the instance to the class to the superclasses. It does never go to the metaclass. So once an instance already exists, the metaclass can do absolutely nothing about it. And also, and this can be a bit surprising, metaclasses cannot give normal methods to classes. So if you want to say, if you want your class to have a quack method, like class with capital dot quack. You cannot use a metaclass for that, because the regular method resolution order of classes is to go from the class to the superclasses all the way to object, and it does not go to the metaclass. Only special methods go to the metaclass. That's different from instances, where classes also provide attribute lookup for the instances themselves. So there's this difference between metaclasses and classes. Let me see if I have some more examples over here. Yes. The examples are for the next slide. You will probably never write metaclasses. Oh, come on. You spent the last, I don't know how many minutes, telling me about metaclasses and I'm not going to use it? Yes. Why? Because there are other things that the Python language has been developing over time to alleviate the need for using metaclasses. So, for instance, if you want to intercept a class creation of a subclass of your class, you can declare the underneath subclass on your class, not on the metaclass the underneath subclass will be called on ever so every subclass of your
+
+**Speaker 2** _[65:45]_
+
+There's another slide. Yes. I don't need to go into it so much.
+
+**Speaker 1** _[65:50]_
+
+um Yeah, so yeah, it's right here. So init subclass is called for each declared subclass of your class. Every time you create a class that inherits from a class that has init subclass, init subclass is called. So at that moment, you can intercept the creation of the class, mess with its attributes, put things inside it, even for subclasses of the subclasses. but init subclass is not called on the class where it's created so you don't need to create a meta class just to do something on class creation like adding new methods you can also use class decorators data class is a good class decorator it inserts methods in your class to give it default initializers so that you don't have to do def init it, self.x equals x, self.y equals y, the data class does that for you. A third use that people use to write meta classes for a lot is to make a class behave like a dictionary. You see that in Python typing, where if you want to say something is a list of strings, We're using dictionary lookup style to say that this list is not a list of any generic thing. It's a list specifically of strings. If you want to have a dictionary that's going to map strings to classes, you can declare that as a mapping of string to classes. And this is using the dictionary lookup. Or if I have a list of coordinates, which is a list of tuples of int and int, I can declare this, and this is all using the dictionary lookup syntax. And this is all implemented using class getItem on the types themselves. This was introduced because when Python started introducing typing, if you had to put this in meta classes, that meant that list had to have a meta class, and mapping would have its own other meta classes. And if you need to inherit from two of those things, you would have to create a metaclass that inherits from both of them before you could inherit from that metaclass. So things start getting pretty gnarly. So since people were using dictionary lookup on classes a lot, Python grew a class getItem method. And we are going to show all three of those here. Meta-alternatives, 14 minutes, OK. We are getting to the end. So here I have meta-waterfall type. So this is a meta class, right? It's inheriting from type. It has an initialization that prints useful stuff. It has increased defaulting.
+
+**Speaker 2** _[69:04]_
+
+Increase the fault a little bit.
+
+**Speaker 1** _[69:05]_
+
+Everybody reading in the back? And it has a representation for classes, right, because it's a metaclass. Here I create a class of this metaclass that has a registry. It has an init subclass method. So whenever a subclass of waterfall is created, this method is called with that subclass. And it also has a class getItem. So whenever I try to use the waterfall class itself as a dictionary, it looks up the name in the registry here. And here, I'm declaring valid an entity, which is things that look like ducks. And this is a function that checks if waterfall class is a valid entity, right? How do I use these things? So here we can see that I think I can put this thing to the side so we can see both at the same time. So when I imported the class, these things became available. And then I created a duck class, and it said registering duck. But before that, the init of the meta class was called init in metaclass for waterfall. This was when waterfall was created, and this was when duck was created. And then I used this function, checkWaterfall, as a decorator. So what is a decorator? A decorator is a function, a regular Python function, that when you use it with the at syntax before a class or a def, it receives what was declared with that. It can do whatever it wants, and then whatever it returns gets assigned to the variable that was going to be assigned if it didn't have a decorator. Remember how class and def serve double duty? They create, a class creates the class, and also then binds it to a variable name. A decorator happens in the middle of the process between the value being created and the value being assigned to a name. It receives that value, can do anything it wants with it, and then it needs to return something that will get assigned to the variable instead of what was going to be assigned before. If it just returns whatever it received, then that thing gets assigned to the variable. If it returns something else, then that something else will be assigned. So it's very important that in your decorators, you always return something. Because if you forget your returns, then you're assigning none to the variables, to the classes and defs that are being decorated. So here, if I say cat is a subclass of duck, the meta class mentions it's declaring cat. And then, so it's registering cat here. And here, the init's been called for cat. And even though it meows when quacking, nothing happened here. It allowed me to have a cat as usual. I can even do cat equals cat, cat.quack, and it meows. Right? But if I use the decorator before, it raises an error. It does not allow me, because the decorator has this thing here that raises an error if the name of the class is not one of the valid names. So I don't have a dog here to do something with.
+
+**Speaker 2** _[73:35]_
+
+So let's imagine a scenario maybe Your company does something some this code that has to have some audits in some places So classes that have to be audits are audited have to have a special Name that says audited, you know a name suffix something like that. This would be a possible use
+
+**Speaker 1** _[74:01]_
+
+So, another interesting aspect of classes is that they accept keywords. This has nothing to do with metaclasses. All classes can accept keywords when you're creating them. But you need to consume them, either in the new of your metaclass or in the init subclass of your class. Why? Because the init subclass of object does not accept keyword arguments. So if you forget to consume the keyword arguments, the object.needSubclass will complain. Here we can show this happening here. It's like class bar something equals something else. Here, oops, pass to SS. So it's saying bar.init subclass takes no keyword arguments. But where is this init subclass that takes no keyword arguments? It's actually objects.init subclass that takes no keyword arguments. So if you want to accept keyword arguments, you have to consume them. I think I have an example of keyword arguments somewhere here, sorry, don't bother trying to read this. I'm just trying to find my example. Where is it? Yeah, keywords. All right, it's 23, so, yeah. Just a quick question. Mm-hm. Thank you.
+
+**Speaker 2** _[76:24]_
+
+I'm going to repeat the question. Thank you. So the question is, it seems like that error message is confusing, right? Because, first of all, bar doesn't have a dendroinit subclass, but this could assume that it was coming from inheritance, right? But this, I actually, when I saw this just now, I thought we should file a bug, because the dunder init subclass of bar would not be called in this situation, right? Yes. Because only the dunder init subclass of the superclass of bar would be called. So the message is really wrong, in my opinion.
+
+**Speaker 1** _[77:09]_
+
+It should say object.init subclass state matured arguments. Yes.
+
+**Speaker 2** _[77:14]_
+
+Mm-hmm. Thank you.
+
+**Speaker 1** _[77:18]_
+
+So, let me just copy the name of the file here that I need to open. So here, I have a... Everybody back in read? So here is... is a swan that inherits from MetaWaterfall, the one that we had before, that we showed before. This one has an init subclass, right? So I can just copy this thing over here. Or I can just import it, yeah. import slide 23 keywords. So it's printing a lot of stuff because there's all these prints here. But the interesting thing here is when it's instantiating blacks one, Oops, when is it? Oh, in black's one it's failed, white failed. Takes no arguments when given. In its subclass should have, yeah, no, this is wrong. Sorry. The subclass on super call is already in. The first argument is already implicit, so yeah, in this one. Maybe I can run it again. Yes, so before class needs a class, so here. I create black swan with the keyword argument key with the value word. So init subclass is saying consuming kw with the dictionary with key and word. So everything that was passed as keyword arguments here get passed as keyword arguments into init subclass. And when I say consuming, what I mean is I don't pass it onto the superclass.
+
+**Speaker 2** _[80:08]_
+
+class you accept it but you don't pass it on
+
+**Speaker 1** _[80:08]_
+
+You want Let's see here again. Yeah. You should accept, but you should not pass it on, because object, the init subclass from object doesn't accept it. So I receive it here, but I don't pass it on. And where should I not pass it on? Either on the new of the meta class, or the init subclass of superclass. class. One example of keyword arguments in classes in the wild is the SQL model Python package from Tiangulo, the same guy that created FastAPI. Yeah, FastAPI. So if you pass table equals true keyword arguments to a class that inherits from SQL model, the design also the framework that you actually want to create a table for instances of this class. If you don't, you don't get. You can use it for creating inheritance and everything, but only classes that have table equals true get equivalent tables in the database. In summary, and we got to the end of it, in Python, everything is an object, which means that everything has a class. includes classes themselves. Metaclass is a name we give to a class of a class and it exists to provide special methods for classes and only special methods. Metaclasses have no influence over instances of a class and you can create metaclasses for your classes but you probably shouldn't.
+
+**Speaker 2** _[81:57]_
+
+So, we can say that this is really a challenging subject so much that even the core developers of Python decided, yeah, we need to find ways of doing some things that we do without using metaclasses, and so they invented.
+
+**Speaker 1** _[82:13]_
+
+class get item yes in its of the class
+
+**Speaker 2** _[82:17]_
+
+Class decorators.
+
+**Speaker 1** _[82:20]_
+
+So, this is a quote from Tim Peters, one of the main core contributors to Python. Metaclasses are deeper magic than 99% of users should ever worry about. If you wonder whether you need them, you probably don't. The people who actually need them know with certainty that they need them and don't need an explanation about why. Now, this sounds a bit arrogant, right? But in any case, it raises the question, why did I waste everybody's time telling about you about metaclasses? because you are going to find them in the wild. You're going to see them in your frameworks and you want to understand how they were used and why they were used, even if you never write one yourself. So it's important to know their mechanisms and their ways of working. And questions? Questions? Yes. Yes. So you mentioned that we will not write one ourself. Uh, can you name some examples of those which you might use, which are available,
+
+**Speaker 2** _[83:32]_
+
+Available
+
+**Speaker 1** _[83:32]_
+
+available? Using metaclasses, they are available. Okay, so in the collection modules, the collections module, there's an ABC submodule, and it has a metaclass there that you use to declare that some things are collections. But most of the time, you don't actually use metaclasses directly because a very useful standard is if you have a metaclass, if you provide a metaclass for certain uses, you create a class that is an instance of this metaclass and tell people to inherit from that class instead. So instead of going metaclass equals this, metaclass equals that in your own classes, you just inherit from that class that already has metaclass equals something. But yeah, the collections.abc module has metaclasses. Jungle models. JAN-FELIX SCHWARTZMANN- Jungle model.
+
+**Speaker 2** _[84:32]_
+
+The jungle model class that represents a table is, it is not an instance of type. It has a special metaclass, but you never see it because of that trick that he just explained. You want to create to, you know, for it to be more user-friendly, you create a class that is an instance of your special metaclass, and you tell people to subclass from that one. You don't even need to document the metaclass in the public API, you know?
+
+**Speaker 3** _[85:09]_
+
+thank you I tried in better class better wrapper type so basically you ingest wrapper to the object like to the class object and also it's possible to provide the function like init in namespace dict so for example I tried to add wrapper to inside namespace dict to see what would win so and I expected to win the one that I provided to namespace dict because super method so
+
+**Speaker 1** _[85:44]_
+
+Uh, uh,
+
+**Speaker 3** _[85:45]_
+
+super init is called at the very end but it looks like that it doesn't win so that this class.injectingInstance method would win why it happened so?
+
+**Speaker 1** _[86:02]_
+
+I would have to see the example, but I believe this is because of one thing that I mentioned over here, which is Special methods are not looked up on the instance if you did Inject it during the init of the instance to the dictionary of the instance Then it will look like a regular attribute and would not be looked up on the class But it would have to look at the code to be sure
+
+**Speaker 3** _[86:29]_
+
+Sure. You need messages provided in a namespace dict. So you need method itself of the object where you assign X to self that X is provided through a namespace dict in your example.
+
+**Speaker 1** _[86:44]_
+
+Yes, the init is being provided to the dict of the class. Yes. Right. And you try to put an init on the class as well. And that didn't catch.
+
+**Speaker 3** _[86:58]_
+
+I tried to put a rapper to the name Space Dict. I can provide you an example.
+
+**Speaker 1** _[87:04]_
+
+Well, yeah, I'd have to look it up to write the book.
+
+**Speaker 3** _[87:04]_
+
+Well, yeah.
+
+**Speaker 1** _[87:07]_
+
+From the top of my head, I'm not seeing it.
+
+**Speaker 2** _[87:11]_
+
+I don't want to change the behavior of the dicts
+
+**Speaker 3** _[87:13]_
+
+I want to change the behavior of the final object to override the wrapper.
+
+**Speaker 2** _[87:24]_
+
+Show us the code later and then we can...
+
+**Speaker 1** _[87:28]_
+
+Okay, any further questions? Yeah, I think we can wrap up because it's like exactly the time and it's a lunchtime. So yeah, thank you everyone for attending
+
+---
+transcript_status: auto
+---
+transcript_language: en

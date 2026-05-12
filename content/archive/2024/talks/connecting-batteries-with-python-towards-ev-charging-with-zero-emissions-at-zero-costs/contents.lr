@@ -82,3 +82,138 @@ video_duration_iso: PT29M33S
 video_thumbnail: https://i.ytimg.com/vi/81jNDVGtzvU/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:06]_
+
+Thank you a lot. Thanks for having us. I'm Christopher from the Mobility House, and I'm going to tell you a little bit about how we connect actually EV batteries on wheels and without wheels into the grid using Python, and how we are building a future towards recharging with zero emissions at zero costs. first of all let's have a look at the agenda first of all going to tell you a little bit about our vision as well as our motivation then I'm going to tell you something about what we actually do introduce to you BGI we could grid integration how we actually use Python there why it's important for us and also why it's important for stationary projects and then conclude a little bit with who we are so let's come to our vision it's boldly stated as hashtag zero zero we're working towards a future of ev charging causing zero emissions zero zero three emissions at zero cost for the ev chargers ideally even going beyond that where you actually can then use your Assets your EVs at home to actually even generate value for yourself Why do we do that? What's our motivation behind that? So you all know from the news from the discussions in the recently year climate change is coming we even already had talks here about that topic looking at the data we have and The combustion engine basically is well, I would say deprecated The EV market will grow. There will be a lot of batteries out there which we can use. So this alone is quite a reason to dig deeper into the topic because we will need buffers, as we also will see on the latest line. And if you just look at the connected power, which we will most probably have by 2040, according to the forecast, it will be roughly about 2.5 terawatts of connected power just from these cars alone and comparing that to the current low peak in Europe and North America together it's a factor of two even more so that's a huge asset which we should also utilize however this asset also causes a problem if we just put it in if you just plug it in at home When coming home, these cars usually just do very dumb charging. So, in addition to the load peak we already have on the grid, just by turning on our washing machines, starting to cook, watching TV, doing whatever at home, switching lights on because it gets dark, we create another peak in the grid by all these cars which suddenly start to charge. So, we are actually putting more stress on the grid. However, if we use these cars actually as assets and manage their charging, we can actually load or offload this charging and actually use it actually to support the system instead of just putting more stress on it. What also is quite present in the news currently is our transition towards renewable energies, to solar, to wind energy, and the cumulative annual growth rate until 2040 will be roughly about 7%, but already if you're looking at the graph, already in the next few years the growth is quite huge there. By 2040 we will roughly have a total installed capacity in Europe and the US of 5.7 terawatt, which is even a factor, too, of the power we are actually currently having in the power of the cars. So, what challenges do these renewables create? Well, they are a little bit unpredictable. They are not as, well, even in the power generation as nuclear and coal power plants. They are quite, well, flexible in a bad way. They are volatile. They create quite new challenges because sun is usually just shining throughout the day. and this is something we need to face we need more flexibility in the power grid we need to store the surplus of power production we need to store it somewhere and we need to store it also in a quite timely manner because a cloud can always quite quickly cover up PV, solar plant does reduce its production and then all of a sudden also we need to quickly react and stabilize the grid by putting power back into the grid. So there's quite a volatility challenge, which, looking at the potential sources of flexibility we have, batteries are very, very good for. The cost of flexibility for the gas turbines and pump storages is quite huge compared to the cheap cost of batteries. And they are not just cheap, but also in terms of speed and precision, they can react pretty fast. You know that. You can turn your devices on quite instantly. You can just start the cars if you just put a start ignition or if you actually just open the door. So that really, really helps in these very, very volatile times on the energy markets we have and which we will be facing. Also, all these cars which are already driving around on the streets, but which are also going to drive around, they are quite well distributed. It's not like they are localized like these old power plants we had, but instead they are, since all our homes are also quite well distributed as well. They are there where we need actually the energy. And of course currently they are unused. So let's put them to good use So what do we do? On the one hand side we help people in building charging solutions because if you electrify your fleet, for example You electrify a lot of cars Simultaneously and then all of a sudden you have a huge load if all people plug in simultaneously or after another and and charge in parallel. So you need a kind of dynamic load management system to cover this. That's what we developed the charge pilot for, one of our products, which is mostly Python and is doing, as I said, mostly load management. It can do more, but let's stick to that. And then we offer also energy solutions of different kinds. On the one hand side, Terrace. Terrace, for example, for home customers, including an app, the most promising one, or the one you find currently on the app stores, EONT, where you basically can sign up with this. You can put in all the details of your car. You can connect it. We control the charging of your car, and you give us certain boundary conditions, the minimum state of charge you want to have, the target state of charge you want to have and in these boundary conditions we operate the more the further the more freedom you give us the more flexibility we can use in the grid and this you also get more back from us right how do we do that well our tech stack is quite diverse we try to use the best tool for the problem we have rust we have python but we also use typescript And Flutter, we are running on AWS. If you want to know more about the techy details, just visit us at our booth. VGI. What actually does VGI stand for? It's an abbreviation for Vehicle Grid Integration. So basically making use of these electric vehicles as assets in the power grid. And we distinguish between two cases. the unidirectional and the bidirectional charging. The unidirectional is basically just this charging. So basically you can just store the power but you cannot retrieve it other than for mobility reasons. So it helps in surplus but it does not help if you actually do not have enough power generation anymore. So it doesn't help throughout the night. However, there's also the other case of bidirectional charging, which means charging and discharging, which we actually also call V2G. So you as a home or as an electric vehicle owner provide us your battery as a kind of asset, and thus an asset which provides flexibility to the power grid to deal with the overproduction or underproduction. and from us when you have an energy tariff with us we give you back money so you have a monetary incentive also to do so here in the following slides we will just focus now on the charging of the electric vehicle using actually eont which is a renewable energy tariff and we make sure within the app and within our algorithm to actually guarantee your mobility needs. So that's our primary objective, to fulfill mobility needs, not to just act on the grid. That's a very nice side effect, but your mobility needs come first. We do this via our smart charging app, which has a back end where there's an optimization going on, taking into account the energy market. So we serve with your battery the needs of the energy grid. And for this, you get a flexibility bonus. The more flexibility you provide to us, to the energy grid, the more you actually get back. How does that look like? Let's get a little bit into data, into the more fancy stuff. What we see here is a case of V1G, so just charging. On the upper panel, you see the battery energy level in kilowatt hour. And the charging session basically just started. So what our algorithm first of all does is look at the parameters you provided us with, look at the energy prices, and then plan the next charging slots. And plan them such that actually charging basically is cheapest. As you can see here, with the rough counting, Here we have six charging slots, which are planned. However, what can of course happen is that your car behaves a little bit different than we predicted. So what our algorithm also does, it adapts not just to market conditions, here we kept them fixed in the example, but also to the charge rate which your car actually has, how fast it charges. Also what can happen sometimes is that the battery management systems of the cars recalibrate, and thus the state of charge actually might be different than actually what has been expected before. So there's a lot going on and that's what we need also to adapt to. That's why our mobility needs come first for us. If you do that over a whole portfolio, that looks quite crowded. We try to keep a very close eye on what is happening in the portfolio, how often do we actually overshoot or undershoot the state of charge, how often do people use our PV features, how many cars are plugged in in parallel. So that's a lot of analysis, a lot of insights going on there where we try to keep track of our charging sessions. coming now to the other case again focusing on just a single vehicle v2g here to explain you also better what does flexibility actually mean for us so if we go to the very left hand side of this graph we have the start of the charging session as a star that's roughly at 45 percent state of charge of the battery. This is a V2G car so it can charge and discharge. Of course what you could do is charge it as soon as possible and then maybe if you overshot the target SOC you can also go downwards then to the target SOC. The other case you can have is at first just discharge because the grid needed power maybe because everyone was cooking and there was a lot of power consumption in the grid and then charge it later on, maybe in the night or maybe in the early morning when PV kicks in again. However, usually the sessions would just look very different because the needs, the predictions, all the bigger energy providers, they usually have their own predictions. They might be right, they might be wrong. So a usual session will be a lot more chaotic, like, for example, the track illustrated here with this little rocket. So the car might charge for a while and then stop charging for a while because energy prices are not optimal to buy energy, and then it might happen that there's maybe a huge gap in production in the grid, and thus we need to discharge your car and then actually charge it again at the very last instant, maybe. So that's the framing. and for us flexibility is basically the area of this polygon and you actually get your reimbursements according to these flexibility conditions you provide us so if you change to the target state of charge or the minimum state of charge you get more if actually the difference between that increases if your departure time is further in the future you also get more because we can use that resource that asset in the grid for longer let's look a little bit at the architecture for a moment why actually python is good in some cases and why actually we had to move away from it in some cases so when we are controlling the cars the charging sessions we can control them either via the OEM backends and then via GSM connections, which talks to the cars, which of course, if you listen closely, it's a GSM connection. So in underground parking lots or in rural areas, it might not be too reliable. To reliably, however, control the charging of the car, then we need other means. But let's stick to the direct car connection via the OEM backends first. That's the rest interface, that's easily handleable, and we can easily scale instances of the service. That's not a stateful connection. So, there we still use Python, and it works flawlessly, that's awesome. On the other hand side, however, if we talk to the charging stations directly, which we are currently integrating, those are stateful connections. Those are stateful WebSocket connections. And thus, we need to keep them open also for the whole charging session, which causes the problem that we need to keep a lot of parallel connections open, and that's why we actually also there chose differently and moved away from Python to Rust. All the handling in the back, inside our assistants, That's still possible in Python. There we can decouple the problems. There we do not have stateful connection handling. And thus, there we stick to Python. So, why actually do you want to use Python? Why do we still think it's great? Of course, a quick time to market, but sometimes what is even a lot more important, if you look at the backgrounds of the people in the room, I guess you will quite quickly see it's diverse. It's very diverse. The people come from a lot of different professions and that's really great. That's also what we try to utilize in our teams. It's a shared language among professions and kind of every software engineer speaks it. It's an awesome data set, data analysis tooling, which Python provides. So actually doing all the number crunching analysis, which we need to do to understand our batteries and systems, Python's the go-to tool. It has an awesome community. You all are here at this venue, you all know that. The ecosystem is big, and one very nice thing is also it's suitable for scripting. I, as a head of tech VGI, can still do my analysis of the costs of something else, not interfering or having to go to my programmers and software engineers, even though I also still do software engineering, sometimes at home. But we can also use it for production code. And, of course, it's a first-class AWS citizen. Why do we also use REST? Well, on the one hand side, developers just like it. On the other hand side, performance. Then, however, also the compile time checks, which at least help you avoid some of the problems. And of course the strong typing, yes, Python also does have it, but sometimes the supporting libraries you use do not have it, so that's a little bit of a problem in some cases. So one of the questions which often arises is what shall we actually do with these used batteries? So well, often they are still too valuable to actually just dump them or recycle them right away, but on the other hand side, they do not provide enough power anymore to actually power your car. Well, we found solutions for that also together with energy providers and the OEMs. Well, we just stack them together and operate them. And it's quite interesting to also see them operate and if you keep them in certain boundaries, actually they also stay healthy for a lot longer than you usually would expect. So that knowledge we also try to use in the home customer cases. So let's get to the next to final slide. Where are we actually as a company? Well, we're based in Munich, so the Oktoberfest visit is of course a must. do not get around it um of course we also do have holiday parties but we also engage in corporate volunteering events together with the lvb so there's a restoration and maintenance of habitats where we are helping and of course there's a health week feature on i guess all the usual stuff so if you want to know more um come to our booth we are also hiring so there are some job ads open and you can also go to our website and have a look there. Here's also the QR code if you want to know more. So, let's get to the questions.
+
+**Speaker 2** _[21:24]_
+
+Yes, thank you very much, Christopher. We have quite a number of fascinating questions. Let's start with the first one. How do you ensure customers that integrating their EV into grid does not affect their overall battery's state of health?
+
+**Speaker 1** _[21:45]_
+
+Basically, it's a little bit also the job of the customers because they provide us with settings for the target SSC of the car. We have a certain set of recommendations and default settings in the app, but you can set that. And we stick to these boundaries, and usually it's something around between 80% and 20%, and we remain the operation usually within these boundaries. And also we are currently partnering with Renault and that's also the boundaries which Renault recommended to us for their new Renault Eco, which is a V2G car.
+
+**Speaker 2** _[22:27]_
+
+Okay, thank you. Are the EV batteries' current chemistry proper to offer grid services? How about battery degradation?
+
+**Speaker 1** _[22:37]_
+
+I would say yes. They are definitely suitable for that. And these storages are already operating for several years. And before that, they were operated in cars, which have actually more extreme conditions. So usually people in cars are not as friendly to batteries as we are in a stationary storage.
+
+**Speaker 2** _[23:02]_
+
+How fast can the optimization react to changing prices? How do you mitigate the risk of exploding prices?
+
+**Speaker 1** _[23:09]_
+
+Well, how fast? That depends a little bit. If you look at the prices of the energy market, of course, they also close. If you look at the intraday continuous, five minutes before delivery. However, our trading algorithms, I'm not sure, Jonathan, do you know on which scale they react? It depends on how far away from now you are. It really depends on the markets we're trading on, but we're usually reacting quite fast. However, for the customers, for the home customers, there is, of our current tariff, quite a benefit. We're taking the rest of these exploding prices, not the customer.
+
+**Speaker 2** _[23:58]_
+
+And would this mean that my EV needs to be plugged in basically all the time that I'm not using it? Can I tell the system when I'm next planning to use my EV?
+
+**Speaker 1** _[24:08]_
+
+Yes, that's the purpose because that is an information we actually need to define the flexibility if we do not know when you want
+
+**Speaker 2** _[24:08]_
+
+Yes.
+
+**Speaker 1** _[24:16]_
+
+To leave next we basically do not have any guidance. So you actually need to set it in the app
+
+**Speaker 2** _[24:24]_
+
+What's the environmental impact of producing batteries nowadays?
+
+**Speaker 1** _[24:29]_
+
+Well, that's a good question. That I haven't looked up before.
+
+**Speaker 2** _[24:32]_
+
+Yeah, I think it's rather a hardware question. Would I be able to use the flexible charging just at home or at any charging station, for example, when traveling for multiple days?
+
+**Speaker 1** _[24:44]_
+
+Actually would recommend just use it at home and also the app tries to Prevent you from using it somewhere else because you have to set your home location and unless there's no bug introduced into your car Which also happened in the past by different manufacturers where it wasn't updating the location anymore You might run into the issue of blocking fees at public charging stations. So at public charging stations that would not be optimal. If you go to friends houses you can still change your home location for if you're there for a longer time.
+
+**Speaker 2** _[25:26]_
+
+Are you planning on using V2G for grid balancing services such as the frequency containment reserve with the EVs at some point in the future?
+
+**Speaker 1** _[25:35]_
+
+It's well, that's hard to predict now. We had in the past We were involved with Nissan in the pre-qualification of the Nissan LEAF And we also at Wacken, I guess have proven that it works so Let's see where the future is heading
+
+**Speaker 2** _[25:56]_
+
+You moved for your WebSocket server from Python to Rust, right? With what numbers or count of parallel WebSockets do you start to get problems with Python?
+
+**Speaker 1** _[26:07]_
+
+That is a good question, that always depends a lot on the stacks you use in the background in the servers, which library versions, so that I cannot tell for sure because it was So dependent on a lot of other stuff
+
+**Speaker 2** _[26:34]_
+
+Are you sharing the charging strategy with the user? What are the pros and cons of doing that or not doing that?
+
+**Speaker 1** _[26:42]_
+
+So that's currently in heavy discussion also in the development teams and where we are also currently evaluating a lot the customer feedback, what is interesting for them, what not, what do you actually want to see. So if you have feedback on that, also just hand it in. We are happy to know what you actually want to see also in the app.
+
+**Speaker 2** _[27:04]_
+
+How do you offset the opportunity costs of EVs blocking charging points longer so the infrastructure cost of? The charger that could charge another EV in the meantime so so
+
+**Speaker 1** _[27:15]_
+
+So since we do not want to control the chargers in the public, that's not a problem we're dealing with.
+
+**Speaker 2** _[27:25]_
+
+Okay, how does it affect the battery life? I think we already have that a bit
+
+**Speaker 1** _[27:30]_
+
+Yeah, so we tried to not to. Actually it prolongs the battery life if actually you set your target SSC not to a hundred percent or the minimum SSC to zero.
+
+**Speaker 2** _[27:43]_
+
+Okay, last question. I assume your data processing happens in the cloud. What's the latency and how does it affect the dynamic charging? Oh, another question just coming in.
+
+**Speaker 1** _[27:55]_
+
+Well, the latency, that's definitely quite a challenge because depending on the actual OEM, the latency is quite different. So we have Teslas. They are basically computers on wheels. So they have quite a high update frequency, whereas, however, we have car manufacturers, which send every once in a while an update. however luckily the energy markets act on a 15 minutes scale so at least with latencies we currently have with the cars usually it works out fine so on a minute scale we get updates from the cars
+
+**Speaker 2** _[28:37]_
+
+Okay, now actually the final question, and I'm sorry for the one that will get dropped. Is V2G already in operation, or are there still changes in legislation required?
+
+**Speaker 1** _[28:49]_
+
+Well, that actually depends on your definition of operation. So together with Renault, actually, we had the first kilowatt-hour charge in the public grid in France beginning of this year. So I would say, actually, the road is set towards V2G.
+
+**Speaker 2** _[29:11]_
+
+Okay, then that's it. If you have further questions, are you available still somewhere?
+
+**Speaker 1** _[29:18]_
+
+We are still available at the booth, so just come, visit us, and enjoy the rest.
+
+**Speaker 2** _[29:24]_
+
+Yeah, then let's give a thanks to...
+
+---
+transcript_status: auto
+---
+transcript_language: en

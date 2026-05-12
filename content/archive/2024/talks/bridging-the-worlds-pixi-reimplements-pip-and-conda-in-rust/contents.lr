@@ -100,3 +100,174 @@ video_duration_iso: PT29M27S
 video_thumbnail: https://i.ytimg.com/vi/sVc0PmeSUNk/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:06]_
+
+Yeah, so someone I think on Twitter or something like that said, Pixie is Conda with a friendly face so we use that as a tagline because it's kind of fitting. About us, so I'm Wolf, I'm the creator of Mamba and I've been doing package management since four or so years, I'm a member of the Conda Forge core council and these kind of things and Ruben is with me here, we're both working at Prefix now. He's got some background in robotics and developer experience and is kind of managing our little Pixie community. So what do we want to fix with Pixie? I don't know if you've ever sort of seen tweets like this but people are kind of always a bit confused when they enter the Python world like there's so many packaging tools and then you also need to figure out where you get a Python from and then even some universities have to do this Python installation support to get their students to figure out how to get started with Python and with Pixie you really want to simplify all of that. And so in the beginning there was Conda, in a way, and Conda is written in Python. And we're going to talk a little bit about the Conda ecosystem. So Conda, a lot of people, they sort of associate Conda with Python, which is of course true, and the largest sort of Conda community is probably doing data science and Python stuff. But Conda also supports other programming languages, and here's just a subset, like C++, R, C, Julia and so on can all be installed via Conda, so it's just generic binary packages. And then Conda also supports multiple operating systems, so Windows, MacOS and a number of different Linux distributions, as long as they use glibc, which is just a limitation on the packaging side, like we could change that. And then processor-wise, you can use ARM, Intel, and we even have some experimental things for WebAssembly using M script and Forge as a project. So that's a very versatile binary package management, everything that Conda essentially does. I already said, people use it in data science, has great Windows support, machine learning, it has awesome GPU support, Nvidia is sort of playing a role in Conda Forge to maintain the CUDA packages there, robotics is something that we use for Conda, or the other way around, because you can combine C++ and Python and that's what a lot of roboticists do. And then in CI and cloud deployment works pretty well because you can just use the same package manager in all the different systems. A few words about CondaForge. So CondaForge is a community effort, completely open source, not attached to Anaconda as a company or any other company. It is a big infrastructure with over 25,000 unique packages that are created from recipes. It has over 2 million artifacts, so individual packages plus versions, and then over all the different operating systems. And there are over 5,000 individual contributors in the GitHub organization. And there are a lot of bots as well that are doing migrations or version bumps and patching of repo data and all these kind of things. So it's a huge infrastructure that is run by volunteers. And after Conda, there came Mamba. sort of. So Mamba was written in C++ and it's a drop-in replacement for Conda that fixed the one hour long solves that people were experiencing at some point. And Mamba is actually, the core of Mamba is nowadays integrated back into Conda. So that's very great because now Conda users can also enjoy sort of the speed. And Mamba is written in C++ but the next evolution step is now the thing that we're going to present which is Pixie. Pixie is written in Rust. What does Pixie do? Pixie is not a drop-in replacement for Conda or Mamba, but Pixie is slightly different. Pixie has a few features like workflows and tasks that are inspired by cargo or NPM or poetry or other sort of modern package manager. It's very, very fast. It's even a little bit faster than Mamba. It's super easy to install. It's a single binary. You don't need to do any global configuration. There's no base environment. That's like a nice thing. And Pixie projects should work out of the box for all the platforms that are supported by that project. As I said, the installation is super simple. You can use a curl command or a PowerShell command or brew, winget, cargo, Pacman, and a number of other distributions that are packaging Pixie. And what do we want to fix? So today I went on Hacker News and I saw the new Coronet thing from Apple on place one and I went to the GitHub page and I saw README and the README says something like sudo apt-git install git lfs, Python 3 pip install blah and libsocks.def and ffmpeg and then you have different instructions for Mac OS and on Windows it's not even supported. And we basically want to get rid of that whole section of the README. All you should have to do is do a git clone and then do a pixi run start. That should be the entirety of the experience. And I want to give you a quick demo of what that can look like. So we are having a pixi toml file, which is the configuration file for your pixi project. You can also use pyprojectoml. And you can define some tasks here and some dependencies. And when I do pixie run start now, it will install all the dependencies and just run the task that I defined and it should also pick up what I'm speaking now because this is using whisper CPP and the model is running which is also installed as a Kona package and all of this. It's making some mistakes. But again, like, if you would have this channel, like, if you would have that pixie Tomlin and the git repository clone, you could just do pixie run start and everything would be be set up, including your system dependencies like these libraries that were just mentioned.
+
+**Speaker 2** _[06:20]_
+
+Yes, thank you. So I will take over. So what is great about pixie as you just saw it just did an actual install It was a warm cache install, but that is also what we're presenting here. So pixie is a lot faster It takes around two seconds to get an environment that is in this shape So you probably know these packages it does some pip installs as well Yeah in comparison. It's just Pushing my command conda out of the water. It's even so bad that my graph thing didn't want to show the conda example anymore anymore. So we've already showed the pixie toml. The pixie toml includes your project definition and what he said as well, the pyproject.toml can also do this as well. If you do the pyproject.toml then just add tool.pixie to every table in your file and then you can define what pixie needs to know to run your environment. So the most important things to get started is like you need to define the channel that you need no more comma RC global definitions anymore you can just do that in the project itself the platforms that you want to support define only the ones that you know is going to work and then for those platforms it will download the dependencies so you see we download Python in this case and there's one of these tasks they can be as simple as just simple Python commands so there's more we also have features you probably familiar with the optional dependencies and in your pipe project automl and pip this is kind of similar but it is a way to define an environment in the feature definition and then later you can create environments from those feature definitions and in this example we show that you can have two different environments the dev environment and the prod environment and they both share the same solve group which means that the default dependencies are used in the the production environment and in the dev environment we add in like by test and rough in this case and all your other Death dependencies and then at solve time we check the dependency versions that there we make sure they're the same in all the Environments and then as soon as you run the production environment in your production your actual production environment You will not get by test not get rough But all the other dependence was built exactly the same so you know that what you tested is the stuff that you will be running and you don't need the overhead of actually downloading all of those extra files. Then we also support PyPI dependencies. In your PyProject.toml, you can just use the dependencies in your project table, but in Pixie.toml, you need to define them in your PyPI dependencies. And as you can see here, we also support the path dependencies, the git dependencies, the URL dependencies, and also editable installs and extras if you want to define them or just use them from PyPI with version dependency. so what we have also included in pixie is that you can define your own workflows we call them tasks and this is a simple example of what you can do with with a certain task a dependency tree so in my example you can see that i defined a top level task that is start so if you look at the graph that would be like the run application kind of thing which depends on a build task And that build task does some building that you need to do, which has an input defined. So in my little drawing, you can see it depends on the source tree in your file system. If there's changes in that tree, re-render, re-run this certain task. And for the download example, there are some outputs. So if you have something that generates some output, you can define it as well, and then it will only run that task if you don't have that output in your file system yet. This is all inspired by TaskFile, and it can be a really powerful tool to extend your package management experience. Next to Task, we also support log files, which is very important to us because we've all been here. You're trying to reproduce a previously working environment. Somebody on PyPI deployed another release that was actually not a non-breaking release, and suddenly you cannot roll it back and it pulled in a lot of other dependencies and you don't know what actually happened. We always store a log file after you solved your environment. So it's up to you if you want to use it in your repo, but it will always be there if you didn't install. And it will show you everything that all the different platforms and all different environments on your project should get installed. And, yeah, this is a really powerful way to define what your environment is actually looking like. You can put this in Git, and you can track what changes are being made. If you update something, you will see that back in your Git div, so it's easy to track what your environments actually look like. This is a super small part of it. There's more information about the packages themselves, so we can actually really quickly check if your environment's up-to-date with your log file and also if your Pixie tunnel is up-to-date with your log file. As a bonus feature, we actually were developing Pixie as a project tool, and we were like, oh, but I also need Starship and BAT and FFmpeg, and we now also do the whole installation, so we're a package manager already, so why not just add the global installation as well? So we did that. You can also use Pixie to globally install all of your tools. They will be put in an environment by their own, so you will have the same experience as PipX, but we also install Python so you cannot break your environments anymore because you change your Python version with brew or something else. This will just keep working.
+
+**Speaker 1** _[12:10]_
+
+So, one of the sort of topics that we were looking into for a little while is PyPI integration because we do as a baseline want to cover the same features as Conda basically does so that people can easily switch from Conda over to our tooling. And it's been kind of the integration with PIP and Conda was always a bit, yeah, it just like has this environment file and then afterwards, after installing all the Conda dependencies is just called pip, and so we wanted to do something much better, which is really integrate with PyPI and make sure that we also lock all the dependencies and everything. And so we were working on this RIP project, and then as the name suggests, it kind of died after a few months of work, but because we were switching, we're now integrating with UV, which is, I think, for us, an easy choice, since, yeah, there's more people just supporting this effort, and we are directly integrating with it in Rust, so that makes it also very nice for us, and it can easily support wheels, and all these things that PyPI serves us. Now there are a few things that kind of make it difficult to integrate conda and PyPI because a lot of the conda packages are derived from some PyPI sort of source package and we need a way to have some extra knowledge basically over the conda packages that are in your environment to make sure that we don't overwrite them with packages coming from PyPI and these kind of things. And so what we're doing is we have built a tool to run over all of the packages from Conda and try to figure out what are the sort of original PyPI packages that this Conda package is mapping to. And that resulted in like a lot of small JSON files like this one that would basically tell us that, okay, this Conda package there with that name maps back to NumPy, so, and that version of NumPy and then we inject that into the PyPI solve so that we don't sort of overwrite that. A few people might also kind of wonder, like, what's the difference between PyPI and Conda Forge? Should I use PyPI, should I use Conda Forge, et cetera? And PyPI is basically lots of individuals just uploading their packages willy-nilly. You don't have a lot of guarantees and it's very easy to get started and upload something, while on CondaForge there's a bit more of gatekeeping in a way. It acts much more like a Linux distribution. We have sort of a global pinning that maintains some ABI compatibility and makes sure that everybody uses the same compiler versions and all these things. All of the builds are done in CI systems and not on the CondaForge own CI and not some CI system. It has a core team that has some extra powers. And we are striving to really have great CUDA support, for example. And we also are rolling out optimized binaries so that you have different CPU architecture support and can have more optimized packages for your CPUs that maybe use some SIMD features like AVX2 or AVX512, et cetera. And again, conda-forge, or conda in general, serves more than just the Python community. There's a lot of C, C++ libraries, like I already mentioned, or we saw FFmpeg in that whisper example, or R, Rust, et cetera. All of that can be sort of managed and packaged on conda-forge. Who's using Pixie? So we have a bunch of very sort of early adopters like our friends from Quantco that maybe have already talked to a few people here. Rerun and yeah, a few other companies are really embracing it. We have a Discord that's growing by the day so if you wanna chat with us we warmly invite you to come. Yeah, just a few words about the outlook. So Pixie is not our only effort at Prefix. We are also working hard on a tool that's called RattlerBuild. I don't know if any of you have any experience with CondaBuild, but it's another super great tool. So we're trying to completely rewrite it in Rust again, and it's called RattlerBuild, and we're actually really lucky because we got some funding from the Sovereign Tech Fund, which was publicized yesterday, to integrate RattlerBuild into CondaForge, and that's what we are sort of working towards. The next step up from that would be that we work on PixieBuild, which would mean that you can take your Pixie project and run PixieBuild, and it would do all the magic to sort of package it up into a conda package, which is also a prerequisite for, depending on source, Pixie projects, which would be really cool, because again, that cannot only be Python, For Python, it's already possible to depend on other source dependencies using the PyPI dependencies. But for Pixie, you could depend on your other C++ library or your Rust tooling or stuff like this, very easily using these Pixie tomlits and Pixie source bits. Another pain point of the Conda ecosystem right now is that the repository data is growing and growing and growing and there's more and more packages. And right now, if you are on Linux and you want to use CondaForge, there's like a 40 megabytes or something like this download that you have to do to get all the repository data. It's better if you already have a cache, then it's kind of okay, but we want to really change that game and make a recursive process where we sparsely download only the bits from the repo data that you actually need for whatever you're doing. Because if you're doing something with Python, you might not need all the R packages and the other way around. So, that's something we are hopefully going to work on. And then another story is that we would like to support a monorepo or workspace kind of workflow with Pixie so that you can have multiple Pixie projects in one repository that also can depend on each other and maybe use a single source of truth for all the dependency versions or things like this which is something that we are actually using in the in the rust and cargo world quite a lot that's uh already our presentation so thanks for listening and let's keep chatting on discord twitter mastodon whatever
+
+**Speaker 3** _[19:27]_
+
+Thank you very much. That was Rust fast. We have some time for questions, and I just read them as they are uploaded. The one you answered pretty much already, I said, how does Pix rate the UV? They are both written in Rust and try to be a cargo for Python.
+
+**Speaker 1** _[19:42]_
+
+Should I speak to that? Yeah, so again, we are building on top of the Conda ecosystem, and the Conda ecosystem does more than just Python, so I think that's sort of what we're betting on, that we want to build the ultimate sort of cross-platform binary package manager for all kinds of packages. Now, we are also using UV, and we also acknowledge that there is a big sort of PyPI ecosystem and a lot of people are mixing Conda and Python, or Conda and PyPI, and that's why we're integrating with UV. Yeah, so that's kind of the answer.
+
+**Speaker 3** _[20:24]_
+
+Another one how is pixie development supported financially will it be around for a while a long way
+
+**Speaker 1** _[20:32]_
+
+We are a startup, so we have some funding. As I mentioned, we got funding from the sovereign tech fund. We have also applied for some other like open source funding opportunities. So that's one way that we are trying to also like definitely continue to sustain the open source development, but we also have our sort of startup money that we are spending on developing and that we want to make this project be around forever.
+
+**Speaker 2** _[21:05]_
+
+OK. Forever? OK.
+
+**Speaker 3** _[21:06]_
+
+Okay, pixie versus poetry. Is pixie better and why?
+
+**Speaker 1** _[21:12]_
+
+So I don't think I've ever really used Poetry, so I'm not sure I can accurately answer this question. But I know that we're doing things a bit different in terms of log files. We think we want the user to explicitly define the system requirements and the system that they want to log for, while Poetry kind of keeps that open so that it works on all different platforms that also make some more problems in terms of how you have to expand the entire tree of dependencies that you can have. I think poetry also gets some critique of doing things in a non-PEP-compliant way. I think we're probably doing some things a bit different from poetry. Pixie is really fast. I would just give it a try.
+
+**Speaker 3** _[22:10]_
+
+How did you come up with the name Pixi?
+
+**Speaker 1** _[22:12]_
+
+name pixie. Yeah, so it was a lot of iterations. We had a few other names in mind like packs for, I don't know, package.
+
+**Speaker 2** _[22:23]_
+
+but
+
+**Speaker 1** _[22:24]_
+
+But it turned out that there's already a pre-installed thing that's called Pax on Mac OS and Linux And so tab completion would have been a bit weird We tried PX, but that some reason Wasn't sticking and people didn't like it. And yeah, we thought pixie would be cool. It's easy to pronounce in all languages, I think and
+
+**Speaker 3** _[22:49]_
+
+Okay, now a question on my CI run. Can I just curl install Pixy and use a bearer so no conda installation is needed?
+
+**Speaker 1** _[22:58]_
+
+That's completely correct and actually we didn't mention it in the talk, but we have an amazing contributor Pavel and he created setup pixie which is a github action that you can use and it also does caching and does it really well and it's a very good experience to use that on your github CI and Thanks to the log file if you check it into your repository the installation is super fast
+
+**Speaker 3** _[23:21]_
+
+Is there a plan to replace parts of Conda with it? Why not make Conda better directly?
+
+**Speaker 1** _[23:28]_
+
+I think at this point Pixie and Conda are very sort of different beasts so yeah I mean we would we are inviting sort of the Conda team to use the underlying tools that we have built the Rattler is called a set of rust crates and build or rebuild Conda on top of it would be great we would love to see that but so far they haven't shown that interest yeah and there's also Pyretla which is Python bindings to the Rust crates and so on so it would be easy for them to do it but and we would love to see that but
+
+**Speaker 3** _[24:06]_
+
+Okay, how's your relationship with Anaconda Company?
+
+**Speaker 1** _[24:11]_
+
+well, I'm also part of the like actually me and bus so two people from from the prefix team a part of the conda steering council and I think anaconda or The conda project itself has moved a bit away from anaconda as a company and has become more like a multi stakeholder organization Which is really great to see And yeah, we're working together sort of in this field. And one thing we do for example a lot is write conda enhancement proposals and so we currently have like I don't know two or three open conda enhancement proposals it's mostly focused on the new recipe format that we want to push and we really want to go through the process of standardizing that before we implement it and a lot of the stuff that is in the conda world right now is sort of like grown organically and we want to stop that trend and we want to make nice specifications and really sort of build something cool
+
+**Speaker 3** _[25:04]_
+
+Does Pixi have also replaced, does Pixi also replace PyEnv?
+
+**Speaker 1** _[25:10]_
+
+I think so. Okay.
+
+**Speaker 3** _[25:12]_
+
+Does Pixie have an API? Can it be used as a library? And if not, are there any plans to enable this?
+
+**Speaker 1** _[25:18]_
+
+So pixie itself doesn't really have an API and I think it would not be a good way to use it as a library But again, we have these underlying tools that's called Rattler And that is a library and it works really great. You can use it from rust. You can use it from Python Yeah, I would love to see more tools people are starting to build more tools on top of it and it's really cool to see
+
+**Speaker 3** _[25:45]_
+
+Is it safe to use Pixi as a drop-in replacement for PIP condor at the moment or should I wait?
+
+**Speaker 1** _[25:51]_
+
+I think you can start and report some bucks.
+
+**Speaker 3** _[25:56]_
+
+And then there's Pixy2 environments.
+
+**Speaker 1** _[25:59]_
+
+Yes, so the thing that Ruben showed was the features and you can combine features to environments and then it creates multiple sort of independent environments that you can use very easily.
+
+**Speaker 3** _[26:12]_
+
+Can I use local custom channel or a company internal channel?
+
+**Speaker 1** _[26:15]_
+
+internal channel. Yes, both.
+
+**Speaker 3** _[26:18]_
+
+How does Pixy solver compare to PyPI solver?
+
+**Speaker 1** _[26:24]_
+
+Yeah, so we've built, actually we've rebuilt the solver that we were using in Mamba, LibSolve, we've rebuilt it in Rust called Resolvo, and we've also extended that to work well for PyPI packages, which was sort of part of that entire RIP effort. The way to solve these two, for these two ecosystems is slightly different because in the PyPI world, you have to be lazy because the metadata, you can't get it up front. You need to fetch it from the wheel files and then sort of figure out next wheels that you need to fetch to solve for your environment. While in the Conda world, you get everything, all the metadata up front, and then you can solve. So I think that's kind of the relation. I mean, both are, at the end, SAT problems, so that's similar. Some things in the Conda world work a little different. when it comes to match specs and these kind of things, but yeah.
+
+**Speaker 3** _[27:26]_
+
+Apart from the conda ecosystem, what are the advantages compared to Rye?
+
+**Speaker 1** _[27:31]_
+
+I yeah I think that's your choice basically like if you a lot of people prefer Connor forge because it's a distribution of Python that has been around for a while it's very well tested it's very well adopted and yeah apart from that right and pixie in that sense both use UV so it's
+
+**Speaker 3** _[27:57]_
+
+Okay, now Windows question, does Pixie install need admin rights under Windows? Nope.
+
+**Speaker 2** _[28:02]_
+
+Okay, good.
+
+**Speaker 3** _[28:03]_
+
+Good now. We have another fun question. How did you get such cute picture in pixie? Did you hire a graphics designer?
+
+**Speaker 1** _[28:10]_
+
+So the true story is that we played around with mid-journey a bit. But then we hired a graphics designer.
+
+**Speaker 3** _[28:21]_
+
+Okay, now there's another one. Could PyPI also have all metadata available like CondaForge to make it faster?
+
+**Speaker 1** _[28:29]_
+
+Yeah, so one thing that's happening in the PyPI world is that the metadata gets extracted from the wheel files and then also placed as a separate file on the server. So you can already only download that little file individually, but you still have to download multiple small individual files. I think with wheels, it's much more statically defined how the metadata looks like. In the old times, you had to execute a setup.py maybe and then like get the metadata from the build wheel and stuff like this. So if people start only uploading wheel files, I think the world will be much easier for all the package resolvers. And this could be done with some effort, yeah.
+
+**Speaker 3** _[29:13]_
+
+Thank you very much. Give a big hand of applause to Pixie.
+
+---
+transcript_status: auto
+---
+transcript_language: en

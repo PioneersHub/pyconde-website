@@ -99,3 +99,142 @@ video_duration_iso: PT28M52S
 video_thumbnail: https://i.ytimg.com/vi/qz-zAHBz6Ks/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:06]_
+
+Berlin. Woo! Make some noise. How are we doing? My name is Marco Gorelli from Quonsight Labs and I'm here to talk to you about polars and time series and how to do absolutely anything. Hope I'm not overselling things. I'm here at PyData Berlin 2024 feeling pumped. First time in Berlin so I figured I should learn a bit about German culture to prepare and there's one German art form I came across called Lüften, which is a practice Germans are supposedly obsessed with. They ventilate their rooms multiple times a day for a minimum of five minutes. Less than five minutes, it's a gentle breeze, but to be Lüften, five minutes at least twice a day, regardless of where you are, even if it's like deep in the Alps, in Bavaria, in the middle of winter, you're going to get some Lüften. I hope this room has been adequately lufted so you can all make it until the end of the talk. If not, don't worry, it's only 25 to 30 minutes. You can get some fresh air at the end. Today it's going to work a bit like this. I'm going to start with a super fast Polar's crash course, make sure we're all on the same page when it comes to fundamentals. We can then talk about Polar's time series, step it up a notch and I'll focus in on the one Polar's innovation which I don't think people talk about enough. We'll then talk about going beyond polars. This is the really advanced part of the talk. I will do a bit of live coding, which I'm absolutely terrified of, but you seem like a friendly audience, so I'm going to do it anyway. Might want to wait until I've done it to clap. I hope it's educational to you, and if it goes terribly wrong, I hope it at least provides you entertainment in the form of, as I think you call it Schadenfreude. We'll then talk a bit about what comes next and we'll have an engaging Q&A which presumably at some point will fizzle out into an awkward silence. We'll then put the talk out of misery and declare it to be over. Right, let's get this party started. Why care about Polars? It's a library which has been getting a lot of traction in the last year. We see a lot of libraries using it and we see a lot of companies using it in production. Here's a leading quantitative research firm in london and dallas talking about how it lets them get 150x speed ups and how it's not just an improvement but a game changer we see sky posting about what it does to their processing times dutch startups are saving money in the cloud and nvidia considering it valuable enough to contribute a gpu engine not yet available but getting there right now that you're all psyched up for polars, let's talk about how to use it. The most fundamental object in polars is the data frame, which is a collection of columns, each of which should have a homogeneous data type, and you can manipulate data frames using expressions. Now, expressions, they're a new concept if you're coming from pandas, and I think the energy level at this point is going to be probably quite low, been through a whole day of talks, and I don't know if this room has been adequately lufted, so to try to get energy levels up, let's have a bit of audience interaction, are you ready? Not off to a great start, I said are you ready for some audience interaction? Alright, gonna read off some data types, and when you hear your favourite data type being called, please give a cheer, so numeric data types Alright, Boolean Alright, strings not so many presumably all the string enthusiasts are at the LLM talk next door let's combine the next two categorical and nested data types I think I read an article by a German person about like top three reasons why they're using polars and one of the reasons was the list data type so maybe one of those very enthusiastic woos was from that person and finally the data type we're all gathered here to appreciate today I want you to go absolutely bananas for this one Berlin let's make some noise for temporal data types alright so that didn't address the lufton problem but i think it addressed the energy problem so now that we're all energized let's talk about expressions an expression is a recipe you can use it to create new columns for example pl.col a times 2.alias b means take a column a double each value and rename it to b by itself it doesn't have a value it only assumes a value when you put it in the context of a data frame, kind of like how a function doesn't have a value until you give it an input and call it. For example, if we start with a beautiful data frame like that one on top, we can produce a beautiful data frame like the one on bottom with an extra column given by the expression we just defined. We can also use inequality expressions to get Boolean columns, which we can then pass to filter to only keep certain rows which we're interested in. Right, now that we are all experts in polars, let's talk about time series. And I'm going to do this using the data format which the world officially runs on. Not my favorite, but the world runs on CSV files, so of course I've got a CSV file which includes polars downloads for the past year taken from Google BigQuery. I don't know how reliable these numbers are, but the line goes up and it looks good, so I'm going to use it. It's divided by source, I don't know half of these sources, so I'm just going to combine them by source, so that's going to be a group by aggregation. Let's pass it and answer some questions. I'm going to show you a life-changing magic pro tip. If you're reading a CSV file with polars, pass try pass dates equals true, and if something can be passed as a date, it will. Not only does this get out of the tedium of having to pass dates yourself, it's also faster to read something directly in as a date as compared to first reading it as a string and then converting it. Right. To then find the total number per day, we are going to want to aggregate by day and sum the number of downloads. If you're coming from a purely Pandas background, you might not be familiar with this syntax, so let's zero in on it. The rest of the cell is kind of irrelevant, I just wanted to show that polars has a plotting namespace. Let's go on a groupby.ag detour, because this is the one thing that's about polars that I don't think people give enough attention to. Let's try doing something like find the mean of column B per group A, and I'm going to compare pandas syntax to polars syntax. I'm just talking about syntax here, so when I say pandas, this is any library that copies is the pandas syntax including pandas itself. On the right we've got polars. I think they are both pretty good at expressing this question. What about if we try to do something less elementary like find the maximum value of c where b was greater than its mean per group a. Right in polars we just put an expression which expresses that within .ag but for pandas how do we do this? Got some pandas core developers in the audience who maybe can suggest an answer in the slido but to be honest, I think the only way is to either use apply and a Python lambda function, and if there's one thing you take away from this talk, it's that if you find yourself writing dot apply open bracket lambda, then chances are you're shooting yourself in the foot. Either that or you pre-compute the mean of column B per group, but then you're doing two group bys, it's going to be at least twice as slow. And I really wanted to emphasize this because I'm angry. I'm angry that all these new data frames come out and they just claim to solve Pandas implementation problems but then they keep the API and I just want to say, please, if you're going to make something new, have the courage to innovate on the syntax level as well, have the courage to do something different. Now that we've got over that motivational speech, I'd like to present you with a quote that you hear very often among Polar's practitioners which is, I came for the speed but I stayed for the syntax. Indeed, POLAS allows you to express yourself, and this is one point of agreement the library has with Dr. Dre. Let's get back to smoothing. Let's try to stay focused. We can plot the aggregations we've just computed over the last year, but it looks a bit jagged, so let's try smoothing it out a bit by taking a rolling mean. The idea behind rolling mean is to replace each value with, like, a mean of the last n or whatever we can do that based on a temporal column as you may have guessed we do this using expressions expressions everywhere if you don't like expressions polars might not be the library for you but the problem with rolling mean is that it weights every point in the mean the same way like feels a bit more natural to wait more recent points more heavily than old points and we can do that using the exponentially weighted moving average there's a scary looking formula but if you try writing it out and going through it it's a lot less intimidating than it looks again use expressions right what else you got polis also has support for business days including custom weekdays and holidays if any polis experts in the audience were thinking where is this i I haven't seen it. It was just upstreamed like last week. So that's maybe why you haven't seen it yet. If you're working with colleagues who follow a different calendar, like maybe they take Friday and Saturday off as weekend or have different holidays, this is useful for that. Upsampling and downsampling, kind of like Pandas resample. All operations can be done time zone aware. So I'm going to take the chance to plug my talk at Pydata Eindhoven, everything you need to know. Duration's arithmetic. There's a more flexible version of rolling for more customized kind of aggregations. There's a plug-in with extra functionality that's too niche for Polar's itself. And if you're interested in gazing into crystal balls, sorry, if you're interested in making wild guesses about the future, sorry, if you're interested in forecasting, that's it. If you're interested in forecasting, you'll be pleased to know that Polar's is supported by StatsForecast and FuncTime. It's also supported by scikit-learn, not necessarily relevant to forecasting, just wanted to plug it. What do we do when polars isn't enough? Here's a Stack Overflow question which was asked recently. Somebody has some values ordered by date, and they want to find a very particular kind of cumulative sum. They want to find a cumulative sum that resets itself when it goes above a threshold of 5. so 1 plus 2, 3 3 plus 2, 5 if we then add 2 again we're above our threshold so we need to restart, 3 plus 3 would be 6 so again we need to restart and so on, like it's a very customised kind of cumulative sum not entirely sure why they needed this but the point is I don't think any data frame library gives you a way to do it so what people often end up doing is something like this they'll write a custom Python function initialize a running sum, initialize an empty list for the result, set a threshold, iterate over the values, reset the running sum if it goes above a threshold, append to their list, and return a series to the user. I think this is probably correct, but if you do it for a few million, billion elements, you'll find yourself waiting a bit longer than you'd like to. So let's go to solution two, the six steps to writing a Polar's plugin. So first of all, I recommend using cookie cutter which will give you a template which you can use to start get started with writing polars plugins second you'll need to install the dependencies which are polars and maturin then comes the hard part you need to write some rust finally if you made it past that part you can register your rust function in python you can then compile your rust code and then do not forget step six, you must celebrate, because you now have a plug-in. I can see some blank stares in the audience, like, is this guy really expecting us to write Rust plug-ins for things like, how long does it take to do this? And my claim is that it takes less than you expect, so I'm now going to set a timer to five minutes, and I'm going to make a plug-in out of the function we just saw. Now, full disclaimer, I didn't want to risk ruining my presentation because of a flaky Wi-Fi connection, so the first two steps, which are just download the template and then pip install dependencies, I did those beforehand, came prepared, you see. Sorry, Rodrigo. And the rest is going to be live. So without further ado, without further stalling, My heart rate is now probably approximately 220 beats per minute. Let's do it. So I've got here a folder in which I've downloaded the template. I've called it PyData Berlin. That's the name of my plugin. We've got a Python function here in which we're going to put the plugin. There's actually already a plugin inside called Pig Latinify, and we're going to replace that with our fancy function, cumulative resetting sum need to replace that here as well and then let's set is element y is equal to false because this function does not work on each element independently it needs to consider like the whole series together next let's go over to the rust side let's replace pig latinify with cumulative resetting sum let's change the output to be into 64 you can make it more generic but I'll show you later where to go to learn about how to do that in 64 chunked then instead of the pig latinify logic we are now going to do iter so we're going to iterate over the input and then for each value we're going to say well if it's missing just keep it missing and otherwise we are going to take the value which is not missing and we're going to increment our running sum although first we should probably initialize our running sum to zero let's set a threshold to five then if the running sum is greater than the threshold then we reset it to the current value We then return it and collect. Let's see if the red goes away. Okay, VS Code isn't complaining, so that's a pretty good sign. Let's compile the code. I've now got a Jupyter notebook in which I've got a Python version of the function. Let's see how long that takes. Any moment now? Okay. So that took 2.55 seconds. How are we doing for time? Okay. Not too bad. Less than two and a half minutes. So I've got time to try running the Rust code. And if it doesn't work, I might have time to debug it as well. Live debugging is scary. But again, you're a friendly audience. You're politely laughing at my silly jokes. So I think you'll let me get away with a bit of debugging right let's copy and paste this one my heart rate has now increased to 230 beats per minute and let's replace this one with cumulative resetting some delete that then let's keep the time I don't have the courage to look at what's going to happen so I'm just going to run it and judge based on your reaction whether we get any errors or not all right we did it and it took 128 milliseconds as opposed to 2.5 seconds and thank you let's stop the timer and thank you Which is not bad for, like, two and a half minutes of coding and, like, six lines of Rust code. Maybe my counting skills are not yet on par with my programming skills. I'll try to work on that. I think Rust has a reputation for being difficult, but really, if you want to write a plug-in, you only need the basics of Rust. You just need to understand basic Rust syntax, and Polar's takes care of the difficult parts of Rust for you. If you're interested in learning more about Polar's plug-ins, then I have a tutorial on Polar's plugins freely available online for all of you. The problem with this is that you need to learn some Rust, and Rust requires focus, and focus means not getting distracted by social media. Raise your hand if you checked social media this morning. All right, raise your hand if you checked social media within the last two hours. All right, raise your hand if you're checking social media. Sorry, where were we? Right. Not getting distracted. So yeah, it's very important to stay focused on the task at hand. I recommend cold turkey for blocking out distractions. So yeah, you can learn how to write a Polar's plug-in, and here I had some back-up slides just in case the live coding went horrendously wrong. So let's go straight to the confusion. In conclusion, Polars is a data frame library gaining a lot of traction both in open source and in production in companies. Many libraries are supporting it. It's got excellent support for time series analysis, but for cases where it cannot do what you need it to do, you can extend Polars using plugins. What comes next? Some things that I'd like to work on are better ergonomics for rolling functions, more exponentially weighted moving windows, not just mean and standard deviation, expanding windows, more operations. Got a big fan of expanding windows over there. More operations being weighted by time and not just assuming that all values are equally spaced. I'd like to really bring the power of Polar's plugins to the people and make them more accessible and easy to write. people should not be scared of writing Rust code. In fact, I hope that we see more stories like this person in the Polar's Discord who told us how they took a pipeline down to just about five minutes from 45 minutes using Polar's and Polar's plugins. They loved Polar's before plugins, but then since plugins, it became the number one most important tool in their whole data stack. Thank you, thank you. Yeah, that last part is one that open source devs always like to read about. And, yeah, this could be you. It's good. It's good if things take less than five minutes. Very good if things take less than five minutes, unless... unless you're in Germany and are trying to get some Lüften. Thank you. Thank you. very kind of you you're amazing thank you okay I haven't cured anything
+
+**Speaker 2** _[20:45]_
+
+Thanks a lot.
+
+**Speaker 1** _[20:45]_
+
+No worries.
+
+**Speaker 2** _[20:49]_
+
+Our most voted question, do you consider a career comedian instead?
+
+**Speaker 1** _[20:56]_
+
+I think yes. So I'm actually a failed musician, so this was my plan B.
+
+**Speaker 2** _[21:04]_
+
+How long does it take to learn Rust so that you can implement a Python function in five minutes?
+
+**Speaker 1** _[21:08]_
+
+In five minutes. Exactly two weeks. In all seriousness, there's a course online called Rustlings. If you can make it through chapters 1, 2, 3, 4, 5, 7, 8, 10, 11, 12, and 13, then I think you'll be able to solve 99% of inefficient Python codes, Python usage in data frame land. Not an exaggeration.
+
+**Speaker 2** _[21:34]_
+
+Yeah. Can I add the Rust plugins inside a clean subfolder of my large project so that it does not clutter my code base?
+
+**Speaker 1** _[21:44]_
+
+I'm not sure I would recommend that I would suggest Developing it separately and just exposing it as a library and then just import that within your project You know keep things as separated
+
+**Speaker 2** _[22:00]_
+
+Okay. What is Polar's support for connecting with large database on cloud?
+
+**Speaker 1** _[22:06]_
+
+you're catching me unprepared, I'm not a database or cloud person, I know that there is a read database function and I know that there's a company behind Polars where people are working on like a cloud offering and distributed stuff, but unfortunately if you're asking a question about Polars and you cannot put a time zone on the thing that you're asking about then chances are I don't necessarily know that much.
+
+**Speaker 2** _[22:37]_
+
+personally prefer Pandas 2.0 or Polars? Do you have any arguments in regard to Polars?
+
+**Speaker 1** _[22:44]_
+
+As a user.
+
+**Speaker 2** _[22:46]_
+
+I'm not so sure
+
+**Speaker 1** _[22:48]_
+
+Well, I do some consulting as part of my job, and my general advice is if you're starting a new project, use Polars. But I think Pandas still has millions of users, and it's really important to keep it well-maintained, and it's a thankless job. So let's show appreciation for people doing it.
+
+**Speaker 2** _[23:08]_
+
+Okay, why not cumulative sum and model 5, which disregard the code, I guess.
+
+**Speaker 1** _[23:17]_
+
+Why not cumulative sum and model 5? Oh, modulo 5, right, because it doesn't work. If you do cumulative sum and then modulo 5, so then here you'll get to 7, 7 mod 5 is 2, then 7 plus 1 is 8, 8 mod 5 is 3, then 8 plus 3 is 11 and 11 mod 5 is 1, not 3 Very kind of you to clap for that Glad that my maths degree came in handy
+
+**Speaker 2** _[24:07]_
+
+You have some angry comments actually about Lufthansa.
+
+**Speaker 1** _[24:16]_
+
+Did I get the wrong type of Lufthansa? I think you've got multiple different types
+
+**Speaker 2** _[24:20]_
+
+Yeah, so pro tip, try Stossluften, which is like the right way to do it. Yeah, it's also about Luften.
+
+**Speaker 1** _[24:35]_
+
+Okay.
+
+**Speaker 2** _[24:36]_
+
+Back to the topic.
+
+**Speaker 1** _[24:37]_
+
+Did I say it correctly, by the way? Yeah. Oh, wow, so kind. I was practicing it and asking random people to rate my pronunciation.
+
+**Speaker 2** _[24:51]_
+
+Can I easily use PyArrow when saving my data frame to bracket including strings with none values?
+
+**Speaker 1** _[24:59]_
+
+So can I use PyArrow to what, sorry?
+
+**Speaker 2** _[25:02]_
+
+When saving my data frame to bracket including strings with none values
+
+**Speaker 1** _[25:08]_
+
+Saving my maybe I'll open Slido because I didn't quite catch the last part Let me help you with that. Oh Thanks Can I use Pyro schemas when saving my data frame to parquet including strings with none values I can't remember Feel free to go to the next question.
+
+**Speaker 2** _[25:48]_
+
+And maybe this one it's better for you to see
+
+**Speaker 1** _[25:53]_
+
+I'm not sure about my answer oh wait is this the how to do the group by aggregation efficiently within pandas okay so df.lock ah no sorry no no wait no no no no no this does not work you're taking you're taking the overall group mean of column b we need to find the mean of column B per group so that needs to be within the group by how good is GPT on rust code so I was actually debating how to do the live coding because I actually found out that if you just take the python code and you copy and paste it into the rust file then GPT will auto complete the Rust version for you. But then I was like, I don't know what an open source maintainer is going to think if I do a live demo and I'm just copying and pasting from GPT, so I turned it off for the purpose of the demo. But my general feeling is that if you can express the logic in Python, then just translating that logic to Rust is not too bad. It'll get you 80% of the way there. It won't compile. But if you just spend two weeks learning the basics of Rust and then, yeah, that should be enough. Any other amazing questions? This is quite fun. I kind of feel like we should do the whole talk just Q&A, just freestyling, improvising.
+
+**Speaker 2** _[27:27]_
+
+What works well in bandas and not in polars.
+
+**Speaker 1** _[27:31]_
+
+So, I've seen examples of where, like, making heavy use of the multi-index can lead to clean code in Pandas. Maybe if I didn't reset index drop equals true whenever I have a Pandas data frame, I would also have stumbled upon that use case. But I didn't get there. Wow, someone really hates the index down there.
+
+**Speaker 2** _[27:58]_
+
+So maybe last question. Why does the with columns statement have two syntax for assigning new columns name, name, name, blah, blah, Alice?
+
+**Speaker 1** _[28:13]_
+
+Ah, right, yeah, y.alias or y.name equals. Well, I think the name equals is a bit more ergonomic and looks better, and it doesn't clutter your code with unnecessary round parentheses. And .alias, well, if you want to name your column something that's got a space in it, then you're going to be a bit hard-pressed to use the first syntax. Anyway, Berlin, you've been absolutely wonderful. Best audience ever. Please enjoy the rest of the conference. Respect the code of conduct. Have a good one.
+
+---
+transcript_status: auto
+---
+transcript_language: en

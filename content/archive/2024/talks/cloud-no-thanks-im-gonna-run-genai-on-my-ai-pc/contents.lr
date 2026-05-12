@@ -85,3 +85,114 @@ video_duration_iso: PT30M10S
 video_thumbnail: https://i.ytimg.com/vi/lE6CjjY60vw/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:05]_
+
+So, hi everyone. My name is Adrian, I am together here with Dima, and we are AI software evangelists at Intel, so our role is to talk to people, to talk to developers, and to show what Intel has for them. And today we would like to show you how to run either conventional AI or generative AI on this computer. And we will prove that with running live demo on this computer later, of course. But first, Dima, could you tell us what AIPC is?
+
+**Speaker 2** _[00:40]_
+
+Hi, everybody. So this is my first PyCon. And I'm really excited to be here. So thanks a lot for visiting our session. And we have an exciting topic, which is really new. And before I jump in and talk about Gen-AI, AI PC, let's start with this. So what do you think which AI use cases we should and can run on the PC. And here, so we have, or we consider to have two groups or categories of use cases. One category is conventional AI. So all of you are familiar with such use cases and also models to work with such use cases. They exist since years. So you can see here such use cases like voice recognition, super resolution denoising and so on and we have also in our category which is now very popular there were a lot of talks tutorials about generative AI on this conference or about the genii and such use cases they are also relevant for the PC for consumers and so many of you I believe familiar with chat boards text-to-image generation, image-to-image generation, even now it's possible to generate video from text. And we consider that you should be able to access all these use cases on the PC itself. But let's take a look to the difference between these two groups For conventional AI and generative AI, we may have different goals. For example, for conventional AI, we predict the output depending on the input and model itself. For generative AI, we generate unique content like text, code, music, video, whatever. So there are a lot of modules on the market and they can do really amazing things. What else? Model size. For conventional AI, models may contain maybe a thousand parameters or even less. And sometimes they are, let's say, big, like hundreds of millions of parameters. But if you take a look to the model size for generative AI models, so they are maybe really huge. So it's from single digit billions to trillions of parameters. So I believe the latest GPT model, so it has more than trillion parameters. So how user interacts with such models? For conventional AI, in many cases, it's just background execution. So user does not really interact directly with the model. And opposite to that, generative AI, so it very often requires interaction with the user. For example, if you have a chatbot, then you interact with that directly. And depending on this, we have also different latency requirements for conventional AI. In many cases, low latency is required. And for generative AI, for example, if you ask chat bot to generate some text and travel plan for your next vacation, it's totally okay to wait for seconds. But if you drive a car, and the car has an algorithm to detect the object in front of the car, so I believe you don't like to wait for seconds for the reaction, right? So it's dangerous for private generating pictures and so on. It's totally okay. And how we can deploy these use cases? Of course, we have a cloud. And this is a very popular approach right now. So when a model is executed in the cloud and there is a PC or H device connected to this cloud and request the results, get the results, and execution is done in the cloud itself so what is the advantage of such solution so cloud can handle a large amount of data first of all and in the cloud we have limitless compute on demand right but so we have some cons here as well so risk of data privacy for example again it's totally okay to just put maybe some own data for that but if you work for the company and you cannot simply share corporate data here so high latency can be a problem so it takes time for round trip to get the results from the cloud and of course dependency on the connection to the cloud so i may say okay so it's maybe not a problem because we have internet everywhere but i visited some tutorials and presentation on this conference and it actually was not always the case but the connection is internet to internet is present so our category which is populates age right it's it's for industry specific ai use cases so real-time processing data is one of the usual requirements for the edge and wider reach so you can install edge everywhere so pros here data privacy we don't share the data to any provider service provider cost efficiency we don't pay anything normally software is open source and we just buy the hardware increase control we can do whatever we want and we also have autonomous execution here cons here compute limited by local resources. If we need to have more, we need to update the hardware. And now we have something very special and very new. We have also EIPC. And EIPC is actually very similar to the Edge, but it's considered to be used for consumer-specific AI use cases. And as a result, we have the same pros here, data privacy, cost efficiency, increased control, but also on EIPC we have dedicated computing agent for optimal performance and energy consumption. I will talk about this a bit later. Cons are the same as for the edge. So, what is the EIPC? And now, we have it. So, last December, Intel released Intel Core Ultra, so this is a new generation of Intel processors, and it consists from several AI engines, from three AI engines. First one is a CPU, central processing unit in the center of this slide, so we can run AI on this, and this module is good for AI workloads with low latency requirement with a small amount of parameters. Another model is GPU, so it's dedicated for high throughput, and so we normally run generative AI models on the GPU, and we have a new model, which is called InPue, and it's dedicated for power-efficient execution of sustained AI workloads and AI offload for better battery life. so and all these engines can be handled can be programmed with open vino adrian will talk more about that i just would like to say here so we have multiple client client ai use and you can decide yourself which model to be or engine to be used for which use cases for example depth estimation you can do on NPU, or you can select CPU. So generative use cases, chatbots, you can run on GPU, and even you can run some use cases on both, like text-to-image, you can run on GPU and NPU in parallel, and this way you can maximize your system throughput. And with that, let's start with software stack. So Adrian, wait.
+
+**Speaker 1** _[09:57]_
+
+Thanks, Dima, for showing us what is the difference between conventional AI and generative AI, also for presenting AAPC. Now I would like to tell you a little bit more about software stack, so what software is needed to run AI on AAPC. And there are many frameworks, right? TensorFlow, PyTorch, Keras, ONNX, PaddlePaddle, anything like that. But OpenVINO is in the center here, And the question is, why the hell OpenVINO is in the center? So, because OpenVINO plays central role in AI inference for AI PC, so you can use OpenVINO to run on any of these hardware devices like NPU, CPU, and GPU. And of course, there are more than one way to use OpenVINO with your code. But let's start what OpenVINO is first. So, OpenVINO started as open visual inference and neural network optimization. right now it's an open source toolkit for optimizing and deploying AI inference and AI inference in general so it also works with NLP, audio processing, large language models, generative AI, transformers and so on so right now it's for general use so if you have your model in one of these frameworks PyTorch, TensorFlow, Keras, TensorFlow Lite and so on then you can use OpenVINO for optimizing your performance and running on variety of different hardware like CPUs and of course today we are discussing about AIPC, the PC which is here, the laptop, but OpenVINO is not only for client computing, it's also for servers like Intel Xeon, it's also for discrete GPU cards like Intel Arc, Flex Series. We also support officially ARM, so if you have Mac with your arm it will also work and of course any operating system Windows Linux or Mac and how to use OpenVINO directly let's say that you don't want to use any other dependency you would like to just use OpenVINO so you need to install OpenVINO this is the first of course step and then let's let's run some code so first we need to open sorry import OpenVINO then load the image or audio or text or any data you would like to use for your inference, initialize OpenVINO by creating core object read model from disk it can be OpenVINO format model but it can also be a PyTorch TensorFlow, ONX and so on it can be in this format then we compile model for some specific device, in this case we will use CPU, then we need to get the output to the handle layer and we run the inference and get the result so just seven lines of code to run this inference but the question is if we have cpu here in this function compile function what else can we have it here so let's start with cpu of course it's intel core in this case of aipc but it can be also a xeon as i said also atom arm and so on and then gpu and when we talk about gpus in this laptop we don't mean any NVIDIA GPU we just mean the integrated GPU like Intel Arc it's already integrated in this CPU so when you buy this laptop the GPU is already there but you can also use discrete GPU cards like Flex Max Series and so on and of course we would like to show you NPU a new device in neural processing unit which is able to run an inference for neural networks but if you don't know which is the best for you you can also select auto and auto will select the best device for you so if you don't want to think you you don't want to decide you can just leave the decision to auto super nice right but that was the first approach to to run open vino um inference the second approach if you use pytorch 2.0 pytorch 2.0 introduced um um possibility to define different backends and open vino is one of these backends so if you have your pytorch cord and you would like you don't want to rewrite it to OpenVINO or anything like that you can just add these two lines of code just import OpenVINO torch and then use compile function and specify that backend must be OpenVINO and the result will be exactly the same of course if something is not supported in OpenVINO it will be fall back to PyTorch so no problem everything will work there will not be any exception good And the third way, for ONNX, so if you use ONNX, you can install also ONNX runtime with OpenVINO and OpenVINO is one of the execution providers, so you need to specify in your code that the provider you will use is OpenVINO execution provider, and that's all. It will also use OpenVINO as backend. And there is one more way. If you like Hugging Face and transformers library or diffusers, which are very great, So we combined the convenience of Hugging Face API with the efficiency of OpenVINO, and right now we have Optimum Intel. And to use it, just let's install Optimum Intel, and then let's replace just two lines of code. So first, for some language model, we would use auto model for casual LM class, but in this case we just import OpenVINO model for casual LM from Optimum Intel. Then of course we, as usual, import auto tokenizer, pipeline, everything like that. We specify the model ID we would like to use. Then we need to use our new class, OpenVINO model for casual LM, and then, of course, usual code, get the tokenizer, get the pipeline, and run the inference. And we will use the API of HuggingFace, but with the, as a backend, it will be OpenVINO. Okay, good. So it's time to enter the most exciting part of this speech. Let's run some live code and live demo and see how it works here on this device. So I will ask Dima to run the first demo. So Dima, the stage is yours.
+
+**Speaker 2** _[16:19]_
+
+So I'm back with a demo. So we have a Jupyter notebook to demonstrate LCM, Latin Consistency Model, which is a very popular model based on stable diffusion to generate an image from text. The key point of this model is that you can generate very good images with just a couple of steps. So you don't need to spend a lot of steps for good images. and let me show you how does it work. So as Adrian mentioned, so we installed some dependencies like Optimum Intel, and so then it's possible to use standard Hagen-Face pipeline, so you can copy it just from Hagen-Face website, but to run the inference in the most performance way, So we have an optimum Intel, and you can see here in the code, I won't comment on every line, so we create the pipeline, we download the model from the internet once, save it, so you see that here some code to save the model and then also read it from the disk. and we can just this second so we also select the device for inference so as i mentioned gpu is a right or good choice for generative ei which is selected here and here we compile the model for the gpu itself and so we run some prompt here so we were thinking about what to show yesterday and we come up with such prompt like a photo of beautiful Berlin bear. So let me run it, let's see what happens. So and here we are. So this is a bear, you know, so it works actually without internet so you don't need to be connected and also if you change the prompt like beer with beer, so let's try again with eight steps. So it's also possible to use four steps or two for this model, and you see, so it represented quite correctly. So this is how it works, so Adrian will show the next demo.
+
+**Speaker 1** _[19:04]_
+
+Yeah, this is not the only one we have for you. So this was generative AI, but also we promised you that we will prove that conventional AI is also good for this AI PC. So let me switch to object detection. I'm not going to explain code. I don't have time for that. However, everything you can see here is open source. So you can find on our GitHub. I will share QR codes later. So let's start first running CPU. This is SSD Lite MobileNet object detection. let's start it here yeah running CPU so you can see that the performance is about 400 frames per second even 700 Jesus is so so high I didn't expect it but at the same time I would like to show you something so we are not using NPU we are not using almost GPU we are just using CPU here what you can see above is a power consumption of CPU. So, okay, we have almost 900 frames per second. Oh, even more than 1,000. It changes so quick. The performance is 1,900 or anything like that, but we use 40 watts to run the inference. And you can see CPU utilization. So let's switch to another device because CPU could be used for something else in your computer. So maybe let's switch to GPU and and then to NPU and see if the performance is good enough and what about the power consumption. So let's run the code once again. Yeah, I'm running here. Let's also open this. More than 1,000 frames per second as well, so the performance is absolutely not a problem. How many of you already need more than 1,000 frames per second? Come on. And let's look at the utilization of CPUs. CPU utilization is very low in this case, that's good. can use CPU for something else so let's switch to GPU and GPU is very very high as you can see here well I don't know why it's not here no idea okay but here on the left you can see that utilization is 100% also here but the power consumption is lower much lower so previously we had 40 watts right now we have 20 watts and we are running just GPU almost the same performance of Of course, the measurement is difficult when we have only 1.2 milliseconds, so that's why it varies a lot. And let's try also NPU, the newest device we have in this laptop. And let's run once again. Let's see the performance and power consumption. So the performance, again, is about 900, 1,000 frames per second. right now we don't use CPU, we don't use GPU anymore, and we use NPU, finally. Good. What about the power consumption? In this case, previously we had about 20 watts. In this case, it's a little bit lower, 17, 18, even 19. But when I tested it without screen sharing, it was about 12 right so maybe that's why i cannot see so much difference so the question is if we can run the same almost performance or you know like 1000 frames per second maybe it's best oh now it's 16 uh maybe it's best to use the low power device in this case right so we don't drain much of battery we don't have to recharge often we don't have to use power at the same time we use less carbon for example right so this is what I wanted to show today let's switch back to the in this demo let's switch back to the deck yeah perfect so what we showed you was a latent consistency model that was what Dima was showing so if you would like to try at home as I said you don't have to have this specific laptop you can scan this QR code and try at home, run the, what happened here? No idea. Why it's duplicated right now? Good, so if you would like to try at home, scan this QR code, go to our Github, it's open source, you can clone this notebook and you can run on your computer, on your server wherever you want it will work right so this was our first demo i can see that you still take some photos so one more second good and i need to switch the next slide so the second demo i was running was object detection but this was only a sample right we have even more demos we have post estimation we have action classification and many many more of course not all of them run with NPU but I can promise that all of them run with CPU and GPU so if you would like to try them just scan these QR codes go to our main directory there are many many notebooks I think right now more than 150 and you can try all of them on your computer and I have a bonus for you as you are here yeah one more second for for photo takers and i have bonus for you uh because we are here we have also a survey so if you take a survey which i have here fill it for us and put your name here because i need to identify you then let's say that in 15 minutes we will draw here three lucky people which win this nice survival pack with backpack, travel mag, solar, power bank, notebook, and pencil case. So what you need to do, just come to us after this speech in one minute, one, two minutes, fill the survey, put your name here, and let's say 5, 15, we are doing lucky drawing here. So three lucky people will win this nice swag. And we showed you that AIPC exists, and it's here, and it can run a conventional and generative AI. I hope you can try it at home. If you don't have AI PC, please just use your own device. Thank you very much.
+
+**Speaker 3** _[25:43]_
+
+Amazing. It's incredible. Thank you for your brilliant talk. It was enjoying. First question. Thank you. We have not too much questions. The first question. Is OpenVINO a propriety to Intel GPUs?
+
+**Speaker 1** _[26:02]_
+
+Absolutely not. OpenVINO is, as I said, open source, so you can go to our GitHub, OpenVINO toolkit, OpenVINO repository, and you can even contribute to it. We encourage you to do so.
+
+**Speaker 3** _[26:14]_
+
+Second question, interesting question. Can I use multiple backends at the same time together to improve performance?
+
+**Speaker 1** _[26:25]_
+
+But in PyTorch or ONNX or OpenVINO itself?
+
+**Speaker 3** _[26:31]_
+
+In this case, you should ask. It's not specified.
+
+**Speaker 1** _[26:34]_
+
+specified yeah i believe i am not you know very sure about pytorch or nx to use different back ends i never tried them um i don't think so probably you just need to use one back end but of course you can mix between different models right so one model can run one back end the second one can run the second back end and the same for open vino one model can run on cpu and the second one at the same time on gpu and you still have npu right so we can run even three of them in parallel or completely different devices.
+
+**Speaker 3** _[27:08]_
+
+Okay, next question. Thank you for answer. Next question. How does the price of NPU compare to GPU of a similar performance?
+
+**Speaker 1** _[27:21]_
+
+Um, so we have some benchmarks in our OpenVINO docs page. There you can compare, like, performance per dollar, something like that. So probably this is the answer for that question. NPUs, of course, integrated into CPU, so it's integral part. You cannot buy this CPU without NPU. Of course, there are some CPUs without NPU, but this specific one is integrated. So it's not like a USB stick you can buy and plug or something like that. It's already integrated into the CPU as well as integrated GPU.
+
+**Speaker 3** _[27:55]_
+
+There comes some more questions. The first question, which metrics should I obtain as a developer to optimize my model for the Intel hardware?
+
+**Speaker 1** _[28:10]_
+
+This is a difficult question, because I believe we talk here about performance, right? Something like that. So it doesn't... Okay. .
+
+**Speaker 3** _[28:21]_
+
+memory usage, memory brand.
+
+**Speaker 2** _[28:24]_
+
+Yeah, so maybe I can answer. I can give some example. For example, there is a popular model, LAMA2, right? And unoptimized in full precision, this model will require 25 gigabytes of RAM to run. But using OpenVINO and the tool, which is part of OpenVINO, is called NNCF, you can quantize the model to four bits, and it will take just four gigabytes RAM in this case. So, and for generative AI, it's very important optimization, especially memory size optimization, which is provided by OpenVINO.
+
+**Speaker 3** _[29:03]_
+
+Thank you, and yeah, two questions, it can be used with NVIDIA or other GPUs, it was already on. So if we discuss.
+
+**Speaker 1** _[29:15]_
+
+So if we discuss about OpenVINO, no, we don't support NVIDIA right now. We support ARM, which is not our devices, but it can be used with many Intel's hardware.
+
+**Speaker 3** _[29:26]_
+
+And come on.
+
+**Speaker 1** _[29:27]_
+
+Come on, it's a benefit.
+
+**Speaker 3** _[29:30]_
+
+And external NPU cards, which you can offer.
+
+**Speaker 1** _[29:33]_
+
+author? NPU. GPU yeah there are discrete GPU cards for client computing arc GPUs for for server okay for server max and flex series NPU is only integrated into CPU you cannot buy something like which is separate device
+
+**Speaker 3** _[29:55]_
+
+Like a PCI.
+
+**Speaker 1** _[29:56]_
+
+No, no, no, it's not available right now.
+
+**Speaker 3** _[29:59]_
+
+Okay. Thank you for your talks.
+
+---
+transcript_status: auto
+---
+transcript_language: en

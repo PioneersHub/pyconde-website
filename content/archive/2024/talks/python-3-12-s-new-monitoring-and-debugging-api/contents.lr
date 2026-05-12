@@ -82,3 +82,138 @@ video_duration_iso: PT29M6S
 video_thumbnail: https://i.ytimg.com/vi/i7CbCNGfMvI/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:06]_
+
+Hi, I'm Johannes. Without further ado, I think you're all here for my talk, so I don't bore you with who I am, you've already heard my name, so let's get started. I'll be talking about debugging, but when we mean debugging, I don't mean the ants that I saw yesterday, but I mean, and I also don't mean moths, this was the moth that was found in the 1950s, It was the first bug found by the people in the US. But we're not talking about these, but we're talking about other bugs. But why are we debugging? Because if debugging is the process of removing software bugs, then surely programming must be the process of putting them in. And as all of you are probably programming a lot here, and hopefully at work, you're also producing lots and lots of bugs. And I do too. So consider this. You know probably when in the olden times when your boss asked you how many lines of code did you write when you have like this matrix of software developer can write ten lines of code a day, so I wrote a small code, a small count example and just counts the lines of code in a program. The problem was it returns zero. That's not great. It should return something else, so it is a bug and it should return 26, so what do we do? code, but we look short enough that you don't see the actual bug, because I want to show you that you can probably should use a debugger, and debuggers are your friend, they are here to help you, and nice folks working on them, and they help you fix your bugs, and I also help you understand things, I help you understand what debuggers are. I'm Hannes Pechberger, I work at SAP in Waldorf, I work at the submachine team, we're like the third biggest contributor to the Java runtime, and we have nice logos with submarines and stickers in front, and we also have at SAP many, many, many other open source projects that you can follow, for example, Gartner, where they work on Kubernetes and such. But enough on me. Why do we need a new monitoring and debugging API, as it said in the title? there clearly was something before, and it worked, because also before, like last year, you were debugging. Now let's join me on this short journey down the rabbit hole into the unknown depths of CPython and debugging. So I'm coming from the Java world. In the Java world, Java has built-in debugging support. So Java knows about the concept of breakpoints, but Python, does your Python interpreter know the concept of breakpoints? Can you just tell them, hey, set a break point there? And I have here a large audience. Who of you thinks that Python knows about the concept of break points in the interpreter? Hands up. Okay. There are many people that hopefully know that that's a fangfrage as we call it in Germany. Of course it doesn't, because why else would I give a talk here? So any ideas how we could implement a debugger if the interpreter doesn't know about debugging Any ideas? Show it just in. Yeah, printf debugging is nice, I use it all the time, but another idea is, let's look at our code, I just invented a method called dbg, it's related to debugging, as you might soon see, and replace it in front of every line. I know the semicolon isn't used that much in Python, it's used in Java, but we can use it to put two statements on the same line. So the debugger says, oh, if we are currently at the break point in this line, then please open a debug shell, and this debug shell could usually be something like a B Python shell or a normal Python shell, but where do we get the file on the line from? There's a sketch frame in, and for all the people here that are wondering what the underscore means, it's simple. It's a proper Python function, yes, but it's not fully specified. It's kind of CPython only. It's an implementation detail, so all your debuggers depend on a CPython implementation detail. Yay! But the thing is, when you ask the PyPy people, and they even wrote it, they're like, you can use it, but it will make your performance worse. But in debugging, you usually don't care about performance, only if you then do. But anyway, so what this method does, and it's instrumental here for our debugging proofers, is that essentially you have the stack, you have the main method, it's called the countCountLines method, and in this countCountLines method, we have a loop over all lines that check for the isCountLine, and then we have the debug method on top, and so sys.getFrame0 gives you the topmost frame, then goes down, and so on. And this is the way where we can get more information about where we currently are. And in the frame, we get information about the local variables, the global variables, and we can even change them. Because it's Python, we can change everything. function, which comes in handy later. So, how can we do this? We essentially ask for our frame like directly under the debug method, we get the line, we get the frame, we check it, and that's fine. That's how we implemented our first debugger. Yay! A debugger in like five, six lines. The problem is, who wants to write dbg in front of every line? I don't, So the question is what do we do? We can also do like the at break point method, it's simple, but what do we do? How do we automate this? And now to the pre-3.12 way that was like the old days before like October last year. It was when you were all young and playing in the kindergarten, but I'm not because I'm old, so I also know the time when we had only the set trace. And what's the set trace? It's a simple method where we can pass a handler, but what does this handler do, you may ask? this handler gets, and I'm using typing because typing is nice, you should all use Python typing, you get past the frame type which essentially says what type of event you're getting and the event itself, so the event could be here something like a line and the argument would then be a line number, and so how can we then use this? we register handler, and whenever a function is called, this handler is called, so for example here when code confines is called first, the method handler is called, and it tells you, hey, it's the frame, it's like the frame where we see all this information that we got before with the set trace, with this get frame, and then we are called like, hey, that's also a call frame, so we call this method at this specific frame, and that's nice, and when we enter is code line, we get the same. This allows us to automate stuff, especially because the handler specification is slightly longer, essentially we can return a callable that in this case allows us to get frames per line, so we can get line events, so we can get an event per line, and then we are almost close, and we can extend our debug method, and it's simple, we call it in the handler, and we return it, and we then check, okay, when the event is in the line, then we ignore it, but that's all, so that's we registered in the handler, and then we implemented the proper debugger, and that's essentially how most debuggers worked in like the pre 3.12 ways, and I can show you later why it's a terrible idea. But now we have T-Bank, just a short note here, how can we use this to implement simple stepping, single stepping. Single stepping can be easily implemented in the at-trackpoint method, just because when we step out, it's simple. We just compare the top frame and say, oh, the top frame isn't the frame that I had before, and it's a frame below, so maybe we step out, that's fine. Stepping is we check that the top frame, the method was the same. Step into, we check that the topmost frame is something different, but the frame below is the same as we call here. And that means that with the thing that we saw before, that can be extended in like three lines more in a fully functional debugger, and that's cool. The problem is it's not as simple. Of course, the question here, do we get line events for every function in our program? Do we need to get line events? So if you're running some code, are you getting a line event for even functions? Even the functions that you didn't place a break point here. Who thinks that we get a line event for every function? Who thinks that we don't and that it's performant and fast? Optimistic people here. No. We get one. The main problem is here, we are in this code line method, and we have their break point, and so we're in, but our user, as a debugger writer or users like you, the user makes something interesting. He has a break point to code lines, the problem is now when we don't get line events for every line in code lines, we can't have any break points in this method because we're in this code line, we can't change the handler that we returned before for code lines. So we have to have a line event for every single line in your program. This is slow, I can tell you. I can show you later it's about your program runs three times slower with C Python, sometimes ten times slower, which you might consider slow, especially when you're debugging hard loops. So, of course, what do we do? Yeah, we can probably do something with Cytr and some hacks or so. Or someone started the process to add a new API, because in Python, as in Java, we have an enhancement proposal, and so somebody, and especially it's important, it's not me, I just read it and found it really, really cool, the people that wrote the PEP669 that came out with Python 3.12, it was Mac Shannon who worked on this for a couple of years, now it's out. So it's a new API that allows you to have a more fine-grained way of specifying where you want these events. So you start with something simple. We define some shortcuts because most of the things live in system monitoring and there we have events like the line event as before. And then we have a tool ID. So tools have specific IDs. So we have, for example, a profiling ID, we have a debugging ID, and the cool thing is that a profiler and a debugger can live alongside, and we can even potentially register two debuggers so we can debug the debugger while we're debugging the debugger, which is really nice. I can tell you it's nice when you have to when you write the debugger to write your own debugging debugger debugger. It's turtles all the way down, and they can tell you it doesn't break your brain. So essentially the idea is now we have an ID, but then we use it. So we tell Python, so, hey, please, we have a debugger, we call it dbg, so that other people know, oh, there's already a debugger registered, and then what we do, we enable these events. So we have specifically to enable events, but before, we register callbacks, so before we had like the callbacks that were like with returning functions and such, but it's clumsy, so what we can do here, we register callback for the line event, and we say, oh, the line event specifically, call this function. With PyStart, you have to start handler, call it specifically. For start handler, we get the code object, might be a function, or alumna, we get the bytecode offset, where this function is, and then we have the line handler, which also gets the current function, but it also gets the line, which is all nice. So, we unregister, And we essentially then enable events. So with set events, we can tell, oh, globally, please set these events for this debugger and please call every PyStart, which is nice. And also then later somewhere like that, it doesn't matter where, we can tell, oh, please set local events. So we can set events specifically for every function. That's cool because we only get the events for the function that we really need. So because usually when we set a breakpoint, 99.999% of our functions, we don't want to set a breakpoint in. We never, but we still get line breakpoints everywhere. So this fixes it because we only get the line events per function we will need it. And the interesting things for the people here that care about the global interpreter log, it's emitted per thread and not per interpreter. This essentially makes it far better and far future-proof. Because, as Lukas Langa said, the biggest opportunity of PEP669 isn't even the speed, it's the fact that the debugger built on top of it will automatically support all threads. And that's really cool. So I'm looking forward to many more things in the debugging and monitoring space that support this. Yeah. And especially with, like, he's the guy who sponsored PEP703, so he might know something about making the global interpreter log optional. I hope it gets in. Let's see. Or is it in? I'm not as used to Python. Is Python 13 out already? Maybe. Let's see. Anyway, so the ideas here, the enabled events per function or per method are combined of the globally set events on the one hand, so we set events that should be triggered for every function, like the PyStart function, and locally set events, and they form like the events that are enabled by function. If you wonder how this is implemented, it's quite simple, it's bytecode instrumentation, so essentially our zip hyphen modifies the bytecode to replace, for example, instruction at every line with something that tells, oh, please, please call this handler. That makes it so fast. So the power here is in the fine-train configuration. Speed isn't really a thing, but you can fine-train it and thereby achieve speed. So the idea is even if you are in a function f, for example, and you then set for whatever reason a breakpoint in there, you can still set a breakpoint for the specific function. So consider here a small contrived example. We essentially register a line breakpoint, and then we have a function that prints hello, And then it sets the local events, so it triggers the line handler later, then it prints enter, then it disables the local events. So what happens? It prints hello, and then we're setting the local events, so we get the line, so we get the line handler called, and then we call, and then we print inner, and then we also get like on the set local events, that's also a line, so we get a line handler called, but then we don't. So that shows us how powerful this compared to the previous mechanism. Of course it takes more work to implement, but it's worth it, I think. So the question is on what's fast. It has multiple methods, we saw them already, set local events, global events, and so much. So there are things that are pretty fast, we're just seeing a callback for whatever reason is fast, because it probably just sets, like, a variable in your C pattern interpreter, to get the tools, you can also ask, hey, what's this tool here? What's rather fast is setting local events. You can definitely just do it, just set a local event for the current function, because current functions are usually not too large in Python. What's really slow, what you should just do at the beginning is when you register a tool at the end when you set events globally. So the earlier, the faster, if you want to learn more, there's a QR code that tells you. I can recommend when you're working with Python to read the Python proposals, they're usually really well written, and almost all of my talk is just like reading the pep and giving you a talk about it, so you can do it too. But anyway, back to the debugger. We have here our sound handler, we saw it before, and the idea is that it looks similar as before. The only difference is when we have a break point, when we see that we have a break point specific function, we then enable the line events in this function, and then when we are in line handler, the line handler looks similar as before, which is nice. Now the question is what kinds of events we have. We have quite a lot, so we have events from PyStar to PyResume to PyReturn, so for everything that we have, almost every major thing like returning, like yielding, we have a PyEvent, and also for things that we like to see. Now to the performance. So essentially I thought, like, hey, I want to show that it's performant running this, so my idea was why not just run a mini debugger, with mini debugger I mean a debugger that doesn't hit a break point with both versions and see how it works. So I was thinking where is there some kind of Python performance benchmark, and there was PyPerformance lying around, and I hacked it a little bit. It's not pretty, but it works, and you get nice graphs out of it, so the idea is here essentially our mini debugger just has a line handler, calls it for every line because that's like the basic main thing in a debugger, until we optimise the add break point layout, and then we have the monitoring, and of course we can, I wanted to also check what happens when we compare this with the new API which also hits the line handler at every line to make it more comparable. So I used the Python performance benchmark suite to get some numbers, and the broad bumper sticker numbers are like that you're saving a lot of time in this country. For example, the set trace has an overhead of 3.5 times the runtime, and with the monitoring without having any break point, it's like just 1.2, so it's 20% overhead, which is pretty cool, I think, and even if you're hitting every line track point, it's still much faster, so it's a really cool thing, you should get much more performance out of it when doing debugging, and you can also now use it for monitoring. So then I plotted some graphs, and PyPerformance has a lot of things, the blue things are related here to the new API, so you see sometimes it's the blue things are to the old API, so see that sometimes it's more than ten times slower to run the old one, so that is probably a cause why debugging wasn't that great before, but now it's hopefully great. The question is now, is it used? The answer is kind of so. You probably all know and use the PDB, the Python debugger on the command line daily. If not, you know why you shouldn't. The thing is the new monitoring API is not yet used in PDB, which isn't great, but it's used in IDEs like PyCharm and also the Eclipse PyDev project also uses it, so just use a normal IDE. They have versions that use it, and they found large speeds up, which is well-needed. To quote the offer of the PDB, it's currently sadly still open for like a year, after this change with the trap, we will have the chance to build a much faster debugger for breakpoints. We don't need to trigger the trace function all the time and change the line number, as we saw. The bad news is it's almost impossible to do a completely backward-compatible transition because the mechanism is quite different, so yes. That's the problem when you break. I think the Python community knows this, but that when you break, sometimes things don't work that well, but at least with monitoring, I think the break in the behavior is well deserved, but be rest assured, the set phrase works still. It's just superseded by this, and if you start a new project, start with this. I'm coming to the end of my talk. If you like what I told you, you can also come tomorrow to the Java user group here where I tell about different things, and I give the same talk, but with demos in Budapest on next Thursday, so if you want to have a longer version, just come there. I was Johannes Pechberg, you find me on Twitter and on GitHub, you find my team, where you find things that you probably don't need to know about SAP machine and about OpenJK there. It was nice talking to you all.
+
+**Speaker 2** _[21:37]_
+
+Thank you so much, Johannes. And we have a lovely eight minutes for questions, which is excellent. And there's oodles of them. So I'm just going to get straight into it. Why not use the PyCharm debugger?
+
+**Speaker 1** _[21:49]_
+
+Yes, as I said, you should, so for one, use the PyCharm debugger, it's great, I like them, it's cool, it's open source, and I looked into this to prepare my talk, yes, use, you can, you should definitely look into how debugger works just to understand how it works and why it's sometimes slow, but of course, in production or in your daily work, don't use your self-written debugger, because then you almost certainly debug your debugger while you should be debugging non-debuggers, so please use proper debuggers and just make it at home to give talks and write nice blog posts.
+
+**Speaker 2** _[22:28]_
+
+Next question, I think you kind of touched on this after the question was posted but I'll say it anyway because it was highly upvoted. How does your debugger implementation compare to the built-in PDB module?
+
+**Speaker 1** _[22:39]_
+
+So essentially the idea is that the debugger, so I wrote a larger debugger that you can find on, that you can find, I think, hopefully somewhere there under the QR code. It has the same context, of course, it's not as fully fleshed and it's not as fully tested, but the core ideas are the same because I took the ideas from the PDB, I looked into this, so what you saw here is essentially how the current PDB is implemented, just the The current PDB adds much more things. So it's the core concepts, and that's why you're here. I think I could have given a talk on PDB, but it's like two lines of Python code, and that's not for 25 minutes.
+
+**Speaker 2** _[23:21]_
+
+Fair enough. Does the new debugger work on external servers? In other words, could I debug a code that is not on my own computer?
+
+**Speaker 1** _[23:30]_
+
+The new debugger and the new debugging API is the same. It has the same problems regarding this, regarding sys.xray, so there's no change in this way. Usually what PyCharm and others do, they essentially create a server, so what PyCharm does, it creates a server that has connections and people and the debugger, the IDE then speaks of our protocol, and it's also what VS code does, so essentially that's how it would work. Is this debugger all Python debuggers run in the same process, in the same code, in the same context as your code?
+
+**Speaker 2** _[24:07]_
+
+Awesome. Could or should one abuse the line callbacks for other purposes than debugging, i.e., in production code?
+
+**Speaker 1** _[24:14]_
+
+Yes, you should, essentially because this whole talk is called monitoring, and the whole
+
+**Speaker 2** _[24:15]_
+
+Yes. . . . . . .
+
+**Speaker 1** _[24:21]_
+
+you can do it, for example, you can do it, you can use it for essentially monitoring,
+
+**Speaker 2** _[24:22]_
+
+. . . . . .
+
+**Speaker 1** _[24:27]_
+
+you can check, okay, you can register it for a specific method to see, oh, which parameters
+
+**Speaker 2** _[24:28]_
+
+. . . . .
+
+**Speaker 1** _[24:32]_
+
+does this method get, you can do some validation, you can do many more things, and I think in
+
+**Speaker 2** _[24:33]_
+
+. . .
+
+**Speaker 1** _[24:37]_
+
+the future we will see many more libraries using these techniques that wasn't possible before because it was just too slow to use in production. So I'm looking forward to you doing the talk at the next PyCon showing how you can use monitoring APIs.
+
+**Speaker 2** _[24:52]_
+
+I mean, this kind of touches on the same topic, but again, highly upvoted, so I'll also throw it in. What are the benefits of a faster debugger? Is it not already fast enough that a human wouldn't notice any speed improvement? You can always go faster.
+
+**Speaker 1** _[25:05]_
+
+Yes, you can always go faster. Tell this to people that speed doesn't matter. When you're debugging, the problem is you usually have large applications, especially when you have, like, space or other tools, and the problem is when you're debugging, you get hit at every line also of your library, so it increases the speed, and you're much faster at the point where you will be debugging your code, where you will add to your code your debugger isn't stuck like instrumenting all the lines of code that you don't care about so yes, faster debugger is better and the thing is, you all know when you have to wait a couple of more seconds for something you turn to Twitter and do something else so I think developer productivity is really a good thing
+
+**Speaker 2** _[25:52]_
+
+And also you can abuse it in production.
+
+**Speaker 1** _[25:55]_
+
+Of course, you can use it now because we have an overhead of like in the 23%, we can write
+
+**Speaker 2** _[25:55]_
+
+Of course.
+
+**Speaker 1** _[26:00]_
+
+really fast debuggers, so you can probably use it in production, which is also nice, but you shouldn't, because debug on your test systems, you have hopefully CIs for this. Testing is great, yay!
+
+**Speaker 2** _[26:14]_
+
+We have a couple more minutes left, so we'll try and smash out one or two more questions. I apologize to the author if I got this wrong. What about new in version 3.7, the built-in breakpoint, when called with defaults can be used instead of import PDB, colon, PDB set trace?
+
+**Speaker 1** _[26:32]_
+
+trace. Oh, yes. So the idea is that we had a breakpoint method introduced in, I think, Python 3.7 or so, and the idea is you can call this breakpoint method and it's a handler that calls your breakpoint directly. Of course, you can insert a breakpoint in a specific place. That works. The problem is you change your code and you can't dynamically add new breakpoints, which is kind of a mess. So yes, when I wrote a debugger in my block series that you find on this QR code, I also implemented this. It's easy, but usually people want to have nice UI clicky, in Germany we call it clicky bunty, I like breakpoint, I like printf debugging, I do segmentation, but many people don't like So, yeah.
+
+**Speaker 2** _[27:19]_
+
+One last question. Can I use monitoring in VS Code? And I'm guessing, also, is there an extension for it yet?
+
+**Speaker 1** _[27:25]_
+
+I don't know. Maybe there's someone.
+
+**Speaker 2** _[27:30]_
+
+Can you answer that?
+
+**Speaker 1** _[27:30]_
+
+Can you answer that?
+
+**Speaker 2** _[27:31]_
+
+No, no, no, no. Oh, sorry. I still have more questions here, but I mean, go on. Off you go.
+
+**Speaker 1** _[27:41]_
+
+I'm not sure it may be off topic, but have you ever used to, have you ever tested your code coverage by test in your project? If I'm honest, I haven't ever written a PyTest because I'm a Java developer, I test my Java code. So, briefly, there is a most popular tool for that in Python, PyCaf or something like that. Oh, yes, so I heard about it. The thing is, one of the debugging IDs, one of the tool IDs that you have is also coverage, so yes, I forgot to mention it. It's not just profiling, it's also coverage tools, so this makes coverage tools, and even I can show you shortly, so the cool thing is they even had something in there, because if you look closely here, if you look closely here, there isn't disable on any, so the cool thing is you can when you are the line you can just return disable in the line handler and this line handler will never ever be called that's specifically there for coverage tools so coverage tools are made this is made with coverage tools in mind and should dramatically speed up your coverage so I think it's a good thing that we have this now
+
+**Speaker 2** _[28:57]_
+
+Let's thank Johannes again. Please chat to him again after the talk, and we'll have some more.
+
+---
+transcript_status: auto
+---
+transcript_language: en
