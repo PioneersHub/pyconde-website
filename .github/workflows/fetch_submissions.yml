@@ -1,11 +1,22 @@
 name: Fetch submissions
 
-# Scheduled execution temporarily disabled until PyCon 2027
-# on:
-#   # runs once per day at midnight
-#   schedule:
-#   - cron: "0 0 * * *"
-#   workflow_dispatch:
+# ---------------------------------------------------------------------------
+# TRIGGER POLICY — DO NOT ADD `push:` TO THIS WORKFLOW.
+#
+# This workflow auto-commits Pretalx data back into the repo and must only
+# run on the scheduled cron (and optionally workflow_dispatch for manual
+# reruns). Wiring it to `push:` would cause every commit to main to hit the
+# Pretalx API and race with the deploy in main.yml.
+#
+# Scheduled cron is disabled until PyCon 2027 — uncomment the two
+# `schedule:` lines below to re-enable daily auto-fetching. `workflow_dispatch`
+# is kept active so the workflow remains schema-valid and so maintainers can
+# trigger a manual run from the Actions UI in the meantime.
+# ---------------------------------------------------------------------------
+on:
+  # schedule:
+  # - cron: "0 0 * * *"  # runs once per day at midnight
+  workflow_dispatch:
 
 jobs:
   fetch_submissions:
