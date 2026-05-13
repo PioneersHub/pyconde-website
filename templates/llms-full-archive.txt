@@ -1,0 +1,86 @@
+{%- set branding = bag('branding') -%}
+{%- set host = branding['canonical_host'] -%}
+{%- set archive_root = site.get('/archive') -%}
+{%- set editions = (archive_root.children|list)|sort(attribute='year', reverse=true) if archive_root else [] -%}
+{%- set ns = namespace(total=0, transcripts=0, recordings=0) -%}
+{%- for ed in editions -%}
+  {%- set talks_node = site.get('/archive/' ~ ed.year ~ '/talks') -%}
+  {%- if talks_node -%}
+    {%- for t in talks_node.children -%}
+      {%- if t['_model'] != 'redirect' -%}
+        {%- set ns.total = ns.total + 1 -%}
+        {%- if t.youtube_id and not t.do_not_record -%}{%- set ns.recordings = ns.recordings + 1 -%}{%- endif -%}
+        {%- if (t.transcript or '')|trim and not t.do_not_record -%}{%- set ns.transcripts = ns.transcripts + 1 -%}{%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endfor -%}
+# {{ site.config.PROJECT.name }} — full archive corpus
+
+The complete archive of PyConDE / PyData past editions: every talk with
+its abstract, recording metadata, and — where available — the full
+speaker-diarized transcript text.
+
+Plain text, no markup. UTF-8. Generated from the live site at build
+time. Source HTML pages: {{ host }}/archive/
+
+Total archived talks: {{ ns.total }}
+With YouTube recording: {{ ns.recordings }}
+With full transcript:  {{ ns.transcripts }}
+
+Editions covered: {% for ed in editions %}{{ ed.year }}{{ ", " if not loop.last }}{% endfor %}.
+
+Transcripts are auto-generated from session audio with speaker
+diarization. Labels "Speaker 1", "Speaker 2" reflect diarization, not
+identity attribution. Timestamps in brackets refer to the recording.
+
+For the current edition see {{ host }}/llms-full.txt.
+For the structured site index see {{ host }}/llms.txt.
+
+{% for ed in editions %}
+{%- set talks_node = site.get('/archive/' ~ ed.year ~ '/talks') -%}
+{%- if talks_node %}
+========================================================================
+# PyCon DE & PyData {{ ed.year }}
+
+{% if ed.date_from %}Dates: {{ ed.date_from }}{% if ed.date_to %} – {{ ed.date_to }}{% endif %}
+{% endif %}{% if ed.location %}Location: {{ ed.location }}
+{% endif %}Edition page: {{ host }}/archive/{{ ed.year }}/
+Talks index: {{ host }}/archive/{{ ed.year }}/talks/
+Speakers index: {{ host }}/archive/{{ ed.year }}/speakers/
+Tracks index: {{ host }}/archive/{{ ed.year }}/tracks/
+
+{%- set real_talks = [] -%}
+{%- for t in talks_node.children -%}
+  {%- if t['_model'] != 'redirect' -%}{%- set _ = real_talks.append(t) -%}{%- endif -%}
+{%- endfor -%}
+{% for talk in real_talks|sort(attribute='title') %}
+{%- if true %}
+
+------------------------------------------------------------------------
+## {{ talk.title }}
+
+- URL: {{ host }}{{ talk|url }}
+- Pretalx code: {{ talk.code }}
+- Edition: {{ ed.year }}
+- Speakers: {{ talk.speaker_names or 'unknown' }}
+{% if talk.track %}- Track: {{ talk.track }}
+{% endif %}{% if talk.python_skill %}- Python skill: {{ talk.python_skill }}
+{% endif %}{% if talk.domain_expertise %}- Domain expertise: {{ talk.domain_expertise }}
+{% endif %}{% if talk.day and talk.start_time %}- Scheduled: {{ talk.day }} {{ talk.start_time }}{% if talk.end_time %}-{{ talk.end_time }}{% endif %}{% if talk.room %}, room {{ talk.room }}{% endif %}
+{% endif %}{% if talk.do_not_record %}- Recording: opted out (do_not_record)
+{% elif talk.youtube_id %}- Recording: https://www.youtube.com/watch?v={{ talk.youtube_id }}
+{% else %}- Recording: not available
+{% endif %}{% if talk.transcript and not talk.do_not_record %}- Transcript status: {{ talk.transcript_status or 'auto' }} ({{ talk.transcript_language or 'en' }})
+{% endif %}
+
+### Abstract
+
+{{ (talk.abstract or '')|striptags|trim }}
+
+{% if talk.transcript and not talk.do_not_record %}
+### Transcript
+
+{{ (talk.transcript|string)|striptags|trim }}
+
+{% endif %}{% endif %}{% endfor %}{% endif %}{% endfor %}

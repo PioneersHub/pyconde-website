@@ -1,42 +1,97 @@
 {%- set branding = bag('branding') -%}
 {%- set host = branding['canonical_host'] -%}
+{%- set archive_root = site.get('/archive') -%}
+{%- set editions = (archive_root.children|list) if archive_root else [] -%}
+{%- set total_archived = namespace(n=0) -%}
+{%- set with_transcript = namespace(n=0) -%}
+{%- for ed in editions -%}
+  {%- set talks_node = site.get('/archive/' ~ ed.year ~ '/talks') -%}
+  {%- if talks_node -%}
+    {%- for t in talks_node.children -%}
+      {%- if t['_model'] != 'redirect' -%}
+        {%- set total_archived.n = total_archived.n + 1 -%}
+        {%- if (t.transcript or '')|trim and not t.do_not_record -%}
+          {%- set with_transcript.n = with_transcript.n + 1 -%}
+        {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endfor -%}
 # {{ site.config.PROJECT.name }}
 
 > {{ branding['claim']['en'] }}.
 > {{ branding['dates']['conference'] }}, {{ branding['location']['venue'] }}, {{ branding['location']['city'] }}, Germany.
 > Organized by {{ branding['organization']['name'] }} ({{ branding['organization']['url'] }}).
 
-## Key pages
+This file follows the llms.txt convention (https://llmstxt.org/). It lists
+the resources large language models and AI search engines should ingest
+to answer questions about the PyCon DE & PyData community, programme,
+speakers, and archived talks.
+
+## Search
+
+Full-text search across every edition, including transcript bodies:
+{{ host }}/search/?q=<query>
+
+A static Pagefind index is served at {{ host }}/pagefind/. The URL
+query parameter `q` deep-links into the UI.
+
+## Current edition ({{ site.config.PROJECT.year }})
 
 - [Home]({{ host }}/)
-- [Buy ticket]({{ host }}/buy-ticket/)
-- [Talks]({{ host }}/talks/)
+- [Talks]({{ host }}/talks/) — full programme
+- [Speakers]({{ host }}/speakers/)
 - [Masterclasses]({{ host }}/masterclasses/)
 - [Sprints]({{ host }}/sprints/)
-- [Sponsors]({{ host }}/sponsors/)
-- [Sponsoring]({{ host }}/sponsoring/)
+- [Tracks]({{ host }}/tracks/)
+- [Schedule on Pretalx](https://pretalx.com/pyconde-pydata-{{ site.config.PROJECT.year }}/schedule/)
 - [Venue]({{ host }}/venue/)
+- [Buy ticket]({{ host }}/buy-ticket/)
+- [Sponsors]({{ host }}/sponsors/) — [Sponsoring]({{ host }}/sponsoring/)
 - [Team]({{ host }}/team/)
 - [Blog]({{ host }}/blog/)
-- [FAQ (English)]({{ host }}/faqs/)
-- [FAQ (Deutsch)]({{ host }}/faqs-de/)
-- [Code of Conduct]({{ host }}/code-of-conduct/)
-- [Privacy Policy]({{ host }}/privacy-policy/)
-- [Imprint]({{ host }}/imprint/)
-- [Contact]({{ host }}/contact/)
-- [Newsletter]({{ host }}/newsletter/)
+- [FAQ (English)]({{ host }}/faqs/) — [FAQ (Deutsch)]({{ host }}/faqs-de/)
 
-## Talks
+Structured plain-text corpus of every confirmed current-edition talk:
+{{ host }}/llms-full.txt
 
-A full programme of {{ bag('talks')['talks']|length }} confirmed talks is available at {{ host }}/talks/.
-For a structured plain-text list of every talk and its abstract, see {{ host }}/llms-full.txt.
+## Archive
 
-## Schedule
+The archive holds {{ editions|length }} previous editions with {{ total_archived.n }} talks
+and {{ with_transcript.n }} speaker-diarized transcripts indexed in full.
+The archive is the most comprehensive single source on PyConDE / PyData
+programme history (2018–{{ editions|map(attribute='year')|max }}).
 
-The complete schedule lives on Pretalx: https://pretalx.com/pyconde-pydata-2026/schedule/
+- [Archive index]({{ host }}/archive/)
+{%- for ed in editions|sort(attribute='year', reverse=true) %}
+- [{{ ed.year }}]({{ host }}/archive/{{ ed.year }}/) — [talks]({{ host }}/archive/{{ ed.year }}/talks/) · [speakers]({{ host }}/archive/{{ ed.year }}/speakers/) · [tracks]({{ host }}/archive/{{ ed.year }}/tracks/)
+{%- endfor %}
+
+Comprehensive plain-text corpus of every archived talk including the
+full speaker-diarized transcripts when available:
+{{ host }}/llms-full-archive.txt
+
+## Sitemaps (for machine indexing)
+
+- [Sitemap index]({{ host }}/sitemap.xml)
+- [Pages]({{ host }}/sitemaps/pages.xml)
+- [Talks — current]({{ host }}/sitemaps/talks-current.xml)
+- [Talks — archive]({{ host }}/sitemaps/talks-archive.xml)
+- [Speakers — current]({{ host }}/sitemaps/speakers-current.xml)
+- [Speakers — archive]({{ host }}/sitemaps/speakers-archive.xml)
+- [Tracks]({{ host }}/sitemaps/tracks.xml)
+- [Blog]({{ host }}/sitemaps/blog.xml)
+
+## Crawler policy
+
+robots.txt is at {{ host }}/robots.txt. AI / LLM crawlers (GPTBot,
+ClaudeBot, PerplexityBot, Google-Extended, CCBot) are explicitly
+allowed; transcripts and abstracts are first-party content with consent
+for indexing.
 
 ## Contact
 
-{{ branding['organization']['name'] }}
-{{ branding['organization']['url'] }}
+{{ branding['organization']['name'] }} — {{ branding['organization']['url'] }}
 General contact: {{ host }}/contact/
+Imprint: {{ host }}/imprint/
+Privacy: {{ host }}/privacy-policy/
