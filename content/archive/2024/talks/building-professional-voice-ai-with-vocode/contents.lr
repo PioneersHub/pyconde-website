@@ -82,3 +82,178 @@ video_duration_iso: PT24M51S
 video_thumbnail: https://i.ytimg.com/vi/RS0gn2beLlY/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:06]_
+
+Hello. My name is Lev, and I will talk to you about this open source project called vocode. This is the plan of my talk. I will start with a live demo, hope it goes well, and then I will talk about the uses of AI voice agents in the industry. After that, we will look under the hood of this open source project, how does it work inside. And, finally, there will be some criticism of what is missing in vocode right now. Okay. So, let's do a demo. So, it will be a conversation between me and artificial intelligence about the topic that I care about and why Python is the best programming language for highly parallel, low-latency applications, for example, AI voice agents. Okay. let's try. So I'm choosing the sound sources. Okay. I should connect to conference Wi-Fi first. Maybe I'll just try it with my phone, actually. Okay. Yeah, let me maybe let's just play a recording.
+
+**Speaker 2** _[01:52]_
+
+Hello, Lev.
+
+**Speaker 1** _[01:54]_
+
+Hello?
+
+**Speaker 2** _[01:56]_
+
+Great to hear from you. I understand we're diving into the world of programming languages, particularly for highly parallel, low-latency applications. Yeah, you're right.
+
+**Speaker 1** _[02:07]_
+
+Um...
+
+**Speaker 2** _[02:08]_
+
+So I'd love to discuss this further and explore other options that could be perfect for your needs.
+
+**Speaker 1** _[02:12]_
+
+I have this application that has a lot of I.O.
+
+**Speaker 2** _[02:14]_
+
+What specific applications or projects are you making?
+
+**Speaker 1** _[02:15]_
+
+There's many things happening at the same time.
+
+**Speaker 2** _[02:17]_
+
+at the same time. That sounds like an interesting challenge.
+
+**Speaker 1** _[02:19]_
+
+Is there some kind of Python library I could use?
+
+**Speaker 2** _[02:19]_
+
+Is there some kind of For handling high I.O. and concurrency... Absolutely. Python has several powerful libraries designed to handle concurrency and parallelism, which are crucial for I slash O bound and high throughput applications. Here are a few you might consider. 1. Essentio. This is a Python library to write concurrent code using the async slash await syntax. It's particularly useful for I slash O bound and network bound applications. Yeah, that sounds great. It provides a framework that...
+
+**Speaker 1** _[02:47]_
+
+Is that hard to learn, I think, Ayo?
+
+**Speaker 2** _[02:47]_
+
+Is it hard to learn? I think I'm glad to hear that It's understandable to feel that way especially with something as conceptually different as asynchronous programming Essentio specifically can have a bit of a learning curve initially because it involves a shift in thinking about how code is executed However, once you grasp the basic concepts like async slash await event loops and tasks It becomes much easier and quite powerful great. Here are a few tips to I'm so definitely yeah
+
+**Speaker 1** _[03:16]_
+
+I was agent, and I think I know right now. Thank you. Bye. Okay. So this was a demo. And yeah. It was me talking to GPT for Turbo, just to, you know, which is one of the best models we have available. And I was using DeepGram for speech-to-text, and Azure Voice for generating audio from text. And, yeah, there were definitely some glitches in here. You could hear that. We were talking at the same time. Somehow felt that asyncio is this Italian word, you know, so saying asyncio, Python library, like, you know, this is the first time it sees this word and how to pronounce it. There are some issues here, however, these voice agents are being used in the industry quite a lot. I work for a voice agent company, and we see a lot of applications of them. One of the main applications is booking an appointment with someone. A lot of people are used to calling a receptionist at their hairdresser or dentist and booking an appointment that way. That can be easily done with AI voice. You call, you ask what slots are available, and then finally you book an appointment with them. Similarly, if you miss your hairdresser appointment, usually they would call you and ask you to reschedule. That can also be done with AI voice. Of course, if there's some problem, then you can always press a button, talk to a human, and you can talk to a human receptionist. But actually, this AI voice agent is enough for these simple tasks. Also, the first job screening, like, when I apply for a job and they don't know you, the first call is very simple, just like, are you the person you put on your CV or not? Do you have the basic skills? And that can be done by AI. You make a recording, extract some information, and then later the HR person can review it very quickly asynchronously. That's an application which is already working out there. Cool. So this is why. Let's talk about how. And one way to do it is by using this open source framework. And it was developed in the spring and summer of 2023 by two people who are in the Y Combinator at that time, called Wallcode HQ. And you can see this vertical line in April where you just get 1,000 stars in one day. And that can only happen if you get to the top of Hacker News, which is what happened to vocode at that time, which is pretty cool. Since then, things have been slower. The reason they have been slower is the company pivoted to having a hosted closed-source solution, which is really great. Even though they put most of the efforts into that product, they still spend time on open source. The engineers still review community PRs, there's an open source maintainer, Sebastian, spends a lot of his time on this project. I'm very grateful that they left it on open source because it allows all of us to learn about AI voice agents. If you want to use an AI voice agent, it's quite easy, you can find many APIs online, but if you want to look inside and see what's happening under the hood, how do I build one, how do I as an engineer learn how this technology works, then open source is great for this. I'm very grateful that they left it there, and they maintained it a bit, and it allows all of us to learn. Any voice agent you talk to now, there's like 80% chance that they did their first version just with vocode. When we started in the summer, our first version was vocode, and now we use our own code. But they just started the whole ecosystem like this, and I'm very grateful to them for this. This is the power of open source. Cool. So how does it work under the hood? There are four main components. First, there's a telephony provider, you call on the phone, and you send some audio. This audio has to be transcribed into text. Once it becomes text, you can actually give it to the text language model, and the text language model generates a reply. That reply needs to become audio again, so you have to use some other model to generate audio from that, and then you send it again over the telephone network. And vocode actually doesn't do any of these four parts. You have to use your own models for that, or some other vendors. If you want to talk on the telephone, there's no open source solution here, unfortunately, for PyCon. You have to talk to a vendor, and like Twilio and Vonage are the two main providers who you can engage with and make calls all over the world. For LLM, there are some open weights models like Mixtrall, Lama, or you can of course use OpenAI. For speech-to-text, you can host your own whisper, which transcribes audio into text, Or you can have a more faster, you know, closed-source cloud provider, DeepGram. And for text-to-speech, we used to have Cocky and OpenWeights, a text-to-speech company which sadly doesn't exist anymore, based in Berlin. Or you can use Cloud Vendor 11 Labs. Okay. So vocode actually doesn't do any of the hard stuff. So, like, what's the point of using vocod at all? And to me, I think vocod serves the hardest problem in AI voice agents right now, in 2024. And I want to ask you, maybe you have some ideas, what is the hardest problem in AI voice agents? Yeah? Yeah, I think conversational understanding, they don't really understand turn-taking like we do. turn-taking, detecting end of turn, when to start a new turn. More ideas? Latency, yeah, that's pretty important. Orchestration! Ah! Bingo! So this is an orchestra conductor. Cool! So, yeah, latency depends on orchestration. The end of turn, that's a hard problem as as well. I will talk about it later. Cool. So orchestration is very hard. But when I say orchestration, what do I actually mean by this? So this is a small example of what happens under the hood. It's quite a complicated diagram. I will go into it in several iterations. So first I need to receive audio from the telephony provider, then I send it to speech-to-text API, and sometimes it's just silence, sometimes it's just noise of a car passing by, and sometimes it's a human talking. It's a human talking, the bot needs to go silent. In a polite human conversation, if your dialogue partner starts talking, you should probably go quiet. And the water is already quiet, and then I need to wait a little bit more, another half a second, until I get the actual words that the human is saying, so I have to wait for the transcript. When I have these words, I send it to the LLM, I get the reply back, the reply doesn't come back all at once, it comes back as a stream, talking by talking, so I need to collect it into some kind of first meaningful chunk which I can synthesise voice with. And voice also doesn't come back all at once, it's generated, you know, in some kind of different levels of chunks, it comes to me over a web socket, and I have to keep sending that over phone again. So you see there are two loops in here. There's a loop in the beginning where I receive audio, send it to the speech-to-text, and then come back again. And there's also another loop here. And this loop is an asyncio worker. This loop is also an asyncio worker, and it's all happening in a single thread. So this talk is about AI voice agents, but the whole of the slide is about asyncio, actually. And there's some complicated asyncio stuff happening under the hood. For example, the reason I can only send one second over the phone at a time is because If you have a task running, there's no way to cancel it. It has to stop, check in with the event loop, should I keep running or should I stop? And then it will decide if it needs to stop again. So the stop bot talking, I send a little chunk, check, did the human start talking? No? Okay, I can keep talking again. If yes, I have to shut up. And this is actually quite a complicated code. Cool. So this is engineering. Let's go back to AI and machine learning. So this is a there's some very important machine learning problems in voice agents, like you mentioned before. First one is when to end the call. And you know, even if two humans are talking, deciding when to hang up is a complicated problem. Now we have AI needs to solve it for us somehow. And it's done by text embeddings. There's a list of goodbye phrases, and whenever bot or human says something, it just checks If they said a goodbye phrase, if it's similar enough to one of these, then it hangs up. This doesn't scale to many languages very well, but for English, it works okay. Cool. The other problem, the turn-taking and pointing, it's simple terms you can just say, when should I start replying? If the human is saying, I am slowly thinking, you know, like, should I already interrupt and come back? Because you just think there's nobody there, or maybe they should just wait a bit more to let them finish their thought. Or somebody giving you the phone number, like, my phone number is 12345. It's really uneven. The default solution to this is just wait 10 milliseconds after the last word, but as you heard in the demo, it doesn't quite work very well. You can wait for the full stop, but full stops are not always detected in speech. I don't speak in sentences, I just speak in words. I don't tell you what the full stop is. That's a hard problem, and you need a separate model which is both text meaning and also audio intonation understanding for this. Most of the voice agent vendors have their own models for this, and Volcode doesn't do that very well. But it's good enough for a prototype. Another interesting problem is when you need to do something which is not just replying with words. If I call a hairdresser to book an appointment, they need to call an API of the calendar provider to put this appointment into their system. This is called function calling in LLMs, so if I say I want to have an appointment in two weeks on a Monday at 9 a.m. with this hairdresser that I like, and I want to make it one hour long, so the LLM has to extract all this information from the text and put it into the function call, and they can do it, but not perfectly. Even GPT-4 is actually struggling with this function calling, so the solution is you have to make very specific task-based models here. Cool. And finally, the cons of vocode, why I would not use it in production, and because there's some functionality which is missing. The commercial voice agents, closed-source voice agents, they have some features that vocode does not have, unfortunately. For example, this interruption prevention where bot and human talk at the same time. That is not there very well. There's no noise cancelling. Another important thing is voicemail. A lot of calls when you call somebody and say you missed your appointment, would like to reschedule, it will go to voicemail, very likely. You need to not spend your time talking to voicemail. And, yeah, and I think, like, the more I spend the more I think about Go as a great programming language, because there are some hidden rakes that you can step on, like how exceptions come up in long-running tasks and stuff like that. So, yeah, it's great for prototypes, but it needs more work if you actually use it in production. Cool. Yeah, thank you. These are all my slides. Let's move to questions.
+
+**Speaker 3** _[16:50]_
+
+Thank you, Liev, for your talk. We haven't got any questions yet, so I have to do my own question. What happens if there is a word in another language which the bot doesn't understand?
+
+**Speaker 1** _[17:05]_
+
+Yeah, like, say, the name of the company, or the name of the person you are calling to, or the name of the hairdresser, yeah, these words can occur. And in a good speech-to-text system, you can provide specific keywords beforehand. And you just say, this is a rare word, but it's actually very likely to occur in this conversation. So you just give it this list in advance. And before I start the call, I already know the name of the person I'm calling, I know the names of all the people who work in my hairdresser salon, so it's quite easy to fix on the level of speech-to-text. Then it comes to the language model, and I also need to train it with all these words included. GPT-4 can do it, but your specific task model will need to be fine-tuned for that. Yeah, but that's a good question. Thank you.
+
+**Speaker 3** _[17:58]_
+
+Can I ingest my own data, for example, like a rack approach? Yeah.
+
+**Speaker 1** _[18:03]_
+
+Yeah, rug is included there, it's supported natively by vocode, it's more like when the bot hears a human say something, like, oh, how do I cancel my subscription, it does the usual similarity search in the rug, your vector database, and just says to LLM, okay, I searched this in the database, and I got this five hits back. So do whatever you want, and LLM decides how to use this information. If you already have an FAQ, how to cancel a subscription, then LLM will figure it out and say back, okay, this is how you cancel your subscription. FAQ is a nice format, of course, but if you have a PDF or a website, what are the best chunks to chunk it, you know, like all these questions which you usually have in RUG, this whole kind of worms, you have to deal with yourself in this context of AI and voice. So good luck.
+
+**Speaker 3** _[18:56]_
+
+Can it recognize emotions in speech and react to it?
+
+**Speaker 1** _[19:01]_
+
+No. That's the problem that we have this split model. We have speech to text, and once it's text, it's text. There's no emotions left. And then they have the LLM, which just deals with pure text. That's the real problem, that people out there like Gazelle is a great model where it understands audio and outputs text as a reply. And that model can understand emotions really well. So I think when we talk about AI voice agents in 2025, that will be the models that we'll all be using. Right now that's lost, but people are working on that to include that.
+
+**Speaker 3** _[19:36]_
+
+Next question is very long. Have you tried to form any function calls which encode preferences? For example, I prefer morning over afternoon, but I prefer any appointment over no appointment. Yeah.
+
+**Speaker 1** _[19:51]_
+
+Yeah, absolutely. I mean, that's because if you send this kind of request to an LLM, it will actually change it into two requests. It will say, like, first I'm going to ask for all availability, and you first go to the calendar and say this is my availability for the next, you know, several days and afternoons and mornings, and it will tell you, okay, are the choices that I have, and your top preferences are this. So with some smaller function calls, like availability separate to booking, and a good LLM who is fine-tuned on this specific task, you can actually do this. Yeah, that is possible.
+
+**Speaker 3** _[20:32]_
+
+Could you give an example of data sources that you use for model fine-tuning towards the target domain?
+
+**Speaker 1** _[20:40]_
+
+Yeah, I mean, synthetic data generation, you know, GPT-4 is good at generating synthetic data for you. There will be another talk in this room about text classification, where this speaker will talk more about how to generate synthetic data for text classification stuff. And we have a lot of text data already which some of our clients allow us to use.
+
+**Speaker 3** _[21:11]_
+
+Can it tell the difference between see you as a conversation and it occurring naturally in a sentence?
+
+**Speaker 1** _[21:19]_
+
+See you as in how does it occur naturally in a sentence? Good to see you, something like that. Let's look at the list of our goodbye phrases. It says see you and see you later. If it's just one thing, then it will hang up. If it's in a bigger context, like if you use a good text embedding, then it will put them far away. But it just depends on how good your text embeddings are, really. And we didn't have problems with text embeddings so far for goodbye detection.
+
+**Speaker 3** _[22:03]_
+
+How is it if I go through a street and there's someone next to me saying see you?
+
+**Speaker 1** _[22:09]_
+
+Oh, yeah. That's a great problem. That's called voice isolation. For example, Zoom has great
+
+**Speaker 3** _[22:09]_
+
+Oh
+
+**Speaker 1** _[22:17]_
+
+voice isolation. You can have children screaming in the same room, and your colleagues will not hear this, because in advance, you enrolled in it. You gave it a minute of your voice, and it's actually fine-tuned the model just to get your voice out of there. We cannot do this if you just call many people on the phone. We cannot do voice enrolment, but there They are actually models for voice isolation without enrolment, like Crisp.ai for example has a model like that, where they just figure out who is the main speaker and just stick to that speaker throughout the call.
+
+**Speaker 3** _[22:52]_
+
+And do you disclosure to the caller that he, she is talking to an AI?
+
+**Speaker 1** _[22:58]_
+
+Yes. Yes. There are even some laws about it, actually. For example, in America, you need to have permission of somebody to call them in an automated way. Yeah. But what actually happens in the prompt, that's something that our clients decide for themselves. Yeah, we platform.
+
+**Speaker 3** _[23:26]_
+
+Do you think there is an alternative open source Python solution for finer gained event control instead of AsyncU?
+
+**Speaker 1** _[23:36]_
+
+Which kind of event control?
+
+**Speaker 3** _[23:45]_
+
+for finer gained event control.
+
+**Speaker 1** _[23:48]_
+
+Yeah. I mean, there are threads in Python. You know? And, yeah, like, if you learn the
+
+**Speaker 3** _[23:48]_
+
+Yeah.
+
+**Speaker 1** _[23:58]_
+
+SyncIO and all its peculiarities, or you can do threads, or you can just write it and go. Those are my three options. If somebody knows better ways, I would be very happy to hear from you for something which is low latency.
+
+**Speaker 3** _[24:14]_
+
+Can you identify the voice bot on the other side and speed up information exchange?
+
+**Speaker 1** _[24:21]_
+
+if two voice bots are talking to each other. I don't know. I really don't know. If they just say, like, let's switch to Jason, and then they just, you know, send Jason to each other in some kind of high-pitched voice, like in Terminator movie.
+
+**Speaker 3** _[24:39]_
+
+Well, these were all of our questions. Thank you for answering it. To all of you, have a nice lunch break.
+
+---
+transcript_status: auto
+---
+transcript_language: en

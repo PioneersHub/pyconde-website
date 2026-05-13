@@ -87,3 +87,290 @@ video_duration_iso: PT45M19S
 video_thumbnail: https://i.ytimg.com/vi/fIFA4eHBI8s/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:06]_
+
+Okay. Hi. Thanks for your time. And we're happy to be here to present our work. We call it best of both worlds. How we built an AI-aided content creation tool for language learning. And so we're going to present it together. So there's me, I'm Lea, I work for Innovex. Currently in the project, I work as a data and AI product manager. And I've been involved in this project for almost a year now. As already mentioned, I have a background in behavioral economics. I'm obviously super interested in LLMs and everything around it. But also I'm really interested in more traditional topics like causality, evaluation, but also data storytelling, data and AI ethics. And then I'm going to hand over to Hector.
+
+**Speaker 2** _[00:55]_
+
+Yeah, I'm Hector and I'm working right now as a computational linguist at Babbel. My educational background is in second language acquisition, foreign language teaching, and when I started working at Babbel, I transitioned on to working more closer with NLP and that led to content analysis and analytics and that also led to LLMs. So right now, we are a team at Babel, a cross-functional team. We have a collaboration with Innovex, and our mission is to integrate AI into the content creation process to provide personalized experience for our learners. So the agenda today, we will delve into the details of our traditional content creation pipeline and then I will hand over to Lea who will share with you the whole product development process and how we develop the features of the system that we have developed So far and we will also give you a taste of the dynamic content creator And of course if you have any questions, we hope we can answer them So What is the lay of the land in Babel so we have five overarching steps in our content creation. So pre-production, production, localization, editorial checks, and staging and release. Each of them has its own sub-steps and this is a process that has evolved at Babel for a little bit over 15 years that we've been in the market, it's a process that has supported the growth of the company and to provide language learning education for our users. So from the lesson manuscript, starting with a very, very general outline of what the content should be all the way through the recordings and illustration with images to provide visual support for our learners and then localizing that into eight different languages. This is a process that involves several steps and it brings a lot of experts into each step of the process. We follow high-quality guidelines for each one of the steps, but one of the main challenges that we face is that each stage usually depends from the deliverables of the previous one, making it a little bit rigid and time-consuming, and as you can imagine, with the different needs that each learner has it also brings some restrictions more or less a unit that composes three to four uh self-study lessons takes about 35 hours only in terms of production so that is quite quite uh taxing for for all the people uh involved and of course it brings about some restrictions and how much content, how personalizable it can be, so this is the these are the challenges that our editors and content creators were facing and therefore we try to provide value by injecting large language models into the mix which is what Lea will be presenting to you.
+
+**Speaker 1** _[05:12]_
+
+Yes, so we built this team with this mission to bring AI into the content creation process. As you already mentioned, we have this cross-functional setup, so we have really a mix of people within our team, so there are people with more like a language learning background, we have a data scientist, we have experts who somewhere sit in between, so really able to see both sides, and I think this was one of the strengths of this team, and we started off with this vision that we have this, Well, I think back then we didn't call it the dynamic content creator yet, but we were built as a team which is called the dynamic content team, and we had this vision to build this interface that allows to easily interact with AI-driven functionalities, but still has the human in the loop to enable this collaboration between artificial intelligence and human intelligence along the whole generation of content. And how did we start out with this? So in the first step, we really had this kind of process onboarding. We talked a lot to subject matter experts. Luckily, we also had some of them in the team. So really, we could work closely understanding what is the current workflow, how does it look like, what is important, but also understand the pain points and limitations of this workflow. And thereby already having in mind what other functionalities that AI could support and help with to make this more efficient, more scalable, in a sense. And what we did, we started off with an internal POC. So what I haven't mentioned yet is that this team, we not only are kind of, we should develop the tools, but we also have a user-facing feature that we support, namely everything around grammar within the app. And therefore, we also had the need to create content for our own feature, which we then took as a POC for this tool. Also, within this, we also chose some more high value, low risk use case. So we wanted to have something where we, in this case, we had to generate items, a lot of items. So therefore, it's something which is scalable. So we could invest some time in the prompt engineering and set up the tool in order to generate a lot of items that we then can further unuse. We also, something that is important, in my opinion, is to have this friendly user group in this first phase. So we had those in the team, so they knew their limitations also with this POC. It's quite basic, and we started off with this. We got a lot of feedback, and we iteratively added new features and improved on the interface. Then we kind of moved further to a more internal MVP. We extended the space of the use cases that we are covering, added more features within the tool. We always, as I said, we always thought of the use case that we are looking at. However, we already had in mind that this is something we want to build for more general use cases. So we always start with the functions that are important for us at this stage. We always build them in a way that they can be generalized to other use cases as well. And we added a stable deployment here. So beforehand, we kind of had this local setup where we could somehow, there were some sharing links where we could access the local deployment of our developer, but then we actually deployed this whole thing to make it more easy to access it every day. And then now we're actually already in the phase of rollout and enablement, so we released the tool to a broader public, to a broader audience, like within Bubble, we had some sessions to onboard users to better explain what the tool offers and enable them to realise their own use cases, but we also still continue supporting them if there are questions and also always collect feedback to find new ways to support those use cases, functionalities that we could add and broaden the tool and make it more useful for everyone. So this is what we went through, and it also kind of changed the way we generate content and what kind of functionalities we can offer within each step. So what we usually start off with is the prompt generation for the use case that we're looking at. What we have as features is a prompt library that is going to be accessed for everyone. They can generate their own templates. We have some functionalities integrated, which is prompt optimization. So we use AI to optimize the prompt that people start using. So they might start with a really simple prompt, and then we give them kind of suggestions of how they could improve the prompt. We also have the function of condense the prompt to reduce cost. I think nowadays it's not as important anymore, but we also have this function at TIER. And I think what is really, really nice is a kind of dynamic variable selection. So we have a connection to bubble data so they can automatically choose certain placeholders and integrate them into the prompt. This also allows for scaling quite a lot and helps the content creation process thereby. Then in Next Step, we actually generate the content. There's some ways where you can choose different formats, and we also integrate constitutional AI model reflection capabilities within the step, so there's actually a way to evaluate on the one hand, and we integrate our own Babel principles here, so it actually can evaluate the content that was generated. And as Hector already mentioned, we have really a strong emphasis on the quality of the data, of the content that was generated, and have some really strong also emphasis on how the content should be phrased, what kind of it should be really inclusive, diverse. So that's something that we can test here and also modify within the step. And then this is where the human in the loop is more strong and integrated. So there's a feedback loop where the content creator can give explicit or implicit feedback by editing, and then we can go back and loop back to the prompt generation and use this feedback to optimize the prompt that was initially used. Then the second last step is the content transformation. As Hector mentioned, oftentimes we need localized content, meaning translated content from the initial content that we produce because we offer the contents to many different languages. And we also have some specific bubble formats that would be used to integrate them into the bubble systems. And then last but not least, we have the content saving. We're currently working on that. But you can have a report of everything you did there. But in the future, we also want to integrate it more to the content management system so you can directly upload it to those systems. And, yeah, there's still the human loop is an integral part of this process. It's not always linear. So there might be, of course, there might be loops going back and forth between those. And you can also start at different steps. So maybe you have some, and this is some of the use cases that we already have. There might be content that was already produced. And maybe you want to now have a check whether it actually maybe there are some kind of guidelines that wouldn't be fulfilled in this case. And so we can also test this using AI. Yeah, here's a quick overview again for all the features that we have. So a prompt library. We have this AI-aided prompt engineering. We also have safety and compliance as an important part here. We have output formatting and then finally the upload to the bubble and content management systems. And, yeah, so now it was a lot of theory and walking you through. And, of course, I guess you would be interested how it looks like in, oh, well, yeah, first the tech stack. Of course, it's really important. It's quite a simple setup. We use Blankchain and Python as a programming language, obviously. Gradio is the interface the user can interact with. And a nice thing about Gradio is that it automatically creates API endpoints for all the functionalities that we are building. so it's actually quite easy to also programmatically access the features that we are building. It's also linked to our content management systems. We deployed it using AWS instance, and we are using OpenAI, GPT, but of course we also build it in a way that is quite modular so you can easily exchange the LLMs also, the LLM that's sitting behind. For now it's GPT, but that's how the tech stack looks like. And yeah, so now I would like you to show the demo. And Pascal, who is the main developer, is presenting it to you. He unfortunately couldn't be here, so he's still part of this, and he will give you a quick intro to the tool. I hope the setup works now.
+
+**Speaker 3** _[14:23]_
+
+Hi, my name is Pascal and I'm the developer of this tool. I have the pleasure to show to you now some of its features. So specifically, I'm going to show you how to create with it language learning dialogues in a scalable and personalized manner. So for example, a dialogue like this one, you don't have to read it now entirely. It's just to give you an idea. and specifically I'm going to guide you through some of the content generation stages not all of the ones we have seen in the presentation but a selection so we will start with a prompt library which is a collection of all the prompts we have where we are going to select one prompt for language learning dialogues we will then or the prompt template we will then ingest data in prompt template in the prompt generation stage in order to generate a prompt and also optimize it and then we will use this prompt and feed it to the generative ai in order to generate content and finally in the last stage it's for the content creators to make use of their expertise and creativity to revise the generated content. And also we're using AI to evaluate itself and evaluate the content, which can then serve as basis for the content creators again to give them some evaluations already. And we can also use this as constructive feedback to also revise the initial prompt templates. So let's start with the prompt library. As I've already mentioned, it's a collection of predefined prompt templates that quickly allow us to solve tasks using the power of LLMs. For this demonstration I have only included a single one here and as you can guess it's for creating language learning dialogues. So the most important part of the prompt card is the template and this is the one that we are going to select now. and you can see here that automatically for all the variables we have in the prompt template a corresponding set of widgets appeared and this is now the power of those prompt templates that we can actually ingest data into them so that we can in a scalable way we can generate customized prompts for different types of input and in this case we assume that we are a German student who wants to learn American English it's the proficiency level is A1 so it's a beginner and let's say in those dialogues we want to learn how to communicate when we are meeting people so we select this one and as a topic let's say not something boring but we are talking about the best programming language in the world and finally we select a number of so the maximum number of words we want in the dialog we can then click on generate prompt and I give you a few seconds to read through it. All right. If you're familiar with prompt engineering, you may realize that this prompt could be improved. Yeah. And yeah, it's not perfect already. So we have a button for this actually. So we can let the AI do the heavy lifting for us and optimize the prompt template itself. You can see that, for example, it starts with as an expert in language education. This is one of the several strategies in prompt engineering. So we let the AI take on a role, usually an expert, and this usually then also leads to better results. Also, it's much more structured we have concrete instructions and we have an example so we have a much better prompt template and here you can see the changes or the suggested changes made by the AI and we are now in charge so we can still decide do we accept them or decline them so it's always important there's always a human in the loop and we always have the last say so in this case I will just assume that I'm happy with it and accept it. And so we can regenerate the prompt. And here we can see it already looks much better structured. And from experience and research, we know it will lead to better content. So we can now take this new prompt template and go to the content generation stage. And yeah, one more feature that I want to present to you is that we can not only not only generate the content, but we can then automatically after the content was generated let the AI evaluate it so that we are getting an evaluation report that we can use as a basis to have some idea if the content needs to be revised. For this demonstration I have included two evaluation criteria inclusion and diversity which I will select so we want to identify any biases and prompt performance where we want the AI to evaluate how well the generated content aligns with what we intended in the prompt. So I'm going ahead and start generating the content. You can see it starts with creating the content and as soon as it's finished it will then evaluate it for us. Alright the content was created. In this case it looks fine like this and we can see it now went ahead and it starts evaluating inclusion and diversity and afterwards it's going to evaluate the prompt performance so in the meantime we can read through it and we can already see i think it's the best so it seems to be correct python is great so in my opinion already i think it's it's perfect but we can we can wait and see what the ai says you can also see we we said the proficiency level was a1 so it's actually very simple so simple words simple word structure um yeah but let's take a look so here we have now this report and actually it's also not that surprising because the dialogue is very short there was not much room to to do any harm so it didn't find any any biases in in that case and regarding the prompt performance uh from a rating it's from one to five almost everything looks quite good but apparently it could be more creative. So this is one thing we can keep in mind now. It has also some suggestions for improvement. Usually I would take now my time or the content creator and thoroughly read through it and form my own opinion. Again due to time constraints I would just assume that it's correct and that I have the same opinion and so I can now go to the next stage and to the post editing stage here the content creator can revise the content using the expertise and creativity he or she has but what we can also do is that we can look again at the feedback and here it was already converted into a more actionable and concrete feedback so evaluation report was converted into that and we can now do something else instead of creating the content itself we can again leverage the ai and ask it to incorporate this feedback and use it in order to optimize optimize the initial prompt template um let's see one maybe maybe yeah we can also add our own feedback there and it will also be included. Let's maybe only select one. We remember the creativity only had three points so let's only focus on this one feedback and we ask it now to include more creative aspects. So I go ahead again and our hope is now that it will revise the initial prompt template and incorporate this feedback so there should be a new sentence which maybe asks specifically for more creative content in this very simple example and then the ideas that we use this new prompt template again generate content and hopefully improved on the score regarding creativity and yeah we can go on with this iterative process and always have a human in the loop until we are finally happy with the results and actually I guess I will finish the demonstration here thank you for your attention and enjoy the rest of the presentation at the best conference in the world
+
+**Speaker 2** _[24:10]_
+
+Yeah, so as you have seen, there are plenty of advancements that this type of technology can bring into the language content creation. Nonetheless, there are still several challenges that we have to face. The first part that goes a little bit beyond the technological aspect is trust. So, creating trust with the content creators that AI is not really a threat, but something that can support them in the work that they are doing in order to make it more robust, more scalable, and to allow them to focus their attention on what brings the highest impact for learners. Another challenge that we have faced is given the nature of Babbel's content, we have audio scripts, live classes or live tutoring sessions, the self-study app, other types of audio experiences and conversations. So it's a heterogeneous nature in terms of the content. So given this, it becomes a little bit challenging to bring them into a structured and unified data frame. So something that we started working on is first structuring that part of the content and make it easier for a model to ingest this data. Also, so that the content and the output that we get is more in line with the context that we are facing. And as you have seen, we still have several parts of the process that still rely on human review and annotation. And as we prepare for scaling the feature and the system itself, we're still facing the challenge of output evaluation. So this is something that we will tackle in the near future. But something that we have also seen is some learnings, and the learnings is to focus on the things that you can start delivering value first and, as Lea mentioned, reduce the risk of the deliverables and the exposure that you can get by presenting wrong content to users or content that doesn't go in line with the reputation of Babel. Also another thing that we have learned is the importance of the existing content and the data that we have about everything that we have deployed for our users. So leveraging this content data is super important, again, to make the model aware of the specific context that they are addressing and to make it relevant for the communicative situation that our users are facing. And yeah, also, despite of the advancements and how sophisticated the systems have become, it is super relevant to still keep that human expertise, to enhance the content, to adjust it, but also to keep it relevant to the cultural aspects that language inherently has. So yeah, that's in a nutshell what we have presented to you, thanks for your attention.
+
+**Speaker 3** _[28:49]_
+
+Thanks so much. Do you have questions? Anyone with questions?
+
+**Speaker 1** _[28:57]_
+
+I'll stop you.
+
+**Speaker 3** _[29:00]_
+
+Great, thank you for this talk.
+
+**Speaker 2** _[29:01]_
+
+talk, I can relate.
+
+**Speaker 3** _[29:02]_
+
+I can relate to much of this.
+
+**Speaker 2** _[29:03]_
+
+much of this having built RAG pipelines myself.
+
+**Speaker 3** _[29:04]_
+
+pipelines myself.
+
+**Speaker 2** _[29:06]_
+
+I wanted to ask a little bit about AI trust within the organization. How does the static content team respond?
+
+**Speaker 3** _[29:14]_
+
+team, respond to what you feel.
+
+**Speaker 2** _[29:15]_
+
+to what you've built in the dynamic content team.
+
+**Speaker 3** _[29:16]_
+
+dynamic content team.
+
+**Speaker 1** _[29:20]_
+
+Yes, so there definitely is a challenge, and I think there's different sides also within this team, actually. So some of them are really skeptical, and we're like, okay, there might be nice from what we can see outside, but for Bubble, it's not the way to go, and they never will be able to do as good as we do. Then there's the other side where they're more curious about it. they would be more trying and I think there's also partially there's a mindset that while there are competitors as well they have been doing this for longer already there is and they see it more as a chance and I think on the one hand the strategy is a little bit to get those people who are open on board to really also make this not our tool but like what the tool of our team but from the whole company and something that enables them to do things and where like to kind of do this kind of combination of humans and AI to see where humans are still needed and are really good at, which is more like this kind of conceptual thing, this learning science part where they really see how it fits together. But then also do some kind of hand over some of the stuff to AI where they really shine. So when it goes around scaling, generating a lot of things, and so they try to focus more. But of course, you're right that there's still, and I think there still are, skeptical people about that. And I think in the one hand, it has been kind of a management decision as well to go this route. I think there were some goals to really be able to use this technology to update content, to generate new content with that. And so therefore, we are trying to have the conversations to showcase what we worked. It's not magic. It's also, it's, but of course, it's hard. and you won't be able to convince everyone, I think.
+
+**Speaker 2** _[31:14]_
+
+Yeah, no, and I think it's a good question because it also falls back to what Leo was mentioning about displaying the value with a very low risk task. So in the sense we started with, I don't know, 1,000, 2,000 items to generate for a new feature that would have been most likely possible to be done by a human. but it would have been time-consuming as I illustrated in the workflow that we have, right? So it has to go through several revision and if you can reduce the workload and still keep the standards and display to the same people that are the ultimate judges of the sanity of the content, I think that's something that can not completely eliminate because I think it's also healthy to have some skepticism, but to definitely be a little bit more receptive and understand also the shortcomings and the things that we'll still have to stay attentive to.
+
+**Speaker 3** _[32:26]_
+
+Yeah, I also have a question about language learning. So from my point of view, it's usually easy for general language learning to start with the basics and then learn specifics. But I can understand that for people it's usually easier when they have a motivation, like a passion for a hobby or something, and they want to attend a meetup or something to specify, hey, I'm interested in synthesizers, whatever, and sports, and I want to attend a meetup in that particular language. Can you graph me a language course for that? Not to learn everything and then go to the specifics of that passionate project, but directly incorporate it to you learn the basics with that passionate where you already have some knowledge behind it.
+
+**Speaker 2** _[33:24]_
+
+Yeah, absolutely, and I think this is critical for language learning, and I think this technology can enable that, right? And it doesn't always have to start from ground zero. There is a lot of content that we may have about synthesizers and, I don't know, skiing or, sorry, I don't know, whatever your passion is. but maybe then you are interested in putting it into a very specific dialogue, right? So maybe you can take a collection of words or phrases that will be useful for your meetup and put it in the context that you as a user or as an end user imagines they would face, right? So then in the example that Pascal gave about Python is like, yeah, maybe I'm just learning English, but I want to still interact with a few of the attendees here, so I'm going to create a little dialogue that allows me to engage in that situation. Yeah, I think that's one of the really cool parts because you can leverage those interests and that knowledge of the world that people already have to make their language journey more successful. Hi, I had a...
+
+**Speaker 3** _[34:50]_
+
+Two question
+
+**Speaker 2** _[34:52]_
+
+connected somehow, so
+
+**Speaker 3** _[34:53]_
+
+So the first one is we saw a lot of like human and AI
+
+**Speaker 2** _[34:56]_
+
+and AI.
+
+**Speaker 3** _[34:57]_
+
+communication, let's say, on how
+
+**Speaker 2** _[34:58]_
+
+let's say on how what to choose and when to choose do you have like some other metrics that you chose in the different steps from the prompt generation something like rouge or blue or any of these metrics that are really like nlp related or and then the second question is
+
+**Speaker 3** _[35:14]_
+
+When the human is changed,
+
+**Speaker 2** _[35:15]_
+
+human is changing no I don't like this answer I want to change it I are you saving this
+
+**Speaker 3** _[35:20]_
+
+transformation may be reused for
+
+**Speaker 2** _[35:21]_
+
+we use it for training in the future of the model.
+
+**Speaker 3** _[35:22]_
+
+training. of the model that
+
+**Speaker 2** _[35:24]_
+
+but you do less of that.
+
+**Speaker 1** _[35:26]_
+
+Yeah, that's it. We haven't really dived so much into the measurement yet. As you said, evolution is hard. Like in the very beginning of our, we did a lot of experiments also for the prompt and how much was edited and kind of stored as results. However, it was like we found it hard sometimes because, for example, we did some experiment like that for the localization, so it was translated to other languages. And then we kind of measured how often we had freelancers to kind of cross-check this, how often they would edit it. And it was good measures to measure this thing, but it's hard to really pin down, was this really the initial translation? Was it really bad, or is it more like taste of this particular human? But you're definitely right that this is something we are also having on our roadmap to kind of integrate this more. We are not really, yeah, we don't really have it integrated in the tool yet to see kind of how many things are changed. I think in the very beginning, where where we had the item generation at scale. I think we did that a lot.
+
+**Speaker 2** _[36:28]_
+
+We did have one, so for the first feature that we developed, it was interesting for us to see because we're presenting it to the experts and we were facing this skepticism of this, which I think is pretty healthy, and it's like, okay, can you take a look? This is the topic that we're going to develop, this is the context behind it, and this would be the learning items that the user would face. So for that, I don't have them from the top of my head, but it was pretty much over 85% of acceptance rate of the editor. And yes, I think that what Lea mentioned is really important. There are certain traditional NLP metrics that might be useful to observe, but sometimes they don't always address, because something can be correct from the NLP perspective, but maybe it might not be culturally relevant, and in that situation you would discard that item because it doesn't provide enough value, enough educational value. So it's not only the language part, but also the educational aspect that we have to take into account hi I have a question here it's also related to what you are just talking about how
+
+**Speaker 3** _[37:56]_
+
+How exactly do you have a mechanism?
+
+**Speaker 2** _[37:57]_
+
+have a mechanism to deal with hallucinations that the LLM output might have.
+
+**Speaker 3** _[38:01]_
+
+might have or is the
+
+**Speaker 2** _[38:02]_
+
+or is the human loop that actually takes care of it? And the second part of the question is that, do you also use your own data as a knowledge base for the LLM?
+
+**Speaker 1** _[38:13]_
+
+So I think actually hallucinations weren't like, I think it always depends on the use case what exactly you have to do. But I think what we found eliminated the hallucinations quite a lot was actually putting in a bubble proprietary data already to give a good context. So we, in the very beginning for this particular use case, we were experimenting a lot with prompt engineering and phrasing and giving more instructions. but actually what changed the quality immensely was really adding already existing learning items to the examples. So I think after that, there were not really much of hallucinations going on anymore. But of course, that's also something we're afraid of and which we really want to make sure because Babbel is really known for the high quality content, where the sentences really are targeted that for this particular learning situation. So that's something we wouldn't put it out there. So we always have the human in the loop for now, at least, in our use cases. But actually, since then, I think the hallucinations were quite limited. But also, we have been working on really smaller. I think it generally really depends on the use case, whether you want to craft a whole lesson or whether you just work on small items, learning items, then it's maybe less of a problem.
+
+**Speaker 2** _[39:33]_
+
+Yeah, also something that we realized at this early stages was, as I mentioned, that having some of the content fed could incredibly reduce the prompt that you were implementing. So I think that at the first instance, we had, I don't know how many lines. It was a very long prompt, but it was still not rendering the results that we were expecting. So not that it was incorrect or hallucinative, but it was definitely not at the quality that we were expecting. and I had to deal with that myself and it's like okay we have all this content and I just reduced the prompt to I think five lines and just fed around 16 to 30 examples of the output that I was expecting and and that improved like that that's what led us to this 85 80 something percent of acceptance by the In that sense, the human is the final judge.
+
+**Speaker 3** _[40:44]_
+
+Okay, we have only five minutes more so Yeah, thank you very much for was really interesting. I Would like to know if you see this also the first step to go into a really fully dynamic directions that I as a user Get directly generated content for me on my learning state
+
+**Speaker 2** _[41:03]_
+
+Stay, stay.
+
+**Speaker 3** _[41:03]_
+
+state and So without a human group of course much more risky, but will we get there and when and I work
+
+**Speaker 1** _[41:12]_
+
+I guess this is the idea to kind of really test the limitations and when we push it. Right now we work more in this kind of pre-generation of things. However, we have another team which is working on a situation where you can speak directly to an AI about certain communicative situations. So this is something Barbara is already experimenting with. I think there's always also this thought about individual generation of contents. think we are currently kind of testing this balance and sometimes it makes also sense maybe like at least My perspective would be that maybe it's not really meaningful to really just generate it for you But maybe for your preferences that you might share with other like like more like cluster based Generation and more personalized based on certain preference that you're Stating but I think that's something we want to test out actually and go in this direction. That's exactly we were working towards to
+
+**Speaker 3** _[42:10]_
+
+I also have a question. So one question is, everything is based in English, like
+
+**Speaker 1** _[42:15]_
+
+in English like most of the LLMs.
+
+**Speaker 3** _[42:15]_
+
+most of the LLMs are based in English, and you are dealing with languages.
+
+**Speaker 2** _[42:19]_
+
+Can the template also be in?
+
+**Speaker 3** _[42:20]_
+
+also be in German.
+
+**Speaker 2** _[42:21]_
+
+And how do you really deal with those kind of, like, when you have the template in German?
+
+**Speaker 1** _[42:25]_
+
+template in German because
+
+**Speaker 3** _[42:26]_
+
+And that's one question. And the second question is,
+
+**Speaker 2** _[42:29]_
+
+Are you I'm sure
+
+**Speaker 3** _[42:30]_
+
+I'm sure you must have tried RAG, which is retrieval.
+
+**Speaker 2** _[42:33]_
+
+retriever retriever men
+
+**Speaker 3** _[42:35]_
+
+or you use Phyton.
+
+**Speaker 1** _[42:36]_
+
+Fight on.
+
+**Speaker 2** _[42:36]_
+
+which was more...
+
+**Speaker 3** _[42:39]_
+
+what accrued it, which was better.
+
+**Speaker 2** _[42:41]_
+
+If it was better, you didn't fight so much.
+
+**Speaker 3** _[42:42]_
+
+You didn't fight under us.
+
+**Speaker 2** _[42:43]_
+
+or use ROG, or how do you feed your content? Or do you feed your content using also the prompt, or how do you do that? Yeah, so for the content in other languages, I dealt with generating German content, and the prompt was still in English. But this is where the previous output or the previous content that we had was very, very useful because it kind of grounded the content. It was not racked. It was a little bit more static and hard-coded, the approach. But, yeah, I think for our use case, it provided the results we were expecting, and also for our stakeholders, it demonstrated that we could scale certain experiences without that much of human input and reducing the risk substantially. Thank you.
+
+**Speaker 3** _[43:43]_
+
+Okay, we have only two minutes. Might be a question for Pascal, sorry.
+
+**Speaker 2** _[43:47]_
+
+Sorry, how did you find langchain versus other similar?
+
+**Speaker 3** _[43:51]_
+
+similar RAG library.
+
+**Speaker 2** _[43:53]_
+
+libraries
+
+**Speaker 1** _[43:54]_
+
+I think we haven't really tested any other, like we started off with long chain and I think for now also the rack part was, like we have, it's limited in what we have. It's more, but it's more like, it's not really the issue with the tech, but it's more the issue of our content management systems actually. So I think that's what you were pointing towards, so that's something we're really struggling with is to really get the content in a single source of truth where you can really extract it more easily. I think that's something, and that's also maybe a little bit towards the question about RAG and fine-tuning. So RAG actually we have more like doing the in-context prompting, which worked quite well for us. However, of course, there are also RAG use cases that we would love to target next. Fine-tuning would be a vision, but I'm also like, there's also the question how much better would it get with fine-tuning versus really directed in-context or like RAG prompting. So yeah. Yeah. I think we haven't really talked any other frameworks.
+
+**Speaker 2** _[44:54]_
+
+frameworks no no I I started using langchain for and yeah I think for it works like something out of the out of the box it works pretty well for our use cases and
+
+**Speaker 3** _[45:08]_
+
+Okay, thank you everyone for this section.
+
+**Speaker 2** _[45:11]_
+
+I really enjoyed it
+
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -114,3 +114,158 @@ supporting_material_url: https://mathspp.com/talks
 slides_link: https://snappify.com/view/52e25a1b-e890-4300-8a34-a1c262cb0f27
 ---
 social_card_image: /static/media/social/talks/ZMC9FU.png
+---
+transcript:
+
+**Speaker 1** _[00:06]_
+
+Thank you for the introduction. Zoran and I, we are coming from Zagreb, capital of Croatia. We are working on Ruder Bošković Institute. Zoran is a physicist, I am a chemist. And here we are now at the PyCon DE and PyData Berlin. First of all, let me tell you something about proteins. Proteins are very large biomolecules. All living organisms have them. They have a variety of functions. They catalyze reactions and stuff. And they are very, very big compared to, you can see here on the video, small red dots. These are water molecules. And you can see how one protein can be big when you look at the water molecule and the protein itself. The protein of our interest is purine nucleoside phosphorylase. This is a protein that is involved in the purine degradation reactions. And it can be found in a form of trimer or dimer. And this means that in lower organisms, it combines six identical units in hexameric form. And in the higher organisms, it forms trimeric, so three identical units form a molecule. And we chose a particular organism to study, so we chose Helicobacter pylori. This bacteria infects almost 50% of the world's population, and it is a very dangerous pathogen. and a protein from a PMP from helicobacter pylori is hexameric and you can see here on the video that is formed from six identical units and what we are studying actually is the conformational change you will see in in a second so you can see here the active site one active site of this protein and how the substrates are entering the active site and when substrate enter the active site the conformational change happens and we called it we called it opening or closing the active site you can see the difference between the between the confirmations in open and closed state so Zorana and I we are working we are doing crystallography we are crystallographers. And what is crystallography? It is a study of structures of molecules and biomolecules that can be solved from crystals. From small molecules, for example, like salt, sugar, you can imagine that these are crystals, but proteins also crystallize. And with crystallography we use x-rays to pulsate this x-rays onto the crystals and we get like this diffraction patterns from which we get structures by the step between the diffraction pattern and the structure is like all computational stuff and we eventually get structures of the proteins and to recall the title of our lecture, we are working on the dynamics of this protein, and we needed to do molecular dynamics simulations. So we performed all sorts of simulations on this particular protein, and you can see here on the video how one snapshot of this simulation looks and now I will give the mic to Zoran and he will continue
+
+**Speaker 2** _[04:18]_
+
+Hi, guys. I'm very excited to be at my first PyCon conference. We're scientists, but I hope I give you a glimpse of what we do and how we use Python to reveal how these big molecules move in time. So as Boris said, this is just how we imagine or we simulate in the computer because the picture we get from the X-ray crystallography is just one static picture. So we get a very, very high atomic resolution of how these molecules look, but it is just frozen in time. So in order to understand how these molecules move, which is essential for understanding of their function, you need to do the MD simulations. And these MD simulations, as I will show you in a moment, generate incredible amounts of data. So for a typical simulation that simulates one microsecond of protein motion, actually we have to do 10 days on a modern GPU. So it's really, really demanding on computation time. And it also generates enormous amounts of data. So one trajectory, as we call it, one simulation is like half a terabyte of data. and it is composed of typically 400,000 steps of each 2.5 femtoseconds. So it's a really, really short time, but these molecules move very fast, and this is the timescale we have to look into. So how do we deal with this sort of massive amounts of data? How do we extract the information that is of interest? This is what will be the topic of the next slides. So one way to follow how the molecule changes its shape is to follow these two angles, which are called phi and psi. And these are actually very famous ones, and this was invented back in the 50s by Ramachandran. And this is a so-called Ramachandran plot. So each amino acid has just two neighbors, it's connected with them, and these two angles can show us what's their mutual position, let's say like that. And if the angles change, you just follow how the whole molecule changes. So that's the whole point. And usually if you just look at the static, one static structure, It gives you one dot in this phi-psi plane that just depicts where this molecule is in this space, let's say. And so traditionally, these diagrams were used to give you just one snapshot of one picture of the conformation of your molecule in time. So, and these angles don't just come at any point, so there are these areas which are allowed, these pink ones, and there are some areas that are like extended or generously allowed, and there are some areas which are never populated. This is where these dots don't ever come. So this is these empty areas. So our idea was just to use this kind of plot, but to plot it for each amino acid in time. So this is like to plot 400,000 points on one plot. Well, already this is kind of demanding, but it just depends on how many amino acids you have. It's like from anywhere from 20 to a few thousand amino acids is one protein. So this could even be done just by using these kinds of plots. But we wanted to do the time-dependent plots for each amino acid. So this is what I will show you. And what are actually the pitfalls of plotting this amount of data? If you just throw a few thousand points, then you have all sorts of problems of how do you plot this and this is the first actually time the Python actually helped us so this is all kinds of problems that you can bump into by trying to plot these many points so if you use spheres then you get these overlaps you don't see anything then you have the oversaturation undersampling, undersaturation underutilized dynamic range and non-uniform column mapping. So these are all the problems that you can come across. But actually, one library that we use that solves all of these problems right off the bat is DataShader. So how many of you guys have used DataShader before? Oh, so only a few hands. I'm a bit surprised because you definitely should be. If you have enormous amounts of data, A data shader is like a lifesaver. So what it does is actually it plots as many points as you like. So there's no limit. And it's amazingly fast at doing this. And it uses color mapping to just give you the third dimension. So the points aggregate, and it counts how many points fall into bins. And then this is represented by the color mapping. You'll see in a moment how this actually was used in our case. So we divide the whole trajectory for one amino acid into 10 segments. It could be more or less, but 10 is like a golden number that we used. And then the movement of one amino acid could be represented like this in time. So you see this one is spending its time here, here, here. and then suddenly it just goes into different areas. So it changes its phi and psi angles. And when you combine this into a time gif, then you get this for one analysis. So you see that it's kind of jumping up and down in this phi pipe space. But this is only one. So if you do this for every analysis... Oh, sorry, I shouldn't... I forgot about that. because I tend to wave my hands a lot, so I should be still. So if you do this for every amino acid, this is just six of them, you see that some are actually remaining. Oops, do you see? I pointed this here. So these guys sitting here throughout the whole simulation, this one is jiggling a little bit, this one even more, this one is jumping up and down, these guys are going crazy. So this is something that we saw for the first time using this approach, because it's very difficult to see what's actually happening. But it gets even more exciting. So if you go from one amino acid to all of the amino acids, and this protein happens to have 234 amino acids in just one chain, and then six chains. So you get the picture like this. So this is the whole trajectory, these 500 gigabytes of data compressed into one, let's say, diagram that actually Data Shader provides us. And you see that there are areas where nothing happens. So like this, these are very well behaved, and these are in so-called alpha helical conformation. They are just sitting still. but then we were kind of surprised to see incredible movement of some of them so some guys and we actually at this very moment try to understand why is this what's happening but actually so DataShader was great now actually everything is I just went online and then this This, we made from this, this is just part of the project, but we made it using Django and a web application, and now you can browse all of these amino acids, and if you go here, it will just take you to that amino acid and its movement in time. So we tried to follow when one amino acid is moving and how is this correlated to the movement of all the other amino acids. So you see in a moment, you can just go from one and nothing happens here. And then the next one, just this one happens to be correlated with some amino acids in other chains and it just shows you here. But then you go to the next one and you see that this one is actually like orchestrating like, I don't know. So blue are positively correlated. So there's a positive correlation, and this now shows only the correlations from 0.5 onwards and below minus 0.5 downwards. So the red ones are also very important. And you can now just click on any of them and just kind of browse, and it takes you to the one. So if I go from this one to that one, then I see that both of these are dancing simultaneously. And you can click on this, I cannot see it from here, but I'll probably, okay. So you can click and see actually how these two are now on one GIF. So they are overlapped and a little bit differently correlated. So each one of these figures has like 400,000 points. And now you see how they are jumping together. So now there are hundreds of thousands of these diagrams. So how can we just do this automatically? Obviously, you can browse like this for how long you like, and you will never figure out what's happening. So we needed a way of automatically assigning when these jumps happen. And this is the second time that Python helped us. We used an awesome library from Raptures, from Charles, who is here in the audience, and who we met just before the conference and we didn't know he was coming and we only just before the conference found out that we are actually coming here together. So that's awesome. And this library lets you automatically assign these jumps. And determine the change points. So you see here this change point and change point are automatically assigned by ruptures. So, that's another thing. So, I'm just a little bit difficult to go back here. Where's the mouse? So, I can go back to trajectory. This is the whole trajectory. These are all six chains. So, now you see how they are kind of behaving the same, but not in the same moment. So, this is demanding for us to go. And then we try to do the graph representation of these correlations. So this is for this trajectory. And now you see A, B, C, and D are these chains, and these are approximate positions of these amino acids. And the bigger circles are kind of hubs, or they are colored by the graph centrality. And this is done by another awesome Python package, NetworkX, which we also used. And this now shows how this area of the protein is somehow related to the other ones. But it's still too much information, so we have to figure out how to compress this even more. So back to the presentation. I hope that I oops sorry I clicked again on the so I hope I gave you just a taste of how these three tools I forgot to mention MD analysis which is also the tool written entirely in Python for doing these MD simulations for actually extracting the information from them which we used extensively. So our point is that Python, I don't know any programming language that can actually give you such a broad spectrum of things you can do with it, from programming a web application, a little bit Django, using awesome libraries like Data Shader, MD Analysis, Raptures, and NetworkX, completely different scopes, but everything is there in Python. So we scientists are like, you know, I'm very grateful for the Python community for giving us all this. Actually, the whole project used a much broader range of programs. We used all of these. And actually, on the first day, when the first keynote lecture, I was really surprised. I counted like 15 of the packages that were shown in the first lecture from the non-focus, and I actually put many of them here. So, awesome stuff. The library program is available on GitHub. Actually, we tried to make an acronym, and we were pretty good with it, But we missed the final O. He couldn't figure out how to fit the final avocado in O. So it's actually an acronym for Analysis and Visualization of Correlated Angular Diagrams, O. But this O is kind of disappearing and reflects the fluidity of the avocado diagrams. And with the beautiful picture of the protein crystals, I would like to thank you all for attention and keep up the awesome work.
+
+**Speaker 3** _[19:41]_
+
+Thanks to both of you for the great presentation. We have some questions here. The first one is, how did you determine the required temporal resolution for a realistic simulation?
+
+**Speaker 2** _[19:56]_
+
+I'm not sure that I get it. Could you repeat it how
+
+**Speaker 3** _[19:59]_
+
+How did you determine the required temporal resolution for realistic simulation?
+
+**Speaker 2** _[20:05]_
+
+Ah, that's a good question. Well, we did the simulations. One microsecond is a very, very long time in terms of simulations of these trajectories. They used to be like done in 100 nanoseconds, which is 10 times less. But one microsecond is the kind of range where these changes are happening in the proteins. So there are some changes that are happening much faster, but these conformational changes are happening in this range of microsecond time. So this is what we actually showed, that these amino acids are jumping and staying stable for some time, and then jumping, and there are like one or two jumps per trajectory. So this is kind of a good point. You could try simulating like one millisecond, which will take a thousand times ten days. How many days? Like three years. So if you have time, and then you generate like hundreds of terabytes of data. So it's a trade-off, but luckily we are in the ballpark where we can simulate these kinds of times that are relevant for these changes that we are looking for.
+
+**Speaker 3** _[21:15]_
+
+Also, can you comment on the impact of DeepMind AlphaFold on protein research?
+
+**Speaker 2** _[21:21]_
+
+That's a very good question. DeepMind is going to put us all, crystallographers, out of business, so Yeah, well, there are like 220,000 protein structures deposited in the PDB, so it takes a lot of work to crystallize a protein, solve the structure, and deposit it. And human efforts, like from 60s, 70s, to now managed to get only 200,000 220,000 protein structures. Sorry for the bad numbering. But now AlphaFold, AI using these structures learned how to predict, this is the holy grail of biochemistry, how to predict the structure from the sequence only. And this now generates over 200 million structures. So this is an astronomic, and this is kind of a revolution, a new revolution. These structures are not to be trusted completely, but they are like 90% accurate in many times. So crystallography is at the crossroads now, and we'll see what happens, but there is another problem now, who is going to process all this information. But now we kind of know how proteins look like in all of the kingdom of life, which is an incredible achievement. So, great work from AlphaFold.
+
+**Speaker 3** _[22:55]_
+
+What does the motion of the proteins actually mean?
+
+**Speaker 2** _[22:58]_
+
+Well, proteins move all the time, and this is actually something that is essential for their functioning. So in order to bind small molecules, they have to go like this in order to release. Proteins are, this is biochemistry, I'm a physicist, but if you ask me, as a physicist, biochemistry would never work. It's an incredibly complex thing, and these proteins interact in incredible ways, and it's simply amazing. But they have to move, and this is essential for them.
+
+**Speaker 3** _[23:34]_
+
+Did you try to combine your charts with Bokeh?
+
+**Speaker 2** _[23:37]_
+
+Yeah, yeah, yeah, we use Bokeh. Did I not put it on the, on the, on the, you check out the web and there are some things that are done exactly in Bokeh. Bokeh is also awesome.
+
+**Speaker 3** _[23:50]_
+
+Is there a way to get real observations instead of simulated data?
+
+**Speaker 2** _[23:56]_
+
+For the protein motion, it's really difficult. Not yet. Not yet. So we have to trust these. But these are, you know, well-established methods, and they are only computationally intensive, but they give us much information on how actually these things move.
+
+**Speaker 3** _[24:16]_
+
+Does each frame in the video of the plots then aggregate multiple time steps? It was 400k steps in total seems like a 4k steps in each image 100 times
+
+**Speaker 2** _[24:27]_
+
+times? No, no, no. It's just each image is generated by 40,000 plots. So 400,000 are divided in 10 bins, and then one image is actually 40,000 points, which is impossible to draw without using data shader. So try drawing thousands, and you'll see you already encounter problems let alone 40,000 so big thumbs up for data shader and you guys check it out it's awesome
+
+**Speaker 3** _[25:00]_
+
+Did you get comparable results with different force fields?
+
+**Speaker 2** _[25:05]_
+
+This is actually more Boris's expertise.
+
+**Speaker 1** _[25:09]_
+
+They are not comparable between each other, but they do get same the same results So so we use amber for force field and so we used amber for force field So and all the all of the simulations are done in that so we can compare them in between But if we do get some grommaks or other force field simulations we can't unfortunately Do do the do the a comparison.
+
+**Speaker 3** _[25:41]_
+
+And how much compute did you have available to do all of this?
+
+**Speaker 2** _[25:45]_
+
+We have a machine that we bought from the project and it is one GPU and it can do one simulation in 10 days. But we had access to the computational resources in the high-performance computing center in Zagreb in Croatia and this also gave us a lot of... Because it wouldn't be possible without distributing this to many nodes.
+
+**Speaker 3** _[26:14]_
+
+Why did you plot all points in each plot and not use contour instead before correlating analysis?
+
+**Speaker 2** _[26:22]_
+
+Could have used contour. I don't know how it actually does work in data shader. It probably could be done But I guess the results will be similar if you just contoured it or just use the use the scatterplot
+
+**Speaker 3** _[26:35]_
+
+X-ray crystallography is real-time measurement. It seems better than flyroicin protein. Can you comment on benefits or disadvantages over fluorescent proteins?
+
+**Speaker 2** _[26:47]_
+
+Well, X-ray crystallography is like, I always say, queen of the methods. So it's just a microscope that gives you the atomic resolution. The only unfortunate thing is that you have to use X-rays, and there are no lenses for X-rays. So actually, it's a little-known fact, but more than 30 Nobel Prizes were given related to crystallography, X-ray crystallography. It's something that gives you the unprecedented sharp image on how atoms look like, and there is no microscope. Fluorescent microscopy is like for some special applications, it's nowhere near X-ray crystallography in terms of what they can
+
+**Speaker 3** _[27:24]_
+
+Why did you choose heliobacteri pylori in particular? Did you hope to learn something about pathogen specific?
+
+**Speaker 2** _[27:34]_
+
+I'm not sure if I get that one.
+
+**Speaker 3** _[27:38]_
+
+I will go to the next one. Some comment. Heya, great talk. Thanks. Are the gifts you showed pre-rendered or created on demand?
+
+**Speaker 2** _[27:51]_
+
+Actually, we render each GIF with DataShader and then use Convert, ImageMagick sub-package, Convert to just merge them into one GIF. And then everything is put on the server and connected in the Postgres database which calculates all these correlations and then you can browse them all and everything is merged up together in Django.
+
+**Speaker 3** _[28:18]_
+
+Did you use Python for the simulations?
+
+**Speaker 2** _[28:21]_
+
+No, for the simulations, no. These are two packages that are Amber and Gromacs, which are written in, I think, C or C++. But Python was, from that point onwards, it's all Python. And the analysis, actually, is written in Python.
+
+**Speaker 3** _[28:38]_
+
+Can every protein crystallize
+
+**Speaker 2** _[28:40]_
+
+Oh, that's an awesome question. No. It is the bottleneck. So to crystallize the protein, you need to find the conditions into which this protein wants to crystallize, makes these crystals. And this is like a horribly difficult step. And it's a trial and error. You cannot know upfront. You have to have very pure protein and try hundreds of conditions in so-called screens and just pray. I mean, there are some, it's more alchemy than science.
+
+**Speaker 3** _[29:15]_
+
+Did you try new 4J for graphic visualizations?
+
+**Speaker 2** _[29:19]_
+
+Neo4j, yeah, we tried that, we actually wanted to do graph databases, to use graph databases instead of Postgres, a relational one, and we didn't get too far, but we have to try it again because these graph databases have a large advantage when you want to follow something that happens on many relations hops like friend of a friend of a friend of friend you just choke a relational database when you try to do that in relational database but neo4j is great for that so we'll continue to do that
+
+**Speaker 3** _[30:00]_
+
+I'm sorry, there are so many questions coming in right now. I think you have to answer them on Discord.
+
+**Speaker 2** _[30:06]_
+
+No problem. We will be here for the rest of the day and thank you guys for an awesome conference and we'll be happy to answer any questions you have afterwards.
+
+---
+transcript_status: auto
+---
+transcript_language: en
