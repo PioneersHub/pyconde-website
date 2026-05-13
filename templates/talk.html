@@ -19,12 +19,15 @@
 {%- set talks_root = '/archive/' ~ archive_year ~ '/talks' if is_archive else '/talks' -%}
 {# Resolve the speakers who actually presented this talk. We iterate the
    edition's speaker index and pick the ones whose `talks` list includes
-   this talk's pretalx code. #}
+   this talk's slug. Since the migration to slug-canonical URLs,
+   speakers reference talks by slug (= talk folder name = this._id),
+   not by Pretalx code. #}
 {%- set speakers_index = site.get(speakers_root) -%}
 {%- set my_speakers = [] -%}
+{%- set this_ref = this._id -%}
 {%- if speakers_index -%}
   {%- for sp in speakers_index.children -%}
-    {%- if this.code in (sp.talks or []) -%}
+    {%- if this_ref in (sp.talks or []) or this.code in (sp.talks or []) -%}
       {%- set _ = my_speakers.append(sp) -%}
     {%- endif -%}
   {%- endfor -%}
@@ -44,10 +47,16 @@
   "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
   "eventStatus": "https://schema.org/{{ event_status }}",
   "inLanguage": "en",
+  {%- set tz = branding['dates']['tz_offset'] or '+02:00' -%}
+  {%- macro iso(date, time) -%}
+    {%- if date and time -%}{{ date }}T{{ time }}{% if time|length == 5 %}:00{% endif %}{{ tz }}
+    {%- elif date -%}{{ date }}
+    {%- endif -%}
+  {%- endmacro -%}
   {%- if this.slot_date %}
-  "startDate": "{{ this.slot_date }}{% if this.start_time %}T{{ this.start_time }}{% endif %}",
+  "startDate": "{{ iso(this.slot_date, this.start_time)|trim }}",
   {%- if this.end_time %}
-  "endDate": "{{ this.slot_date }}T{{ this.end_time }}",
+  "endDate": "{{ iso(this.slot_date, this.end_time)|trim }}",
   {%- endif %}
   {%- endif %}
   "superEvent": { "@id": "{{ super_event_id }}" },

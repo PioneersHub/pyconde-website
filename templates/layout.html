@@ -35,8 +35,8 @@
 
   <meta name="description" content="{{ page_description }}">
 
-  <meta property="og:title"
-    content="{% if this.meta_title %}{{ this.meta_title }}{% else %}{{ this.title }}{% endif %}">
+  {%- set page_title = this.meta_title or this.title or this.name or self.title()|striptags -%}
+  <meta property="og:title" content="{{ page_title }}">
 
   {% if this.social_card_image %}{% set turl = this.social_card_image %}
   <meta name="image" property="og:image:secure_url" content="{{ site.config.PROJECT.url }}{{ turl|url }}">
@@ -61,8 +61,7 @@
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="{{ branding['social']['twitter_handle'] }}">
-  <meta name="twitter:title"
-    content="{% if this.meta_twitter_title %}{{ this.meta_twitter_title }}{% else %}{{ this.title }}{% endif %}">
+  <meta name="twitter:title" content="{{ this.meta_twitter_title or page_title }}">
   <meta name="twitter:description" content="{{ page_description }}">
   {% if this.social_card_image %}
   <meta name="twitter:image" content="{{ site.config.PROJECT.url }}{{ this.social_card_image|url }}">
@@ -85,7 +84,7 @@
       "@type": "WebSite",
       "@id": "{{ branding['canonical_host'] }}/#website",
       "url": "{{ branding['canonical_host'] }}/",
-      "name": "{{ site.config.PROJECT.name }}",
+      "name": {{ site.config.PROJECT.name|tojson }},
       "publisher": { "@id": "{{ branding['canonical_host'] }}/#organization" },
       "inLanguage": "en"
     },
@@ -93,7 +92,7 @@
       "@context": "https://schema.org",
       "@type": "Organization",
       "@id": "{{ branding['canonical_host'] }}/#organization",
-      "name": "{{ branding['organization']['name'] }}",
+      "name": {{ branding['organization']['name']|tojson }},
       "url": "{{ branding['organization']['url'] }}",
       "sameAs": [
         "{{ branding['social']['twitter_url'] }}",
@@ -107,6 +106,26 @@
   ]
   </script>
   {% endblock %}
+
+  {# Sitelinks Search Box — emitted on every page outside the
+     structured_data block so page-level overrides cannot remove it.
+     Google requires this on the WebSite root to surface in SERP. #}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": "{{ branding['canonical_host'] }}/#website",
+    "url": "{{ branding['canonical_host'] }}/",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "{{ branding['canonical_host'] }}/search/?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
 
   {% block header %}
   {% endblock %}
