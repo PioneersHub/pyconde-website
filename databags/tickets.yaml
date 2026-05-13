@@ -1,0 +1,57 @@
+# Ticket pricing for the current edition.
+#
+# Single source of truth for the conference-pass Offer / AggregateOffer
+# in schema.org JSON-LD. Templates pull from here so Google Rich Results
+# can show price hints in the SERP and so AI search engines have a
+# verifiable price assertion.
+#
+# Prices below are the public conference passes only; sponsor / partner
+# passes, financial-aid recipients, and masterclass / sprint tickets are
+# not modelled here.
+#
+# Update on each pricing tier change. The `lowPrice` and `highPrice` of
+# the AggregateOffer should bracket every public retail tier currently
+# on sale at https://2026.pycon.de/buy-ticket/.
+
+currency: EUR
+
+# Date the public sale window closes — conference last day for the
+# conference pass; templates use it as Offer.validThrough.
+valid_through: "2026-04-16"
+
+# Switch point between Early-Bird and Late-Bird. Informational only;
+# AggregateOffer doesn't have per-tier dates so this just helps humans
+# reading the YAML.
+late_bird_from: "2026-02-12"
+
+# Tier list — order is preserved in rendered output. `kind` informs
+# whether a tier counts toward the public-retail bracket.
+tiers:
+  - id: 3day-standard-early
+    kind: public
+    name: "Conference Pass (3-day, Standard)"
+    period: "Early Bird"
+    price: 690
+  - id: 3day-standard-late
+    kind: public
+    name: "Conference Pass (3-day, Standard)"
+    period: "Late Bird"
+    price: 890
+  - id: 1day-individual-early
+    kind: public
+    name: "Conference Pass (1-day, Individual)"
+    period: "Early Bird"
+    price: 400
+  - id: 1day-individual-late
+    kind: public
+    name: "Conference Pass (1-day, Individual)"
+    period: "Late Bird"
+    price: 550
+
+# AggregateOffer hints — explicit so the template doesn't have to
+# min/max-derive from the tier list. Update together when adjusting
+# tiers above.
+aggregate:
+  low_price: 400
+  high_price: 890
+  offer_count: 4

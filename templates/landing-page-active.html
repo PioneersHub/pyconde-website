@@ -58,12 +58,27 @@
       }
     },
     "organizer": { "@id": "{{ branding['canonical_host'] }}/#organization" },
+    {%- set tickets = bag('tickets') -%}
+    {%- if tickets and tickets['aggregate'] %}
+    "offers": {
+      "@type": "AggregateOffer",
+      "url": "{{ branding['canonical_host'] }}/buy-ticket/",
+      "availability": "https://schema.org/InStock",
+      "priceCurrency": {{ tickets['currency']|tojson }},
+      "lowPrice": {{ tickets['aggregate']['low_price'] }},
+      "highPrice": {{ tickets['aggregate']['high_price'] }},
+      "offerCount": {{ tickets['aggregate']['offer_count'] }},
+      "validThrough": {{ tickets['valid_through']|tojson }},
+      "category": "Conference Ticket"
+    }
+    {%- else %}
     "offers": {
       "@type": "Offer",
       "url": "{{ branding['canonical_host'] }}/buy-ticket/",
       "availability": "https://schema.org/InStock",
       "category": "Conference Ticket"
     }
+    {%- endif %}
   }
 ]
 </script>
