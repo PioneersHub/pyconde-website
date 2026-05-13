@@ -95,3 +95,242 @@ video_duration_iso: PT29M19S
 video_thumbnail: https://i.ytimg.com/vi/Qp90ka5ZMqg/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:02]_
+
+Thanks, hi everyone. Welcome to my talk on observability for distributed computing on the one hand, and in particular with Dask.
+
+**Speaker 2** _[00:09]_
+
+ask.
+
+**Speaker 1** _[00:11]_
+
+As introduced, I'm Hendrik Machheit. I work as an open-source software engineer at Coiled, where I mainly work on Dask and its distributed runtime engine.
+
+**Speaker 2** _[00:19]_
+
+Um, so...
+
+**Speaker 1** _[00:21]_
+
+So before we dive into observability, let's first quickly talk about Dask and how it relates to distributed computing. Dask is a library for general purpose parallelism in Python, which means that it can help you parallelize pretty much all workloads or all kinds of workloads that you want to run. As an easiest example, you can parallelize something like this, where you just have a bunch of files, want to iterate over those, and just process them, embarrassingly parallel without any interactions. Dask can do that. Dask also has some pretty nice integrations into the existing PyData ecosystem. So if you have data frame-based workloads running on NumPy, running on Pandas, sorry, or you have area computations in NumPy, Dask has parallelized versions of those that help you to parallelize your code without having to rewrite everything and having to learn a different API. Just use what you have in place and use a small drop-in. But since it's general purpose, Dask also allows you to bring your custom workloads, however complex or dynamic they may be. For that, we have low-level APIs that you can use, and the graph can look as complicated as something like this, and it will still be able to get parallelized. Now, Dask is not only a library for parallelization, but it also comes with a distributed runtime, with a distributed execution engine. That means that you can now take whatever you parallelize and not only run it on all eight cores on your machines, but you can actually parallelize it and scale it to hundreds or even thousands of machines, and therefore also run it on much larger data sizes. There are several deployment options for this. So if you have a Kubernetes cluster, you can use that.
+
+**Speaker 2** _[02:10]_
+
+that.
+
+**Speaker 1** _[02:11]_
+
+HPC clusters, also the CloudWorks. So if you want to run it on your AWS or GCP setup,
+
+**Speaker 2** _[02:18]_
+
+up.
+
+**Speaker 1** _[02:19]_
+
+There are deployment options for this or you can just use a managed service like Dask which takes care of the deployment plans for you
+
+**Speaker 2** _[02:26]_
+
+Um,
+
+**Speaker 1** _[02:29]_
+
+Let's make this a little practical to understand things. For this, I have one question. Who here likes breaking things? You guys. Yes, you all are why we can't have nice things. But I also like breaking things. I really don't like if you just have a glossy demo, so what I've prepared here is just something where we totally will break Dask. I've already spun up a cluster here with 20 workers. And we're just going to run this small workload here, where we're going to read a ton of data from Parquet, aggregate it, try to calculate a bunch of medians from it, and then just get a small result. They should all fit into memory. Everything should be great. We see the cluster picked up the work. Then we have the DAS dashboards here. We can see the progress being made. We can see that there's a bunch of tasks running. We see how much data we store in the cluster. We can also see CPU usage. And yes, slowly, but it's making its way forward.
+
+**Speaker 2** _[03:34]_
+
+Um...
+
+**Speaker 1** _[03:36]_
+
+We can also see stuff like workers what they're up to We have System information we have some metrics here. We see pretty much what the cluster does We can also go into call it where I've now spun up a cluster. Once again, we have some stuff we can see There's some code we see what code we run what we execute we have even more metrics We see logs. Logs are useful.
+
+**Speaker 2** _[04:07]_
+
+Um...
+
+**Speaker 1** _[04:09]_
+
+And eventually, we even have more complicated stuff, more rich visualisations like Grafana here. That's all great. Our workload is doing stuff. That's what it's supposed to do. Oh, no! Things failed. I broke Dask. That's kind of what I wanted to do in the end.
+
+**Speaker 2** _[04:28]_
+
+Um...
+
+**Speaker 1** _[04:29]_
+
+The runtime error here is, yeah, kind of tells me what happened, the shuffle broke, but why? If only we had a system that could tell us what happened and why it happened. And in other words, well, if only we had observability. So what is observability is to get everybody on the same page here. I quite like this definition from the OpenTelemetry project that says that observability lets us understand the system from the outside without really knowing what's going on inside. It allows us to ask questions about the system, handle novel problems, even the ones that we didn't anticipate before and where we didn't set up an alert before, and most importantly it allows us to ask the question of why did something happen, not just what happened. So in essence, observability is a property of a system that allows us to take all sorts of actions like monitoring root-causing issues, debugging them, or even just like analysing performance and optimising hardware utilisation. How do we get to an observable system? For this, it's usually these three beautiful pillars of observability being cited. Those are logs, metrics, and tracing. Those are the kinds of telemetry data you want to add to your system to be able to understand it. In this talk, I'm actually going to skip tracing because that's pretty much talk on its own. Not enough time for this, unfortunately. But instead, I want to talk about diagnostic tooling because it's all nice if you have telemetry somewhere in your system, but how do you actually interact with that? How can users see that data and make sense of it? How can they ask questions about the system and answer them? Now first, let's talk a little bit about logging. All of us know logs, I guess, this beautiful wall of text scrolling by on some screen when you tell the output of a program you run can be overwhelming at times. And before we dive into the interesting bits here, let's quickly recap logging best practices that you should all follow. First one, don't use print. It is bad. Just don't use it. If you don't know why, take a look at the documentation of one of the logging libraries. There's a lot of things you will learn from that, and there's a lot of functionality you're missing out if you're just relying on print to get something into your standard out. Next thing is provide necessary context. We just said that we want to understand why things happened in your system, not just what happened, so give me context for that. If you're stopping a worker, tell me which worker did you stop, or why did you do that in the first place? I want to know what happened and in which context. Last but not least, if you want to really take it to the next level and want to go into some advanced levels of lock usage, use structured locks. This will help you to, on the one hand, have still human-readable locks, but also be able able to process them in some systems, analyse them with machines without having to write annoying regex. Now most of you probably know this and you might be asking, so, yeah, cool, now I follow these best practices for logging, am I done now? Well, if you're using a single machine setup, if you're just running one application on one server, you're probably good at this point, but let's consider this. We now scale to a cluster of 100 workers. What happens? Well, congratulations. We now have 102 places where we can look for our beautiful logs.
+
+**Speaker 2** _[08:16]_
+
+Um,
+
+**Speaker 1** _[08:17]_
+
+I don't know how you feel about, as it's aging into 102 workers, figuring out what the logs are, reading through files, figuring out what's going on. I don't like that. So there's better ways to do this. One way is already built into Dask, and that is that you can ask the client, for example, to get you some of the scheduler logs, you can also ask it to get you the worker logs or even just specific worker logs if you know that already something happened just on this particular machine. The problem with that is that this works as long as things are live and as long as they I'll answer your questions.
+
+**Speaker 2** _[08:54]_
+
+But,
+
+**Speaker 1** _[08:55]_
+
+But since we're usually looking and looking into logs when we're debugging stuff Chances are pretty high that worker is long dead because something bad happened to it And if it's dead, it doesn't answer your messages. It doesn't return logs Instead what you want to do in Dask and pretty much any distributed system is you want to centralize your logging in an external system So that means you take all the logs from all the machines you have from all the programs you have to ship them over into some other system that takes care of, first of all, storing all of those logs, and then letting you query those. With that in place, you can retroactively analyse what happened on your systems, even if your cluster is long gone. You will know what happened when a worker died, because it still might have sent over last couple of logs that were informative. And if you followed, for example, structured logging best practices, you have rich functionality to query those logs as well. Here's an easy example of just querying some stuff with the called cluster API. We're just asking for logs from a specific user because memory usage looked odd and we just want to see, hey, what's going on on that one? Let's now actually take a look at logs for our example to understand how useful and maybe also how annoying logs are. What we'll see here is there are a lot of logs. On the one hand, this is great, because, yes, when we have logs, we can really dive into problems, we can really dig down into what happened, understand where things failed, and this really has some rich information in there. The downside is, if I don't know where to start, how will I figure that out? Instead, what I want to have is something that gives us a bit of a glimpse into what happens in your system by just looking at it briefly and not reading through logs from 20 workers for half an hour. That's where metrics come in. That's the next point I want to talk about. Metrics are all these beautiful things, all those measurements you collect about your system at runtime that we usually use in some visualisations, in Grafana dashboards and other things to take a look, see roughly what happened in our cluster, and then be able to hopefully drill down into this. In Dask, we have a bunch of metrics exposed.
+
+**Speaker 2** _[11:25]_
+
+Um,
+
+**Speaker 1** _[11:26]_
+
+This is to give you as users the opportunity to like yeah get some detailed information statistic about what's happening inside the system and its components This can go from like relatively easy stuff like how many workers does the schedule actually know about? To more detailed metrics like the memory breakdown per worker. How much of it is managed memory? How much memory have we spilled? How does that differ between workers? Is there some imbalance there maybe? and there's many others. We won't go into details about this. If you're interested, take a look at the documentation that we have. Now, similar to logging, you also want to have centralised metrics. Once again, we want to have this stuff available for a long time even when the cluster is dead. For this, Dask has a native Prometheus integration, and that That allows Prometheus, which is a metrics time series database and pretty much any compatible system to just continuously ask the cluster for metrics about it, and we can use that in a centralised system to get a picture of what's going on and even track that over time. If we have those centralised metrics, we can do pretty powerful stuff with that. We can on the one hand have those beautiful and powerful dashboards here, like this one, which is from the cluster that just died. we scroll through this here, we can see that there's a lot of information that we've collected. Maybe we can also use this to figure out why our cluster died, why our shuffle failed.
+
+**Speaker 2** _[13:03]_
+
+Um,
+
+**Speaker 1** _[13:06]_
+
+a lot of stuff going on here, but there's one thing in particular that looks interesting, and this is it. Here we have disk usage, and suddenly disk usage went to 100% and died. We all know 100% disk usage is usually pretty bad. Things fail when that happens because we can't write to disk anymore. Let's see if that was the cause of our problems here. see, maybe there's something, usually there's something like space left, complained by Python, and if we take a look at the logs here, once again, there's a lot of them, we see, yes, indeed, at some point during the shuffle, we did not have any space left on the machine, and that's why everything failed, why things died, why things broke down, and why DAS just blew up, exploded. So, yeah, this is how metrics helped us solve this case, but not only that, we can also just have things that proactively or retroactively tell us if something is off. We can have alerts, most of us know this, we should probably have an alert that if disk usage goes to 90%, 95%, things are bad, we should probably take a look at this. Or we could also tell users that what we do in college here, for example, things looked up and they should probably take a look at this in the end. The cluster I used, yes, it used memory, and it used disk in particular.
+
+**Speaker 2** _[14:41]_
+
+Um, we know that, um, we know that, um, we know that, um, we
+
+**Speaker 1** _[14:42]_
+
+We knew this was a problem here, so it's good that we alert us We see that there's network traffic That's kind of useful because it's a distributed system, but also we want to minimize that external network traffic even worse because it's lower so we can use metrics to also make sure that users or Developers just use the system in a good way and make sure that it's performant Now, let's also take a look at another example of how we used metrics to make decisions at call for users. And this is something where we tried to figure out which workers, which AWS instance types should we use as a default for customers. In particular, we compared two things. Those are T3 large instances, M6I large instances. Those are, in terms of CPU and memory, pretty much the same. One of them is cheaper. The other one is not but I see how they compare in different workloads What we see here is that t3 large if you have something that uses a lot of network and disk is Actually pretty bad. It takes a lot longer And if you trust me on this one this number here the throughput we achieve for the m6 eyes is much higher than for the t3 So if you just take a look at that Yeah, t3 lose out If we take a look at another workload where you just use more CPU or less constrained by the IO that we can achieve Once again, we see still t3 large takes a lot longer and we have this weird steel thing going on so we're not exactly using CPU efficiently and By comparing those kinds of workloads and then digging a bit through the documentation we were able to figure out that But first of all, yes, those T3 large instances are worse for data science and data engineering workloads because they have worse hardware when it comes to I.O. And, also, they're cheaper, but if you use a lot of CPU, they actually become more expensive. And also, if you use 10 minutes more of CPU, those per-minute savings you had don't really come into play. So, in our case, we ended up actually shifting default instance types to M6Is because they're much better for these data science, data engineering workloads that we use.
+
+**Speaker 2** _[17:15]_
+
+Um...
+
+**Speaker 1** _[17:16]_
+
+We were able to achieve this through metrics and understand what's going on, why things are working the way they are. There's another use case where we heavily rely on metrics, and that is for data-driven development in DAS. When we make decisions about algorithms or implementations in our system where we suspect that there will be performance issues, we like to run A-B tests to understand how does Does this affect a variety of different workloads that we see in the wild? Does it improve them? Does it suddenly cause things to spike up, clusters not finishing, memory blowing up, all those kinds of things? And if you want to learn more about that, I will not tell you about this, but instead my colleague Guido Imperialo will do this later today at his talk on data-driven design for the DAS scheduler. Now so much for metrics, and with that also for telemetry data. As we said, telemetry data is great if you have it in your system, but we need a way to access it. We've already seen that centralised logging and centralised metrics platforms can do this for us, but there are also a few tools we have built into Dask that allow us to diagnose things directly. For example, we've already seen the dashboards and the visualisation it has. This is quite useful in Dask, it has a lot of information in there. We see the progress the cluster is making, we see this pew-pew plot up in the middle that basically tells us which worker is talking to whom, and a lot more things. We can track GPU memory, utilisation, whatever.
+
+**Speaker 2** _[18:55]_
+
+Um, the.
+
+**Speaker 1** _[18:56]_
+
+These plots are catered at specific things we want people to have an understanding about in the system So they're usually pretty useful, but once again since they're not in some external system They're ephemeral if you're not looking at them at the right point in time or something interesting is happening. You're kind of out of luck so What we did to solve a part of this pain is that we also added performance report and these things you can use as a context manager. They just wrap around the work we want to track and with that we take a subset of those measurements we've seen before and compile them into basically one HTML page that people are able to then store and share. Like we see the task stream here, we see once again some metrics that we can use and interestingly we also have some profiling.
+
+**Speaker 2** _[19:55]_
+
+Now,
+
+**Speaker 1** _[19:56]_
+
+Now profiling, we just saw the first plot there. This is the one thing you probably won't get around if you really want to dig into performance analysis of your systems and of your workloads. For this in Dask, we have a built-in profiler at the slash profile endpoint. This is a statistical CPU profiler, so it's far from perfect. But it's great because it's low overhead, so it's always on as soon as you suspect something to be fishy about performance, you can just take a look at this. It also aggregates profiles across the entire cluster, or you can drill down into individual workers depending on what you want to look at. The two downsides are that it's first of all Python only, so if you heavily rely on things that use C bindings, you won't see what's going on in there. So if it's a heavy panels workload, it's basically just doing all sorts of C or so. You don't really see much unfortunately It also lacks a bit of a rich timeline You get this flame graph which aggregates what happened over time and tells you like how much time was taken up by what? But you don't see a distribution of a time for that if you want to take a look at something like that There's also the more in-depth profiling option to use the Dask PI spy package this essentially allows you to take the great and famous PySpy profiler and run this on a Dask cluster. Requires some more work, but it also goes way deeper into this system. You learn a lot more from this. So with that, I've told you about most of the important things that we have in Dask. Time is all starting to run out. Let's zoom out a bit. What have you learned today? day. First and foremost, we've learned that an observable system lets us ask why something is happening. That's the main question we want to ask and that's the question that helps us answer. To do this, logging and metrics are two key pillars that we need. But also, we need good diagnostic tools that help us to refine this data that we have collected somewhere and then hopefully stored obscurely to really gain insights and as a user to be able to make sense of those.
+
+**Speaker 2** _[22:19]_
+
+Um,
+
+**Speaker 1** _[22:21]_
+
+We also learned Dask has a lot of built-in logging metrics and diagnostic tools. But if you really want to make use of those and fully leverage them, in Dask and in any distributed system, you want to use centralised and durable collection of their telemetry data. There's pretty much no way around this. This can get annoying. This is something where you can use a managed service like Coil to help you with, but yes, This you want to have this if you don't want to deal with, well, as it's aging into a hundred different machines. Thanks. Thank you, Hendrik, you were three minutes early. More questions. Yes, more questions. Who has a question?
+
+**Speaker 3** _[23:21]_
+
+Hello, my name is Evgeny. I'm from aligned colleges, and I have a question So how do I approach debugging the deadlocks caused by?
+
+**Speaker 1** _[23:29]_
+
+is caused by
+
+**Speaker 3** _[23:31]_
+
+few tasks with fairly large footprint being started maybe at the same time
+
+**Speaker 2** _[23:40]_
+
+Um
+
+**Speaker 1** _[23:42]_
+
+Deadlocks and ask It's actually introduced. We've spent significant amount of time over the last couple of months Basically last year to not have any deadlocks and there my main question to you would be which version are you on? Have you upgraded recently? In that case, I would invite you to come over to a booth later. First of all, my first guess would be, debug this by upgrading, because there has been a lot of work on this. At the moment, there aren't really any deadlocks we're aware of. If they are still in there, we definitely need to talk. There is also a tool for that that we have, we have basically a cluster dump which allows you to reproduce everything that happened in the cluster. So if something, basically tracking all the state transitions of individual tasks, that's very useful for those kinds of things but also very heavy. But yeah, let's let's talk
+
+**Speaker 4** _[24:54]_
+
+Hello, thanks for the wonderful presentation, I found it very understandable, very meaningful. We do not use the system, in fact this is very much new for me, but still we use Spark or PySpark which is also a distributed computing engine and I was wondering how would you say does Dask compare to Spark or PySpark and especially with regards to what you have been presenting here. Can you maybe give any insights on this?
+
+**Speaker 2** _[25:27]_
+
+Um
+
+**Speaker 1** _[25:30]_
+
+I think there's a few different aspects to this. First of all, once again, my main question is, what do you use PySpark for? That kind of frames the question a bit. What kind of workloads do you run? ETL stuff, but especially... Yeah. Provisioning machine learning workloads. Like deploying machine learning workloads. So the main things that would differentiate between PySpark or Spark and Dask here is that Dask is more flexible in what it can do. So Spark is pretty good at data frame stuff because it's built for that. But Dask is more general. So if you venture out of that, you'll see some benefits in terms of the customizability of what kind of workloads you can run in Dask compared to PySmart. The other one is that Dask is, first of all, Python only, so you kind of avoid the entire JVM stack, and it has very good integrations into the PyData ecosystem.
+
+**Speaker 2** _[26:41]_
+
+so
+
+**Speaker 1** _[26:43]_
+
+If you have something you've built in pandas, you can pretty much just take that import something different Which is DOS data frames instead of pandas and you use that for PI spark You have to rewrite it in this PI spark data frame API
+
+**Speaker 2** _[26:58]_
+
+Hi
+
+**Speaker 1** _[27:00]_
+
+There was a second part to the question, which was observability, where I think both systems have useful observability in there. I'm not entirely aware of what PySpark exactly offers.
+
+**Speaker 2** _[27:14]_
+
+Um,
+
+**Speaker 1** _[27:16]_
+
+There for both systems. Yeah, it's a pain to set some of this up both systems have managed service Like Databricks or or called in that sense and make this a lot easier for you
+
+**Speaker 2** _[27:27]_
+
+Thank you.
+
+**Speaker 1** _[27:29]_
+
+I don't know if there is one that has much better telemetry or observability than the other. It really boils down to your use case. Sorry, yes.
+
+**Speaker 5** _[27:39]_
+
+Okay, i have two questions first of all thank you for the nice talk First question is how long does dask store the metrics and logs
+
+**Speaker 2** _[27:48]_
+
+Um
+
+**Speaker 1** _[27:50]_
+
+If you're talking about OSS standard Dask, as long as whatever machine you want to ask a question is alive, or as long as any worker or scheduler is alive, that's the big thing or the big downside I talked about. So if you don't use any additional tooling to centrally collect those logs or metrics, as soon as you shut down your cluster, things are gone. Or if your worker dies, any information from that worker is gone. That's a big problem, But that's also something you can't really solve in that sense because by definition you need an external system to set up
+
+**Speaker 5** _[28:25]_
+
+Okay, and that's the second question is it possible to to send logs to open telemetry for example
+
+**Speaker 1** _[28:33]_
+
+I haven't dealt with this myself, but yes, it should absolutely be possible. There's different setups you can do this. One thing is you can just by default send everything to sender out, sender error. You can just at a lower level just pick this up and then send this over to OpenTelemetry. You could also then one way to see is install something on the workers that does this within the Python processes themselves. For example, you have a streaming handler.
+
+**Speaker 5** _[29:05]_
+
+OK, great. Thank you.
+
+**Speaker 1** _[29:09]_
+
+Thank you for your questions, and let's thank Hendrik again for his presentation.
+
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -83,3 +83,150 @@ video_duration_iso: PT29M16S
 video_thumbnail: https://i.ytimg.com/vi/RcNhY3vMcpY/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Thank you. Welcome, everyone. So, my name is Theo, and I'm a data scientist now moving to management at GetYourGuide, and previously I was also a machine learning engineer at Plista, and what I want to talk about is software design pattern for data science. And what What I want here in this talk is to condensate what I've read and also experienced, and this is a kind of subjective selection of thoughts that I have. So that was originally asked me to jump in for the slots. So the talk should be around 20 minutes, and so we hope to have some time for questions, but yeah. I'm sorry I'm not as prepared as I wish I would be. I would like to. So yeah, please bear with me. So with that, let's start with the introduction. We'll define what a design button is and what is the focus on this presentation. Then we'll dive into the software design, so more precisely like what advice we want to give to a data scientist that you should keep in mind when designing software. Then the second thing I want to dive into are more ML designs. And here I want to talk more about choice in the architecture that helps to have cleaner data products or machine learning products. And finally conclude and open for questions. So what is a design pattern? So a design pattern is a reasonable solution to a commonly occurring problem. It's not a concrete piece of code that you can just copy and paste from Stack Overflow. What we want is actually to what help is actually identifying the pattern will help you first to understand the problem that you are facing and also help building a common language around this problem. I do not want to focus this talk on pattern, how to improve your model performance. There are already a lot of talks in the wild about how you can improve accuracy and all all these kind of things. Here, what I want is a pattern that can help you bring your data product, your model into production, and so basically push it through the finish line. Okay. Let's dive first into our software design pattern. So here more like lower level advice I can give. So the first thing that I think is important to keep in mind is that you should design after the fact. So in data science, the work that we do is closely related to research. So there is very high uncertainty around it. So the code that you will write tomorrow depends on the result that you obtain at the end of the day today. And so you should refactor to make it right, but you should not try to over-engineer to what you think it will be, because you probably will be wrong. So you should make it right for what it is today. So you should keep it clean so that you can understand it. And just a reminder, what is refactoring? It's the process of reorganizing the code without changing its external behavior. And as like any software developer, that's part of the normal software lifecycle to refactor the code as it moves forward, basically. So keep in mind that this is part of the job, and you will have to refactor your code as you do, but just do it for what is right for now. Then the second thing is you should design for people's cognitive capabilities. So just as a reminder, we know that humans can only hold around five elements in memory. So that means that basically when you are writing codes, you should be able to understand the code by only understanding five concepts. That means breaking big functions into pieces and giving meaningful names so that people do not have to remember what this A, B, I, J, K, et cetera, means. So the goal is to keep these five things to remember, to understand, and so all that will struggle, also you will struggle, in the future you will struggle when you are trying to read your code. It happened to me. I'm sure it already happened to some of you. Then another one is designed for testability, and I think that's the most important one. Most of what we do, even in data science, can be tested, but we need to design it accordingly. What we want in practice is to avoid legacy code. So legacy code, what it is, it's software that we are afraid to modify because it might break in some unexpected way. And I imagine all of you have already experienced this. I don't know if I should touch that or not. Yeah, and test is something that helps us to bring confidence when you want to do any kind of change. To give you an example in practice, let's imagine an example of a function that was not designed with our testability. So we have some preprocessing steps that is doing... Wait, let me... Can I put the pointer? The laser, yes. So we have a preprocessing thing that is doing some function, and actually then, oh, suddenly, you need another table, so you just load this table, then you join, and then you continue your magic. Here, it's terrible to test. What makes much more sense is actually to give them as a give these things that you need as part of your function so that if you need to test, you can just pass different type of function instead of having to do some kind of mocking for this table because it's hard coding in the middle of the code. This is an example of how you can basically make your code designed for testability. There are many more things, but I think that's the main thing. If you ask yourself, how can I test it, that will help you make the code in a much better shape. So, yeah, that's the three main software patterns. So first, please refactor your code. This is part of the process, and it's normal to do it. You should break down the code into pieces, and five is a kind of rough number you should try to keep in mind, and make it testable so that you can test it. The worst is a piece of code that you cannot, that is not tested, you need to, you want to test it, but it's not designed to be testable, so you will need to refactor it before you can test it. But if you refactor it without test, you're already stuck. Okay. So with that, let's go into the ML designs. Here what I want to talk more is about architectural change that you can do to be more effective in your code and to have a cleaner data product at the end. The first thing I want to talk about is this workflow pipeline pattern. So usually a data science project or a data product at the end is composed of multiple steps. We have some preprocessing, we have some training, then we need to deploy, et cetera. And as the project grows, each step grows and gets more and more complex. And so at some point you want each of them to be able to work on them independently. It might be not the same time, not the same person, not the same team that work on this different part. So what you need is to have some kind of being able to containerise each of these steps and to be able to orchestrate them. An example on the top of the different steps that you would expect, so data collection, data validation, pre-processing, building, training, evaluation, and then you deploy the model. And as I said before, you can have different persons doing different things. Having this isolation makes it more portable and scalable and maintainable. There are some ML-specific tools that help you, like TensorFlow Extended or MLflow Pipeline, but actually you can also use some tools that are not used specifically for machine learning, like Airflow. They are also a really great, more general-purpose orchestration tool that can help you do that. And once you have this workflow, actually, then you can integrate it in your CI, or also have some kind of trigger to retrain automatically and things like that, so it helps you to be able to separate them, so that basically you can retrain, re-trigger some specific steps on some specific events, basically, when, I don't know, you want maybe to retrain your model once a week, or if the production is getting, or something is changing, then it's It's good that you have these things already prepared. Then the second one really useful is this transform design pattern. The problem here is that the input data usually is not the feature that we will use for the model. So there is some kind of transformation that needs to happen to the input to be transformed our features, and that needs to happen for the training, but also for the inference. And it easily can happen that we'll end up with having two logics, one that you have for the training, and another one for the inference. And of course, if you have two pieces of code doing the same thing, don't repeat yourself, and you increase the chance of having some kind of mismatch, like the logic can be slightly different and then you end up with some weird things happening, basically. Here, this pattern is basically to capture this transformation and keep them and reuse them in both places. Just an example here is you can have a model with an input that has some inputs, let's say the start date, basically. What you want is to transform this feature into some example like the feature will be the date of the week or the hour of the day, and you would need to do that for training and inference. This is the kind of thing where this transform pattern makes a lot of sense. This concept is already present in some of the major libraries. You have it, for example, in PySpark with a transformer. You have it in Scikit-learn with this pipeline when you have the different transform. And TensorFlow Extended also have this concept. Great. Then last but not least, the feature store. So the feature store design pattern. The goal here is to simplify the management and the reuse of the features. And what we want is to decouple the feature creation from the model development. But you should just use it only if and only if the features that are recreated that you need for your model are recreated over and over for different models. And the training and the serving features, you already see that they have some inconsistency. And finally, when you have problems productionising the features. So basically in the diagram I think it will help understand what the features are. So basically it's a component that you have between your data sources that are on one side and the models that want to use these features. And it's basically tailored for ML which makes it easy to get some kind of historical feature values for the training or just get the latest value that you have when you want to do batch or online inference. There have been quite a lot of hype around this concept, and it should use it wisely in the sense that it can add more complexity than it solves. So you should check with your use case and use it only if it makes sense for you. Great. With that, let's conclude. So yeah, what I did today, I wanted to present some useful patterns that we had for data science that I think you should keep in mind when you design your project. There are many more that were not covered in this presentation, and I just made my selection where I think the top one for me was the most useful. I hope you find them useful, but yes. Finally, you might be able to identify some pattern at some point, but decide not to use it. Actually, it's totally fine. Just want to make sure, like, actually just to identify this pattern helps you to understand the trade-off that you are making if you want to use it or not. So the best example will be again what we had just before with this feature star. And, yeah, I think we're pretty nascent in data science. Still not so much experience, gathered experience that we have as a whole, so this pattern is likely to evolve, and with the industry as we evolve, so, yeah, exciting time to see it happening. But that's the end of my talk. Thank you very much. Yeah, opening for questions. I also put some references where these things are coming from, and I will share the slide in the channel so that you can also check this. Most of this actually is coming from this excellent boot machine learning design button, but also some blog posts that you can read that are coming.
+
+**Speaker 2** _[15:17]_
+
+Okay, well, thanks. Thanks, Theo. I'm not seeing any questions so far in the slider. So getting quick.
+
+**Speaker 1** _[15:37]_
+
+Yeah, I'm kind of used to that.
+
+**Speaker 2** _[15:41]_
+
+As meaningful names go, I...
+
+**Speaker 1** _[15:42]_
+
+names go, I usually have the problem.
+
+**Speaker 2** _[15:43]_
+
+I usually have the problem that my
+
+**Speaker 1** _[15:45]_
+
+Names of my columns explode and then you can't see anything anymore. Do you have a golden rule for balancing that one?
+
+**Speaker 2** _[15:51]_
+
+that one.
+
+**Speaker 1** _[15:54]_
+
+First thing, you have, I mean, usually you have 80 characters for things, and then you have those four characters, but still, if your name is more than 60 characters or something, that's pretty impressive. Very expressive. But then, usually, naming things is one of the hardest things in computer science, and We are writing software in data science, so we have the same problem, but usually when it happens, the best thing is actually to ask a colleague, and usually the colleague will ask you what this is really doing, and usually you can shrink it, and I now do not ask that much my colleague, I just ask myself, like, explain what this is doing, and usually I come up with a shorter name, and there are some kind of recurrent short ones that you can use with respect to, you can use WRT and these kind of things that you can use that are repeated over and over. That's my common tip. In that, I would prefer a longer name that explodes than having a too short name that no-one understands.
+
+**Speaker 2** _[17:08]_
+
+I've just realized that I was meant to be approving Slido questions, which is why there's probably none in the chat. Anyone, while I work ahead of fix that, we've got time for me to fix that, but does anyone have a question they want to ask over the microphone? Cool, yeah, you're convenient.
+
+**Speaker 3** _[17:32]_
+
+I'm not so much in this field, but I was wondering if you consider the classic object-oriented design patterns that were described in the Gang of Four book that maybe a lot of people are familiar.
+
+**Speaker 1** _[17:48]_
+
+uh, how
+
+**Speaker 3** _[17:50]_
+
+How relevant are those kinds of design patterns for data science and machine learning, in your opinion?
+
+**Speaker 1** _[18:02]_
+
+I think they are relevant, I think that things that come on top of those, more than things, and what I was thinking about the software one, I think they are the most basic one. So for example, should you use object and things like that, yes, it makes sense, but sometimes you can have clean code with just some functions that, if they are well designed and you have a meaningful name, it makes more sense to keep it easy. And not every data scientist or maybe a data analyst that we'll run will understand the intricacy of some complex pattern with some object-oriented. So I think there are relevance. I still think that we have to adapt to the audience that we have. And not everyone has a computer science background in data science, basically.
+
+**Speaker 2** _[19:02]_
+
+Okay, so I found some questions. So there's a number of questions about testing and how much you test. So, like, you know, given, you know, you're going to refactor and the... I'm paraphrasing here. But given you're going to refactor, what's the... How do you make the decision between writing tests now and given that they're going to be potentially obsolete in the future? Uh,
+
+**Speaker 1** _[19:33]_
+
+Okay, so should you write a test if the test will be obsolete soon, basically? So I think testing is important. You should have testing. We ended up not testing that much, like with unit tests in our pipeline, but then I will come you to the talk that I have in the afternoon where I say I will explain how we do testing in data science for the MLOps in practice, talk of the afternoon. The high level is sometimes unit tests make sense. For data science, most of the time I think end-to-end tests make more sense, and there we use some real data to do them. The thing is, I think you should test what you care for the most. Like, if you care that you are, I don't know, that you are right on your revenue that you generate, or the prediction revenue, and you want to make sure that it cannot be negative, or a thing like that. Sounds like a pretty good use case. Like, that's a very specific edge case. If someone puts really weird things on the input, will that give back some slightly wrong results? Probably is not worth a test, basically. So it should be pragmatic when you test.
+
+**Speaker 2** _[20:52]_
+
+Cool, okay, so the top rated question is it's hard to prioritize refactoring over working on new features Any take on that?
+
+**Speaker 1** _[21:00]_
+
+take on that? Can you repeat please? It's hard
+
+**Speaker 2** _[21:02]_
+
+It's hard to prioritise refactoring over working on new features. Any take on that?
+
+**Speaker 1** _[21:08]_
+
+Yes, it's hard. What worked well in the Get Your Guide, what we have done, and I think it can be introduced, is basically you plan in advance days where you will focus on this tech depth and adding tests and things like that, and you say, like, you can talk with your PM, your manager, say, in the team we want to have these two or three days where we'll tackle the most pressing tech dev thing that we have. And it will be in one month, something like that. And then on these days, you will only be able to focus on this topic. And that's the best way we found to be able to tackle this. I know that if you follow the normal DevOps, they say that every sprint you should be adding some 10 to 15, sorry, 20% of your time to work on this. But it did not work well for us. We always end up spending most of our time on the project and never on this ticket that went push back, but this thing of like we blocked days, and these days are not for project time, they are for tech depth testing and things like that. And of course the other thing is once it happens, it's too late, but at least you can make sure it won't happen again. So once you have an incident and something really wrong happens, usually people are much more comprehensive why you want to add a test to make sure it won't happen again.
+
+**Speaker 2** _[22:32]_
+
+Yeah. OK, so the next top question is, do you have any tips on how to organize the code, your code base, based on these design patterns?
+
+**Speaker 1** _[22:44]_
+
+No. It depends on the project, the size of the project. I think, like, if you just have some scripts, then probably you should introduce some function. If you have lots of functions, probably you should introduce some classes, probably some repetition that happened. So I think the project will go with time. I think there are some great templates with cookie cutter that you can use to how you want to organise between the test and the project and things like that. I would say please keep the bare minimum, first put it in a repository, that would be the first thing, and please put the test in another repository, in another folder than the thing that you have, your code, make some documentation, so have something for README that people can understand. But then as it evolves, I think it does not make sense to I will refer back to the first design for what you have now. Even if you think that this project will be an amazing thing and you should have it will have 1,000 line of of course, but right now it's just hundreds, just write the code that is, like, make the repository work for her hundreds line of code things, not have 20 repositories with everything just 10 line of codes, because you expect that to be expanded. Just refactor as you go and make it right for what it is now.
+
+**Speaker 2** _[24:21]_
+
+Cool. Next question is, are those real software design patterns or best practice from Get Your Guide? And then, no offense, I like them a lot and follow similar rules. That's what the person said. But basically, are these actual design patterns that you're using in your work? It was a really good question.
+
+**Speaker 1** _[24:38]_
+
+Yes. Yes and no. They are coming from my personal experience, so I do not represent Get Your Guide in this presentation. But, yes, for example, we have a feature store that we are experimenting with. We also try to keep the code, like, I will not say we are perfect. Actually, this presentation started as an internal one. We say, hey, this is where we should be going internally in our data product team and where I think we need to improve. We are working on it.
+
+**Speaker 2** _[25:21]_
+
+Cool. So the next two questions are both about feature stores. So I'm just going to kind of merge them together. So, well, one's just a longer version than the other. So can you elaborate a bit more about feature stores and then maybe some experiences and how they look like?
+
+**Speaker 1** _[25:38]_
+
+Um...
+
+**Speaker 2** _[25:40]_
+
+They're quite popular at the moment, so can you dig into feature stores?
+
+**Speaker 1** _[25:45]_
+
+I mean, I also had watched you use a feature store, and there is also some nice diagram here, but can I make it a bit bigger, basically, is how, when to use a feature store or not, basically. That was also coming from this blog post. I think the most important thing is, like, feature store can be really helpful to you If it ticks the right boxes, you have features that you repeat over and over, you have struggled to productionalise them, and you have problems. I think Moreno, I see in the audience here, had a talk on Feature Store on the PyData meetup some time ago. They are a big beast, basically, so use them if you have a big problem. That would be my main point. They are made for machine learning, and that can solve a big problem, which you can have, which makes sure that you have the training. So I think I will refer to this one. When you train, you are sure to have the right data for the right timing point. You always have this problem of leakage, data leakage, basically, where you can, for example, if you train a model, and you look at what are the bookings each customer did before to try to predict. You have to make sure that the booking you try to predict is not in the feature of the user when you look at some aggregation on this. This is tricky to do. And Feature Store can help you solve this kind of problem very easily. But you should have this problem, basically. And also make sure to have always the last value when you you do online inference basically.
+
+**Speaker 2** _[27:35]_
+
+Okay, so that you've also answered the other one of the other questions which was what are the disadvantages, okay?
+
+**Speaker 1** _[27:41]_
+
+Okay.
+
+**Speaker 2** _[27:41]_
+
+So you've got nothing more to add on that call.
+
+**Speaker 1** _[27:41]_
+
+So... um...
+
+**Speaker 2** _[27:45]_
+
+We've got time for maybe one more quick question. What are the advantages and disadvantages of using tools like MLflow over building the pipelines manually, for example, using Kubernetes job or Jenkins or whatever, right? What are the advantages and disadvantages of using tools like MLflow over building pipelines manually?
+
+**Speaker 1** _[28:08]_
+
+Less you build, less you have to maintain. Don't forget that. And the nice thing with these tools is that people, like, a lot of people are working to improve them, so it's just like I introduced that, and as we move forward, things are getting better basically. Whereas if you do it yourself, well, everything you build you have to maintain, and if you don't touch it, it will not get better basically. So I think that's the main trade-off, and at GetYourGuide we're really biased towards open source, because we think it's really great to be able to reuse these tools when they make sense. Sometimes you have to build it because we cannot find a tool that solves this problem, and then we build it, but most of the time there are tools that exist, and then we can help contribute, basically, or if we don't, then we have a specific problem, then we make the tool and then we'll punch or set
+
+**Speaker 2** _[29:04]_
+
+Awesome. Well, that's us. That's time. So I think another round of applause for Theo.
+
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -82,3 +82,186 @@ video_duration_iso: PT29M35S
 video_thumbnail: https://i.ytimg.com/vi/GxsNL_1lN_Y/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+the first time I went to PyData, I was a peer student, I was lucky I got a free ticket from the PyLadies, and I think back then I was trying to brush up my Python skills, wanting to get a data science position, and was very keen on using all this new machine learning technologies and learn about these, and I guess back then I probably would have asked, like, why should I care about clean code? And maybe I would have not gone to this talk, and now, a few years later, I've worked in different data science teams with different code repositories and I've also worked with engineers and often that work with data scientists and often it's more like why don't they care about clean code? So I've talked with so many engineers and it's like oh my goodness this code base of the data science, it's a bunch of spaghetti code and I remember my brother recently software engineer also switched to work with data scientists and then I asked like how is it going? Like how do you like Python? And he was like my goodness these data scientists, they want to put Jupyter Notebooks into production, like what a mess. And I think there's one reason I think why that is that often data scientists don't care so much about their code is that very often our main output isn't actually code that runs in production, but very often it's a research document that outlines our finding. We have some Jupyter Notebook, we test some assumptions, we try out some different models, And maybe in the end our conclusion is, actually, this approach doesn't make sense, currently we need to wait for more data, or maybe it's just some number in a presentation, some pie chart or something, so it's really not always code that runs in production. And so, because code is not the main output, we care a bit less about it and we tell ourselves these lies like, I'm only going to run this curvy once, and this is probably not going to change, and no one's going to need this again, and, yeah, especially with some analysis that didn't quite work out, it's like, okay, we won't run this again, and maybe you also do have the hope that you can just deploy the notebook to production, maybe copy paste some stuff, but the reality looks very differently, in the end what happens is that someone asks like, oh, can you check if it also, what happens if we only restrict to this group of people, Maybe you have some idea to come up with, you want to change some small thing. And also very common and a favorite of mine is, oh, can you have a look at this old notebook, this old code path that a former coworker left and that back then we didn't really have the capacity to do, but now we think it's a good idea to look at it again and maybe implement it. And yeah, deploying a notebook is probably also not a good idea. So I think, yeah, one thing with code is that in the end we read code more often than we write it. And it means that if we have dirty code that is hard to understand, it slows us down. It takes much more time to understand if you need to go through multiple files to see what is actually happening there, and then also it becomes much harder to change it. So if at some point business says, like, hey, we actually realise we need to change something here, the business rules, it can be very hard if you have to trade through multiple files to make this change. And if you have a very big Jupyter notebook, a lot of spaghetti code, it's also much easier to hide bugs in there. And I think one last reason why especially data scientists should care more about clean code or good coding practice is that it also makes reproducibility easier if your code is in a clean structure. Okay. So now I hope you agree with me that it's good to have code that is easy to read. And I just want to go through a few things that I think help to make code easier to read. So one of the more important ones and probably also a very difficult one is that it's good to have meaningful names. So this one, for example, is example functions. It's hard to understand what it does. The variable names are very short and super generic. There is some magic number in there that you don't know what it is. Very commonly what happens if you start writing or learning about coding, people tell you it's good to add comments and so you just add a comment and it's like okay now we know that this calculates a new price. But it's still not very helpful. So a much better solution to this is to use very descriptive names that are longer and this also has an added bonus that we can actually use, we can search for these names in our code base. Good luck if you want to search for the variable named K. And in this case we also don't need the comment anymore, we can just explain the code through our names. And here then it becomes clear we want to discount some prices, so I work with hotel data, of 10%, so now we also know where the 0.9 came from, it's for the discount. And we also avoid generic names like transform item that don't really tell us much. Yeah, another good thing, and I think this is a very popular one, especially for data scientists, you do write some code and you do a lot of data transformations and it just grows very organically and then you have this very long function that, yeah, you add some comments somewhere to the different sections so that you see now a bit what happens, but a much better solution would be to structure this long code into shorter functions and then each function then can also, the name of the function can tell us what actually happens here. So this is also a bit of a pet peeve of mine, I think comments, most comments are bad, so especially tend to go stay, so if you work with some old code base and someone was very kind or thought kind and they added many comments and you read them and they just don't make sense anymore because the code evolved but the comments did not. So my rule of thumb is always to try to explain the what with the code itself in the function names, variable names, et cetera, and keep the comments to only explain the why, like why are we doing this weird magic trick here, so, yeah. And this one is a bit more complicated, maybe a bit more abstract, but in the end kind of the overruling principle, at least for me, it's about to avoid mixing different abstraction layers. example, the code for example, we have one function compute features, which probably does a bunch of important things somewhere in there, and then we have some very low level function that is some string transformation and some filtering of some certain IDs, and a much better solution would be to group operations together that have the same level of abstraction, and so use this to structure the code into different abstraction hierarchies. And the same also holds for the variable names, what I showed before. If we have a very generic function, then of course we can have very generic names. If we have more specific functions, we want to have more specific names. So probably many of you have already heard some of these principles, maybe you already read about these or you already know them intuitively, but it's often very difficult to find the time for this and especially if then your product manager wants to see results and your results is not actually code, it sometimes can be difficult to prioritise these or find the time. And I think this is something where the data science perspective can help a bit. So what we can do is we can try to find ways to measure the code complexity or how clean our code is and once we have data from our measurements we can visualize these and with visualizations and the measurement data we can also then prioritize how to improve our code. So I think this has been very commonly used since you can only improve what you measure. I don't know who actually said it. I think it's a bit overused but it is true that to some degree that if you can measure something, it can help you to improve. So this brings me to my second part about like measuring code complexity. So what we can do is we can use some heuristics that help us to measure code complexity which gives us like a proxy on our code quality. So a very easy one is function length. You can just count the lines your function has and if it's very long, that's a good indicator that you should probably refactor. You can also check the number of input and output parameters, so this is all relatively easy to check and count. Then the next one is the cognitive complexity. So in this one, one way to measure how complex a function is, like how much mental load we need to understand what is happening is, we can count the increments for breaks in the flow. So like every time there's an if-else statement or like a for loop, or a nested for loop, this is a break in the linear flow of the program. So the more increments we have, the more nested the function is, and the more difficult it is to understand it. And then this one is kind of hinting on this, yeah, the different abstraction layers, but like in very small, yeah, scope. So this, there's a, you can check that you only have generic variable names if the function is very small. So the bigger the function is, the more scope, you should have more specific names and not use these very generic terms like items, wide, et cetera. And then this one, the last one, is about expression complexity. I mean, a good rule of thumb is that if your expression goes over multiple lines, you should probably split it. But this is basically about trying to see how long is your expression, like how complex is it, how many expressions do you put together. So for example, in this panda statement, it becomes very difficult what we're actually trying to check here. So the good news is that all of these are available as Flake 8 plugins, so we don't really have to do that much work. The, yeah, one, I mean, Flake is great, you can put it into your CI pipeline, but the disadvantage is that it's only giving you like a binary number, like your code fails or it passes. And if you have some old code base or you're just starting out on this journey, this can be a lot of work, like your whole code base might be a big mess, and then it can be a bit difficult to introduce these flakers because your whole code's just gonna, yeah, just a mess, and it's just gonna fail everything, and you don't wanna go and improve everything all at once, or you, well, then the other option is you just make the threshold very high for everything to pass, and then, well, you kind of lose the benefit. And so what I did, I did make some wrappers on these flake functions to actually collect the numbers that the flakers use for their binary flags. So I computed some complexity heuristics, like just some wrappers around these flake functions, and in my case, I just have a Jupyter notebook, which we as a team decided is good enough, and I saw it in a Google sheet, so your needs might vary, so depending on how you need it, you might want to run it more often, so in our case, we decided that it's good enough to run it once every two months to see. And yeah, this then gives us some data that we can visualise, so these are two repositories from my team, and we can now see, like, okay, this is the average complexity of all functions in this code base, so the second one is steadily declining, so I think it's good that we're having this in mind, that we want to have good code, and then the blue one, the top one, was one of our old code base that no one really wanted to touch, and some of my colleagues went and improved it, and you can see that the complexity decreased by quite a bit. The other way that we can then use this data is that we can, like I said, I store it in a Google Sheet so we can see some highlighting and then this can help us to prioritise to see, okay, which files functions are actually like the worst functions and which one should we tackle first. So here we see this main function is quite long and it's high cognitive complexity, so this one would be a good candidate to refactor. So what we did in our team is we look at this like once a month or once every two months and then discuss which kind of functions we want to tackle, which one we want to prioritize, and we set aside around like two hours a month per person. And this already has quite a big impact on our team. So when we refactored this one, so this was the blue line from before, you can see now it's green. I mean, it doesn't say much, but my colleagues also say that it's indeed much nicer now to work with this code. So this brings me already to the end of my talk, and I hope you didn't come here expecting some magic solution, some neat trick that's going to solve all your code problems, because I think in the end it's a lot about culture. So you have to foster a clean code culture in your team if you want to have good code. So what I presented here it's a bit more like a process, and I think this process definitely can help to foster this culture. So as I mentioned, the way we do this, we meet like once a month, once every two months, and then just sitting together, I have a look which code we think needs improvement, and kind of hand out like some, everyone grabs like okay, I want to have a look at this part. We have set aside like some time, and I think one big benefit also that we saw is that we pair programming, I think especially if you have some old code base that no one really wants to touch because it's such a mess and everyone knows it, it can be really nice if you do it in a pair programming so you don't have to wait through the dirty code alone. I think this was also one of the feedbacks from my team that they say this was one of the biggest benefits that through the pair programming they also really shared the knowledge about the code and really also improved their coding skills if you pair junior and more senior together. Another way how you can foster code, clean code culture, in a previous team we read the clean code book in a reading group at work, and this really helped us to kind of get to see a bit more what things are out there, so I only presented some of the main concepts of clean code but of course they like more and especially this kind of reading together and then after reading one chapter checking like okay how bad is our code for these terms really does help to foster this culture. And with that I conclude my talk.
+
+**Speaker 2** _[15:49]_
+
+Sorry for very interesting and so very hands-on topics with lots of memes we all love to use. And I can see here that we have a very lively Q&A section. So first off, are you sharing these Flaked 8 wrappers for trackings? They sound perfect for our team.
+
+**Speaker 1** _[16:04]_
+
+Yes, so I have them in this GitHub repository called Complexity, and I have to confess that they also didn't start out very clean, they were like some quick and dirty wrappers in the beginning, so now I did clean them up for this talk, but yeah, you can have a look there.
+
+**Speaker 2** _[16:22]_
+
+Awesome. Yeah, someone else wants to ask, what do you think about doc strings for every class method? When to use them?
+
+**Speaker 1** _[16:32]_
+
+Good question. So I think doc strings, they can be great, but it really depends on the function. So as I mentioned, code, like comments do have the problem that they can go stale. The same holds also for doc strings, also, by the way, for type hints. So I've seen some type hints that were really lying about what was happening in the function. The way we do in our team is that, like, the smaller the function, the less doc string you want to have, you probably need. So and then keep the dog swing for the more higher level functions.
+
+**Speaker 2** _[17:08]_
+
+Good tips. Another question. I have the problem of not having too many inner functions because there are so many possibilities.
+
+**Speaker 1** _[17:18]_
+
+There's too much what?
+
+**Speaker 2** _[17:19]_
+
+What? Possibilities.
+
+**Speaker 1** _[17:20]_
+
+In the beginning.
+
+**Speaker 2** _[17:20]_
+
+The. Too much, I guess, like, you know, see a lot of complexity in a function. And he say because, or her say, she say, there's so many possibilities, therefore have very long names. How can I try to improve this?
+
+**Speaker 1** _[17:35]_
+
+Yeah, that's a good question. So the way I understood it is like about if we prefer like long names versus short names. I do like short names because I like short line lengths, but there is then the trade-off that indeed you should not compromise readability. And I guess if it's about readability, sometimes you have to bite the apple and then you just go for the long names.
+
+**Speaker 2** _[18:00]_
+
+I see. And one of the other questions I have, which tool you think would be used to identify the level of code coupling or to aid in separations of concerns?
+
+**Speaker 1** _[18:16]_
+
+Good question. I have not looked at this, so feel free to share if you have any tools. So I'm not aware of any tools for that. Like I remember I also looked up for how dry the code is, like if there's repetition in the code. I think there was somewhere, something, but it didn't seem very applicable. So it's a good point. There's definitely so many issues that you will not be able to catch with these code complexities. they really act more as heuristics to get a feeling like what direction your code is going.
+
+**Speaker 2** _[18:49]_
+
+It's good to know. And I think this is another question for the communities. Another question is, are there any types of comments that you think are OK to use? What to do if you need to document the reason for decisions made during data processing?
+
+**Speaker 1** _[19:10]_
+
+I'm not against types or comments, so I do use type hints and comments as well. I think it's just like we have to be aware that comments are not the solution to having explainable code. That said, sorry, can you repeat the last part?
+
+**Speaker 2** _[19:27]_
+
+What to do if you need to document the reasons for decisions made during data processing?
+
+**Speaker 1** _[19:36]_
+
+So, I mean, this kind of depends where this decision is later needed. So I think some decision for us goes more into a research doc that we share with the business, with product managers, et cetera. But indeed, like many kind of, especially like the weirder decisions or some code decisions where we copy-pasted something from Stack Overflow that was hard to understand. So this then I usually comment like, okay, we did this way. we copy paste it from here also because I think these are often then the parts if it looks weird someone in the future might look like why does it look so weird I'm going to change this and then it's going to break so I think these are the places where it's good to have a comment to document your decisions
+
+**Speaker 2** _[20:21]_
+
+That's a good point. A lot of people are very curious to try the GitHub link, but it seems like it's not working. So maybe it's not public.
+
+**Speaker 1** _[20:28]_
+
+public maybe I have yeah maybe I have to put it public good point I'm gonna do this after the talk
+
+**Speaker 2** _[20:35]_
+
+Do you have any experience in using Lightning on GitHub? Using what? Linting. Linting. Ah, linting.
+
+**Speaker 1** _[20:48]_
+
+Actually not, my company currently is using GitLab, so. Or do you mean like using linting in a CI pipeline?
+
+**Speaker 2** _[21:00]_
+
+I think this person wants to specifically ask about GitHub.
+
+**Speaker 1** _[21:05]_
+
+Yeah, I don't know. I mean we do have linting in our code part in our CI pipeline. I do think it's nice I personally also like automatic formatter. It does work for me, but I Know that there's always lots of discussion about linting stuff. So
+
+**Speaker 2** _[21:23]_
+
+Listen here every day and maybe that's something you want to try later on. Our next question, are there alternatives to Flick8 and what are the pros and cons?
+
+**Speaker 1** _[21:33]_
+
+definitely some other commercial tools so I had one from a team that also used I think there's like a github integration that also measures this code complexity so in a way it does very similar things to what I do I think maybe without the customization data processing if you want to do anything on your code complexity data but there are some tools available that can also do this
+
+**Speaker 2** _[21:58]_
+
+Do you have any examples that specifically you want to share?
+
+**Speaker 1** _[22:01]_
+
+I think one, two, that does, I think it was called Code Coverage, so it integrates nicely also with GitHub, but it's a commercial product, so you have to pay.
+
+**Speaker 2** _[22:12]_
+
+I see. That's interesting. And so there's a lot of other questions about code complexities. So another person wants to ask, there are instances where reducing code complexities might affect code efficiency. Based on your experience, when would this be worth it?
+
+**Speaker 1** _[22:30]_
+
+I don't think there's a general rule when it's worth it, when not, so I think there was one talk before about speeding up Python where he also mentioned naive code is usually not the most efficient one, but it can be very readable. so I like that he mentioned there are like some easy plug and play ways like using for example number that make then the whole code easier to read like it still stays easy to read because you're using basically the native implementation and you're just switching out some code, some types and I think if that's possible that's a great solution but of course this is a trade off and it will depend heavily on your use case so of course if it's business critical, if it costs you a few thousand, I don't know, dollars or so, then it might be worth to go for the less readable, more efficient version, but yeah, I think that's really up to the use case.
+
+**Speaker 2** _[23:24]_
+
+So the question is, as the answer is, it depends.
+
+**Speaker 1** _[23:27]_
+
+It depends, yes. Thank you very much.
+
+**Speaker 2** _[23:29]_
+
+Thank you for sharing your perspectives. Another question is about code metrics. Do you think that creating the code metrics with every PR would help the team or is it going to be counterproductive? You think that creating the code metrics with every PR would help the teams or is it going to be counterproductive? productive
+
+**Speaker 1** _[23:56]_
+
+one thing that I did I mean this is kind of more using kind of so I think one thing we did is that if you then have like a decent code complexity in your code base so that you can start using the flakers as they're supposed to be then it can be a nice way to have them in your PRCI pipeline to check like okay that the code does not deteriorate you cannot include checks I think it can be nice. I think especially the color coding often can have a good benefit if you see this code that you're trying to merge has an orange complexity. So often it's not so much about the number but kind of giving the colors. And I do think that people are a bit more reluctant to merge something if it's orange. There is also a lot of discussion. I had some discussion with the guy setting up the pipelines in my company that I wanted to have some flakes to only show orange but you can still merge it because it was a big pain in the beginning when he introduced all of them some people are like no if it's orange but you can still merge it people are going to ignore it I think people do not necessarily ignore it but I think it's also something that where it comes back again to culture like this is a bit also about culture that if you do a PR review it does help if everyone in the team has this kind of culture of paying attention to code complexity to the readability and then to mentions like hey maybe you could improve this function by changing this name like this is really hard to understand so I think this is probably how you want to do it
+
+**Speaker 2** _[25:34]_
+
+And yeah, it all ties back to cultures, I should say. Another question is particularly about gamifications. How do your users react on the gamification of PyLint and a graph by PyReverse? How do your users react on the gamification of PyLint and a graph by PyReverse?
+
+**Speaker 1** _[25:59]_
+
+I'm not sure what pi reverses Gamification so I think the feedback in my team was very positive that it's nice If you can visualize bound the could the code really improve because I think especially with code quality the results aren't always that Tangible so I think this is also why maybe it's sometimes a bit difficult to convince your product project manager that you need to invest Some time in this and I think this is just very satisfying for yourself If you see, it's like, look, now we really see this, the cold quality improved quite a bit and also something that you can show.
+
+**Speaker 2** _[26:35]_
+
+That makes sense. Another thing about complexities, I think in terms of list and dictionary comprehension, how do you measure the cognitive complexities?
+
+**Speaker 1** _[26:48]_
+
+I don't know how to measure cognitive complexity. I think, as I say, these heuristics definitely don't cover all cases. You can still do very dirty things that are hard to understand that will not be covered by any of these heuristics I presented. So that's why they're called heuristics. Again, I think this is where it comes down to foster a culture of having nice, good code and also like a culture of learning and try wanting to improve your code.
+
+**Speaker 2** _[27:16]_
+
+It's a work in progress.
+
+**Speaker 1** _[27:16]_
+
+Yeah.
+
+**Speaker 2** _[27:18]_
+
+Another question is, I want to split the function into smaller bits, but have trouble organizing it properly, both to understand the use and also to reuse the code. Do you have any advice on how to organize it?
+
+**Speaker 1** _[27:32]_
+
+Well, no one said it's going to be easy. So, well, there is still some work to do. Like, the code doesn't organize itself, so I guess that's going to be your job as a developer or data scientist. So, yeah, I think this is the part where you probably need to think what makes most sense. Yeah, I don't think I have really any tips for that. I know that there's some discussion as to how much sense it makes to reuse functions a lot, because this also can increase maintainability problems if you reuse functions in very different contexts. But this really depends on the use case and I think this is kind of like the part where you really need to think a bit like how do you separate the different parts of the code.
+
+**Speaker 2** _[28:16]_
+
+Awesome, I think this is the very last question we can take. Do you have any recommendation for material beyond the more basic use case? For example, a good repo structures or interactions of functions or classes of script.
+
+**Speaker 1** _[28:32]_
+
+I guess a good recommendation would be to be consistent. But I think this also, for me, finds hard because I usually came into a company that already has existing code structure and I think often it doesn't make sense to change things because that's going to be the math to just reorganizing stuff. So often a good case is to just work with what you have and see how you can organize in this structure. Yeah, I had to say, I think be consistent. I do like for data science, I think they like some cookie cutter approaches that already provide a good structure for repositories, which I think is very nice, but of course it doesn't always fit all projects, but it can give a good guidance which direction to go.
+
+**Speaker 2** _[29:23]_
+
+I see. That's good tips. And I think that's the end of our talk today. Everyone, please give a warm applause to
+
+---
+transcript_status: auto
+---
+transcript_language: en

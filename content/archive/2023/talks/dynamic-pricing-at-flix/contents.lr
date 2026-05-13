@@ -83,3 +83,182 @@ video_duration_iso: PT29M26S
 video_thumbnail: https://i.ytimg.com/vi/4KcTVbUHe70/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:02]_
+
+So today we're going to talk about how dynamic pricing can be implemented. Before we start, a few words about me. So I'm working at Flixbus since almost three years as a data engineer, and my main skills are information retrieval, big data, algorithms, and data structure. And this summit course I didn't engineer, I just went there to climb. It's one of the highest mountains in Switzerland, So when I'm not working, I'm usually in the mountains. So what are we going to talk today? So first, we will give a brief introduction about what is dynamic pricing, why it's so important for the companies, and what are the biggest challenges when you have to implement something like that. And then we will see how we step by step move closer to something like real-time pricing. And when it comes to dynamic pricing, every second counts. So how many of you have heard about dynamic pricing? Oh, that's quite a lot, so it's going to be an interesting talk. And how many of you have worked with dynamic pricing in their projects? Nice. Nice to see that a lot of people have already done something. We can talk after the talk. So, yeah, what is dynamic pricing? So it's a strategy that used to set the prices for the same product, and this price can depend on different criterias, for example, the demand at different time, and it can be depending on different types of people. So just to give you some example, here's an example from Uber. So when you are booking a ride in Uber, it might depend on at what time you are booking the ride and what's the total distance of the ride and what is the current traffic situation. Also, it depends on the current demand. There might be some other factors, but I just wanted to give you some examples. So let's say you are in the city center of Munich at 7 o'clock in the evening on Friday and there is a huge demand for going around the city. In that case, what Uber does is it increases the price and they notify also the users and the drivers about this increase in the price and this way if the user is willing to pay higher prices this will bring them more profit. At the same time some users might not afford this price and they prefer to wait for the cheaper prices and this way they manage the demand. Also they notify the drivers that there is a huge demand in certain areas, so they might be travelling to that area and in that way they also manage the demand because they will be able to serve more demand with more drivers. So that's like a two-way benefit for them. So let's see in these graphs how it can be useful for the companies. So if you have just one price point, as you can see in this plot, your revenue is also fixed. And the disadvantage of this approach is that there might be some people who could not afford this price, and then you could not sell your product to those people. And also, maybe there were some people who were willing to pay more prices or higher prices, but you couldn't get that extra benefit from them. So then there is something where you can have multiple price points and you can see this plot. Usually the plot looks like this where the price and the demand is like in this curve. And there you have multiple price points. In this way you can see like if you have some people who are not able to afford that price, they maybe buy your product earlier or depending on situation when the prices are cheaper. And at the same time, there might be some users who don't care so much about the money, and you will get more revenue from them. This way you can see there are several bands of revenue, and your revenue has suddenly increased in this way. So that's a little introduction about the dynamic pricing, and now let's see what are the biggest challenges when it comes to implementing dynamic pricing. So there might be several challenges, but I want to focus on this talk mainly on two big challenges, which we found were worth mentioning in the talk. So the first one is handling a large amount of data in real time. And the second problem is optimizing pricing in the real time. So coming back to the first problem, when you have a large amount of data in real time, you can imagine if you have a very large company like Flixbus, people are continuously booking the tickets and this generates a lot of data in real time. Also we have a lot of, we have network all across the globe and that's why like 24 hours we have a huge demand and we have a lot of data generated to our system and we should be able to handle this large amount of data. And the second important factor is this data has to be very fresh, because if you are late in capturing this data to your system, you will lose revenue for every second. And the third important factor is that when you have a new company merged to your company, for example, recently we bought Greyhound, and it was a big network from them, and you You have to adapt your system such that you can also accommodate the changes from the new company. And this results in schema changes on your system and a lot of stuff, maybe they were doing the same things in a different way and you have to adapt to your system according to the requirements. And the last very important point is that your system has to be robust so that it can handle the load in the peak time. So maybe in the mornings there are a lot of rides departing. So you should be able to handle this load, because every downtime to your system will cost the money. So how we solve this is using Kafka and Postgres. So how many of you have already heard about Kafka? Wow, that's a good number, and so I'm not going to go into detail. So we use Kafka to consume different types of data. So it could be, for example, the passbooking data. So when users are purchasing tickets, we collect this data and then we use Kafka to consume it. It could also be network-related data. For example, a bus ride, some information about the route from which it's going through. And it could also be the information about the bus, maybe how many seats are there, and so on. And it could also be data which is coming from different teams, from machine learning models. data can be really, really huge. On the other hand, it could also have some data which is not changing so frequently, for example, the geolocation data. And this all we use a consumer group and where each topic is dedicated for one particular topic. And then the large topics are usually divided into several partitions so that we can consume this data very fast in parallel. and usually the events from Kafka are continuously persisted in our database and most of the time one event corresponds to the one row in our database. And you can imagine like since there is continuously data coming to our database it will explode at some point so that's why we also have some cleanup done regularly so we remove the past and stale data from our database which is not useful anymore and last point is very important to handle the peak load so when we have a lot of data coming in we can use kubernetes auto scaling to handle this load and keep our data fresh by the way i forgot to mention that all our applications are written in python otherwise i wouldn't be talking here and we use kubernetes to deploy our applications So I will talk a little bit more about this horizontal pod scaling. So on the left side, you can see a Kubernetes configuration file. And you can use a lot of tricks to handle the peak load. In this case, we use something called horizontal pod autoscaling, which means you can replicate your instances depending on how much your needs are. For example, in our case, we can use something called consumer lag, which represents how far behind you are from the current Kafka stream. And this number can give you approximately an idea about how fresh your data is. So in this case, you can specify the number of replicas, maybe minimum one or three. And you can specify a target value, for example, one million or something like this. And based on this target value, they can replicate automatically and you will have the desired number of instances for your application. So here you can be as aggressive as possible. So maybe you don't want one million, maybe you want really, really fresh data. So you can just say a very low number here. And here the number of replicas are calculated using this formula. so if you have let's say desired number 1000 and your current consumer lag is 2000 then it will have like two replicas or something like this so this is very important to keep our peak load in to handle the peak load in our application so now we have the data ready we have very fresh data in our database and now we are ready to optimize the prices. So there are other challenges when it comes to optimizing the prices in real time. The first problem is that optimization can be very expensive because it requires a lot of computational efforts and resources to perform every optimization. And you have to apply this optimization as soon as possible. So how we tackle this it will before we come to that point I want to give a little background about how pricing engine can look like so here you have there are some inputs it could be booking data it could be the forecasts about the demand it could be it could be some data related to the ride itself like how many seats are there which city pairs it's going through and so on and then there might be some other data which I'm not mentioning here, yes. So then all this go in this something called pricing engine, and then it will find the optimal prices, which will bring the maximum revenue. And you can also tune it to have other desired effect. Maybe you want to have maximum load, so that your buses are running full. can tune the target and based on that you will get the optimal prices. So yes, you might have imagined that the computational efforts are so much and if you do it a lot of times it will require a lot of money and also it might be not possible. So a little bit of background about the demand estimation. So when there is a ride, you can see it's departing maybe somewhere in the future, and you can see a lot of people actually buy tickets when it comes to just maybe a few weeks or a few days, so the demand changes very fast close to the departure. And when you are further away from the departure, then the demand stays more or less the same. So you can divide the whole time access in several periods. We call them booking periods. And these booking periods, you can assume the demand would more or less stay the same in this booking period. And as you can see, if you go to departure, you have very fine intervals. But when you are far away from the departure, you have a really huge interval. And this is because, as I said, a lot of demand changes as you go close to the departure. And we receive this information over Kafka every day. It's generated by some machine learning models from other teams. And also, there might be some cases when there was an unpredicted event which our machine learning model was not aware of, and there is a possibility to externally affect or influence this demand. And in that case, we also receive this immediately. So now we have the fresh data. Now we have the demand and what we can do. So the first thing we started or we thought about was batch processing job. So let's say every day we apply the optimization for each ride, for each booking period, and let's see what happens. So if you have one million writes, which you want to optimize in two hours, you will have to do like 140 optimizations per second. By the way, these numbers are artificial, so they are not so important. The advantage of this approach is that it's easier to implement. You can scale it because you can have a lot of parallel computations, and it works offline. But there is not just a problem that you have to perform these many optimizations per second, which is a lot of computational effort, and maybe you will earn more revenue, but you will spend more time spending money in AWS or something. So let's see what are some other problems instead of just the computational effort. So here is the first problem. As you can see, this batch processing job, let's say it starts at 3 a.m. in the morning and it takes two hours. Then you have just optimized the price 5 o'clock the previous day, and you have an unoptimized price for approximately 24 hours. Because at 5 o'clock there is a bubble, which means that the demand has already changed, and you should have optimized at this point. The prices are already too old, and this is not the optimal prices for this ride. Other problem is the cost effectiveness. As you have already seen, the demand has not changed so much when it's very far away from future. But if you optimize everything every day, it will require a lot of wasted resources because most probably the prices will not change. And the last problem with the batch processing job is a really important one. So it's not reactive to changes. So let's say at 5.5 previous day, they decided to change the ride, maybe they decided to add more seats in the bus, and then you will have no chance to identify these changes until the next optimization comes. So that's why it's also a loss of revenue for us. So these are some problems, and we see how we solve them by moving one step closer to the real-time processing. So here is one example where a ride has time access, and these bubbles in green, they show the places where the demand actually changes. And if you have several of those, let's say you have six of those, you can see all the bubbles in the time axis and each bubble represents that at this point the demand will change and you should optimize that specific ride. And if you just do these numbers of optimization, it will reduce already the number of optimizations performed per second. For example, if you have one million rides, it will be approximately very less than one optimization per second. So how can we achieve this? Let's say you have this time axis, and you are somewhere in this red place where the current time is shown. You don't have to consider all the next optimization time for any particular ride, but just the next one. And this way you have only six bubbles in the time axis, and you just keep the track of these bubbles. And when you are at a particular bubble, you optimize this particular ride, and then you You calculate the next optimization time, and you move it to the next one. And this is just an illustration in pictures, but how can you achieve this in computer science? You can use something called Priority Queue. How many of you have heard about Priority Queue? Yes, it's a very nice data structure because it can do some magics. So it basically has two properties. One is called heap property. It's a binary tree which is balanced, and each parent node has a priority higher than the children. And if you have some example here, for example, the orange one would be the first one, and then you have the subsequent numbers where they are at lower priority. But the highest one is always at the top. And this is very useful because this is exactly what we need in our case. We want to find out at a particular time what is the highest priority write, and you might also want to update some of the writes. And this you can see in the write table. These operations are really, really fast. Like the maximum is the worst case is big O in Victor O notation is just log n, which is very fast, and it can handle millions of writes also. Just to give you the big picture, it's very simplified compared to what we actually have. We have a Kafka consumer where we have continuously data coming to our system, we store this in our database, and then we have something called Ride Manager, which takes this data and then it decides the priority, calculates the next optimization time, and then it also puts in something called Redis Task Queue, which is an open source library from Flixbus. you can check it out, and this is very useful when you have to perform a lot of parallel computations, and this is very well documented. And the next thing is when you have a lot of tasks here, these pricing engines can work in parallel, so you have multiple instances of these pricing engines running, and then these prices are produced, these optimal prices are put in the Kafka again as a lookup table where they can be used further. One important point I wanted to mention here is I didn't mention so far how it's reactive to changes to some events. For example, maybe there was a change in the route, or maybe there was a change in the capacity. This is done also in the ride manager. So when there is data incoming to this ride manager, it also sees if there was such change. And in that case, it will update the priority in such a way that actually it re-optimized those rights immediately. And this is the core of this whole pipeline that actually can handle all the changes in real time. And in the best case, if you have not so much load, the prices are reflected within seconds once there is such an event in your real time. So, just to summarize what I explained, we saw how we can do real-time pricing updates and how it is reactive to different types of activities, maybe this forecast, a lot of bookings are happening, capacity updates, and so on. And it's also possible to externally influence in case of unpredicted events, because your models cannot predict everything. And in case of these such cases, we have possibility to externally influence the prices also. And it's highly scalable and robust. As I said, we use Kubernetes autoscaling to make this work. There are some links here. For example, the first one is a little bit article about how you can implement autoscaling. And the second one, as I mentioned, it's open source library. should check it out and there might be some other projects from flix which you can also which you might be interested also and yeah that the last slide is about flix like I'm really happy working with flix because there are a lot of creative projects and we are also hiring so if you are looking for new challenges in your life join the ride
+
+**Speaker 2** _[22:13]_
+
+Thank you so much for your talk. We have a couple of questions The first one is particularly good. The real reason why we are here is what is the trick to buy the bus tickets for the best price?
+
+**Speaker 1** _[22:25]_
+
+Yeah, that's very interesting question I and I knew it would be there So actually it's very hard to predict even for us like when the prices will jump because it depends on a lot of activities and Criterias but in in general like if you buy the prices well in advance you will have cheaper tickets
+
+**Speaker 2** _[22:45]_
+
+Okay, next one, how do you test and compare the business performance of different pricing models?
+
+**Speaker 1** _[22:52]_
+
+Yes, we did some simulations with our past data, and we compared the performance of different models.
+
+**Speaker 2** _[23:02]_
+
+Okay, what algorithms are you using to predict the prices?
+
+**Speaker 1** _[23:08]_
+
+Yeah, I'm not sure if I'm allowed to disclose this here, so you can move to the next question.
+
+**Speaker 2** _[23:17]_
+
+In case you're removing the past data, don't you think that this data might be useful for continuous learning of your machine learning models for dynamic pricing?
+
+**Speaker 1** _[23:26]_
+
+Yes. So data is removed only from our database, but we store this also at some other places where the cost is not so important or also the performance is not so important, for example, in S3 or in Snowflake.
+
+**Speaker 2** _[23:27]_
+
+Yes. Okay, how do you make sure that the given price will capture the demand? That is, how do you find the most optimal price that will serve the demand?
+
+**Speaker 1** _[23:51]_
+
+Yeah, as I said, it's very difficult to predict if your prices are really optimal, but yeah, we have seen some increases in revenue. Sure, if I can reveal the numbers, but we have seen significant increase in the revenue with this.
+
+**Speaker 2** _[24:07]_
+
+How do you identify the demand bubbles?
+
+**Speaker 1** _[24:11]_
+
+I'm not actually working in the demand prediction model, so I'm not maybe the right person for this question.
+
+**Speaker 2** _[24:22]_
+
+Okay, what's the data size you have to store in your Postgres SQL database? Is one database instance sufficient or did you have to distribute data across multiple instances?
+
+**Speaker 1** _[24:34]_
+
+So, we have a pretty big instance in AWS and so far one database has been sufficient to handle all the load and we do a lot of tricks to optimize the queries which we perform against the database. So, it's so far fine, but maybe in future we will think about further improvements if we have some more data or we hit some bottleneck.
+
+**Speaker 2** _[24:59]_
+
+Do you use any, for example, rule-based sanity checks to ensure that only reasonable prices come out of this optimization?
+
+**Speaker 1** _[25:06]_
+
+Yes, we do a lot of sanity checks before this data is published in Kafka.
+
+**Speaker 2** _[25:07]_
+
+Yes, we do.
+
+**Speaker 1** _[25:11]_
+
+And also the teams which is taking these prices as input, they also perform further checks on top to make sure that our prices are good enough or they qualify certain minimal criterias.
+
+**Speaker 2** _[25:26]_
+
+Do you have A-B testing for finding the best price? If yes, how does the A-B testing framework look like?
+
+**Speaker 1** _[25:32]_
+
+Yeah, again, it's something I cannot answer here.
+
+**Speaker 2** _[25:36]_
+
+So we don't know whether it's better in Safari or Mozilla browser.
+
+**Speaker 1** _[25:40]_
+
+Yes.
+
+**Speaker 2** _[25:42]_
+
+Do you do anything to track competitor prices and adding it into your models?
+
+**Speaker 1** _[25:50]_
+
+Yeah, again, it's a very sensitive topic.
+
+**Speaker 2** _[25:55]_
+
+Yeah, I mean, they're all going to be sensitive, but I'm moving on. How much financial impact are you able to generate with this dynamic pricing?
+
+**Speaker 1** _[26:07]_
+
+Yeah, it's again in the same category, unfortunately.
+
+**Speaker 2** _[26:12]_
+
+How many people are working on your pricing pipeline?
+
+**Speaker 1** _[26:18]_
+
+I think we have around 50-100 people working in the whole domain and we have divided this in several teams, maybe 6-7 teams.
+
+**Speaker 2** _[26:30]_
+
+Okay. Why is real time not possible?
+
+**Speaker 1** _[26:35]_
+
+I mean real time is like very difficult, but you can achieve the same results with when you're up at least like 15 within seconds, so it's almost real time
+
+**Speaker 2** _[26:48]_
+
+How do you deal with the current instance shortage on cloud providers like AWS when autoscaling?
+
+**Speaker 1** _[26:56]_
+
+Yes, we have auto scaling and we have some configurations where we have also some fault tolerance when it comes to like maybe there is a breakdown or something happens. We make sure that our pipeline starts at the same place where it actually terminates. So it actually creates some very small backups in the system and then it starts from where it actually left. So it does not lose a lot of information. It actually does not lose any information, and then it starts again.
+
+**Speaker 2** _[27:32]_
+
+Okay, was there any crazy dynamic pricing like above 1K for a ride?
+
+**Speaker 1** _[27:38]_
+
+I haven't seen it so far.
+
+**Speaker 2** _[27:42]_
+
+Is there a feedback loop with the network planning?
+
+**Speaker 1** _[27:48]_
+
+Yes, we get information from the network planning and we do communicate with them about the prices and optimisation. But it's also something which I cannot say clearly here.
+
+**Speaker 2** _[28:12]_
+
+Why was it necessary to build your own priority queue?
+
+**Speaker 1** _[28:16]_
+
+That's a very good question, actually. Finally, something I can answer. So, actually, if you know, like I mentioned, that you also have to update the priority of certain rights. Maybe there is an event which was required to change the priority, and this is not happening in default priority queue. So in default priority queue, you can only remove the topmost element, or you can add a new element. But you cannot change the priority of any particular node in the tree. And that's why we had to implement our own priority.
+
+**Speaker 2** _[28:52]_
+
+Okay, very nice. And the last one, was there any COVID effect?
+
+**Speaker 1** _[28:57]_
+
+Yes, there was some problem, like a shortage of network, but it didn't affect so much that we were so much affected by this.
+
+**Speaker 2** _[29:09]_
+
+Okay, then thank you so much for your presentation for your answers and we look forward for the more sensitive answers next year
+
+**Speaker 1** _[29:16]_
+
+Yeah, thank you.
+
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -87,3 +87,130 @@ video_duration_iso: PT30M49S
 video_thumbnail: https://i.ytimg.com/vi/GoFRwLBNhjA/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+Thank you for the introduction. Before I begin, I just wanted to tell you a little bit about myself and the work I do. I'm a data scientist based in New Delhi, India. I moved there about a year and a half ago to work in international development for my dream job. My teammates and I work in low to middle income countries to help governments, foundations, and nonprofits maximize their impact on issues like agriculture, education, health, governance, and financial inclusion. To give you a flavor of the kind of work we do, here are some problems we solved. We developed models to match citizens to government benefits and schemes that they'd be eligible for so that our partner organization could reach out to them to receive their social welfare benefits. predicted out-of-school girls in rural regions so that our client could bring 600,000 more out-of-school girls back to school and succeed and we allocated a cohort of around 1,000 new teachers to schools based on the teachers expertise and the school's need so these are the kinds of projects we worked on but today I want to tell you about another project we did this time in South Africa where maternal deaths still happen ten times as more frequently than they do in high-income countries. Amale lives in South Africa. She's pregnant and expecting a baby soon. For the past seven months she's been getting help through MomConnect, South Africa's national WhatsApp helpline for maternal and child health. She gets messages every week about changes she should expect and receives reminders for checkups. She also often asked the services help desk about her challenges. At one point she got really worried that she couldn't feel her baby move. The help desk got back to her with a reply but only after hours of wait. And as I'll explain later this was because the help desk was overburdened, each operator having to answer hundreds of messages each day. And And I want to tell you how we helped unload the burden on the help desk so that a pregnant person like Amale could get their questions answered instantly. And we're calling this solution Ask a Question or AAQ for short. By the end of this talk, I hope you'll know where to start if you were to run an FAQ answering service yourself. Understand one example of the kind of work you can do in international development using your technical skills. And this is a bonus for me and my team, give us feedback on the tool I'll introduce and help us make it better. Let's take a look at the problem we wanted to tackle. Reach Digital Health is a South African organization. It's been running MomConnect, a national maternal and child helpline, child health helpline since 2014. And just like Amale, folks expecting babies would sign up through a clinic, get the timely messages about checkups reminders physical changes they should expect and ask questions to trained professionals at the help desk in 2018 over 95 of clinics and 60 of all pregnant women in south africa were signed up and it's only grown since then with 450 000 active users currently and all that is to say it has and still has the potential to impact millions of people going through pregnancy and birth in south africa and as i touched on earlier users could send their questions to the help desk within mom connect but the help desk could be operated by only a few operators which meant they were overburdened with hundreds of questions each day as i said this lead this led to some users having to wait hours to get their questions answered and with limited human resources we wanted to ensure that only the most urgent or tricky questions would go to the help desk and wherever possible instantly address user questions with accurate medical content another important context is that reach is running other helplines too and and that not every helpline could be equipped with a help desk with trained operators. In 2020, they launched COVID-19 Connect. And because they had to launch this quickly, they weren't able to set up a help desk. And in fact, this is when we came up with our first version of ask a question solution. And our former colleague, Adam, actually talked about it at PI Data Global a few years ago. And last year, another helpline was in preparation launch called Young Africa Live, a helpline for teenage sexual health. In these cases, we needed a way to answer user questions without relying on any help desk. To enable that, we needed some plug-in for the helplines. This would be something that takes in a user question, looks at the available FAQs and outputs FAQs that are most likely to answer the question. for mom connect we were aiming to reduce the workload on the help desk operators by 50 initially and since mom connect shows the top five faqs that means we want the top five to contain the correct faq at least 50 of the time and other times the questions would go to the help desk and will be answered by humans what kind of data science model would we need on the back end we would need something that again takes an user question as an input and outputs a match score for each of the FAQs. Then we take the top FAQs according to the match scores and show the top ones to the users. And if you've done an NLP project or two, you might already have some ideas about how to build a model like that. And we'll get into some things we ended up building, but I wanted to touch on some restrictions or requirements we have for a service like that. The first restriction was that we couldn't rely on any external services. Users will be sending potentially sensitive medical questions. Sometimes they would send their names, things that we don't have control over. And the data must be stored within South Africa due to South African data regulations. So we can't rely on any NLU APIs because we wouldn't have full control over where the data would go, how it would be used. That meant that we did have to build our own model. The second restriction is that we couldn't build any supervised models. What do I even mean by supervised models? You can imagine if we had a question FAQ pair data, then for example, we can train a classifier that would classify any question into maybe 70 FAQ contents. But for helplines without any help desk, like COVID-19 Connect and Young Africa Live, there wouldn't be any such data because these are new services without help desk. And Mom Connect only had questions data, and the FAQ labels would have been expensive to produce. Another thing is, FAQs could be added, removed, rearranged based on people's needs. So training a classifier would have been too rigid. So we needed an unsupervised approach, one that would take any user question and FAQ pair and be able to come up with a match score. How about requirements for the service? Since there were repeated use cases for AAQ, we wanted to make it easy to roll out a new instance of AAQ quickly. As I'll introduce, as I introduce my team solution, I would like you to keep these requirements in mind. And I'd also be curious to hear when you had to build a model called Start or how to deal with data regulations. And if you can think of any alternative approaches, I'd be very curious to hear. But I'll share what worked for us, which I'm calling AEQ. And I'll walk you through its components, including the FAQ answering models we used, how you can use these models through a library we built called FACT and how to use the template applications to easily launch a new instance of AAQ. Let's start with the FAQ matching models. I'll discuss two approaches that worked best, one that used word embeddings and word movers distance and another that relied on BERT. Let's look into them one by one. In our first approach, we rely on word embeddings and as many of you know, I'm sure, these are vector representations of words such that the relative positions of words in this vector space mirror the semantic relationships among the words. As in the example here, words similar in meaning would be closed together like media and press. Let's look at how the model works in full. Given a user question and one of the FAQs in the FAQ database, we first tokenize them and look up those tokens in the word embedding model to get the word vectors. To get a match score between a question and an FAQ, we compute what's called the word mover's distance between the question vectors and the FAQ vectors. This will be done for every single FAQ in the FAQ database to produce the match scores, which we use to rank the FAQs. What is word mover's distance? Let's look at this diagram from the original paper by Kusner. The word mover's distance between the left and the right documents is the minimum distance that the words from the left document would have to travel to arrive at the words in the second document. And by words here I mean word vectors. And if there are different numbers of tokens, some words would get split so part of it travels to one word and part of it travels to another. In summary, the word movers distance score represents tokens as word vectors and we get the score by getting the word movers distance between question vectors and FAQ vectors. To start this without any data, you do need some sort of pre-trained word embedding. And it's great when you have absolutely no data and no data science capacity to train any models. But if you have some data science capacity, and if you have some unlabeled data, like as in the case of MomConnect, you can potentially make improvements by training your own word embedding on the domain-specific corpus, which is what we did for MomConnect. Let's move on to the next approach. In our second approach, we took inspiration from Maths and Chechik's paper and used BERT, or this Dilbert more precisely, but any kind of BERT model would work. And to give you a quick recap, BERT is a transformer-based language model that was pre-trained to predict mass tokens in a sentence and the next sentence in a text. This led to a powerful latent representation of tokens and sentences within the context of other words in the text. And following Mass and Chechik's work, we added a single-layer neural network top of BERT, which would be trained to score a question FAQ pair. So working from the bottom of the diagram, we first feed the question FAQ document pair through BERT and use the aggregate representation vector, feed it through a fully connected layer to get the final match score. Now, to train the top feed forward layer, you do need some sort of training data. That means we first need to come up with synthetic questions for each FAQ, ideally they'd be phrased realistically with typos and grammatical errors, and cover all different questions that could be answered by a particular FAQ. Then we create a dataset of synthetic question FAQ pairs, label them as having label 1.0 of perfect match score, and for each FAQ we also randomly sampled some negative example as irrelevant questions and assigned them label 0.0, so match score of 0. This is what we used to train the final feedforward layer. It does require some effort of coming up with the example questions initially, but because BERT is pre-trained on a massive data set, we were able to get great results with just four to five questions per FAQ. With question-answer BERT score, we used BERT to represent the question FAQ pair and used a small synthetic data set to train a single-layer neural network to predict the matched scores. Again, this requires some example questions and the BERT model itself. And if you can bear the GPU costs and have some data science capacity to train the model, could be a good alternative. So which model was better? On the test data for MomConnect, both did equally well with a top five accuracy of 62%, which comfortably exceeds our target of 50%. But for MomConnect, we decided to go with the Ward Movers Distance Score to start with because it was lighter and hence cheaper to maintain than BERT. And of course, the performance might look different as we run the service and collect label data to train and improve the models with but initially and in resource constrained settings we can't always resort to the latest and the fanciest and simpler solutions can work just as well so we package these models into a library called fact the intention here is to provide a suite of models for faq matching that's appropriate under different circumstances And let me give you an example of how it works. Let's say we want to use the word movers distance scorer. We first need to load some pre-trained word embedding into a key vector object like gen sims word2vec. We also need a list of FAQs. Now you can create the scoring object using fact by feeding it the word embedding and we call set contents method to feed the FAQs in the scoring object and whenever a new question comes query the model using score contents and it should return the match score for each of the FAQs. Zooming out again, to make it easy to serve the model as a service we created application templates for AAQ. The applications are built in class consisting of the core app and the admin app which read and write to the database for the FAQs and to keep a record of model outputs. The core app serves the fact model and I'll just show you an example of how it works. So here the user has already expressed the desire to ask a question to the help desk. And yeah. So they type their question in here with a typo. And they send the message. And what's happening on the back end is the chat service is calling the core app to get the FAQ match scores. So the core app is using fact model to create the scores and it records this message and the model output into the database and shows the top five that should answer the question. And the user can select the FAQ that seems to best answer their question and view the entire content like so. Read more, and at the end, we ask for feedback. So yeah, we ask if this answered their question. And if and when the user gives feedback, the chat service will ping the core app's feedback endpoint to attach this feedback to the question and the model output that we had. So we use this data to monitor and improve the model performance. Now I'd like to show you the AQ admin app which our client's content managers use. So this is for managing FAQ contents and testing the FAQ matching endpoint and also to manage the fact model configurations. I'll just show you how it works. I recorded it because I didn't want to fumble. You can view the FAQs here. You can add, edit, and delete stuff here. And you can see an example of the edit page for an FAQ. And we can also test the core app's FAQ matching endpoint. So if a content manager wants to check which if the content that they added would get floated up with like certain questions, they can test. It's pretty simple stuff but super useful for the content managers. So yes. What is AQ's impact? So according to beta testing results. So not on the test data, but on real-world data, 58% of the user feedback was positive, meaning AAQ instantly answered 58% of the questions with accurate and relevant medical advice, which meant that MobConnect's help desk workload was significantly reduced, and AAQ allowed the help desk operators to focus more on urgent and tricky questions regarding maternal and child health. So in closing, what have we seen today? I've shown you how you can use AAQ to quickly create your own version of an FAQ answering service by showing two different FAQ matching models, how you can use fact library to use those models, and how you can serve the model and manage the content using AAQ template applications. We also saw that in resource-constrained settings, like having no data or smaller budget, we may not be able to use state-of-the-art, and that simpler solutions can work well too. And finally, we saw that AAQ had a real impact on the operation of MomConnect, which we hope contributes to improving maternal and child health in South Africa. But is AAQ the answer? We know better performance is possible and we certainly don't want to reinvent the wheel. Many of you might know of Rasa. I think there was a talk about it earlier. It's a popular open source framework for building chatbots. We wanna explore the possibility of providing fact models as custom components of Rasa. And since Rasa already has a wide user base, more people can take advantage of the FAQ matching models that I showed you. And with the advent of so many easily accessible large language models, there's so much potential to improve not just the FAQ matching model, but the user experience in general. And we're exploring how we can use powerful embeddings like open AI embeddings while adhering to data regulations. And I'd love to hear your ideas as well. And this is all open source, open for your contribution and critique. you can check out the repositories here. And if you have ideas about potential use cases, what parts of it you found useful, if there are some obvious things that you think were missing, et cetera, my team and I would love to hear from you. And finally, I'd like to point out that if you think about it, nothing we did was revolutionary. And with your technical skills, I think all of you have a huge potential to help improve lives in the less well-off parts of the world. I hope you'll entertain that potential. And if you're interested, please check out the link here or talk to me after the talk. And I'd like to thank Reach Digital Health for their partnerships, Skoll Foundation for funding the work and my team at ID Insight for working on this together. And thank you for listening.
+
+**Speaker 2** _[21:44]_
+
+All right, Sujin, thank you very much for this talk. We have a couple of questions. The first one is, what is the reason that you have included negative examples in the bird training?
+
+**Speaker 1** _[21:59]_
+
+you're training the model to basically discriminate between cases so how do I put this because for when a question comes in you want to go through all of the FAQs in the database to see which ones are the best matches right and so for the FAQs that are like the wrong answers you want the model to output zero so it needs like those wrong matches to learn that these are these are not the right matches
+
+**Speaker 2** _[22:35]_
+
+Yeah, makes sense. Next one, have you tried sentence embeddings? They can be fine-tuned and good models are open source in hogging phase.
+
+**Speaker 1** _[22:44]_
+
+Yes, we have experimented initially and didn't pursue it, but we should probably look into it more. One thing is we did try open AI embeddings with like anonymized data and it's like the performance is really impressive. It's just we don't have, we haven't figured out a way to use it while complying with South African data regulation, but we are talking about how we can use it yeah
+
+**Speaker 2** _[23:10]_
+
+Okay, nice. Next one is what is your inspiration to use BERT instead of T5 GPT or something like that?
+
+**Speaker 1** _[23:20]_
+
+not know what that is, and please come to me after the talk and teach me what it is.
+
+**Speaker 2** _[23:24]_
+
+Yeah, actually don't know what t5 is myself, so Do you use the word embeddings per word or do you aggregate the word embeddings for the full questions and answers?
+
+**Speaker 1** _[23:40]_
+
+The nice thing about like our approach is we are using it by word, but Let me just bring this up Yeah The nice thing about this is that like you can compare like a set of vectors two sets of vectors And you don't need to aggregate them per se you can just compare like how much does do these vectors have to like travel to arrive at the others and that's If the vectors are close together like they wouldn't really have to travel much, right? So no aggregation needed
+
+**Speaker 2** _[24:20]_
+
+All right, what service did you use for running the dialog flow?
+
+**Speaker 1** _[24:24]_
+
+Oh, that one, so our client reach digital health has a open source like WhatsApp thing called turn.io, I think. And also I think rapid flow is a popular one for like creating those dialogue flows. I think turn.io is for managing users and WhatsApp flows, but yeah.
+
+**Speaker 2** _[24:49]_
+
+How large is your FAQ corpus?
+
+**Speaker 1** _[24:55]_
+
+like less than 200 FAQs and like an average length is the one you saw so it is quite long but not huge so that's that's why it's possible for us to compare like get the questions compare each FAQ I know like for if you're like doing text search I know like it's a different problem you need to I know there are like specialized databases for that and such but ours was simple
+
+**Speaker 2** _[25:27]_
+
+Okay, next one is did you also experiment with other embedding methods Such as bird for word movies distance model instead of word to vector
+
+**Speaker 1** _[25:46]_
+
+Word, the thing is, it already has quite powerful representations of the tokens and the sentences. We didn't think to experiment with it, but maybe it's worth a try.
+
+**Speaker 2** _[26:04]_
+
+Okay, did you consider using sense to vector instead of default word to vector?
+
+**Speaker 1** _[26:12]_
+
+So I think that that's talking about like sentence embeddings, and yeah, I think I may know it's a different one Oh interesting, okay
+
+**Speaker 2** _[26:34]_
+
+Why is the question answering model better to a search-based approach? What do you think?
+
+**Speaker 1** _[26:46]_
+
+a typical like so I think there's like the baseline actually Tobias gave a talk about like typical baselines for different text NLP problems and I think you mentioned BM25 as a good baseline. For us the way the users ask questions would be like so different from like the FAQ contents themselves that it wasn't yeah BM25 wasn't appropriate for our case.
+
+**Speaker 2** _[27:17]_
+
+All right Regarding that model. What if a user asks a question out of context? How do you handle that?
+
+**Speaker 1** _[27:30]_
+
+like threshold the score so that like we we don't want to always output like the top five right if the scores are overall really low then i think we would just have to say like in the service flow like we we did not understand your question like could you rephrase it or something
+
+**Speaker 2** _[27:50]_
+
+If a user asks a question out of context, is there any way you deal with that?
+
+**Speaker 1** _[28:07]_
+
+Maybe you can come up to me and clarify the question. Sorry, I didn't understand it properly. Yeah. You already asked that question just now. I guess so. It's similar. Yeah. Yeah. Thresholding, I guess. Yeah. But if I understood it incorrectly, please come up and I'd be happy to talk.
+
+**Speaker 2** _[28:32]_
+
+Because it is related to health you would want to get the highest precision possible How could you get to a reliable precision using an unsupervised model?
+
+**Speaker 1** _[28:45]_
+
+mean I don't think we are confident about the precision like the the good thing is that we have human in the loop right we have built-in mechanism for someone to escalate it if this doesn't like if you think about it 40% of the time people aren't getting their questions answered either they're like really they just want to talk to a human because it's urgent and they don't care about they don't care to read through or like our model isn't performing well but it's yeah I think just having human in the loop is key and we'll collect more more data to improve the model as we go forward
+
+**Speaker 2** _[29:22]_
+
+Okay nice May some kind of automatic spelling correction improve your processes word vectors won't handle them
+
+**Speaker 1** _[29:30]_
+
+Yeah, so we do spell correction. We did spell correction for, like, the embeddings that had fixed dictionaries, but with, like, MomConnect, we used fast text, which doesn't have a fixed dictionary, and actually spell correction didn't improve the performance that much, if I remember correctly.
+
+**Speaker 2** _[29:54]_
+
+I guess last question before I leave you into the coffee break. Did you consider FAQ paraphrasing through, I'm sorry, I don't know what that is, translation for generating more data?
+
+**Speaker 1** _[30:09]_
+
+Yeah, so actually the original paper for BERT used like GPT to generate the example questions. And yeah, I think they actually used GPT to like generate examples. I didn't think about like paraphrasing the FAQs themselves, but yeah, like using GPT or some generative model to like augment the data could be a promising approach, I think, yeah. I didn't, we didn't try it.
+
+**Speaker 2** _[30:40]_
+
+Thank you very much. Give it up for Sujin.
+
+---
+transcript_status: auto
+---
+transcript_language: en
