@@ -91,3 +91,2250 @@ video_duration_iso: PT31M33S
 video_thumbnail: https://i.ytimg.com/vi/zSkyxXpshj4/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Thank you. My name is Sal McCoy-Mans. I'm a senior developer. I developed software for 18 years right now. Most of the time I developed in Java. Only this March...
+
+**Speaker 2** _[00:15]_
+
+And this March, March this year,
+
+**Speaker 1** _[00:16]_
+
+March this year I switched moved to a new company
+
+**Speaker 2** _[00:19]_
+
+and since I don't work for Protech
+
+**Speaker 1** _[00:19]_
+
+and since then I've work for Protix and Protix I started developing in Python. About Protix,
+
+**Speaker 2** _[00:25]_
+
+about Protix. Protix is like
+
+**Speaker 1** _[00:26]_
+
+Protix is like a farm.
+
+**Speaker 2** _[00:27]_
+
+a a farm that we don't
+
+**Speaker 1** _[00:28]_
+
+But we don't breed pigs or cows, we breed
+
+**Speaker 2** _[00:30]_
+
+cows, we breed insects.
+
+**Speaker 1** _[00:32]_
+
+And the insects we sell to our customers.
+
+**Speaker 2** _[00:34]_
+
+to our customers, and those customers
+
+**Speaker 1** _[00:36]_
+
+Customers turn those insects into
+
+**Speaker 2** _[00:38]_
+
+into feed for different
+
+**Speaker 1** _[00:39]_
+
+for different kinds of animals. And we also sell insects for human consumption.
+
+**Speaker 2** _[00:44]_
+
+consumption. And the whole goal of the company
+
+**Speaker 1** _[00:45]_
+
+of the company Protex is
+
+**Speaker 2** _[00:46]_
+
+protect is to make the feed and food
+
+**Speaker 1** _[00:48]_
+
+feed and food production more sustainable. Right, but since I'm working for Protix quite recently, most of the things I'm working on are still confidential, so I cannot show you code examples.
+
+**Speaker 2** _[00:58]_
+
+code examples from
+
+**Speaker 1** _[00:59]_
+
+from Protex but then
+
+**Speaker 2** _[01:00]_
+
+But in the past I worked quite a long time for a paint factory
+
+**Speaker 1** _[01:02]_
+
+for a paint factory so I want to show you code examples for a warehouse management system of a paint factory let's
+
+**Speaker 2** _[01:10]_
+
+But the trouble was, I worked in Java most of the time.
+
+**Speaker 1** _[01:12]_
+
+So I cannot show you the code example of the real warehouse management system.
+
+**Speaker 2** _[01:17]_
+
+I just rewrote some
+
+**Speaker 1** _[01:18]_
+
+wrote some parts of the warehouse management system just enough code to show you the techniques i want to present so in that sense what i'm going to tell you it's based on a true story first a little bit of names about tests if you have a test you don't need to read the whole code but the one part this
+
+**Speaker 2** _[01:38]_
+
+in this case move better, that's the part we want
+
+**Speaker 1** _[01:39]_
+
+that's the part we want to test that's called the subject under test we have an arranged part
+
+**Speaker 2** _[01:43]_
+
+an arranged part. That's the part of the test where you
+
+**Speaker 1** _[01:45]_
+
+the part of the test where you set up data, for instance if you set up data in a database that's used by the subject on the test.
+
+**Speaker 2** _[01:50]_
+
+The act part, that's the part
+
+**Speaker 1** _[01:52]_
+
+that's the part that actually invokes the subject on a test and finally the assert part that's the part where we validate that the subject on the test did what it was supposed to do so in short what I'm gonna present in this talk is
+
+**Speaker 2** _[02:10]_
+
+How you can write an arranged part of the test that is short
+
+**Speaker 1** _[02:13]_
+
+short few lines of code but generates a lot of data in your database to be used by your test so i want to first quickly introduce you to a warehouse management system
+
+**Speaker 2** _[02:25]_
+
+Then I want to talk about different strategies.
+
+**Speaker 1** _[02:26]_
+
+about different strategies to set up the database for test. Then the main course, the three techniques to set up database for test, and finally Q&A. So the best way to start explaining what a warehouse management system is, is first to explain what a warehouse is.
+
+**Speaker 2** _[02:39]_
+
+warehouses. Well, this
+
+**Speaker 1** _[02:40]_
+
+This is a warehouse. It's just like a large building full of racks.
+
+**Speaker 2** _[02:44]_
+
+full of racks and each rack is full of pallets
+
+**Speaker 1** _[02:46]_
+
+is full of pallets, and each pallet contains, let's say, cans of paint, buckets of paint. The pallets are moved around by operators.
+
+**Speaker 2** _[02:54]_
+
+by operators driving forklifts and this is like a typical plan
+
+**Speaker 1** _[02:57]_
+
+typical plan of warehouses, like the top view.
+
+**Speaker 2** _[03:01]_
+
+The factory is out of scope.
+
+**Speaker 1** _[03:02]_
+
+Out of scope, the factory is where the paint is.
+
+**Speaker 2** _[03:03]_
+
+the paint is actually produced.
+
+**Speaker 1** _[03:04]_
+
+actually produce but pallets with
+
+**Speaker 2** _[03:05]_
+
+the pallets with paint are moved to
+
+**Speaker 1** _[03:05]_
+
+paint and moved to the warehouse and then they enter and they moved when they entered the warehouse they're moved
+
+**Speaker 2** _[03:11]_
+
+warehouse there moved in the bulk area in a wreck in
+
+**Speaker 1** _[03:13]_
+
+area, in a rec and a bulk area.
+
+**Speaker 2** _[03:14]_
+
+The bulk area is used to move
+
+**Speaker 1** _[03:15]_
+
+used to move pallets to replenish empty locations in the pick area.
+
+**Speaker 2** _[03:19]_
+
+area.
+
+**Speaker 1** _[03:21]_
+
+The pick area is location where forklifts or operators driving forklifts will do the order picking on behalf of customers.
+
+**Speaker 2** _[03:28]_
+
+And once a palette has been picked,
+
+**Speaker 1** _[03:29]_
+
+that has been picked containing the items for an order
+
+**Speaker 2** _[03:30]_
+
+items for an order for
+
+**Speaker 1** _[03:31]_
+
+for an order for a customer.
+
+**Speaker 2** _[03:32]_
+
+for customer.
+
+**Speaker 1** _[03:32]_
+
+the pellet is moved to the
+
+**Speaker 2** _[03:34]_
+
+Pallet is moved to the audit area.
+
+**Speaker 1** _[03:36]_
+
+In the audit area, another operator verifies that the contents of the palace are
+
+**Speaker 2** _[03:39]_
+
+of the palace are correct.
+
+**Speaker 1** _[03:41]_
+
+After that, the pallet goes
+
+**Speaker 2** _[03:42]_
+
+but the pallet goes to the wrapping
+
+**Speaker 1** _[03:43]_
+
+to the wrapping area. In the wrapping area, we put a plastic
+
+**Speaker 2** _[03:46]_
+
+a plastic foil around the pallet to keep the items
+
+**Speaker 1** _[03:48]_
+
+to keep the items on the pallet during transport. Next, the pallets go to the staging area, and from the staging area, the pallets are put into the trucks. And finally, the truck driver...
+
+**Speaker 2** _[03:57]_
+
+A truck driver will take the
+
+**Speaker 1** _[03:58]_
+
+we'll take the panels
+
+**Speaker 2** _[03:59]_
+
+the pallets to the customer.
+
+**Speaker 1** _[04:00]_
+
+to the customer. There's also a problem location, and I'll come back to that in a minute.
+
+**Speaker 2** _[04:06]_
+
+So that was like a warehouse in a nutshell.
+
+**Speaker 1** _[04:07]_
+
+warehouse in a nutshell then okay what what is the warehouse management system well that's like
+
+**Speaker 2** _[04:11]_
+
+That's like a software system.
+
+**Speaker 1** _[04:12]_
+
+a software system that supports the warehouse
+
+**Speaker 2** _[04:13]_
+
+supports the warehouse and, well,
+
+**Speaker 1** _[04:14]_
+
+and the goal of the system is order.
+
+**Speaker 2** _[04:16]_
+
+order handling. Customers
+
+**Speaker 1** _[04:17]_
+
+customers.
+
+**Speaker 2** _[04:18]_
+
+or items that have to be delivered.
+
+**Speaker 1** _[04:19]_
+
+that have to be delivered. How does it do that? Well, at low level, a warehouse management system keeps track of everything. It keeps track of the items,
+
+**Speaker 2** _[04:25]_
+
+the items, the orders, the picklists, locations, pallets, notes,
+
+**Speaker 1** _[04:26]_
+
+the orders, Well, that's it, no...
+
+**Speaker 2** _[04:28]_
+
+It knows where everything is.
+
+**Speaker 1** _[04:29]_
+
+where everything is.
+
+**Speaker 2** _[04:30]_
+
+And on a high level,
+
+**Speaker 1** _[04:32]_
+
+It supports a couple of workflows, like stocking, picking, auditing, replenishment, loading.
+
+**Speaker 2** _[04:38]_
+
+loading. A couple of these
+
+**Speaker 1** _[04:39]_
+
+A couple of these workflows I will
+
+**Speaker 2** _[04:41]_
+
+workflows I will show you later during the presentation.
+
+**Speaker 1** _[04:42]_
+
+during the presentation.
+
+**Speaker 2** _[04:44]_
+
+So now it's time to show you some code
+
+**Speaker 1** _[04:47]_
+
+What do I mean with a lot of data in a test?
+
+**Speaker 2** _[04:51]_
+
+many people that's
+
+**Speaker 1** _[04:52]_
+
+that start writing unit tests or maybe follow a course on test-driven development will write a test for, for instance,
+
+**Speaker 2** _[05:00]_
+
+For instance, a class.
+
+**Speaker 1** _[05:01]_
+
+a class for a stack and this is how the test might look like and well there's not much data in there like the strings foo well it's strings not not data in a database but still I consider it like data
+
+**Speaker 2** _[05:15]_
+
+Just one item for test.
+
+**Speaker 1** _[05:17]_
+
+item for test, that's not much. And here, a test case of two.
+
+**Speaker 2** _[05:19]_
+
+Two items, that's not much.
+
+**Speaker 1** _[05:20]_
+
+that's not much. So for a warehouse management system, these
+
+**Speaker 2** _[05:23]_
+
+system, well, depending on
+
+**Speaker 1** _[05:24]_
+
+Depending on the workflow you want to test,
+
+**Speaker 2** _[05:28]_
+
+You need like tens to hundreds
+
+**Speaker 1** _[05:29]_
+
+to hundreds of records in a database.
+
+**Speaker 2** _[05:35]_
+
+Okay, and there are different ways to...
+
+**Speaker 1** _[05:36]_
+
+ways to get that data in a database. Before I joined Prodix, I worked for other companies, also the Paint Factory, other companies, and I've seen different strategies of getting test data in a database. The first question is when do you fill the database? Do you fill it for each test case, which I recommend, or
+
+**Speaker 2** _[05:56]_
+
+Or do you fill the database only once?
+
+**Speaker 1** _[05:57]_
+
+database only once and use the database for all test cases? Rather not. How do you fill a database? Using SQL statements or using code?
+
+**Speaker 2** _[06:06]_
+
+Or using code, yeah.
+
+**Speaker 1** _[06:07]_
+
+Yeah, I prefer using code. The code examples I show you are written
+
+**Speaker 2** _[06:11]_
+
+are written in Python using Django
+
+**Speaker 1** _[06:12]_
+
+using Django and Django has a nice
+
+**Speaker 2** _[06:13]_
+
+and Django has a nice ORM feature which makes it very easy to
+
+**Speaker 1** _[06:15]_
+
+easy to create data in a database. And what data are you going to put in a database? I only put in the minimum set of data that is
+
+**Speaker 2** _[06:23]_
+
+of data that is needed by the
+
+**Speaker 1** _[06:24]_
+
+needed by the subject or not test, maybe even incomplete.
+
+**Speaker 2** _[06:26]_
+
+even incomplete data and
+
+**Speaker 1** _[06:27]_
+
+fleet data and non-realistic data.
+
+**Speaker 2** _[06:29]_
+
+Or are you going to put in complete?
+
+**Speaker 1** _[06:30]_
+
+to put in complete and realistic data, but
+
+**Speaker 2** _[06:32]_
+
+realistic data, but maybe a little bit more than that's strictly needed to test a subject
+
+**Speaker 1** _[06:35]_
+
+to test your subject or not test.
+
+**Speaker 2** _[06:37]_
+
+recommend seconds
+
+**Speaker 1** _[06:39]_
+
+Okay, now here's an example of how we create
+
+**Speaker 2** _[06:42]_
+
+of how we could create a location record.
+
+**Speaker 1** _[06:44]_
+
+records in a database using SQL.
+
+**Speaker 2** _[06:48]_
+
+And I have seen
+
+**Speaker 1** _[06:49]_
+
+I have seen companies that
+
+**Speaker 2** _[06:51]_
+
+import data from a real live
+
+**Speaker 1** _[06:53]_
+
+real life database and store the data.
+
+**Speaker 2** _[06:56]_
+
+in XML or now
+
+**Speaker 1** _[06:57]_
+
+or nowadays we would use JSON for that but I consider that to be just as
+
+**Speaker 2** _[07:02]_
+
+to be just as bad as SQL, I prefer to do it in code.
+
+**Speaker 1** _[07:05]_
+
+encode. So this is how it would look if you
+
+**Speaker 2** _[07:07]_
+
+look if you would like
+
+**Speaker 1** _[07:08]_
+
+would look like if you use Django to
+
+**Speaker 2** _[07:12]_
+
+Insert as one record.
+
+**Speaker 1** _[07:14]_
+
+But if you look at this one line of code, it doesn't look that much better than SQL.
+
+**Speaker 2** _[07:19]_
+
+Better than Sequel, I must admit.
+
+**Speaker 1** _[07:20]_
+
+I must admit. But I'm going to explain you three techniques that will make it so much clear that using code is so
+
+**Speaker 2** _[07:27]_
+
+Using code is so much better to do
+
+**Speaker 1** _[07:28]_
+
+much better to do than
+
+**Speaker 2** _[07:30]_
+
+using SQL.
+
+**Speaker 1** _[07:31]_
+
+SQL to generate a lot of test data for your tests. So the first technique. Now we come to the problem location. Imagine an
+
+**Speaker 2** _[07:39]_
+
+Imagine an operator device.
+
+**Speaker 1** _[07:39]_
+
+operator drives a forklift. He has like three items on the pallet. And then, oh, one of the items, the can of pain falls and it opens. It
+
+**Speaker 2** _[07:47]_
+
+it spills paint so we have to
+
+**Speaker 1** _[07:49]_
+
+so oh we have to clean it up the
+
+**Speaker 2** _[07:51]_
+
+The operator can drive...
+
+**Speaker 1** _[07:53]_
+
+the palette to the problem location and then put the palette there, use a barcode
+
+**Speaker 2** _[07:57]_
+
+use a barcode scanner to scan
+
+**Speaker 1** _[07:58]_
+
+scanner. To scan the barcode of the problem location, that tells the warehouse management system, okay, the pallet has been moved to
+
+**Speaker 2** _[08:03]_
+
+has been moved to the problem location.
+
+**Speaker 1** _[08:04]_
+
+the problem location and at that moment the warehouse management system will
+
+**Speaker 2** _[08:07]_
+
+management system will change the status of the pallet
+
+**Speaker 1** _[08:09]_
+
+of the palette from okay to problem and this is a test scenario for what I just described and I will go through it step by step the step the first thing it does it creates the
+
+**Speaker 2** _[08:21]_
+
+the forklift.
+
+**Speaker 1** _[08:23]_
+
+It creates from location.
+
+**Speaker 2** _[08:26]_
+
+It creates an item
+
+**Speaker 1** _[08:27]_
+
+item
+
+**Speaker 2** _[08:29]_
+
+Then it creates a palette.
+
+**Speaker 1** _[08:30]_
+
+pallets and at this point the pallet is still empty because in this line we're going to add the items on pallets and to be specific we add one
+
+**Speaker 2** _[08:36]_
+
+100 times
+
+**Speaker 1** _[08:37]_
+
+the item on this pallet.
+
+**Speaker 2** _[08:38]_
+
+the Well, this is the range part.
+
+**Speaker 1** _[08:41]_
+
+This is the range part. This puts a couple of records in the database.
+
+**Speaker 2** _[08:44]_
+
+Then we can call the subject
+
+**Speaker 1** _[08:45]_
+
+called the subject of the test, that is, move the palette to the problem location. And finally, we can assert that...
+
+**Speaker 2** _[08:50]_
+
+assert that the palette status has changed to blocked and that the palette actually moved to the
+
+**Speaker 1** _[08:54]_
+
+actually moved to the problem location. If you look at this arranged part
+
+**Speaker 2** _[08:57]_
+
+This arranged part is quite big.
+
+**Speaker 1** _[08:59]_
+
+and a container
+
+**Speaker 2** _[09:00]_
+
+And it contains a lot of detail.
+
+**Speaker 1** _[09:01]_
+
+There's a lot of details that are not
+
+**Speaker 2** _[09:02]_
+
+that are not really relevant
+
+**Speaker 1** _[09:03]_
+
+not really relevant for this test.
+
+**Speaker 2** _[09:04]_
+
+So the first thing I will do typically
+
+**Speaker 1** _[09:05]_
+
+will do typically is refactor the
+
+**Speaker 2** _[09:06]_
+
+is Refractorless Coat.
+
+**Speaker 1** _[09:07]_
+
+And I do that by extracting methods.
+
+**Speaker 2** _[09:07]_
+
+And I do it Now extract these methods, create forklift, create problem location, create item.
+
+**Speaker 1** _[09:13]_
+
+create item, create palette.
+
+**Speaker 2** _[09:15]_
+
+Create pallet. And after extraction,
+
+**Speaker 1** _[09:15]_
+
+And after extraction, the test looks like this.
+
+**Speaker 2** _[09:17]_
+
+It looks like this.
+
+**Speaker 1** _[09:18]_
+
+So the range part is...
+
+**Speaker 2** _[09:20]_
+
+shorter, more clear, I think
+
+**Speaker 1** _[09:22]_
+
+I think the intent of the range part is not
+
+**Speaker 2** _[09:23]_
+
+of the range part is now more clear than it was before.
+
+**Speaker 1** _[09:27]_
+
+um but okay still four lines of code i want to make it even more smaller
+
+**Speaker 2** _[09:33]_
+
+So...
+
+**Speaker 1** _[09:34]_
+
+these variables, forklift, from location, I want to inline these variables so that I can put everything on one line
+
+**Speaker 2** _[09:40]_
+
+Put everything on one line, the whole arranged part on one line,
+
+**Speaker 1** _[09:42]_
+
+part on one line. But I cannot inline the problem location, because if I replace problem location by cell
+
+**Speaker 2** _[09:47]_
+
+Set up the Create Problem Location.
+
+**Speaker 1** _[09:48]_
+
+problem location I would
+
+**Speaker 2** _[09:49]_
+
+I would actually create
+
+**Speaker 1** _[09:50]_
+
+actually create two problem location one in the X part and one in the assert part so yeah I will do this
+
+**Speaker 2** _[09:57]_
+
+How do I solve that?
+
+**Speaker 1** _[09:58]_
+
+Well, I do the...
+
+**Speaker 2** _[09:59]_
+
+I do the inline anyway.
+
+**Speaker 1** _[10:01]_
+
+Anyways.
+
+**Speaker 2** _[10:02]_
+
+but I changed the code a little bit.
+
+**Speaker 1** _[10:04]_
+
+See, I read...
+
+**Speaker 2** _[10:05]_
+
+I inlined the code, but I also renamed create forklift to forklift.
+
+**Speaker 1** _[10:09]_
+
+I renamed create problem location to problem location and I renamed
+
+**Speaker 2** _[10:13]_
+
+Trade item 2, item 1.
+
+**Speaker 1** _[10:14]_
+
+item on but not only renamed the methods also changed implement
+
+**Speaker 2** _[10:19]_
+
+also change the implementation a little bit.
+
+**Speaker 1** _[10:20]_
+
+a little bit, for instance, for a problem
+
+**Speaker 2** _[10:22]_
+
+for problem location, the first time you call problem location, it will
+
+**Speaker 1** _[10:24]_
+
+location, it will create a new problem location in the database.
+
+**Speaker 2** _[10:27]_
+
+And the second time you call it, the third time you call it, the fourth time you call it,
+
+**Speaker 1** _[10:29]_
+
+you call the fourth time you call from location it will return the same problem location that was created the first time
+
+**Speaker 2** _[10:34]_
+
+first time.
+
+**Speaker 1** _[10:35]_
+
+So this way
+
+**Speaker 2** _[10:36]_
+
+Well, we ended up with an arranged path.
+
+**Speaker 1** _[10:37]_
+
+with an arranged path with just one line that puts in like
+
+**Speaker 2** _[10:40]_
+
+that puts in like five records in a database.
+
+**Speaker 1** _[10:42]_
+
+so I think that's a great improvement but now we extracted all
+
+**Speaker 2** _[10:46]_
+
+we extracted all those helper methods.
+
+**Speaker 1** _[10:49]_
+
+probably you want to reuse them because probably you're writing more tests and then you put your tests
+
+**Speaker 2** _[10:53]_
+
+You put your test in different modules, different classes.
+
+**Speaker 1** _[10:56]_
+
+So my next step is to move these helper methods
+
+**Speaker 2** _[10:58]_
+
+these helper methods to a separate module. I call that module a test.
+
+**Speaker 1** _[11:02]_
+
+a test data builder.
+
+**Speaker 2** _[11:06]_
+
+I import the test data builder
+
+**Speaker 1** _[11:07]_
+
+TestDataBuilder while renaming TestDataBuilder to TDD. So it's like a nice and a small, because if I want to use the TestDataBuilder, I can use it like that.
+
+**Speaker 2** _[11:18]_
+
+And using TDP is even smaller than 70%.
+
+**Speaker 1** _[11:19]_
+
+even smaller than itself, so it still looks the same. One line of code to set up the database for your test.
+
+**Speaker 2** _[11:25]_
+
+for your tests.
+
+**Speaker 1** _[11:26]_
+
+And when I move those helpful methods
+
+**Speaker 2** _[11:28]_
+
+those helpful methods to this test data builder moduli.
+
+**Speaker 1** _[11:30]_
+
+build a module i typically tweak them a little bit to make them more reuseable
+
+**Speaker 2** _[11:32]_
+
+to make them more reusable for
+
+**Speaker 1** _[11:33]_
+
+usable for other tests. For instance, well, we started out with one item. Well, typically, we create item one, item two, item three, because many tests need two different items
+
+**Speaker 2** _[11:44]_
+
+different items or three different items
+
+**Speaker 1** _[11:45]_
+
+with three different items and having them already available in the test data builder, it is very easy to write a test that uses two or three different items.
+
+**Speaker 2** _[11:53]_
+
+Same for the forklift, I added
+
+**Speaker 1** _[11:54]_
+
+I added uh you know
+
+**Speaker 2** _[11:56]_
+
+this ID parameter
+
+**Speaker 1** _[11:58]_
+
+parameter, it already has a default.
+
+**Speaker 2** _[11:59]_
+
+It's already has a default value.
+
+**Speaker 1** _[12:00]_
+
+default value, so you can
+
+**Speaker 2** _[12:01]_
+
+So you can call forklift without parameters, and then you get forklift
+
+**Speaker 1** _[12:03]_
+
+and then you get forklift with id forklift01, but sometimes you need a test that needs
+
+**Speaker 2** _[12:07]_
+
+a test that needs two forklifts. Well if you need two forklifts you can call forklift with id is forklift01
+
+**Speaker 1** _[12:12]_
+
+is forklift01, and you can call it with forklift id is forklift02. So it's very easy to write tests that even have more
+
+**Speaker 2** _[12:18]_
+
+More than one forklift, if you want.
+
+**Speaker 1** _[12:18]_
+
+than one forklift. forklift if you want.
+
+**Speaker 2** _[12:22]_
+
+Finally, create blocks.
+
+**Speaker 1** _[12:23]_
+
+create palette, I tweak that
+
+**Speaker 2** _[12:25]_
+
+tweak that a little bit more.
+
+**Speaker 1** _[12:27]_
+
+what does it do?
+
+**Speaker 2** _[12:29]_
+
+Use Django to create valet.
+
+**Speaker 1** _[12:30]_
+
+to create the valid object, and the location parameter
+
+**Speaker 2** _[12:33]_
+
+parameter actually is the only required parameter. The other parameters are optional.
+
+**Speaker 1** _[12:36]_
+
+are optional so it starts by creating this palette on the specified location and then if you specify items item is a dictionary dictionary from
+
+**Speaker 2** _[12:44]_
+
+a dictionary from an item to quantity,
+
+**Speaker 1** _[12:46]_
+
+quantity well for each item quantity you put in a dictionary it will add an items on pallet records
+
+**Speaker 2** _[12:52]_
+
+But that's records.
+
+**Speaker 1** _[12:53]_
+
+with the item and quantity you specified.
+
+**Speaker 2** _[12:56]_
+
+Here I applied one trick that
+
+**Speaker 1** _[12:57]_
+
+One trick that might be handy, each item or palette also
+
+**Speaker 2** _[13:02]_
+
+ItemOnPalette also stores the batch
+
+**Speaker 1** _[13:03]_
+
+the batch ID of that group of items.
+
+**Speaker 2** _[13:05]_
+
+that group of items.
+
+**Speaker 1** _[13:06]_
+
+I use this trick with this global variant
+
+**Speaker 2** _[13:08]_
+
+what is Global Farewell Next Patch
+
+**Speaker 1** _[13:10]_
+
+to generate unique batch IDs
+
+**Speaker 2** _[13:12]_
+
+batch IDs for each item
+
+**Speaker 1** _[13:12]_
+
+each item on palette that you create. As a global variable each
+
+**Speaker 2** _[13:16]_
+
+of variable each time you need a new
+
+**Speaker 1** _[13:17]_
+
+time you need a new unique value, you could just use the next batch variable and then increment that variable. So this is a very handy trick to generate unique values if the database doesn't supply them for you. Right, that was the test data builder, and we're going to see it back a lot. The second technique I want to show you is visualizing
+
+**Speaker 2** _[13:36]_
+
+is visualizing the set of data
+
+**Speaker 1** _[13:36]_
+
+setting the set of data.
+
+**Speaker 2** _[13:39]_
+
+This is the workflow.
+
+**Speaker 1** _[13:40]_
+
+workflow stocking and stocking is when a new palette arrives in the
+
+**Speaker 2** _[13:42]_
+
+pallet arrives in the warehouse, it has to be put in the bulk area.
+
+**Speaker 1** _[13:45]_
+
+in the bulk area and imagine we already decided in which aisle and which rack
+
+**Speaker 2** _[13:49]_
+
+aisle and which rack we want to put it.
+
+**Speaker 1** _[13:50]_
+
+we want to put it, we still have to figure out on what exact location
+
+**Speaker 2** _[13:53]_
+
+exact location in that rack.
+
+**Speaker 1** _[13:53]_
+
+in that rack we're going to put it well we can
+
+**Speaker 2** _[13:56]_
+
+Well, we can fill the racks like row by row
+
+**Speaker 1** _[13:57]_
+
+like row by row.
+
+**Speaker 2** _[13:59]_
+
+But yeah, in real life,
+
+**Speaker 1** _[14:00]_
+
+In real life, the warehouse has like hundreds of locations in one row. So that means that the operator has to drive quite far
+
+**Speaker 2** _[14:04]_
+
+to drive quite far to fill
+
+**Speaker 1** _[14:05]_
+
+to fill one row so that's that's not efficient so we can fill the racks column by column that's more efficient but for forklift moving vertically is a little bit slower than moving
+
+**Speaker 2** _[14:17]_
+
+bit slower than moving horizontally.
+
+**Speaker 1** _[14:18]_
+
+horizontally so we figured out that
+
+**Speaker 2** _[14:20]_
+
+that the best way to fill these racks is to do it directly.
+
+**Speaker 1** _[14:20]_
+
+the best way to is to do it diagonally. So okay, this is a test case that shows you
+
+**Speaker 2** _[14:29]_
+
+where the first pallet in an empty rack should be placed.
+
+**Speaker 1** _[14:33]_
+
+Let's explain what this test does. It starts by creating a palette.
+
+**Speaker 2** _[14:37]_
+
+And I use the test data to build one line of code
+
+**Speaker 1** _[14:38]_
+
+Build one line of code and have a pallet with 100 items
+
+**Speaker 2** _[14:40]_
+
+100 items on it.
+
+**Speaker 1** _[14:40]_
+
+on it. One line of code.
+
+**Speaker 2** _[14:41]_
+
+195. And then with two nested loops, I can create this.
+
+**Speaker 1** _[14:44]_
+
+I can create this rack, the same rack as we saw in the previous picture.
+
+**Speaker 2** _[14:50]_
+
+It's three lines of code.
+
+**Speaker 1** _[14:52]_
+
+And then we ask, okay, the rack is still
+
+**Speaker 2** _[14:54]_
+
+the rack is still empty, you won't have to
+
+**Speaker 1** _[14:54]_
+
+empty you own applications without pallets so it is empty and we ask where should this pallet
+
+**Speaker 2** _[14:57]_
+
+where should this pallet go? It should go to the first location
+
+**Speaker 1** _[14:59]_
+
+go to the first location at level zero,
+
+**Speaker 2** _[15:01]_
+
+level zero, at ground level. So that's what's
+
+**Speaker 1** _[15:03]_
+
+So that's what's expressed in the assert part. But this is the setup for...
+
+**Speaker 2** _[15:07]_
+
+for an empty rack, still doable in code.
+
+**Speaker 1** _[15:10]_
+
+doable in code, but imagine you want to put a pallet at specific locations.
+
+**Speaker 2** _[15:14]_
+
+locations? Well, the code
+
+**Speaker 1** _[15:15]_
+
+Well, the code might get a bit ugly.
+
+**Speaker 2** _[15:18]_
+
+But looking at this diagram inspires me to
+
+**Speaker 1** _[15:21]_
+
+to represent the setup data using a multiline string.
+
+**Speaker 2** _[15:26]_
+
+So you see the string on the right-hand side.
+
+**Speaker 1** _[15:27]_
+
+string on the right hand side, I use the pipes to indicate like the boundaries of the rack. And
+
+**Speaker 2** _[15:33]_
+
+And then the letter O indicates the positions, the locations that...
+
+**Speaker 1** _[15:35]_
+
+locations that contain a pallet.
+
+**Speaker 2** _[15:37]_
+
+And then the asterisk indicates the location where the next pallet should be.
+
+**Speaker 1** _[15:40]_
+
+The next pallet should be put.
+
+**Speaker 2** _[15:42]_
+
+So actually, we're not only specifying the range part, but even the assert part.
+
+**Speaker 1** _[15:45]_
+
+part with one multiline string. We can write tests like that. I showed you an example of three different tests. Each test has a string that describes the intent of the test, and then comes this multiline string that
+
+**Speaker 2** _[16:00]_
+
+specify the range part and assert part. And on the right hand, you see the code.
+
+**Speaker 1** _[16:03]_
+
+see the code that executes this test. It's a parameterized test. So for each tuple of a description and this multi-line string, each such tuple
+
+**Speaker 2** _[16:13]_
+
+For each such tupple tupple
+
+**Speaker 1** _[16:13]_
+
+this method test
+
+**Speaker 2** _[16:15]_
+
+method TestStockingPalette will be called once.
+
+**Speaker 1** _[16:18]_
+
+And how does this...
+
+**Speaker 2** _[16:19]_
+
+Just work while it gets
+
+**Speaker 1** _[16:20]_
+
+while it gets the description and the smelter lines
+
+**Speaker 2** _[16:22]_
+
+This multiline string is parametric.
+
+**Speaker 1** _[16:23]_
+
+thing as parameter. Well, I
+
+**Speaker 2** _[16:24]_
+
+Well, I ignored the description.
+
+**Speaker 1** _[16:25]_
+
+the description for the test is only used for the developer to
+
+**Speaker 2** _[16:28]_
+
+the developer to read, but yeah, to
+
+**Speaker 1** _[16:28]_
+
+read but you have to understand the intent of the test but then this multi-line string it's a
+
+**Speaker 2** _[16:33]_
+
+assigned to the variable bulk I'll map and then
+
+**Speaker 1** _[16:35]_
+
+and then, okay, how does this test work?
+
+**Speaker 2** _[16:37]_
+
+test work first it builds using the model on string and builds the location
+
+**Speaker 1** _[16:41]_
+
+the locations in the database and it returns the expected location. I will show you the contents of this create location.
+
+**Speaker 2** _[16:46]_
+
+this create locations in all methods in a minute. Then we use the test data builder
+
+**Speaker 1** _[16:51]_
+
+a test data builder again to create a pallet. Then we ask, okay, we have a pallet to what stop location should it move. And finally, we assert that the destination is equal to the expected location.
+
+**Speaker 2** _[17:04]_
+
+So using this multi-line string, okay,
+
+**Speaker 1** _[17:05]_
+
+line string okay it gets a little bit maybe a little bit nasty but just a little bit this method takes this multi-line string and it's going to parse it
+
+**Speaker 2** _[17:16]_
+
+I'll use a regular expression to
+
+**Speaker 1** _[17:17]_
+
+expression to split this smooth line string in one line.
+
+**Speaker 2** _[17:20]_
+
+one line
+
+**Speaker 1** _[17:21]_
+
+an array of one lines.
+
+**Speaker 2** _[17:24]_
+
+I reversed the order of the lines because I want to create
+
+**Speaker 1** _[17:26]_
+
+because I want to create the rack from
+
+**Speaker 2** _[17:27]_
+
+direct from level zero.
+
+**Speaker 1** _[17:28]_
+
+level zero to the top.
+
+**Speaker 2** _[17:31]_
+
+And then we enter an asset loop.
+
+**Speaker 1** _[17:32]_
+
+nested loop and the nested loop will if
+
+**Speaker 2** _[17:33]_
+
+loop will iterate over the lines and per line.
+
+**Speaker 1** _[17:35]_
+
+and per line and it's going to scan character by character
+
+**Speaker 2** _[17:36]_
+
+character by character within.
+
+**Speaker 1** _[17:37]_
+
+actor of a film between
+
+**Speaker 2** _[17:38]_
+
+between those five characters.
+
+**Speaker 1** _[17:39]_
+
+in those pipe characters, and then it checks, okay, for each.
+
+**Speaker 2** _[17:41]_
+
+Each position I have to create a bulk
+
+**Speaker 1** _[17:42]_
+
+I have to create a build location. Again, I can use the test.
+
+**Speaker 2** _[17:44]_
+
+the test data builder for that. Again, just one line. And then if the character happens to be the letter O, we
+
+**Speaker 1** _[17:49]_
+
+We create a palette on that bulk location, again, using the test data builder.
+
+**Speaker 2** _[17:56]_
+
+If the character happens to be the asterisk, we remember the expected
+
+**Speaker 1** _[17:59]_
+
+remember the expected location and there's one thing I didn't tell you yet but if the character is the letter X then it means that the bullet location is blocked
+
+**Speaker 2** _[18:08]_
+
+And if a bulk location is blocked,
+
+**Speaker 1** _[18:09]_
+
+is blocked, that means we are not allowed to put
+
+**Speaker 2** _[18:11]_
+
+you're not allowed to put paddles in there.
+
+**Speaker 1** _[18:12]_
+
+It's not shown in this, in the three test cases before, but it's shown in one of these actual test cases. But see, having this kind of code and visualizing your set of data, it's...
+
+**Speaker 2** _[18:24]_
+
+data it's very easy
+
+**Speaker 1** _[18:25]_
+
+Very easy to
+
+**Speaker 2** _[18:26]_
+
+to write lots and lots of tests. And you can even invite your
+
+**Speaker 1** _[18:29]_
+
+invite like your product owner if the product owner is not a programmer everyone who understands the context can help you write test cases like that so i think it's really a
+
+**Speaker 2** _[18:37]_
+
+I think it's really a powerful technique.
+
+**Speaker 1** _[18:41]_
+
+The final technique I want to show you, the workflow,
+
+**Speaker 2** _[18:45]_
+
+This is a typical workflow
+
+**Speaker 1** _[18:46]_
+
+the typical workflow of
+
+**Speaker 2** _[18:47]_
+
+flow of order handling.
+
+**Speaker 1** _[18:48]_
+
+order handling, customer places order, plan on general support,
+
+**Speaker 2** _[18:51]_
+
+The planner generates a pick list. An operator picks the pick list.
+
+**Speaker 1** _[18:53]_
+
+the pick list, more steps alone. In the end, the
+
+**Speaker 2** _[18:57]_
+
+Yeah, the fella's put in a truck.
+
+**Speaker 1** _[18:57]_
+
+the pallets put in the truck, but each of those steps actually consists of a sub-break flow, like the picking of a pick list.
+
+**Speaker 2** _[19:06]_
+
+It has its subflow on the right.
+
+**Speaker 1** _[19:07]_
+
+flow on the right. It starts with an operator in a forklift picking up an empty pallet, then go to some location in the pick area and then the wearer's management system tells him to which location he should drive, and then how many items should be picked, and then go to the next location, again, pick a number of items, and finally the pallet is put away, and then the operator can pick up the next pallet for the next pick list.
+
+**Speaker 2** _[19:32]_
+
+But having this workflow inspires me.
+
+**Speaker 1** _[19:34]_
+
+inspires me to write
+
+**Speaker 2** _[19:35]_
+
+to write a class, which I will call PickWorkflow,
+
+**Speaker 1** _[19:38]_
+
+that will help you to execute these
+
+**Speaker 2** _[19:40]_
+
+execute these steps in the correct order.
+
+**Speaker 1** _[19:43]_
+
+So this big workflow
+
+**Speaker 2** _[19:44]_
+
+This pick workflow class will get methods like
+
+**Speaker 1** _[19:46]_
+
+at methods like generatePickList, which generates a pick list.
+
+**Speaker 2** _[19:49]_
+
+But it also will have like a method called
+
+**Speaker 1** _[19:50]_
+
+a method called pick and you can specify which items should be picked
+
+**Speaker 2** _[19:53]_
+
+But you can call this pick method.
+
+**Speaker 1** _[19:55]_
+
+all this big methods without explicitly calling
+
+**Speaker 2** _[19:57]_
+
+explicitly calling generatePixels
+
+**Speaker 1** _[19:58]_
+
+generate picklist. And then this pick method will detect that no picklist was generated and it will
+
+**Speaker 2** _[20:03]_
+
+will ensure that all the necessary steps
+
+**Speaker 1** _[20:05]_
+
+the necessary steps that have to be taken in advance,
+
+**Speaker 2** _[20:08]_
+
+will be executed for you.
+
+**Speaker 1** _[20:09]_
+
+for you so let's show
+
+**Speaker 2** _[20:10]_
+
+let's show it in code. I think maybe it's easier to explain in code. This is the pick workflow class. It has only one required parameter. It's the items.
+
+**Speaker 1** _[20:17]_
+
+It's the items, and that is a dictionary with items.
+
+**Speaker 2** _[20:20]_
+
+item quantities and that are the
+
+**Speaker 1** _[20:21]_
+
+and that are the items of the order.
+
+**Speaker 2** _[20:23]_
+
+the customer ordered certain items.
+
+**Speaker 1** _[20:25]_
+
+certain items. We create a service,
+
+**Speaker 2** _[20:28]_
+
+service class
+
+**Speaker 1** _[20:28]_
+
+class that contains the business logic.
+
+**Speaker 2** _[20:29]_
+
+that contains
+
+**Speaker 1** _[20:31]_
+
+It has methods like generate picklist, move palette. The forklift, we store the forklift. If you didn't specify a forklift explicitly, we use a test data builder to
+
+**Speaker 2** _[20:39]_
+
+a test data builder to get you one
+
+**Speaker 1** _[20:40]_
+
+to get you one, we create the order using the
+
+**Speaker 2** _[20:42]_
+
+order using the test data builder.
+
+**Speaker 1** _[20:43]_
+
+That's Data Builder.
+
+**Speaker 2** _[20:44]_
+
+We remember the picklist we were working on, well initially
+
+**Speaker 1** _[20:47]_
+
+well initially it's none
+
+**Speaker 2** _[20:49]_
+
+We remember the big bell
+
+**Speaker 1** _[20:50]_
+
+Pick palette is actually the palette that's now on your forklift.
+
+**Speaker 2** _[20:53]_
+
+on your forklift.
+
+**Speaker 1** _[20:54]_
+
+That's the palette on which you're putting the item.
+
+**Speaker 2** _[20:55]_
+
+putting the items and we also have a list called picked pallets where we
+
+**Speaker 1** _[21:00]_
+
+That's where we remember all the pick palettes you have seen so far. Imagine some orders are so big that you need more
+
+**Speaker 2** _[21:06]_
+
+you need more than one palette to pick
+
+**Speaker 1** _[21:07]_
+
+on one palette to pick them, so this
+
+**Speaker 2** _[21:09]_
+
+So this list pick palettes.
+
+**Speaker 1** _[21:09]_
+
+list picked palettes remembers all palettes that belong
+
+**Speaker 2** _[21:11]_
+
+all pallets that belong to this one order.
+
+**Speaker 1** _[21:12]_
+
+to this one order. And then you can specify if you should generate pick locations. Many tests are not really interested from which locations you actually want to pick. So if that's not relevant, you can say, okay, generate the pick locations for me.
+
+**Speaker 2** _[21:27]_
+
+And then this big workflow,
+
+**Speaker 1** _[21:27]_
+
+And then this pick... workflow we'll look at
+
+**Speaker 2** _[21:29]_
+
+We'll look at the order and we'll create
+
+**Speaker 1** _[21:30]_
+
+create pick locations for the items in the
+
+**Speaker 2** _[21:32]_
+
+for the items in the order and we'll put
+
+**Speaker 1** _[21:33]_
+
+order and we'll put pallets on the pick locations with enough stock
+
+**Speaker 2** _[21:35]_
+
+so you can pick the entire order.
+
+**Speaker 1** _[21:35]_
+
+so you the entire order.
+
+**Speaker 2** _[21:39]_
+
+And then, for instance, the pick method.
+
+**Speaker 1** _[21:43]_
+
+Yeah, you can only pick after picklist has been generated. So how do we ensure
+
+**Speaker 2** _[21:46]_
+
+How do we ensure that all the steps in the workflow are
+
+**Speaker 1** _[21:48]_
+
+are executed in the correct order,
+
+**Speaker 2** _[21:49]_
+
+executed in the correct order, well, this is one way to
+
+**Speaker 1** _[21:50]_
+
+This is one way to implement that. The pick method starts the calling, ensure picklist
+
+**Speaker 2** _[21:54]_
+
+ensure picklist is generated
+
+**Speaker 1** _[21:54]_
+
+is generated. And that method only checks
+
+**Speaker 2** _[21:57]_
+
+If there's already a pick list,
+
+**Speaker 1** _[21:58]_
+
+a picklist defined, and if not, it will generate a picklist right then.
+
+**Speaker 2** _[22:03]_
+
+And next, well, you
+
+**Speaker 1** _[22:03]_
+
+Well, you can only pick pick items if there is a
+
+**Speaker 2** _[22:05]_
+
+if there is a pallet on your forklift. So we ensure that the pick pallet is created
+
+**Speaker 1** _[22:08]_
+
+pig palette is created. And how do you do that? Again, we check this
+
+**Speaker 2** _[22:11]_
+
+at this detectives pick palette variable, if it's none,
+
+**Speaker 1** _[22:14]_
+
+If it's none, then we create a palette on the forklift.
+
+**Speaker 2** _[22:16]_
+
+on the forklift and we remember this palette in
+
+**Speaker 1** _[22:18]_
+
+this pallet in the picked pallet list.
+
+**Speaker 2** _[22:22]_
+
+And after that, we can perform the actual pick by
+
+**Speaker 1** _[22:24]_
+
+actual pick by asking the service method to which location you should drive with the forklift and then pick the items from that location. So how can you use this workflow? Well, imagine we're testing picking. One of the flows is you have an order.
+
+**Speaker 2** _[22:41]_
+
+You have an order of five items, which
+
+**Speaker 1** _[22:42]_
+
+which is expressed here.
+
+**Speaker 2** _[22:44]_
+
+express here and you already picked two items
+
+**Speaker 1** _[22:46]_
+
+In this case, I generate the pick location explicitly.
+
+**Speaker 2** _[22:50]_
+
+I call location P1.
+
+**Speaker 1** _[22:51]_
+
+P1. So we
+
+**Speaker 2** _[22:52]_
+
+So we create an order of five items
+
+**Speaker 1** _[22:53]_
+
+five items and we already pick two items that's just expressed by two lines of code.
+
+**Speaker 2** _[22:57]_
+
+And then we go to...
+
+**Speaker 1** _[22:58]_
+
+we ask, okay, how many items should I still pick if I go to location P1?
+
+**Speaker 2** _[23:02]_
+
+in P1 and the answer
+
+**Speaker 1** _[23:03]_
+
+And the answer should be three.
+
+**Speaker 2** _[23:03]_
+
+should be
+
+**Speaker 1** _[23:05]_
+
+But the whole setup, these three lines of code, will generate a lot of data in your database.
+
+**Speaker 2** _[23:08]_
+
+an order, a pick list, a
+
+**Speaker 1** _[23:10]_
+
+a big palette on a forklift, just three lines of code.
+
+**Speaker 2** _[23:14]_
+
+I think it'd even get better if you
+
+**Speaker 1** _[23:16]_
+
+get better if you
+
+**Speaker 2** _[23:17]_
+
+have to go further into the
+
+**Speaker 1** _[23:18]_
+
+further into the flow, maybe even
+
+**Speaker 2** _[23:19]_
+
+flow, maybe even go all the way in the flow.
+
+**Speaker 1** _[23:20]_
+
+in the flow for instance imagine you want to put pellets inside the trucks
+
+**Speaker 2** _[23:24]_
+
+inside the truck, you have to pick the pallets, put them in the truck
+
+**Speaker 1** _[23:25]_
+
+Let's put them in a truck.
+
+**Speaker 2** _[23:26]_
+
+Before the truck leaves, you have to generate
+
+**Speaker 1** _[23:28]_
+
+you have to generate a transport notice.
+
+**Speaker 2** _[23:30]_
+
+A transport notice is a document
+
+**Speaker 1** _[23:31]_
+
+a document or a file you send to the transport company and it just describes the contents in the in the truck so describes which pallets are in there
+
+**Speaker 2** _[23:39]_
+
+which palettes aren't there and what
+
+**Speaker 1** _[23:39]_
+
+there, and what are the items on the pallet. Well, if you want to test this for three pallets,
+
+**Speaker 2** _[23:44]_
+
+from three different orders.
+
+**Speaker 1** _[23:48]_
+
+Well, you only need three lines of code.
+
+**Speaker 2** _[23:50]_
+
+we create three times a big workflow specified
+
+**Speaker 1** _[23:51]_
+
+specify the contents of the orders and say, pick and put pallet in a truck. It's just three lines of code to get three pallets, but on the route, it will create three orders, three pick lists. It will pick those orders and move
+
+**Speaker 2** _[24:04]_
+
+and move the palace to the picture.
+
+**Speaker 1** _[24:04]_
+
+the palace to the piglets. Three lines of code.
+
+**Speaker 2** _[24:07]_
+
+Then we can generate the tick list of the
+
+**Speaker 1** _[24:08]_
+
+pick list or the transport notice,
+
+**Speaker 2** _[24:10]_
+
+And we can assure that the transfer notice
+
+**Speaker 1** _[24:11]_
+
+transport notice contains the correct contents so to conclude
+
+**Speaker 2** _[24:17]_
+
+I've shown you three techniques, test data builder, visualizing the
+
+**Speaker 1** _[24:19]_
+
+visualizing the set of data and
+
+**Speaker 2** _[24:20]_
+
+setup data and the workflow, and if you use
+
+**Speaker 1** _[24:22]_
+
+And if you use these techniques, you can set up your database for each test case with complete and realistic data with just a few lines of code.
+
+**Speaker 2** _[24:29]_
+
+A few lines of code.
+
+**Speaker 1** _[24:31]_
+
+So, to finalize, if you want...
+
+**Speaker 2** _[24:33]_
+
+Finally, if you want to learn more
+
+**Speaker 1** _[24:34]_
+
+want to learn more about me, my hobbies, my open source projects, I
+
+**Speaker 2** _[24:38]_
+
+worked on and why I draw these
+
+**Speaker 1** _[24:39]_
+
+draw these funny pictures check out my website the contents of what i just talked to you and explained to you are available on my website just scan the qr code then there's a post that explains everything with the same code samples even more complete code samples so
+
+**Speaker 2** _[24:57]_
+
+Thank you for your attention.
+
+**Speaker 1** _[24:58]_
+
+Thank you for your attention.
+
+**Speaker 3** _[25:05]_
+
+Thank you, Sandra, for the very insightful talk. I have to confess, when I do my Python code testing, it heavily relies on print statements, so this was a whole other world of testing. We have five minutes for questions, so please just do raise your hand and I'll run over to you.
+
+**Speaker 4** _[25:33]_
+
+Yes, hi. Thank you for a great talk and just a little advice. It might be a good idea to start using PyTest fixtures to separate creation of test data from the actual testing method, because then you can reduce even amount of code instead of that three lines of code. But when you create actual data, you can just put one argument or three arguments to the method. It will be a huge simplification.
+
+**Speaker 1** _[26:10]_
+
+Okay, I would love to find out more about that, but then I wonder, is the test data still near the code?
+
+**Speaker 2** _[26:17]_
+
+near the code that executes the test or it's some are completely different.
+
+**Speaker 1** _[26:20]_
+
+Some are completely different because that's something new for me.
+
+**Speaker 4** _[26:23]_
+
+Yes, just a point to discover, so that might be a good idea.
+
+**Speaker 1** _[26:28]_
+
+Okay, I would love to talk about that. Maybe in the evening during the party at IBM.
+
+**Speaker 2** _[26:35]_
+
+maybe during lunch break or during another break i'd love to hear more
+
+**Speaker 1** _[26:39]_
+
+hear more about that
+
+**Speaker 3** _[26:41]_
+
+Very well. Thanks for the suggestion. Anybody has...
+
+**Speaker 5** _[26:54]_
+
+Hi, thanks for the talk and the nice examples. I was curious if you could speak a little bit to the performance or maybe some of the trade-offs in terms of the database operations required to set up these complex structures. Do you find that that ends up being a significant proportion of the test running time? Are there ways to maybe speed that up when you have lots of objects that need to be created every single time? What are your thoughts on that?
+
+**Speaker 2** _[27:18]_
+
+Good question.
+
+**Speaker 1** _[27:20]_
+
+As I said, the Paint Factory, in the end, we wrote, I think, about 16,000 tests. Most of them used the database. I must admit that there we even used the database.
+
+**Speaker 2** _[27:32]_
+
+used SQL statements or something.
+
+**Speaker 1** _[27:33]_
+
+statements ourselves to create the structure of the database. We didn't have a nice ORM like Django over there. But to fill the data in the database, in the end, we started using these kind of techniques. I think the running time was mostly determined by...
+
+**Speaker 2** _[27:51]_
+
+building the tables and
+
+**Speaker 1** _[27:52]_
+
+tables and executing the SQL scripts to build the tables. Filling like 10, 20, 100 records in a database per test wasn't the biggest concern for us in the end.
+
+**Speaker 5** _[28:02]_
+
+So sorry to monopolize. Do you run into any problems related to if you have data migrations that, for example, change the structure of something like a palette or just to say more generally, if you have data migrations or schema migrations where you need to basically.
+
+**Speaker 1** _[28:17]_
+
+to basically uh
+
+**Speaker 5** _[28:18]_
+
+apply migrations, having them defined in code, I could imagine is maybe a liability because then you can't so easily just apply the migrations to that. You have to actually make changes in the code. Do you find that that's a concern?
+
+**Speaker 1** _[28:31]_
+
+or how do you get around that? I think it's even quite easy to support migrations because if you use Django, you use Django for the database migrations. But for instance, if you say, we're gonna add one more column to the pallet table, it means that in the test data builder, you maybe have to change a couple of methods that they
+
+**Speaker 2** _[28:49]_
+
+methods that they also take care
+
+**Speaker 1** _[28:50]_
+
+also take care of this new property of that palette but that you only do that like in the in the test
+
+**Speaker 2** _[28:56]_
+
+in the Test Data Builder and all
+
+**Speaker 1** _[28:56]_
+
+data build and all tests that use a test data builder get this new column basically for free. If you, at least if you can use like a default value for a new column. And only probably also gonna add a few more tests
+
+**Speaker 2** _[29:08]_
+
+a few more tests that will attest
+
+**Speaker 1** _[29:09]_
+
+test, that will test this new property. So you have to add a couple of more tests that are going to use that new property. And yeah, in my experience, I think it's really easy to use to deal with changes in the database with the test data builder instead of writing SQL scripts to fill the data for your test cases.
+
+**Speaker 2** _[29:29]_
+
+So for us, yeah, it was never a problem.
+
+**Speaker 1** _[29:30]_
+
+never a problem using these techniques.
+
+**Speaker 3** _[29:35]_
+
+Yeah, just one question from that side of the room, and then we'll have to wrap it up.
+
+**Speaker 4** _[29:51]_
+
+Hi, thanks for the talk. I like the idea of the test data builder we are also using at our company. I was just wondering for the examples that you presented.
+
+**Speaker 1** _[30:00]_
+
+I thought that...
+
+**Speaker 4** _[30:02]_
+
+I would rather write unit tests for that and not having every single test rely on the full database integration. And as you just said, most of your tests in the paint factory were actually using the databases. Maybe you have a comment on that as well.
+
+**Speaker 1** _[30:15]_
+
+Yeah, we indeed made a swing. We started out writing unit tests with lots of mocks in there. And in the end, it bit us so hard because we had quite a lot of complex logic in our service layer. And it turned out that if you want to use unit tests where you have to mock out the data layer, then the setup of those tests was so complex. And it made it harder to refactor code or to reimagine.
+
+**Speaker 2** _[30:42]_
+
+or to re-implement certain parts of this logic,
+
+**Speaker 1** _[30:44]_
+
+parts of this logic. So for us, it really paid out by using those tests that use the database for basically all test cases. So yeah, they perform maybe a little bit, take a little bit longer to run. But in the end, for us, it was much easier to write the test. The tests were also easier to understand because they are written like at a high level describing a whole workflow. And if you only have a unit test that only focus on one
+
+**Speaker 2** _[31:08]_
+
+focus on one small part
+
+**Speaker 1** _[31:08]_
+
+small part with a very small
+
+**Speaker 2** _[31:09]_
+
+with a very specific setup.
+
+**Speaker 1** _[31:11]_
+
+up, yeah, for us, it didn't break
+
+**Speaker 2** _[31:11]_
+
+Yeah, for us, Break out at all
+
+**Speaker 1** _[31:13]_
+
+out.
+
+**Speaker 3** _[31:15]_
+
+Right. Thank you very much for attending. Please stay in for the next talk about PyWTF. That's the description. And for those who want to leave, please leave, but do give a round of applause for the speaker.
+
+---
+transcript_status: auto
+---
+transcript_language: en

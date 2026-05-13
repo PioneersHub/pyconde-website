@@ -83,3 +83,1850 @@ video_duration_iso: PT20M19S
 video_thumbnail: https://i.ytimg.com/vi/98nyBGXalNg/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+Hi there, I'm glad to be here and I like to take
+
+**Speaker 2** _[00:07]_
+
+like to tell you about some of our recent
+
+**Speaker 1** _[00:10]_
+
+recent data-related projects at JetBrains. Let me briefly introduce my
+
+**Speaker 2** _[00:14]_
+
+introduce myself. My name is Vasily. I
+
+**Speaker 1** _[00:17]_
+
+I work at JetBrains as a data scientist and product manager in
+
+**Speaker 2** _[00:21]_
+
+in Datalog's team.
+
+**Speaker 1** _[00:22]_
+
+JetBrains is a software vendor. We develop and sell IDs and developer tools.
+
+**Speaker 2** _[00:29]_
+
+and since
+
+**Speaker 1** _[00:30]_
+
+And since we are...
+
+**Speaker 2** _[00:31]_
+
+we are at the data
+
+**Speaker 1** _[00:31]_
+
+at the data conference.
+
+**Speaker 2** _[00:32]_
+
+conference you might
+
+**Speaker 1** _[00:34]_
+
+have heard or use PyCharm. And regarding datalore, datalore is our recent
+
+**Speaker 2** _[00:39]_
+
+recent product for
+
+**Speaker 1** _[00:40]_
+
+product for data analysis
+
+**Speaker 2** _[00:41]_
+
+data analysis and machine
+
+**Speaker 1** _[00:42]_
+
+and machine learning, you can easily
+
+**Speaker 2** _[00:43]_
+
+You can easily create
+
+**Speaker 1** _[00:44]_
+
+create some predictive models, reach visualization,
+
+**Speaker 2** _[00:47]_
+
+visualization
+
+**Speaker 1** _[00:48]_
+
+and share it with your colleagues.
+
+**Speaker 2** _[00:49]_
+
+with your colleagues get some code review there.
+
+**Speaker 1** _[00:51]_
+
+there everything in cloud and for free and my product my project called
+
+**Speaker 2** _[00:57]_
+
+called AI Intentions and Code Completion. So I'll guess all of you...
+
+**Speaker 1** _[01:03]_
+
+All of you have heard a lot about
+
+**Speaker 2** _[01:05]_
+
+a lot about AI in
+
+**Speaker 1** _[01:06]_
+
+in use and
+
+**Speaker 2** _[01:07]_
+
+use and
+
+**Speaker 1** _[01:08]_
+
+in the web and I apologize
+
+**Speaker 2** _[01:09]_
+
+and I apologize for mentioning
+
+**Speaker 1** _[01:10]_
+
+for mention these two letters in my topic but it's a good way to
+
+**Speaker 2** _[01:12]_
+
+but it's a good way just to indicate the idea behind this.
+
+**Speaker 1** _[01:17]_
+
+meaning to predict something based
+
+**Speaker 2** _[01:19]_
+
+something based on the users'
+
+**Speaker 1** _[01:20]_
+
+users behavior patterns and
+
+**Speaker 2** _[01:22]_
+
+and content. And also when you give
+
+**Speaker 1** _[01:25]_
+
+And also when you giving a talk it's like
+
+**Speaker 2** _[01:26]_
+
+in a talk it's like AI when you
+
+**Speaker 1** _[01:27]_
+
+AI, when you're working on it, it's ML, and when you think
+
+**Speaker 2** _[01:29]_
+
+And when you're thinking...
+
+**Speaker 1** _[01:30]_
+
+how to solve this problem it's usually a linear algebra or statistics
+
+**Speaker 2** _[01:34]_
+
+statistics.
+
+**Speaker 1** _[01:35]_
+
+So I hope you won't blame me for that two capital letters, and let's get started. My presentation is divided into two parts.
+
+**Speaker 2** _[01:42]_
+
+into two parts. First will be about
+
+**Speaker 1** _[01:44]_
+
+intentions and the second about code completions. Let's start from intentions. So the idea of the project
+
+**Speaker 2** _[01:53]_
+
+was quite simple.
+
+**Speaker 1** _[01:54]_
+
+DataLog supports intentions, which is basically
+
+**Speaker 2** _[01:57]_
+
+which is basically a piece of code some
+
+**Speaker 1** _[02:00]_
+
+some recommendation based on your
+
+**Speaker 2** _[02:02]_
+
+based on your previous sales online
+
+**Speaker 1** _[02:04]_
+
+cells or lines of code.
+
+**Speaker 2** _[02:05]_
+
+of code.
+
+**Speaker 1** _[02:06]_
+
+and intentions cover
+
+**Speaker 2** _[02:08]_
+
+over, we're
+
+**Speaker 1** _[02:09]_
+
+variety of actions such as generating code
+
+**Speaker 2** _[02:12]_
+
+code if you load your
+
+**Speaker 1** _[02:14]_
+
+load your csv then you
+
+**Speaker 2** _[02:15]_
+
+then you have
+
+**Speaker 1** _[02:16]_
+
+intentions to drop an A, for example, in
+
+**Speaker 2** _[02:18]_
+
+for example in pandas,
+
+**Speaker 1** _[02:19]_
+
+pandas or it could be some optimization suggestion
+
+**Speaker 2** _[02:21]_
+
+suggestion.
+
+**Speaker 1** _[02:22]_
+
+and the idea was to rank this list
+
+**Speaker 2** _[02:25]_
+
+this list of...
+
+**Speaker 1** _[02:26]_
+
+of intentions and determine the
+
+**Speaker 2** _[02:29]_
+
+top list of intentions based on the previous lines of code.
+
+**Speaker 1** _[02:34]_
+
+lines of code. And the goal is to create
+
+**Speaker 2** _[02:37]_
+
+create smart
+
+**Speaker 1** _[02:38]_
+
+a smart code
+
+**Speaker 2** _[02:39]_
+
+called Code Helper.
+
+**Speaker 1** _[02:40]_
+
+helper and gather some interesting stats from
+
+**Speaker 2** _[02:43]_
+
+stats from the datasets. For sure we faced several
+
+**Speaker 1** _[02:47]_
+
+several challenges during this project. The first one was about
+
+**Speaker 2** _[02:52]_
+
+The first one was about privacy.
+
+**Speaker 1** _[02:52]_
+
+privacy.
+
+**Speaker 2** _[02:53]_
+
+We can't accept
+
+**Speaker 1** _[02:55]_
+
+can't access the users
+
+**Speaker 2** _[02:55]_
+
+the user's source code
+
+**Speaker 1** _[02:57]_
+
+source code.
+
+**Speaker 2** _[02:58]_
+
+and we cannot
+
+**Speaker 1** _[02:59]_
+
+cannot match the exact
+
+**Speaker 2** _[03:00]_
+
+the exact line of code with
+
+**Speaker 1** _[03:03]_
+
+code with
+
+**Speaker 2** _[03:03]_
+
+intention which were
+
+**Speaker 1** _[03:06]_
+
+activated or involved
+
+**Speaker 2** _[03:07]_
+
+invoking.
+
+**Speaker 1** _[03:08]_
+
+and the second we got there
+
+**Speaker 2** _[03:10]_
+
+got the statistic about our usage
+
+**Speaker 1** _[03:13]_
+
+Usage, like events,
+
+**Speaker 2** _[03:14]_
+
+and like events.
+
+**Speaker 1** _[03:15]_
+
+And it's also anonymous.
+
+**Speaker 2** _[03:17]_
+
+anonymous and it was quite
+
+**Speaker 1** _[03:20]_
+
+quite a tricky to make
+
+**Speaker 2** _[03:21]_
+
+to match the
+
+**Speaker 1** _[03:23]_
+
+the activity of users with the intentions from this event data.
+
+**Speaker 2** _[03:26]_
+
+event data so for
+
+**Speaker 1** _[03:29]_
+
+Reinforce our model.
+
+**Speaker 2** _[03:31]_
+
+model, we
+
+**Speaker 1** _[03:31]_
+
+We gathered six million
+
+**Speaker 2** _[03:33]_
+
+6 million public
+
+**Speaker 1** _[03:34]_
+
+public Jupyter notebooks from the web. We filter them out like a Python 2 version or
+
+**Speaker 2** _[03:35]_
+
+jubilee. or just
+
+**Speaker 1** _[03:42]_
+
+or just empty or maybe
+
+**Speaker 2** _[03:45]_
+
+may be very old.
+
+**Speaker 1** _[03:46]_
+
+very old notebooks.
+
+**Speaker 2** _[03:46]_
+
+notebooks.
+
+**Speaker 1** _[03:47]_
+
+and we also use our
+
+**Speaker 2** _[03:48]_
+
+use our internal data
+
+**Speaker 1** _[03:50]_
+
+internal data about usage.
+
+**Speaker 2** _[03:50]_
+
+about usage with more than 1 million events.
+
+**Speaker 1** _[03:55]_
+
+events with timestamps.
+
+**Speaker 2** _[03:55]_
+
+with timestamps.
+
+**Speaker 1** _[03:57]_
+
+And here's the example of
+
+**Speaker 2** _[03:58]_
+
+example of the simple Jupyter notebook
+
+**Speaker 1** _[04:03]_
+
+file with some metadata and cell structures in JSON.
+
+**Speaker 2** _[04:08]_
+
+So before we get started to implement something
+
+**Speaker 1** _[04:12]_
+
+something and create predictive models, we get some insights from this.
+
+**Speaker 2** _[04:15]_
+
+from this
+
+**Speaker 1** _[04:15]_
+
+6 million notebooks.
+
+**Speaker 2** _[04:17]_
+
+notebooks.
+
+**Speaker 1** _[04:19]_
+
+on the slide so basically some of the nobles
+
+**Speaker 2** _[04:21]_
+
+those like 2.6% don't use
+
+**Speaker 1** _[04:24]_
+
+don't use Python at all. There are some Python related Julia language or some exotic ones like
+
+**Speaker 2** _[04:30]_
+
+like F sharp.
+
+**Speaker 1** _[04:31]_
+
+And another interesting fact that more than 300,000 notebooks were with sensitive data, such as credentials, passwords.
+
+**Speaker 2** _[04:41]_
+
+tokens, which is
+
+**Speaker 1** _[04:42]_
+
+which is also quite a lot.
+
+**Speaker 2** _[04:44]_
+
+in that
+
+**Speaker 1** _[04:47]_
+
+data group of six million notebooks and also
+
+**Speaker 2** _[04:52]_
+
+few distributions of some
+
+**Speaker 1** _[04:53]_
+
+of some statistics. Here's like import stats which shows that about 15% of
+
+**Speaker 2** _[05:00]_
+
+of users don't
+
+**Speaker 1** _[05:01]_
+
+use import at all
+
+**Speaker 2** _[05:02]_
+
+at all.
+
+**Speaker 1** _[05:03]_
+
+And, well, the main case cover, then...
+
+**Speaker 2** _[05:06]_
+
+cover them.
+
+**Speaker 1** _[05:07]_
+
+figure with less than 10 imports per
+
+**Speaker 2** _[05:11]_
+
+Notebook.
+
+**Speaker 1** _[05:12]_
+
+And the same for folder structure, which was interesting, because about a third of users don't use any subfolders in their projects. Regarding technical stack, we use...
+
+**Speaker 2** _[05:26]_
+
+We use TensorFlow for training our model.
+
+**Speaker 1** _[05:30]_
+
+training our models
+
+**Speaker 2** _[05:31]_
+
+By the way,
+
+**Speaker 1** _[05:32]_
+
+By the way, PyCharm supports the
+
+**Speaker 2** _[05:34]_
+
+the mission
+
+**Speaker 1** _[05:34]_
+
+New version of TensorFlow fully supported.
+
+**Speaker 2** _[05:36]_
+
+fully supports it, and we use the
+
+**Speaker 1** _[05:39]_
+
+We use standard flow serving for production and for serving our
+
+**Speaker 2** _[05:42]_
+
+serving our models and we use
+
+**Speaker 1** _[05:44]_
+
+and we use flask to
+
+**Speaker 2** _[05:45]_
+
+Use Flask to
+
+**Speaker 1** _[05:46]_
+
+a pre and post
+
+**Speaker 2** _[05:47]_
+
+post-processing our data sets via an Nginx
+
+**Speaker 1** _[05:52]_
+
+and nginx. So to implement
+
+**Speaker 2** _[05:55]_
+
+And our model of
+
+**Speaker 1** _[05:58]_
+
+of intentions, we use
+
+**Speaker 2** _[06:00]_
+
+two standard services.
+
+**Speaker 1** _[06:00]_
+
+to one service for
+
+**Speaker 2** _[06:03]_
+
+for processing data.
+
+**Speaker 1** _[06:05]_
+
+processing data, and another for predictions. And regarding prediction...
+
+**Speaker 2** _[06:08]_
+
+prediction so each action of the user were mapped
+
+**Speaker 1** _[06:13]_
+
+to the vector.
+
+**Speaker 2** _[06:15]_
+
+And then we use a LSTM model.
+
+**Speaker 1** _[06:19]_
+
+and map this feature with the probability.
+
+**Speaker 2** _[06:22]_
+
+of the next tutorial.
+
+**Speaker 1** _[06:24]_
+
+of the next iteration. So the idea to get the list of
+
+**Speaker 2** _[06:27]_
+
+of
+
+**Speaker 1** _[06:27]_
+
+top top top useful intentions based
+
+**Speaker 2** _[06:30]_
+
+based on the previous expectations.
+
+**Speaker 1** _[06:32]_
+
+actions of user. So I can show you the
+
+**Speaker 2** _[06:35]_
+
+you the scheme which is better for
+
+**Speaker 1** _[06:36]_
+
+scheme which is better
+
+**Speaker 2** _[06:36]_
+
+later.
+
+**Speaker 1** _[06:38]_
+
+represent the idea of
+
+**Speaker 2** _[06:39]_
+
+idea of the
+
+**Speaker 1** _[06:39]_
+
+the architecture. So it's like the two-way
+
+**Speaker 2** _[06:42]_
+
+two-way model where we have actions from the user's notebook, tokenized,
+
+**Speaker 1** _[06:49]_
+
+tokenize this data
+
+**Speaker 2** _[06:50]_
+
+this data and then make prediction use
+
+**Speaker 1** _[06:52]_
+
+make prediction using LSTM and at the final step we add some probabilities to get the
+
+**Speaker 2** _[06:57]_
+
+to get the final list.
+
+**Speaker 1** _[06:58]_
+
+final list with
+
+**Speaker 2** _[06:59]_
+
+with top-ranked
+
+**Speaker 1** _[07:00]_
+
+ranked intentions. And the next slide shows
+
+**Speaker 2** _[07:04]_
+
+shows the
+
+**Speaker 1** _[07:06]_
+
+Simple demo of our model.
+
+**Speaker 2** _[07:07]_
+
+of our model.
+
+**Speaker 1** _[07:09]_
+
+So, on the left side it's like the old one, without any kind of
+
+**Speaker 2** _[07:12]_
+
+kind of ML algorithm.
+
+**Speaker 1** _[07:13]_
+
+ML algorithms. And the new one is
+
+**Speaker 2** _[07:15]_
+
+is our AI intentions,
+
+**Speaker 1** _[07:18]_
+
+where you can see the user
+
+**Speaker 2** _[07:19]_
+
+the user loads some CSV file with pandas.
+
+**Speaker 1** _[07:24]_
+
+file with pandas and set their target feature and after that with new model you
+
+**Speaker 2** _[07:28]_
+
+the new model, you get the
+
+**Speaker 1** _[07:30]_
+
+A train and test split prevails over others, whereas with the old one you just get the list of intentions. So that was the idea.
+
+**Speaker 2** _[07:41]_
+
+the idea of the
+
+**Speaker 1** _[07:43]_
+
+AI intentions and as a result
+
+**Speaker 2** _[07:46]_
+
+we get the 60%
+
+**Speaker 1** _[07:48]_
+
+60% accuracy for top one
+
+**Speaker 2** _[07:49]_
+
+for top one intention.
+
+**Speaker 1** _[07:51]_
+
+Intention and 92% for Top 5.
+
+**Speaker 2** _[07:53]_
+
+top 5.
+
+**Speaker 1** _[07:54]_
+
+Which is quite good
+
+**Speaker 2** _[07:56]_
+
+deck and account
+
+**Speaker 1** _[07:56]_
+
+taking account the fact that it's like the five options after you, let's say, upload your CSV file.
+
+**Speaker 2** _[08:03]_
+
+CSV file
+
+**Speaker 1** _[08:06]_
+
+The second part is about code completion.
+
+**Speaker 2** _[08:07]_
+
+code completion. It's also a hot topic
+
+**Speaker 1** _[08:10]_
+
+topic, and lots of companies like to get rid of data scientists or engineers.
+
+**Speaker 2** _[08:15]_
+
+engineers with the AI algorithms.
+
+**Speaker 1** _[08:18]_
+
+and for sure there are lots of existences
+
+**Speaker 2** _[08:20]_
+
+of existing solutions for of small
+
+**Speaker 1** _[08:22]_
+
+of smart helpers and code
+
+**Speaker 2** _[08:24]_
+
+helpers and code completions a jet
+
+**Speaker 1** _[08:27]_
+
+At JetBrains we already have
+
+**Speaker 2** _[08:28]_
+
+have ML completion.
+
+**Speaker 1** _[08:30]_
+
+a completion ranking, which we could
+
+**Speaker 2** _[08:31]_
+
+which you could activate
+
+**Speaker 1** _[08:32]_
+
+you could activate in your settings in
+
+**Speaker 2** _[08:33]_
+
+settings in IntelliJ IDEA and PyCharm.
+
+**Speaker 1** _[08:36]_
+
+PyCharm.
+
+**Speaker 2** _[08:36]_
+
+There are many of them, like, you name it, from...
+
+**Speaker 1** _[08:41]_
+
+from where my
+
+**Speaker 2** _[08:42]_
+
+where major...
+
+**Speaker 1** _[08:43]_
+
+major vendors, but at Datalore we'd like to create a specific
+
+**Speaker 2** _[08:48]_
+
+a specific code completion model because data law works
+
+**Speaker 1** _[08:52]_
+
+data lower work with some subset of
+
+**Speaker 2** _[08:55]_
+
+subset of Python because it's about
+
+**Speaker 1** _[08:57]_
+
+it's about data analysis and
+
+**Speaker 2** _[08:59]_
+
+machine learning.
+
+**Speaker 1** _[09:01]_
+
+learning.
+
+**Speaker 2** _[09:04]_
+
+We have a specific machine learning vocabulary, so...
+
+**Speaker 1** _[09:09]_
+
+but we can also use
+
+**Speaker 2** _[09:10]_
+
+we can also use the whole domain for
+
+**Speaker 1** _[09:13]_
+
+for pre-training our model.
+
+**Speaker 2** _[09:14]_
+
+our model
+
+**Speaker 1** _[09:15]_
+
+And also, where you work with Jupyter Notebook,
+
+**Speaker 2** _[09:19]_
+
+Jupyter Notebooks, you have
+
+**Speaker 1** _[09:20]_
+
+you have the structure of cells and this structure and sequences of
+
+**Speaker 2** _[09:23]_
+
+also might be useful.
+
+**Speaker 1** _[09:24]_
+
+also might be used to
+
+**Speaker 2** _[09:25]_
+
+to get additional
+
+**Speaker 1** _[09:26]_
+
+get additional input features. So with this project we also face some challenging
+
+**Speaker 2** _[09:32]_
+
+some challenges with which are
+
+**Speaker 1** _[09:35]_
+
+a large variety of
+
+**Speaker 2** _[09:37]_
+
+of completion data.
+
+**Speaker 1** _[09:37]_
+
+data and the
+
+**Speaker 2** _[09:38]_
+
+and the classical
+
+**Speaker 1** _[09:40]_
+
+classical imbalance of intentions data
+
+**Speaker 2** _[09:40]_
+
+imagination. data because the
+
+**Speaker 1** _[09:44]_
+
+the vast majority of our users don't use intentions at all, unfortunately.
+
+**Speaker 2** _[09:49]_
+
+Unfortunately,
+
+**Speaker 1** _[09:49]_
+
+So we have unbalanced
+
+**Speaker 2** _[09:50]_
+
+balance problem
+
+**Speaker 1** _[09:53]_
+
+And we use oversampling to solve that.
+
+**Speaker 2** _[09:57]_
+
+Concerning pipeline
+
+**Speaker 1** _[09:59]_
+
+so we're dealing with with the notebooks and at the first step we just
+
+**Speaker 2** _[10:04]_
+
+merge or like join all the
+
+**Speaker 1** _[10:07]_
+
+all the sales.
+
+**Speaker 2** _[10:08]_
+
+and filter out
+
+**Speaker 1** _[10:09]_
+
+filter out markdowns, some
+
+**Speaker 2** _[10:11]_
+
+some images and metadata from the Jupyter notebooks.
+
+**Speaker 1** _[10:15]_
+
+Then we use...
+
+**Speaker 2** _[10:17]_
+
+We use byte pair.
+
+**Speaker 1** _[10:17]_
+
+byte pair encoder for data compression
+
+**Speaker 2** _[10:21]_
+
+for data compression, and we use last-end tokens with
+
+**Speaker 1** _[10:24]_
+
+with different variety to
+
+**Speaker 2** _[10:26]_
+
+variety to path the model for
+
+**Speaker 1** _[10:28]_
+
+the model for predictions.
+
+**Speaker 2** _[10:28]_
+
+predictions the next token will send.
+
+**Speaker 1** _[10:30]_
+
+Wilson
+
+**Speaker 2** _[10:31]_
+
+try different models and different value of n
+
+**Speaker 1** _[10:37]_
+
+and at this step.
+
+**Speaker 2** _[10:39]_
+
+step.
+
+**Speaker 1** _[10:39]_
+
+And on the last step we just use the TopKeyPredictions to
+
+**Speaker 2** _[10:43]_
+
+to understand the list of probabilities for them.
+
+**Speaker 1** _[10:47]_
+
+next line of code or next piece of code for model architecture we use
+
+**Speaker 2** _[10:52]_
+
+use a transformer.
+
+**Speaker 1** _[10:53]_
+
+transformer because
+
+**Speaker 2** _[10:54]_
+
+because it's...
+
+**Speaker 1** _[10:55]_
+
+it's like a state of the
+
+**Speaker 2** _[10:56]_
+
+of the
+
+**Speaker 1** _[10:58]_
+
+the art for the last two years, especially for
+
+**Speaker 2** _[11:00]_
+
+especially for NLP problems.
+
+**Speaker 1** _[11:04]_
+
+But we use only an encoder.
+
+**Speaker 2** _[11:06]_
+
+encoder blocks with positional embedding.
+
+**Speaker 1** _[11:09]_
+
+positional embeddings in it. And the number of attention heads and size of
+
+**Speaker 2** _[11:14]_
+
+and size of blocks also.
+
+**Speaker 1** _[11:15]_
+
+blocks also vary.
+
+**Speaker 2** _[11:16]_
+
+vary. And to implement this model, we generate bit-pair encoding, as I mentioned before, and we mapped it with
+
+**Speaker 1** _[11:26]_
+
+mapped it with like most frequent
+
+**Speaker 2** _[11:27]_
+
+most frequent units.
+
+**Speaker 1** _[11:29]_
+
+and then we trained our model using the
+
+**Speaker 2** _[11:34]_
+
+using the answer
+
+**Speaker 1** _[11:34]_
+
+unsupervised approach where we have
+
+**Speaker 2** _[11:37]_
+
+where we have a few tokens.
+
+**Speaker 1** _[11:39]_
+
+tokens, and we predict the next one.
+
+**Speaker 2** _[11:43]_
+
+And to show the
+
+**Speaker 1** _[11:45]_
+
+The result of our
+
+**Speaker 2** _[11:46]_
+
+of our model.
+
+**Speaker 1** _[11:48]_
+
+have some simple example with
+
+**Speaker 2** _[11:51]_
+
+with our current proof of concept as
+
+**Speaker 1** _[11:55]_
+
+As you can see,
+
+**Speaker 2** _[11:55]_
+
+As you can see,
+
+**Speaker 1** _[11:57]_
+
+So, sometimes it shows quite a good accuracy, but the idea that you type some
+
+**Speaker 2** _[12:03]_
+
+you type sum.
+
+**Speaker 1** _[12:05]_
+
+some string and get the
+
+**Speaker 2** _[12:06]_
+
+and get there
+
+**Speaker 1** _[12:08]_
+
+and get the output for your next
+
+**Speaker 2** _[12:10]_
+
+or your next function or component.
+
+**Speaker 1** _[12:12]_
+
+or command so as a result we have
+
+**Speaker 2** _[12:16]_
+
+have 57% top 1.
+
+**Speaker 1** _[12:20]_
+
+accuracy and moreover it's only 200 ms
+
+**Speaker 2** _[12:24]_
+
+milliseconds performance. So for the further
+
+**Speaker 1** _[12:30]_
+
+further improvement and further steps.
+
+**Speaker 2** _[12:32]_
+
+and further stays because there's
+
+**Speaker 1** _[12:33]_
+
+there's always space to improve your
+
+**Speaker 2** _[12:35]_
+
+to improve your model, we plan to add into our
+
+**Speaker 1** _[12:40]_
+
+into our dataset.
+
+**Speaker 2** _[12:41]_
+
+data set the right
+
+**Speaker 1** _[12:41]_
+
+the runtime metadata as
+
+**Speaker 2** _[12:44]_
+
+as an additional feature because it has
+
+**Speaker 1** _[12:45]_
+
+because it helps us to understand
+
+**Speaker 2** _[12:46]_
+
+helps us to understand the
+
+**Speaker 1** _[12:47]_
+
+the consumption of each line or also
+
+**Speaker 2** _[12:50]_
+
+Also, we can use this for...
+
+**Speaker 1** _[12:52]_
+
+additional loss function. And we can also plan to use domain-specific
+
+**Speaker 2** _[12:57]_
+
+in specific Python language to...
+
+**Speaker 1** _[13:01]_
+
+create new intentions for
+
+**Speaker 2** _[13:02]_
+
+for like the
+
+**Speaker 1** _[13:03]_
+
+for the first project which I mentioned, and the idea was to find some
+
+**Speaker 2** _[13:06]_
+
+find some patterns.
+
+**Speaker 1** _[13:08]_
+
+some patterns during the
+
+**Speaker 2** _[13:09]_
+
+during the data science workflow to create a new
+
+**Speaker 1** _[13:13]_
+
+create a new intentions for datalore. And also we plan to
+
+**Speaker 2** _[13:16]_
+
+we plan to implement the evaluation
+
+**Speaker 1** _[13:18]_
+
+the evaluation metric into
+
+**Speaker 2** _[13:19]_
+
+into Datalog product.
+
+**Speaker 1** _[13:21]_
+
+Datalore product to understand the
+
+**Speaker 2** _[13:22]_
+
+to understand the real performance of our feature.
+
+**Speaker 1** _[13:27]_
+
+feature and this code completion will be implemented in the coming
+
+**Speaker 2** _[13:32]_
+
+in the coming update.
+
+**Speaker 1** _[13:32]_
+
+update of the datalore.
+
+**Speaker 2** _[13:35]_
+
+So it's also a good time to mention
+
+**Speaker 1** _[13:38]_
+
+to mention my teammates.
+
+**Speaker 2** _[13:39]_
+
+and my teammates. Adam from Boston.
+
+**Speaker 1** _[13:40]_
+
+from Boston and Vladimir from Moscow.
+
+**Speaker 2** _[13:42]_
+
+from Moscow, so we...
+
+**Speaker 1** _[13:44]_
+
+now working on this
+
+**Speaker 2** _[13:45]_
+
+project and project relates to machine learning at Datalore
+
+**Speaker 1** _[13:52]_
+
+And the final slide is about references which
+
+**Speaker 2** _[13:58]_
+
+from which we got the inspiration.
+
+**Speaker 1** _[14:00]_
+
+the inspiration to this. to these projects and for example, the second one is
+
+**Speaker 2** _[14:07]_
+
+For the second one, attention is only needed
+
+**Speaker 1** _[14:08]_
+
+all you need is not about
+
+**Speaker 2** _[14:10]_
+
+not about some personal development or mindfulness.
+
+**Speaker 1** _[14:14]_
+
+mindfulness or happiness
+
+**Speaker 2** _[14:14]_
+
+happiness is just specifically about the neural nets transformer
+
+**Speaker 1** _[14:20]_
+
+architecture. So that's basically it. Thank you for your attention.
+
+**Speaker 3** _[14:31]_
+
+All right. Thank you, Vasily. We have lots of time for questions. Any questions in the audience?
+
+**Speaker 4** _[14:43]_
+
+Thank you for the talk. And in regards to code completion, I have a question. Then maybe if nobody has a question, then I'll ask about AI intentions. But first, the code completion. So how did it, how did you, what's the specific, like, the details? Are you predicting, like, based on n previous characters, the next character? Or is it a word-based, like, or is there some rule-based technique in there in order to alleviate the possible problems?
+
+**Speaker 1** _[15:08]_
+
+Right, so we use different number of
+
+**Speaker 4** _[15:08]_
+
+Right.
+
+**Speaker 2** _[15:10]_
+
+number of
+
+**Speaker 1** _[15:12]_
+
+words and symbols to create the prediction for the next one and we try
+
+**Speaker 2** _[15:16]_
+
+we try different like skipping window to create the prediction for for the next line of code
+
+**Speaker 1** _[15:22]_
+
+line of code. And we just choose the
+
+**Speaker 2** _[15:24]_
+
+the one with the
+
+**Speaker 1** _[15:25]_
+
+one with the best performance.
+
+**Speaker 2** _[15:26]_
+
+the best performance.
+
+**Speaker 5** _[15:36]_
+
+First of all, thanks for the talk. And one thing I'm a bit confused about is when you talked about the class imbalance, did you manually tag those or how did you get the actual target intention?
+
+**Speaker 1** _[15:53]_
+
+So as I mentioned,
+
+**Speaker 2** _[15:54]_
+
+As I mentioned, the problem with unbalanced data
+
+**Speaker 1** _[15:59]_
+
+with unbalanced data and for that we use like oversampling with synthesized data of
+
+**Speaker 2** _[16:05]_
+
+of
+
+**Speaker 1** _[16:06]_
+
+uh Intentions Evoking
+
+**Speaker 2** _[16:08]_
+
+a walking and
+
+**Speaker 1** _[16:09]_
+
+and we label this
+
+**Speaker 2** _[16:10]_
+
+these samples.
+
+**Speaker 1** _[16:12]_
+
+as intentions.
+
+**Speaker 2** _[16:14]_
+
+so
+
+**Speaker 1** _[16:16]_
+
+Because for imbalance problem you have several approaches like under-sampling and over-sampling. So we choose over-sampling because we...
+
+**Speaker 2** _[16:24]_
+
+because we gathered six million millions
+
+**Speaker 1** _[16:28]_
+
+public Jupyter notebooks. Also we match them with our
+
+**Speaker 2** _[16:30]_
+
+with our 1 million events of usage of our platform.
+
+**Speaker 1** _[16:35]_
+
+Usage of our product, like the intentions,
+
+**Speaker 2** _[16:37]_
+
+the intentions events.
+
+**Speaker 1** _[16:38]_
+
+events with timestamps. And this helps us to generate the
+
+**Speaker 2** _[16:42]_
+
+generate the
+
+**Speaker 1** _[16:43]_
+
+Additional classes for Intentional and
+
+**Speaker 2** _[16:45]_
+
+and to uh
+
+**Speaker 1** _[16:46]_
+
+get the balanced problem between classes.
+
+**Speaker 6** _[16:59]_
+
+I was wondering how much faster you think you can make it in the near future. Because 200 milliseconds is already pretty fast, but still on the edge of real interactivity.
+
+**Speaker 1** _[17:15]_
+
+Right, thank you for that question.
+
+**Speaker 2** _[17:16]_
+
+question it's really
+
+**Speaker 1** _[17:17]_
+
+It really depends on performance.
+
+**Speaker 2** _[17:19]_
+
+performance because still
+
+**Speaker 1** _[17:20]_
+
+still with the current model we can
+
+**Speaker 2** _[17:22]_
+
+model we can make it faster but
+
+**Speaker 1** _[17:23]_
+
+faster, but with less
+
+**Speaker 2** _[17:24]_
+
+but with less experience.
+
+**Speaker 1** _[17:25]_
+
+accuracy and also we have other limits
+
+**Speaker 2** _[17:29]_
+
+other limits such as web-based product because data lore is
+
+**Speaker 1** _[17:32]_
+
+DataLore is in cloud.
+
+**Speaker 2** _[17:33]_
+
+is in cloud, you don't need some local
+
+**Speaker 1** _[17:34]_
+
+some local environment or
+
+**Speaker 2** _[17:36]_
+
+or your...
+
+**Speaker 1** _[17:38]_
+
+Machine with lots of memory.
+
+**Speaker 2** _[17:39]_
+
+So we stuck into
+
+**Speaker 1** _[17:40]_
+
+we stuck into that limits and I think
+
+**Speaker 2** _[17:43]_
+
+I think the...
+
+**Speaker 1** _[17:45]_
+
+threshold of 200 milliseconds is quite
+
+**Speaker 2** _[17:48]_
+
+is quite good for data
+
+**Speaker 1** _[17:50]_
+
+data science workflow because you don't need
+
+**Speaker 2** _[17:53]_
+
+don't need to think what
+
+**Speaker 1** _[17:55]_
+
+like to think first when you write
+
+**Speaker 2** _[17:56]_
+
+when you write the next line of code and we
+
+**Speaker 1** _[17:59]_
+
+aim to do this
+
+**Speaker 2** _[18:00]_
+
+this figure for the
+
+**Speaker 1** _[18:02]_
+
+for the next version.
+
+**Speaker 2** _[18:03]_
+
+the next version.
+
+**Speaker 3** _[18:08]_
+
+You want to ask again?
+
+**Speaker 4** _[18:11]_
+
+So I joined two minutes later, so maybe you talked about it in the very beginning, but about these AI intentions, where do you get the ground truth on the intentions? Where does it come from?
+
+**Speaker 1** _[18:23]_
+
+So, in DataLore we have intentions.
+
+**Speaker 2** _[18:26]_
+
+have intentions, like it's just a code
+
+**Speaker 1** _[18:27]_
+
+It's just code suggestions. And when the user...
+
+**Speaker 2** _[18:30]_
+
+other
+
+**Speaker 1** _[18:31]_
+
+press this button or activate it, we collect all the
+
+**Speaker 2** _[18:34]_
+
+collect all the data about these events, like the type of
+
+**Speaker 1** _[18:37]_
+
+like the type of intention and the type of code which user generate. So we got this
+
+**Speaker 2** _[18:41]_
+
+So we got these historical data.
+
+**Speaker 1** _[18:44]_
+
+data and use it for train our model
+
+**Speaker 3** _[18:50]_
+
+Anybody else? I have one more question. How did you determine that there were 300,000 notebooks with sensitive information?
+
+**Speaker 2** _[18:59]_
+
+Basically, we just count them using...
+
+**Speaker 3** _[19:02]_
+
+But not by hand, right?
+
+**Speaker 2** _[19:03]_
+
+But not by hand. No, of course not.
+
+**Speaker 3** _[19:04]_
+
+No.
+
+**Speaker 1** _[19:05]_
+
+We use like a simple string
+
+**Speaker 2** _[19:06]_
+
+string mask, which
+
+**Speaker 1** _[19:08]_
+
+with regular expressions to
+
+**Speaker 2** _[19:08]_
+
+regular to get the pattern
+
+**Speaker 1** _[19:11]_
+
+pattern of best
+
+**Speaker 2** _[19:11]_
+
+of passwords and
+
+**Speaker 1** _[19:14]_
+
+like the form of the regular sensitive data.
+
+**Speaker 2** _[19:15]_
+
+data.
+
+**Speaker 1** _[19:19]_
+
+Right then
+
+**Speaker 3** _[19:19]_
+
+then if there are no more questions let's thank this oh there is one
+
+**Speaker 1** _[19:27]_
+
+How do you split the code of those many notebooks into blocks for suggestions and for training?
+
+**Speaker 2** _[19:36]_
+
+as I shown on the
+
+**Speaker 1** _[19:37]_
+
+shown on this slide with the
+
+**Speaker 2** _[19:38]_
+
+with
+
+**Speaker 1** _[19:40]_
+
+with the sample of Jupyter notebook you can easily
+
+**Speaker 2** _[19:44]_
+
+can easily understand the sequence of cells and
+
+**Speaker 1** _[19:47]_
+
+and you can filter them with some conditions and after that you can
+
+**Speaker 2** _[19:53]_
+
+can concatenate them and split by
+
+**Speaker 1** _[19:55]_
+
+split by, let's
+
+**Speaker 2** _[19:56]_
+
+let's say by
+
+**Speaker 1** _[19:57]_
+
+by packages or libraries,
+
+**Speaker 2** _[19:59]_
+
+depends on your goal.
+
+**Speaker 3** _[20:10]_
+
+All right, so if there are no more questions now, let's thank the speaker again.
+
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -92,3 +92,434 @@ video_duration_iso: PT1H16M
 video_thumbnail: https://i.ytimg.com/vi/MZjjPn7IpgQ/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:06]_
+
+My name is Jessica, this is Dominique. We both work at Ecosia. So Ecosia is a search engine that trees. So it's similar to Google, DuckDuckGo, but with the difference that we plant trees with our ads revenue and today we will talk about goal and we were before
+
+**Speaker 2** _[00:43]_
+
+I don't know when I should go do it, but it's clear. I don't know. I don't know.
+
+**Speaker 1** _[00:49]_
+
+Right.
+
+**Speaker 2** _[00:52]_
+
+What is this?
+
+**Speaker 1** _[00:57]_
+
+Right. Thank you. Yeah, so we both worked with Python before. And today we want to show you about how it's working with Go and we'll create a small project. And then we also want to show you the perspective of working with Go, but from a perspective of being Python developers. And now Dominic will tell you more about how it goes and its advantages.
+
+**Speaker 2** _[01:39]_
+
+like because we might be being recorded. Are we recorded?
+
+**Speaker 1** _[01:42]_
+
+Please use the mic anyway. Yeah. Okay, so...
+
+**Speaker 2** _[01:56]_
+
+right is that working kind of cool um so first we want to tell you why us python developers would even care about go uh and there's some points here um one of the reasons you probably heard a lot it's fast and from our experience that's pretty much true so that's cool um if you need to you can do system level development which can be cool if you need to do these kind of things But it's the much nicer than using C for these kind of things One of the big reasons why we oh, yeah, that would be nicer One of the reasons why we using it at Ecosia is because it has web kind of built in into its standards library so you can do a lot of Web stuff like sending requests But also starting a server all of these kind of things just with the Senate library in a really really nice way And also it has parallelism built right into the language which especially as a Python developer. I think here's the main difference You can do a lot of these things in Python, it's just way harder to do so. It's a type language, you might like that or not. And it has kind of an interesting concept of interfaces, things that Python kind of does with inheritance, you do with interfaces here, and find it at least interesting, I wouldn't necessarily say better or worse. It has a very extensive standard library, which is something you know from Python, but if you, for example, had to use JavaScript, you sometimes have this feeling, oh yeah, there's something missing maybe. And, yeah, as I said, web is so much built in that it has even, like, an HTML rendering, like, template rendering engine built in, right, in the language. And it's heavily inspired by Python. I mean, that's a good reason to use it, I guess. As the title kind of promises, this is mostly going to focus on parallel programming. And I already said this may be a little bit tricky to do in Python. And here's some of the reasons why. um one of them maybe you heard the talk yesterday about the jill um yeah so the most commonly used python implementation c python has a global interpreter lock which for a lot of scenarios might not matter as much but for some scenarios is still relevant um yeah you could use something like multi-processing to kind of work around that but then the cost of running all of these heavy processes it's memory intensive exchanging messages gets quite expensive um so you might not want to do that uh and the way go is structured because it's right built in into the language it's very nice to do things in parallel you don't you barely notice in python you have to jump for a lot of hoops doing threads using queues um to somehow synchronize having new texas um all of these kind of things especially talking about new texas um in python most of the standard library is not thread safe so you have to make sure parallel access is fine go on the other hand as i said has parallelism built right in it has a very interesting way of doing parallelism which is called go routines i don't want to go into too much detail but it's basically you can run several go um go routines uh concurrently in a single operating system thread so you can have parallelism on a sub-operating system thread level, but also it can pan out to multiple threads if necessary. And it kind of handles that in the back itself. So it's super lightweight, it's super automated, and it's just pretty nice. Also you have the go keyword, which is basically the only thing you have to do to run something in parallel. You have your function, you write go in front, it's parallel, there you go. That was not a bad one. And it has channels to kind of synchronize between these goroutines, which is a very nice way to send messages between goroutines, and you don't have to think about race conditions, you don't have to think about locking, all of these things are just kind of magically taken care of. And as already said, in Go, the standard library is pretty much thread-safe, so pretty much everything you can use, you can use it in a goroutine and share between goroutines. Also because the core language is that way, a lot of packages written by third parties like open source packages are written in a thread-safe way as well. All right, awesome.
+
+**Speaker 1** _[06:14]_
+
+Yeah, so today we will show to you most of the strengths from Go, especially because Go has a strong HTTP library, so we will take advantage of that and use it today. And we will build this small project, which is kind of a smaller version from a project that we have at Ecosia running production. We will run several APIs concurrently, and we will just parse the response and show to the user. And in this case, as you guys are attending a live session, we ask if you have any questions in between, because we will do some live programming, so if you have any questions, we just ask the person that is not presenting, so we can try to help you. right, so I actually need to change
+
+**Speaker 2** _[07:11]_
+
+Thank you.
+
+**Speaker 1** _[07:40]_
+
+Cool. So everyone has access to this repo? Has everyone cloned the repo and it's locally? So I'll start but in between you can clone this as a base and actually we can start just with everyone has access to this URL yeah okay so actually you can clone if you want but we can start creating an empty folder and you can just add this new Go.mod file with a module and the Go version.
+
+**Speaker 2** _[08:43]_
+
+Thank you.
+
+**Speaker 1** _[08:54]_
+
+Good morning, everyone.
+
+**Speaker 2** _[09:06]_
+
+Thank you.
+
+**Speaker 1** _[09:09]_
+
+Right, so the first thing we will do, we will basically call a very simple endpoint. So this is how the endpoint looks like. It just returns a list of colors, and the value is always kind of random, just an hexadecimal. and I'll start creating a new file which we will call main.go. This will be the entry point to our project and I start defining package main and And then here we...
+
+**Speaker 2** _[10:02]_
+
+Thank you.
+
+**Speaker 1** _[10:06]_
+
+We start defining our main function.
+
+**Speaker 2** _[10:09]_
+
+Thank you.
+
+**Speaker 1** _[10:12]_
+
+So, here, similar to Python, the difference is that in Python, you would do something like if name equals main. So, that is equivalent to that in Python. So, here will be the first entry point to our project. And for now, we didn't implement yet the call to the API. so I'll just write this
+
+**Speaker 2** _[10:41]_
+
+Thank you very much.
+
+**Speaker 1** _[10:46]_
+
+Let's just call api.coexbot.
+
+**Speaker 2** _[10:50]_
+
+Thank you.
+
+**Speaker 1** _[10:53]_
+
+And then this will return a response and an error. So different from Python, in Python you just raise an error and then you catch it in the try accept block. In Go, we actually expect an error variable of type error in Go. And then we would do the validation manually. so it would do something like if error different from null and then we would treat the error but for now let's just not do that let's just ignore the error and we will just print the response
+
+**Speaker 2** _[11:47]_
+
+Thank you very much.
+
+**Speaker 1** _[11:48]_
+
+This is just a special way to format the string. And then we do the same for the arrow. Cool, so now we want to implement the code to the API and
+
+**Speaker 2** _[12:25]_
+
+That's right. Maybe there's an original just because.
+
+**Speaker 1** _[12:33]_
+
+Ah, sorry. So Dominique just remembered me. Since I'm using the VS Code, so it handles imports automatically, and I have like a Go plugin that just handles syntax and imports and everything. So what happened is that when I added those two lines to print the response and the error, it also imported the FMT package from Google, which is just the one that we can use for printing things. It also has things for errors, and you can also print errors and format errors, strings, and everything.
+
+**Speaker 2** _[13:14]_
+
+I hope you'll listen, though, to...
+
+**Speaker 1** _[13:16]_
+
+Yeah, you can do like import FMT. Yeah, you just add to the file, import FMT, and then if you have Go installed, when you run this Go run main.go, then it would just work, hopefully.
+
+**Speaker 2** _[13:40]_
+
+his targeting status I bring to you.
+
+**Speaker 1** _[13:43]_
+
+Yeah, exactly. It's already built-in. Actually, for this first part, everything is already built-in in the language.
+
+**Speaker 2** _[13:43]_
+
+Yeah.
+
+**Speaker 1** _[13:52]_
+
+So, we wouldn't need to install any specific libraries outside. So, now we can create a new folder. Here we would have the code to the API. just call xbot.go, and you see that the response that we have is very simple, it's just like a list of colors and each element has a value, the value is a string, and that in Go we would use structs to parse the response, so I'll show you, we would basically mimic the same structure that we have in the response, so we would call typeExportResponseStruct and then here we define our list of colors, which is also struct, like each element is a struct, and then inside the struct we have the value. So here Go will see, okay, I have colors, I have value, and then it will match automatically with the structure that we defined, that is defined in the JSON response. So now we can start implementing our function that we call function call XBot. And as we saw here, we expect that this function returns a response and an error. So here in the return, we will just write like this. and now is the nice thing so here we call http dot get so again this is already beauty in the language you don't need to install anything from from outside and we can just put our our URL here and in this case if returns an error, what we do is that we check if we have an error, we just propagate it. So in this case we don't have any response actually, because we had problems, so we return new and then we propagate the error, which will be used in this the main function and then we can do the validation there. And then now we need to actually parse the response, the JSON response, into our struct. Let's just create another function for that. We can call function onMarshallXBotResponse. response and this function will receive a response
+
+**Speaker 2** _[17:34]_
+
+Thank you for watching.
+
+**Speaker 1** _[17:35]_
+
+of type HTTP response And then we will return here an export response and an error So here you see that I'm using this notation so this is to indicate that this is a pointer to a struct Which is our struct So in Go it has this concept of pointers, it's more explicit, it's actually explicit, which in Python we don't care about, and I'll not get into detail on that, but for now we just accept that we are returning a pointer to this struct, and that would be more efficient, because we are not returning the whole struct, so we just return a pointer to it, and then we can save like performance would be better and then here we can start parsing our response so we create a new variable of type Xbox response which is our struct and then we call it parsed
+
+**Speaker 2** _[18:51]_
+
+Yeah.
+
+**Speaker 1** _[18:56]_
+
+So, this is just to say that is a variable with name parsed of type XpotsResponse. Align 11.
+
+**Speaker 2** _[19:10]_
+
+It's too late.
+
+**Speaker 1** _[19:11]_
+
+Yeah, so here in this case, because I'm creating the variable, so we have different types, different ways of creating variables in Go. So you can use like this, or you could also use this notation, like XBot response, and then here expects that you create already. And also this two points, it indicates that it's a new variable. So if I was just reassigning, it would be something like this.
+
+**Speaker 2** _[19:51]_
+
+Thank you.
+
+**Speaker 1** _[20:00]_
+
+Cool, so now we have a new error that we expect because now we would use this method from JSON which is also included in the library in Go. And then we pass the body of our response to this new decoder and with the result of that we decode what we got into our parsed.
+
+**Speaker 2** _[20:32]_
+
+uh
+
+**Speaker 1** _[20:32]_
+
+struct. So now we send a pointer to the parsed variable and then this would already fill this struct with the values from our response.
+
+**Speaker 2** _[20:50]_
+
+Thank you.
+
+**Speaker 1** _[20:51]_
+
+And then we return this, so we return the pointer to the past, and the arrow, and then now we want to call this here inside call xbot, because we want to fill our struct. So let's just return already our function on Marshall call XBot response, passing the response that we get from here. And actually we can use this in a new constant to make it more explicit and better, so let's just call
+
+**Speaker 2** _[21:42]_
+
+Thank you for watching.
+
+**Speaker 1** _[21:43]_
+
+const, which is a constant, xbot.url,
+
+**Speaker 2** _[21:54]_
+
+Oh
+
+**Speaker 1** _[22:01]_
+
+Then we use here. And then this http.get I forgot to mention, it's like a request in Python.
+
+**Speaker 2** _[22:14]_
+
+Thank you.
+
+**Speaker 1** _[22:17]_
+
+and of course I forgot to add here the package API because now we like we created a new folder called API and then we need to specify the package cool so now we can try calling. You see again that the package was automatically imported.
+
+**Speaker 2** _[22:48]_
+
+Thank you.
+
+**Speaker 1** _[22:56]_
+
+So now we can try running our main function, and for this we just use go run main.go. Now you can see the response. If I call again it should do another request, and for now we don't get any errors.
+
+**Speaker 2** _[23:26]_
+
+for gift from God.
+
+**Speaker 1** _[23:28]_
+
+Yeah, so this is because, like in Go, you specify the path to the package. In this case, we are using from API, and this project is cloned inside this path. Did you write the code? No, I don't think so. You would need to write like this.
+
+**Speaker 2** _[23:55]_
+
+You might be from Java, where they also have the like, coms, log, whatever, whatever kind of... It makes it equal based on the type you did, the type you wrote, or like any type you wrote. Yeah. Is that your source or is there a space for it? Now we're from modules, but do you think we did?
+
+**Speaker 1** _[24:13]_
+
+Yeah.
+
+**Speaker 2** _[24:14]_
+
+Yeah.
+
+**Speaker 1** _[24:18]_
+
+Yeah.
+
+**Speaker 2** _[24:20]_
+
+Yeah.
+
+**Speaker 1** _[24:23]_
+
+Cool, so now you can try yourselves. So the idea is that we call another API, and you can see the instructions in the GitHub repo. You go to the second API call folder. So it's basically the same, but with the difference that now the API that we call returns a different response and it's another API so you would mimic so would add here new vexpot.go file do all the parsing from the response and then adding the code
+
+**Speaker 2** _[25:09]_
+
+Thank you.
+
+**Speaker 1** _[25:11]_
+
+Sorry. Adding the call from the main function. So we will give you 20 minutes? Five? Okay, five minutes.
+
+**Speaker 2** _[25:29]_
+
+Yeah, so I mean, this is why it's structured in several steps, so you don't, if you, well, I can just say that word. Yeah. All right, so there was concerns that maybe not everybody can follow in that speed, and that's completely fine. it's split up into several steps each step contains all the code that was written before so if you get lost somewhere in the middle of a step just wait for the step to be over copy paste the next step and you're good to go so everything we just wrote in this repository hardware is actually in step one api call and this has all the code we just wrote
+
+**Speaker 1** _[26:27]_
+
+Thank you.
+
+**Speaker 2** _[26:29]_
+
+So if you get lost, you can just copy-paste it from there and follow it from the start of the next step. All right. So in an ideal world, you all now would run the command and see something like this. Because you're not living in an ideal world, feel free to, as I said before, just go into the repo, go into second API call, and copy the file vexpod.go and main.go and replace what you currently have in your folder. Then we should be at the same state again, and you should hopefully be able to follow me from there. Jessica is still running around, so she can still support you in debugging things, getting things to run, but because we also want to make some progress, I'll just go ahead. All right. So, in the next step, in the introduction when you saw it in the schedule, we talked about wrapping this whole parallelism thing into a small abstraction that we call a job, and this is what we are going to do, and again we make a new folder called jobs, which is which is also, again, gonna be our package name, and we create a new file, which we're just gonna call base.go. This is gonna contain our base interface, which, if you're coming from some Java experience, interface might ring a bell. Otherwise, in Python, it's more the same concept as an abstract class. So you kind of define a blueprint of, all of these things should have these methods. And in Go, this happens like this. So, as I said, let's start with the package name. So, Go doesn't have classes. So, if you want to write methods, you have to attach methods to something. And actually, that something in Go can be pretty much whatever you want. The kind of default, if you don't know any better, is using a struct. But you could be using a string. People would probably look at you a bit weirdly and ask you why exactly do you pick a string. If you want to extend a string, that's cool. For anything else, if it doesn't matter, use a struct. We already defined structs, so that looks something like this. And I'm normally not typing on a US keyboard, so I managed, perfect. And as before, when we wanted to parse our JSON, we can just have arbitrary fields in there with arbitrary types. We think it's kind of nice to have an ID for a job so we can tell the different kind of jobs apart. Oh, sorry, that's a job result. So we want our job to return something and that should have the same ID as the job. It should have a result because that's what it's wrapping. And if you don't know the type of something in Go, because it's a typed language, you have to say something. And this is the so-called empty interface. An empty interface means I accept anything that doesn't implement anything. So it's basically no expectations. Anything passes through this. So that means I can put every type into this thing. And as you already saw before, Go likes doing error handling with explicit errors, so a job could return an actual result or an error. So now to the thing I actually introduced, the job interface. which we actually call an interface. Just to be able to kind of tie the result and the actual job together, this one has a method called id, which should ideally return the same string as id in the result up there. It also has a method called start, which basically means start doing your thing, please. And now there comes something that syntactically looks a bit strange. What does that mean? That means we have something that we were gonna call done, and here the name doesn't actually matter, of type channel job result. So this is both together is the type, and that means this is a channel that we can send job results over. Channels are something we use to synchronize goroutines, and you're gonna see how we use that later, but right now that just means this gets past the channel of that type. It's a little bit like a callback in JavaScript. I mean, you can also do callbacks in Python, especially if you did iSyncIO, maybe. So this is a similar concept. And we also want to be able to actually cancel a job. Right? So this is basically saying we, if we expect a job, we expect that job to have an ID method, a start method, and a cancel method, which is pretty much kind of formalized duct typing, right? It's like, you know, we should be able to do these things. We don't care if you inherit it from somewhere, if you implement it at yourself, or wherever you get these methods from, do whatever you feel like. You just have to have these methods. Right, let's also actually implement an example job. And we're gonna implement a job that wraps the HexBot API call. So we're just gonna call it HexBot as well. Right. it's in the same folder and in the same folder things have to have the same package so let's do that also i mean you saw before we kind of have a lot of things called ids we should probably define some id somewhere the quotes are here yes and it's just going to be the string hex button right so before i said if you want to have something that has methods that's something ideally is a struct so that's what we're going to do here and you can see this is just an empty struct right it doesn't have any fields because the fields don't matter what matters is the methods right how do you write a method onto a struct it's not that obvious and the syntax is a bit weird but once you have your head wrap your head around it it's at least understandable i guess and I'm going to write it out and then I can explain what that means later. Right. So this basically means if you forget about this thing, it's just a function, right? This is just a function called id that returns a string. This basically means this is a function and the first thing is called a receiver this is a function that can do things on hex bot which technically makes it a method on hex bot and the age there is pretty much the same as self in python right so this gives you a reference back to the struct
+
+**Speaker 1** _[33:52]_
+
+Thank you.
+
+**Speaker 2** _[33:54]_
+
+We're not actually going to use that, we're just going to return our ID here.
+
+**Speaker 1** _[34:00]_
+
+Thank you.
+
+**Speaker 2** _[34:03]_
+
+We also said we have to have a cancel method. So let's write that one. Again, same thing. We have this receiver argument. Yep, that is correct. Thank you very much. That looks better. Oh, yeah. Thank you. I also forgot the right struct here right we're gonna do the cancel in the next step so this is just going to print and we said we have a start method as well so let's implement that as well and we said that gets something called done which is a channel of type job result and we said what this job is going to do is rep the api call so we should probably call the api and then we had this wrapper around the result which we call job result and we said this has an ID which is just the export ID we already saw it wraps a result which is whatever type and in our case this is going to be the response and it has an error which Sarah so now if this would be a normal function which is to return result and be done right but we we said we're going to use this in a parallel fashion we're going to use it as a go routine we kind of want to use channels to not care about synchronizing things uh so instead of just returning it rewrite it into the channel and the syntax for that if i find that on this keyboard looks like this so this basically means put res into the channel done it's very similar to return this won't stop execution though so if you write code afterwards like here that would still get executed so in that regard it's different from a return right um you know constructors from python that's the lovely thing that It's called dunder init, right? Where you can initialize things. We don't have classes here, so constructors don't really work that well. But there is another pattern that kind of was established in Go, which is a so-called new method, function, sorry. And that's basically just a function that returns a new instance of that type. and right now that is super not exciting because you're not actually going to do something. But this would be the way where you can do all the kind of things you would do in an init. Nothing is preventing anybody from the outside to just do that themselves, right? It's a convention. So they can use new, and they get all the initialization that you think is meaningful. They can step around it and do it themselves. Because you're going to have several jobs in the same package, the names have to be unique. So let's call it new hex. bot job right um my ide lovely enough fixed all the things for me so make sure you have all the the imports here and i mean we're not using that job anywhere yet so it shouldn't change the output but it should ideally still run which it does which means i'm going to hand over to jessica
+
+**Speaker 1** _[38:12]_
+
+Thank you. Right, so now we defined the jobs and everything, but we actually want to use it and call it from the main function, which is still calling directly the API instead of calling the job. So now what we would do is that we define a new channel, like we define a new variable actually that creates a channel type jobs job result and this is from go as well built-in so this is how we create a channel and you can also would for use for other things like map and other types of variables. So let's comment this for now and then here we can call our XBot job.
+
+**Speaker 2** _[40:20]_
+
+Thank you.
+
+**Speaker 1** _[40:22]_
+
+so we just use jobs dot new export job
+
+**Speaker 2** _[40:34]_
+
+Thank you.
+
+**Speaker 1** _[40:38]_
+
+And the interesting thing now is that we will run this job in a GoRoutine. So then for that, we just use Go, the keyword Go, and then we start the job inside this new GoRoutine. So that we already run concurrently with our main function. So now we do the same for VexBot. Let's do this for now and I'll just copy, because in the tutorial in the Git repo we have the VEXBOT job as well, so for now I'll just copy to save some time.
+
+**Speaker 2** _[41:38]_
+
+Amen.
+
+**Speaker 1** _[41:39]_
+
+And so here would be also very similar to the XBot. Okay, so also the same structure, calling the API inside the start.
+
+**Speaker 2** _[42:27]_
+
+Thank you.
+
+**Speaker 1** _[42:35]_
+
+And then, of course, we need to import the packages, which sometimes work automatically, not sure why I didn't. And then we also put inside a new GoRoutine. the VexBot. Just pause a while, we don't have VexBot job. Yeah, so Dominic just should suggest me to run because, yeah, sometimes I have also problems with this IDE, let's just see if those jobs are defined. So, base, package jobs, ah yeah, okay, right, it was just this file that was not saved, apparently. Let's just try again cool yeah so now we don't have no problem it's also i didn't enable the autosave so um yeah not sure why sometimes i get those problems with but then it's we don't have any errors so let's just continue um and then now we are running both jobs in different go routines they would run concurrently to each other but we want actually to read the result from the channel right because then like both jobs are writing to the channel so we want to get the response and then now we can create a new function to wait into this channel and then read the results, so we can just create a new function called waitForResponse and then we pass our variable that we defined here as results and then we can just implement it. Here we receive a channel, a results channel. We need to specify the type so this is a results variable of type job result and first we read from the channel using the syntax so the channel is sending the result to my variable result, then I assign this variable, and now I want to know which response I got that can be either from the XBot API or the VEX bot, and it also can return an error, like since we define in our struct. So let's just check this first if we have any error we just return already and we don't do any more work so we just check if result dot arrow is different from new then let's Let's just print for now this result. So here, again, just formatting the string, the first one is our result.id, so we know which job failed, and the second is just the arrow. Supposing that everything went okay, we go into the NELS, and then here we can use switch. So we will switch on the result, and then we will have the cases, like the case for the xbot response, the case for the xbot response, and this in Python you could use doing lots of ifs, but in Go you can try using switch, which is similar, I think, also to Java, right? Java also has a switch case and other languages. So for now we will switch on our result, and then here we do a type conversion. So this would be similar in Python as instance, like checking the instance. So we have a first case, like if the job, if the result is an XBot response.
+
+**Speaker 2** _[48:56]_
+
+Thanks for watching!
+
+**Speaker 1** _[48:58]_
+
+Then let's also just print successful and here we pass our response and we do the same for Vexpot. And in case we don't have any of those, we also want a default case, right? So we'll just for now print that we don't know.
+
+**Speaker 2** _[49:58]_
+
+Thank you.
+
+**Speaker 1** _[50:02]_
+
+Then we also would be good to see the response here, what we get. Right, so now we have this logic to just get the result from the channel and then print. And we can call this in our main function. So here we call once. It's also called another time. And any of the APIs can return first, right? It depends on how long it will run. But let's just run this for now and see what we get. So now you see that we have, like, in this first run, I actually got the VEX bot first, and then the X bot. So, it can alternate and then it can change depending on how slow one API is compared to another. Yeah, so I think that's it for this section, now I'll hand over to Dominique. Thank you very much.
+
+**Speaker 2** _[51:40]_
+
+yes it is so you wait on the channel until there's a response potentially that could block indefinitely if there's no response so in the case where you know there's an arbitrary number of messages that could come you would probably put that in a separate coroutine again so it's fine if that blocks does it work anyway not really
+
+**Speaker 1** _[52:09]_
+
+Thank you.
+
+**Speaker 2** _[52:10]_
+
+Thank you.
+
+**Speaker 1** _[52:11]_
+
+Thank you.
+
+**Speaker 2** _[52:18]_
+
+Does that look better? All right. Check it? Okay, cool. Right, next step. So you saw this little bit sad message about the canceling that asked us to please implement it. So let's do exactly that, I'd say. where do we start i think best we start here all right so um to make an ap so when we cancel the job what should we do ideally would cancel all the outstanding api calls right because they might be long running and we want to stop this uh also they might be incurring a cost on the side that we're calling so you want to cancel our hdp request um right now we don't really have access to our hdp request right it's just this hp.get can't really cancel that wouldn't know how to um and this is one of the nice things in go is the standard library is quite flexible so on one hand it gives you this really high level i'm just going to do my job with meaningful defaults and hopefully that's okay but it also gives you a lot of control um over the details if you want them so what we will do is instead of using this very high level function we'll go one level deeper down and for this we'll use an HTTP client and if you use an HTTP client it quite often makes sense to share it between all the API calls you want to make because that way once the TCP connection is already connected and there's a keep alive enabled which by default it is from ghost side so if the server also supports keep alive the connection actually stays open so if you do several requests with the same client you don't have to do a handshake every single time also because to be cancelable we need to modify the client a little bit and so we don't want to do this in every single API call so that's another reason why we pass it in as a pointer right and instead of doing the call right away you create a request and And to do that with a context. And this is still a get request. It's still going to the hex bot URL. And the final one, if it would be a post, you could pass the post body here. It's not a post. We don't need it. It's nil. And you see I left something empty here. A context is a little bit of a tricky thing. But for the purposes that we use it, it's going to be a cancel context. of type context and we're going to pass it here which basically means from the outside I can create this context pass it into the client here and when from the outside I tell the context stop everything that's listening to you our HTTP request will be cancelled. There's other things you can do with the context but this is as far as we go here and this is just kind of goes way to be open for outside injection right so we have an error so as we have an error we should check the error if it's not new basically give up so now we created a request but we never actually made a call So this is going to happen now. And we just pass the request we created up there. And from there on out, it's basically the same thing. So we don't need to change anything anymore. Undeclared name context. All right. There we go. Yeah. We have to kind of do the same for the VEX bot. So let's do that. Well, my IDE is smart enough to delete imports that I'm not using, but sadly not smart enough to import ones I'm using anymore. well right well basically copy paste the same things here so we got a context we get a client and instead of just doing our nice little get we now recreate request and the only difference what you just saw is basically that URL is different right so where does this magical client come from yeah Should both be pointers? Yeah. It's a bit tricky with interfaces. This is actually going to be a pointer. You can pass a pointer here.
+
+**Speaker 1** _[58:24]_
+
+Thank you.
+
+**Speaker 2** _[58:27]_
+
+interfaces except expect accept everything that has these methods which can both be a pointer and not a pointer it's yeah it's strange i agree all right um so yeah where does the client come from well i mean the thing that's calling these apis are the jobs so obviously bots have to be aware of this and this is now where kind of our in it function our constructor comes into play so again this one actually doesn't create the client it just gets it passed in if I find a star but now this actually does it does something to that client and And that's creating a cancel context. right i'm going to explain that in a second because this is again it's maybe not super obvious what this does right so context background don't know where that name comes from specifically this is basically the non-nil empty context which also is what the doc string says there don't ask me why it's called background and not default um this is how you initialize a new context, and then we say, well, this context shouldn't be anything special, but it should have a way to be cancelled, which A gives you a modified context, which now is cancellable, and a function that you can use to cancel it. If I call this function, the context is cancelled, every HP client that uses that context will also cancel its requests. Now I have these local variables, how do I make sure that later on when I want to call cancel, I actually still have a reference to these? And in Python, you would probably now write something like self.cancelContext equals cancelContext. And this is pretty much exactly what we're going to do here as well. Or maybe not. So basically, we add these as fields on our struct, which has pretty much the same functionality as assigning it to self. And also, you want to keep a reference to this client. right now go is like well I mean I'm a type language you said my stock doesn't have fields why does it have fields all of a sudden so we need to add the fields up here as well cancel context and I cancel punk yeah thank you and HP clients right so now go should be happy again it's not a hundred percent happy because we said well this API call now actually expects a context and the client well luckily enough we just created these and now goes happy again all right but we did all of this to actually be able to cancel stuff so now we can actually implement our lovely cancel function here which is as easy as calling the cancel function that we provided so now you see this really behaves a lot like self right so I assign stuff to my my object, which is a struct in this case, and I get a reference to that object, and I can call my methods on it. Cool, I'm gonna do the same for backspot. So I'm gonna just do it from the top to the bottom. Adding the fields to the struct. Actually calling the cancel function, passing it to the API, and then in the constructor creating the context and the cancel functions and assigning them to
+
+**Speaker 1** _[63:27]_
+
+the distributor.
+
+**Speaker 2** _[63:27]_
+
+destruct And, of course, actually expecting the HP client in. All right, let's just make sure this actually still runs. Right, it does not, because now the jobs expect the client. We never created that client. And normally you do that as far out as you can to be able to share the pointer between as many clients as you can. So we do it in the main. and creating a client isn't terribly tricky should we do this here so basically say our client is the HP default client
+
+**Speaker 1** _[64:26]_
+
+Thank you.
+
+**Speaker 2** _[64:31]_
+
+And then we just pass it in. And we said this has to be a pointer, but you can't really tell that this is a pointer. But if you hover there, you see the default client actually already is a pointer. All right. Cool, so it still runs. That's good. And, I mean, we did a lot of changes, but it does the same thing. So let's actually cancel stuff. And this is relatively straightforward. So instead of directly reading from a channel, you can, it's a little bit like the concept of a generator. You can have a select case and select from several channels. So you kind of have a meta channel that wraps the other channels. So for this we write SELECT and then we say, well, we still want to keep that case, hopefully things are still fine. It slips all the way down here. Right, so right now I would still do the exact same, it's just now a channel wrapping exactly one channel, it's not terribly exciting, but we can now add another case, I'll always be confused with that syntax but I think it needs to go here right so there's a built-in channel that just sends a message after a given time so now we can either get a message from our results channel or we get a message from our timeout that runs out after a certain time and here we're going to iterate over all the jobs that we have and i haven't written this part yet but we're going to have an array of all jobs and this is basically a for loop in python this range keyword it turns an array into something that you can iterate over. And this underscore, you would automatically get the same thing you get when you do enumerate in Python. So you get an ID that just increments. We don't care about it, so we do an underscore just as you would in Python. And now we actually cancel things. That's why we did all of this for. And just so that we are aware, we did this. I don't know where percent sign is, where is it, where is the percent sign, right, and But yeah, just again, we print the ID just so we know what's going on. Right, so now you see we made some assumptions. I said we have an array of all started jobs. So let's actually parse this, started jobs, which is an array of jobs. So that's assumption number one. And the other one is I have a time I'll define somewhere, and I'm just going to make that a const. And Go has an interesting way of defining times, which is basically you set a number, and then you multiply it by the right kind of thing. So you could write minutes and milliseconds and whatever here as well. All right, just one small modification because we actually, when we wait for a response, we kind of want to know that we get an actual response, or was it a cancel, so I'm just going to return a bool, and here we say, nope, everything's fine, we did not cancel, so return false, and here we said, nope, we got canceled, return true. All right, now we said we need all this array of all-sided jobs, which is what we're going to create And then as we create the jobs we hand them to this array which again, is pretty similar to how Python does it, but with a slightly different syntax, so append actually is a function, not a method. And, it's not a jobs.
+
+**Speaker 1** _[70:15]_
+
+Yeah
+
+**Speaker 2** _[70:17]_
+
+right and you can also see the this is actually declaring an interface right so this is what we did this work for so now we can have an array of just job and we know it contains things that we can call cancel on this is just due to the interface all right um so now we potentially might get three responses, right? Because cancel would also give us a response. So we say cancel one. Cancel two, just to know whether one of the two calls was actually a cancel call. And we pass the sorted jobs here as well. and then if one of the calls got cancelled where's the pipe on a us keyboard there so this is kind of the or syntax of a lot of languages which is not python so one of them got cancelled we want to actually still see the response of the third API right cool so let me just print oh actually we can run this now so right now nothing should have changed because they're not as slow as two seconds but if we for example change this to one second it probably still can do let's just say, whatever, 2 milliseconds
+
+**Speaker 1** _[72:06]_
+
+Thank you.
+
+**Speaker 2** _[72:08]_
+
+and now we should actually see them getting canceled. Yeah, so here we see the timeout kicks in, it cancels both of them, and the jobs still return, because we have this error object, right? So the job returns, but instead of a result, we get now an error object, and the error reads, the context was canceled. All right, this is actually as far as we wanted to get today. There's more steps online that you can follow. If you have questions, you can write emails to us about the following steps, which will then explain how can we use these results, how can we turn this into a server, because then you have Go routines running on Go routines. For every request you get on a server, you start a Go routine. That Go routine then starts Go routines for all the API calls, and then it all comes together and is sent back through channels. All right, thank you very much. We have three minutes for questions. Oh yeah. Thank you. No idea what the order was, so I'm just going to go from left to right. Can you comment on the possibility of calling Go from Python, and if it's difficult or easy, or? I haven't tried. So no, I cannot comment on it. I'm not aware of an easy way to do that, but I mean, you can integrate C code in Go, and you can integrate C code in Python, so maybe there's a way to do it. I haven't tried, I don't know. I mean, obviously, the nice thing about Go, it compiles down to a single binary, right? So if you just, you can do system call, call the binary, let it do its thing, and then read the results back, right? So if you just wanna use Python for orchestration and run some Go binaries in between, that's pretty straightforward and easy. Yep.
+
+**Speaker 1** _[73:50]_
+
+My question is regarding the...
+
+**Speaker 2** _[73:52]_
+
+Why did you choose to do this in your company?
+
+**Speaker 1** _[74:01]_
+
+Why go more other
+
+**Speaker 2** _[74:02]_
+
+Yeah, I mean, I wasn't around. We were one of the very early adapters of Go like five years ago or something. I started the company three and a half years ago, so I wasn't around. But mainly, we have a lot of traffic, but we're not doing anything too fancy. What's the number? Number of requests is several hundred per second. So the nice thing is you don't really have to care about scaling as much because it naturally scales quite nicely. just by language design and as i said we don't do anything too fancy like we don't do i mean we have other projects that are in python and the company as well like when we go more into like data engineering machine learning we use python but for things where you have the feeling this is a small thing it doesn't do much but it should be do it should be doing it fast we use go yeah um so a lot of people use it for infrastructure stuff as well a lot of parts of kubernetes for example written in go um so yeah also when you really want to be kind of close to the metal system programming and you don't like see as much um go can be a good choice because you can go quite low um get access to a lot of things but you don't have to for example care about garbage collection yourself right um so that's good for that and yeah and generally like high performance stuff um i think there's now slowly some machine learning and data stuff also happening in go um but i haven't used that for for that yet just because the python ecosystem is just way ahead there any more questions we have zero more minutes all right uh okay
+
+**Speaker 1** _[75:46]_
+
+to stay in Morocco.
+
+**Speaker 2** _[75:49]_
+
+So this is step five, so there's four more steps.
+
+**Speaker 1** _[75:53]_
+
+Thank you.
+
+**Speaker 2** _[75:55]_
+
+Thank you very much.
+
+---
+transcript_status: auto
+---
+transcript_language: en

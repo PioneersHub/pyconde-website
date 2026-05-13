@@ -97,3 +97,158 @@ video_duration_iso: PT24M49S
 video_thumbnail: https://i.ytimg.com/vi/IH2gEtxIbqM/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+Hello, everybody. Good morning. I'm Alessia, and today I would like to talk about versioning in the data science world. And since we're talking about versioning, I'm assuming a bit of knowledge about Git in the audience. But in case not, don't worry, here's a brief recap. So, Git is a free and open-source distributed version control system. and the first thing you can do with git is either creating a new repository with git init or clone an existing one. The local repository consists of three trees, the first one is the working directory which contains the actual files, then there is the index which acts as a staging area for your files and finally the head pointing to the last commits you've made. The three most used commands are git add, commit and push and as names are suggesting you can propose changes with git add, commit them using git commit and sending your changes to remote repository using git push. Branches are essentially a unique set of code changes with a unique name and are used to develop features isolated from each other. To create a new branch, let's say called Feature X, you can run git checkout dash b feature x, do all your stuff and then go back to master with git checkout master. Master is the default branch for Git. To update your local repository you can run git pull, for merging you have git merge, and to view the changes you've made relative to the index you can run git diff. One of the first things that comes to mind when thinking about versioning is code, right? And in particular one of the first thing that comes to mind when thinking about data science is Jupyter Notebook. It's one of the most used tools for experimenting in data science. They're great, they contain source code, markdown, plots, and it's very handy to have all of these things in one place. But the reality is that in this case you cannot manage versioning as you would do with regular Python scripts, because at the very end they are nothing more than a JSON file and Git is not able to understand the structure of your notebook. So you cannot simply add a notebook to your repo and pretend it's alright. What happens if you change the order of the imports in a source code cell and change the name of the executing environment, for example? Well, the diff is still understandable, right? But what What happens when you try to change the order of two cells and delete another one? The result is that the same code is added and deleted. But let's move on to an example a bit more data science oriented. We have an array containing numbers from 1 to 9 and we want to plot the square of this array. This is what we get. Now we change our mind and we want to plot the third power of the array. This is what we get if we use the diff. Well the only bit of usable information is contained in these two lines. What a mess, right? The first tool I'm presenting to you today that will hopefully improve your life if you're working with Jupyter notebooks is called mbdime. provides content-aware diffing and merging of Jupyter notebooks because it understands the structure of your JSON file. It's pip installable and it provides two ways to diff your notebooks. The first one is in the terminal as usual but also in a browser as we saw in the previous slide. The cool thing is that it fully integrates with Git, so you don't have to worry anymore. Awesome, right? This is the diff that nbdime shows. Way much better. But when it comes to data science, we know that not only the code is involved in the process, also the data used to perform the experiments plays a crucial role. So imagine this setting. We have a data set, data.csv, let's say a bunch of numbers with some metadata, and now you preprocess your data set, rescaling the numbers to range 0 to 1, and you perform some checks. Then you find some incorrect data, and then you decide you want to remove them. You investigate a little bit more and you find some outliers in your dataset and you decide to remove them too. Now you have your dataset up and running. This is a quite simple scenario, but if you're not careful enough, you could end up messing up things very, very easily. So how do you keep track of changes in your data? Here is where Hangar comes into place. This is a very young project, born only six months ago, but in my opinion is very promising. It basically provides support for versioning your data in a smart way. It is designed to solve many of the problems faced with regular code versioning systems, just adapted to numerical data. So, time travel to see the historical changes of your dataset, zero-cost branching, merging to build a dataset over time, or with multiple collaborators, and so on. It is based on the concept of array sets, where an array set is a grouping of similar type information. So if we are working with images, we are most likely to have an array set with tensors representing the images, another one containing file names, and the last one containing labels. And since each ArraySet is a separated entity, Hangar provides also a way to efficiently store your data using different backends. You may want to save your images in HDFI format, while your file names using NumPyrate and labels using TidyB. Hangar enables to save efficiently your data and you don't even have to think about it because the interaction with the backend is totally transparent with the user. So let's see how it works. You import the Hangar repository, You instantiate it, given the path to the repository, and initialize it, providing your name and your email. You check out into this repository, keeping the lock on writing. And let's say you want to load your images using NumPy. Then you Initialize a new ArraySet, providing the name and a prototype. You need to specify a prototype, which is an element of your collection, so Hangar can know the shape and the type of the elements, and so decide for the best backend for storing your data. Now we want to add elements to our ArraySet. Hangar accepts both strings and integer keys, or we can leverage the add API. We commit our changes and we close to liplock. Now let's watch at branching and merging features. You create a new dummy array with range from 0 to 9, we create a new array set and as before we commit and then we close. We create a new branch called testBranch and we check out into this branch and we verify that the array set we created before contains exactly what we believe is containing and then we create a new array with numbers ranging from 1 to 10 and we assign it as the second element of the array set. We commit and then we go back to master and we merge. That's it. Hangar also lets you to work with remote storage, and the first thing you need to do is starting an hangar server. By default the server is bound to the port 50051, so the second thing you have to do is add this remote to your repository and then you can push your changes. So now in another folder or in another machine you can clone your repository but this operation retrieves only commits records and history and you don't have the actual data. If you want to download the data you need to call fetch data explicitly but the cool thing here is that you can specify the number of bytes you want to retrieve or you might want to fetch if you if you want to have only a closer look to some files to see if they actually storing as you might think. The last useful feature is that you can easily integrate Hangar into your existing pipeline thanks to these APIs MakeTF dataset or MakeTorch datasets with return of TensorFlow or a PyTorch dataset from Hangar array sets. So now, can you remember the previous setting with all the dataset changes? Yeah, now we know Hangar that is able to track all our changes to our data. Fantastic! But are we done? Not really. If we look at the whole picture and not only at the individual pieces, we noticed that there's a lot more going on. In fact, we consider only the inputs, the data, and the transformation function that operates on this data, the code, but not at the outputs. This could be the reality. So at this point you may be wondering how to link code, data, resulting models and metrics, but most importantly, will you be able to replicate all your experiments a year from now? Well, I used to use this kind of spreadsheet where you annotate your experiments, what network architecture you were using, the data set, metrics and so on. But trust me, it's a nightmare because how easy is to mess up with rows or copy-paste the wrong column. DVC to the rescue. DVC is able to manage these kind of issues and provides a general view over what's going on with your machine learning project. It works with any framework you may have and is designed to run on top of git repositories. But I have a little short video for you.
+
+**Speaker 2** _[12:33]_
+
+data science is exciting you get a data sample define the goal in data features clean them up and make your setup ready to go process it through the machine learning algorithm get the results display the results and you have found some cool insights so you can take a break but a couple days later a colleague of yours could ask have you cleaned this feature from the noise oh no it seems like you overwrote something a couple dependencies are missing and the old file you used before kind of stinks well you have a lock and you wrote down every step you took so that you your colleagues and your future self can pick up at any point of the experiment but you still lose time on processing which can take forever but don't worry we found a fix for Data Version Control is an open-source experimentation tool. It helps you, the scientist, define your pipeline no matter what language you use. Swish! It is based on Git, but supports large files. Git and reproducibility warp you to any prior stage of your project without model retraining, like a time machine. But in all seriousness, anyone can use it. So, the process of fixing mistakes is much easier now. Versions become shareable. Swish! Problems become fixable. Swish! And collaboration is now simpler than ever before. Or, more simple. It's just the best it's ever been. At DataVersionControl.com
+
+**Speaker 1** _[14:23]_
+
+Pretty impressive, right? So, how does it work? First of all, in a Git repository you have to initialize also a DBC repo. Then you have to choose your remote where DBC can store your data. So let's say, let's go with AWS and then go with the common DBC remote head. Great. How can you add data to DBC then? dbcadd creates a dbc file and add data slash data.csv to the gitignore. Dbc files are small text files with human readable format that stores the information about your data and then can and they can be committed to git. To upload data to a remote just go for dbcpush. If you want to retrieve your data from the remote storage you can use dbcpool or dbcpool followed by the dbc files that describe the exact file you're looking for. And the dbcrun command lets you connect code and data and also to specify dependencies and output files or folders generated by the Python command and last but not least it executes the command. dbc-run generates the file preprocess underscore data dot dbc which has the same format as the dbc file we created before but has additional information about the output folder and the Python command required to build it. By using dbc-run multiple times and specifying output of a command as dependencies of another one, you can describe a sequence of commands to get to a final result. You are building a dependency graph. Now, as we have a number of stage files that describe the full pipeline, it's extremely easy to re-run your experiments end-to-end using the dbc report command. train-dbc describes which source code and data files are needed and how to run the commands in order to get the final result. For each data file it depends on, it performs the same analysis, so it finds DVC files that includes the data files at its output and gets dependencies and commands, and so on. This means that DVC is able to recursively build a complete sequence of commands it needs to execute in order to get the mod file. You can understand that DVC-Run and DVC-Repro are a powerful framework for replicable experiments. You can also tag your experiments, so in the future you can retrieve all the data and code used to perform the experiment. To get back to this initial experiment, you run git checkout along with dvc-checkout, and you're done! To conclude, I think that at the moment the general solution to all of our problems does not exist yet, but the community is getting along and is becoming aware that as data scientists we need a specific tool designed to meet our needs. Because honestly, I don't want to spend any more time trying to figure out if that spreadsheet of experiments is still worth my trust or not. Why would you? Thank you.
+
+**Speaker 3** _[18:07]_
+
+Questions? There is one already.
+
+**Speaker 4** _[18:14]_
+
+So, first question. Does this tool have any deduplication mechanism? Maybe you know, because the idea of sending all terabytes of data to Amazon doesn't sound really good for my salary.
+
+**Speaker 1** _[18:31]_
+
+Are you referring to hunger or DBC?
+
+**Speaker 4** _[18:37]_
+
+DVC, I think.
+
+**Speaker 1** _[18:38]_
+
+Okay. DBC is based on hash mechanisms. So if your data set, let's say you have one zip file and you change a single data inside it, the hash changes, right?
+
+**Speaker 4** _[18:38]_
+
+Oh.
+
+**Speaker 1** _[18:57]_
+
+Yeah.
+
+**Speaker 4** _[18:57]_
+
+Yeah, so it stores everything in a row.
+
+**Speaker 1** _[19:01]_
+
+while Hangar behaves a little differently because it stores tensors so you're able to merge, diff and all the things
+
+**Speaker 4** _[19:14]_
+
+And the second tiny question, does it make more sense to have a proper script, how did I clean the data, than all the stages? Because for me, it seems more reproducible when I have a script, when I have an original data set and script that actually did final data set.
+
+**Speaker 1** _[19:35]_
+
+Yeah, but the DBC files, what I call stage files, are only descriptors of the data file itself.
+
+**Speaker 4** _[19:46]_
+
+But it still stores everything
+
+**Speaker 1** _[19:49]_
+
+Did you see? Yes. I'm not sure I got the question.
+
+**Speaker 4** _[19:56]_
+
+Yeah, you answered this one.
+
+**Speaker 1** _[19:58]_
+
+Maybe we can talk offline
+
+**Speaker 3** _[20:13]_
+
+Can you tell a bit about the background of Hangar?
+
+**Speaker 1** _[20:17]_
+
+How
+
+**Speaker 3** _[20:18]_
+
+How does it store the data? Is it like a large file system from Git? So if I think about machine learning data, I think of gigabytes of data just per day. So don't we multiply these data in the background if we store every step?
+
+**Speaker 1** _[20:39]_
+
+I'm not sure I got your question. Are you referring to the same thing as...
+
+**Speaker 3** _[20:46]_
+
+I think it's close to the question, yes. So if I modify my data, and it's gigabytes of data, and I have 10 steps in there to modify them. So I'm storing 10 times the data in the background in the Git repository or Hangar repository.
+
+**Speaker 1** _[21:04]_
+
+If you want to you have the full freedom of creating your array set or also deleting them if you don't need them anymore. So it's up to you, I think.
+
+**Speaker 3** _[21:22]_
+
+Okay, so I can delete history
+
+**Speaker 1** _[21:26]_
+
+Um, no?
+
+**Speaker 3** _[21:30]_
+
+Okay, maybe we can talk offline then. Okay. Okay, but thank you.
+
+**Speaker 5** _[21:42]_
+
+Just a single very easy question. What's the advantage of using Hangar compared to DVC if DVC can also do the data?
+
+**Speaker 1** _[21:53]_
+
+Well, I think that they are meant for different purposes. I would suggest you to use Hangar if your data set is evolving very fast and you need to control everything that's going on. But on the other hand, Hangar does not provide all the, let's say, reproducible stuff out there. so Hangar lets you store your data efficiently depending on what kind of data it is. DVC does not care so much about this, so it really depends on your use case I think.
+
+**Speaker 5** _[22:46]_
+
+Thank you for your talk. In a previous talk, we were told that DVC does not help keeping track of the metrics attached to some model. So while I can reproduce a model, the presenter said it was not possible to have the metrics alone. Do you have a, or to explore the metrics after? Do you have experience the same? And would you have a hint for that?
+
+**Speaker 1** _[23:24]_
+
+DBC lets you attach metrics files that are result of training, let's say, or evaluation as you would do with simple files. I didn't attach the metrics step, let's say, but you can refer to the documentation. There are a couple of comments that let you also compare them, so you have the full view over your experiments, so you can compare them.
+
+**Speaker 3** _[24:17]_
+
+Hi, thanks for the talk. Do you know how DVC compares to other technologies to store large file systems in Git, like Git Annex?
+
+**Speaker 1** _[24:28]_
+
+I don't know that. It's worth checking out.
+
+**Speaker 3** _[24:31]_
+
+out okay just you wanted to know if the other performance
+
+**Speaker 1** _[24:33]_
+
+performance
+
+**Speaker 3** _[24:40]_
+
+If there are no further questions, then let's thank Alessia again.
+
+**Speaker 1** _[24:43]_
+
+I think, Alessia again.
+
+---
+transcript_status: auto
+---
+transcript_language: en
