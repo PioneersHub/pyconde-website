@@ -81,3 +81,126 @@ video_duration_iso: PT16M3S
 video_thumbnail: https://i.ytimg.com/vi/C-1XWTgFo5g/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+Yeah, thanks for the introduction. So my name is Florian Jetter. I'm a data scientist at Blue Yonder. I won't talk about the company since we have a small booth outside, if you haven't noticed.
+
+**Speaker 2** _[00:13]_
+
+Um,
+
+**Speaker 1** _[00:14]_
+
+You can find me on Twitter, on GitHub, and I'm going to talk about memory management and memory profiling in Python. So basically I'm going to tell you a story about something that happened to me a few months ago where I,
+
+**Speaker 2** _[00:29]_
+
+um
+
+**Speaker 1** _[00:30]_
+
+A bug was reported, which sounded like a strange issue, memory issue, memory leak, and I always went insane debugging it. And I learned a lot on the way, so I thought I'd share what I know.
+
+**Speaker 2** _[00:44]_
+
+Amen.
+
+**Speaker 1** _[00:46]_
+
+So, what are we looking at? Basically, we have some kind of ETL pipeline, data extraction from a database. Then we do some transforming of this data and eventually store it in the National Blob Store. This happens on clusters. Think of something like Kubernetes or something like that, Dask distributed.
+
+**Speaker 2** _[01:09]_
+
+Um,
+
+**Speaker 1** _[01:10]_
+
+Doesn't matter that much, but we store it in a parquet file and eventually we submit some metadata of the network. At the time where we had this thing, this was just basically very thin metadata, essentially the file names we were storing the blobs in, and in the end we collected everything and stored it in a sort of reference file so we knew what did we actually store. So very simple thing, and then this happened. So I got a bug report called memory consumption changed drastically. On the left hand side, which is after the mess happened, you can see, so these were the original pictures, which is why this looks a little bit messy. We have maybe two hours of slow data processing without a lot of memory consumption, and when you see the huge pile going up, this was basically a step afterwards. where we just load the data again and crunch some numbers. And the library I was working on, we rolled out a new release. We didn't think there should change anything, but then this report came in, and of course on a production system, half an hour after this job started, our workers died horribly. So these are Grafana plots. What you can actually see is the memory distributions of these workers, so the minimum, the maximum, the mean values and so on. and I was tasked with fixing this thing. So it looked like the memory leak. Of course, we're in Python, so memory leak is always a little bit of a loaded term. So bear with me, I'll clear that up, what I actually am referring to as a memory leak. But first of all, what did we change in this whole process? So the only thing we changed was actually that we did no longer submit only the file names, but a little bit of schema information. The schema is basically just what columns that we store in these tables in these per-key files and what types that they carry on. Why this is an important issue is something I cannot talk about now, but there is a dedicated talk tomorrow by Marco, a colleague of mine, strongly typed data sets in a weakly-typed world. So there's actually a reason why we did this, a very interesting one, but unfortunately there's no time. But it seemed very obvious where this leak is, so it is of course the schema. But when we looked at this schema, it was essentially an empty data frame, an empty Pandas data frame, and this is actually what it looked like.
+
+**Speaker 2** _[03:50]_
+
+Ah
+
+**Speaker 1** _[03:51]_
+
+This was of course the first thing I looked at and it was just telling me I'm empty. So, okay, where the heck is my memory? And this is where I basically embarked on a long journey of memory profiling and tracking down references to my objects. I looked into the garbage collector of the interpreter itself and I was going insane. Of course, the very first thing I did was I was creating memory profile. So this is only a snapshot of the entire job. Basically two iterations of the thing we are looking at on my local machine. On the right hand side you can see basically the pseudo code of what we are doing.
+
+**Speaker 2** _[04:30]_
+
+we expect
+
+**Speaker 1** _[04:30]_
+
+We extract some meta information, so basically we strip the data frame off all of its data, which I call meta. Then we store it, which is straightforward, just convert it into a parquet file and put it into the store. And in the end, I delete my payload data because it's in the store and return my meta information. And the only thing that changed, okay, now we have this empty data frame and I deleted my payload data before I returned. So, I was looking at this memory profile, and as you can see, I used the memory profiler library, which you can trigger with this decorator profile, and the functions you annotate with your profile are in these braces, so these teal braces basically show where this stored data frame ends. And in the end, I expected the memory to drop, but it didn't. I deleted my payload data. I deleted all of my data, but it didn't drop. It just went on increasing. This is why I thought I have a memory leak. I somehow leaked the entire payload data, which is of course very strange because I'm writing Python code and how can you produce a memory leak in Python? And this is where the whole nomenclature about memory leaks is a little bit fuzzy. If you look at what an actual memory leak is, so this is a little bit of C code. I took it from the Wikipedia page because this is an extremely simple
+
+**Speaker 2** _[05:56]_
+
+for Excel
+
+**Speaker 1** _[05:56]_
+
+example. So you have an ordinary memory leak in C, C++, or any other more hardware focused language. You allocate memory, which is usually in C called malloc. So you just tell your operating system I'd like to have a chunk of memory, then you do something with it, but in the end you forget to tell your operating system to free it again. So this is the classical memory leak, and I'm not talking about that. these are really messy and there are tons of libraries out there you can debug these but I was concerned about Python so I was concerned about garbage collection and to tell you a little bit more about garbage collection just we take a step back and look what coverage collection is I took these these visualizations from the Python data science handbook because I very very interesting read, and on the upper left corner you can see basically the exact definition of a long object, so basically an integer in Python 3. It's not much, it's just a C struct where you can see there's an attribute called object ref count, and this is basically what all garbage collection is about. Every time you assign an object in Python to a variable, this number is increased. And in the end, when you go out of scope Go out of scope with your variable or you delete it like I did with my data frame the reference count goes one down And once the reference can't reach a zero Python because it's smart cleans up after you this is why we don't have to deal with Memory allocation and the allocation by ourselves because Python does it for you everything else you can see in the struct is either specific to your Object or for example in this thing called opt type there are just reference stored to what this integer does. Now this is, by the way, the reason why Python is slow because you always have to dispatch to some more C code. But that's not the issue now. So I was basically concerned with references to objects. So did I somewhere hold onto a reference of my payload data? Maybe. Another issue with this garbage collection is that there are things like psychic references. So you can actually create objects which reference themselves, or by a chain. On the right hand side you can see basically this dependency chain of a Pandas data frame. This was actually something I considered a bug back then, but they called it an enhancement when they removed it. So the Pandas data frames prior to .23 basically had this issue that they referenced themselves somehow, you can clean this up if you call garbage collect explicitly, it's cleaned up, but I was paranoid. I didn't see anything drop, so I thought to myself, did we create these cycles faster than the garbage collector could clean them up? I don't know, this was really messy. In the end, the fix is actually quite interesting because they deferred this initialization call to siphon, and there the reference count simply doesn't go up.
+
+**Speaker 2** _[09:14]_
+
+So, um...
+
+**Speaker 1** _[09:15]_
+
+If you ever encountered these, upgrade to Pandas 0.23, then you don't have to deal with this issue. But as I said, I was basically concerned that I somewhere had still a reference to my original data, and I used this library, for example, OptGraph, which is also a great thing, where you can,
+
+**Speaker 2** _[09:34]_
+
+and then, um,
+
+**Speaker 1** _[09:35]_
+
+Plot a little bit more of your data, and I told you this stuff we submit over the network is only the file reference in in Reality, it's a little bit more complex. This is this is the class. We were basically serializing over the network and on this side you can actually see my empty data frame my empty metadata and You can see there is no reference to something else You can zoom in, you can look a little bit closer, but there is no reference left. There's no reference to my original payload data, so where did it go? I showed you before this plot, and at this point I was maybe two days in debugging and a colleague showed up and told me, okay, give me your code, I'll help you debug. And then he showed me this. That's the way it looked on his machine, and I was going insane. I didn't understand what was going on. This is exactly the same code, but it's faster. There's a lot more structure in the memory profile. And we can see, yes, I delete the data frame. The data is gone. So I was chasing two days the wrong lead.
+
+**Speaker 2** _[10:46]_
+
+Um
+
+**Speaker 1** _[10:48]_
+
+Putting it next to each other, you even see that the peak memory consumption is much less. It's about 33% less.
+
+**Speaker 2** _[10:56]_
+
+so
+
+**Speaker 1** _[10:57]_
+
+So, what was behind this thing? I was running everything in a Docker container, Debian 8, Debian 9, I tried everything. He was running it locally on his MacBook. So, we thought to ourselves, what the hell did happen? And it turns out it's the operating system, it's the memory allocator of the operating system, actually. So, jmalloc is, for example, a memory allocator developed by Facebook, and once I used this memory allocator, it reproduced the same thing, and I finally could look into the issue more closely because I didn't chase the wrong lead anymore. So what GemAlloc does, I'm afraid I don't have too much time to talk about this, but essentially Facebook wrote it for faster memory allocation, better memory allocation, more efficient one, and one of the most important thing in my case, for example, is that they reduce memory fragmentation. So memory fragmentation appears that, So think of a memory allocator that talks to the operating system and says, hey, give me a huge chunk of memory. And he returns me just a bit, such that he doesn't have to talk to the operating system that much. And memory fragmentation happens if there are two huge chunks or multiple huge chunks, where there are just small references in there. So the operating system allocates way more than I actually need. And this is what happens here. On the left-hand side, I allocated a huge amount of memory, but I never freed it. And once I had Jamaloc in place, everything was smooth and we could actually debug this thing. But we only noticed what was going on when we ran a CPU profile, actually.
+
+**Speaker 2** _[12:35]_
+
+So, um,
+
+**Speaker 1** _[12:36]_
+
+The thought behind that was, if we have memory somewhere, a lot of memory, and we have to copy it, we have to serialize it, it's slow. So we actually ran a CPU profile, so the developer who was helping me is a core developer of Arrow, and he's very keen of zero copy. It's Uwe Korn, he had to talk previously how zero copy between Java and Python is possible. So he did a CPU profile, and it turns out, at this connection, the serialization is extremely slow. So we thought to ourselves, how can an empty data frame, a serialization of basically nothing, take up any CPU time? And this is where we get back to the beginning. So we were two or three days into debugging this, and then we looked at our meta class a little bit more closely. We looked at the types we submitted, and it turns out we were using categorical Pandas D types, which are great and mean. So if you don't know what categorical D types are, that's basically the thing on the left. You have a huge array of strings, for example, or other objects, dates, datetimes, whatever, and then you encode them. So you just store your unique elements as categories. And then your actual array, you just store integers, small integers, zero, one, and so on. This is much cheaper for the memory. And if you actually look even more closer and used the Pandas API to check what the memory consumption is, you see that even though I have categoricals, the dtypes themselves, this empty data frame, takes up a huge, huge amount of memory. On the right-hand side, you actually can print out your dtype, and for this particular example, I used just random strings, so the dtype itself carries a lot of memory. So eventually we got rid of this whole empty data frame schema information and we used proper PyArrow schema information. And as I said before, this is a very interesting topic and there will be a talk tomorrow about this whole thing, why it is important, how we deal with these issues.
+
+**Speaker 2** _[14:46]_
+
+issues.
+
+**Speaker 1** _[14:47]_
+
+but that was actually the culprit I was chasing for basically three days. So my conclusions for this whole thing, if you encounter a memory leak, breathe. Usually it's not that bad. You usually don't have to debug C code. And don't jump to any conclusions, and definitely check out Gemalog. It's faster, and you save memory, and if you ever do memory profiling, you should have something like this enabled. And the last thing, and this is probably the most important, if you use something like Pandas, read the documentation carefully. Anyhow, last but not least, we have a booth outside. If you're interested in anything like big data, data engineering, and so on, come talk to us, and that's it from my side.
+
+**Speaker 3** _[15:44]_
+
+Yeah, thank you Florian Lightning talks will start in five minutes. So unfortunately, we don't have time for questions So you can I guess hunt him down personally if you have I'm all right
+
+**Speaker 1** _[15:53]_
+
+Yeah, I'm all around and I'm on the social events, so if you have questions, just approach me. All right, thank you again.
+
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -80,3 +80,2610 @@ video_duration_iso: PT35M39S
 video_thumbnail: https://i.ytimg.com/vi/bf2hISLgK84/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:02]_
+
+So hi everybody, I'm not sure how much fun is it going to be unless you're really interested.
+
+**Speaker 2** _[00:06]_
+
+interested in natural language processing. And this is the first disambiguation of the
+
+**Speaker 1** _[00:10]_
+
+of this talk. If you are waiting for the talk on neuro-linguistic
+
+**Speaker 2** _[00:13]_
+
+neuro-linguistic programming.
+
+**Speaker 1** _[00:14]_
+
+programming, which is also NLP, you're probably in the wrong room. I'm going to be talking about natural language processing.
+
+**Speaker 2** _[00:20]_
+
+And the idea of this talk
+
+**Speaker 1** _[00:22]_
+
+idea of this talk is to introduce some concept of NLP and just some examples that could
+
+**Speaker 2** _[00:27]_
+
+examples that could be useful for your first
+
+**Speaker 1** _[00:28]_
+
+your first nature study.
+
+**Speaker 2** _[00:29]_
+
+natural language processing project.
+
+**Speaker 1** _[00:30]_
+
+project. Okay, a little bit about me. I am Anna Vidiga, I'm a computational linguist.
+
+**Speaker 2** _[00:37]_
+
+traditional linguist.
+
+**Speaker 1** _[00:37]_
+
+I speak three languages
+
+**Speaker 2** _[00:39]_
+
+three languages most of the time.
+
+**Speaker 1** _[00:41]_
+
+originally from Russia. I got my degree from the University of Tübingen. And this XKCD comic is how I was introduced
+
+**Speaker 2** _[00:49]_
+
+how I was introduced to XKCD.
+
+**Speaker 1** _[00:52]_
+
+It's about computational linguistics, and it's ill-defined.
+
+**Speaker 2** _[00:52]_
+
+It's about... ill-defined field.
+
+**Speaker 1** _[00:55]_
+
+field, just like NLP. You can think of computational linguistics as some parts of
+
+**Speaker 2** _[01:01]_
+
+Computer science, some fun.
+
+**Speaker 1** _[01:02]_
+
+some fun parts of computer science, and all the headaches of linguistics.
+
+**Speaker 2** _[01:07]_
+
+okay so what this talk is about I'm
+
+**Speaker 1** _[01:12]_
+
+about I'm going to start with
+
+**Speaker 2** _[01:13]_
+
+going to start with introducing some NLP
+
+**Speaker 1** _[01:15]_
+
+some NLP concepts.
+
+**Speaker 2** _[01:16]_
+
+Mostly as it relates to machine learning, but also some rule-based stuff.
+
+**Speaker 1** _[01:21]_
+
+The main part of the talk are some examples of processing
+
+**Speaker 2** _[01:24]_
+
+processing text, real-life text.
+
+**Speaker 1** _[01:26]_
+
+live text examples and those examples would be you can think of it as recipes first as an appetizer I'll show some NLP pipelines with the tweet
+
+**Speaker 2** _[01:38]_
+
+with a tweet, and then as a main course named entity recognition,
+
+**Speaker 1** _[01:41]_
+
+named entity recognition, an example of a Yelp review, and as a dessert, multilingual topic modeling with a toy example. So all of these examples are on this.
+
+**Speaker 2** _[01:51]_
+
+on the smallest text possible so you can see all the fun.
+
+**Speaker 1** _[01:56]_
+
+all the fun stuff, but it's easily scalable. And I will end the talk with...
+
+**Speaker 2** _[02:01]_
+
+end the talk with some takeaways of some do's and don'ts.
+
+**Speaker 1** _[02:03]_
+
+do's and don'ts of NLP, hopefully some of it will be useful for your NLP project. Okay, show of hands, how many of you have done something with NLP already?
+
+**Speaker 2** _[02:14]_
+
+Oh, wow. That's great.
+
+**Speaker 1** _[02:15]_
+
+That's great. So chances are you know more about it than me because I've only tried some of the things. And another disappointment of the talk is probably going to be I'm not going to talk about...
+
+**Speaker 2** _[02:27]_
+
+deep learning other than
+
+**Speaker 1** _[02:28]_
+
+other than introducing some of the concepts, because my opinion is for your first NLP project, deep learning is probably a little bit too complicated, unless you already know a lot about deep learning. All right, so let's start with NLP.
+
+**Speaker 2** _[02:44]_
+
+with NLP and machine learning. Linguists like to think of languages as
+
+**Speaker 1** _[02:49]_
+
+of languages as
+
+**Speaker 2** _[02:50]_
+
+living organisms ever
+
+**Speaker 1** _[02:51]_
+
+ever evolving. For data scientists, unstructured text is more of a headache. It's something
+
+**Speaker 2** _[02:58]_
+
+It's something that they can...
+
+**Speaker 1** _[02:59]_
+
+that they can apply
+
+**Speaker 2** _[03:00]_
+
+apply tools to
+
+**Speaker 1** _[03:01]_
+
+tools to extract some useful information. This is not always an easy task.
+
+**Speaker 2** _[03:05]_
+
+not always an easy process and some familiar tools like pandas
+
+**Speaker 1** _[03:10]_
+
+like pandas are not really applicable to
+
+**Speaker 2** _[03:11]_
+
+applicable to unstructured text.
+
+**Speaker 1** _[03:12]_
+
+structured text.
+
+**Speaker 2** _[03:16]_
+
+When you organize text into some meaningful chunks of information,
+
+**Speaker 1** _[03:19]_
+
+chunks of information, meaningful nuggets of information, you end up with tokens.
+
+**Speaker 2** _[03:23]_
+
+tokens and something that you have to discard.
+
+**Speaker 1** _[03:24]_
+
+you have to discard and filter out. So you have some tokens and some garbage.
+
+**Speaker 2** _[03:31]_
+
+Once you have those tokens,
+
+**Speaker 1** _[03:32]_
+
+have those tokens, what you can do with them is
+
+**Speaker 2** _[03:35]_
+
+is apply some meaningful labels to them. Those labels can be
+
+**Speaker 1** _[03:40]_
+
+can be linguistic, like in this case POS.
+
+**Speaker 2** _[03:44]_
+
+stands for part of speech tagging and
+
+**Speaker 1** _[03:47]_
+
+not the other meaning, but you can also have some custom tags. For example, for named entity recognition you have tags like
+
+**Speaker 2** _[03:53]_
+
+You have tags like organization,
+
+**Speaker 1** _[03:54]_
+
+like organizations and geopolitical
+
+**Speaker 2** _[03:55]_
+
+geopolitical entities.
+
+**Speaker 1** _[03:59]_
+
+Once you've collected
+
+**Speaker 2** _[04:00]_
+
+collected the tokens, labeled
+
+**Speaker 1** _[04:01]_
+
+tokens, label them, you can count them, but the raw count is not particularly useful for machine learning applications.
+
+**Speaker 2** _[04:07]_
+
+you have to vectorize them.
+
+**Speaker 1** _[04:08]_
+
+vectorize them. You have to transform the count into something else. And in the next step, you're going to have to weigh some tokens. Some of them are going to be more important than the others. It depends on your source material and it depends on the...
+
+**Speaker 2** _[04:23]_
+
+information you're trying to extract.
+
+**Speaker 1** _[04:24]_
+
+trying to extract from the text.
+
+**Speaker 2** _[04:29]_
+
+That's the deep learning slide that I promised. Deep learning is a fantastic...
+
+**Speaker 1** _[04:35]_
+
+is a fantastic tool in
+
+**Speaker 2** _[04:36]_
+
+tool in machine learning, and it's very
+
+**Speaker 1** _[04:37]_
+
+and it's very much applicable to NLP. In fact, most of the novel research, both in academia and in industry, is done using deep learning.
+
+**Speaker 2** _[04:47]_
+
+And it's very lucrative because
+
+**Speaker 1** _[04:48]_
+
+lucrative because all you need is a huge collection of data, but you can start with some
+
+**Speaker 2** _[04:55]_
+
+You can start with something very simple.
+
+**Speaker 1** _[04:57]_
+
+when you have no labels whatsoever, you can still take
+
+**Speaker 2** _[05:01]_
+
+You can still take your text blob
+
+**Speaker 1** _[05:02]_
+
+your text blobs and combine them to bigger, meaningful text blobs. This is the process
+
+**Speaker 2** _[05:06]_
+
+This is the process known as clustering.
+
+**Speaker 1** _[05:08]_
+
+clustering.
+
+**Speaker 2** _[05:09]_
+
+This process doesn't require
+
+**Speaker 1** _[05:10]_
+
+doesn't require anything other than your data. It's completely unsupervised.
+
+**Speaker 2** _[05:15]_
+
+Once you have some labels,
+
+**Speaker 1** _[05:16]_
+
+some labels.
+
+**Speaker 2** _[05:17]_
+
+For example, for email.
+
+**Speaker 1** _[05:18]_
+
+For emails, you have spam and ham.
+
+**Speaker 2** _[05:21]_
+
+The tasks become something of a
+
+**Speaker 1** _[05:22]_
+
+something of a classification. And there's a variety of machine learning algorithms to
+
+**Speaker 2** _[05:26]_
+
+algorithms to choose from for that.
+
+**Speaker 1** _[05:27]_
+
+for that.
+
+**Speaker 2** _[05:28]_
+
+And deep learning is.
+
+**Speaker 1** _[05:29]_
+
+can be done
+
+**Speaker 2** _[05:30]_
+
+can be done with both
+
+**Speaker 1** _[05:31]_
+
+with both labeled and unlabeled data.
+
+**Speaker 2** _[05:34]_
+
+It basically can be applied as
+
+**Speaker 1** _[05:35]_
+
+be applied as a black box algorithm, it picks up some linguistic patterns along the way, but you don't necessarily know how it comes up with those patterns.
+
+**Speaker 2** _[05:47]_
+
+All right, so this follows.
+
+**Speaker 1** _[05:50]_
+
+This follows the example by
+
+**Speaker 2** _[05:51]_
+
+by Josh Wills.
+
+**Speaker 1** _[05:52]_
+
+Josh Wills who introduced the
+
+**Speaker 2** _[05:54]_
+
+data science infinite loop of sadness.
+
+**Speaker 1** _[05:57]_
+
+I'm introducing the NLP Pyramid of Sadness, and it's based on how you view
+
+**Speaker 2** _[06:02]_
+
+how you view linguistics as a discipline.
+
+**Speaker 1** _[06:04]_
+
+as a discipline.
+
+**Speaker 2** _[06:05]_
+
+For linguists, it's a nice...
+
+**Speaker 1** _[06:05]_
+
+For linguists, It's a nice organized world where each level is built on top of each other and each
+
+**Speaker 2** _[06:10]_
+
+each other and each level deals with different aspects of languages like for example phonetics and phonology
+
+**Speaker 1** _[06:15]_
+
+And phonology deals with the sound of a human language. Morphology deals with some components of the word.
+
+**Speaker 2** _[06:24]_
+
+like word roots
+
+**Speaker 1** _[06:25]_
+
+roots and stems
+
+**Speaker 2** _[06:26]_
+
+and stems, and suffixes and prefixes.
+
+**Speaker 1** _[06:28]_
+
+and prefixes.
+
+**Speaker 2** _[06:30]_
+
+Syntax...
+
+**Speaker 1** _[06:31]_
+
+helps combine
+
+**Speaker 2** _[06:32]_
+
+helps combine those words into sentences.
+
+**Speaker 1** _[06:33]_
+
+words into sentences.
+
+**Speaker 2** _[06:35]_
+
+It deals with rules and constraints.
+
+**Speaker 1** _[06:37]_
+
+constraints of how you organize.
+
+**Speaker 2** _[06:39]_
+
+words into something more meaningful.
+
+**Speaker 1** _[06:40]_
+
+to something more meaningful as a phrase.
+
+**Speaker 2** _[06:43]_
+
+And syntax provides
+
+**Speaker 1** _[06:44]_
+
+provides help and scaffolding for meaning.
+
+**Speaker 2** _[06:48]_
+
+Meaning is something that's...
+
+**Speaker 1** _[06:49]_
+
+something that semantics and pragmatics deal with. And the difference is semantics, it's something you can look up in the dictionary, the basic
+
+**Speaker 2** _[06:55]_
+
+the basic meaning of the word.
+
+**Speaker 1** _[06:56]_
+
+meaning. of the word, pragmatics is the highest level of
+
+**Speaker 2** _[06:59]_
+
+level of abstraction.
+
+**Speaker 1** _[07:00]_
+
+It's something that's not necessarily written but understood by context. It's a world.
+
+**Speaker 2** _[07:06]_
+
+It's world view.
+
+**Speaker 1** _[07:07]_
+
+It's something that you understand out of the context.
+
+**Speaker 2** _[07:11]_
+
+So, and machine learning kind of...
+
+**Speaker 1** _[07:13]_
+
+learning, kind of.
+
+**Speaker 2** _[07:14]_
+
+tips this pyramid.
+
+**Speaker 1** _[07:16]_
+
+and makes it a less structurally sound structure. But machine learning likes to tackle really hard problems.
+
+**Speaker 2** _[07:25]_
+
+problems and in this case
+
+**Speaker 1** _[07:25]_
+
+And in this case, it is all about the meaning, it's all about the semantics. This is where a lot of research is, and this is where the money is.
+
+**Speaker 2** _[07:32]_
+
+This is where the money is.
+
+**Speaker 1** _[07:34]_
+
+about natural language understanding.
+
+**Speaker 2** _[07:34]_
+
+language understanding systems.
+
+**Speaker 1** _[07:36]_
+
+is where you have to combine
+
+**Speaker 2** _[07:38]_
+
+to combine linguistic knowledge and a lot of
+
+**Speaker 1** _[07:40]_
+
+and a lot of sophisticated machine learning algorithms, but also some rule-based stuff.
+
+**Speaker 2** _[07:40]_
+
+sophistication. heuristics.
+
+**Speaker 1** _[07:46]_
+
+An example of NLU would be...
+
+**Speaker 2** _[07:50]_
+
+systems like Alexa.
+
+**Speaker 1** _[07:51]_
+
+Alexa, but the problem is that
+
+**Speaker 2** _[07:57]_
+
+The problem is that semantics
+
+**Speaker 1** _[07:58]_
+
+that semantics can be really hard.
+
+**Speaker 2** _[08:00]_
+
+really hard and it's very language specific.
+
+**Speaker 1** _[08:01]_
+
+language-specific okay I'm going back to
+
+**Speaker 2** _[08:05]_
+
+one level down, which is syntax. If you've never done syntactic parsing before, this
+
+**Speaker 1** _[08:11]_
+
+before, this may be a little bit confusing. I tried to pick a more contemporary example that you don't find.
+
+**Speaker 2** _[08:16]_
+
+that you don't find in usual linguistic textbooks.
+
+**Speaker 1** _[08:18]_
+
+textbooks. So I'm analyzing the phrase this part is going to be lit
+
+**Speaker 2** _[08:23]_
+
+And I'll start.
+
+**Speaker 1** _[08:24]_
+
+I'll start with the verb phrase, going to be.
+
+**Speaker 2** _[08:27]_
+
+and has two dependencies.
+
+**Speaker 1** _[08:28]_
+
+independency this party
+
+**Speaker 2** _[08:29]_
+
+This party, which is this
+
+**Speaker 1** _[08:30]_
+
+which is the subject of the sentence.
+
+**Speaker 2** _[08:32]_
+
+and the complementary phrase
+
+**Speaker 1** _[08:33]_
+
+phrase be lit and you see lit in this case is classified as a noun which is not necessarily correct but it works
+
+**Speaker 2** _[08:42]_
+
+but it works in the overall system.
+
+**Speaker 1** _[08:42]_
+
+in the overall structure of the sample.
+
+**Speaker 2** _[08:43]_
+
+structure of the sentence. Those dependencies are
+
+**Speaker 1** _[08:46]_
+
+Tendencies are important when you organize.
+
+**Speaker 2** _[08:47]_
+
+when you organize words into moments.
+
+**Speaker 1** _[08:49]_
+
+into more meaningful chunks.
+
+**Speaker 2** _[08:54]_
+
+There are some pitfalls.
+
+**Speaker 1** _[08:55]_
+
+pitfalls when you're dealing with natural languages.
+
+**Speaker 2** _[08:58]_
+
+Data produced by humans
+
+**Speaker 1** _[08:59]_
+
+by humans is naturally messy.
+
+**Speaker 2** _[09:01]_
+
+really messy. You have a lot of
+
+**Speaker 1** _[09:02]_
+
+lot of special characters, you have typos, it's not necessarily correct.
+
+**Speaker 2** _[09:03]_
+
+special correct English or other languages.
+
+**Speaker 1** _[09:07]_
+
+or other languages.
+
+**Speaker 2** _[09:08]_
+
+So you have to come up with some
+
+**Speaker 1** _[09:10]_
+
+come up with some strategies how you
+
+**Speaker 2** _[09:10]_
+
+strategies how you're going to deal with
+
+**Speaker 1** _[09:11]_
+
+you're going to deal with that. Even when you're dealing with correct and grammatically
+
+**Speaker 2** _[09:16]_
+
+and grammatically correct language,
+
+**Speaker 1** _[09:16]_
+
+the correct language.
+
+**Speaker 2** _[09:18]_
+
+you still have some ambiguity.
+
+**Speaker 1** _[09:19]_
+
+ambiguity that makes it difficult to
+
+**Speaker 2** _[09:20]_
+
+difficult to process meaning.
+
+**Speaker 1** _[09:21]_
+
+process. Like, for example, homonyms in English.
+
+**Speaker 2** _[09:24]_
+
+in English. Tear and tear are two different words that
+
+**Speaker 1** _[09:27]_
+
+words that are spelled completely identically. When you look at words on the level of morphology,
+
+**Speaker 2** _[09:38]_
+
+different word forms.
+
+**Speaker 1** _[09:39]_
+
+forms
+
+**Speaker 2** _[09:40]_
+
+and noun phrases, the same word can suddenly change
+
+**Speaker 1** _[09:43]_
+
+can suddenly change the meaning. Like in this example, this agreement is about the principle
+
+**Speaker 2** _[09:48]_
+
+about a principled compromise, not a principle compromised. So just by changing something,
+
+**Speaker 1** _[09:53]_
+
+By changing some suffixes, the noun phrase
+
+**Speaker 2** _[09:55]_
+
+One phrase completely changed the meaning.
+
+**Speaker 1** _[09:58]_
+
+And this is something to think about.
+
+**Speaker 2** _[10:01]_
+
+those corner cases
+
+**Speaker 1** _[10:02]_
+
+cases, it's not necessarily something you'll find in your
+
+**Speaker 2** _[10:04]_
+
+you'll find in your own natural
+
+**Speaker 1** _[10:05]_
+
+your own natural language processing project, but it's something to think about before you
+
+**Speaker 2** _[10:10]_
+
+before you start the process,
+
+**Speaker 1** _[10:11]_
+
+start the processing and it's also something important to keep in mind.
+
+**Speaker 2** _[10:14]_
+
+to keep in mind when you
+
+**Speaker 1** _[10:15]_
+
+mind when you
+
+**Speaker 2** _[10:16]_
+
+interpret the results. Okay.
+
+**Speaker 1** _[10:22]_
+
+And it all depends on how much data you're going to have. If it's a huge collection of text or if it's just a relatively small collection.
+
+**Speaker 2** _[10:30]_
+
+relatively small corpus. If you have a big data
+
+**Speaker 1** _[10:33]_
+
+data, by the
+
+**Speaker 2** _[10:34]_
+
+by the law of large numbers.
+
+**Speaker 1** _[10:35]_
+
+large numbers.
+
+**Speaker 2** _[10:37]_
+
+All the errors, all the ambiguity,
+
+**Speaker 1** _[10:38]_
+
+all the ambiguities in special cases are going to be evened out.
+
+**Speaker 2** _[10:42]_
+
+and a lot of time and research
+
+**Speaker 1** _[10:43]_
+
+time and research is invested in annotation schemes.
+
+**Speaker 2** _[10:46]_
+
+annotation schemas and tools.
+
+**Speaker 1** _[10:48]_
+
+to provide
+
+**Speaker 2** _[10:49]_
+
+correct and more meaningful label.
+
+**Speaker 1** _[10:50]_
+
+more meaningful labels.
+
+**Speaker 2** _[10:52]_
+
+But for the first...
+
+**Speaker 1** _[10:53]_
+
+the first NLP project, chances are that your data is relatively small. And then every word counts.
+
+**Speaker 2** _[11:00]_
+
+You'll have to invest time into preprocessing.
+
+**Speaker 1** _[11:05]_
+
+And in this case, natural language processing library.
+
+**Speaker 2** _[11:08]_
+
+processing libraries to the rest
+
+**Speaker 1** _[11:09]_
+
+to the rescue.
+
+**Speaker 2** _[11:10]_
+
+You don't have to reinvent the wheel.
+
+**Speaker 1** _[11:11]_
+
+reinvent the wheel and the library that I'm going to talk about in this in this talk is called spacing
+
+**Speaker 2** _[11:20]_
+
+It's an open source project maintained by Matthew Honnebel and
+
+**Speaker 1** _[11:23]_
+
+Hannibal and Ines Montani.
+
+**Speaker 2** _[11:25]_
+
+The idea is to get from
+
+**Speaker 1** _[11:26]_
+
+is to get from an unstructured text blob
+
+**Speaker 2** _[11:29]_
+
+to something that has
+
+**Speaker 1** _[11:30]_
+
+that has a lot of
+
+**Speaker 2** _[11:31]_
+
+a lot of meaningful labels that you
+
+**Speaker 1** _[11:32]_
+
+label that you can use for machine learning. And it's an NLP pipeline. It's
+
+**Speaker 2** _[11:37]_
+
+applying. It starts with the top
+
+**Speaker 1** _[11:37]_
+
+It starts with the tokenizer, and then you have various taggers, part of
+
+**Speaker 2** _[11:42]_
+
+part of speech taggers, parsers.
+
+**Speaker 1** _[11:43]_
+
+parsers named
+
+**Speaker 2** _[11:44]_
+
+named entity recognition and some custom plugins.
+
+**Speaker 1** _[11:46]_
+
+some custom plugins.
+
+**Speaker 2** _[11:47]_
+
+that you can combine in a way
+
+**Speaker 1** _[11:48]_
+
+in a way that makes sense for your task.
+
+**Speaker 2** _[11:55]_
+
+I'm going to show some very simplistic
+
+**Speaker 1** _[11:58]_
+
+stick NLP pipe
+
+**Speaker 2** _[11:58]_
+
+NLP pipelines using the examples of very short sentences.
+
+**Speaker 1** _[12:03]_
+
+And my first example, my
+
+**Speaker 2** _[12:04]_
+
+First example, my first recipe is a twig.
+
+**Speaker 1** _[12:06]_
+
+is a tweet.
+
+**Speaker 2** _[12:08]_
+
+In case you don't know her, Mara Everick is a data scientist and she describes data science tools on
+
+**Speaker 1** _[12:12]_
+
+tools on Twitter.
+
+**Speaker 2** _[12:14]_
+
+using her own very visual language.
+
+**Speaker 1** _[12:16]_
+
+language.
+
+**Speaker 2** _[12:16]_
+
+She uses a lot of...
+
+**Speaker 1** _[12:18]_
+
+A lot of GIFs, emojis, popcorn.
+
+**Speaker 2** _[12:19]_
+
+which is pop culture references.
+
+**Speaker 1** _[12:21]_
+
+And the challenge here is that it's not a lot of text.
+
+**Speaker 2** _[12:25]_
+
+It's a lot of other characters.
+
+**Speaker 1** _[12:27]_
+
+characters. But what I want to see
+
+**Speaker 2** _[12:30]_
+
+want to see is
+
+**Speaker 1** _[12:30]_
+
+is how does an NLP pipeline
+
+**Speaker 2** _[12:31]_
+
+um pipeline deal with that. I'm just going to read out the tweet.
+
+**Speaker 1** _[12:36]_
+
+out the tweet star intro into
+
+**Speaker 2** _[12:40]_
+
+Intro into a Glowing Star Tool, Detective RegExplained,
+
+**Speaker 1** _[12:44]_
+
+RegExplain by at.
+
+**Speaker 2** _[12:47]_
+
+Twitter handle?
+
+**Speaker 1** _[12:48]_
+
+Twitter handle, and then you have a link and hashtag.
+
+**Speaker 2** _[12:51]_
+
+And hashtag rstats.
+
+**Speaker 1** _[12:52]_
+
+Our stats, hashtag Regex. All right. What parts of the pipeline...
+
+**Speaker 2** _[12:58]_
+
+pipeline are important, what parts are nice to have. It always starts with, for
+
+**Speaker 1** _[13:04]_
+
+starts with, first of all, the
+
+**Speaker 2** _[13:05]_
+
+The step zero is identity.
+
+**Speaker 1** _[13:06]_
+
+is identifying the language that you're going to deal with. In this case, it's English. This will determine what kind of language model you're using.
+
+**Speaker 2** _[13:13]_
+
+which model you are using.
+
+**Speaker 1** _[13:14]_
+
+using. The next step that is important is tokenization.
+
+**Speaker 2** _[13:17]_
+
+organization.
+
+**Speaker 1** _[13:18]_
+
+And this is basically splitting the sensors.
+
+**Speaker 2** _[13:20]_
+
+the sentence that you have into words or phrases.
+
+**Speaker 1** _[13:25]_
+
+The simplest case is splitting by y.
+
+**Speaker 2** _[13:27]_
+
+splitting by white space or
+
+**Speaker 1** _[13:28]_
+
+white space or punctuation.
+
+**Speaker 2** _[13:29]_
+
+punctuation, but it doesn't always work this way.
+
+**Speaker 1** _[13:32]_
+
+this way. Some languages, like Japanese, don't even have white spaces.
+
+**Speaker 2** _[13:35]_
+
+white space so you have your own chat
+
+**Speaker 1** _[13:35]_
+
+so you have your own challenge. And in German, with long compounds,
+
+**Speaker 2** _[13:39]_
+
+long compound words.
+
+**Speaker 1** _[13:41]_
+
+Sometimes you have to split something in the middle of the work.
+
+**Speaker 2** _[13:43]_
+
+in the middle of the world.
+
+**Speaker 1** _[13:44]_
+
+Like the three English
+
+**Speaker 2** _[13:45]_
+
+Three English words in the phrase income.
+
+**Speaker 1** _[13:47]_
+
+phrase income tax return.
+
+**Speaker 2** _[13:47]_
+
+tax return.
+
+**Speaker 1** _[13:48]_
+
+Einkommenssteuererklärung in German. Next step that is very important for things like organizing work
+
+**Speaker 2** _[13:57]_
+
+Organizing words in a sentence, it's part of speech tagging.
+
+**Speaker 1** _[13:59]_
+
+tagging and syntactic parsing.
+
+**Speaker 2** _[14:01]_
+
+Without it, you cannot really
+
+**Speaker 1** _[14:02]_
+
+you cannot really combine
+
+**Speaker 2** _[14:04]_
+
+words into noun chunks.
+
+**Speaker 1** _[14:05]_
+
+noun chunks.
+
+**Speaker 2** _[14:07]_
+
+Chunking is really
+
+**Speaker 1** _[14:08]_
+
+really nice to have.
+
+**Speaker 2** _[14:10]_
+
+even concentrating on
+
+**Speaker 1** _[14:11]_
+
+concentrating on not one word,
+
+**Speaker 2** _[14:12]_
+
+not one word, but two words, increasing the window size too.
+
+**Speaker 1** _[14:15]_
+
+size too, it improves the accuracy of any machine learning model. And it's all about the context. So as you can see in the examples,
+
+**Speaker 2** _[14:24]_
+
+Chocolate bar, bar exam, wine bar, and space bar are very different kinds of bars.
+
+**Speaker 1** _[14:30]_
+
+And in order to understand what you are talking about, you have to look at
+
+**Speaker 2** _[14:32]_
+
+You have to look at the words surrounding your target.
+
+**Speaker 1** _[14:34]_
+
+your target word. Alright, I will make the Jupyter Notebook available on GitHub after this talk, but I'm going to show some
+
+**Speaker 2** _[14:47]_
+
+small parts of the code.
+
+**Speaker 1** _[14:48]_
+
+of the code. So you can see
+
+**Speaker 2** _[14:51]_
+
+The simplistic NLP pipeline
+
+**Speaker 1** _[14:52]_
+
+NLP pipeline. What I'm doing here after loading
+
+**Speaker 2** _[14:55]_
+
+after loading spaCy, I'm choosing the
+
+**Speaker 1** _[14:59]_
+
+Using the...
+
+**Speaker 2** _[15:00]_
+
+language model, in this case English, and then I'm loading the
+
+**Speaker 1** _[15:03]_
+
+the example
+
+**Speaker 2** _[15:04]_
+
+example sentence into a document object.
+
+**Speaker 1** _[15:06]_
+
+document object and what I'm going to look at are different groups of tokens.
+
+**Speaker 2** _[15:12]_
+
+tokens, in this case very simple
+
+**Speaker 1** _[15:14]_
+
+very simple divide between alpha tokens and not alpha tokens. I'm only looking at the
+
+**Speaker 2** _[15:19]_
+
+You're looking at words and non-words.
+
+**Speaker 1** _[15:19]_
+
+words and non-words.
+
+**Speaker 2** _[15:21]_
+
+And then looking at noun chunks.
+
+**Speaker 1** _[15:23]_
+
+And what I'm doing here is
+
+**Speaker 2** _[15:24]_
+
+doing here is a very simplistic sentiment analysis.
+
+**Speaker 1** _[15:27]_
+
+analysis. I have created a custom dictionary
+
+**Speaker 2** _[15:30]_
+
+custom dictionary for
+
+**Speaker 1** _[15:31]_
+
+for emoji, and I'm using emoji count as sentiments.
+
+**Speaker 2** _[15:37]_
+
+sentiment score.
+
+**Speaker 1** _[15:41]_
+
+So you can see this is my very
+
+**Speaker 2** _[15:42]_
+
+This is my very simplistic
+
+**Speaker 1** _[15:43]_
+
+simplistic emoji dictionary that can be expanded.
+
+**Speaker 2** _[15:47]_
+
+and the nice thing about
+
+**Speaker 1** _[15:48]_
+
+about Space-C pipelines is this is the
+
+**Speaker 2** _[15:51]_
+
+This is the customizable part. This is something you can expand.
+
+**Speaker 1** _[15:53]_
+
+and you can expand depending on your goal.
+
+**Speaker 2** _[15:55]_
+
+on your goals.
+
+**Speaker 1** _[15:56]_
+
+They have special containers.
+
+**Speaker 2** _[15:58]_
+
+containers for
+
+**Speaker 1** _[15:59]_
+
+for things like that, and you can either flash
+
+**Speaker 2** _[16:02]_
+
+either flag something,
+
+**Speaker 1** _[16:03]_
+
+something as a
+
+**Speaker 2** _[16:05]_
+
+token of interest, or you can create
+
+**Speaker 1** _[16:06]_
+
+create your own vocabulary list.
+
+**Speaker 2** _[16:08]_
+
+list. In this case, I'm flagging it in the vocabulary list. The tokenization is
+
+**Speaker 1** _[16:15]_
+
+is done
+
+**Speaker 2** _[16:16]_
+
+done behind the scenes by Spaceman.
+
+**Speaker 1** _[16:17]_
+
+scenes by Spacey, it's basically one line.
+
+**Speaker 2** _[16:19]_
+
+one line for
+
+**Speaker 1** _[16:20]_
+
+for token in document one and then all you do is use built-in attributes
+
+**Speaker 2** _[16:26]_
+
+in attributes to filter tokens.
+
+**Speaker 1** _[16:28]_
+
+In this case, I am interested in war.
+
+**Speaker 2** _[16:29]_
+
+interested in words, which is, is alpha.
+
+**Speaker 1** _[16:31]_
+
+alpha and then I collect it in a list.
+
+**Speaker 2** _[16:36]_
+
+Right, and then using the
+
+**Speaker 1** _[16:37]_
+
+using the previously defined emoji dictionary for sentiment analysis, I'm just going to create
+
+**Speaker 2** _[16:42]_
+
+create a sentiment score. And the second part of it
+
+**Speaker 1** _[16:47]_
+
+part of it is, I'm going to show you.
+
+**Speaker 2** _[16:49]_
+
+It's a very simple example of
+
+**Speaker 1** _[16:50]_
+
+example of syntactic tree
+
+**Speaker 2** _[16:52]_
+
+tree dependency.
+
+**Speaker 1** _[16:53]_
+
+And you can see, I was interested.
+
+**Speaker 2** _[16:55]_
+
+I was interested in...
+
+**Speaker 1** _[16:56]_
+
+in emoji and how they're integrated? Are they part of the noun?
+
+**Speaker 2** _[16:59]_
+
+part of the noun phrase or they're completely separate entities.
+
+**Speaker 1** _[17:01]_
+
+entities. And this example shows that
+
+**Speaker 2** _[17:03]_
+
+shows that they are indeed integrated, so you can see the
+
+**Speaker 1** _[17:07]_
+
+the first star is identified as a pronoun, which is
+
+**Speaker 2** _[17:11]_
+
+which is not correct, but it's still possible.
+
+**Speaker 1** _[17:12]_
+
+but it's still part of the sentence. And I was luckier with the second emoji, the
+
+**Speaker 2** _[17:18]_
+
+emoji, the glowing star.
+
+**Speaker 1** _[17:18]_
+
+Glowing Star, which is part of
+
+**Speaker 2** _[17:19]_
+
+which is part of the noun phrase
+
+**Speaker 1** _[17:20]_
+
+of the noun phrase
+
+**Speaker 2** _[17:21]_
+
+A Glowing Star Tool.
+
+**Speaker 1** _[17:24]_
+
+And this kid is, it's identified as a pro.
+
+**Speaker 2** _[17:26]_
+
+as a proper noun.
+
+**Speaker 1** _[17:26]_
+
+proper noun, but you can use that example as something, this is the prerequisite for the chunking.
+
+**Speaker 2** _[17:34]_
+
+and my noun chunk is
+
+**Speaker 1** _[17:36]_
+
+Noun chunk is going to be a glowing star tool.
+
+**Speaker 2** _[17:41]_
+
+And this is how you access the noun chunk in spaCy.
+
+**Speaker 1** _[17:45]_
+
+So some of the noun chunks I'm not going to be particularly interested in, but this is something you can use for further.
+
+**Speaker 2** _[17:53]_
+
+further filtering.
+
+**Speaker 1** _[17:54]_
+
+filtering. If you're only interested in nouns or only in
+
+**Speaker 2** _[17:56]_
+
+or only in adjectives for example. Alright, so some pitfalls that you can
+
+**Speaker 1** _[18:02]_
+
+that you can already see with examples like tweets or social media posts.
+
+**Speaker 2** _[18:03]_
+
+No. you're going to have to deal with a lot of
+
+**Speaker 1** _[18:07]_
+
+with a lot of garbage, some encoding issues.
+
+**Speaker 2** _[18:09]_
+
+encoding issue.
+
+**Speaker 1** _[18:10]_
+
+And even with emoji, they can be UTF-8 or they can be Unicode, but you have to decide.
+
+**Speaker 2** _[18:14]_
+
+but you have to decide what to do with them.
+
+**Speaker 1** _[18:15]_
+
+what to do with them. Do you just ignore them, filter them out?
+
+**Speaker 2** _[18:18]_
+
+or do you process them as
+
+**Speaker 1** _[18:19]_
+
+them as special entities.
+
+**Speaker 2** _[18:20]_
+
+special entities.
+
+**Speaker 1** _[18:23]_
+
+And punctuation is normally filtered out, but in case of emoji you have to decide early on are you going to treat emoji as a special case of punctuation or are you just going to ignore them. And not all part of speech tags automatically identified are going to be correct.
+
+**Speaker 2** _[18:42]_
+
+relying on built-in models
+
+**Speaker 1** _[18:44]_
+
+models it's something that is not necessarily a good idea always have to go back and double-check like in my example that the emojis were completely misclassified best practices I'm just going through them really quickly but please take it with a grain of salt especially if you've already have some experience with NLP what works for my projects might not work for yours
+
+**Speaker 2** _[19:09]_
+
+In any case, identifying
+
+**Speaker 1** _[19:10]_
+
+identifying the language before any preprocess.
+
+**Speaker 2** _[19:11]_
+
+any pre-processing is important.
+
+**Speaker 1** _[19:12]_
+
+processing is important.
+
+**Speaker 2** _[19:13]_
+
+And then this decision to filter.
+
+**Speaker 1** _[19:14]_
+
+to filter or remove special characters?
+
+**Speaker 2** _[19:16]_
+
+characters. Nice to have as a custom dictionary, like a vocabulary list, but it's odd.
+
+**Speaker 1** _[19:20]_
+
+but it's time consuming.
+
+**Speaker 2** _[19:23]_
+
+Again, nice to have his chunking.
+
+**Speaker 1** _[19:24]_
+
+with chunking and noun phrases.
+
+**Speaker 2** _[19:25]_
+
+noun phrases that you
+
+**Speaker 1** _[19:26]_
+
+that just makes the output and the interpretation.
+
+**Speaker 2** _[19:27]_
+
+interpretation lay
+
+**Speaker 1** _[19:28]_
+
+later much, much neater.
+
+**Speaker 2** _[19:30]_
+
+neater. Some not-to-dos
+
+**Speaker 1** _[19:35]_
+
+to-dos is, please don't assume that everything is going to be simple.
+
+**Speaker 2** _[19:39]_
+
+going to be simple and well-organized.
+
+**Speaker 1** _[19:41]_
+
+newspaper articles are on a completely different level.
+
+**Speaker 2** _[19:44]_
+
+completely different level then.
+
+**Speaker 1** _[19:45]_
+
+level than social media posts. It may be very tempting to write your own tokenizer, but
+
+**Speaker 2** _[19:53]_
+
+Why reinvent the wheel?
+
+**Speaker 1** _[19:54]_
+
+invent the wheel when libraries like Spacey do
+
+**Speaker 2** _[19:56]_
+
+Pacey do it for you in one line.
+
+**Speaker 1** _[19:57]_
+
+it for you in one line of code. And just like I mentioned,
+
+**Speaker 2** _[20:00]_
+
+like I mentioned, don't rely on
+
+**Speaker 1** _[20:00]_
+
+Don't rely on off-the-shelf, pre-built, pre-trained models. Okay. The second recipe is a Yelp review. It's a one-star negative review.
+
+**Speaker 2** _[20:14]_
+
+I would like to find out why was this
+
+**Speaker 1** _[20:16]_
+
+Why was this review negative? Is it something?
+
+**Speaker 2** _[20:19]_
+
+tangible, like the name of
+
+**Speaker 1** _[20:21]_
+
+the name of an employee, maybe it's about the price, maybe it's the location.
+
+**Speaker 2** _[20:25]_
+
+Maybe it's the location.
+
+**Speaker 1** _[20:26]_
+
+So I'm going to be interested, I'm going to be focused on very specific tokens. Okay, the text of the review. We drove...
+
+**Speaker 2** _[20:33]_
+
+30 minutes out of our way to get some dessert.
+
+**Speaker 1** _[20:35]_
+
+to get some dessert and ordered a ton to go, only to find that they didn't give us what we ordered. What we did get was not good.
+
+**Speaker 2** _[20:42]_
+
+We called, and they refunded us.
+
+**Speaker 1** _[20:44]_
+
+us $4. Ridiculous. Don't waste your time or money here.
+
+**Speaker 2** _[20:48]_
+
+money here sixth course right around the corner is
+
+**Speaker 1** _[20:49]_
+
+around the corner is way better. I should probably mention this is a review of my favorite chocolate shop in San Francisco, so it is very surprising that it's such a negative review. Alright, so what's the typical pipeline for processing something like that?
+
+**Speaker 2** _[21:06]_
+
+It's a longer text, but it also has some challenges.
+
+**Speaker 1** _[21:08]_
+
+some challenges.
+
+**Speaker 2** _[21:10]_
+
+What you can do with your tokens is to create a new token.
+
+**Speaker 1** _[21:11]_
+
+with your tokens is normalize them get them to some basic form that you can look up in the dictionary
+
+**Speaker 2** _[21:18]_
+
+One way to deal with it is
+
+**Speaker 1** _[21:19]_
+
+with it is for example
+
+**Speaker 2** _[21:19]_
+
+For example,
+
+**Speaker 1** _[21:21]_
+
+Expand contractions.
+
+**Speaker 2** _[21:23]_
+
+and expands.
+
+**Speaker 1** _[21:24]_
+
+expand some units of measurements, like $5, spell it out as $5. Again, tokenization is filtering, is going to be part of the process.
+
+**Speaker 2** _[21:37]_
+
+In this case, I'm just going to
+
+**Speaker 1** _[21:38]_
+
+I'm just going to remove puncture.
+
+**Speaker 2** _[21:39]_
+
+punctuation as well as stop words. Stop words
+
+**Speaker 1** _[21:42]_
+
+stop words are very common
+
+**Speaker 2** _[21:44]_
+
+very common words
+
+**Speaker 1** _[21:45]_
+
+words that
+
+**Speaker 2** _[21:46]_
+
+carry no special meaning.
+
+**Speaker 1** _[21:47]_
+
+meaning, like the and of. Those stop words are language-specific, and every language has a list of those
+
+**Speaker 2** _[21:54]_
+
+list of those stop words.
+
+**Speaker 1** _[21:54]_
+
+stop words. And the main part of what I'm going to do with this Yelp review is going to be named entity recognition.
+
+**Speaker 2** _[22:03]_
+
+And like I mentioned, it's going to be...
+
+**Speaker 1** _[22:05]_
+
+I mentioned it's going to be something special.
+
+**Speaker 2** _[22:06]_
+
+specific
+
+**Speaker 1** _[22:07]_
+
+like location, date, quantity.
+
+**Speaker 2** _[22:11]_
+
+or organization.
+
+**Speaker 1** _[22:12]_
+
+I'm going to have a lot of different tags.
+
+**Speaker 2** _[22:19]_
+
+side about normalization.
+
+**Speaker 1** _[22:19]_
+
+normalization, you have two choices when you're trying to normalize.
+
+**Speaker 2** _[22:22]_
+
+trying to normalize words, and
+
+**Speaker 1** _[22:23]_
+
+and it's stemming or lemmatization.
+
+**Speaker 2** _[22:26]_
+
+They both have advantages and disadvantages.
+
+**Speaker 1** _[22:27]_
+
+and disadvantages. Stemming is basically removing cutting-off suffixes. Sometimes it creates nonsense
+
+**Speaker 2** _[22:34]_
+
+creates nonsensical words
+
+**Speaker 1** _[22:34]_
+
+words. Lemmatization is doing things
+
+**Speaker 2** _[22:37]_
+
+is doing things properly,
+
+**Speaker 1** _[22:38]_
+
+properly.
+
+**Speaker 2** _[22:39]_
+
+by looking up words
+
+**Speaker 1** _[22:40]_
+
+up words in a dictionary like WordNet.
+
+**Speaker 2** _[22:42]_
+
+It produces better results.
+
+**Speaker 1** _[22:43]_
+
+better results and it's usually more accurate, but it's also, it can be more time consuming. So it's always the difference between precision and recall.
+
+**Speaker 2** _[22:54]_
+
+When using spaCy, you don't
+
+**Speaker 1** _[22:55]_
+
+In spaCy you don't get a choice, spaCy only does lemmatization, so in this case it's going to be more by the book.
+
+**Speaker 2** _[23:04]_
+
+So this is my fiber.
+
+**Speaker 1** _[23:05]_
+
+This is my pipeline.
+
+**Speaker 2** _[23:06]_
+
+I'm removing stopwatch.
+
+**Speaker 1** _[23:07]_
+
+moving stop words and punctuation, which is again just
+
+**Speaker 2** _[23:09]_
+
+again just using some built-in
+
+**Speaker 1** _[23:10]_
+
+some built-in attributes, which is very nice, provided by spaCy. I'm not particularly interested in one
+
+**Speaker 2** _[23:15]_
+
+interested in one specific part of speech.
+
+**Speaker 1** _[23:17]_
+
+part of speech tag, which is pronouns. So I'm just going to filter them out outright.
+
+**Speaker 2** _[23:21]_
+
+What I am interested in is
+
+**Speaker 1** _[23:22]_
+
+in is I'm
+
+**Speaker 2** _[23:23]_
+
+I'm tracking named entities.
+
+**Speaker 1** _[23:24]_
+
+named entities like person, organization, geopolitical entity, and so on. And, yeah. So it's just going to provide me a list of those.
+
+**Speaker 2** _[23:34]_
+
+list of those entities. And this is the result.
+
+**Speaker 1** _[23:39]_
+
+we can just look at what are the named entities that are identified and what was missed.
+
+**Speaker 2** _[23:48]_
+
+30 minutes was identified.
+
+**Speaker 1** _[23:49]_
+
+was identified a ton as a quantity.
+
+**Speaker 2** _[23:50]_
+
+is a quantity.
+
+**Speaker 1** _[23:52]_
+
+money in $4.
+
+**Speaker 2** _[23:55]_
+
+And here are the...
+
+**Speaker 1** _[23:56]_
+
+Here are the mistakes.
+
+**Speaker 2** _[23:58]_
+
+ridiculous was identified as a
+
+**Speaker 1** _[23:58]_
+
+Ridiculous. as a geopolitical entity.
+
+**Speaker 2** _[24:02]_
+
+The reason being its capital.
+
+**Speaker 1** _[24:03]_
+
+it's capitalized, and it's a single word in the sentence, so it's an easy mistake to make. Way, because of the way it was spelled, all caps, was identified as organization.
+
+**Speaker 2** _[24:15]_
+
+So you can see this named entity is very
+
+**Speaker 1** _[24:17]_
+
+is very case sensitive. This is why it produces some
+
+**Speaker 2** _[24:19]_
+
+produces some results that are not
+
+**Speaker 1** _[24:20]_
+
+results that are not accurate. And there is also something that was missing. Sixth course.
+
+**Speaker 2** _[24:26]_
+
+should be identified, but it wasn't. The reason for that is
+
+**Speaker 1** _[24:29]_
+
+is both part
+
+**Speaker 2** _[24:31]_
+
+parts of this named entity sixth and
+
+**Speaker 1** _[24:32]_
+
+and coarse, a very common English word. And even though it's capitalized, it's not going to be identified.
+
+**Speaker 2** _[24:33]_
+
+quarter Okay, just very quickly expanding.
+
+**Speaker 1** _[24:42]_
+
+expanding contraction, you have to be really careful. You can customize the tokenizer to include
+
+**Speaker 2** _[24:47]_
+
+to include expanding contractions.
+
+**Speaker 1** _[24:48]_
+
+contractions, but
+
+**Speaker 2** _[24:49]_
+
+but you're going to have some ambiguity with some.
+
+**Speaker 1** _[24:51]_
+
+with some contractions.
+
+**Speaker 2** _[24:52]_
+
+contractions that are the same.
+
+**Speaker 1** _[24:54]_
+
+It's very tempting to clean up the text using spellchecks,
+
+**Speaker 2** _[24:57]_
+
+using spell checker.
+
+**Speaker 1** _[24:59]_
+
+But before you do that, you have to make sure that it's worth it, because the spell checker will try to correct every word in the sentence.
+
+**Speaker 2** _[25:07]_
+
+whether it was necessary
+
+**Speaker 1** _[25:08]_
+
+necessary or not. And then again, lowercase is a real problem with named entity recognition. Some people don't even capitalize their own name, so it makes it very, very hard to identify.
+
+**Speaker 2** _[25:21]_
+
+And some names,
+
+**Speaker 1** _[25:23]_
+
+when they are not capitalized are just very common.
+
+**Speaker 2** _[25:25]_
+
+very common English noun.
+
+**Speaker 1** _[25:26]_
+
+English nouns like a rose
+
+**Speaker 2** _[25:31]_
+
+So best practices is the
+
+**Speaker 1** _[25:32]_
+
+is the order of operations becomes very important.
+
+**Speaker 2** _[25:36]_
+
+Expand contractions.
+
+**Speaker 1** _[25:37]_
+
+contractions before tokenization, spell checker before limitization and normalization. If you are going to convert everything to
+
+**Speaker 2** _[25:45]_
+
+everything to
+
+**Speaker 1** _[25:46]_
+
+lowercase, make sure that you identify your name.
+
+**Speaker 2** _[25:46]_
+
+lower case make identify your named entities
+
+**Speaker 1** _[25:48]_
+
+entities before that and sometimes it's a very good idea to just create custom lists for named entities it makes it more accurate okay
+
+**Speaker 2** _[25:59]_
+
+So, very quickly about those.
+
+**Speaker 1** _[26:01]_
+
+about the last recipe it's topic modeling I'm not going to show a lot of pipeline code just what I did here I took two texts one translation of another and it's a text about natural language processing with spaCy one in English and one in Spanish
+
+**Speaker 2** _[26:18]_
+
+And I...
+
+**Speaker 1** _[26:20]_
+
+made those two texts a parallel corp.
+
+**Speaker 2** _[26:22]_
+
+parallel corpus by splitting them
+
+**Speaker 1** _[26:23]_
+
+splitting them into paragraphs. And by topic modeling, what I want to find out is what are the most important
+
+**Speaker 2** _[26:30]_
+
+important words in those texts.
+
+**Speaker 1** _[26:32]_
+
+in those texts. The pipeline is basically connecting everything I talked about before, including tokenization and name-dating recognition. And the results are, I have identified some topics.
+
+**Speaker 2** _[26:45]_
+
+topics using the library called Gensim and the pre-processing step
+
+**Speaker 1** _[26:48]_
+
+processing steps were done.
+
+**Speaker 2** _[26:49]_
+
+were done by Spacey.
+
+**Speaker 1** _[26:51]_
+
+And I don't really speak Spanish, but I know that PLN in Spanish,
+
+**Speaker 2** _[26:55]_
+
+N in Spanish is the same as NLP in English.
+
+**Speaker 1** _[26:58]_
+
+So I have some parallels already, some topics that were identified.
+
+**Speaker 2** _[27:02]_
+
+Even though the corpus was really small,
+
+**Speaker 1** _[27:03]_
+
+corpus was really tiny okay right I'm gonna
+
+**Speaker 2** _[27:09]_
+
+I'm going to skip the best practice.
+
+**Speaker 1** _[27:11]_
+
+the best practices for that. It doesn't really make sense.
+
+**Speaker 2** _[27:13]_
+
+sense if you don't see the code.
+
+**Speaker 1** _[27:15]_
+
+just two words about the approaches that you can use.
+
+**Speaker 2** _[27:20]_
+
+can use one is bag of words.
+
+**Speaker 1** _[27:20]_
+
+One is, bag of words which is basically collect all the
+
+**Speaker 2** _[27:22]_
+
+collect all the words regardless of where they are in the sentence.
+
+**Speaker 1** _[27:25]_
+
+The order is not important.
+
+**Speaker 2** _[27:27]_
+
+when you convert the whole document to a bag of words.
+
+**Speaker 1** _[27:29]_
+
+a bag of word. And you can also have word embeddings with the
+
+**Speaker 2** _[27:32]_
+
+where the context and the order of words is important.
+
+**Speaker 1** _[27:34]_
+
+is important. An example is doc2vec.
+
+**Speaker 2** _[27:40]_
+
+and you can think of it as
+
+**Speaker 1** _[27:41]_
+
+as
+
+**Speaker 2** _[27:42]_
+
+Scrabble tiles.
+
+**Speaker 1** _[27:43]_
+
+Kyle's bag of words is
+
+**Speaker 2** _[27:44]_
+
+bag of words is just the whole bag
+
+**Speaker 1** _[27:45]_
+
+just the whole bag of them and once you put them on the board and the order becomes important then you can do
+
+**Speaker 2** _[27:51]_
+
+do more with this.
+
+**Speaker 1** _[27:52]_
+
+with these styles. Some takeaways for NLP projects. Don't forget that natural language is very messy and it's harder to deal with words than numbers. Looking at your input and output in any stage is very helpful, then you can identify the mistakes.
+
+**Speaker 2** _[28:11]_
+
+And then you can customize your
+
+**Speaker 1** _[28:12]_
+
+Customize your NLP pipelines, like I did with Emoji. And just don't forget, in general, for natural language processing,
+
+**Speaker 2** _[28:20]_
+
+processing projects.
+
+**Speaker 1** _[28:21]_
+
+projects, domain knowledge,
+
+**Speaker 2** _[28:21]_
+
+Domain knowledge is very important. It's better to ask the experts.
+
+**Speaker 1** _[28:24]_
+
+Ask the expert.
+
+**Speaker 2** _[28:25]_
+
+or a native speaker.
+
+**Speaker 1** _[28:26]_
+
+speaker okay so like I promised the the code will be on github along with the slides so I'm happy to answer any questions I think we ran out of time but I'm gonna be around if you want to have some one-on-one discussions about NLP and I'll be happy about it
+
+**Speaker 3** _[28:54]_
+
+Test, test. Oh, that's great. Yeah, I hope there are many, many questions. We have a whole bunch of minutes for all the questions. Questions? Yes, over there. Yeah, thank you for the talk. You mentioned the language that is getting chosen, so you had English and German. Is there also a split between like formal English and social media English at that position or is it really just the high level?
+
+**Speaker 1** _[29:30]_
+
+The model is independent on the context, so it works for...
+
+**Speaker 2** _[29:35]_
+
+It works for formal language and informal language.
+
+**Speaker 1** _[29:36]_
+
+and informal language. Anything you do to customize for your specific case, you'll have to do it on your own. Unfortunately, there is no social media English or Twitter English. We don't have that yet.
+
+**Speaker 3** _[29:50]_
+
+Over there.
+
+**Speaker 4** _[29:53]_
+
+Hi, thanks for the talk. I'm just a little confused about your position on chunking. That first example you had, which was star intro to glowing star tool, that's just a nominal group, right? So, I mean, it was analyzed as a clause with a verb, but it's not actually a clause. It's just a nominal group, and therefore it would just be one chunk.
+
+**Speaker 1** _[30:23]_
+
+It is a one chunk, it's a noun phrase.
+
+**Speaker 4** _[30:25]_
+
+phrase yeah so what would the value of chunking be when in your own example the whole the entire text would just be a single chunk
+
+**Speaker 1** _[30:35]_
+
+Not exactly. The chunks were
+
+**Speaker 2** _[30:36]_
+
+The chunks would be, for example, names, first name, last name.
+
+**Speaker 1** _[30:41]_
+
+or the whole phrase that belongs together as one.
+
+**Speaker 2** _[30:43]_
+
+there is one concept.
+
+**Speaker 1** _[30:44]_
+
+concept, like United Nations would
+
+**Speaker 2** _[30:46]_
+
+that nations would be one chunk.
+
+**Speaker 1** _[30:47]_
+
+So the important part is you're not dealing with words.
+
+**Speaker 2** _[30:50]_
+
+towards a single element,
+
+**Speaker 1** _[30:51]_
+
+single elements, but
+
+**Speaker 2** _[30:53]_
+
+collect all the words that belong to the same
+
+**Speaker 1** _[30:55]_
+
+to the same noun.
+
+**Speaker 4** _[30:56]_
+
+chunk but in that example a star like a good review for a great tool this is a single noun phrase with embedded noun phrases yes and because chunking is flat rather than nested then yeah it just seems kind of self-defeating to apply chunking to this rather than using the dependency parse or something instead so yeah I'm just I mean you could see the tool produced a miss analysis where it said the intro was a verb where it's actually introduction and noun so yeah I'm confused why I'm like I don't think Spacey and Matt Honnable really recommend chunking either
+
+**Speaker 1** _[31:42]_
+
+There are more sophisticated ways of producing better chunks. It becomes more important for topic modeling when you want to have meaning.
+
+**Speaker 2** _[31:49]_
+
+to have meaningful.
+
+**Speaker 1** _[31:50]_
+
+Meaningful noun chunks and you want to glue the words together It's the built-in chunking may not be as useful. You're right. Thank you. So When you have to customize it for the purposes of interpretation just to make it easier to Map the right chunks to the right concepts. This is
+
+**Speaker 2** _[32:10]_
+
+This is something you may have to
+
+**Speaker 1** _[32:11]_
+
+may have to do as a customized
+
+**Speaker 2** _[32:13]_
+
+code.
+
+**Speaker 4** _[32:15]_
+
+Okay.
+
+**Speaker 3** _[32:18]_
+
+Thank you. More questions?
+
+**Speaker 1** _[32:19]_
+
+Questions?
+
+**Speaker 3** _[32:22]_
+
+Okay, over there, so I take the chance of going there. You know this conference only works if there are volunteers, so you all know the signup.zone page, and you visited already, and all of you already put your name in the right slots for session chairs, video recordings, conference setup and teardown, hopefully. So you have to do it. It's not a joke. The conference will not go on if there are not enough volunteers. So here's the next question.
+
+**Speaker 4** _[32:55]_
+
+Thank you again also for introducing spaCy. I didn't know it so far and he is also quite questionable
+
+**Speaker 3** _[33:01]_
+
+is also quite a question about how is the support for the German language for packages
+
+**Speaker 4** _[33:06]_
+
+So especially regarding
+
+**Speaker 3** _[33:07]_
+
+regarding Compunt.
+
+**Speaker 4** _[33:08]_
+
+compound splitting and
+
+**Speaker 3** _[33:09]_
+
+and,
+
+**Speaker 4** _[33:10]_
+
+uh,
+
+**Speaker 3** _[33:10]_
+
+uh, dramatizing.
+
+**Speaker 2** _[33:13]_
+
+Sorry, I'm not sure I...
+
+**Speaker 1** _[33:14]_
+
+I'm not sure I understood the question. Is it about limb disease?
+
+**Speaker 2** _[33:17]_
+
+Limitization?
+
+**Speaker 4** _[33:18]_
+
+um so um spacey is um the support for the german language so um in particular for the
+
+**Speaker 3** _[33:24]_
+
+particularly for the compounds worth splitting.
+
+**Speaker 4** _[33:25]_
+
+splitting and the lemmatizing
+
+**Speaker 3** _[33:28]_
+
+How well is it?
+
+**Speaker 1** _[33:31]_
+
+The language model for German is very good.
+
+**Speaker 2** _[33:33]_
+
+So it's been tested many times.
+
+**Speaker 1** _[33:35]_
+
+tested many times the tokenizer
+
+**Speaker 2** _[33:37]_
+
+the tokenizer has been
+
+**Speaker 1** _[33:38]_
+
+has been improved continually, so it's something you can find out when you run space
+
+**Speaker 2** _[33:42]_
+
+on spaCy over German.
+
+**Speaker 1** _[33:44]_
+
+I would say it's as
+
+**Speaker 2** _[33:45]_
+
+as good as English, which is really good.
+
+**Speaker 1** _[33:48]_
+
+Really good for language like German. Okay, it's not as good for I think finish was the one where they really struggled But the compound German words you might think it's a bigger problem, but it really isn't
+
+**Speaker 4** _[34:03]_
+
+Okay, thank you.
+
+**Speaker 3** _[34:06]_
+
+So more questions over there so as you see the most Annoying part of being a session chair is to run around But the rest is easy you can do it
+
+**Speaker 1** _[34:19]_
+
+Thank you for your talk. It was very interesting. I just came across a library. It's called Vader. Do you know that? I just wanted to ask about your experiences. Are they supposed to analyze also the emojis and stuff like that? How are your experiences? Yes, so Vader.
+
+**Speaker 2** _[34:41]_
+
+Vader um
+
+**Speaker 1** _[34:42]_
+
+Just like Darth Vader, it's part of NLTK.
+
+**Speaker 2** _[34:44]_
+
+of NLTK library nowadays.
+
+**Speaker 1** _[34:45]_
+
+Nowadays, it was integrated.
+
+**Speaker 2** _[34:46]_
+
+It was integrated, and it's used for sentiment analysis. It's completely rule-based. It has lists of things.
+
+**Speaker 1** _[34:51]_
+
+lists of things that is like an emoji dictionary, but it's a more expanded way. It's unfortunately not very accurate.
+
+**Speaker 2** _[34:59]_
+
+I have tested different sentiment and
+
+**Speaker 1** _[35:00]_
+
+different sentiment analysis libraries, and Veda was one of the least accurate, surprisingly. But it's always the disadvantage of rule-based verses.
+
+**Speaker 2** _[35:09]_
+
+based versus machine learning.
+
+**Speaker 1** _[35:10]_
+
+versus machine learning. Even naive base algorithms were more accurate than VADR.
+
+**Speaker 2** _[35:14]_
+
+So just to give you an idea.
+
+**Speaker 3** _[35:18]_
+
+Okay, more questions? No? Not at all? So then, thanks again, Anna, for this great talk.
+
+---
+transcript_status: auto
+---
+transcript_language: en

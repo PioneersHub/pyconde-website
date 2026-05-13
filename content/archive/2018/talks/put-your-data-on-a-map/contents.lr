@@ -84,3 +84,62 @@ video_duration_iso: PT16M54S
 video_thumbnail: https://i.ytimg.com/vi/CdgI-TUv5z0/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Thank you. So my name is Alex, and I love maps. I work as an engineer in the company called BCD Travel. We do corporate travel management, and my team works on a tool to book hotels. This talk is inspired by my work. Even the order, how I would show you things, It's how I found them myself. So I'll tell you about three instruments today, about Folium, Mapbox GL, and Coupler GL. My goal today is to introduce you to those tools, show a few visualization techniques, and give you something that you can use right away. Now, what you see here is a point, but it doesn't give you a lot of information. It's just some numbers. Even if I put it in a more familiar format, it's still not informative enough. That's where comes Folium. Folium is a library that is effectively a roper around Leaflet.js library that is used to create maps. So we'll start with a map, and it will be centered around the point. with some zoom. Now you can see what this point represents. And a good thing about Folium is you get this web map that you can drag around, zoom out or zoom in. But if I drag it, I lose my location. So here comes a marker. Adding it is as simple as centering the map. And we have a marker in location. By now you probably figured that the location is where we are right now. But I will add some more context for those of you who are not from here. I will draw a circle with a radius of 500 meters, which is around 5 to 7 minutes walking. Next, I will add some data. The data is actually parkings in a format called GeoJSON, which is a JSON document that used to talk about geography. Now we have a bunch of these polygons, but they're still not informative enough. What can we do? So first of all, we will change our tiles. So tiles is like a base map. It's what you draw on. And we will pick the one that is white and blue, white and black and we will use a style function to show our polygons basically what we will do here is we will use color to distinguish different categories so we will use purple for bicycles yellow if there is some fee red if the parking is restricted and green if we don't have any of as restrictions. Now you can see a map and you can see a parking that we have around so if you come by bike there are plenty of options here and the good thing about volumes that you can just type save and it saves your map as HTML that you can then distribute. So here is how it looks and it's already contain all the data. So that's the first thing that I wanted to show you. Now you know where to park tomorrow or if you come to for the sprints. Now next thing is Mapbox GL. Mapbox GL is quite different from Folium because of what it uses. So So Folium is about tiles and about raster maps. The difference is, so tiles is when you split the map by rectangular parts, and then you download the picture of it from the server. And Mapbox uses WebGL to draw the maps on your computer. So what it gives you, a lot of possibilities. So for example, you can make rivers purple, or omit some of the data that you don't need. You control your environment fully. So we'll read this CSV file. The data for that is from python.org slash events. And I will show you the events that already happened in 2018 or will happen and are on this calendar. Now, we will use this tool from MaboxGL library called df2geojson. You might have guessed that it will transform our data frame. Oh, snap. So, the errors are not very informative, but that was a setup. You can actually not transform something without a geometry to geojson. so you need to clean your data and remove all the features that doesn't have latitude or longitude. Now we will have our GeoJSON, and here's how it looks. You have two most important types of GeoJSON documents. It's a feature and feature collection. So feature is basically some geometry, and properties map to it. and a feature collection is an array of features. We also use some defaults for our map. I will show you a few of them, and they will all use this data that we have in GeoJSON and center it around one point. So we will start with simple circle visualization with a radius of four pixels. And you can see all those events, but even though we have these pop-ups, it's not informative enough. So we will use our first tools that I already told you about, color, and we will color them based on whether it's a main event like a conference we're today or a user group like, for example, meetups that was yesterday evening. so next i will show you how to deal when you have a lot of points the first thing that we will use is a heat map right now we're creating the color stops basically we say that for this amount of points we will paint it in this color and we will give it all to the heat map visualization and you can see all of those events and you can see some clusters for example here in Europe or in South America another great tool to deal with a lot of points is clusters so heatmap is more about the trends you can see that there are many events here or there. The clusters are used to not clutter the map with a lot of points but you still can zoom in and see the points one by one. So now to make this map useful for you we will filter out the events that were in the past and we will create we will create color stops that will go from yellow to red based on days that are left to the event and we will show you we will show a new visualization but this time we will not only use color for showing the data but also radius so here you can see a map where it is colored based on the time left for the event and the radius corresponds to user group or main event so here is some user group that is happening soon and some conferences so if we're right here in car through the closest you can go to is either by paris in 20 days or geo python which is in 24 in 240 days so you even have a chance to submit your talk there. So, we answered two questions, where do we park and which conference to go to next. Let's move to our next question. And it will be live demo. So, here is sorry. Here is a tool called Kepler GL and it is more interactive and requires less programming skills so we will add a file of the CSV file with the restaurants around this area the data is coming from OpenStreetMaps I can show you how it looks so there are some coordinates and type of the place, name and so on. So right away you can see all the points on the map. Now we can pick a color based on some property to be amenity which is basically a type of event and because our data is categorical we will pick colors that are not like one another but this is not that useful for you just a lot of restaurants on a map how can we make it better we will use another type of visualization called hex bin now I will tinker with it a bit and we'll pick some gradual lights and now you see the blocks of the city where we have more restaurants or cafes than in others so So we are somewhere here, and if I were you and was looking for a place to eat, I would go somewhere in this area because we'll definitely find something. And because Kepler GL is based on my box GL, here comes all those possibilities that I told you. We draw this map in the browser so we can hide something. For example, roads, if you don't need them. or the labels of the cities and it gets redrawn immediately so I didn't have to show you this light and that's great so now we solve three questions and I told you about a bit about maps and it's time to make some conclusions or what to choose when. So we have a volume. Volume has a lot of features. It has plugins and it is really good supported and it relies on Leaflet.js which is like a standard in mapping industry to do web maps because you can change the tiles you're not dependent on for example Google or someone else to have your maps. Next we have Mapbox GL Jupiter. So it's more of a visualization tool than a mapping tool and if you have the visualization that will fit in it, I recommend use it. And another great thing is that it uses WebGL to draw the maps. So you can create an account in Mapbox and use their Mapbox Studio and make whatever you want with that map. Make rivers purple. I don't know. Whatever you need. And there is also Kepler. I really like Kepler for the one simple reason. I can show someone this tool, give them this data, and then this person can explore the data by him or herself. So you don't need any programming knowledge. you just need a file with coordinates basically and it's also useful to explore even by myself so thank you if you want to talk more about maps come and find me this has been Alex Vukoluk see you on GeoPython Are there any questions?
+
+**Speaker 2** _[14:19]_
+
+Thank you very much for this interesting talk. I was wondering about, have you any experience with dynamic data? So, for example, points moving in time, and what would you use in this occasion?
+
+**Speaker 1** _[14:33]_
+
+I guess it depends on how many points you have. You can use basically any except Kepler because Kepler is like a static tool, but you can use both the MapboxGL and Voluum. And when you do some visualizations that is not trivial, I recommend to switch to JavaScript XOA.
+
+**Speaker 2** _[15:12]_
+
+Yeah, so this is kind of a meta question. What kind of software did you use to make this kind of interactive presentation?
+
+**Speaker 1** _[15:20]_
+
+It's a Jupiter. I can show you. So here's all my slides. And you open this.
+
+**Speaker 2** _[15:21]_
+
+It's a... Open this.
+
+**Speaker 1** _[15:31]_
+
+Oh, I actually don't remember where it is. It's a cell toolbar that's called Slideshow. And then you can click Download as Slides. That's all. So everything you've seen is actually Jupyter cells.
+
+**Speaker 2** _[15:46]_
+
+Okay, thank you
+
+**Speaker 3** _[15:51]_
+
+Thanks for the talk. How do you deal with many data points? Because, for example, when you use Bokeh with many data points and you don't have a data shader, then you struggle with performance to display many data points. Are there similar problems when using Folium or the second tool?
+
+**Speaker 1** _[16:12]_
+
+So it depends on your kind of visualization. Sometimes you can use clustering, as I showed you, because when you have a lot of points, you just cluster them, and then the redraw is simple, because you have much less of those clusters than the initial points. Or you can also... Actually, no, that's all. I don't have anything more.
+
+**Speaker 3** _[16:40]_
+
+Okay, thank you.
+
+**Speaker 1** _[16:45]_
+
+Okay, then thanks, Alex, for your talk.
+
+**Speaker 2** _[16:46]_
+
+Alex for your talk.
+
+---
+transcript_status: auto
+---
+transcript_language: en
