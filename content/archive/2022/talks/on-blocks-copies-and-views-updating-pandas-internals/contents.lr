@@ -87,3 +87,502 @@ video_duration_iso: PT30M18S
 video_thumbnail: https://i.ytimg.com/vi/aBeEN2klZQE/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+So, I'm Joris van den Bossche, I'm one of the
+
+**Speaker 2** _[00:08]_
+
+um, yeah.
+
+**Speaker 1** _[00:09]_
+
+Pandas core developer. I'm also involved with some of the geospatial packages in Python. And at the moment, I'm working at Voltron Data, a company that is building upon the Apache Arrow project. And so at Voltron Data, I'm able to maintain the Python, PyArrow bindings to Apache Arrow.
+
+**Speaker 2** _[00:32]_
+
+Thank you.
+
+**Speaker 1** _[00:34]_
+
+If you're interested in that I'm still here the full day, but so this talk is not about apache arrow, but about pandas
+
+**Speaker 2** _[00:41]_
+
+Um...
+
+**Speaker 1** _[00:42]_
+
+And, I'm going to focus on the copy and view part of this title, or, yeah, how we can get rid of the setting with copy warning. So, when it comes to copies and views, how people the easiest way to run into something related to that is with this warning. The setting with copy warning, a value is trying to be set on a slice, on a copy of a slice from a data frame, complicated sentence, but maybe a quick show of hands, so who has already used pandas in the room. And you can keep your hand up if you already
+
+**Speaker 2** _[01:25]_
+
+the
+
+**Speaker 1** _[01:27]_
+
+If you encountered the warning. Okay, so many people, and maybe you have been annoyed by it or wondered what it is or run away in terror. But in any case, it's a topic that gets quite some attention or confuses people. There are lots of, if you do a Google search, there are lots of blog posts and very lengthy posts that try to explain what it is, where it comes from, what you can do with it to get rid of it or to fix your Pandas code.
+
+**Speaker 2** _[02:03]_
+
+and
+
+**Speaker 1** _[02:05]_
+
+Just a few screenshots from a Greek Google search.
+
+**Speaker 2** _[02:09]_
+
+Now, the actual
+
+**Speaker 1** _[02:12]_
+
+What is the fundamental copy and view concept? When it comes to, you have a certain data frame, and you derive a second data frame from it, either, for example, with an indexing operation, so it's shown here, so you have a second data frame, and the second data frame can either be a view, which means that the data of the DF2 in this case is actually still sharing the data with the original data frame, or it can be completely new data, so the data is copied. Why is this important, or when does it matter, is that because those views in NumPy are mutable, is that if you would mutate a value in this df2, because the data is shared, also the original data frame is updated. Or in case of the copy,
+
+**Speaker 2** _[03:14]_
+
+and
+
+**Speaker 1** _[03:14]_
+
+only the second data frame is updated.
+
+**Speaker 2** _[03:17]_
+
+and
+
+**Speaker 1** _[03:18]_
+
+So that's the fundamental aspect of a copy versus a view in this case. So for a few examples to illustrate the problem.
+
+**Speaker 2** _[03:31]_
+
+So,
+
+**Speaker 1** _[03:32]_
+
+So, yeah, small toy example, I create a data frame, df.
+
+**Speaker 2** _[03:37]_
+
+Um, I can,
+
+**Speaker 1** _[03:38]_
+
+I create a second data frame which is a subset of the original data frame, in this case by filtering the rows with the condition, with the Boolean mask, and then I'm mutating, I'm changing the second data frame subset, in this case setting a specific row and column value. This triggers the warning, and so the question regarding this copy and view is then, by changing the subset, the second data frame, did also the original data frame change. I don't know if people, who thinks that it will have changed? You can raise your hand. A few people. And who thinks that it didn't change the original data frame? A little bit more people, and many people didn't raise their hand, probably because you don't know, and that's perfectly fine. That also illustrates my point. In this case, it didn't. Update the original data frame, but if I slightly change the example So the code is the same only the how I create the subsets I'm still selecting rows, but not anymore using a mask with a boolean ability condition But with the slice so in this case It actually does change the original
+
+**Speaker 2** _[04:57]_
+
+the original one
+
+**Speaker 1** _[04:59]_
+
+Another example, now I'm selecting columns, selecting multiple columns, same question, does the original data frame change? In this case, no, it does not. Another example, I'm selecting a single column. In this case, you actually don't get the warning, and it also updates the original data frame.
+
+**Speaker 2** _[05:20]_
+
+and
+
+**Speaker 1** _[05:21]_
+
+But so few examples to illustrate this and I think what a problem with this is that it's quite confusing. It's difficult to understand or to predict which of the two will happen. You get this warning that confuses people.
+
+**Speaker 2** _[05:36]_
+
+and and
+
+**Speaker 1** _[05:39]_
+
+And to be sure, I only took a few simple examples. I could have made it harder with more corner cases.
+
+**Speaker 2** _[05:45]_
+
+Thank you.
+
+**Speaker 1** _[05:47]_
+
+So even for expert users of pandas, it's often difficult to predict what is actually happening It means that you need to be aware of this concept of copy versus you you need to know the rules in numpy For example the the example of the boolean masking Why does it not update here is because in numpy a mask fancy indexing always creates a copy while a slice Can create a view
+
+**Speaker 2** _[06:13]_
+
+Thank you.
+
+**Speaker 1** _[06:14]_
+
+So you need to be aware of that, and also how it translates to pandas, because we don't exactly follow NumPy.
+
+**Speaker 2** _[06:21]_
+
+And
+
+**Speaker 1** _[06:22]_
+
+You also get a lot of
+
+**Speaker 2** _[06:23]_
+
+a lot of copying.
+
+**Speaker 1** _[06:24]_
+
+Copying as I will directly show getting back to the original setting with copy warning
+
+**Speaker 2** _[06:29]_
+
+and
+
+**Speaker 1** _[06:31]_
+
+the reason that it's
+
+**Speaker 2** _[06:32]_
+
+And...
+
+**Speaker 1** _[06:33]_
+
+That pandas introduced it so in the previous examples. I created explicitly a second data frame as a subset But where the original like the original use case for the warning is when you do What is called change assignments where you do a multiple indexing operations? After each other with the final set item with the final assignment so and a small example here So this line actually works. Here's the goal is to update the original data frame. The one line works, the other not, because there is a different order in which
+
+**Speaker 2** _[07:11]_
+
+which
+
+**Speaker 1** _[07:12]_
+
+Now, here we are first selecting the column and then
+
+**Speaker 2** _[07:15]_
+
+to the
+
+**Speaker 1** _[07:15]_
+
+selecting the rows, in the second case it's the other way around.
+
+**Speaker 2** _[07:19]_
+
+and
+
+**Speaker 1** _[07:21]_
+
+And that's the reason that we are in the second case
+
+**Speaker 2** _[07:24]_
+
+um,
+
+**Speaker 1** _[07:25]_
+
+I'm raising the warning that you might want to try, you're trying to update the data frame
+
+**Speaker 2** _[07:25]_
+
+raise,
+
+**Speaker 1** _[07:30]_
+
+but it didn't actually work. Now if you rewrite the second example that doesn't work, in two lines. So first we are selecting our rows, that becomes a temporary variable, and then on this temporary variable we then assign the value to that specific column. So basically for Python this is very equivalent, the last line here or this. But here you see you're getting very close to the example that I used originally where I create a subset and then want to work further with this subset.
+
+**Speaker 2** _[08:11]_
+
+and
+
+**Speaker 1** _[08:12]_
+
+And that's not the reason that in this last example you also get this warning, although maybe in that case you actually don't care about the original data frame. So, that's a typical thing that people say how to solve this, or the blog post in documentation, so either you actually wanted to update your actual data frame, so this is the line that didn't work, so the warning also says you can use .log to do it in one go, so pass both the row and column selection directly inside the .log, or an alternative is you can use assign to update a certain column, and then with those methods, you also don't run into the warning. In many cases, you're actually creating a subset of filtering your data frame and you don't care about that the original data frame might or might not be updated, you just want to work further with your subset. And in that case, if you want to get rid of the warning, you could do a filter warning and just hide all the warnings, but the typical thing that people do is add a copy. And then you also don't get a warning if you then mutate this subset. But in this case, as I just mentioned, with the Boolean mask, the data in the subset is already a copy of the original data frame, so you're doing an additional unnecessary copy.
+
+**Speaker 2** _[09:35]_
+
+And then
+
+**Speaker 1** _[09:36]_
+
+And that comes back to my third point here, that this is one example of where pandas will create lots of copies, unnecessary often. Another example where this happens is in meta-chaining. So I used a tweet from Matt Harrison. He has written books about pandas and teaches a lot, and he's a fan of meta-chaining. He makes it very long. He can be in favor of that or not. But it's certainly a valid way to write Pandas code with meta chain after each other, and it's something that many people do. So I simplified based on this example from him, I simplified it a little bit to this example there. I think a rather typical cleaning, initial cleaning workflow of your data frame, so from somewhere you have a data frame, you're renaming some columns, replacing dots with underscores to make it Python names. Updating a certain column.
+
+**Speaker 2** _[10:38]_
+
+change
+
+**Speaker 1** _[10:39]_
+
+changing the type of some column, dropping some columns, dropping some rows based on for missing values, and resetting the index. And so quite straightforward steps, each of them.
+
+**Speaker 2** _[10:56]_
+
+But
+
+**Speaker 1** _[10:57]_
+
+But the question here on the slide is which of those steps is actually copying the data frame. And so that are all the steps that are copying the data frame while it's actually not needed because it's directly used in the next step, and we are copying and copying and copying the data without good reason. The reason that we copy is methods return a new object, and that new object should not, If you change it, update the original one. So that's the reason that we currently, every time, do a copy tool.
+
+**Speaker 2** _[11:33]_
+
+but
+
+**Speaker 1** _[11:34]_
+
+When you rename columns, you get a new data frame with new column names, but it could perfectly share the data with the original one if you don't further mutate the actual data. The same for assign, of course, and as type. Of course, the columns that you're changing, there the data changes, but all the other columns that you're not changing with assign or as type are also copied while it's not needed. The same for drop. The columns that you don't drop, we copy. index, we only change the index, but we also copy all the other data. So that's a case where a lot of copies happen in pandas. There is an in place keyword that avoids sometimes the copy, but not always. It's also a very unclear aspect of pandas, and we typically also don't recommend to use it. It might also get deprecated. That's another thing. So can Can we do better? I'm personally convinced that we actually can make this easier and also more performant and improve pandas in that way, and so the proposal that has been discussed already for for some time.
+
+**Speaker 2** _[12:47]_
+
+Thank you.
+
+**Speaker 1** _[12:48]_
+
+It's based on this single rule. Any data frame or series derived from another, either with an indexing operation or a method call, always behaves as a . So a single rule that we can apply on all those examples that we have seen.
+
+**Speaker 2** _[13:09]_
+
+Thank you.
+
+**Speaker 1** _[13:11]_
+
+The implication of this, or put it in a different way, is that if you actually want to mutate the data frame, it's only the object itself that will change, and not any other object that might be derived or might be the parent data frame. So the proposal is not to change the fact that data frames are mutable, but if you mutate a data frame, it will only be that data frame that gets changed and not any other data frame. So I think it's a simpler, yeah, will be simpler to understand, more consistent user experience, we can get rid of the setting with copy running, we can avoid a lot of copies. I will go into those points. Getting back to our examples, so again the same question, changing the subset data frame, does it also change the apparent data frame? So if you apply this proposed rule, then the answer is no, because subset is a different object, and mutating subset will not change another object, df. And then, for all those examples, we can give the same answer, no, it's a different object, so it will not change the original data frame. Same here and same for the last case as well. So I think personally this will give a more consistent and easier to understand user experience. I'm personally also convinced that it's much closer to what people expect, what expectations are, especially in cases like I don't think that many people expect or want that if you change this filter data frame that it also updates the original one.
+
+**Speaker 2** _[15:05]_
+
+Yeah, and
+
+**Speaker 1** _[15:10]_
+
+And a second argument or a second advantage is that we can get rid of the warning itself, because it's now clear. There is no possible confusion. So if you look at the example that I used, so with current pandas, the one way works, the other way doesn't work. With the proposal, both wouldn't work, because if you look at the case that did work right now and rewrite it again in this two line with a temporary variable, we are first getting a column. This is a new object, and then we are mutating this new object, so the rule says you only change the object itself and not the other object.
+
+**Speaker 2** _[15:52]_
+
+Um...
+
+**Speaker 1** _[15:53]_
+
+And so that means that this change assignment will basically never work, and so we also don't need to warn in all cases where you might or might not be trying to do change assignments. Of course, this case currently works, so there will need to be a transition period where we also start to warn for that case as we do for the other case. And ideally, maybe to smoothly transition, It would also be nice if we can maybe raise an error for that in the future. If it never works, we can actually try to raise an error for it. The other case where you get the setting with copy warning is that you are not actually trying to mutate the original one, so that was the case where one of the solutions is to add a copy. That's very simple. We no longer need to add this copy to get rid of the warning, and you don't need the additional unnecessary copy in this case.
+
+**Speaker 2** _[16:51]_
+
+Um
+
+**Speaker 1** _[16:52]_
+
+So the
+
+**Speaker 2** _[16:53]_
+
+the
+
+**Speaker 1** _[16:57]_
+
+That already comes back to the third advantage that I mentioned here about no longer needing this defensive copy.
+
+**Speaker 2** _[17:07]_
+
+And
+
+**Speaker 1** _[17:08]_
+
+So, that's something I want to go a little bit into detail, and I highlighted one part of the single rule, and it's that a new data frame will behave as a copy, and so it doesn't say that it is a copy, only that it behaves as a copy. something so we That makes that we can actually delay this copy and maybe even never Actually do the copy if it's not needed and so we are using the copy on right term to explain this The term is also used in other contexts, but I think it's it's fitting here as well. And so the guarantee is that the new objects
+
+**Speaker 2** _[17:58]_
+
+behavior.
+
+**Speaker 1** _[17:58]_
+
+behaves as a copy, so for the user it looks as a copy, but internally in pandas we can still use a view when possible to avoid making a copy, but make the fact that it's a view, make it an implementation detail instead of something that the user needs to understand when it doesn't happen. To illustrate this a bit more, so assume that you have a data frame here
+
+**Speaker 2** _[18:27]_
+
+um, and
+
+**Speaker 1** _[18:28]_
+
+and you have a data frame, so you create the subsets. I used here the example of selecting multiple columns, selecting a subset of your columns. And so currently, I think, so this is a case where it's not a view currently in Pandas, but we could perfectly make this subset a view of the original data frame so that the data in those columns of the subset that's actually shared, that is still the same data as from the original data frame, so that we don't make the copy up front.
+
+**Speaker 2** _[19:06]_
+
+Um...
+
+**Speaker 1** _[19:07]_
+
+If you then modify this subset, At that moment, we can, so for example here, I'm mutating now, I'm updating the values in this first column of the subset, and at that moment, to ensure that the guarantee that we give that it behaves as a copy, which means that if we update the subset, it wouldn't update the original one, at that moment we can
+
+**Speaker 2** _[19:35]_
+
+Yeah.
+
+**Speaker 1** _[19:36]_
+
+Yeah, the cut ties between those two data frames for this column and actually copy the data of the original column
+
+**Speaker 2** _[19:43]_
+
+Um...
+
+**Speaker 1** _[19:45]_
+
+And then we can mutate this copy to ensure and to the guarantee that we give that it behaves as a copy the advantage of this is that We can avoid copies initially
+
+**Speaker 2** _[19:57]_
+
+Um, and, um...
+
+**Speaker 1** _[20:00]_
+
+And in many cases, you will actually never mutate the results, so you maybe never need to do this copy.
+
+**Speaker 2** _[20:05]_
+
+Um,
+
+**Speaker 1** _[20:06]_
+
+A disadvantage is that you get a copy later on, or you can get a copy later on, maybe at an unexpected moment when you're actually mutating data.
+
+**Speaker 2** _[20:17]_
+
+Thank you.
+
+**Speaker 1** _[20:19]_
+
+The same applies for, so the copy and write I showed on the previous slide is for indexing, but we can use the same mechanism if we implement it in Pandas for all the method chaining. So all those steps that we're making a copy, we can actually use the same mechanism, and we don't need to copy the data in every step. Only when you would actually try to modify one of the resulting data frames, at that moment we can make the copy. But in this method chaining, we are constantly returning a new data frame, so in all those steps we are never mutating the actual data of the, at least for many columns, we are here with assign and as type, we are changing data for certain columns, but all the other columns, they never need to be copied in all those different steps. It's actually only the one line in this workflow is dropping A. That's actually creating a copy, but that's because it's dropping rows, and for that operation, you inherently need to copy the data to new arrays to get contiguous data when you drop some rows. But all the the others could, in principle, use this delayed copy mechanism to avoid a lot of copies. That gets me to the end of this presentation. I'm personally convinced that this would be a nice improvement to Pandas. There are, of course, not only advantages, but that are, I think, for me, the main advantage is that we can get out of this. It will also, I think, make pandas...
+
+**Speaker 2** _[22:08]_
+
+So, more
+
+**Speaker 1** _[22:09]_
+
+more consistent with, for example, other data frame libraries. On Monday, there was a talk about the Data API Consortium that tries to standardize APIs.
+
+**Speaker 2** _[22:21]_
+
+and yeah
+
+**Speaker 1** _[22:22]_
+
+And yeah, it's easier to write code that works on multiple libraries or multiple DataFrame libraries. And I think a behavior like this will be much easier to ensure some standardization between different DataFrame libraries. Because yeah, you don't want or also you cannot try to imitate the current behavior of pandas on this topic.
+
+**Speaker 2** _[22:49]_
+
+Thank you.
+
+**Speaker 1** _[22:50]_
+
+To be clear and to reiterate, it's a proposal, it's not something that already exists in Pandas. There are some resources here, a blog post, a full written-out proposal with much more detail and examples. There is a GitHub issue. If you want to get to those links, probably the easiest is to go to that link, and there you find a link to the slides, and then you can click on those links instead of trying to type it over.
+
+**Speaker 2** _[23:20]_
+
+Thank you.
+
+**Speaker 1** _[23:22]_
+
+And so feedback is very much welcome, both on the concept as later on if you actually have a prototype. So there is already an initial prototype implementation.
+
+**Speaker 2** _[23:34]_
+
+Thank you.
+
+**Speaker 1** _[23:34]_
+
+If you want to get updated when it's ready, you can maybe follow the GitHub issue. That's one way to get updated. And so, yeah, feedback is very much welcome. And so here's the link again, and thank you for listening.
+
+**Speaker 3** _[24:01]_
+
+So let's move on to the Q&A session. This is the gentle reminder that now you can vote if you haven't done it. And the first question I have here is also one that personally interests me. Sounds great. When do we get it?
+
+**Speaker 1** _[24:18]_
+
+That's a good question. I can't guarantee anything on that. I hope. So, yeah, we still need to decide in the Pandas community on, like, yeah, do we actually want it?
+
+**Speaker 2** _[24:32]_
+
+do
+
+**Speaker 1** _[24:32]_
+
+Is it feasible? How are we going to implement it? In what kind of transition period? Personally, I would like to see it in the coming, at least as an optional or as optionally with warnings, that we can have people test it out this year, hopefully in the next Pandas release, and then it's probably based a bit on feedback, if it goes well. that we can have it in, for example, Pandas 2.0, which is planned for later this year or next year. But yeah, that's very much...
+
+**Speaker 2** _[25:10]_
+
+Yeah.
+
+**Speaker 1** _[25:12]_
+
+Not guaranteed.
+
+**Speaker 3** _[25:14]_
+
+Okay, maybe as a follow-up, I've seen several questions asking if there's a general majority of Pandas developers supporting this change, or is it an early stage proposal?
+
+**Speaker 1** _[25:25]_
+
+It's something that already has been discussed for many years. I think there are mostly many people and also feedback that we got from people teaching Pandas is mostly positive. So it's mostly a matter of having an implementation and then testing that implementation. And that's something that I'm trying to do at the moment. But for me, it's also a bit of a side project, so it's going not always super fast.
+
+**Speaker 3** _[26:05]_
+
+Lot of people seem to wonder why not use in place equals true
+
+**Speaker 1** _[26:10]_
+
+Why not use in-place ACoS2?
+
+**Speaker 2** _[26:12]_
+
+that's
+
+**Speaker 1** _[26:14]_
+
+So I showed it, I set it here.
+
+**Speaker 2** _[26:19]_
+
+One, it's...
+
+**Speaker 1** _[26:20]_
+
+you can certainly use it but one argument is that it breaks method chaining of course if you don't use meta chaining then you don't care about this
+
+**Speaker 2** _[26:31]_
+
+Um...
+
+**Speaker 1** _[26:32]_
+
+Another argument is that the inplace keyword is currently implemented in many places in Pandas, but also in many places where it's actually not doing anything in place. It's just internally copying the data frame and then replacing or copying the underlying data and replacing inside the Python object, the data frame object, just replacing the data with the new data. So it looks as it is in place in the data frame object, but it's not actually in place when it comes to the data itself. And so that also makes it a very inconsistent and confusing keyword because people think, in many cases, I can avoid memory usage by putting that, and often it doesn't actually do that. In some cases it can do that, in others not. So that makes it not a very loved keyword, I would say, in the contributor community.
+
+**Speaker 3** _[27:33]_
+
+Then a lot of people wonder what would be arguments against this change. There need to be downsides. Yeah.
+
+**Speaker 2** _[27:41]_
+
+Yeah.
+
+**Speaker 1** _[27:42]_
+
+I think there are, maybe I can show this here, so one argument against the change is that it's a breaking change, and yeah, breaking changes, it's backwards incompatible, always affects lots of people, because Pandas is being used by lots of people, and a clear breaking case is, for example, the example that is on the screen right now, where there is a chained assignment, and one of those two currently works.
+
+**Speaker 2** _[28:12]_
+
+While, on the other hand,
+
+**Speaker 1** _[28:14]_
+
+while under my proposal, neither of them would work. And I think that's by far the biggest... breaking change or the the one breaking change that impacts the most people because that's something that actually is being done right now so that's a case where we will have need to have very good warnings and maybe keep those warnings after that it actually has been changed so that people are still getting aware that they are now doing something that doesn't work anymore
+
+**Speaker 2** _[28:42]_
+
+But
+
+**Speaker 1** _[28:45]_
+
+So that's one argument. A second argument can be that it deviates pandas from, it gets farther away from NumPy and how NumPy works with copies and views. Personally, I think that many users of pandas are actually not aware of those concepts in NumPy or at least not exactly how this works. So for me, I would say that's not a, I don't find that a valid argument. Another argument is also that, I mean, we still need to see the implementation, how robustities because this concept is implemented in pandas itself. There are some other languages where those concepts are very much inside the language itself. In Python, that's not the case. We are trying to emulate this in pandas using weak references and keeping track of that. But, yeah, there will certainly be some corner cases or you will always be able to manually circumvent that or to still mutate something where we can't make any guarantees. But again, that's more, I think, corner cases where people are doing something where we can just say that outside of the public API we don't guarantee anything.
+
+**Speaker 3** _[30:01]_
+
+I'm afraid unfortunately we have to come to an end. Thank you so much for this very insightful talk
+
+---
+transcript_status: auto
+---
+transcript_language: en

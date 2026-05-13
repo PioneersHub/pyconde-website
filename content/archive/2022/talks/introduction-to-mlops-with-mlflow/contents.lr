@@ -95,3 +95,1154 @@ video_duration_iso: PT1H25M1S
 video_thumbnail: https://i.ytimg.com/vi/IUF4s9SXnd4/maxresdefault.jpg
 ---
 recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+So, hello. Thanks a lot. I will have a quick set-up here, but yeah, it's really nice that you're all here at this time. Last large session of the day, probably later there will be the And... The keynote, right?
+
+**Speaker 2** _[00:24]_
+
+Thank you.
+
+**Speaker 1** _[00:26]_
+
+So I can only see that on one screen. That's a bit funny. So that's good, right?
+
+**Speaker 2** _[00:32]_
+
+Thank you very much.
+
+**Speaker 1** _[00:34]_
+
+So yeah, so hello glad you're all interested in ml ops and getting hands-on with ml flow
+
+**Speaker 2** _[00:43]_
+
+Yeah.
+
+**Speaker 1** _[00:44]_
+
+Yeah, I'm to be a step back as Simon said I'm an NLP freelancer doing doing all kinds of stuff machine learning data science mostly with text Nowadays also, it's more NLP a like becoming more NLP and machine learning engineering also
+
+**Speaker 2** _[01:00]_
+
+Um...
+
+**Speaker 1** _[01:01]_
+
+So and that's why also this talk came to be kind of I gave a similar tutorial in 2019 but Something's changed since then on there and the flow So I thought I'd do it again, and it was quite nice last time. And I hope it will give you some insights in MLflow, what is MLOps, what you can do, some overview. Maybe if you are familiar with MLflow, close some gaps, you'll see some new things.
+
+**Speaker 2** _[01:30]_
+
+or
+
+**Speaker 1** _[01:32]_
+
+See what other people might do within a flow
+
+**Speaker 2** _[01:35]_
+
+Um...
+
+**Speaker 1** _[01:36]_
+
+Yeah, so you can find me on a website called to be a step up calm I have a blog with mostly NLP data science stuff depends on the definition .com you can tweet it to be a step back and I forget up. We're also the notebooks and the material for the talk is the slides are not there yet and probably never will because they are not super great and Will not be useful without me talking Probably most of the content will be on the blog in the following weeks Yeah, so I have to block here because later we would just do hands-on stuff
+
+**Speaker 2** _[02:10]_
+
+Thank you.
+
+**Speaker 1** _[02:12]_
+
+So before we begin I have some questions for you quickly to check what's going on in the crowd
+
+**Speaker 2** _[02:19]_
+
+Um,
+
+**Speaker 1** _[02:20]_
+
+So who of you and raise hands please train the machine learning model before something So that's basically everyone I guess kind of
+
+**Speaker 2** _[02:32]_
+
+Um...
+
+**Speaker 1** _[02:33]_
+
+And now, next question. Who of you tracked or used Excel sheets, Google sheets, or something to keep track of results of machine learning experiments and stuff? OK, so a few. OK, so the following question. Who didn't keep track of machine learning experiment results at all or just dumped some files somewhere? OK, so some people are honest. Cool. Then last question like who is familiar with some tracking solutions for machine learning experiments. I use them for Okay, so also a few people so I'm wondering what is what is the the leftover people but we will figure out so Today we I would try to answer basically all of these questions And said I am the flow might be a solution for stuff at a certain point in your machine learning learning, maturity journey in the company and the problem you're working on.
+
+**Speaker 2** _[03:34]_
+
+Thank you.
+
+**Speaker 1** _[03:35]_
+
+Sometimes it's not the right tool. Sometimes it's not yet the right tool and sometimes it never will be the right tool So yeah, let's have a look at the Agenda for today. So first I will give you a brief introduction on MLOps. What are the goals? What are the ideas? Really really brief
+
+**Speaker 2** _[03:54]_
+
+Thank you.
+
+**Speaker 1** _[03:55]_
+
+Then, give you a short high-level overview of MLflow. What are the different components and what are they used for?
+
+**Speaker 2** _[04:02]_
+
+I don't know.
+
+**Speaker 1** _[04:03]_
+
+And then basically we will only do hands-on stuff from there on and I try to Show you basic not super basic setup of MLflow for tracking experiments And having a tracking server and keeping track of what's going on and then We go into how to manage artifacts like models from these experiments, these machine learning experiments, and how to deploy them with MLflow and keep track of the state of the resulting models. And then if we have time in the end, we'll probably skip this, but the material will be online.
+
+**Speaker 2** _[04:43]_
+
+Um...
+
+**Speaker 1** _[04:44]_
+
+Tips and tricks like what kind of stuff might be interesting for you at a certain point And might be might be useful to achieve certain outcomes so So what's MLOps and why should you even care?
+
+**Speaker 2** _[05:02]_
+
+Um, and so.
+
+**Speaker 1** _[05:02]_
+
+And so basically ML Ops stands for Machine Learning Operalization Management or Machine Learning Operalization hard word
+
+**Speaker 2** _[05:11]_
+
+Um,
+
+**Speaker 1** _[05:12]_
+
+And it's basically, I mean, nobody really agrees, I guess it's less agreed on what it means than DevOps, and that's even a hot topic what that means. So it's basically a set of tools, right?
+
+**Speaker 2** _[05:30]_
+
+Um,
+
+**Speaker 1** _[05:31]_
+
+to Bring machine learning to production. That's basically what it's focusing on It's focusing on taking machine learning models to production Maintaining them monitoring them and stay sane in the process basically
+
+**Speaker 2** _[05:45]_
+
+Um...
+
+**Speaker 1** _[05:46]_
+
+And it tries to reduce the technical debt in doing that, so you want to be as lazy as possible to achieve and reduce the bus factor basically, be fast and know where you left off last month basically. It's important for me as a freelancer, right, because if I'm coming back after a month or if, like, I need to know what happened. And that's an interesting requirement. And then lifecycle management. So you want to keep track of your release cycle. You want to know which models are used at what time, how they came to be, what data were used, what parameters were used. And you want to be able to reproduce it also for governance reasons. When someone says, like, something went wrong,
+
+**Speaker 2** _[06:35]_
+
+Thank you.
+
+**Speaker 1** _[06:36]_
+
+And probably need to be able to track down what happened and where this model came from, basically. So that's the really high-level MLOps overview. And I mean, there might be other ideas and other definitions.
+
+**Speaker 2** _[06:54]_
+
+Thank you.
+
+**Speaker 1** _[06:57]_
+
+So, and to see where this fits in the machine learning life cycle, I give you a brief overview also there, what I understand on machine learning life cycle and I mean the material is by Databricks. or at least this this picture and Yeah, and Basically you start with data right on the left hand side and then of this Normally followed by some exploratory data analysis you look at a data you you try to figure out What is actually the machine learning problem you want to solve you need to solve what are metrics? What is what is?
+
+**Speaker 2** _[07:34]_
+
+this.
+
+**Speaker 1** _[07:34]_
+
+Going on in your data then there usually comes data preparation data selection feature engineering step And of course, I mean there are these arrows going in one direction, but usually they go all the way all over the place We call it life cycle because it's a nice cycle then but usually it's not directed acyclic graph
+
+**Speaker 2** _[07:58]_
+
+I don't know.
+
+**Speaker 1** _[07:59]_
+
+Then we come to model training and fine-tuning or tuning the model There's a bunch of tools available for that and then once you have a model or you settled for a model and specific configurations You probably do model review and need to consult people for for model governance to check That the model behaves in certain ways Beyond probably your machine learning metrics and next step is you package your model for inference and serving and then followed by deploying and hopefully monitoring and then we have at a certain point in time probably a retraining step in the ideal case it's automated i mean here it's automated model retraining because databricks has a has a platform for machine learning i'm not affiliated with them in any way by the way so they like databricks the company built this open source to MLflow that I like to use, but I'm not affiliated with them and it's open source so you can use it. And as I said, usually you go back somewhere in the process and start from different points. And what we see today basically is with model training...
+
+**Speaker 2** _[09:12]_
+
+Um,
+
+**Speaker 1** _[09:13]_
+
+We try to collect information to have the model review and governance in place and can we can work there And we see how to package the stuff and run inference on the models and then how to deploy from a centralized
+
+**Speaker 2** _[09:27]_
+
+Um,
+
+**Speaker 1** _[09:28]_
+
+infrastructure basically. I would love to show all the monitoring but I have no idea how to do that in a structured way. It's so from my perspective so problem-dependent but it's super important so don't forget this and it's super important in your MLOps part. But yeah, maybe there will be a tutorial on this in the future so that was MLOps now MLflow and As I probably said MLflow is an open source platform to manage your machine learning lifecycle so You can host it yourself
+
+**Speaker 2** _[10:11]_
+
+run the
+
+**Speaker 1** _[10:13]_
+
+take the parts you need and build some kind of machine learning platform around it. It has so far four components, four main components that we will look into. First component is tracking. It's basically, an API and a storage format and a UI to record and query and keep track of experiments, machine learning experiments, and collect all the relevant information to these experiments. Then there's projects. We won't look into that too much, but that's basically a packaging format to reproduce models with Docker or with Conda or something. So you can just package everything together and someone else running it with the same data with a simple command gets the same model on a different machine optimally.
+
+**Speaker 2** _[11:04]_
+
+and that's
+
+**Speaker 1** _[11:05]_
+
+I never found that too particularly useful, to be honest. Yeah, we won't look into that too much. And then there's models, which is basically a specific general format to describe the model you want to use and what needs to be done to deploy it. So it's a flexible format to manage deployments of models.
+
+**Speaker 2** _[11:35]_
+
+Um...
+
+**Speaker 1** _[11:36]_
+
+And we also will use that and then finally and I find quite interesting and quite important here It's the model registry Which is basically? other UI and the format to
+
+**Speaker 2** _[11:50]_
+
+Thank you.
+
+**Speaker 1** _[11:51]_
+
+manage the model life cycle to keep track of state of the model to deploy from there and to Yeah, keep track of the model lineage basically where did it come from? And what happened to the model downstream like when did it move to production? When was it archived was it on staging at some point you can you can add features to that even we? Probably would see that too
+
+**Speaker 2** _[12:19]_
+
+Thank you.
+
+**Speaker 1** _[12:20]_
+
+So that was basically the short introduction. So time wise that's fine. So at this point any short Questions, I mean it was less just high-level overview Okay, perfect So everyone's happy or confused or both
+
+**Speaker 2** _[12:39]_
+
+Um...
+
+**Speaker 1** _[12:41]_
+
+So for the hands-on part, I will switch to Jupyter Notebooks. You can find the notebooks on this GitHub link. And there will be also some annoying installation instructions.
+
+**Speaker 2** _[12:52]_
+
+I'll do it again.
+
+**Speaker 1** _[12:53]_
+
+To get it running, I will now try to switch there. So this is somewhat readable in the back. I can zoom a bit, probably, if I can figure out how. So basically, so this is, like, so what we need is we need an SQLite database. And I'm sorry, so, like, this is Linux, but it's, of course, only Debian-based, I guess. Sorry for that and for your windows. I have absolutely no idea what to do and for Mac. It already should be installed. I was told So we need SQLite that's requirement to deploy models from from the registry and then there's I Settled for pipenv here. So pipenv is the way to go. Other than that, I mean if you want there is also It's basically four packages, right? So MLflow is installable with pip so you can just create whatever environment you like and pick these four packages Jupyter, Pandas, scikit-learn and MLflow
+
+**Speaker 2** _[14:01]_
+
+Thank you.
+
+**Speaker 1** _[14:03]_
+
+cool, so then if you have make installed you could also just run make notebook, but We can just do Run Notebook and then it will open it probably in some very crowded browser that I don't want to use and we go to to the chromium and look at this there so just a somewhat readable I mean it's a Jupiter notebook so at a Jupiter notebook whatever landing page And then in the tutorial, so I might be a bit fast sometimes but there will be breaks and exercises. So I start with the first part of the notebook and then I have some small exercise and go around and check if everything works out so far. Thanks for the comment. So this is the first notebook.
+
+**Speaker 2** _[15:27]_
+
+Um,
+
+**Speaker 1** _[15:27]_
+
+Run track experiments. And then we will see how to set up the MLflow tracking server, the UI, how to interact with the UI, and how to actually run experiments and track them in...
+
+**Speaker 2** _[15:41]_
+
+Um,
+
+**Speaker 1** _[15:42]_
+
+In the MLflow with the tracking server. So first, of course, I wanted some penguins in the in the presentation so we were going to use the primer penguins data set which is basically a simple classification data set as a drop-in replacement for the iris data set where you want to Classify three types of penguins By their bill length or it's called a common measurement. So we have basically two Features to numerical features and want to classify into these three categories of penguins Yeah, the data set should also be included in the repository. If you clone the repository you have the data set And let's see if that all that stuff works so we can load the data set With pandas, so we see there's some measurements and some Labels for those then we do simple Like the usual machine learning steps. We do a try and test split with scikit-learn We pick some classifier picked your decision tree classifier you could later change it if you want
+
+**Speaker 2** _[16:56]_
+
+Thank you very much.
+
+**Speaker 1** _[16:57]_
+
+Yeah with two. I mean it's a bit over could change any parameters here, but so we get Yeah, and then we evaluate and get some some accuracy score for the classifier So that's so that's where we where we are right you you started a machine learning project you you played around you got the first metric Now what what to do? if you if you want to iterate on that and That's where basically Emma flow So, tracking comes in. And I probably ask at this point, is for whom who wants to run the notebooks, are they running now? So is someone trying to run them but needs a minute longer or something? Okay. So then we wait for a second, but otherwise it looks good, so that's good, I'm happy. Okay. So I'll just move on because now it's a bit more talking again. Sorry. I'm not sure if I understood, but I guess the question was like if we can see the Python modules again. I mean I used 3.9 either. The question was if there's a requirement for specific Python version, I used 3.9 here, but I guess everything over 3.7 should be fine, but it's not fine. I'm not sure. I can come back to you in a second. Yeah. Ah, it doesn't work with 3.8, so then we have 3.9. Okay, then sorry. Okay. So there should be a log file there. So if you install from the repository, it should then work. I guess I tested with 3.7 even. I'm not sure. Well. Okay. Minor setup issues I'm sorry for that I can try to come around in an exercise break and we can see if I can fix it or we can fix it Now it's again a bit of a theoretical.
+
+**Speaker 2** _[19:42]_
+
+Thank you.
+
+**Speaker 1** _[19:43]_
+
+section here, which is basically the introduction to the tracking stores and the artifact stores. So MLflow tracking is basically composed out of two components, which is basically a tracking store which tracks all the metrics, parameters, all kinds of stuff you want to track.
+
+**Speaker 2** _[20:00]_
+
+I don't know.
+
+**Speaker 1** _[20:02]_
+
+At some place, so there's a default path that can be a local local file path Where it would just dump everything for one experiment in a file Or you could use all kinds of relational databases MySQL SQL SQLite Postgres basically everything that SQL alchemy
+
+**Speaker 2** _[20:21]_
+
+um
+
+**Speaker 1** _[20:23]_
+
+supports, you could use an HTTP server that listens to, or that has the MLflow tracking server running, and of course you can use a Databricks workspace, whatever that does. So that's one side where you track the information of the experiment, and then there's the other part which is the artifact store, where you store all the models, the artifacts, plots, I like to store all the source code there, for example, for every run.
+
+**Speaker 2** _[20:54]_
+
+Um,
+
+**Speaker 1** _[20:55]_
+
+Like that's where you store all the hard heavy stuff basically you could store their data sets if you if you like
+
+**Speaker 2** _[21:02]_
+
+and
+
+**Speaker 1** _[21:03]_
+
+And that could be also a local file path or something like Amazon S3, Azure Blob Storage, Google Cloud Storage, and all kinds of other...
+
+**Speaker 2** _[21:13]_
+
+I don't know.
+
+**Speaker 1** _[21:14]_
+
+file system like things where you can dump files
+
+**Speaker 2** _[21:19]_
+
+Um...
+
+**Speaker 1** _[21:21]_
+
+And so we go for...
+
+**Speaker 2** _[21:24]_
+
+like
+
+**Speaker 1** _[21:25]_
+
+like a medium heavy setup, which is basically This does not even fit in the whole picture. Yeah So I mean if you have two notebooks or you can look at github on the github in the notebook there you see this picture Properly, so we we used for artifacts. We use a local file path, which we called be called ml runs
+
+**Speaker 2** _[21:51]_
+
+Um, and.
+
+**Speaker 1** _[21:52]_
+
+And as the tracking storage, we use the SQLite database.
+
+**Speaker 2** _[22:02]_
+
+Um, may
+
+**Speaker 1** _[22:03]_
+
+mainly the main reason for that is for deployment for some reason which I'm not sure what it is and a flow requires you to Use a database and not a local file path But I guess it's because even even with this setup It's a bit annoying with the file paths because they are probably not absolute and then sometimes things can get messed up. So Yeah, we use a database to track the experiments and that's kind of how it looks like so we have an ML flow user code declined API and And then two storage repositories that ML runs for the artifacts and a database to store all associated information to that experiment.
+
+**Speaker 2** _[22:44]_
+
+Um...
+
+**Speaker 1** _[22:45]_
+
+And now you need a terminal. And you can run basically this command, which is basically uses the ML flow CLI tool to start a server at this SQLite.
+
+**Speaker 2** _[23:01]_
+
+Um.
+
+**Speaker 1** _[23:03]_
+
+database and or it will create it if it's not there yet and The artifact route is basically the artifact storage that will be ML runs And then it will run the server on localhost with port 5000
+
+**Speaker 2** _[23:16]_
+
+Thank you.
+
+**Speaker 1** _[23:17]_
+
+So I would recommend running this in the tutorial directory and not in the root of the repository just because then it works easier with the Mac's notebook. And you probably need to run pip and run or check out your environment or something. So I will move to a terminal. And we do... Okay. Wait. Of course I want to copy this. and pip and fran. So I paste it in and try to zoom a bit. So like this. And now we see like there's a lamb break running that's creating the database and the migrations for the database. Probably it was already stupid because I didn't do what I said. Let's remove this again. I mean and if you if you mess up anything in this in this tutorial you just delete these two files like the Emma flow DB and the ML runs runs directory and then everything and a flow did to your environment and your Stuff is gone. So I'm check a tutorial and then run this again So now we see you have the server running. And we can now open this in the browser, and then we should see the MLflow tracking UI. It says, yeah, you can track some stuff now and run experiments. So The question is who arrived there so far Okay, that's probably 50% The what Okay. I'm sorry about that. So who is in the process of still trying to start it and still It has not given up. So one issue that occurred so far and possible solution, so issue was the required server wasn't starting up and one solution could be change the port from 5000 to something else. Did it work? solution that worked.
+
+**Speaker 2** _[26:22]_
+
+Cool.
+
+**Speaker 1** _[26:23]_
+
+Cool. So now you have the MLflow tracking server running. You can check in your file system that it created the database and the ML runs directory to store the artifacts.
+
+**Speaker 2** _[26:35]_
+
+Um...
+
+**Speaker 1** _[26:36]_
+
+And now we can conveniently go back to the to the notebook
+
+**Speaker 2** _[26:41]_
+
+Um
+
+**Speaker 1** _[26:43]_
+
+import MLflow, and the built-in MLflow scikit-learn tools. I forgot to mention that. So MLflow comes with a bunch, a large bunch of built-in tools to track and keep track of existing machine learning libraries, like, for example, scikit-learn. And they call it Flavors, and that provides super easy access to all kinds of stuff related to these libraries and to tracking and deployment. And they even have functionality, for example, for scikit-learn for autologging, where you really don't have to do anything other than call autolog, and then it logs whatever it thinks is appropriate to log for a scikit-learn model.
+
+**Speaker 2** _[27:30]_
+
+Um, we don't...
+
+**Speaker 1** _[27:32]_
+
+We don't do it here for different reasons because we are not flexible if you know how it works under the hood.
+
+**Speaker 2** _[27:38]_
+
+Um...
+
+**Speaker 1** _[27:39]_
+
+And I never used auto logging so I feel a bit weird to tell you about it
+
+**Speaker 2** _[27:44]_
+
+Um,
+
+**Speaker 1** _[27:46]_
+
+So we use the scikit-learn flavor here to make our lives a bit easier then we set
+
+**Speaker 2** _[27:52]_
+
+um
+
+**Speaker 1** _[27:55]_
+
+the remote server Like we point basically our tracking server
+
+**Speaker 2** _[28:02]_
+
+Or like, yeah.
+
+**Speaker 1** _[28:03]_
+
+Or like, yeah, we put our tracking server address here and let MLflow know where we want to track. This is especially important if you have a distributed server, a server somewhere in the cloud where you want to lock your experiments, for example, as a team or so. So here we set it to the localize port 5,000. And then we can verify, yeah, it's actually set. Yay. Next step is we create an experiment. We give it a name, and then we call MLflow create experiment.
+
+**Speaker 2** _[28:33]_
+
+Um
+
+**Speaker 1** _[28:34]_
+
+This is like the explicit step you could also just check out the experiment But like I like to keep that explicit here You can also create experiment in the UI You see here's some experiments right now is the only the default experiment you could add experiment here But that's probably something you don't want to do So the question was if if I'm a floor is compatible with some windows So sadly I have no idea I Haven't found any windows users to test it also, so I don't know But in theory it should work if Python works works. But maybe someone in the audience knows.
+
+**Speaker 2** _[29:31]_
+
+Thank you.
+
+**Speaker 1** _[29:35]_
+
+Yeah, with Windows, I'm sadly not helpful.
+
+**Speaker 2** _[29:38]_
+
+So
+
+**Speaker 1** _[29:39]_
+
+Sorry about that
+
+**Speaker 2** _[29:41]_
+
+Um...
+
+**Speaker 1** _[29:44]_
+
+Okay, moving on So now now we have we've seen in the beginning that the basic machine learning stuff we want to track yeah, we want to run and now we presented with the
+
+**Speaker 2** _[29:59]_
+
+Um,
+
+**Speaker 1** _[30:00]_
+
+Opportunity to track that stuff And there are two basic things that I'm a flow Wants you to track or you probably want to track and one is parameters Which is all kind of configuration stuff or your model like you would the depth of your trees or the number of data points or? something like this Which you can use em a flow log param Or log params if you want to store so Yeah, the log param takes key value pairs and the log params takes the dictionary and locks and multiple at the same time and for metrics, which is basically things you want to compare and and Check compare your models on you You can use log metrics and lock metric we will see later how that is different in the UI So as you remember, I mean as a remember Yeah, this is the code we had before right? And then now we add to this machine learning code, we add the MLflow tracking code. First, here we have to set an experiment that tells MLflow where it should track the stuff in the UI. So we see we have here, you probably have to refresh, right? So we see we have here a second experiment that's called penguin classification which is currently empty as the ID number one. So we set the experiment here for the run, and then we start the run with this context manager. So it says mfloss.run, and then you can pick srun. This is not directly required, but I like it so you can have some output on the run. Like for example, you get the run ID, which is the central information, like the central piece of information you need to know which kind of experiment you are talking about. Like your git hash for a commit or something.
+
+**Speaker 2** _[32:01]_
+
+Thank you.
+
+**Speaker 1** _[32:02]_
+
+So, then we just load the dataset as usual.
+
+**Speaker 2** _[32:08]_
+
+Thank you.
+
+**Speaker 1** _[32:11]_
+
+Do the train test split and then here we start logging the parameters for our decision tree classifier So we basically call emma flow log params With the dictionary with the name of the parameter and its value Then we instantiate the classifier and train it
+
+**Speaker 2** _[32:34]_
+
+Um, and it.
+
+**Speaker 1** _[32:35]_
+
+And at the end, we log our test accuracy with mflow log metric. So if I run this now, I mean, you see the output here now because I didn't clean it. But then you see, okay, this is the custom output I put there. And if we go and refresh the UI, you see, okay, there's now one run recorded. It's coming from a Jupyter IPython kernel. I created it, and this is the output. What we see here differentiates between metrics and parameters.
+
+**Speaker 2** _[33:08]_
+
+Um, and.
+
+**Speaker 1** _[33:09]_
+
+And if we click here, we can also go and see the specific information of this run, the run ID, duration, certain information, lifecycle stage. You can add a description here. And here we see the parameters, metrics, text and artifacts. So currently we have no artifacts recorded. That will change soon. And we have test security that we can compare that we also do later once we have more stuff to compare. Good. So now we come to the first exercise. Track some more stuff, right? So right now we did the basics, but you could track, of course, more stuff like git versions, versions, start and end times, sometimes it's also part of MFLow already. I like to track the source code, like if I have a script producing the model, I like to just, or the library to create the model, I like to log the source code, you can just copy it to S3 and it usually doesn't matter if you dump a few more kilobytes on S3, if you know in the end this is the exact code.
+
+**Speaker 2** _[34:28]_
+
+Um...
+
+**Speaker 1** _[34:30]_
+
+I mean, git commit hash is also nice, but usually I'm not committing every different machine learning experiment I run because if I only change some parameters or something or some small stuff, then I'm not sure if it works and otherwise my commit history is completely crowded with stupid minor changes to model parameters that I probably don't want to have in my code, right?
+
+**Speaker 2** _[34:56]_
+
+um
+
+**Speaker 1** _[34:57]_
+
+It depends. So properties of the input data is probably something you want to track plots and model artifacts like the output of a model. So what you could track now, for example, is like examples here, is one of the properties of the input data, like the shape or the number of samples or how the split is done or something. Or you could track the whole notebook source code. For this, Emma Flow has a specific
+
+**Speaker 2** _[35:29]_
+
+Um
+
+**Speaker 1** _[35:30]_
+
+Function which is called log artifact which takes a file path Local path basically and puts it to the artifact storage They could load it up to a Google blob storage or s3 or whatever file path you specify so Yeah, so here in this exercise cell you find the code from a buffer that you can modify now
+
+**Speaker 2** _[35:52]_
+
+Um, and
+
+**Speaker 1** _[35:53]_
+
+probably track some some more runs right and I how long do we have probably five to ten minutes and I walk around and answer some questions and then we can move on So cool. So some problems, some problems were solved. Everyone basically resolved them themselves. So cool. So let's move on. You had some fun with tracking some different stuff. One thing that was pointed out to me and one question I had someone had was if you can track for example environment variables because there are different ways how you would pass information to your script and yeah sure you can I mean you can track everything to the parameter store that you can access as a Python string or Python whatever and you can track everything and log everything to the artifact store that you can access in the local file system.
+
+**Speaker 2** _[37:07]_
+
+Um,
+
+**Speaker 1** _[37:08]_
+
+So here here's this possible solution that we see how to log for example a file a local file in this case the notebook itself
+
+**Speaker 2** _[37:16]_
+
+Um,
+
+**Speaker 1** _[37:17]_
+
+So first quick like here's the number of samples logged as a parameter Could also be logged as a metric depends on how you want to use it
+
+**Speaker 2** _[37:30]_
+
+Um...
+
+**Speaker 1** _[37:31]_
+
+I keep it as a parameter here. And then the second thing I suggested was you could lock the notebook. So here we just point to the notebook, I mean, this is a path. It's in the same directory, so it's not super exciting, but you could also lock the whole code directory, for example. And if we run that, we see, okay, same output, but in the repository, I need to get back Look here, here.
+
+**Speaker 2** _[38:01]_
+
+Um,
+
+**Speaker 1** _[38:03]_
+
+We see there is no artifacts I'm not Thanks good point so here yeah in the artifacts there's now the
+
+**Speaker 2** _[38:29]_
+
+Thank you.
+
+**Speaker 1** _[38:30]_
+
+The notebook itself and you could put it in a deeper directory directory if you want so there's different options Where you can put that? So and now now the important part basically or one of the important parts is like how to lock the model
+
+**Speaker 2** _[38:48]_
+
+Um,
+
+**Speaker 1** _[38:49]_
+
+so We of course want to use the model artifact later probably and we want to go back to it And we want to deploy it and we want to keep track what it is actually And, since we use the scikit-learn model here, things are quite nice, but it's also there for PyTorch, for TensorFlow, for Keras, for XGBoost, for whatever, there's inbuilt flavors as I said. And here we use the MLflow scikit-learn log model, and you just pass the model, here it's called tree, and give it a name so that it's basically the directory where it's put on the MLflow artifact store. And then we can put this at the end of our script. So here's the log mfflow.cycletlearn.logmodel, and then if we run that, looks the same.
+
+**Speaker 2** _[39:43]_
+
+Thank you.
+
+**Speaker 1** _[39:46]_
+
+And we see as the first thing we see is here we see a model With the name of the flavor in this case, but could be also custom thing And we see here. This is in the artifact now the models directory appeared that contains different like different things to reproduce the model and specifies how the model
+
+**Speaker 2** _[40:11]_
+
+Thank you.
+
+**Speaker 1** _[40:12]_
+
+what a model is like in a model ML models file, for example, you see description of dependencies and
+
+**Speaker 2** _[40:19]_
+
+Um,
+
+**Speaker 1** _[40:21]_
+
+Different information conda conda environment requirements pip environment specification and then there's the model pickle to Basically get the model back
+
+**Speaker 2** _[40:34]_
+
+Thank you.
+
+**Speaker 1** _[40:35]_
+
+So now I have another small exercise, but I guess most of you already did it
+
+**Speaker 2** _[40:42]_
+
+Um,
+
+**Speaker 1** _[40:43]_
+
+But run around this code with different parameters So I will quickly do that and you can also if you want but we want to do it longer than I need to It takes me to do it. So we create different Different outputs here. Let's say it is Some of them are stupid So this is probably not good. This is good So we create a few things that we can compare something So okay, so and if we go now to the UI Was confused so there's now a few more runs we see here also failed runs Now because I failed to run them properly and now we can select for example here. We want to compare them, right? So we can select this select these four runs because they were successful They have a model and then I mean if you're only interested in test accuracy nice You can look here and say like our this is the best one. I'm happy but you could also Compare them and see like how get different different plots to inspect the model based on parameters like here's the parallel coordinates plot and you can get the scatter plot where depth versus accuracy for example probably other way around depends yeah Or you can see the run specifically in how the parameters affect performance and the metrics. So, and here you could jump directly to the specific runs and see the details of the run. So, yeah. Feel free to play with that. Compare models in the UI. Done. Yeah, sorry. I have a question. I tried to store a data.describe, the result of data.describe, which is a data frame, and it failed. Is there a possibility for this? So the question was, can we store the result of data.frame.describe, like pandas, data.frame.describe, and yes, you can.
+
+**Speaker 2** _[43:01]_
+
+Um,
+
+**Speaker 1** _[43:03]_
+
+You cannot store it. So so the log params log metrics take on the key value pairs of Simple, I mean simple types probably hard but like simple types like numbers or strings, but not data frames so what you can do is you can write it to file and Then store the file which is usually what I would do like if you do like create classification report with scikit-learn something would write that to file and store it and then it would appear here in the in the artifacts as a file that you can read like this. You can look here and see like, well. But it's hard to compare them. So if you want specific information, I would recommend logging it as a parameter or a metric. But if you say, OK, I have a model. I have long classification report, different details. I want to know plots, specific plots, and I would log them as files. Cool. So, I mean, optional, but I guess we will do it. How long do I have, actually? How long is it still? Okay, 25 minutes is cool. Good, 25 minutes will be fine, then we do that. So, Signature, which is basically an API.
+
+**Speaker 2** _[44:21]_
+
+API
+
+**Speaker 1** _[44:23]_
+
+I forgot API schema that that you can attach to your model that is important and interesting later in deployment So if we look for example at a current model here, it says like well, here's no model schema Hmm sad What we can do, and I mean, I just give you here the code, so you could also do that if you want. So we import the relevant stuff, model signature and the schema, and then we can specify every input column as a schema. We expect double here, and we give it a name. We specify output schema, we output strings, and then we create a model signature from that.
+
+**Speaker 2** _[45:06]_
+
+Um
+
+**Speaker 1** _[45:09]_
+
+model signature from that and that can be passed here to the log model as signature.
+
+**Speaker 2** _[45:16]_
+
+Um, and
+
+**Speaker 1** _[45:17]_
+
+And actually, if you deploy that later, MLflow will enforce this schema. Otherwise, it will fail internally if you pass something else, right? But if you have a schema in place, then it will be enforced. Note that different deployment tools like SageMaker or Google Cloud or something, They might not enforce it in a way like you expect or sometimes don't expose it. I don't enforce it properly given Given the runtime. Yeah, so Run this and now if we refresh here we see another model and Now this has a schema here that says us. Okay. This is what I expect. This is the output I I expect it didn't give the output a name. That's probably bad. You should give it a name.
+
+**Speaker 2** _[46:16]_
+
+Um...
+
+**Speaker 1** _[46:19]_
+
+Good and now now what we finally can do is like to simply test the model and references from the experiment log even as like we can like run it locally like we retrieve it from the artifact store and tracking server So actually, I mean it will talk to the tracking server tracking server knows where the artifacts are stores brings everything together and loads it locally which can also be a first step of deployment depending on how you how you like to work with it, but here...
+
+**Speaker 2** _[46:51]_
+
+you
+
+**Speaker 1** _[46:52]_
+
+This is how you would reference different runs in MFLow. So this is runs column and then this is the run ID and this is the name of the model or basically the directory in the artifact store of that specific run. So for example here, it would be this ID, right? I need to get some ID now because the ID in the notebook is obviously old. So I need this one and then I know it's called model here. So I go here. Okay, this is what I want. And it loads the model and then we run some test the same test data basically again, and we see okay. We get some output cool, so That's part part one now tracking is up and running MLflow is properly starting to fill up with stuff. And now we want to move to the second notebook and see how to deploy and keep track a bit of the state. So as we saw before, what I was talking about is MLflow models is basically a specification of how the model can be packaged and reproduced and run.
+
+**Speaker 2** _[48:12]_
+
+Um,
+
+**Speaker 1** _[48:13]_
+
+And the built-in deployment and serving tools of MLflow basically reference this format and put together environments so you can run your model basically everywhere. Hard to say, but Yeah, so you can for example push it to SageMaker, push it to an Apache Spark cluster, push it to Kubernetes with a Docker container, do different stuff, push it to Azure ML.
+
+**Speaker 2** _[48:41]_
+
+Um,
+
+**Speaker 1** _[48:42]_
+
+And MFLOW makes it quite easy.
+
+**Speaker 2** _[48:46]_
+
+We will
+
+**Speaker 1** _[48:47]_
+
+We will not do most of the things now because probably there's no SageMaker or Kubernetes available. At least not for this tutorial. So basically the format is this kind of YAML format in the models repository, in the models directory that specifies the flavors. So we can deploy it as a scikit-learn flavor and the lowest possible flavor is the Python functions flavor which can could basically run everything that is a Python function so I probably put this in here now so you can write your custom models there and then and I like to do that you can put all your pre-processing in there and track this also with MLflow and then you would deploy it as a Python function of course and you can deploy any kind of Python function with this functionality Yeah, so, and the simplest way to deploy as a HTTP local REST server is basically if MLflow models serve and then point to the model, I'll show you in a second the proper command.
+
+**Speaker 2** _[50:03]_
+
+Um...
+
+**Speaker 1** _[50:06]_
+
+So we talked about MLflow models, and now we talk about a model registry, which is probably, you noticed, another part of the UI. And now there's a bit of confusion. So the model registry is basically a component as a centralized model store. Like you have a set of APIs, a UI, and some conventions to manage the lifecycle of an MLflow model. That becomes mostly interesting once you have at least a small team, but also for single Single person project. It might be interesting to know what happened in the past to your stuff yeah, it provides model lineage and Tells you like which experiment and which run led to some model and what happened to that model, right? model versioning stage transition for example from To staging to production to some archive or to deleted even and you have another set of annotations available.
+
+**Speaker 2** _[51:03]_
+
+Um,
+
+**Speaker 1** _[51:04]_
+
+There's a bit of confusion here because there's like the model which is the model As an MLflow model and then there's a registered model Which is a model that is registered in the model registry, but will be also called model Okay, but who will see the difference I guess so
+
+**Speaker 2** _[51:23]_
+
+Thank you.
+
+**Speaker 1** _[51:24]_
+
+and how to register this.
+
+**Speaker 2** _[51:27]_
+
+Wait a minute.
+
+**Speaker 1** _[51:28]_
+
+Right, I should do probably this for So so we start again by setting up and pointing to the to the tracking server
+
+**Speaker 2** _[51:43]_
+
+Um,
+
+**Speaker 1** _[51:44]_
+
+And now we want to register a model in the code. So we say, okay, how do we want to call our model? That's a Penguin classifier CLF. And for this, we use a little bit lower API of MLflow, which is the MLflow client API. And there we create a registered model with that model name.
+
+**Speaker 2** _[52:06]_
+
+Um,
+
+**Speaker 1** _[52:09]_
+
+And I mean I put it in a try-except because if it already exists it will complain, but Yeah, so and then basically we know okay, we created a registered model has no description so far, no versions, and there's a name and no tags. And in the UI you can now go from experiments to models and there you see now there's here penguins CLF created. You could also create it here in the UI by clicking on create model. And we see this has nothing inside of it. So no versions, nothing in staging, nothing in production. So we want to change that
+
+**Speaker 2** _[52:52]_
+
+Um...
+
+**Speaker 1** _[52:53]_
+
+So and registering a model is actually quite simple and again there are two ways There's always the or act probably even three ways. There's also the CLI way I'm showing you here the Python API and then of course there's the UI way
+
+**Speaker 2** _[53:06]_
+
+Um, so.
+
+**Speaker 1** _[53:07]_
+
+So, you pick a run ID that you want to register, so we go to the experiments, and what do we pick? We want this one, probably. So I have this run ID, copy this over here, and then we call mflow register model, point to the specific model file in the artifact store, basically, like runs, and the name where we want to register it, which is basically the name of the model we created, we registered. And we run this. Okay, so it tries to say, okay, probably didn't exist. So we check. Okay, it says, all right, already exists. So I create a new version. And it created version one of the penguins classifier. And we can see again the results. So this is basically basically the model that is created, the model version is created at no stage, has a name, it's linked to this run ID. This is the path to the artifact store, like to the model in the artifact store. It's ready, had no text, no status messages so far, and version one. So if we go here we can We can see it here, so there's now one version and this is it.
+
+**Speaker 2** _[54:35]_
+
+Um...
+
+**Speaker 1** _[54:36]_
+
+One thing to notice is now in the experiment UI you also see that this model is now part of a registered model of version 1. So it's not scikit-learn anymore, so it's that now a registered model with a version. That's that and you can go back here to the run and see the run and the results, parameters and metrics and stuff. good so next yeah I know that's a eunuchs eunuchs time seconds since 1970 something
+
+**Speaker 2** _[55:32]_
+
+Thank you.
+
+**Speaker 1** _[55:34]_
+
+So yeah, the question to this answer was what these timestamps mean and if they can be decode, like what they are, and they are Unix timestamps. And they should be here in the UI, they should be proper timestamps, like they should be decoded in the UI. So registered here, last modified here.
+
+**Speaker 2** _[55:58]_
+
+Um
+
+**Speaker 1** _[55:59]_
+
+It's just for internal handling. Any other questions? Yes, and the run. So the question was if the registered model directly references the artifact stored model, the pickle file, basically. And yes, that's the case. It basically points to the location in the artifact store and to the specific run. Yeah. If we delete the run, then the register is broken? Yes. So the question was if we delete the runs then the registry is broken Yeah, it should not let you delete runs that are connected to a registered model
+
+**Speaker 2** _[56:51]_
+
+Thank you.
+
+**Speaker 1** _[56:52]_
+
+And I mean if you delete your database if you lose your database if you delete your s3 bucket or whatever file system Of course stuff is lost
+
+**Speaker 2** _[57:01]_
+
+Um,
+
+**Speaker 1** _[57:04]_
+
+But play play around with it. That's the time for breaking things. Yeah, please I mean so the question was if we can enforce or use some lifecycle policy to get use rid of unused models or unused runs and so Short questions. Yes So there is nothing in place in MLflow to directly say, like, I want a lifecycle policy. But like register model or create experiment or something, there's a bunch of functions available. I'm just not including them here in the documentation. There's a bunch of, like, delete run, delete run, list all runs. You can iterate through runs and check if they link to something, and then you could delete them automatically. So you would have to write your own script or your mail flow Node or whatever you you like to enforce it yourself I mean and the flow basically gives you like a UI and some conventions to put things together and then you can quite I would say quite easily and With a reasonable effort at functionality as you need it to to make you happy Yeah So, good, we have this registered. And so now we want to serve the model from the registry. And the steps are basically similar for different deployment tools. Some deployment providers like SageMaker or something, like AWS SageMaker or Azure ML, have also Python API available. And I guess Kubeflow is also something that's part of MLflow.
+
+**Speaker 2** _[58:49]_
+
+Um
+
+**Speaker 1** _[58:50]_
+
+But yeah, we won't do that here, but it is possible. It's relatively convenient So what you need to do to run this from the from the CLI is Basically this command as I said we do MFL model serve You tell it where the tracking server lives as an environment variable here. And, since I didn't list conda in the installation requirements, we use no conda, otherwise it would create a specific conda environment, here it will use pip. You could also use docker here, but also I didn't want anyone to install, like everyone to install docker here.
+
+**Speaker 2** _[59:30]_
+
+Um,
+
+**Speaker 1** _[59:32]_
+
+And then you point to the model and the version of the model you want. And you tell it the port where it should serve the model. You can also, if you're later, we will see transitioning to stages. You could also tell it the stage here. You can tell it the version or you can tell it the stage to deploy. So now we can do that. Probably you need to put pipenv run before that between MLflow and 5000. So new thing. So pipenv run. We point to the tracking server again and then run this. So let's see. And now we say, OK, it gives us a bit of information. So it says, well, we deployed with backend Python function flavor.
+
+**Speaker 2** _[60:38]_
+
+Thank you.
+
+**Speaker 1** _[60:40]_
+
+And then it basically started a scoring server that's listening on port 4242 conveniently and now we can We can use for example the URL to invoke the endpoint and the endpoint is always on slash invocations
+
+**Speaker 2** _[61:01]_
+
+um
+
+**Speaker 1** _[61:03]_
+
+Or we can use the requests Python library to query the endpoint. One important thing to notice if you want to
+
+**Speaker 2** _[61:13]_
+
+Um,
+
+**Speaker 1** _[61:15]_
+
+JSON or something structured data there, it's most of the time recommended and necessary to tell MLflow, the MLflow endpoint how to decode.
+
+**Speaker 2** _[61:27]_
+
+Um,
+
+**Speaker 1** _[61:28]_
+
+Your data so here we have so you pass a format with the content type and tell it It's a pandas records Which means it should use the pandas load from records or pandas from records or data frame from records and yeah, something like this to Okay to load this data into pandas and if we run this, okay, we see okay it worked at 200 and we get some predictions and I mean these are also completely made-up values but you get some predictions.
+
+**Speaker 2** _[62:03]_
+
+Um...
+
+**Speaker 3** _[62:04]_
+
+Can I jump in here really quick? Because we have three questions from the online community.
+
+**Speaker 1** _[62:09]_
+
+OK, please.
+
+**Speaker 3** _[62:09]_
+
+Okay, please. number one is is it possible to lock the entire pipeline of the model for example the pre-processing steps
+
+**Speaker 1** _[62:17]_
+
+So if you have a scikit-learn pipeline, then it's quite conveniently the way we did it here. If you have different preprocessing steps in place, you would probably write a custom model, which is basically a Python class that at some point has a prediction function and that can be used there as a Python function. I can in a second point to the part in the documentation and I prepared a bit for it. So yeah, I would recommend it in general. So I never used it actually with the built-in flavors. So I always have like a custom thing, which is not too hard. then you can really track everything you did and you can expose also everything you did and not just have a model and another thing around it to have a production ready API kind of that's that yeah do you have more questions that
+
+**Speaker 3** _[63:20]_
+
+Yes, I have two more, but I think this one lost a little bit of context. It asks, you have to set the environment variable separately, right? It's not part of the command, unfortunately, it doesn't mention which command.
+
+**Speaker 2** _[63:34]_
+
+Um...
+
+**Speaker 1** _[63:35]_
+
+that might refer to this right yeah I mean you that's one environment where we have to set the MFL tracking URI that should be enough to run everything here but yeah I'm not sure ask again
+
+**Speaker 3** _[63:57]_
+
+And then question number three also, how to ensure that the model dependencies of the pipeline are the same once we serve the model?
+
+**Speaker 1** _[64:05]_
+
+I mean, I was in the DevOps talk before and it seems not too easy, right? But here, MFLow tries to do that by giving you...
+
+**Speaker 2** _[64:15]_
+
+So, um, um,
+
+**Speaker 1** _[64:18]_
+
+pinning pinning the versions in the model files. If you go to the model see here, there's a conda YAML which basically takes all the other requirements from your that I needed to run the model and tries to pin them as possible. Yeah, so that should hopefully hopefully recreate it. You have to be a bit more careful again if you have a custom model you need to probably log your code with it to have it available in the environment, right? You cannot just rely on the pickle file if you have custom code logged, but yeah.
+
+**Speaker 3** _[65:01]_
+
+Okay, thank you very much. I think these are all questions so far from
+
+**Speaker 1** _[65:03]_
+
+so far. Cool. You had a question? You can also do that. There's also in the documentation a large part of like a large section on how to write your custom deployment targets and how to set it up. I have not done that yet, I have to say, but should be possible. Good. So there's a lot of stuff where you can deploy that. And probably the final thing we want to do here is transition the stages. So if you have a deployment script, for example, you at some point, so MFLow doesn't directly deploy stuff. You have to tell it to deploy stuff. And then you have a deployment script, and in the script you probably want to transition the stage. Here we would jump to just production, but you could also jump to staging.
+
+**Speaker 2** _[65:59]_
+
+It has
+
+**Speaker 1** _[65:59]_
+
+It has three environments, three stages available, staging, production, and archived. And then there's also the deleted stage.
+
+**Speaker 2** _[66:07]_
+
+Um,
+
+**Speaker 1** _[66:09]_
+
+Which only shows up in runs, I guess. So I mean this is also again with the client API So transition model version stage, so we reference the model name, which is the registered model name the version and which stage we want and There's also again the client has a bunch of functions or methods to To manage these stages. I'm only showing you one
+
+**Speaker 2** _[66:34]_
+
+Um, to see.
+
+**Speaker 1** _[66:35]_
+
+to see it and then this is the output and now the model which is basically a reference to the model in the registry and now we see here it's in production and if we go to the UI we see okay version one is in production now, I mean here it means nothing right, but It's in production and here probably does it change here now it still stays version 1. If you go here to the run. Good. So that's part 2. I guess we have done at 4, right? Quarter past. Cool. Very good. Then we can have a quick look at some
+
+**Speaker 2** _[67:28]_
+
+Um.
+
+**Speaker 1** _[67:30]_
+
+Some tips and tricks. I mean, it's not too many so we can have a look what I also find interesting Yeah, or more questions Okay, can you say the first part again I Just didn't understand So if you can, so the question was if you can basically have multiple models at one deployment endpoint, I guess.
+
+**Speaker 2** _[68:28]_
+
+Um,
+
+**Speaker 1** _[68:29]_
+
+Like like here
+
+**Speaker 2** _[68:30]_
+
+Thank you.
+
+**Speaker 1** _[68:31]_
+
+So you cannot, as far as I know. So in the end, all MLflow, at least the built-in deployment tools, all rely on you point to the MLflow to the endpoint invocations.
+
+**Speaker 2** _[68:52]_
+
+Um, I mean,
+
+**Speaker 1** _[68:53]_
+
+Mean you could have a custom model that has takes multiple data points and probably Has different model artifacts inside of it, but that's like a bit of a hack I guess
+
+**Speaker 2** _[69:04]_
+
+Um,
+
+**Speaker 1** _[69:05]_
+
+So you would probably deploy multiple models
+
+**Speaker 3** _[69:09]_
+
+I have another three questions from the online people.
+
+**Speaker 1** _[69:12]_
+
+Cool. Bring him on.
+
+**Speaker 3** _[69:15]_
+
+As a follow-up to one of the previous questions, is it possible to install the dependencies in runtime? For example, if we use the model in an API.
+
+**Speaker 1** _[69:29]_
+
+I'm not sure what to answer there.
+
+**Speaker 2** _[69:33]_
+
+there.
+
+**Speaker 1** _[69:34]_
+
+So if you run them with, for example, I mean, we picked here no conda, for example, because installing conda might be a bit annoying and I didn't want the additional dependency for the tutorial. If you want it with without this no conda, for example, it would create a new conda environment for example for every run for every time you call this command and Deployed in this environment. For example, you can do the same with the docker then it creates a new docker image for every Time you call this and then starts this or you can For example for other tools like if you want to put it to ECS for example, you do build and push and it creates a docker container, pushes it to ECS and you can run it from there, for example, and then of course it also installs the dependencies every time. Fresh. Hope that's answered the question.
+
+**Speaker 3** _[70:36]_
+
+We will know in about five minutes when the next message is in. What's the default strategy to do when you're serving a model in an API and you train the model again and wish to switch the model being served to the new one?
+
+**Speaker 1** _[70:51]_
+
+I mean, that's quite a general question, I guess. Can you say it again?
+
+**Speaker 3** _[71:02]_
+
+I'm afraid I can't. I already closed it.
+
+**Speaker 1** _[71:04]_
+
+So, I mean, optimally, it's hard to answer. I would say you switch, for example, your Docker container completely, your model returns some versioning, for example, could be the model run URI, the run ID, for example, then you can identify later where you store the predictions of your model, for example, you identify where it came from and you just switch out Docker containers for example behind your API and you have a little downtime probably or you have like some rolling deployment depends on what tools you use yeah hard to answer maybe someone else knows So the question was if you can have more, like say two models in production and split the traffic between them. So so Ember flow is not.
+
+**Speaker 2** _[72:11]_
+
+Um...
+
+**Speaker 1** _[72:13]_
+
+It's not in place for managing this kind of deployment, I guess. You can have different versions in place. And different models in production, but then you have to do two deployments, right? So you cannot do deploy these two and split the traffic. So I'm a flow is also not routing the traffic You have to say, okay I have this endpoint and it's a singleton endpoint and it could have kind of two endpoints But then you would need some solution to manage how the and the traffic is distributed I mean SageMaker for example would do that for you or Azure ML as far as I know would do that for you. I can say like, okay I have two models, I give them different weight. But Everflow internally cannot do that. It doesn't manage that, as far as I know.
+
+**Speaker 3** _[73:00]_
+
+And then there's this last question from Discord. Is there a way of decoupling the MLflow code from the actual model code?
+
+**Speaker 1** _[73:13]_
+
+So I guess that refers to this part here. I'm not sure what it refers to. To me, the model code and the MLflow code is reasonably decoupled.
+
+**Speaker 2** _[73:30]_
+
+Thank you.
+
+**Speaker 1** _[73:32]_
+
+So, I mean, sure, I mean, okay, I mean, probably it refers to this mix-in of, like, you have MLflow calls and model and scikit-learn and other stuff calls in between, and you probably don't want that. So, I mean, sure, what you could do, and I've seen that, is...
+
+**Speaker 2** _[73:50]_
+
+Thank you.
+
+**Speaker 1** _[73:51]_
+
+You for example Build that as a decorator or you just start a run here create and collect all your stuff that you want to track In between in some dictionary or something and in the end lock it To MLflow or you could create decorator. That's not seen that
+
+**Speaker 2** _[74:11]_
+
+Um.
+
+**Speaker 1** _[74:12]_
+
+That you put around your training function and all outputs are basically locked
+
+**Speaker 2** _[74:18]_
+
+Um,
+
+**Speaker 1** _[74:21]_
+
+To Emma flow I'm not sure what I prefer And so you can do that you can put you can track it at any point I mean, you just need to I mean This is also only one way to tell and the flow where to run and where to store stuff I mean you could also directly call up an old run for example with the with the client API and say like well I add some more information there. I have some new information That would be part parts for example of the tips and tricks For example, you could have like a model integration test at some point I said, well, I just started like here, I run something at the end, I loaded it, I probably have some other Python code around, I run that.
+
+**Speaker 2** _[75:07]_
+
+Thank you.
+
+**Speaker 1** _[75:08]_
+
+And if that passes some specific requirements with some test data, I add some information to the model itself. Like here, you could, for example, add a tag. And then if you want, for example, to move it to a stage or to move it to a model version, this tag needs to be there. You could check that. I mean briefly here you can for example list experiments and then you can set a tag to a specific run ID after the model was run. This is in the chips and tricks notebook, for example. And I forgot to repeat the question, I guess. Sorry, yeah. I only understood half the question sadly. So I guess the question, so I'm still not 100% sure. I guess the question was if we can lock the scikit-learn parameters from the context somehow, right? Yeah, for a lot of built-in flavors, there is actually called a function autolog. If you go to mflow documentation, We can, whatever. There is all kinds of built-in functionality. So there's an automatic logging for all kinds of libraries. And there you would basically on the call and the flow, where is it, oh, yeah, you would basically just instantiate autolog and then it would discover everything, right?
+
+**Speaker 2** _[77:23]_
+
+I mean, I
+
+**Speaker 1** _[77:24]_
+
+I mean, I don't I mean it might be beneficial. I don't like it too much because it I Need flexibility and it would be also my answer to Would you decouple the machine learning code and the tracking code more and again? I'm not I mean you can do it and I've seen it But I don't like it too much because I know want to know where thing came from that I'm tracking and not hide it further But sure if it gets super complicated, then you can think about doing something The question was if there is user and permission management, and the short answer is no. You can see here which user did something, so that is locked, but it's only your file system, like your local running user.
+
+**Speaker 2** _[78:17]_
+
+So, um...
+
+**Speaker 1** _[78:20]_
+
+So there's no permission management and stuff. Yeah You for right first like left Now it uses that so the question was if it uses an SQLite database on the server here I mean, I mean, so SQLite is the, so I'm not sure for the reason, but MLflow requires to have this deployment and registry stuff working requires database backend, I guess because of the file paths. And the question here was like, if I would really use an SQLite database in a production setting on some server somewhere, right? But of course, so you can do that. I mean, usually that only stores the parameters, right? So it's not super critical data and it's not, doesn't have to be performant in general. So if you just have a backup for that thing in place, yeah, that's something I would do. But you could also point it to a redshift if you want to spend money or you can run your own Postgres or all kinds of different stuff. So there's, if you look here, there's a lot of different scenarios also available or like described here how you can store artifacts and runs, right? And I mean, I grabbed stuff from here, but there's all kinds of different setups that you can do live with a proxy with different remote hosts. So yeah there The model is always saved in the artifact host or the artifact store, so I Mean in our case. It's now in the local file system right, but you could also point it to for example an S3 bucket for example, let's see if I find it quickly
+
+**Speaker 2** _[80:34]_
+
+and
+
+**Speaker 1** _[80:35]_
+
+Okay, I don't find it quickly, but it's probably also in this notebook quite at the beginning. So I mean, you can, I would just dump it to, I mean, you just dump it to some S3 bucket and then you have the run ID and then whatever artefacts you have there. Or basically experiment ID, run ID, and then all artefacts to this run. like you would have here in the ML runs, right? Then you have experiment ID number one, then you have different ones, and you see, okay, here's artifacts in there. And that's then how it's stored.
+
+**Speaker 3** _[81:16]_
+
+Maybe one.
+
+**Speaker 1** _[81:20]_
+
+Okay, we'll continue with this question quickly. Yeah, maybe a little bit more of a general question. The local cloud providers are now obviously providing a local ML tooling, GCP with Perfect AI, Azure with Azure ML. When would you use ML flow-based solutions instead of one of these cloud-based solutions? I mean, so I guess one benefit of ML flow is you can start quite... The question was and there's a lot of lot of built-in cloud provider solutions for this MLOps or management of models and stuff and training what why and when would we use MLflow then?
+
+**Speaker 2** _[82:00]_
+
+Um...
+
+**Speaker 1** _[82:02]_
+
+so I The largest benefit to me from a force you can start small really small like single single developer on local machine and have a benefit and then from there move on to to Some platform and you can customize a lot and then some cloud providers only give you parts of the equation Right and you can use for example Emma flow to patch it together. So that's for example something I do Or what is what I commonly did so far is like have for example SageMaker Handling all the really deployment stuff. I don't care. I don't want to have handle security stuff blah blah and points Someone else can take care of that infrastructure But I'm a flow for for tracking experiments and then it's isolated in SageMaker folks I'm so you can piece together things if you want But sure, I mean, if you have a cloud provider and you know, hey, I have like a 50 or whatever, a data science team, and I know I want to do X, Y, Z, then you can probably just start using a cloud provider. I mean, there's different solutions for that. I mean, I guess also DVC is quite nice, right? I haven't worked much with it. It should offer parts of this functionality. So MLflow is far from the only tool for that. Just some tool that was around when I started looking for such a tool, and then I started using it. And now I'm a bit stuck with that Because it's convenient when you know But what you're doing But yeah, there are different tools and other stuff I mean you could also do the weights and biases or something for for these kind of things, right?
+
+**Speaker 3** _[83:40]_
+
+So I'm afraid we have to come to an end. Maybe we end on a very brief question from our online community, which is about the integration with continuous integration and deployment tools. How well does it integrate?
+
+**Speaker 1** _[83:59]_
+
+I mean, that's quite a general question. I mean, it depends on what you do and how much effort you want to put in managing your environment. Mean if you can get your whatever bitbucket github git lab Runner for example to integrate with to interact with a remote server outside of github and you get your company's IT Department or security department to allow that Then they integrate probably quite nicely
+
+**Speaker 2** _[84:28]_
+
+Um...
+
+**Speaker 1** _[84:29]_
+
+Yeah, depends on I mean in the AWS environment you probably can do stuff with code build and without leaving the Ecosystem which is will probably make some people happy
+
+**Speaker 2** _[84:40]_
+
+specifically
+
+**Speaker 1** _[84:41]_
+
+specifically AWS. But yeah, I don't I don't know too much about that to be honest
+
+**Speaker 3** _[84:49]_
+
+Okay, then thank you very much for an enlightening tutorial.
+
+---
+transcript_status: auto
+---
+transcript_language: en
