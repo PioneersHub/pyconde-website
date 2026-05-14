@@ -4,7 +4,7 @@ Build a structured YAML inventory of every speaker image on the site.
 Walks every speaker record under content/speakers/ and
 content/archive/{year}/speakers/, groups by Pretalx code (so a speaker
 who appears in multiple editions with the same code becomes one entry
-spanning those editions), and writes the result as databags/speaker_images.yaml.
+spanning those editions), and writes the result as databags/person_images.yaml.
 
 Schema (open — future runs may add fields without breaking existing ones):
 
@@ -39,7 +39,7 @@ import yaml
 
 REPO = Path(__file__).resolve().parent.parent
 CONTENT = REPO / "content"
-OUT = REPO / "databags" / "speaker_images.yaml"
+OUT = REPO / "databags" / "person_images.yaml"
 
 
 def field(text: str, name: str) -> str | None:
