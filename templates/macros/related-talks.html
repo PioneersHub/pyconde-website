@@ -8,16 +8,24 @@
 -#}
 
 {%- macro related_panel(talk, my_speakers, talks_root, speakers_root, archive_year) -%}
+  {#- `my_code` (Pretalx) is used to compare against `sibling.code`
+      when iterating sibling talks. `my_ref` (slug = folder name) is
+      used to compare against entries in speakers' `talks` lists,
+      because after the slug migration those lists hold slugs, not
+      Pretalx codes. Compare against both for transitional safety so
+      a fresh import (folder still by code) doesn't reintroduce the
+      bug. -#}
   {%- set my_code = talk.code or talk._id -%}
+  {%- set my_ref = talk._id -%}
 
   {#- 1. More by this speaker -#}
   {%- set by_speaker = [] -%}
   {%- if my_speakers -%}
     {%- for sp in my_speakers -%}
-      {%- for code in (sp.talks or []) -%}
-        {%- if code != my_code -%}
-          {%- set sibling = site.get(talks_root ~ '/' ~ code) -%}
-          {%- if sibling and (by_speaker|length) < 8 -%}
+      {%- for ref in (sp.talks or []) -%}
+        {%- if ref != my_ref and ref != my_code -%}
+          {%- set sibling = site.get(talks_root ~ '/' ~ ref) -%}
+          {%- if sibling and sibling['_model'] != 'redirect' and (by_speaker|length) < 8 -%}
             {%- if sibling not in by_speaker -%}
               {%- set _ = by_speaker.append(sibling) -%}
             {%- endif -%}
