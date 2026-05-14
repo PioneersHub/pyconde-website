@@ -1,79 +1,21 @@
-{% extends "layout.html" %}
-
-{%- set is_share = this._model == 'certificates_share' or 'share' in this.url_path -%}
-{%- if is_share -%}
-{%- set page_label = 'Share a certificate' -%}
-{%- set intro = 'Each PyCon DE & PyData attendee receives a personal certificate of attendance with a unique URL. The link printed on your certificate goes directly to your public share page — use that link to forward it to your network.' -%}
-{%- set url_pattern = '/certificates-share/<your-certificate-id>/' -%}
-{%- else -%}
-{%- set page_label = 'Validate a certificate' -%}
-{%- set intro = 'PyCon DE & PyData certificates of attendance carry a unique URL that links to a public validation record. Use the URL printed on a certificate to verify it; the validation page confirms the issued name and edition.' -%}
-{%- set url_pattern = '/certificates-validate/<certificate-id>/' -%}
-{%- endif -%}
-
-{% block title %}{{ page_label }}{% endblock %}
-
-{% block extra_head %}
-{# Utility page — no value as a search result. Hide from indexers and
-   image-search; the per-cert child pages already carry their own
-   indexing rules. #}
-<meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
-{% endblock %}
-
-{% block body %}
-<section class="subsite">
-  <div class="content" style="max-width: 36rem;">
-    <h1>{{ page_label }}</h1>
-    <p>{{ intro }}</p>
-
-    <p>The URL pattern is:</p>
-    <pre style="background: var(--neutral-50, #f6f7f8); padding: 0.6rem 0.9rem; border-left: 3px solid var(--blue, #00c8e1); overflow-x: auto;"><code>https://2026.pycon.de{{ url_pattern }}</code></pre>
-
-    <p>Enter a certificate id below to jump straight to its page:</p>
-
-    <form id="cert-go" class="cert-form" autocomplete="off"
-          style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
-      <label for="cert-id" style="flex: 1 1 18rem;">
-        <span class="visually-hidden">Certificate id</span>
-        <input type="text"
-               id="cert-id"
-               name="cert-id"
-               placeholder="certificate-id (e.g. 45556db4-d658-cec2-b652-0ff0ab7f1033)"
-               pattern="[A-Za-z0-9-]+"
-               required
-               style="width: 100%; padding: 0.55rem 0.75rem; border: 1px solid var(--neutral-200, #d5dadd); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.95rem;">
-      </label>
-      <button type="submit"
-              style="padding: 0.55rem 1.1rem; background: var(--blue, #00c8e1); color: #fff; border: 0; font-weight: 600; cursor: pointer;">
-        Go
-      </button>
-    </form>
-
-    <p class="cert-hint" style="margin-top: 0.6rem; font-size: 0.85rem; color: var(--text-secondary, #555);">
-      No id at hand? The full URL is printed on the certificate PDF.
-    </p>
-
-    <p style="margin-top: 2rem;">
-      <a href="/">← Back to the homepage</a>
-    </p>
-  </div>
-</section>
-
-<script>
-  (function () {
-    var base = {{ ('/certificates-share/' if is_share else '/certificates-validate/')|tojson }};
-    var form = document.getElementById('cert-go');
-    if (!form) return;
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var id = document.getElementById('cert-id').value.trim();
-      if (!id) return;
-      // Strip a leading slash, trailing slash, or full URL pasted in by the user.
-      id = id.replace(/^https?:\/\/[^/]+/i, '').replace(/^\/+|\/+$/g, '');
-      var last = id.split('/').filter(Boolean).pop() || '';
-      if (!/^[A-Za-z0-9-]+$/.test(last)) return;
-      window.location.href = base + last + '/';
-    });
-  })();
-</script>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting…</title>
+  {# A direct hit on /certificates-validate/ or /certificates-share/
+     carries no useful content — only the per-id child pages do.
+     Hard-redirect to the homepage to keep the URL pattern from being
+     a discoverable surface for guessing or scraping. #}
+  <meta http-equiv="refresh" content="0; URL='/'">
+  <link rel="canonical" href="https://2026.pycon.de/">
+  <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
+  <script>
+    window.location.replace('/');
+  </script>
+</head>
+<body>
+  <p>Redirecting to <a href="/">the homepage</a>.</p>
+</body>
+</html>
