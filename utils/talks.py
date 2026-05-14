@@ -60,7 +60,7 @@ TRACK_PREFIX_PATTERN = re.compile(r"(?i)(pycon|pydata|general):\s*")
 # contraction), the importer prepends a single framing line so the
 # first-person voice reads naturally on a third-party-authored page:
 #
-#     This is what {first_name} says:
+#     About — in the speaker's own words
 #
 #     {original bio, exactly as submitted to Pretalx}
 #
@@ -237,14 +237,13 @@ def speaker_to_markdown(speaker, audit: list | None = None) -> str:
     """Render a speaker block in markdown.
 
     Bios are preserved verbatim. When the bio uses the first person, a
-    framing line "This is what {first_name} says:" is prepended so the
-    voice reads naturally on the conference site without changing any
-    of the speaker's own wording.
+    framing line "About — in the speaker's own words" is prepended so
+    the voice reads naturally on the conference site without changing
+    any of the speaker's own wording.
     """
     raw = (speaker.biography or "").strip()
     if raw and looks_first_person(raw):
-        first = speaker.name.split()[0] if speaker.name else "the speaker"
-        bio = f"_This is what {first} says:_\n\n{raw}"
+        bio = f"_About — in the speaker's own words_\n\n{raw}"
         if audit is not None:
             audit.append((speaker.code, speaker.name, raw[:120]))
     else:
@@ -429,7 +428,7 @@ def main() -> None:
 
     if audit:
         print()
-        print(f"Framed {len(audit)} first-person bios with 'This is what … says:' intro.")
+        print(f"Framed {len(audit)} first-person bios with 'About — in the speaker's own words' intro.")
     else:
         print("No first-person bios — none needed framing.")
 

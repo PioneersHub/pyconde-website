@@ -218,8 +218,7 @@ def speaker_to_lektor(speaker: dict, year: str, questions: dict[str, int | None]
     # Stammdaten
     raw_bio = (speaker.get("biography") or "").strip()
     if raw_bio and looks_first_person(raw_bio):
-        first = name.split()[0]
-        bio = f"_This is what {first} says:_\n\n{raw_bio}"
+        bio = f"_About — in the speaker's own words_\n\n{raw_bio}"
     else:
         bio = raw_bio
 
@@ -335,7 +334,7 @@ def main() -> None:
         sp["submissions"] = kept
         rendered, fields = speaker_to_lektor(sp, year, questions)
         write_speaker_file(rendered, sp["code"], speakers_dir)
-        if "_This is what " in fields["biography"]:
+        if "_About — in the speaker's own words" in fields["biography"]:
             framed += 1
         if fields["inactive_reason"]:
             stubs += 1
