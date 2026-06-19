@@ -18,11 +18,36 @@ robots:
     - CCBot
 
   # Paths excluded from indexing. Applied to wildcard User-agent.
+  # /certificate-share/ and /certificate-validate/ are backend-served
+  # endpoints that carry attendee PII; bots are excluded by default but
+  # social link-preview bots are explicitly re-allowed in
+  # `social_link_preview_bots` so attendees can share their cert URL
+  # on LinkedIn / X / Facebook / WhatsApp / Telegram and get a preview.
   disallow_paths:
     - /sponsoring/test.html
     - /landing-page-inactive/
-    - /certificates-validate/         # intentionally bot-excluded (commit 55cce767)
-    - /certificates-share/            # intentionally bot-excluded (commit 55cce767)
+    - /certificate-validate/
+    - /certificate-share/
+
+  # Per-bot Allow rules. Each entry produces its own User-agent block
+  # in robots.txt above the wildcard block, so the named bots get
+  # access to the listed paths regardless of the wildcard Disallow.
+  social_link_preview_bots:
+    - user_agent: LinkedInBot
+      allow:
+        - /certificate-share/
+    - user_agent: Twitterbot
+      allow:
+        - /certificate-share/
+    - user_agent: facebookexternalhit
+      allow:
+        - /certificate-share/
+    - user_agent: WhatsApp
+      allow:
+        - /certificate-share/
+    - user_agent: TelegramBot
+      allow:
+        - /certificate-share/
 
   # Sitemap URL announced in robots.txt. Lektor builds an absolute
   # path via canonical_host (see databags/branding.yaml).
@@ -37,5 +62,5 @@ llms_txt:
 noindex_paths:
   - /sponsoring/test.html
   - /landing-page-inactive/
-  - /certificates-validate/
-  - /certificates-share/
+  - /certificate-validate/
+  - /certificate-share/

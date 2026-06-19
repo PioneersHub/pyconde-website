@@ -1,6 +1,19 @@
 {%- set seo = bag('seo') -%}
 {%- set branding = bag('branding') -%}
 {%- set policy = seo['robots']['ai_crawler_policy'] -%}
+{%- set social_bots = seo['robots']['social_link_preview_bots'] or [] -%}
+{%- if social_bots %}
+# Social link-preview bots — explicit Allow blocks for paths that the
+# wildcard User-agent disallows. Listed first so the named bots match
+# their own block instead of falling through to "*".
+{% for bot in social_bots -%}
+User-agent: {{ bot.user_agent }}
+{%- for path in (bot.allow or []) %}
+Allow: {{ path }}
+{%- endfor %}
+
+{% endfor -%}
+{%- endif -%}
 User-agent: *
 Allow: /
 {%- for path in seo['robots']['disallow_paths'] %}

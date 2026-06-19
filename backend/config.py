@@ -42,6 +42,12 @@ class Settings(BaseSettings):
     # If set, all requests must include "X-API-Key" header with this value
     api_key: str | None = None
 
+    # Certificate share API settings
+    cert_bucket_name: str | None = None
+    cert_bucket_region: str = "eu-central-1"
+    cert_token_secret: str | None = None
+    cert_token_ttl_seconds: int = 300
+
     @field_validator("allowed_origins", mode="after")
     @classmethod
     def parse_cors_origins(cls, v: str | list[str]) -> list[str]:

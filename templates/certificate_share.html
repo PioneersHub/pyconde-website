@@ -1,57 +1,82 @@
 {% extends "layout.html" %}
-{% block title %}{{ this.title }}{% endblock %}
+{% block title %}Certificate of Attendance — PyCon DE &amp; PyData 2026{% endblock %}
 {% block extra_head %}
-<meta name="robots" content="noindex,nofollow,noarchive,nosnippet,noimageindex">
+<script defer src="{{ '/static/js/cert-share.js'|url }}"></script>
 {% endblock %}
 {% block body %}
 <header class="cert-header">
     <div class="content">
-        <p class="cert-header__eyebrow">{{ this.conference }}</p>
-        <h1 class="cert-header__title">{{ this.title }}</h1>
+        <p class="cert-header__eyebrow">PyCon DE &amp; PyData 2026</p>
+        <h1 class="cert-header__title">Certificate of Attendance</h1>
     </div>
 </header>
 
 <section class="cert-section">
     <div class="content">
-        <div class="cert-card cert-card--share">
-            {% if this.image %}
-                {% set img = this.attachments.images.get(this.image) %}
-                {% if img %}
-                    <img class="cert-card__image" src="{{ img.url_path|url }}" alt="Certificate of Attendance for {{ this.full_name }}">
-                {% else %}
-                    <img class="cert-card__image" src="{{ this.image|url }}" alt="Certificate of Attendance for {{ this.full_name }}">
-                {% endif %}
-            {% endif %}
+        {% set share_bag = bag('certificate_share') %}
+        <div class="cert-card cert-card--share" id="cert-card"
+             data-cert-api="{{ this.api_endpoint or 'https://91i53jcrqf.execute-api.eu-central-1.amazonaws.com/prod' }}"
+             data-share-text-default="{{ share_bag['share_text_default'] }}"
+             data-share-text-linkedin="{{ share_bag['share_text_linkedin'] }}"
+             data-share-text-x="{{ share_bag['share_text_x'] }}"
+             data-share-text-mastodon="{{ share_bag['share_text_mastodon'] }}"
+             data-share-text-whatsapp="{{ share_bag['share_text_whatsapp'] }}"
+             data-share-text-telegram="{{ share_bag['share_text_telegram'] }}">
+            <div class="cert-card__loading" id="cert-loading" role="status" aria-live="polite">
+                <p>Loading your certificate…</p>
+            </div>
 
-            <dl class="cert-meta">
-                <div class="cert-meta__row">
-                    <dt>Awarded to</dt>
-                    <dd>{{ this.full_name }}</dd>
-                </div>
-                <div class="cert-meta__row">
-                    <dt>Conference</dt>
-                    <dd>{{ this.conference }}</dd>
-                </div>
-            </dl>
+            <div class="cert-card__error" id="cert-error" hidden>
+                <p>This certificate link is invalid or has expired.</p>
+            </div>
 
-            <div class="cert-share">
-                <h2 class="cert-share__heading">Share your certificate</h2>
-                <ul class="cert-share__list">
-                    <li><a class="cert-share__link cert-share__link--linkedin" target="_blank" rel="noopener"
-                        href="https://www.linkedin.com/sharing/share-offsite/?url={{ this.share_url|urlencode }}&summary={{ this.share_text_linkedin|urlencode }}">LinkedIn</a></li>
-                    <li><a class="cert-share__link cert-share__link--x" target="_blank" rel="noopener"
-                        href="https://twitter.com/intent/tweet?text={{ this.share_text_x|urlencode }}">X</a></li>
-                    <li><a class="cert-share__link cert-share__link--mastodon" target="_blank" rel="noopener"
-                        href="https://mastodonshare.com/?text={{ this.share_text_mastodon|urlencode }}">Mastodon</a></li>
-                    <li><a class="cert-share__link cert-share__link--whatsapp" target="_blank" rel="noopener"
-                        href="https://wa.me/?text={{ this.share_text_whatsapp|urlencode }}">WhatsApp</a></li>
-                    <li><a class="cert-share__link cert-share__link--telegram" target="_blank" rel="noopener"
-                        href="https://t.me/share/url?url={{ this.share_url|urlencode }}&text={{ this.share_text_telegram|urlencode }}">Telegram</a></li>
-                    <li><a class="cert-share__link cert-share__link--email" target="_blank" rel="noopener"
-                        href="mailto:?subject={{ this.title|urlencode }}&body={{ this.share_text_default|urlencode }}">Email</a></li>
-                </ul>
+            <div class="cert-card__ready" id="cert-ready" hidden>
+                <img class="cert-card__image" id="cert-image" alt="Certificate of Attendance">
+
+                <dl class="cert-meta">
+                    <div class="cert-meta__row">
+                        <dt>Awarded to</dt>
+                        <dd id="cert-name"></dd>
+                    </div>
+                    <div class="cert-meta__row">
+                        <dt>Conference</dt>
+                        <dd id="cert-conference"></dd>
+                    </div>
+                </dl>
+
+                <div class="cert-share">
+                    <h2 class="cert-share__heading">Share your certificate</h2>
+                    <ul class="cert-share__list">
+                        <li>
+                            <button type="button" class="cert-share__link cert-share__link--linkedin"
+                                    data-share-platform="linkedin">LinkedIn</button>
+                        </li>
+                        <li>
+                            <a class="cert-share__link cert-share__link--x" target="_blank" rel="noopener"
+                               id="cert-share-x" href="#">X</a>
+                        </li>
+                        <li>
+                            <a class="cert-share__link cert-share__link--mastodon" target="_blank" rel="noopener"
+                               id="cert-share-mastodon" href="#">Mastodon</a>
+                        </li>
+                        <li>
+                            <a class="cert-share__link cert-share__link--whatsapp" target="_blank" rel="noopener"
+                               id="cert-share-whatsapp" href="#">WhatsApp</a>
+                        </li>
+                        <li>
+                            <a class="cert-share__link cert-share__link--telegram" target="_blank" rel="noopener"
+                               id="cert-share-telegram" href="#">Telegram</a>
+                        </li>
+                        <li>
+                            <a class="cert-share__link cert-share__link--email" target="_blank" rel="noopener"
+                               id="cert-share-email" href="#">Email</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
 </section>
+
+<div id="cert-toast" class="cert-toast" hidden role="status" aria-live="polite"></div>
 {% endblock %}

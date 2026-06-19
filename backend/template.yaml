@@ -51,6 +51,26 @@ Parameters:
     Description: Comma-separated list of allowed CORS origins
     Default: "https://2026.pycon.de,https://pycon.de"
 
+  CertBucketName:
+    Type: String
+    Description: Private S3 bucket holding cert PNGs and metadata JSON
+    Default: "pyconde-26-certs-private"
+
+  CertBucketRegion:
+    Type: String
+    Description: AWS region of the cert bucket
+    Default: "eu-central-1"
+
+  CertTokenSecret:
+    Type: String
+    Description: HMAC secret for signing cert-image URLs
+    NoEcho: true
+
+  CertTokenTtlSeconds:
+    Type: Number
+    Description: Lifetime of a signed cert-image URL, in seconds
+    Default: 300
+
 Resources:
   ContactFormFunction:
     Type: AWS::Serverless::Function
@@ -69,6 +89,17 @@ Resources:
           EMAIL_RECIPIENT: !Ref EmailRecipient
           EMAIL_SENDER: !Ref EmailSender
           ALLOWED_ORIGINS: !Ref AllowedOrigins
+          CERT_BUCKET_NAME: !Ref CertBucketName
+          CERT_BUCKET_REGION: !Ref CertBucketRegion
+          CERT_TOKEN_SECRET: !Ref CertTokenSecret
+          CERT_TOKEN_TTL_SECONDS: !Ref CertTokenTtlSeconds
+      Policies:
+        - Statement:
+            - Sid: ReadCertBucket
+              Effect: Allow
+              Action:
+                - s3:GetObject
+              Resource: !Sub "arn:aws:s3:::${CertBucketName}/*"
       FunctionUrlConfig:
         AuthType: NONE
         Cors:
