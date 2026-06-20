@@ -47,6 +47,30 @@
   .pagefind-ui__filter-name {
     font-weight: 700;
   }
+
+  /* Mobile: Pagefind UI stacks the filter sidebar above the results,
+     pushing the first hit ~950 px down on a 375-wide viewport. Flip the
+     order so results render first; the filter panel becomes a
+     compact below-results section users can scroll to. */
+  @media (max-width: 767px) {
+    .pagefind-ui__drawer {
+      display: flex;
+      flex-direction: column;
+    }
+    .pagefind-ui__results-area {
+      order: 1;
+    }
+    .pagefind-ui__filter-panel {
+      order: 2;
+      margin-top: 1.5rem;
+      border-top: 1px solid var(--neutral-200, #e2e6ea);
+      padding-top: 1rem;
+    }
+    .pagefind-ui__filter-panel-label {
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+  }
 </style>
 {% endblock %}
 
