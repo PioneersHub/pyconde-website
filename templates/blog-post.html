@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
 
 {% block title %}{{ this.title }}{% endblock %}
 
@@ -38,9 +39,17 @@
   "isPartOf": { "@id": "{{ host }}/#event-{{ site.config.PROJECT.year }}" }
 }
 </script>
+{{ breadcrumb_jsonld([
+    ('/blog/', 'Blog'),
+    (this.url_path, this.title),
+]) }}
 {% endblock %}
 
 {% block body %}
+{{ breadcrumb([
+    ('/blog/', 'Blog'),
+    (none, this.title),
+]) }}
 <article class="blog-article">
   <header class="subsite">
     <div class="subsite-title">

@@ -42,15 +42,8 @@
   {%- set page_title = this.meta_title or this.title or this.name or self.title()|striptags -%}
   <meta property="og:title" content="{{ page_title }}">
 
-  {% if this.social_card_image %}{% set turl = this.social_card_image %}
-  <meta name="image" property="og:image:secure_url" content="{{ site.config.PROJECT.url }}{{ turl|url }}">
-  <meta name="image" property="og:image" content="{{ site.config.PROJECT.url }}{{ turl|url }}">
-  {% else %}
-  <meta name="image" property="og:image:secure_url"
-    content="{{ site.config.PROJECT.url }}{{ site.config.PROJECT.social_card|url }}">
-  <meta name="image" property="og:image"
-    content="{{ site.config.PROJECT.url }}{{ site.config.PROJECT.social_card|url }}">
-  {% endif %}
+  {%- set page_image = (this.social_card_image|url) if this.social_card_image else (site.config.PROJECT.social_card|url) -%}
+  <meta property="og:image" content="{{ site.config.PROJECT.url }}{{ page_image }}">
 
   <meta property="og:description" content="{{ page_description }}">
   <meta property="og:url" content="{{ branding['canonical_host'] }}{{ this.url_path }}">
@@ -218,7 +211,7 @@
         </nav>
         <hr class="footer-links__separator" />
         <nav class="footer-links__legal" aria-label="Legal links">
-          <a href="/code-of-conduct/">Code of Conduct</a>
+          <a href="https://pioneershub.github.io/pyconde-conference/code-of-conduct/" target="_blank" rel="noopener">Code of Conduct</a>
           <a href="/privacy-policy/">Privacy Policy</a>
           <a href="/imprint/">Imprint</a>
         </nav>
