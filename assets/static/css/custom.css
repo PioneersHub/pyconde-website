@@ -3401,6 +3401,31 @@ main:focus { outline: none; }
     display: none;
 }
 
+/* Links inside the dark/blue subsite-title hero need a light colour
+   to stay visible. The default site link colour is the same blue
+   as the hero background, so an unstyled <a> reads as invisible
+   text — only the trailing period was rendering on /talks/'s
+   archive-pointer paragraph because the parent text colour is
+   black inside that span. White with an underline keeps semantics
+   + WCAG. The :not() chain matches the specificity of the
+   existing `.subsite .content a:not(...)` rule above so the
+   later declaration wins on source order; an extra `.subsite-title`
+   class would also win on its own, but we keep the symmetric form
+   to make the intent obvious. */
+.subsite .subsite-title .content a:not(.button):not(.slide-cta):not(.blog-card):not(.talk):not(.archive-edition__subnav-link),
+.subsite-title .content a {
+  color: #fff;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.subsite .subsite-title .content a:not(.archive-edition__subnav-link):hover,
+.subsite-title .content a:hover,
+.subsite-title .content a:focus {
+  color: var(--yellow, #ffc34d);
+  text-decoration-thickness: 2px;
+}
+
 /* ── Mobile: speakers-grid two-column override ───────────────────────
    Lives at the end of the file so it comes AFTER every default
    .speakers-grid / .speaker-card__avatar rule and wins on
