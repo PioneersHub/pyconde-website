@@ -2783,10 +2783,23 @@ main:focus { outline: none; }
 .speaker-meta {
   flex: 1 1 280px;
 }
+/* The speaker header sits on the dark/blue subsite-title hero;
+   pronoun / role / location lines must read as light text on dark to
+   clear WCAG AA. The base `.subsite .content p` rule wins on
+   specificity over a single-class `.speaker-meta`, so we chain
+   `.subsite .subsite-title` to get a (0,3,1) selector that beats
+   it. */
+.subsite .subsite-title .speaker-meta,
+.subsite .subsite-title .speaker-meta p {
+  color: #fff;
+}
 .speaker-name { margin: 0 0 0.4rem 0; }
 .speaker-pronouns {
   margin: 0 0 0.2rem 0;
   font-size: 0.95rem;
+  /* opacity 0.85 keeps the subtle visual hierarchy without dropping
+     contrast below the 4.5:1 threshold for normal text against the
+     blue hero. */
   opacity: 0.85;
 }
 .speaker-role {
