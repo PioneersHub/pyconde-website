@@ -3230,6 +3230,22 @@ main:focus { outline: none; }
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 40ch;
+  min-width: 0;
+}
+
+/* Mobile: the persistent hamburger menu sits at top-left ~18px from
+   the edge. The breadcrumb's first item collides with it without
+   extra left padding. Tighten max-width on the current-page label
+   so long talk titles get a clean ellipsis instead of being clipped
+   at the right edge. */
+@media (max-width: 1023px) {
+  .breadcrumb {
+    padding-left: 4rem;
+    padding-right: 1rem;
+  }
+  .breadcrumb__current {
+    max-width: calc(100vw - 11rem);
+  }
 }
 
 /* ── Talk transcript section ────────────────────────────────────────── */
