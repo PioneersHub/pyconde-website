@@ -17,6 +17,39 @@
   {%- set _ = crumb_trail.append((this.url_path, 'Talks')) -%}
 {%- endif -%}
 {{ breadcrumb_jsonld(crumb_trail) }}
+{# ItemList of every talk on this listing — mirrors the /speakers/ pattern
+   so crawlers and AI assistants can ingest the programme in one
+   structured document. Each entry references the talk's Event @id so
+   the connection between the list and per-talk Event schema is
+   machine-readable. #}
+{%- set branding = bag('branding') -%}
+{%- set host = branding['canonical_host'] -%}
+{%- set real_talks = [] -%}
+{%- for t in this.children -%}
+  {%- if t['_model'] != 'redirect' -%}{%- set _ = real_talks.append(t) -%}{%- endif -%}
+{%- endfor %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "@id": "{{ host }}{{ this.url_path }}#talks",
+  "url": "{{ host }}{{ this.url_path }}",
+  "name": {{ this.title|tojson }},
+  "numberOfItems": {{ real_talks|length }},
+  "itemListOrder": "https://schema.org/ItemListOrderUnordered",
+  "itemListElement": [
+    {%- for talk in real_talks -%}
+    {
+      "@type": "ListItem",
+      "position": {{ loop.index }},
+      "url": "{{ host }}{{ talk|url }}",
+      "name": {{ talk.title|tojson }}{% if talk.code %},
+      "item": { "@id": "{{ host }}{{ talk|url }}#event" }{% endif %}
+    }{{ "," if not loop.last }}
+    {%- endfor -%}
+  ]
+}
+</script>
 {% endblock %}
 
 {% block body %}

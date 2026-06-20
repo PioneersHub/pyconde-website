@@ -56,6 +56,11 @@
   <meta property="og:url" content="{{ branding['canonical_host'] }}{{ this.url_path }}">
   <meta property="og:type" content="{% block og_type %}website{% endblock %}">
   <meta property="og:locale" content="{% block og_locale %}en_US{% endblock %}">
+  {# Most pages are English; /faqs-de/ and any future German-only content
+     can override og_locale and skip the alternate. For the EN pages we
+     flag DE-FAQ as a content alternate so DE-locale crawlers know it
+     exists. #}
+  {% block og_locale_alternate %}<meta property="og:locale:alternate" content="de_DE">{% endblock %}
   <meta property="article:publisher" content="{{ site.config.PROJECT.url }}">
   <meta property="og:site_name" content="PyCon DE &amp; PyData">
 
