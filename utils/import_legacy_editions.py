@@ -223,6 +223,71 @@ MULTI_2017 = {
 }
 
 
+# 2017 talk slug -> (youtube_id, ISO-8601 duration). Matched from the official
+# 2017 PyCon DE YouTube playlist (PLHd2BPBhxqRI_HtgmPJcm3LPAlhdX6J9v) by
+# fuzzy title match and 100% eyeball-verified. 56 of 63 talks have a recording;
+# the 7 without are tutorials/workshops that were not recorded, plus the three
+# lightning-talk compilation videos which have no individual session page.
+YT_2017 = {
+    'an-admin-s-cornucopia-python-is-more-than-just-a-better-bash': ('CQ3qwmld5V8', 'PT29M42S'),
+    'an-introduction-to-pymc3': ('FKhivuCLIT0', 'PT43M32S'),
+    'and-now-to-something-else-real-time-data-processing-billiger-de': ('en7XcpYxLU4', 'PT32M41S'),
+    'automated-testing-with-400tb-memory': ('Lro5wC_HxhE', 'PT32M39S'),
+    'building-your-own-sdn-with-debian-linux-salt-stack-and-python': ('yH_0hptXL94', 'PT37M8S'),
+    'connecting-pydata-to-other-big-data-landscapes-using-arrow-and-parquet': ('-IvLScEcoO8', 'PT31M43S'),
+    'data-plumbing-101-etl-pipelines-for-everyday-projects': ('D7fYa0NrCuE', 'PT27M56S'),
+    'data-science-best-practices-from-proof-of-concepts-to-production': ('OPw0VrZdLdo', 'PT28M33S'),
+    'data-science-project-for-beginners': ('4BBCqCgVDLI', 'PT30M48S'),
+    'deep-learning-for-computer-vision': ('X4Q6C915sUY', 'PT41M30S'),
+    'effective-data-analysis-with-pandas-indexes': ('-E2VTtdwT9U', 'PT30M52S'),
+    'empowered-by-python-a-success-story': ('2Ku3tV3QQ3M', 'PT29M50S'),
+    'flow-is-in-the-air-best-practices-of-building-analytical-data-pipelines-with-apa': ('Ea3smcbnGxE', 'PT47M46S'),
+    'from-0-to-continuous-delivery-in-30-minutes': ('yqpOrB0JDto', 'PT30M51S'),
+    'from-java-to-python-migrating-search-functionality-at-billiger-de': ('2fuW9ITUXrU', 'PT29M18S'),
+    'getting-scikit-learn-to-run-on-top-of-pandas': ('boXOVvu43ZI', 'PT28M59S'),
+    'graphql-in-the-python-world': ('FpQpF0BTrJU', 'PT25M3S'),
+    'hacking-the-python-ast': ('kaxAF542Cic', 'PT36M6S'),
+    'high-performance-ingestion-with-python-and-swarm64db': ('L4EdHKLB_08', 'PT40M59S'),
+    'integrating-jupyter-notebooks-into-your-infrastructure': ('xplmuHEFqCg', 'PT32M49S'),
+    'keeping-the-grip-on-decoupled-code-using-clis': ('F20vrgQCFMs', 'PT20M57S'),
+    'large-scale-machine-learning-pipelines-using-luigi-pyspark-and-scikit-learn': ('VFB0rcfFCbg', 'PT32M28S'),
+    'lift-your-speed-limits-with-cython': ('nTKQkm8U0zE', 'PT42M1S'),
+    'master-2-5-gb-of-unstructured-specification-documents-with-ease': ('g277gRcG84I', 'PT30M25S'),
+    'matthew-rocklin': ('rZlshXJydgQ', 'PT1H2M52S'),
+    'michael-feindt': ('Ndi4hqSdBi4', 'PT1H11M52S'),
+    'migrating-existing-codebases-to-using-type-annotations': ('JKvtrb2GWMY', 'PT37M32S'),
+    'modern-etl-ing-with-python-and-airflow-and-spark': ('tcJhSaowzUI', 'PT26M36S'),
+    'no-compromise-use-ansible-properly-or-stick-to-your-scripts': ('7qipNlReXYg', 'PT28M12S'),
+    'observing-your-applications-with-sentry-and-prometheus': ('f3WO4bpLySs', 'PT22M54S'),
+    'platform-intrusion-detection-with-deep-learning': ('dXqBuZi7JOE', 'PT43M32S'),
+    'plugin-ecosystems-for-python-web-applications': ('5NxRdzLTFik', 'PT26M50S'),
+    'programming-the-web-of-things-with-python-and-micropython': ('JtsLlYvcRJI', 'PT46M23S'),
+    'project-avatar-telepresence-robotics-with-nao-and-kinect': ('SGpdc-9QAWE', 'PT37M32S'),
+    'python-in-space-the-n-body-problem': ('E1nx4ReTgps', 'PT41M4S'),
+    'python-is-weird': ('zz9yLOXo2Qk', 'PT26M35S'),
+    'python-on-bare-metal-beginners-tutorial-with-micropython-on-the-pyboard': ('MpRXnyFeEwg', 'PT40M24S'),
+    'python-with-apache-openwhisk': ('E9Yj4g9LuJc', 'PT30M5S'),
+    'rasa-open-source-conversational-ai-to-build-next-generation-chatbots': ('LEFF7-_uh3M', 'PT30M32S'),
+    'really-deep-neural-networks-with-pytorch': ('ZUHhNuw9Tlc', 'PT40M39S'),
+    'simple-data-engineering-in-python-3-5-with-bonobo': ('3agWJTRn2cc', 'PT32M26S'),
+    'sport-analysis-with-python': ('Fl6YFdf37IE', 'PT23M29S'),
+    'susanne-mertens': ('3h-6GBBF4Hg', 'PT57M23S'),
+    'synthetic-data-for-machine-learning-applications': ('riT9KTkBj0E', 'PT45M10S'),
+    'technical-lessons-learned-from-pythonic-refactoring': ('Yq9-b2JKUyU', 'PT31M3S'),
+    'the-borgbackup-project': ('oLFMsP1GMa0', 'PT30M20S'),
+    'the-eye-of-the-python-an-eye-tracking-system-from-zero-to-what-eye-learned': ('JckAPb-HpME', 'PT39M54S'),
+    'the-mustache-movement': ('9lVbpzd1hWk', 'PT28M34S'),
+    'the-python-ecosystem-for-data-science-a-guided-tour': ('BIWcciNeMm0', 'PT37M24S'),
+    'the-snake-in-the-tar-pit-complex-systems-with-python': ('pee-e01DiyI', 'PT41M11S'),
+    'theoretical-physics-with-sympy': ('Ax0et1ZOOTc', 'PT33M1S'),
+    'time-series-feature-extraction-with-tsfresh-get-rich-or-die-overfitting': ('Fm8zcOMJ-9E', 'PT27M11S'),
+    'turbodbc-turbocharged-database-access-for-data-scientists': ('B-uj8EDcjLY', 'PT32M33S'),
+    'verified-fakes-with-openapi': ('NZqovz37Qcw', 'PT7M16S'),
+    'vim-your-python-python-your-vim': ('prnndyNV60w', 'PT29M31S'),
+    'why-python-has-taken-over-finance': ('aXh7K6cFA8g', 'PT32M49S'),
+}
+
+
 def speaker_line_links(links: list[str]) -> tuple[str, str]:
     """From the speaker-line [LINK]s, return (homepage, github).
 
@@ -302,6 +367,16 @@ def build_2017(speakers: Speakers) -> list[dict]:
             submission_type={"talk": "talk", "tutorial": "tutorial", "keynote": "keynote"}[kind],
             submission_type_label={"talk": "Talk", "tutorial": "Tutorial", "keynote": "Keynote"}[kind],
         ))
+
+    # Attach YouTube recordings (matched from the 2017 playlist).
+    for t in talks:
+        yt = YT_2017.get(t["slug"])
+        if yt:
+            vid, dur = yt
+            t["youtube_id"] = vid
+            t["video_link"] = f"https://www.youtube.com/watch?v={vid}"
+            t["video_thumbnail"] = f"https://i.ytimg.com/vi/{vid}/maxresdefault.jpg"
+            t["video_duration_iso"] = dur
     return talks
 
 
@@ -405,12 +480,12 @@ def write_talk(year: int, t: dict, created: str) -> None:
         ("supporting_material_url", ""),
         ("slides_link", ""),
         ("social_card_image", ""),
-        ("youtube_id", ""),
+        ("youtube_id", t.get("youtube_id", "")),
         ("video_link", t.get("video_link", "")),
         ("video_published_at", ""),
-        ("video_duration_iso", ""),
-        ("video_thumbnail", ""),
-        ("recording_available", "yes" if t.get("video_link") else "no"),
+        ("video_duration_iso", t.get("video_duration_iso", "")),
+        ("video_thumbnail", t.get("video_thumbnail", "")),
+        ("recording_available", "yes" if (t.get("video_link") or t.get("youtube_id")) else "no"),
     ]
     (d / "contents.lr").write_text(lr(fields), encoding="utf-8")
 
@@ -480,16 +555,17 @@ def main() -> None:
         write_talk(2017, t, created="2017-10-25")
     for sp in sp17.by_key.values():
         write_speaker(2017, sp)
+    n_rec17 = sum(1 for t in talks17 if t.get("youtube_id"))
     write_edition(
         2017, "PyCon.DE 2017 & PyData Karlsruhe",
         "2017-10-25", "2017-10-27", "ZKM | Center for Art and Media, Karlsruhe",
         "The 2017 edition of PyCon.DE & PyData Karlsruhe took place 25–27 October 2017 "
         "at the ZKM in Karlsruhe. Browse the [archived talks](talks/) and [speakers](speakers/) "
         "below, or revisit the [original conference site](https://2017.pycon.de/).",
-        len(talks17), 0,
+        len(talks17), n_rec17,
         "PyCon.DE 2017 & PyData Karlsruhe — Talks",
         "PyCon.DE 2017 & PyData Karlsruhe — Speakers")
-    print(f"2017: {len(talks17)} talks, {len(sp17.by_key)} speakers")
+    print(f"2017: {len(talks17)} talks, {len(sp17.by_key)} speakers, {n_rec17} recordings")
 
     # 2016
     sp16 = Speakers()
