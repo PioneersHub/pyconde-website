@@ -6,7 +6,10 @@
 {%- set segment = this.url_path.rstrip('/').split('/')[-1].replace('.xml', '') -%}
 
 {%- macro keep(p) -%}
-  {%- if p.url_path in noindex_paths -%}{%- elif p['_hidden'] -%}{%- else -%}
+  {#- Skip noindex paths, hidden pages, and redirect pages. The Pretalx
+      code -> slug redirects (and any databags/redirects.yaml entries) are
+      _model: redirect 301/noindex stubs and must never appear in a sitemap. -#}
+  {%- if p.url_path in noindex_paths -%}{%- elif p['_hidden'] -%}{%- elif p['_model'] == 'redirect' -%}{%- else -%}
     {%- set path = p.url_path -%}
     {%- if segment == 'talks-current' and path.startswith('/talks/') and path != '/talks/' -%}yes
     {%- elif segment == 'talks-archive' and '/archive/' in path and '/talks/' in path and path != '/talks/' and path.endswith('/') and (path.count('/') == 5) -%}yes
