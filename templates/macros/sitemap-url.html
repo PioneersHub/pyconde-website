@@ -5,7 +5,18 @@
 {%- macro url_entry(page) -%}
   <url>
     <loc>{{ page|url(external=true) }}</loc>
+    {#- lastmod is the most recent of the page's publish/created date and the
+        recording's upload date, so a video sync (which only rewrites the
+        youtube_id / video_published_at fields) still moves <lastmod> and
+        triggers a recrawl. Compare as ISO date strings (lexicographic order). -#}
     {%- set lastmod = page['pub_date'] or page['created'] -%}
+    {%- if page['video_published_at'] -%}
+      {%- set vpub = page['video_published_at']|string -%}
+      {%- set pub_s = (lastmod|string) if lastmod else '' -%}
+      {%- if not pub_s or vpub > pub_s -%}
+        {%- set lastmod = page['video_published_at'] -%}
+      {%- endif -%}
+    {%- endif %}
     {%- if lastmod %}
     <lastmod>{{ lastmod }}</lastmod>
     {%- endif %}

@@ -1,6 +1,8 @@
 {% extends "layout.html" %}
 {% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
 {% from "macros/related-talks.html" import related_panel %}
+{% from "macros/funnel-cta.html" import render_funnel_cta %}
+{% from "macros/newsletter-inline.html" import render_newsletter_inline %}
 
 {% block title %}{{ this.title }}{% endblock %}
 
@@ -307,5 +309,9 @@
 </article>
 
 {{ related_panel(this, my_speakers, talks_root, speakers_root, archive_year if is_archive else '') }}
+
+{{ render_funnel_cta(bag('site_state')) }}
+
+{{ render_newsletter_inline(bag('newsletter')) }}
 
 {% endblock %}

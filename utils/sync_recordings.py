@@ -420,6 +420,10 @@ def main() -> None:
     )
     parser.add_argument("--talk-code", help="Limit sync to a single talk code.")
     parser.add_argument(
+        "--codes",
+        help="Comma-separated list of Pretalx codes to limit sync to (a batch).",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Report what would change without writing files.",
@@ -442,6 +446,16 @@ def main() -> None:
         filtered = {args.talk_code: code_map[args.talk_code]} if args.talk_code in code_map else {}
         if not filtered:
             print(f"No video found for {args.talk_code}; nothing to do.")
+            return
+        code_map = filtered
+    elif args.codes:
+        wanted = {c.strip() for c in args.codes.split(",") if c.strip()}
+        filtered = {c: v for c, v in code_map.items() if c in wanted}
+        missing = sorted(wanted - set(code_map))
+        if missing:
+            print(f"  No video mapping for {len(missing)} batch code(s): {', '.join(missing)}")
+        if not filtered:
+            print("No batch codes matched a video; nothing to do.")
             return
         code_map = filtered
 

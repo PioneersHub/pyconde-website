@@ -132,6 +132,11 @@
   {% block header %}
   {% endblock %}
 {% block extra_head %}{% endblock %}
+
+  {# Analytics & retargeting pixels — fires only in production (seo.env)
+     and when analytics.enabled. Local dev stays pixel-free. #}
+  {% from "macros/analytics-head.html" import render_analytics_head %}
+  {{ render_analytics_head(bag('analytics'), bag('seo')) }}
 </head>
 
 {% if this.full_landing_page %}

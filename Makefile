@@ -6,7 +6,7 @@ else
     RUN = PYTHONWARNINGS=ignore::ResourceWarning
 endif
 
-build: redirects tracks lektor-build pagefind
+build: redirects tracks topic-hubs lektor-build pagefind
 
 lektor-build:
 	$(RUN) lektor build -O site
@@ -22,6 +22,9 @@ redirects:
 tracks:
 	@echo "Regenerating per-track content folders..."
 	$(RUN) python utils/generate_tracks.py
+topic-hubs:
+	@echo "Regenerating cross-edition topic-hub pages..."
+	$(RUN) python utils/generate_topic_hubs.py
 
 clean-plugin-cache:
 	@echo "Clearing plugin and Lektor caches..."
@@ -48,3 +51,11 @@ disable-conference:
 	$(RUN) ./utils/disable-conference
 landing-page:
 	$(RUN) python utils/landing_page.py
+flip-pricing:
+	$(RUN) python utils/flip_pricing.py $(if $(PERIOD),--period $(PERIOD))
+publish-video-batch:
+	@if [ -z "$(YEAR)" ] || [ -z "$(BATCH)" ]; then \
+		echo "Usage: make publish-video-batch YEAR=2026 BATCH=llm-agents"; \
+		exit 2; \
+	fi
+	$(RUN) python utils/publish_video_batch.py --year $(YEAR) --batch $(BATCH)

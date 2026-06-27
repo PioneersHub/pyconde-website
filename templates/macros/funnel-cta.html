@@ -1,0 +1,48 @@
+{#
+  Archive funnel-CTA
+  ─────────────────
+  Persistent "tickets on sale" module for archive surfaces (talk,
+  speaker, track, edition pages). Rides the landing-page active/
+  inactive switch via databags/site_state.yaml so it auto-appears
+  when the cycle opens and retires when the site flips to recap —
+  no per-template editing at each milestone.
+
+  Usage:
+    {% from "macros/funnel-cta.html" import render_funnel_cta %}
+    {{ render_funnel_cta(bag('site_state')) }}
+
+  Databag schema (site_state.yaml):
+    mode: active | inactive
+    headline: "PyCon DE & PyData 2027 — tickets on sale"
+    sub: "Returns to the darmstadtium, Darmstadt, 14–16 April 2027."
+    tickets_url: /buy-ticket/
+    tickets_label: "Get your ticket"
+    early_bird_until: "10 February 2027"
+
+  Self-hides unless mode == active and headline is set.
+#}
+
+{% macro render_funnel_cta(state) %}
+
+{% if state and state.mode == 'active' and state.headline %}
+
+<aside class="funnel-cta" aria-label="Tickets on sale">
+  <div class="funnel-cta__content">
+    <p class="funnel-cta__headline">{{ state.headline }}</p>
+    {% if state.sub %}
+    <p class="funnel-cta__sub">{{ state.sub }}</p>
+    {% endif %}
+    {% if state.early_bird_until %}
+    <p class="funnel-cta__deadline">Early bird until {{ state.early_bird_until }}.</p>
+    {% endif %}
+    {% if state.tickets_url and state.tickets_label %}
+    <a href="{{ state.tickets_url }}" class="funnel-cta__link">
+      {{ state.tickets_label }}
+    </a>
+    {% endif %}
+  </div>
+</aside>
+
+{% endif %}
+
+{% endmacro %}

@@ -69,7 +69,8 @@
       "highPrice": {{ tickets['aggregate']['high_price'] }},
       "offerCount": {{ tickets['aggregate']['offer_count'] }},
       "validThrough": {{ tickets['valid_through']|tojson }},
-      "category": "Conference Ticket"
+      {% if tickets['price_valid_until'] %}"priceValidUntil": {{ tickets['price_valid_until']|tojson }},
+      {% endif %}"category": "Conference Ticket"
     }
     {%- else %}
     "offers": {
@@ -93,6 +94,24 @@
     {# ── Motto statement — bold on white ── #}
     {% from "macros/hero.html" import render_hero %}
     {{ render_hero(bag('motto')) }}
+
+    {# ── Programme status — milestone band (CFP / voting / accepted / schedule / live).
+         One databag flip per staggered reveal; self-hides when status empty. ── #}
+    {% from "macros/programme-status.html" import render_programme_status %}
+    {{ render_programme_status(bag('programme_status')) }}
+
+    {# ── Key dates — canonical "what's next", data-driven from keydates.yaml ── #}
+    {% from "macros/keydates.html" import render_keydates %}
+    {{ render_keydates(bag('keydates')) }}
+
+    {# ── Topics — discovery band of pill tags ── #}
+    {% from "macros/topics.html" import render_topics %}
+    {{ render_topics(bag('topics')) }}
+
+    {# ── Keynote reveals — staggered; self-hides until a keynote is
+         flipped to `revealed: true` in databags/keynotes.yaml ── #}
+    {% from "macros/keynote-teaser.html" import render_keynote_teaser %}
+    {{ render_keynote_teaser(bag('keynotes')) }}
 
 
     {# ── Featured speakers carousel ── #}
@@ -120,6 +139,10 @@
     {# ── Why Attend ── #}
     {% from "macros/why-attend.html" import render_why_attend %}
     {{ render_why_attend(bag('why_attend')) }}
+
+    {# ── Numbers bar — schema-citable social proof ── #}
+    {% from "macros/stats.html" import render_stats %}
+    {{ render_stats(bag('stats')) }}
 
     {# ── Community spotlight ── #}
     {% from "macros/community.html" import render_community %}

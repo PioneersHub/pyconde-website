@@ -1,31 +1,39 @@
 # Ticket pricing for the current edition.
 #
-# Single source of truth for the conference-pass Offer / AggregateOffer
-# in schema.org JSON-LD. Templates pull from here so Google Rich Results
-# can show price hints in the SERP and so AI search engines have a
-# verifiable price assertion.
+# Single source of truth for BOTH:
+#  - the schema.org AggregateOffer JSON-LD (read by
+#    templates/landing-page-active.html), and
+#  - the UI tickets CTA (databags/tickets_cta.yaml, kept in sync by
+#    `make flip-pricing` via utils/flip_pricing.py).
 #
-# Prices below are the public conference passes only; sponsor / partner
-# passes, financial-aid recipients, and masterclass / sprint tickets are
-# not modelled here.
+# `make flip-pricing` flips `active_period` (early -> late) and
+# rewrites `aggregate` + `price_valid_until` + the UI CTA copy from
+# the tier list below, so schema and UI never drift. Roll back with
+# `make flip-pricing PERIOD=early`.
 #
-# Update on each pricing tier change. The `lowPrice` and `highPrice` of
-# the AggregateOffer should bracket every public retail tier currently
-# on sale at https://2026.pycon.de/buy-ticket/.
+# Prices are the public conference passes only. Update the tier
+# prices for each cycle; the aggregate is derived by the flip helper.
 
 currency: EUR
 
-# Date the public sale window closes — conference last day for the
-# conference pass; templates use it as Offer.validThrough.
-valid_through: "2026-04-16"
+# Public sale window close — Offer.validThrough for the late period.
+valid_through: "2027-04-16"
 
-# Switch point between Early-Bird and Late-Bird. Informational only;
-# AggregateOffer doesn't have per-tier dates so this just helps humans
-# reading the YAML.
-late_bird_from: "2026-02-12"
+# Switch point Early -> Late (informational + drives the early-period
+# price_valid_until = this date minus one day).
+late_bird_from: "2027-02-11"
 
-# Tier list — order is preserved in rendered output. `kind` informs
-# whether a tier counts toward the public-retail bracket.
+# Which tier set is on sale now. flip_pricing.py toggles this and
+# rewrites `aggregate` + `price_valid_until` to match.
+active_period: early
+
+# priceValidUntil for the currently-on-sale period:
+#  - early: late_bird_from - 1 day
+#  - late:  valid_through
+price_valid_until: "2027-02-10"
+
+# Tier list — order preserved in rendered output. `kind: public`
+# counts toward the public-retail AggregateOffer bracket.
 tiers:
   - id: 3day-standard-early
     kind: public
@@ -48,10 +56,10 @@ tiers:
     period: "Late Bird"
     price: 550
 
-# AggregateOffer hints — explicit so the template doesn't have to
-# min/max-derive from the tier list. Update together when adjusting
-# tiers above.
+# AggregateOffer hints for the CURRENTLY on-sale period only.
+# Derived by flip_pricing.py from the tiers whose `period` matches
+# active_period — do not hand-edit; run `make flip-pricing`.
 aggregate:
   low_price: 400
-  high_price: 890
-  offer_count: 4
+  high_price: 690
+  offer_count: 2
