@@ -791,23 +791,26 @@ button.pretix-widget-button[type="submit"] {
    Design customizations v3–v9 (consolidated 2026-03-01)
    ══════════════════════════════════════════════════════════════ */
 
+/* §06 primary button — yellow fill, ink text + border (authoritative for the
+   newsletter CTA; more specific than the shared .newsletter__cta group). */
 .newsletter a.newsletter__cta {
     display: inline-block;
     padding: 0.8em 2.2em;
-    background: var(--white);
-    color: #1a1a1a;
-    font-weight: 600;
+    background: var(--yellow);
+    color: var(--text-primary);
+    border: 2px solid var(--text-primary);
+    font-weight: 700;
     font-size: var(--font-size-base);
     border-radius: 0;
     text-decoration: none;
-    transition: background 0.2s, transform 0.1s;
+    transition: all var(--t-fast) var(--ease);
 }
 
+/* Hover: 10 % darker yellow, transform stays flat (§06 / §10). */
 .newsletter__cta:hover,
 .newsletter__cta:focus {
-    background: var(--yellow);
-    color: #1a1a1a;
-    transform: translateY(-1px);
+    background: #e0b300;
+    color: var(--text-primary);
 }
 
 /* ── Persistent Desktop Top Nav ─────────────────────────── */
@@ -1389,8 +1392,10 @@ button.pretix-widget-button[type="submit"] {
     color: var(--text-primary);
 }
 
+/* Friendly, engaging brand colour for the subscribe band (green primary,
+   white text per §02 — pairs with the yellow §06 CTA). */
 .newsletter {
-    background: var(--text-primary);
+    background: var(--green);
     color: var(--white);
 }
 
@@ -2069,20 +2074,22 @@ section.subsite.team .content {
     text-transform: uppercase;
     letter-spacing: 0.08em;
     text-decoration: none;
-    transition: background 0.15s ease, color 0.15s ease;
+    /* §06 button motion — guide easing, 120 ms */
+    transition: all var(--t-fast) var(--ease);
 }
 
-/* Primary CTA — filled */
+/* Primary CTA — filled yellow, ink border (§06 .btn-primary) */
 .tickets-cta__link,
 .newsletter__cta {
     background: var(--yellow);
     color: var(--text-primary);
-    border: 2px solid var(--yellow);
+    border: 2px solid var(--text-primary);
 }
 
+/* Hover: 10 % darker yellow (§06) */
 .tickets-cta__link:hover,
 .newsletter__cta:hover {
-    background: var(--white);
+    background: #e0b300;
     color: var(--text-primary);
 }
 
@@ -2100,11 +2107,27 @@ section.subsite.team .content {
     color: var(--white);
 }
 
+/* §06 button states — active press + keyboard focus ring (all CTAs) */
+.tickets-cta__link:active,
+.community__link:active,
+.newsletter__cta:active,
+.sponsoring-cta__link:active {
+    transform: scale(0.97);
+}
+
+.tickets-cta__link:focus-visible,
+.community__link:focus-visible,
+.newsletter__cta:focus-visible,
+.sponsoring-cta__link:focus-visible {
+    outline: 3px solid var(--orange);
+    outline-offset: 2px;
+}
+
 /* ── Footer: Consistent with site design language ───────── */
+/* Top accent is the seven-colour brand bar (see .brand-bar); no single-colour border. */
 footer {
     background: var(--text-primary);
     color: rgba(255, 255, 255, 0.8);
-    border-top: 4px solid var(--yellow);
 }
 
 footer a {
@@ -3577,6 +3600,7 @@ main:focus { outline: none; }
   .footer-links__editions-all {
     margin-left: 0;
   }
+}
 
 /* Loading + error states for JS-driven cert share page */
 .cert-card__loading,
@@ -3671,3 +3695,108 @@ main:focus { outline: none; }
     -webkit-box-orient: vertical;
   }
 }
+
+/* 2027 hero logo is a portrait SVG — size by height, not the legacy
+   width-led max-width caps in main.css. */
+.intro__logo[src$="logo-2027-white.svg"] {
+    height: clamp(140px, 22vw, 220px);
+    width: auto;
+    max-width: none;
+}
+
+/* Latest talks / past-conference video release — horizontal slider,
+   one row, latest-first, scroll-snap (styled like the masterclass cards). */
+.latest-videos__title {
+    font-size: var(--font-size-3xl, 2rem);
+    margin: 0 0 1.25rem;
+}
+.latest-videos__track {
+    display: flex;
+    gap: 1.25rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.75rem;
+    scrollbar-width: thin;
+}
+.latest-videos__card {
+    flex: 0 0 auto;
+    width: clamp(15rem, 30vw, 20rem);
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid var(--neutral-200, #e2e6ea);
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--neutral-50, #f6f7f8);
+}
+.latest-videos__card:hover { border-color: var(--blue); }
+.latest-videos__thumb-wrap {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 9;
+}
+.latest-videos__thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.latest-videos__play {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-size: 1.75rem;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+}
+.latest-videos__info {
+    padding: 0.75rem 0.9rem 1rem;
+}
+.latest-videos__name {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+}
+.latest-videos__meta {
+    display: block;
+    color: var(--text-secondary, #555);
+    font-size: 0.9rem;
+}
+
+/* Latest blog post card — same layout as the latest-videos card
+   (preview image on top, then title + meta). */
+.latest-blog__title {
+    font-size: var(--font-size-3xl, 2rem);
+    margin: 0 0 1.25rem;
+}
+.latest-blog__card {
+    display: flex;
+    flex-direction: column;
+    width: clamp(15rem, 30vw, 20rem);
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid var(--neutral-200, #e2e6ea);
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--neutral-50, #f6f7f8);
+    transition: border-color var(--t-fast) var(--ease);
+}
+.latest-blog__card:hover { border-color: var(--blue); }
+.latest-blog__thumb-wrap {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 9;
+}
+.latest-blog__thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.latest-blog__info { padding: 0.75rem 0.9rem 1rem; }
+.latest-blog__name { display: block; font-weight: 700; margin-bottom: 0.2rem; }
+.latest-blog__meta { display: block; color: var(--text-secondary, #555); font-size: var(--font-size-sm); }

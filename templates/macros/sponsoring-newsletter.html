@@ -1,0 +1,37 @@
+{#
+  Sponsoring Newsletter CTA
+  ──────────────────────────
+  Front-page CTA band that sends prospects to the dedicated
+  sponsoring-newsletter signup page (content/sponsoring-newsletter/,
+  Brevo "Sponsoring Updates" form). Distinct from the attendee
+  newsletter CTA (fp_newsletter.yaml).
+
+  Usage:
+    {% from "macros/sponsoring-newsletter.html" import render_sponsoring_newsletter %}
+    {{ render_sponsoring_newsletter(bag('fp_sponsoring_newsletter')) }}
+
+  Databag schema (fp_sponsoring_newsletter.yaml):
+    display: true
+    title, body, link_text, link_url
+
+  Reuses the `sponsoring-cta` styling. Self-hides when display != true
+  or body is empty.
+#}
+
+{% macro render_sponsoring_newsletter(data, section_label='Sponsoring newsletter') %}
+
+{% if data and data.display != false and data.body %}
+
+<section class="sponsoring-cta" aria-label="{{ section_label }}">
+  <div class="content">
+    {% if data.title %}<h2 class="sponsoring-cta__title">{{ data.title }}</h2>{% endif %}
+    <p class="sponsoring-cta__body">{{ data.body }}</p>
+    {% if data.link_text and data.link_url %}
+    <a href="{{ data.link_url }}" class="sponsoring-cta__link">{{ data.link_text }}</a>
+    {% endif %}
+  </div>
+</section>
+
+{% endif %}
+
+{% endmacro %}

@@ -111,6 +111,11 @@ blockquote {
     --space-3xl: clamp(5rem, 4rem + 4vw, 10rem);              /* 80px → 160px */
     --space-page-margin: clamp(1.25rem, 5vw, 4rem);
 
+    /* Motion — Design Rules §11 (guide easing + durations) */
+    --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+    --t-fast: 120ms;
+    --t-normal: 240ms;
+
     /* Neutral palette for minimalist sections */
     --white: #ffffff;
     --off-white: #fafafa;
@@ -465,6 +470,23 @@ a {
 .site-footer {
     display: block;
 }
+
+/* Seven-colour brand bar — Design Rules §05 / guide footer motif.
+   Fixed colour order: yellow · cyan · blue · green · orange · lime · silver.
+   Order and colours must not be altered. */
+.brand-bar {
+    display: flex;
+    height: 14px;
+    width: 100%;
+}
+.brand-bar span { flex: 1; }
+.brand-bar span:nth-child(1) { background: var(--yellow); }
+.brand-bar span:nth-child(2) { background: var(--blue-light); }   /* cyan */
+.brand-bar span:nth-child(3) { background: var(--blue); }
+.brand-bar span:nth-child(4) { background: var(--green); }
+.brand-bar span:nth-child(5) { background: var(--orange); }
+.brand-bar span:nth-child(6) { background: var(--green-light); }  /* lime */
+.brand-bar span:nth-child(7) { background: var(--grey); }         /* silver */
 
 .footer-outro .content {
     padding: 0;
@@ -2281,9 +2303,10 @@ a.newsletter.cta {
     gap: var(--space-sm);
     padding: var(--space-lg) var(--space-md);
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
+    /* Square corners + colour spine — Design Rules §11 (no radius) / §06 card accent bar */
     border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: background 0.2s ease;
+    border-left: 6px solid var(--yellow);
+    transition: background var(--t-normal) var(--ease);
 }
 
 .keydates__item:hover {
@@ -2295,7 +2318,6 @@ a.newsletter.cta {
     font-weight: 700;
     display: inline-block;
     padding: 0.3em 0.7em;
-    border-radius: 4px;
     color: white;
 }
 
@@ -2306,6 +2328,15 @@ a.newsletter.cta {
 .keydates__date--yellow     { background: var(--yellow); color: var(--text-primary); }
 .keydates__date--green      { background: var(--green); }
 .keydates__date--red        { background: var(--red); }
+
+/* Colour spine matches the date badge (§06 card accent bar) */
+.keydates__item--blue        { border-left-color: var(--blue); }
+.keydates__item--green-light { border-left-color: var(--green); }
+.keydates__item--orange      { border-left-color: var(--orange); }
+.keydates__item--pink        { border-left-color: var(--pink); }
+.keydates__item--yellow      { border-left-color: var(--yellow); }
+.keydates__item--green       { border-left-color: var(--green); }
+.keydates__item--red         { border-left-color: var(--red); }
 
 .keydates__label {
     font-size: var(--font-size-sm);
@@ -2410,7 +2441,9 @@ a.newsletter.cta {
     padding: var(--space-2xl) 0;
     background: var(--blue-light);
     color: white;
-    text-align: center;
+    /* Left-aligned to match the other front-page sections (latest videos,
+       blog, sponsoring). */
+    text-align: left;
 }
 
 .newsletter__title {
@@ -2422,9 +2455,9 @@ a.newsletter.cta {
 
 .newsletter__body {
     font-size: var(--font-size-lg);
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.92);
     max-width: 500px;
-    margin: 0 auto var(--space-lg);
+    margin: 0 0 var(--space-lg);
     line-height: 1.55;
     font-weight: 400;
 }

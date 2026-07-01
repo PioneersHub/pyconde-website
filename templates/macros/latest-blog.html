@@ -1,0 +1,56 @@
+{#
+  Latest Blog Post
+  ────────────────
+  Surfaces the newest blog post on the front page as a linked card.
+  /blog children are ordered -pub_date (models/blog.ini), so
+  `.children|first` is the latest post.
+
+  Usage:
+    {% from "macros/latest-blog.html" import render_latest_blog %}
+    {{ render_latest_blog(bag('fp_latest_blog')) }}
+
+  Databag schema (fp_latest_blog.yaml):
+    display: true
+    section_title: "From the blog"
+    link_text: "Read the latest post"
+
+  Self-hides when display != true or there are no blog posts.
+#}
+
+{% macro render_latest_blog(data, section_label='Latest from the blog') %}
+
+{% if data and data.display != false %}
+
+{%- set blog = site.get('/blog') -%}
+{%- set post = (blog.children|first) if blog else none -%}
+
+{% if post %}
+
+{%- set thumb = post.social_card_image or '/static/media/hero_images/250423-pycon-pydata-mf-FZ8_4498.jpg' -%}
+
+<section class="latest-blog" aria-label="{{ section_label }}">
+  <div class="content">
+    {% if data.section_title %}<h2 class="latest-blog__title">{{ data.section_title }}</h2>{% endif %}
+    <a href="{{ post|url }}" class="latest-blog__card">
+      <span class="latest-blog__thumb-wrap">
+        <img src="{{ thumb }}" alt="" class="latest-blog__thumb" loading="lazy" decoding="async">
+      </span>
+      <span class="latest-blog__info">
+        <span class="latest-blog__name">{{ post.title }}</span>
+        {% if post.author or post.pub_date %}
+        <span class="latest-blog__meta">
+          {% if post.author %}{{ post.author }}{% endif %}
+          {% if post.author and post.pub_date %} &middot; {% endif %}
+          {% if post.pub_date %}{{ post.pub_date|dateformat('medium') }}{% endif %}
+        </span>
+        {% endif %}
+      </span>
+    </a>
+  </div>
+</section>
+
+{% endif %}
+
+{% endif %}
+
+{% endmacro %}
