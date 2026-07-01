@@ -25,23 +25,24 @@ Auto-generated from the recording audio, then imported into the talk's `contents
 
 The importer is idempotent — re-running it on already-imported talks refreshes the field rather than appending.
 
-## Thread 3 — Landing-page mode switch
+## Thread 3 — Front page after the event
 
-The homepage has two modes. Flip from "buy tickets / programme" to "thank you, see you next year" when the conference closes:
+The site has **one always-conference front page** (no recap/inactive
+mode, no activate/disable switch). When the conference closes, do
+**not** flip the homepage to a recap state — instead:
 
-```bash
-make disable-conference     # switch to post-conference recap
-```
+- Publish the gratitude recap ("year in numbers", photos, thank-you)
+  as **blog posts** and link them from the homepage `programme_status`
+  band (`databags/fp_programme_status.yaml`) for a short while.
+- Move the closing edition under `/archive/{year}/` (see the cutover
+  steps below) so its content lives in the archive.
+- Once the next edition's dates lock, update the front-page configs
+  (`databags/fp_*.yaml`, `databags/homepage.yaml`) and
+  `databags/site_state.yaml` to the next conference. The persistent
+  archive funnel-CTA reads `site_state.yaml` and will point archive
+  traffic at the new conference automatically.
 
-Reverse when the next edition opens registration:
-
-```bash
-make activate-conference
-```
-
-The active variant is regenerated into `content/contents.lr`. Edit `content/landing-page-active/` and `content/landing-page-inactive/` directly; do not touch `content/contents.lr`.
-
-Details and image-folder conventions: [docs/landing_pages.md](landing_pages.md).
+Front-page config details: [docs/landing_pages.md](landing_pages.md).
 
 ## Cutover to the archive
 

@@ -34,6 +34,12 @@ clean-plugin-cache:
 
 run: clean-plugin-cache
 	$(RUN) lektor server -O site -p 5001 || (cd content && $(RUN) lektor server -O site -p 5001)
+# Build the site, then serve the built site/ directory on a random
+# local port (port 0 -> the OS picks a free ephemeral port). The
+# chosen port is printed by the server on startup. Ctrl-C to stop.
+serve: build
+	@echo "Serving the built site/ on a random local port (Ctrl-C to stop)..."
+	$(RUN) python -m http.server 0 --bind 127.0.0.1 --directory site
 fetch-submissions:
 	$(RUN) python utils/talks.py
 	$(RUN) python utils/social_card_img_gen.py
@@ -45,12 +51,6 @@ sponsor-pages:
 		echo "$$new_files"; \
 		echo "$$new_files" | xargs git add; \
 	fi
-activate-conference:
-	$(RUN) utils/activate-conference
-disable-conference:
-	$(RUN) ./utils/disable-conference
-landing-page:
-	$(RUN) python utils/landing_page.py
 flip-pricing:
 	$(RUN) python utils/flip_pricing.py $(if $(PERIOD),--period $(PERIOD))
 publish-video-batch:

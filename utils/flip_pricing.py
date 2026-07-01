@@ -2,14 +2,14 @@
 
 `make flip-pricing` (or `make flip-pricing PERIOD=late`) rewrites both
 the schema source (`databags/tickets.yaml`) and the UI CTA
-(`databags/tickets_cta.yaml`) from the tier list so the
+(`databags/fp_tickets.yaml`) from the tier list so the
 AggregateOffer JSON-LD and the on-page price line never drift:
 
   - tickets.yaml: toggles `active_period`, rewrites `aggregate`
     (low/high/offer_count from the on-sale tiers only) and
     `price_valid_until` (early -> late_bird_from - 1 day; late ->
     valid_through).
-  - tickets_cta.yaml: rewrites `period`, `price_label` (from the
+  - fp_tickets.yaml: rewrites `period`, `price_label` (from the
     3-day standard tier of the active period) and `strike_price`
     (early period: the future late 3-day price, loss-framing; late
     period: empty — the regret anchor is dropped).
@@ -31,7 +31,7 @@ import yaml
 
 REPO = Path(__file__).resolve().parent.parent
 TICKETS = REPO / "databags" / "tickets.yaml"
-TICKETS_CTA = REPO / "databags" / "tickets_cta.yaml"
+TICKETS_CTA = REPO / "databags" / "fp_tickets.yaml"
 
 
 def period_of(tier: dict) -> str:
@@ -120,7 +120,7 @@ def main() -> int:
     tx = set_indented_line(tx, "high_price", str(high))
     tx = set_indented_line(tx, "offer_count", str(offer_count))
 
-    # --- tickets_cta.yaml (UI copy) ---
+    # --- fp_tickets.yaml (UI copy) ---
     price_label = f'"from €{target_3day}"'
     strike_price = f'"€{opposite_3day}"' if (target == "early" and opposite_3day is not None) else '""'
     cx = TICKETS_CTA.read_text(encoding="utf-8")
@@ -139,7 +139,7 @@ def main() -> int:
 
     TICKETS.write_text(tx, encoding="utf-8")
     TICKETS_CTA.write_text(cx, encoding="utf-8")
-    print("Wrote databags/tickets.yaml + databags/tickets_cta.yaml. Rebuild to publish.")
+    print("Wrote databags/tickets.yaml + databags/fp_tickets.yaml. Rebuild to publish.")
     return 0
 
 
