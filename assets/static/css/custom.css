@@ -1382,14 +1382,19 @@ button.pretix-widget-button[type="submit"] {
     color: var(--text-secondary, #555);
 }
 
+/* §00 large colour field — blue primary, white text (§02 text-safe). */
 .sponsoring-cta {
-    background: var(--neutral-50);
-    color: var(--text-primary);
+    background: var(--blue);
+    color: var(--white);
 }
 
 .sponsoring-cta__title,
 .sponsoring-cta__body {
-    color: var(--text-primary);
+    color: var(--white);
+}
+
+.sponsoring-cta__title {
+    margin-top: 0;
 }
 
 /* Friendly, engaging brand colour for the subscribe band (green primary,
@@ -2094,17 +2099,35 @@ section.subsite.team .content {
 }
 
 /* Secondary CTA — outlined */
-.community__link,
-.sponsoring-cta__link {
+.community__link {
     background: transparent;
     color: var(--blue);
     border: 2px solid var(--blue);
 }
 
-.community__link:hover,
-.sponsoring-cta__link:hover {
+.community__link:hover {
     background: var(--blue);
     color: var(--white);
+}
+
+/* Ghost button on the blue sponsoring field (§06 .btn-ghost) */
+.sponsoring-cta__link {
+    background: transparent;
+    color: var(--white);
+    border: 2px solid var(--white);
+}
+
+.sponsoring-cta__link:hover {
+    background: var(--white);
+    color: var(--blue);
+}
+
+/* §10 — hover stays flat: background changes, transform does not */
+.tickets-cta__link:hover,
+.community__link:hover,
+.newsletter__cta:hover,
+.sponsoring-cta__link:hover {
+    transform: none;
 }
 
 /* §06 button states — active press + keyboard focus ring (all CTAs) */
@@ -3728,7 +3751,8 @@ main:focus { outline: none; }
     text-decoration: none;
     color: inherit;
     border: 1px solid var(--neutral-200, #e2e6ea);
-    border-radius: 6px;
+    /* §11 — the brand has square corners */
+    border-radius: 0;
     overflow: hidden;
     background: var(--neutral-50, #f6f7f8);
 }
@@ -3780,7 +3804,8 @@ main:focus { outline: none; }
     text-decoration: none;
     color: inherit;
     border: 1px solid var(--neutral-200, #e2e6ea);
-    border-radius: 6px;
+    /* §11 — the brand has square corners */
+    border-radius: 0;
     overflow: hidden;
     background: var(--neutral-50, #f6f7f8);
     transition: border-color var(--t-fast) var(--ease);
@@ -3800,3 +3825,14 @@ main:focus { outline: none; }
 .latest-blog__info { padding: 0.75rem 0.9rem 1rem; }
 .latest-blog__name { display: block; font-weight: 700; margin-bottom: 0.2rem; }
 .latest-blog__meta { display: block; color: var(--text-secondary, #555); font-size: var(--font-size-sm); }
+
+/* ══════════════════════════════════════════════════════════════
+   v11: Design-rules esprit pass (front page)
+   ══════════════════════════════════════════════════════════════ */
+
+/* §02 — body text sits on white/black/blue/green/orange, never on
+   silver. The front page ground becomes paper-white; colour comes
+   from the section fields, not the page background. */
+body.front-page {
+    background-color: var(--white);
+}
