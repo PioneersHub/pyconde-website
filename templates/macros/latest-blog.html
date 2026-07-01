@@ -26,15 +26,20 @@
 
 {% if post %}
 
-{%- set thumb = post.social_card_image or '/static/media/hero_images/250423-pycon-pydata-mf-FZ8_4498.jpg' -%}
-
 <section class="latest-blog" aria-label="{{ section_label }}">
   <div class="content">
     {% if data.section_title %}<h2 class="latest-blog__title">{{ data.section_title }}</h2>{% endif %}
     <a href="{{ post|url }}" class="latest-blog__card">
+      {% if post.social_card_image %}
       <span class="latest-blog__thumb-wrap">
-        <img src="{{ thumb }}" alt="" class="latest-blog__thumb" loading="lazy" decoding="async">
+        <img src="{{ post.social_card_image }}" alt="" class="latest-blog__thumb" loading="lazy" decoding="async">
       </span>
+      {% else %}
+      {# No post image — python on a blue colour field (§05 illustration) #}
+      <span class="latest-blog__thumb-wrap latest-blog__thumb-wrap--brand">
+        <img src="/static/media/brand/python-50.png" alt="" class="latest-blog__thumb latest-blog__thumb--python" loading="lazy" decoding="async">
+      </span>
+      {% endif %}
       <span class="latest-blog__info">
         <span class="latest-blog__name">{{ post.title }}</span>
         {% if post.author or post.pub_date %}

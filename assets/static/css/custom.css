@@ -3836,3 +3836,87 @@ main:focus { outline: none; }
 body.front-page {
     background-color: var(--white);
 }
+
+/* §05 — a python wriggles out of the newsletter band ("have fun with
+   the pythons"). §10 idle sway: 8s loop, ±6px, once per page. */
+.newsletter {
+    position: relative;
+    overflow: hidden;
+}
+
+.newsletter .content {
+    position: relative;
+    z-index: 1;
+}
+
+.newsletter__python {
+    position: absolute;
+    right: 2%;
+    bottom: -12%;
+    width: clamp(180px, 28%, 360px);
+    height: auto;
+    pointer-events: none;
+    z-index: 0;
+    animation: python-sway 8s ease-in-out infinite;
+}
+
+@keyframes python-sway {
+    0%, 100% { transform: translateX(-6px); }
+    50%      { transform: translateX(6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .newsletter__python { animation: none; }
+}
+
+@media (max-width: 700px) {
+    .newsletter__python { width: 40%; opacity: 0.9; }
+}
+
+/* Blog card brand fallback — python on a blue colour field (§05). */
+.latest-blog__thumb-wrap--brand {
+    background: var(--blue);
+}
+
+.latest-blog__thumb--python {
+    object-fit: contain;
+    padding: 8% 12%;
+}
+
+/* §06 hero voice — display headline + one CTA on the intro. */
+.intro__headline {
+    font-size: var(--font-size-5xl);
+    font-weight: 700;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    color: var(--white);
+    max-width: 16ch;
+    margin: 0;
+}
+
+.intro__cta {
+    display: inline-block;
+    padding: var(--space-sm) var(--space-xl);
+    background: var(--yellow);
+    color: var(--text-primary) !important; /* beat the .intro a { color: white } rule */
+    border: 2px solid var(--text-primary);
+    font-weight: 700;
+    font-size: var(--font-size-md);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    transition: all var(--t-fast) var(--ease);
+}
+
+.intro__cta:hover {
+    background: #e0b300;
+}
+
+.intro__cta:active {
+    transform: scale(0.97);
+}
+
+.intro__cta:focus-visible {
+    outline: 3px solid var(--orange);
+    outline-offset: 2px;
+}
