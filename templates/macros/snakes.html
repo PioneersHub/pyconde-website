@@ -1,65 +1,47 @@
 {#
   Section snakes — §05 illustration system
   ─────────────────────────────────────────
-  Generates randomised vertical pythons from the modular building
-  blocks (leaf segments, straight blocks, dome head + eye dot) and
-  pins one to each side gutter of a section.
+  Decorates a section with two pythons from the media-kit artwork
+  (assets/static/pythons — 56 transparent PNGs, indexed with their
+  brand colours in databags/pythons.yaml).
 
   Rules implemented:
-  - colours come from the seven primaries minus the section background
-    (pass the section background hex(es) via `exclude`)
-  - adjacent segments never share a colour; the eye contrasts the head
+  - artwork never contains the section background colour: files whose
+    detected colours intersect `exclude` are filtered out
+  - the two sides always show different artworks
+  - randomised per build: which python, vertical anchor (hanging from
+    the top edge / centred / rising from the bottom edge) and
+    horizontal mirroring — so arrangements vary left/right and the
+    heads face up, down, left or right across builds and sections
   - snakes live in the side gutters outside the centred content column
     and are hidden when the gutters are too narrow — they never overlay
     content (see .section-snakes in custom.css)
-  - randomised per build: segment count, leaf/block mix, colours,
-    eye position, horizontal mirroring
 
   Usage (inside a section with position:relative, before .content):
     {% from "macros/snakes.html" import render_section_snakes %}
     {{ render_section_snakes(exclude=['#00aa41']) }}
 
-  `exclude` must leave at least two palette colours, or the build
+  `exclude` must leave at least two artworks in the pool, or the build
   fails fast on an empty random() sequence.
 #}
 
-{% macro _snake(exclude) %}
-{%- set palette = ['#fac800', '#00c8e1', '#3778be', '#00aa41', '#ff9b00', '#96dc00', '#b7bcbf'] | reject('in', exclude) | list -%}
-{%- set w = 100 -%}
-{%- set h = 52 -%}
-{%- set nseg = [2, 3, 3, 4] | random -%}
-{%- set total = (nseg + 1) * h -%}
-{%- set flip = [true, false] | random -%}
-{%- set ns = namespace(prev='') -%}
-<svg viewBox="0 0 {{ w }} {{ total }}" width="{{ w }}" height="{{ total }}"
-     xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-  <g{% if flip %} transform="translate({{ w }},0) scale(-1,1)"{% endif %}>
-  {#- head: dome + contrasting eye dot, top module -#}
-  {%- set headc = palette | random -%}
-  {%- set ns.prev = headc -%}
-  {#- shapes carry a 1-unit self-coloured stroke so abutting modules
-      can't show anti-aliased hairline seams between segments -#}
-  <path d="M0,{{ h }} A{{ w // 2 }},{{ h }} 0 0 1 {{ w }},{{ h }} Z" fill="{{ headc }}" stroke="{{ headc }}" stroke-width="1"/>
-  <circle cx="{{ [30, 42, 64] | random }}" cy="{{ (h * 0.55) | round(1) }}" r="7" fill="{{ palette | reject('equalto', headc) | list | random }}"/>
-  {#- body: neck down; the bottom segment runs off the section edge -#}
-  {%- for i in range(nseg) -%}
-    {%- set y = (i + 1) * h -%}
-    {%- set c = palette | reject('equalto', ns.prev) | list | random -%}
-    {%- set ns.prev = c -%}
-    {%- set kind = ['leaf', 'leaf', 'leaf', 'block'] | random -%}
-    {%- if kind == 'block' %}
-  <rect x="0" y="{{ y }}" width="{{ w }}" height="{{ h }}" fill="{{ c }}" stroke="{{ c }}" stroke-width="1"/>
-    {%- elif i % 2 == 0 %}
-  <path d="M0,{{ y + h }} A{{ h }},{{ h }} 0 0 1 {{ h }},{{ y }} L{{ w }},{{ y }} A{{ h }},{{ h }} 0 0 1 {{ w - h }},{{ y + h }} Z" fill="{{ c }}" stroke="{{ c }}" stroke-width="1"/>
-    {%- else %}
-  <path d="M{{ w - h }},{{ y }} A{{ h }},{{ h }} 0 0 1 {{ w }},{{ y + h }} L{{ h }},{{ y + h }} A{{ h }},{{ h }} 0 0 1 0,{{ y }} Z" fill="{{ c }}" stroke="{{ c }}" stroke-width="1"/>
-    {%- endif -%}
-  {%- endfor %}
-  </g>
-</svg>
-{% endmacro %}
+{% macro _python_img(file) -%}
+<img src="/static/pythons/{{ file }}" alt="" class="section-snakes__img"
+     loading="lazy" decoding="async">
+{%- endmacro %}
 
 {% macro render_section_snakes(exclude=[]) %}
-<div class="section-snakes section-snakes--left" aria-hidden="true">{{ _snake(exclude) }}</div>
-<div class="section-snakes section-snakes--right" aria-hidden="true">{{ _snake(exclude) }}</div>
+{%- set pool = [] -%}
+{%- for p in bag('pythons')['pythons'] -%}
+  {%- if not (p.colors | select('in', exclude) | list) -%}
+    {%- set _ = pool.append(p.file) -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- set left_file = pool | random -%}
+{%- set right_file = pool | reject('equalto', left_file) | list | random -%}
+{%- for side, file in [('left', left_file), ('right', right_file)] -%}
+<div class="section-snakes section-snakes--{{ side }} section-snakes--{{ ['top', 'mid', 'bottom'] | random }}{{ ' section-snakes--flip' if [true, false] | random }}" aria-hidden="true">
+  {{ _python_img(file) }}
+</div>
+{% endfor -%}
 {% endmacro %}

@@ -1397,12 +1397,8 @@ button.pretix-widget-button[type="submit"] {
     margin-top: 0;
 }
 
-/* Friendly, engaging brand colour for the subscribe band (green primary,
-   white text per §02 — pairs with the yellow §06 CTA). */
-.newsletter {
-    background: var(--green);
-    color: var(--white);
-}
+/* Newsletter band colour lives in main.css (.newsletter — green
+   colour field); no override needed here. */
 
 /* ── v4: Team Photo Standardization ─────────────────────── */
 .team-member > img,
@@ -3877,11 +3873,22 @@ body.front-page {
 .section-snakes--left  { left: 1.25rem; justify-content: flex-start; }
 .section-snakes--right { right: 1.25rem; justify-content: flex-end; }
 
-.section-snakes svg {
-    width: auto;
+/* Vertical arrangement — hanging from the top edge, centred, or
+   resting on the bottom edge (picked at random per snake). */
+.section-snakes--top    { align-items: flex-start; padding-top: 14px; }
+.section-snakes--mid    { align-items: center; }
+.section-snakes--bottom { align-items: flex-end; padding-bottom: 14px; }
+
+/* Horizontal mirror — flips the artwork so heads face either way.
+   Applied to the container, not the img, so it cannot conflict with
+   the sway animation's transform below. */
+.section-snakes--flip { transform: scaleX(-1); }
+
+.section-snakes__img {
+    width: 100%;
     height: auto;
-    max-width: 100%;
-    max-height: 92%;
+    max-height: 88%;
+    object-fit: contain;
 }
 
 @media (min-width: 1280px) {
@@ -3889,7 +3896,7 @@ body.front-page {
 }
 
 /* §10 — one idle python per page keeps the 8 s ±6 px sway */
-.newsletter .section-snakes--right svg {
+.newsletter .section-snakes--right .section-snakes__img {
     animation: python-sway 8s ease-in-out infinite;
 }
 
@@ -3899,7 +3906,7 @@ body.front-page {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .newsletter .section-snakes--right svg { animation: none; }
+    .newsletter .section-snakes--right .section-snakes__img { animation: none; }
 }
 
 /* Blog card brand fallback — python on a blue colour field (§05). */
