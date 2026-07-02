@@ -3837,26 +3837,59 @@ body.front-page {
     background-color: var(--white);
 }
 
-/* §05 — a python wriggles out of the newsletter band ("have fun with
-   the pythons"). §10 idle sway: 8s loop, ±6px, once per page. */
-.newsletter {
+/* §05 — every content section keeps pythons in its side gutters
+   (generated per build by macros/snakes.html from the building
+   blocks; colours exclude the section background). The gutters sit
+   outside the centred .content column, so snakes never overlay
+   content; below 1280px there is no gutter and they are hidden. */
+.latest-videos,
+.latest-blog,
+.newsletter,
+.sponsoring-cta {
     position: relative;
     overflow: hidden;
 }
 
-.newsletter .content {
+.latest-videos .content,
+.latest-blog .content,
+.newsletter .content,
+.sponsoring-cta .content {
     position: relative;
     z-index: 1;
 }
 
-.newsletter__python {
+.section-snakes {
     position: absolute;
-    right: 2%;
-    bottom: -12%;
-    width: clamp(180px, 28%, 360px);
-    height: auto;
-    pointer-events: none;
+    top: 0;
+    bottom: -6px;
+    /* Gutter width assumes the host section uses plain .content
+       (max-width: var(--content-width-default)). A section that
+       switches to .content--wide must not host snakes, or they
+       would overlap text at 1280-1400px viewports. */
+    width: calc((100% - var(--content-width-default)) / 2 - 3.5rem);
+    max-width: 140px;
+    display: none;
+    align-items: flex-end;
     z-index: 0;
+    pointer-events: none;
+}
+
+.section-snakes--left  { left: 1.25rem; justify-content: flex-start; }
+.section-snakes--right { right: 1.25rem; justify-content: flex-end; }
+
+.section-snakes svg {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 92%;
+}
+
+@media (min-width: 1280px) {
+    .section-snakes { display: flex; }
+}
+
+/* §10 — one idle python per page keeps the 8 s ±6 px sway */
+.newsletter .section-snakes--right svg {
     animation: python-sway 8s ease-in-out infinite;
 }
 
@@ -3866,11 +3899,7 @@ body.front-page {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .newsletter__python { animation: none; }
-}
-
-@media (max-width: 700px) {
-    .newsletter__python { width: 40%; opacity: 0.9; }
+    .newsletter .section-snakes--right svg { animation: none; }
 }
 
 /* Blog card brand fallback — python on a blue colour field (§05). */

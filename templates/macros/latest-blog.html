@@ -17,6 +17,8 @@
   Self-hides when display != true or there are no blog posts.
 #}
 
+{% from "macros/snakes.html" import render_section_snakes %}
+
 {% macro render_latest_blog(data, section_label='Latest from the blog') %}
 
 {% if data and data.display != false %}
@@ -27,6 +29,7 @@
 {% if post %}
 
 <section class="latest-blog" aria-label="{{ section_label }}">
+  {{ render_section_snakes() }}
   <div class="content">
     {% if data.section_title %}<h2 class="latest-blog__title">{{ data.section_title }}</h2>{% endif %}
     <a href="{{ post|url }}" class="latest-blog__card">

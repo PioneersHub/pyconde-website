@@ -18,11 +18,14 @@
   or body is empty.
 #}
 
+{% from "macros/snakes.html" import render_section_snakes %}
+
 {% macro render_sponsoring_newsletter(data, section_label='Sponsoring newsletter') %}
 
 {% if data and data.display != false and data.body %}
 
 <section class="sponsoring-cta" aria-label="{{ section_label }}">
+  {{ render_section_snakes(exclude=['#3778be']) }}
   <div class="content">
     {% if data.title %}<h2 class="sponsoring-cta__title">{{ data.title }}</h2>{% endif %}
     <p class="sponsoring-cta__body">{{ data.body }}</p>
