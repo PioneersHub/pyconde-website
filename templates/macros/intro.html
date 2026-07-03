@@ -37,11 +37,14 @@
   {% if has_slideshow %}
   <div class="intro__slideshow" aria-hidden="true">
     {% for image in intro_data.hero_images %}
-    <img src="{{ image_dir }}/{{ image }}"
-         alt=""
-         class="intro__slide"
-         loading="{{ 'eager' if loop.first else 'lazy' }}"
-         decoding="async" />
+    {% set base_name = image.rsplit('.', 1)[0] %}
+    <picture class="intro__slide">
+      <source srcset="{{ image_dir }}/{{ base_name }}.webp" type="image/webp" />
+      <img src="{{ image_dir }}/{{ image }}"
+           alt=""
+           loading="{{ 'eager' if loop.first else 'lazy' }}"
+           decoding="async" />
+    </picture>
     {% endfor %}
   </div>
   {% endif %}
