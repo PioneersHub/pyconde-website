@@ -23,11 +23,10 @@ jobs:
       - name: Build sponsor pages
         run: make sponsor-pages
 
-      - name: Prepare assets for the landing page
-        run: make landing-page
-
-      - name: Build static page
-        run: make build
+      - name: Build static page (current edition only)
+        # Archive editions and certificates deploy on demand via
+        # archive-build.yml — see plans/selective-builds.md.
+        run: make build BUILD_MODE=current
 
       - name: Upload to s3
         uses: jakejarvis/s3-sync-action@master

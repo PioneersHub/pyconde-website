@@ -6,10 +6,30 @@ else
     RUN = PYTHONWARNINGS=ignore::ResourceWarning
 endif
 
+# Build scope — see plans/selective-builds.md and packages/selective-build/.
+#   current (default): current edition only, fast; what production deploys use.
+#   archive:           full render; the archive workflow syncs only archive scope.
+#   full:              full render + Pagefind index.
+BUILD_MODE ?= current
+
+ifeq ($(BUILD_MODE),full)
 build: redirects tracks topic-hubs lektor-build pagefind
+# Only full builds prune: current renders a subset of the site and must not
+# delete previously built archive artifacts from site/.
+PRUNE_FLAG =
+else
+build: redirects tracks topic-hubs lektor-build
+PRUNE_FLAG = --no-prune
+endif
+
+build-archive:
+	$(MAKE) build BUILD_MODE=archive
+
+build-full:
+	$(MAKE) build BUILD_MODE=full
 
 lektor-build:
-	$(RUN) lektor build -O site
+	BUILD_MODE=$(BUILD_MODE) $(RUN) lektor build -O site $(PRUNE_FLAG)
 
 pagefind:
 	@echo "Building Pagefind index..."
@@ -32,8 +52,11 @@ clean-plugin-cache:
 	@rm -rf site/.lektor
 	@echo "Cache cleared!"
 
+# BUILD_MODE is forced off for the dev server: `lektor server` always prunes
+# after building, so a leaked BUILD_MODE=current would delete every archive
+# and certificate artifact from the local site/ directory.
 run: clean-plugin-cache
-	$(RUN) lektor server -O site -p 5001 || (cd content && $(RUN) lektor server -O site -p 5001)
+	BUILD_MODE= $(RUN) lektor server -O site -p 5001 || (cd content && BUILD_MODE= $(RUN) lektor server -O site -p 5001)
 # Build the site, then serve the built site/ directory on a random
 # local port (port 0 -> the OS picks a free ephemeral port). The
 # chosen port is printed by the server on startup. Ctrl-C to stop.
