@@ -1039,8 +1039,20 @@ a.newsletter.cta {
 }
 
 /* subsites */
+/* Embedded third-party forms (Brevo signup iframes on /newsletter/,
+   /sponsoring-newsletter/, /sponsoring/). The iframe's inline height:100%
+   cannot resolve — no ancestor between <body> and the section has a fixed
+   height — so without a min-height it collapses to the 150px browser
+   default. */
 .content.embedded {
-    height: 150%;
+    --embed-min-height: clamp(600px, 85vh, 1000px);
+    height: auto;
+    min-height: var(--embed-min-height);
+}
+
+.content.embedded iframe {
+    min-height: var(--embed-min-height);
+    border: 0;
 }
 
 .subsite p {
