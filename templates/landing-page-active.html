@@ -88,9 +88,9 @@
 
     {# The front page is fully config-driven: `databags/homepage.yaml`
        defines the section order + display, and each section's content
-       lives in `databags/fp_<id>.yaml`. The dispatcher maps id -> macro. #}
+       lives in `databags/frontpage/sections/<id>.yaml`. The dispatcher maps id -> macro. #}
     {% from "macros/homepage.html" import render_homepage_section %}
-    {% for sec in bag('homepage')['sections'] if sec.display %}
+    {% for sec in bag('frontpage/config')['sections'] if sec.display %}
     {{ render_homepage_section(sec.id) }}
     {% endfor %}
 

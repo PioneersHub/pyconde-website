@@ -33,11 +33,11 @@ mode, no activate/disable switch). When the conference closes, do
 
 - Publish the gratitude recap ("year in numbers", photos, thank-you)
   as **blog posts** and link them from the homepage `programme_status`
-  band (`databags/fp_programme_status.yaml`) for a short while.
+  band (`databags/frontpage/sections/programme_status.yaml`) for a short while.
 - Move the closing edition under `/archive/{year}/` (see the cutover
   steps below) so its content lives in the archive.
 - Once the next edition's dates lock, update the front-page configs
-  (`databags/fp_*.yaml`, `databags/homepage.yaml`) and
+  (`databags/frontpage/sections/*.yaml`, `databags/frontpage/config.yaml`) and
   `databags/site_state.yaml` to the next conference. The persistent
   archive funnel-CTA reads `site_state.yaml` and will point archive
   traffic at the new conference automatically.

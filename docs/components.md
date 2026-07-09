@@ -11,25 +11,25 @@ Components that render homepage sections are **data-driven** — content comes f
 The front page is assembled by a dispatcher, not by a hardcoded macro
 stack in the landing template.
 
-- **`databags/homepage.yaml`** — the master config: an ordered list of
+- **`databags/frontpage/config.yaml`** — the master config: an ordered list of
   sections, each `{ id, display }`. This is the single place to reorder
   or switch a section off.
-- **`databags/fp_<id>.yaml`** — one file per section, holding
+- **`databags/frontpage/sections/<id>.yaml`** — one file per section, holding
   `display: true/false` + that section's texts/structured data.
 - **`templates/macros/homepage.html`** — `render_homepage_section(id)`
   maps each `id` to the section macro below and enforces the per-section
   `display` flag.
 - **`templates/landing-page-active.html`** — a 3-line loop over
-  `homepage.yaml` that calls the dispatcher per id.
+  `frontpage/config.yaml` that calls the dispatcher per id.
 
 A section renders iff **both** `display` flags are true (master AND
 section file; both default true). To add a section: append to
-`homepage.yaml`, create `databags/fp_<id>.yaml`, and add one `elif`
+`frontpage/config.yaml`, create `databags/frontpage/sections/<id>.yaml`, and add one `elif`
 branch in `macros/homepage.html`. Full guide:
 [docs/landing_pages.md](landing_pages.md).
 
-The section databags follow the `fp_<section>.yaml` naming convention
-(e.g. `fp_motto.yaml`, `fp_featured.yaml`, `fp_keydates.yaml`). The
+The section databags live in `databags/frontpage/sections/`, one file per section
+(e.g. `motto.yaml`, `featured.yaml`, `keydates.yaml`). The
 macros below take the databag dict as a parameter, so they are still
 reusable outside the homepage by passing any compatible dict.
 
@@ -43,7 +43,7 @@ Bold conference motto with colored value pills. Displays the headline, a subline
 
 ```jinja2
 {% from "macros/hero.html" import render_hero %}
-{{ render_hero(bag('fp_motto')) }}
+{{ render_hero(bag('frontpage/sections/motto')) }}
 ```
 
 **Parameters:**
@@ -53,7 +53,7 @@ Bold conference motto with colored value pills. Displays the headline, a subline
 | `motto` | *(required)* | Full databag dict with `headline`, `subline`, `facets` |
 | `section_label` | `'Conference motto'` | Accessible `aria-label` for the section |
 
-**Databag:** `fp_motto.yaml`. Each facet has a `text` and a `color` (must match a CSS variable name from the site palette).
+**Databag:** `motto.yaml`. Each facet has a `text` and a `color` (must match a CSS variable name from the site palette).
 
 ---
 
@@ -71,7 +71,7 @@ Multi-instance carousel with two display modes. Renders slides from a databag wi
 ```jinja2
 {% from "macros/carousel.html" import render_carousel %}
 {{ render_carousel(
-    bag('fp_featured')['featured_items'],
+    bag('frontpage/sections/featured')['featured_items'],
     carousel_id='featured',
     mode='multi',
     image_dir='featured',
@@ -105,7 +105,7 @@ Multi-instance carousel with two display modes. Renders slides from a databag wi
   link_url: /target-page
 ```
 
-**Databags using this component:** `fp_featured.yaml`, `fp_masterclasses.yaml`
+**Databags using this component:** `featured.yaml`, `masterclasses.yaml`
 
 **Behavior** (provided by `static/js/carousel.js`): auto-advance every 5 seconds, pause on hover/focus, keyboard arrows, touch swipe, random slide order on page load. Multiple carousel instances on the same page operate independently.
 

@@ -280,7 +280,12 @@ def _load_yaml_databag(yaml_path: Path) -> OrderedDict | Any:
 
 
 def _discover_yaml_bags(root_path: Path) -> dict[str, list]:
-    """Discover all YAML databag files in the databags directory.
+    """Discover all YAML databag files, including in subdirectories.
+
+    Bag names mirror the file path relative to databags/ without the
+    suffix, e.g. ``frontpage/sections/intro.yaml`` becomes the bag
+    ``frontpage/sections/intro`` — templates access it via
+    ``bag('frontpage/sections/intro')``.
 
     Args:
         root_path: Path to the databags directory
@@ -292,9 +297,9 @@ def _discover_yaml_bags(root_path: Path) -> dict[str, list]:
         return {}
 
     yaml_bags = {}
-    for filepath in root_path.iterdir():
+    for filepath in sorted(root_path.rglob("*")):
         if filepath.suffix in YAML_EXTENSIONS:
-            bag_name = filepath.stem
+            bag_name = filepath.relative_to(root_path).with_suffix("").as_posix()
             yaml_bags[bag_name] = []
 
     return yaml_bags
@@ -305,6 +310,9 @@ class YAMLDatabagPlugin(Plugin):
 
     This plugin monkey-patches the Databags class to recognize and load
     .yaml and .yml files in addition to the default .json and .ini formats.
+    YAML bags may live in subdirectories; the bag name is the relative
+    path without suffix (e.g. ``bag('frontpage/config')`` reads
+    ``databags/frontpage/config.yaml``).
     """
 
     name = "YAML Databags"
