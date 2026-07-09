@@ -44,6 +44,7 @@ the fields. Rebuild (`make build`).
 `databags/frontpage/config.yaml`. Rebuild. No template edit.
 
 **Add a new section:**
+
 1. Append an `- id: <new>` entry (with `display: true`) to
    `databags/frontpage/config.yaml`.
 2. Create `databags/frontpage/sections/<new>.yaml` with `display: true` + the
@@ -55,7 +56,7 @@ the fields. Rebuild (`make build`).
 ## Section inventory
 
 | `id` | Config file | Renders |
-|------|-------------|---------|
+| ------ | ------------- | --------- |
 | `intro` | `intro.yaml` | Hero (logo, location, slideshow) |
 | `motto` | `motto.yaml` | Motto statement |
 | `programme_status` | `programme_status.yaml` | Milestone band (CFP / voting / accepted / schedule) |
@@ -65,7 +66,6 @@ the fields. Rebuild (`make build`).
 | `featured` | `featured.yaml` | Featured speakers/sessions carousel |
 | `masterclasses` | `masterclasses.yaml` | Masterclasses carousel |
 | `why_attend` | `why_attend.yaml` | Why-attend highlights + testimonials |
-| `stats` | `stats.yaml` | Numbers bar |
 | `community` | `community.yaml` | Community spotlight |
 | `past_editions` | `past_editions.yaml` | Past-editions cards |
 | `tickets` | `tickets.yaml` | Tickets CTA (price + struck anchor) |
