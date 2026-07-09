@@ -2297,7 +2297,7 @@ a.newsletter.cta {
 /* ─── Key Dates — bold on dark background ─────────────── */
 
 .keydates {
-    padding: var(--space-2xl) 0;
+    padding: var(--space-xl) 0;
     background: #1a1a1a;
     color: white;
 }
@@ -2306,49 +2306,41 @@ a.newsletter.cta {
     font-size: var(--font-size-2xl);
     font-weight: 700;
     color: white;
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-md);
     text-align: center;
 }
 
+/* Compact table of dates: rows of "date | label", flowing into two
+   columns on wide screens (chronological: down first, then across),
+   a single column on mobile. */
 .keydates__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: var(--space-md);
-    text-align: center;
+    column-gap: var(--space-2xl);
+}
+
+@media screen and (min-width: 800px) {
+    .keydates__grid {
+        columns: 2;
+    }
 }
 
 .keydates__item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-sm);
-    padding: var(--space-lg) var(--space-md);
-    background: rgba(255, 255, 255, 0.05);
-    /* Square corners + colour spine — Design Rules §11 (no radius) / §06 card accent bar */
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-left: 6px solid var(--yellow);
-    transition: background var(--t-normal) var(--ease);
-}
-
-.keydates__item:hover {
-    background: rgba(255, 255, 255, 0.1);
+    display: grid;
+    /* Fixed date column so rows align like a table */
+    grid-template-columns: clamp(9em, 34%, 11em) 1fr;
+    column-gap: var(--space-sm);
+    align-items: baseline;
+    padding: var(--space-xs) var(--space-sm);
+    /* Colour spine — Design Rules §06 card accent bar, kept slim */
+    border-left: 4px solid var(--yellow);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    break-inside: avoid;
 }
 
 .keydates__date {
-    font-size: var(--font-size-md);
+    font-size: var(--font-size-sm);
     font-weight: 700;
-    display: inline-block;
-    padding: 0.3em 0.7em;
     color: white;
 }
-
-.keydates__date--blue       { background: var(--blue); }
-.keydates__date--green-light { background: var(--green); }
-.keydates__date--orange     { background: var(--orange); }
-.keydates__date--pink       { background: var(--pink); }
-.keydates__date--yellow     { background: var(--yellow); color: var(--text-primary); }
-.keydates__date--green      { background: var(--green); }
-.keydates__date--red        { background: var(--red); }
 
 /* Colour spine matches the date badge (§06 card accent bar) */
 .keydates__item--blue        { border-left-color: var(--blue); }
