@@ -66,7 +66,7 @@ the fields. Rebuild (`make build`).
 | `featured` | `featured.yaml` | Featured speakers/sessions carousel |
 | `masterclasses` | `masterclasses.yaml` | Masterclasses carousel |
 | `why_attend` | `why_attend.yaml` | Why-attend highlights + testimonials |
-| `community` | `community.yaml` | Community spotlight |
+| `about` | `about.yaml` | About — community spotlight |
 | `past_editions` | `past_editions.yaml` | Past-editions cards |
 | `tickets` | `tickets.yaml` | Tickets CTA (price + struck anchor) |
 | `sponsors` | `sponsors.yaml` | Sponsors heading + logo grid (logos from `sponsors.yaml`) |
