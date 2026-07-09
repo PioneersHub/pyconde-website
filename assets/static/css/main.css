@@ -503,13 +503,15 @@ a {
     background-color: var(--blue);
     color: white;
     width: 100%;
-    min-height: 100vh;
-    min-height: 100svh;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
     overflow: hidden;
+    /* Sized by its content (logo, dates, CTA) instead of the viewport —
+       no filler whitespace at any width. The larger bottom padding keeps
+       the absolute-positioned scroll hint clear of the CTA. */
+    padding: clamp(1.5rem, 4vh, 3rem) 0 clamp(2.75rem, 7vh, 4.5rem);
 }
 
 .intro .content {
@@ -522,7 +524,7 @@ a {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: var(--space-lg);
+    gap: var(--space-md);
 }
 
 .intro__logo {
@@ -597,24 +599,31 @@ a {
 .intro__slide {
     position: absolute;
     inset: 0;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+}
+
+/* The <picture> wrapper is only a positioning box — the sizing must
+   apply to the <img> itself, or it falls back to the global
+   max-width/height:auto reset and never fills the section. */
+.intro__slide img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: center 30%;
-    opacity: 0;
-    transition: opacity 1.5s ease-in-out;
 }
 
 .intro__slide.active {
     opacity: 1;
 }
 
-/* Semi-transparent brand overlay for text readability */
+/* Semi-transparent brand overlay for text readability — kept light so
+   the photo, not the blue, dominates the hero. */
 .intro__slideshow::after {
     content: '';
     position: absolute;
     inset: 0;
-    background-color: rgba(55, 120, 190, 0.65);
+    background-color: rgba(55, 120, 190, 0.4);
     z-index: 1;
 }
 
