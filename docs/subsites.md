@@ -24,7 +24,7 @@ Use this pattern when the content is structured and re-orderable. For mostly-sta
 
 ## Linking the subsite
 
-Add an entry to `databags/links.yaml` so the page appears in the navigation:
+Add an entry to `databags/navigation.yaml` so the page appears in the navigation:
 
 ```yaml
 pages:
