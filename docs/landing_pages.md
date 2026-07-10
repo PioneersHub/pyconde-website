@@ -64,6 +64,7 @@ the fields. Rebuild (`make build`).
 | `topics` | `topics.yaml` | Topic pills |
 | `keynotes` | `keynotes.yaml` | Revealed-keynote teaser |
 | `featured` | `featured.yaml` | Featured speakers/sessions carousel |
+| `satellite_events` | `satellite_events.yaml` | Satellite events & initiatives carousel + proposal CTA |
 | `masterclasses` | `masterclasses.yaml` | Masterclasses carousel |
 | `why_attend` | `why_attend.yaml` | Why-attend highlights + testimonials |
 | `about` | `about.yaml` | About — community spotlight |
