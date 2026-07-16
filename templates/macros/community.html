@@ -13,7 +13,8 @@
 
   Databag schema (frontpage/sections/about.yaml):
     title: "We Get Things Done: Together"
-    body: "Built by the community..."
+    body: |            # literal scalar — blank lines become paragraphs
+      Built by the community...
     button:            # optional CTA button
       show: true       # false hides it without losing text/url
       text: "Meet the team"
@@ -29,7 +30,9 @@
     {% if community_data.title %}
     <h2 class="community__title">{{ community_data.title }}</h2>
     {% endif %}
-    <p class="community__body">{{ community_data.body }}</p>
+    {# body must be a literal block scalar (body: |) — paragraphize splits
+       on the blank lines it preserves; folded scalars (>) collapse them. #}
+    <div class="community__body">{{ community_data.body | paragraphize | safe }}</div>
     {% set btn = community_data.button %}
     {% if btn and btn.show != false and btn.text and btn.url %}
     <a href="{{ btn.url }}" class="community__link">
