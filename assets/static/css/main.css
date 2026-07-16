@@ -550,18 +550,22 @@ a {
     gap: 0.35em;
 }
 
+/* Solid white + soft shadow: the details sit on busy photos, so no
+   transparency — hierarchy comes from weight, readability from the
+   shadow + the scrim gradient on .intro__slideshow::after. */
 .intro__location {
     font-size: var(--font-size-xl);
     font-weight: 400;
-    opacity: 0.9;
     margin-bottom: var(--space-sm);
     letter-spacing: 0.01em;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
 }
 
 .intro__date {
-    color: rgba(255, 255, 255, 0.8);
+    color: white;
     font-weight: 400;
     font-size: var(--font-size-md);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
 }
 
 .intro__date strong {
@@ -617,13 +621,18 @@ a {
     opacity: 1;
 }
 
-/* Semi-transparent brand overlay for text readability — kept light so
-   the photo, not the blue, dominates the hero. */
+/* Brand-hued scrim for text readability — light at the top so the photo
+   stays visible, deepening to navy where the text sits. */
 .intro__slideshow::after {
     content: '';
     position: absolute;
     inset: 0;
-    background-color: rgba(55, 120, 190, 0.4);
+    background: linear-gradient(
+        180deg,
+        rgba(55, 120, 190, 0.35) 0%,
+        rgba(30, 52, 90, 0.55) 45%,
+        rgba(30, 52, 90, 0.6) 100%
+    );
     z-index: 1;
 }
 
