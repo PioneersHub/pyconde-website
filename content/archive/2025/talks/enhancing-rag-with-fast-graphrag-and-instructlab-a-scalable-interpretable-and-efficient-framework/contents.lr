@@ -1,0 +1,184 @@
+title: Enhancing RAG with Fast GraphRAG and InstructLab: A Scalable, Interpretable, and Efficient Framework
+---
+description: Retrieval Augmented Generation (RAG) has become a cornerstone in enriching GenAI outputs with external data, yet traditional frameworks struggle with…
+---
+created: 2024-12-21
+---
+code: JABVHK
+---
+slug: enhancing-rag-with-fast-graphrag-and-instructlab-a-scalable-interpretable-and-efficient-framework
+---
+speaker_names: Tuhin Sharma
+---
+speakers:
+
+
+
+### Tuhin Sharma
+
+Tuhin Sharma is Senior Principal Data Scientist at Redhat in the Data Development Insights & Strategy AI team. Prior to that, he worked at Hypersonix as an AI architect. He also co-founded and has been CEO of Binaize (backed by Techstars), a website conversion intelligence product for e-commerce SMBs. Previously, he was part of  IBM Watson where he worked on NLP and ML projects featured on Star Sports and CNN-IBN. He received a master's degree from IIT Roorkee and a bachelor's degree from IIEST Shibpur in Computer Science. He loves to code and collaborate on open-source projects. He is one of the top 20 contributors of pandas. He has 4 research papers and 5 patents in the fields of AI and NLP. He is a reviewer of the IEEE MASS conference, Springer nature and Packt publication in the AI track. He writes deep learning articles for O'Reilly in collaboration with the AWS MXNET team. He is a regular speaker at prominent AI conferences like O'Reilly Strata & AI, ODSC, GIDS, Devconf, Datahack Summit etc.
+---
+abstract:
+
+
+Retrieval Augmented Generation (RAG) has become a cornerstone in enriching GenAI outputs with external data, yet traditional frameworks struggle with challenges like data noise, domain specialization, and scalability. In this talk, Tuhin will dive into open-source frameworks Fast GraphRAG and InstructLab, which addresses these limitations by combining knowledge graphs with the classical PageRank algorithm and Fine-tuning, delivering a precision-focused, scalable, and interpretable solution. By leveraging the structured context of knowledge graphs, Fast GraphRAG enhances data adaptability, handles dynamic datasets efficiently, and provides traceable, explainable outputs while InstructLab adds domain depth to the LLM through Fine-tuning. Designed for real-world applications, it bridges the gap between raw data and actionable insights, redefining intelligent retrieval for developers, researchers, and enterprises. This talk will showcase Fast GraphRAG’s transformative features coupled with domain specific Fine-tuning leveraging InstructLab and demonstrate its potential to elevate RAG’s capabilities in handling the evolving demands of large language models (LLMs) for developers, researchers, and businesses.
+---
+full_description:
+
+
+Retrieval Augmented Generation (RAG) has changed the way AI systems incorporate external knowledge, but it often falls short when faced with real-world challenges like adapting to new data, managing complexity, or delivering reliable answers. Fast GraphRAG steps in to address these gaps with a refreshing approach that blends the structure of knowledge graphs with the proven efficiency of algorithms like PageRank. By focusing on interpretability, scalability, and adaptability, Fast GraphRAG creates a pathway for building AI systems that don’t just retrieve data but leverage it in a meaningful way. 
+
+The agenda for the talk is as follows
+
+Challenges in Traditional RAG
+    - Lack of interpretability leads to untrustworthy outputs.
+    - High computational costs limit scalability.
+    - Inflexibility makes adapting to evolving data cumbersome.
+Fast GraphRAG’s Core Innovations
+    - Interpretability: Knowledge graphs provide clear, traceable reasoning.
+    - Scalability: Efficient query resolution with minimal overhead.
+    - Adaptability: Dynamic updates ensure relevance in changing domains.
+    - Precision: PageRank sharpens focus on high-value information.
+    - Robust Workflows: Typed and asynchronous handling for complex scenarios.
+How Fast GraphRAG Works
+    - Architecture and algorithmic innovations.
+    - Knowledge graphs for intelligent reasoning.
+    - PageRank for multi-hop exploration and precise retrieval.
+    - Entity extraction, incremental updates, and graph exploration.
+    - Role of InstructLab and Fine-tuning.
+Demo and Practical Takeaways
+    - Building a knowledge graph and resolving queries.
+    - Open-source tools for scaling Fast GraphRAG.
+    - Real-World applications
+
+Fast GraphRAG isn’t just another tool. It's a game-changer for anyone frustrated by the limitations of traditional RAG systems. By combining the structured clarity of knowledge graphs with the power of algorithms like PageRank and fine-tuning by InstructLab, it makes retrieval smarter, faster, and the LLM more adaptable. This session will leave you with a clear understanding of how to build/train AI systems that deliver meaningful results while being transparent and trustworthy. Whether you’re a developer, researcher, or just someone passionate about AI, Fast GraphRAG is a framework that sparks possibilities and redefines what intelligent retrieval can achieve.
+---
+room:
+---
+day: Friday
+---
+slot_date: 2025-04-25
+---
+start_time: 11:35
+---
+end_time: 12:05
+---
+slot_id:
+---
+track: Generative AI
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Novice
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/JABVHK.png
+---
+youtube_id: OxlsHjGxMQ8
+---
+video_link: https://www.youtube.com/watch?v=OxlsHjGxMQ8
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/OxlsHjGxMQ8/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:08]_
+
+I work as an AI advisor for the data and AI team, and in this talk, I will actually open source all the code, the deck, and I will consider this talk as successful if you can go back and you can just reproduce the numbers that we are going to show here. So, all right, let's jump into it. This is what our framework will be today. Okay. We'll start with a problem statement and we'll create a setup on how to actually solve that. Gradually we'll build certain solutions and we'll look at the pros and cons and we'll back everything by the numbers. All right. So there is a fictitious character, Maya. She's a data scientist. She works for a literary education platform, right? So what this particular company does is it actually digitizes all the books, and specifically from the literature, and it actually creates AI experts which has all the knowledge of that book, and it actually helps the students understand about that book, write certain homeworks and all those things, right? Now Maya is confused how to make the books talk, right? And that's why she reached out to me and told me, hey, this is something work has come up in my table, and I want to actually solve this problem. How do I do it? So what I said is the best way to do is by start coding. And we decided that we'll set up some framework. By the way, Maya is fictitious, but the problem is real, okay? So what we decided is we'll start with a simple book. In this particular case, we are just taking an example of Christmas Carol by Charles Dickens, It is a very popular data set for doing any graph-related, LLM-related work. And to have the same uniformity across multiple use cases and the solutions, right, so what we decided is we'll go with the LLM as GPT-3.5 turbo, and the models will go with text embedding three small, right, so that everything follows the same patterns, same models, and we can do comparison. Now to start with, we don't have any eval data, right? So how do we create one? So as you know, I mean, there are very few models which can actually take the entire book as a context, right, because of the limitation of the context window. So we saw that Cloud 3.7 Sonnet actually can fit the entire book into its context window, and we decided that we'll use that model to create a data set of 100 question answers, And we'll treat that as the golden data set, right? So what we said is that, hey, Claude, create a set of 100 questions which are extremely complex to answer for a rack system based on the following text. And we passed the entire book there. And we say that make sure the answer is limited to 300 characters so that when we build certain solutions around it, we can actually bank on that all the outputs length are limited And we can actually compare it, apple to apple. And that's it. It actually created 100 question answers. And that we treated as the golden data set. One such example I'm showing here in the yellow, now that is a question. And the green, that is the answer that is provided by Claude. And such 100 examples are actually created. After we build the solution, it is important to evaluate how good the solution is. So we can actually find out how much cost it's in kiosks, how much time it takes, but also it's important to understand how good is that solution, right? So to figure out how closely the answer generated by the solutions that we're going to build is actually following the golden answer, we needed an evaluator. And we decided that GPT-4 is something that we'll use to just evaluate, and we're going to tell it that, hey, for this question, this is the golden answer, and this is the answer generated by the solution that we have built. Now can you rate the generated answer from one to five based on the accuracy, relevance, and completeness? So that is how we decided that this is the framework we're going to follow, and we're going to build certain solutions. So what is the best way to start it, right? So we just simply ask the LLM the question itself, right? We don't actually provide any context, nothing, right, directly ask the question. So this is what we did. And you can see that it is a Lama index code, and we just, I mean, asked that OpenAI model, which is GPT-3.5 Turbo, the same question, right? So the exact same question-answer we are going to try with different solutions that we're going to build, and we're going to find out how is the impact on the answer. So you can see that the answer that it gives, so the question is, how does Charles Dickens is establish Scrooge's character, so Scrooge is the central character of the story, through environmental imagery rather than direct description, right? So actually the golden answer is it actually the cold imagery is he iced his coffee, carries his own low temperature, and is compared to Flint with no generous fire. So this actually reflects the cold nature of his emotional side, right? Now, the answer that is generated by 3.5 directly is The score dark and really settings to reflect squidge's Personality, right? now, the challenge with this is If you can see that the gpt4, which is the evaluator, it Actually told that, well, the score is 3.5 from a 0 to 5 scale For this particular question answer. So it is not very good. So probably the model does not Have really good knowledge and the context of the entire book To analyze the scrooge's personality. So that's why the next step that we go is building a rack Solution. That's what we do every time When we think about solutioning, right? Which works in this way. There's an indexing phase and There's a generation phase. In indexing phase, what we do is We take the book, we chunk it, we use the embedding model, and And we stored the chunks and the respective embeddings in the Vector database. When the question comes from The user, that actually gets orchestrated by some of the Orchestrating tool, for example, it could be haystack, it could Be lan chain, et cetera. And then what it does, it Actually just, i mean, sends the natural language query to the Embedding model, gets the vector embedding for that. Sends that vector embedding for that query to vector database and gets the relevant chunks out of it based on the cosine similarity or some sort of vector-based similarity search. And then the returned chunks are passed with the query and build a prompt. And then the LLM is asked that, hey, this is the question. This is a relevant contest I've got. Can you answer this question? And that's how it answers, right? So when we code it, this is where we just read the book, And we create a book collection. We use the same model we are Going to use everywhere to have apple to apple comparison. And then in the generation step, we actually provide prompt Template which says that given the context and not prior Knowledge, answer the query in less than 15 words or in less Than 300 tokens. And then what we see is the The answer that it generates is better than the gpt 3.5 standalone, right? So we're just giving around 3.5 score only for this particular Question and answer. Which is a bit better, but it is Not actually able to understand the relationship with scrooge, That is the central character, the protagonist of the story, With all the other characters and what is their interaction Between. And if there is a butterfly That is going on in the chapters across, it is not able to Actually capture it, right? because the chunks actually Severs the relationship between entities in between, and there Is no way to actually capture the provenance. So that single question probably does not give the entire picture, right? So we ran the same thing, right, for all the hundred q and a that We have actually generated from cloud as the golden data set. And you can see that we are capturing the both phases, indexing and generation. And we're capturing these are the metrics, right? How much time? What is the cost associated with it? For the LLM, input token count, output token count, and the number of requests we made to open an API, as well as same thing for the embedding model itself. You can see for the simple RAG, the indexing time is very fast. Four seconds, it was done. The cost is .01. And you can see that the input token and the request is one, because it is a batch prediction that it was happening. And 39k tokens have been actually sent. Similarly for the RAG, for the generation part, for 100 question answers, right, for the 100 queries, it took two minutes, 15 cents. And these are the input tokens and output tokens for the llm. And 100 requests have been done because every question, one Request is done to the model, one request is done to the llm. And final eval score that we got is the average across all of Them is 3.68. So we're going to follow the same Framework and we'll compare all the other methods. Now, the advantage is, as we saw, lower cost and faster time To value. Also, it is up to date Injection can be done by setting up an ingestion pipeline. And it's easy to interpret. It's easy to trace back which Chunks actually contributed to that answer. But the disadvantage is the context window is limited. So we can't actually send infinite number of chunks in The llm context window. And as i told, there's no Relationship between multiple chunks and that relation is Severed there. And that is why complex Question like the one that i showed, it is not able to give Really great answer which follows the golden answer. And that is why the graph rag comes into picture. So microsoft actually published this paper which actually talks About how to build a graph rag. And this is how it works. It has an indexing and generation phase. So the documents comes. It actually goes to the llm. The llm actually extracts the entities and the relationships. And then the knowledge graph is constructed based on that. Entity, relationship and entity. That is the triplet that is Created and then the knowledge graph is constructed. After knowledge graph is constructed, there's a community Detection that is done, right? so which entities are closely Related to each other and they should be grouped together and That is why the hierarchical community is actually generated And for each of the communities, there's a community summary that Is generated by using the same llm, right? We have a graph. We have multiple groups in the Graph, and for each of the groups, we have the summaries. Those summaries are used to vectorize, to get vectorized by The model, and that is getting stored in the vector db. In the query time, the user can say that i want to go for a Local search or i want to go for a global search, and based on That, the vector db returns the relevant summaries. As you can imagine, if the graph is very huge, the number of Summaries will be pretty high, and the llm is going to actually Of partial prediction and then eventually combining them to get The final output and that's why the answer is generated. So the way to code is how it works. So you have to just install graph rag. It is there in the repository and you can just follow the Steps and the indexing will be done. So we'll come into how actually the numbers look like. But in the prediction part, we are actually saying that we want To go for the global query and we don't want to go at a Community level and we want to look at the entire book and do The query. And when we tried the same Question and answer, we got a really great answer now. And which is scored as 4.5, right? Which is much better than the previous 3.4 or 3.6. So what actually changed here, right? So let's see in the performance matrix. So compared to the simple rag, now the indexing time takes 2 Minutes and 20 seconds for the entire book. 31 cents, it is pretty costly now because there is multiple Call to the lms that is also being made during the indexing Phase as well as the embedding models. On the answer generation part, it took 24 minutes and 30 Seconds to answer 100 queries. This is absolutely huge compared Compared to only two minutes for a simple rack. And it costed $1, right? because for 100 questions, it Made 294 calls, right? because of the map radius Technique of combining partial responses from the llm. But the eval score is pretty high now. 4.42, right, for the entire 100 question answers. So if we look at the advantages and disadvantages, advantage is The problem is solved now using the map radius. Previously the document relationship was missing. Now we have captured it through the knowledge graph. And now it can handle complex queries. But the disadvantage that we saw is it is expensive, right? The dollar value went high. And the query latency while doing The prediction. That is the generation. So how do we solve it? So this, I think it is last And it also actually does the same thing, but the way it works Is how our brain works, right? so our brain actually looks at Particular information and uses neo cortex to identify different Features of it. Then there is a region which Actually analyzes and makes connections. And then the hippocampus region of the brain actually extracts Extracts and generates the response out of it, right? So this particular paper actually talks exactly like that And that is how it works. Book is showed to the llm. The triplet is generated. There is an entity age and the Entity. Embedding model is used to find Out the synonymous ages between similar entities. And then there is an entity passage matrix that is created. That is, what is the importance of entity across passages in That particular book? and then eventually the The knowledge graph is constructed. During the query generation part, query is sent to the lm. Entity is extracted from the lm. Then those entities are sent to The embedding model. And then using the knowledge Graph, the entities are mapped to which entities are very Similar to the entities in the question. And those becomes the query nodes. And then a personalized page rank algorithm is actually Triggered to find out the subgraph in that whole knowledge graph. That is, this is very relevant to this particular question. And based on the passage, relevant score of the entities, It is ranked and then that is sent as a context to the llm and The answer is generated. So let's see how the code Works, right? so first we do the data Preparation, so we made sure that all the solutions that we Are building is chunk size is 1024, chunk overlap is 20, and That is how the data preparation is done. Indexing is pretty simple. There is a package that you Can just install, and we just mentioned that there is the The same stuff that we actually wanted to initialize. And we indexed the documents. And finally when we generated, Now we saw really good answer, if not better, than a microsoft Graph rack, which is 4.6 score it has got for the same Question and answer. If we look at the performance, So this is how now it's changed, right? So for the indexing part, it is pretty much the same time it But the cost is one-third now, right? So you can see that the number of calls to llm is drastically Reduced from 224 to 90. And that is the reason the Cost actually went down. If you look at the answer Generation, now instead of 24 minutes, now it took around 10 Minutes to actually answer all those questions. And it is half of the cost that was incurred before. But in the eval score, it is not really great. It went down to 3.79, which is really better than the rag, but It is not really as good as the microsoft graph rack package That is there. So what went good and what went Wrong? advantage is scales well, right? And the faster create response we got, the cost actually went Down. The disadvantage is the accuracy Actually went for a toss, right? so how do we solve it? So that is why fast graph came into picture, which actually Combines the good of both worlds, the microsoft graph Rag, it does the community detection but it does not do a Very thorough summarization. But at the same time, it's Actually used as the personal space rank algorithm from the Hyper rag and it does that. So fast graph is also open source Package. You can actually try that out. So let's try building the solution. So we do the same data preprocessing part. And here we are doing the graph construction. So what we say is we actually provide certain questions that Actually helps the fast graph rack to understand what kind of Questions can be actually expected to be asked based on This particular book. And that's how the graph is Initialized using fast graph rack. When we ask the same question to this particular model now, we We got 4.8 score for this particular question and answer, Which is pretty awesome. Now if you look at the entire Q and a, we can see that the indexing time went up. Of course, the dollar value also went up for that. But it is not as high as microsoft's graph rack. If you look at the answer generation, we even halved the Time it took to do the answer generation compared to hippo It is giving the almost similar cost, but the time is very fast Now. If you look at the eval score, Now we have got a ballpark number between the microsoft Graphrack performance and the hyperact performance, which is Almost in the middle of those. So this is how, from a Comparison perspective, how they actually work, right? So microsoft graphrack actually focuses on community clustering Focuses on the synonymous edge generation and the clustering. While the fast graph rack tries to keep it flat, fast and light With graphs. For the readable core, Microsoft graph rack uses map radius, personalized page rank, And fast graph also actually implies the same algorithm to do The faster node extraction. Fast graph rack is added 0.015, So it is not major release yet. But it is very promising because It actually provides fully incremental graph extension Whenever you get new knowledge or new documents coming in. And as we saw for those particular sample, the speed is Quite high for fast graph rack compared to the other graph Rack techniques. Now, imagine your use case is It's not very simple as literary books, right, where mostly the Data is available publicly and you have certain knowledge-based Articles which is very proprietary to your organization, right? So you don't actually want to send that information even as Part of the context, right, to any third-party model service Provider, right? so that is why the instraclab Comes into picture. So instraclab is an open source Tool which actually helps you fine-tune any model, Which is, employs two things. It actually uses synthetic data Generation using a teacher-student sort of, i mean, Architecture. And at the same time, it Actually fine-tunes the models, i mean, including various advanced Techniques. So you can imagine, in a fast Graph rag, you can actually replace that particular model With an instruct lab-tuned, fine-tuned model. And at the same time, the embedding models also can be Can be tuned for to understand that particular domain of the Documents that you are actually trying to solve for and you can Actually use something like llama index to actually fine Tune the model. So that is going to supercharge Your application going forward, right? So that is pretty much it. And these are the references. So these are the blocks i have written which actually includes The entire logic and the code. You can actually go there and Actually try it out yourself. I would encourage you to take a Picture of this last slide. So it has the link to the deck, The code, the blocks, and my professional coordinates. So this is it from me, and i would like to know once you try It out, what is your experience, and please reach out to me if You have any questions. But, yeah, i'm happy to answer answer any questions if you have any.
+
+**Speaker 2** _[22:06]_
+
+Thank you so much for your talk to him and if you want to ask Questions you can do so in slido and many of you have Already asked some questions so let's get right to them. The first one is in your staring slides where the golden answers For those 100 questions were they made manually, how come They come into being if they ain't generated?
+
+**Speaker 1** _[22:24]_
+
+So if i go back to that particular slide, so we use the Cloud 3.7 sonnet model, and we use this particular prompt to Generate it, so it is a synthetically generated data by Cloud because it actually supports huge context window Where we actually send the entire book as part of the Query itself, and we ask that can you please generate 100 Which are extremely difficult for a rack system to answer but It requires a sophisticated graph rack solution to answer. That's how we generated it.
+
+**Speaker 2** _[23:00]_
+
+And then the second question, how do you know if the golden Cloud answers are correct?
+
+**Speaker 1** _[23:05]_
+
+We don't know, right? so that is where we have to trust The bigger model. So that is what actually is Introduced as error to any synthetically generated data That we produce, right? so there is an intrinsic error That is already present in the model that is generating the Data, right? we are just assuming that that That that model is really good and we are going to trust it Completely and we are going to find out the solutions that we Are building, whatever answer it is generating, whether it is Actually following that model's understanding or not, right? We don't know for sure whether that is the absolute truth or Not, but we are just saying that based on that particular model As it is a great model, we are just assuming that it is the Right answer, right? so that's how the assumption is.
+
+**Speaker 2** _[23:57]_
+
+Thank you, and then the next question what do you use to store the knowledge graph?
+
+**Speaker 1** _[24:02]_
+
+To start the knowledge graph,
+
+**Speaker 2** _[24:06]_
+
+Star.
+
+**Speaker 1** _[24:08]_
+
+Oh, okay. So, we actually, so, as you can see that for the Microsoft graph rag, it can be actually stored in a vector database, right? Eventually what happens is once the summaries are generated, you can use, for example, Milvus or any other vector databases to actually store the community summaries as well as the embeddings. And eventually when the query You actually use that particular vector to do the relevant knowledge. So any type of vector database you can actually use because you Have to just write that logic to write to the vector database as Well as write the logic to retrieve from the vector Database. In this code that i showed you, It is actually keeping it in memory. So that's how it actually works in the code right now.
+
+**Speaker 2** _[24:58]_
+
+Thank you and then i'm going to read the next question here word by word in fast graph rack how page ranks graph traversal with neural Retrieval for multihop queries is the learned re-ranking layer for final subgraph selection
+
+**Speaker 1** _[25:12]_
+
+Okay. So what happens is every entity In the first graph rag actually has the information about what It is. So essentially a description is Actually generated by the llm for every entity that is Present in the knowledge graph itself, right? When the question is coming, the llm is actually asked, can you Please generate the entities from that query and then that That entity is actually passed through the model to generate The embeddings and those embeddings are matched with the Description embeddings that is present in the knowledge graph. Then you know that the entities that is present in the query, How many nodes in the knowledge graph are very relevant or Similar to the query nodes, right? And that is where you start your journey as a page rank. That becomes your query node or the starting point in the Knowledge graph to start the page rank. And then you start actually hopping from one node to other And every time you do the hop for every entities, if you can Remember that there is a passage score for every entities and That score is actually used to filter out the final list of Nodes that this is where i will call it as an end of the page Rank hopping and that is the subgraph i'm going to use as a context finally for answering. So that's how it works.
+
+**Speaker 2** _[26:35]_
+
+Excuse me, can you please speak into the microphone?
+
+**Speaker 1** _[26:39]_
+
+I just asked this question. Does it happen automatically or We make sure that such hops should happen and such hops Should not happen? is the filtering happening? Yeah, so what happens is the hopping is actually part of The page bank algorithm and finally the stopping condition Comes from the entity passage score, right? So every time you hop, you actually reevaluate what is the At that particular point, if it is more than the threshold, then You keep on hopping again. Once it crosses, you just stop. That's it.
+
+**Speaker 2** _[27:15]_
+
+Thank you. Then the next question here on Slido, what was the main reason the graph rack improved accuracy?
+
+**Speaker 1** _[27:21]_
+
+Okay. So what happens in this particular Book, for example, right? it has multiple chapters. And the main protagonist, that is scrooge, and that is why i Actually chose it deliberately. So scrooge is actually the main Protagonist of the story, and he appears in every chapter. All the actions, all the decisions he makes actually Affects other entity or other people's actions and lives, Right? so there is a butterfly effect That actually starts from scrooge's character and goes Through propagate through multiple people's life and their Actions eventually. When we did only rag, it does Not consider that relationship and that butterfly effect that Actually keeps on propagating. Because it just captures only Wherever scrooge is mentioned, right? But rather scrooge influence somebody else's action and That is completely missing in the rag solution. But in the graph rag, because we are constructing this knowledge Graph, right, so we know that these are the people related to Scrooge and with this manner, right? So that is why when we are capturing what is scrooge about, What is his personality, so that actually makes sure his Interaction with all the other entities present in the book and That is important to capture which is actually missing for simple Rack solutions. So that's all.
+
+**Speaker 2** _[28:45]_
+
+Thank you. I'm going to skip the next Question on the slide because you just answered it. Then the very last question is which indexing method is used Here and how did you find this indexing method works well for This use case?
+
+**Speaker 1** _[28:57]_
+
+So for the graph rag, all i would say is the models that we Selected for the indexing is i just chose it to, i could have Chose any models, specifically anything english language based Model. Just wanted to make sure that we Use the same model across all the solutions that we're trying So that we can do apple to apple comparison. The best way to choose the model is to actually evaluate on On certain scores like recall at the right end, accuracy at the Right end, mean reciprocal rank, those are the different metrics That needs to be used to actually pick it up. So when you actually find in the model, so assume that the Embedding model does not actually have really good Understanding about the document itself, so that is where you Need to find in the model. And that is where you will Actually see those metrics and eventually check whether the out Model is actually better than the fine tuned model and that's How you choose the final model. Then the indexing part, in this Case, the hyper parameters like the context, sorry, the chunk Size and the chunk overlap, that is actually for this particular Presentation were chosen arbitrarily, but it was chosen For uniformly across all the use cases just to make sure that we we do the comparison apple-to-apple, so that's all.
+
+**Speaker 2** _[30:21]_
+
+Thank you all. Unanswered questions i'll post To discord and you said you would answer them. Thank you so much.
+---
+transcript_status: auto
+---
+transcript_language: en

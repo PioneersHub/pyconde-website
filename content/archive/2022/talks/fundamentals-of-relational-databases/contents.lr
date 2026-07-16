@@ -1,0 +1,264 @@
+title: Fundamentals of relational databases
+---
+description: Are you somewhat comfortable with using SQL to access data, but are curious to know what happens behind the scenes when you send off your query? Then this…
+---
+created: 2021-12-24
+---
+code: KMFPAN
+---
+slug: fundamentals-of-relational-databases
+---
+speaker_names: Katharina Rasch
+---
+speakers:
+
+
+
+### Katharina Rasch
+
+Data scientist | computer vision engineer | teacher
+
+PhD Computer Science (KTH Stockholm)
+
+15 years of software engineering experience | 6 years with a focus on data science / computer vision
+
+freelance since 2017
+---
+abstract:
+
+
+Are you somewhat comfortable with using SQL to access data, but are curious to know what happens behind the scenes when you send off your query? Then this is the talk for you!
+
+Relational database systems have been around since the 1970s and they are stacked full of cool ideas and concepts for making data handling fast and secure. And we are still using them, nearly unchanged, 50 years later! Reason enough, I think, to learn a bit more about how they work and the fundamentals of their design.
+
+Audience level: If you have played around with SQL / written some smaller queries, you’ll be just fine.
+---
+full_description:
+
+
+OK, so I took this database class back in university AGES ago. And it is one of those that has stuck with me ever since. I feel like many of the concepts I learned in that class still guide me today when I approach data science / software engineering problems, even if my problem doesn’t even have anything to do with databases specifically. That is how strong these concepts are. And that is also why I really want to share them with others.
+
+Some of the things we’ll cover are:
+
+- What is the query planner and what does it do with my query?
+- What are indices and how do they help speed up queries?
+- What is the ACID principle and why is it fundamental to guaranteeing data validity? 
+
+I won’t go deep into things like data normalisation / schema design, because that really should be a talk on its own. But I’ll make sure to highlight the differences between actual relational database systems (like PostgreSQL, MySQL) and data warehouses (like Google BigQuery and Amazon redshift).
+
+Overall, I’ll keep it light and there will be loads of examples to help you follow along!
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: Data Handling
+---
+tags:
+---
+submission_type: talk_long
+---
+submission_type_label: Talk (Long)
+---
+submission_type_id: 1701
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: none
+---
+domain_expertise: some
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/KMFPAN.png
+---
+youtube_id: QQUpQ1tpF_o
+---
+video_link: https://www.youtube.com/watch?v=QQUpQ1tpF_o
+---
+video_published_at: 2022-05-06
+---
+video_duration_iso: PT39M47S
+---
+video_thumbnail: https://i.ytimg.com/vi/QQUpQ1tpF_o/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+Welcome everyone this morning who is joining us here in the audience live in Berlin and also to those joining via the live stream today. My name is Katharina. I have a background in computer science. I've been a data scientist for the last eight years or so. I've been freelance for the last five years. For my freelance clients, I build all kinds of data science and software solutions. I also do a whole bunch of open source work, so if that sounds interesting to you, reach out to me, chat with me after the talk, or reach out to me via email. If you search for what skills do I need to have to work as a data scientist, or data science interview questions, one thing that always comes up is SQL. Yeah, that's fair. Rare is the data science jobs where you don't have to query for your data that you want to analyze. Rare is also the Python backend engineering job where you're not working with databases in some kind of fashion. Today, I don't want to talk all that much about SQL at all. I want you to encourage to take a bit of a broader picture and look a bit more at the system that you're sending those queries to namely the database management system because no databases they're kind of running the world right nearly every service nearly every venture imaginable be it an e-commerce site be it bookkeeping software be it manufacturing be it government services they all need to store data and they all do that in a database system so there's probably millions, I guess, of those installed throughout the world, the vast, absolute vast majority of which are relational database systems. There are other systems, for example, there are things called graph databases and NoSQL databases, but today, let's have a look at relational database systems. Again, those are the vast majority of the databases that are installed throughout the world. And you know what? The material that I'm going to present to you today, it's from the 1970s. 50 years old, still going strong, still running the world. And I think that warrants a closer look. But of course, I took a database class back in university. It took like five months, came with a big proper exam, and a textbook like this. Today, we have 45 minutes. So, I present you with what I would call a refreshingly simple agenda. I want to just focus on two things. I want to tell you about the relational model and the relational algebra. And that sounds all mathy and formal right now, but I promise you I'll keep it lightweight. And I'll show you how the relational model builds a beautifully simple abstraction, a way of expressing data, on top of which engineers and researchers have built all kinds of nifty solutions to make your lives easier when dealing with data, and one of those I will be talking about today, which is the query planner, which is what is happening when you are sending a query to your database system. But first, let's get started with the relational model and the relational algebra. Throughout this presentation. I'm going to be using this very simple database. You would see something like similar to this in some kind of e-commerce system probably. So we have a table, it's called product, where we have one row per product, and for each product we know the product ID, we know a category, the name of the product, maybe there's a description and the price as well. And we have a second table called category, which maps category IDs to the name of the category and maybe a nice little icon to display on the website. You see there is this link, this relationship between product and category, so you can look up for your category, all the information about the category of that product. All right. And that's it. That's actually it. Relational model is nothing more than that. All data is expressed as tables and relationships between those tables. In the original paper, which is from 1970, the author uses a slightly different language. A table isn't called a table, it's called a relation, and that is where the name relational database is coming from. A row isn't called a row, it's called a tuple, and a column isn't called a column, it is called an attribute in that tuple. Let's keep using the language we are now more used to, tables, rows and columns. But again, that's all there is to the relational model. All data is expressed as tables and relationships between these tables. And then the relational algebra is operations on these tables. Let's look at our product table again. Let's say we are only interested in some of the columns in this table. That operation is called a projection. It takes as input your table and produces another table that only contains the columns that you need. Of course, you probably all know that, right? It's nothing more than the list of columns you're interested in in your SELECT statement. Similarly, there's an operation called the SELECTION, which only grabs the rows that you need that match some condition that you have specified. Again, you all know that it is just the WHERE clause within your SQL statement. So you've probably seen that I'm using Greek symbols here for both the projection and the selection. That is just to give you a hint that everything I'm talking about right now in the original paper is defined in a way more formal setting. So there is some kind of formal model behind all of that, but let's not bother with those details today. A third operation you probably also all know. It's called the join. We're combining two tables. So here we looked up for our product table, we looked for each of the product, we looked up the name of the category that product is in. And we see, again, you probably know that from your work with SQL, we see the keyword join there in our query, we're joining the product and category, and we're saying on which column to join, meaning which column they both have in common, and that we can use to match the data from one table to the data of the other table. There's a few more, not all that many, just a handful more of operations, but they all have in common. They all take as input one or two tables, and as output, they produce another table. It's an extremely simple model we have. Data expressed in tables, and we have operations that take tables and they produce tables. And it's just that simplicity that allows us to make way more complex queries, because since all of these operations have have the same interface. You can just combine them however you wish. You can take a table, do a projection, grab only a few columns, join that up with another table, followed by a selection, only a few rows of that table, and have another join. You can mix and match as much as you want. And, yeah, sometimes you might be going too far with that. Probably most of us have had to debug a query like this at some point during our career. Yeah, and you see the scroll bars also in both directions there. Little side note, did you know that even the metadata about the table, so the thing that describes the table, is in a table? So here I'm using Postgres, and it has a database called information schema, which has a table called columns. I could just send a select query to that table. So here I'm interested in the name and the data type of the columns in my table product. So I'm sending a query to information schema dot columns with a selection or a where clause, table name equals product. And as a result, well, I get a table. And that table contains, for example, the row that I have a column named ID. It's the first column in my table. It's an integer. I have a column named name. It's the third column in my table. And it is of type character varying, which is just another word for a string. So it really is just tables. It's tables all the way down. Now, you might be just kind of scratching your head a bit and be like, all right, so what? Because it does feel very natural to have data in tables, right? But, of course, hindsight is 20-20. It wasn't always that natural. Before relational database systems, I remind you those came up in the 1970s, people were always writing their own custom data storage solutions. So you'd had your program, and there was no database you could give your program to. You'd have to take the data, find a suitable data format to store that data. And if your program changed considerably, you'd have to write custom data transformation logic to make the data that you had stored match to the data that you need in your system. Relational databases actually weren't the first attempt at making a system that is independent of the data that you want to store. There was also something called hierarchical database systems. The idea was there that you model data in a hierarchical system. For example, you have a department which is made up of different teams, and each team has these people But it turned out that this was too limiting a data model, only there was a lot of data that you couldn't fit into this hierarchical schema. It was only when relational databases came up with a way of representing data that actually works for a broad, broad range of data that we achieved something that researchers called data independence. So the independence of the data that you're working with from the way it is stored. As long as you can fit your data into a table, into this relational model of tables, relationships between those tables, then you don't need to care how they are stored. You give them to your database system, and it takes care of all of that for you. So we have seen relational model, it's extremely simple way of thinking about data. Tables, relations between the tables, and operations that take the tables. And now I want to show how, thanks to that simple data model, that simple interface, fantastic solutions like the query planner exist in the databases today that you're using probably daily. So let's think again about our two tables. We have our table product, and we have our table category. And let's make it a bit more fun. Let's say our product table now, it doesn't have three products. selling 10,000 products, but you still only have three categories. And let's do a bit more complex query here. And this query, it will look up, basically, you're interested in for the product named genes, what is the name of the category that product is in? Let's take apart this query. Let's look at what operations we can find in here. We see a join. We're joining between product and category on that column that they have in common, the category ID. We also see a selection. We have a where clause, and we're only interested in products that have the name jeans. And we also have a projection. In the end, we're only interested in the category name. So we have three operations, but the question is, what order should we execute them in? And also, does it matter? Is the result going to be the same, whatever the order we execute the query in? Let's try it out. This join is looking mighty fine at me. Let's try starting with that one. So as we do the join, what is happening is your database system is going through all of the product table. And for each row, it's going through all of the category table to look for the category with the right ID. And then it just meshes those columns onto the row. We get a table like that, which is quite long. We have 10,000 rows. And we have all of the columns combined of both the product table and the category table. Next up, let's do a selection. So we're only interested in rows where the product name is genes. In our case, that is just one row. Finally comes our projection. We're only interested in the name of the category, so we're only keeping that column. So our result of those three operations is a table with one row and one column. But let's reconsider what we just did. We built up this huge table with 10,000 rows and all of the columns, and we did a lot of work doing that, and then we just threw it all away. We only kept one row, and then we only kept one column. That doesn't seem very efficient, does it? Let's try that again. This time, let's start with our selection. From the product table, let's keep only the rows that contain genes. One row. And now, of course, our join is much more simple. Instead of having to go through all of the rows in that table, we just have to do it for one row, look up the right category, and we get, as a result of that join, a table that contains only one row and a whole bunch of columns. Finally, we do the projection. we only keep one column, the name of the category. And yes, we have exactly the same result as the previous one, but we probably did work a bit more efficiently both in terms of CPU usage as well as memory usage, because we kind of have to keep all of those intermediary tables also in memory, right? And if you have some time, think about, could we also start with the projection? What would happen then? For now, I want to tell you that you don't have to care about these things, because that is exactly what the query planner does. So you send it that SQL query, and then it does just what we just did. It devises execution plans. So it takes apart that query, looks what kind of operations are in there, and tries to find or possible combinations of operations. And quite simple with the query we just saw, but the one earlier from Stack Overflow, the screenshot, probably has to work quite a bit on Query Planner. It then, again, does exactly what we just did. It tries to approximate the cost of executing the query, and that cost is not really some kind of abstract measure. It's It's not in terms of actual money, but in terms of CPU time, memory consumption, running time of the query, all of which at some point, of course, translate into money. The query planner does it exactly like we did. It knows, it keeps statistics about your tables. It knows number of rows in your table, number of columns in your table. For each column, it knows how many distinct values there are. For numeric attribute, it keeps statistics about the spread of the data. To be able to get an idea of does it make sense to do the selection before the join or the other way around, and give you an approximate cost of the query. Finally, again, just like we did it, picks the best plan. You might be asking now, okay, have I interacted with such a thing before? Do all database systems have a query planner? And the answer is kind of yes. Of course, there's thousands of these systems out there. All the big classic relational systems such as Oracle, Postgres, MySQL, SQLite even, they all have a query planner. In terms of when we're talking about data warehouse systems on the cloud, Google Cloud BigQuery, it has a query planner. Amazon Redshift, yes, it also has a query planner. You might even argue that for a cloud database, it's even more important to actually have a query planner because you want to avoid sending a bunch of data around between the different nodes that you in the end are just going to throw away. And also, actually, you can see what a query planner is doing. Here's an example from Postgres. So what you can do is just before your query, you just put explain. And then you get an output like this. And this is the query plan. And it's a bit hard to decipher. And I'll admit, I've rarely needed to use that. Most of the times, the query planner is doing a really good job. It's only sometimes that a query is taking so long and you're running it all the time and you're getting so frustrated, and that's probably when you want to be looking at the query planner to see what's going on. So let's try to dig a bit into what's happening here. First thing we see is our selection. And it's not called a selection here, but we can see that that's what's happening because we have this filter there. the name should be jeans. We also see the join, so we're joining between the result of our selection and the category table, which is the lowest row, and it's not called a join here, it's a nested loop, and we saw earlier that's exactly what we're doing, right? We're going through the product table and try to find the matching rows in the category table. And then we have the cost of this query. You get a range of the cost, and here is actually quite an expensive query. So this is not, it doesn't cost $200, again, it's some measure of CPU memory consumptions, etc. Basically, you can only consider a cost expensive by comparing against other queries run on the same system. I'll tell you this one is expensive right now, and we can do better. If we look a bit deeper, we see that there's one bit in the query that's causing all of that cost, and that is our selection that we're doing in the first step, whereas then finding the right category row for each category ID, that's actually pretty quick. So what's going on here? And the hint is this one, the sequential scan. Let's look at what's happening there. name for it would be table scan, a word I'm a bit more comfortable with. Basically, when your database system is looking for the right row in that database, it has to go through the whole table, which we know has 10,000 rows, to find only the one table that is relevant. And that is causing us, causing it all to take that long and to be that expensive. Well, we could do better. We can do what's called creating an index. Here we're creating an index on the table product in the column name. When basically what they're doing is building another data structure, another view of looking at the data. I present it here as a dictionary. It's not actually a dictionary. It's more like a tree-like structure. But I think this was a way of visualising this easier. So instead of going from ID to name, now you go the other way around. So you know that, for example, bread is in row 1. You know that apple is in row 2 and 10,000. And you know that jeans is in row 3. And now, of course, instead of having to do this whole table scan, you don't need to do that anymore. look up in which row your relevant attributes are. So let's look at a query plan before and after doing that. So on top is the query plan we saw before, at the bottom is the query plan after we have added the index. We see one One thing has changed. Instead of the sequential scan, we now have an index scan, and our cost decreased drastically. Like, we are 10% cost of what we were before, and also all cost then decreased considerably. Now you might be thinking, all right, that's pretty useful. Can't we just have an index for every column? Then everything we query could be fast. But of course, there's always weighing off of different considerations, right? And here, you need to consider first the storage overhead. So instead of just keeping one table in storage, now you also need to keep this other, this index data structure in storage somewhere, and you need to do that for every column. And then you need to consider what happens when you add a new row to the database, because now you're not just inserting it into your product column, you're also inserting it into your index, and your index has also special features for making queries quite fast, so it can take a while to add to the index. So you have both storage overhead and insertion overhead. So index actually only makes sense if this is a column that you often query for. If you find yourself doing the same query again and again and it's always really, really slow, then talk to your database administrator and ask them if it's possible to add an index to that query, to that column that you're using in your selection or the column that that you're using in your join, and it's likely causing your query to be so expensive. OK. Like I mentioned earlier, rather lightweight agenda, also not to overwhelm you with the details here today. There's, of course, many things that I couldn't mention today. One thing I would have loved to mention is how the relational model, this beautifully simple abstraction, also helps you when inserting data. So things like constraints for maintaining data integrity. Constraints are only possible because everything is in a table, and we can just simply say, this column should have a constraint. We should not have any null values in there because we have this data independence, and it's possible to just say columns should not be null without having to know much about the underlying data. Similarly, transactions, which help you when there's concurrent access to the database. Again, they are greatly aided by us having this lovely abstraction. And finally, there's this whole big thing of, well, How do we actually find the tables that fit our data? So that is entity relationships, diagrams, data normalisation, so ways of modelling your data as a table, which I think is probably a 45-minute talk, at least in its own right. So I'll keep it at this for today. a way that the relational model and relational algebra is beautifully simple, but extremely powerful abstraction, and one of the important things it gives us is data independence, which then enables us to build cool things on top, like, for example, the query planner. You can reach me by email, and my slides are already online on my GitHub. Thank you.
+
+**Speaker 2** _[27:49]_
+
+Thank you, Catherine. OK, I'm supposed to moderate the Q&A session through Slido. But I don't see any question at the moment. So we are, I know, we can do also the old fashioned way question.
+
+**Speaker 3** _[28:17]_
+
+Yeah, thank you for the great talk.
+
+**Speaker 2** _[28:18]_
+
+the great talk.
+
+**Speaker 3** _[28:19]_
+
+I have one question. You said it's due to the job of the database designer to decide which columns are
+
+**Speaker 2** _[28:27]_
+
+ought to have an index.
+
+**Speaker 3** _[28:28]_
+
+But can't the databases decide?
+
+**Speaker 2** _[28:30]_
+
+Databases decide on their own.
+
+**Speaker 3** _[28:30]_
+
+They can do some statistics on which column has been queried.
+
+**Speaker 2** _[28:33]_
+
+has been queried how often and then
+
+**Speaker 3** _[28:34]_
+
+how often and then decide to set up an index or throw the old ones away? Is this done?
+
+**Speaker 1** _[28:39]_
+
+It sounds like a great idea, so great that probably somebody has done that. I don't know. I'm convinced. So hopefully somebody has done that.
+
+**Speaker 3** _[28:57]_
+
+Thank you for your great talk. I wanted to ask, considering your vast experience, what do you think is the future for the relational databases? Will they just fade away, become obsolete like everything in the software world, or do you think they will be improved and improved, iterated over and over again?
+
+**Speaker 1** _[29:21]_
+
+Well, I mean, like I said been going strong for for 50 years now and of course there's other system No, SQL had a big big following in the early 2010s seems to have quieted down a little bit and it tries to solve a slightly different problem, right? Relational database are a generalist approach General way of more of storing data. Whereas no SQL databases. They are really for very specific types of data and specific types of usages. From what I understand, relational databases actually have changed after new SQL databases came up to also incorporate what they offer to the people. So it does seem to me that there's still a lot of development in the field, and I'd say it's probably something we're going to be using in the future. Actually, in legacy databases, in legacy systems, you see still hierarchical databases hanging around. So probably not we're not going to get rid of this technology so so quickly
+
+**Speaker 3** _[30:31]_
+
+Hello, thanks for your talk. I was wondering if you had some additional resources that go maybe beyond a little bit, but are still like, I don't know, let's say beginner-friendly for non-database experts.
+
+**Speaker 1** _[30:48]_
+
+Yeah, I would have loved to give you this and maybe somebody else else knows I've looked for something like this but it seems like there's only textbooks and intro to SQL so The middle ground I haven't really seen well covered to be honest, which is a shame
+
+**Speaker 3** _[31:11]_
+
+Thank you really much for your talk. As someone who is working with Google BigQuery, I was interested if you could elaborate a little bit on the differences between relational databases and warehouse systems. Because I always thought Google BigQuery is also kind of a relational system, because it really feels like it.
+
+**Speaker 1** _[31:32]_
+
+like it yeah it does feel like it right and i mean this is it's kind of testament to the strength of
+
+**Speaker 3** _[31:32]_
+
+Yeah.
+
+**Speaker 1** _[31:37]_
+
+the relational algebra that we're using sql to query all kinds of database systems it's the de facto standard language for doing that even if maybe the data behind is not actually stored in a relational manner so for for big query it we we are seeing tables and we're running sql so we're doing relational algebra i actually don't know what's going on behind i don't think it's stored as a classic relational system, because it's really for distributing data across many, many nodes, which you can do in a relational system, but I think it's optimised for that. So I actually don't know, but to me it also feels like accessing just any other relational system.
+
+**Speaker 2** _[32:27]_
+
+Yeah, the slider was better.
+
+**Speaker 3** _[32:33]_
+
+Hello. Thank you for the talk. I have a naive technical question. I hope you don't mind. When you index that column in whichever slide it was, I forgot the number, when you have different values in the column such that it's comparable in the size to the actual table, when you're getting the indices from that, you said it was not a hash map or a dictionary but something else. we're getting the values indices from that structure how is it that it's reproduces a cost so effectively because as far as I imagine it if you for instance have all the different names in the table you have to go through all the different names instead of going through all the different rows right so
+
+**Speaker 1** _[33:23]_
+
+I mean, you're right, an index works best if you have, in case of a categorical column like this, if you have very few distinct values that are repeated over different rows. It is worth less if each value only comes up once, but still the tree-like structure gives you something like an order of log n access to that data, whereas with the table scan you would get in the order of n. access to the data. So it still adds a little bit, but it's even better if you have data that is compressed more.
+
+**Speaker 3** _[34:04]_
+
+Hi there. Thank you once again for your presentation. Just for those of us who don't know, could you briefly explain the difference between a hierarchical and a relational database?
+
+**Speaker 1** _[34:15]_
+
+You know, it's a very good question, because I asked that myself, in a way, because there's very little material on relational databases out there. So the idea on hierarchical databases out there, the idea really is that it's data that you can model in a hierarchical fashion, where it's not possible to... So you can only have links going from the top to the bottom, but you can have links between the different elements or upwards of the tree. And that is quite restrictive to many use cases. But the one example, the one with the department and the different teams, that's actually the one that's always given, and I didn't dig any deeper beyond this. Hi. I wanted to piggyback off the question about BigQuery. query. Someone told me that it isn't necessary to index tables in a data warehouse, cloud data warehouse. Any thoughts on that? I'm sorry, I didn't get the question. Someone told me that indexing is not necessary for cloud data warehouses. Do you have any thoughts on that? It's not something I've worked with so much. I'm sorry, I really don't know.
+
+**Speaker 2** _[35:37]_
+
+other questions no I just otherwise will be not recorded or streamed so
+
+**Speaker 3** _[35:53]_
+
+Hi. I have a question. You mentioned that adding indexes is not the best thing for every use case. From your experience, when you have a table that's updated regularly, like stream updated, does it make sense adding indexes? Is there, from your experience, a pain point when it doesn't make sense to add indexes?
+
+**Speaker 1** _[36:14]_
+
+Well, I mean, I think that's also why we have this separation between operational databases where you store whatever data is coming in, and data warehouses where you then read from and do analysis on. If you're streaming data and doing all inserts all of the time, then the index is going to hurt you. And then it's probably the model where you want to have a separate database like a data warehouse that just copies over that nightly or at higher frequencies, where you have indexes at the strategic points that you don't need to add into because this database is read-only, basically. But it's always use-case-by-use-case dependent, and hopefully you have some experienced database administrator who can help you out figuring at what point it makes sense to switch to a model like this. You should probably check the Slido again as well.
+
+**Speaker 2** _[37:11]_
+
+as well as this.
+
+**Speaker 1** _[37:12]_
+
+Well, yeah. Sorry, is there anything in this light?
+
+**Speaker 2** _[37:14]_
+
+Yeah, no, I just checked. There's no question on Slido. All right. And we still have some time for a few questions, if you will.
+
+**Speaker 3** _[37:26]_
+
+Hello. Thank you for your talk. Do you have an opinion between open source SQL database and proprietary ones like Oracle compared to PostgreSQL? Maybe in the engine behind or the ability to look into the code to understand how it works?
+
+**Speaker 1** _[37:47]_
+
+I mean, thousands, hundreds of thousands of businesses are using Postgres or using MySQL or MariaDB. It seems to be a very mature technology. If the Oracle salesman doesn't give you any better arguments for why you should be using Oracle, then I would go open source.
+
+**Speaker 2** _[38:12]_
+
+All right questions
+
+**Speaker 3** _[38:27]_
+
+Hi, thanks for the great talk. I was wondering, are there any difficulties arising when you are going to higher dimensional databases, like out of 2D to, I don't know, 3D, 4D, ND?
+
+**Speaker 1** _[38:41]_
+
+Yeah, this is probably where your relational model is going to start to crack. And I mentioned earlier something like graph databases, right? Where things, let's say you have a graph of the friendships that people have and you want to have queries such as, who is the friend of this person who is also a friend of this person? That's, again, one of the things that you can put in a database, but it's really hard to use the relational algebra to use that data. So if you can't find a way to normalize your multidimensional data downwards towards two-dimensional, such that you still have expressivity in your queries, then probably it's not the right tool there.
+
+**Speaker 3** _[39:21]_
+
+Okay. Thank you.
+
+**Speaker 2** _[39:26]_
+
+other questions well so I guess this is it Thank You Catherine for your speech and your contribution
+
+**Speaker 1** _[39:41]_
+
+Thank you all.
+
+---
+transcript_status: auto
+---
+transcript_language: en

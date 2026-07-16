@@ -1,0 +1,67 @@
+{#-
+  Breadcrumb macros.
+
+  Usage from a page template:
+
+    {% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
+    {{ breadcrumb([
+      ('/talks/', 'Talks'),
+      (none, this.title),
+    ]) }}
+    {{ breadcrumb_jsonld([
+      ('/talks/', 'Talks'),
+      (this|url, this.title),
+    ]) }}
+
+  Each entry is a (path, label) tuple. The first crumb (Home) is added
+  automatically. Use `none` as the path for the current page so it
+  doesn't render as a link in the visible breadcrumb. The JSON-LD
+  variant requires every entry to have a path (use `this|url` for the
+  current page).
+-#}
+
+{%- macro breadcrumb(trail) -%}
+  {%- set branding = bag('branding') -%}
+  <nav class="breadcrumb" aria-label="Breadcrumb" data-pagefind-ignore>
+    <ol class="breadcrumb__list">
+      <li class="breadcrumb__item">
+        <a href="{{ '/'|url }}" class="breadcrumb__link">Home</a>
+      </li>
+      {%- for path, label in trail -%}
+      <li class="breadcrumb__item">
+        {%- if path and not loop.last -%}
+          <a href="{{ path|url }}" class="breadcrumb__link">{{ label }}</a>
+        {%- else -%}
+          <span class="breadcrumb__current" aria-current="page">{{ label }}</span>
+        {%- endif -%}
+      </li>
+      {%- endfor -%}
+    </ol>
+  </nav>
+{%- endmacro -%}
+
+{%- macro breadcrumb_jsonld(trail) -%}
+  {%- set host = bag('branding')['canonical_host'] -%}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "{{ host }}/"
+      }
+      {%- for path, label in trail -%}
+      ,{
+        "@type": "ListItem",
+        "position": {{ loop.index + 1 }},
+        "name": {{ label|tojson }},
+        "item": "{{ host }}{{ path }}"
+      }
+      {%- endfor %}
+    ]
+  }
+  </script>
+{%- endmacro -%}

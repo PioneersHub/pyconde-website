@@ -1,0 +1,162 @@
+title: Replacing Callbacks with Generators: A Case Study in Computer-Assisted Live Music
+---
+description: *Callbacks* have become an ubiquitous programming technique that we use every day without even thinking about it. They are definitely handy in many…
+---
+created: 2023-12-15
+---
+code: Y7R9GZ
+---
+slug: replacing-callbacks-with-generators-a-case-study-in-computer-assisted-live-music
+---
+speaker_names: Matthieu Amiguet
+---
+speakers:
+
+
+
+### Matthieu Amiguet
+
+Trained both as a musician and a mathematician, Matthieu Amiguet took up programming as a hobby and somehow ended up making a PhD in computer science. He now works freelance - both as a musician and a developer. He is Artistic Director at Les Chemins de Traverse, jointly with Barbara Minder.
+
+Les Chemins de Traverse is a collective of musicians, artists and researchers from a variety of backgrounds with a focus on sonic exploration and live performance. They cover a large musical territory from renaissance and baroque music to jazz, rock music and contemporary experimental noise. More often than not, they mix different styles and techniques - like in a weird chemical experiment that would produce nice colored fluids but might as well explode at any time.
+---
+abstract:
+
+
+*Callbacks* have become an ubiquitous programming technique that we use every day without even thinking about it. They are definitely handy in many situations, but sometimes they feel more like a burden than a help. In developing an interactive realtime audio processing system for use on stage in live music, we encountered such a situation. This talk will present how a few dozen lines adding a thin abstraction layer allowed us to replace a complex callback mess with tremendously more readable *generators* (yes, you know, those functions which `yield` results instead of `return`ing them...).
+---
+full_description:
+
+
+At [Les Chemins de Traverse](https://www.lescheminsdetraverse.net/) we explore ways of "augmenting" acoustical musical instruments with new sonic possibilities offered by computers (think "augmented reality" for live music). For doing so, we are using Olivier Bélanger's great [pyo](http://ajaxsoundstudio.com/software/pyo/) module for realtime audio processing. To make the system interactive, this module allows to register callbacks on some events. While this works great in many situation, it can get very cumbersome when we design a stateful system, where the same event must trigger different callbacks depending on the system's inner state.
+
+This talk will present how we developed a thin abstraction layer that allows us to replace many callback functions together with many registering/unregistering of these functions by a nice, streamlined *generator* definition that's incomparably more readable than the many-callbacks version. This allows us to keep our mind focused on what's important, namely supporting the music we want to play, instead of tedious boilerplate code.
+
+While our use case is admittedly very specific, we believe that the ideas we present could be adapted in many other situations where callbacks are used for technical reasons, but lead to bulky and contrived code.
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2024-04-24
+---
+start_time: 13:45
+---
+end_time: 14:15
+---
+slot_id:
+---
+track: Python Language & Ecosystem
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 3578
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: None
+---
+supporting_material_url: https://www.matthieuamiguet.ch/blog/PyConDE24
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/Y7R9GZ.png
+---
+youtube_id: PkAE6dsqIJw
+---
+video_link: https://www.youtube.com/watch?v=PkAE6dsqIJw
+---
+video_published_at: 2024-10-28
+---
+video_duration_iso: PT28M5S
+---
+video_thumbnail: https://i.ytimg.com/vi/PkAE6dsqIJw/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:06]_
+
+I am actually very excited to be here today to talk about replacing callback with generators, a case study in computer-assisted live music. In fact, this is only the official title of my talk. I know how to look like a sensible guy when I must. But, you know, it's siesta time and you're tired after two days and a half of talks, so I decided to tell you a little story. and I retitled my talk The Augmented Mutual A Tale of Music, Snakes and Wizardry Once upon a time in a land far, far away lived a man who went from town to town playing music and bringing joy to the inhabitants all over the country He also had a magic box he called a computer and liked to extend the sonic possibilities of his instrument with real-time audio processing in those ancient times augmented reality was very popular and as this guy did some kind of augmented reality in the audio world he was called the augmented minstrel his music was a fascinating blend of old tunes and more modern styles that was very personal and delightful to the ears Thank you. Thank you. Thank you. Thank you. Thank you. Thank you. Thank you. In the beginning, the minstrel used existing magic like loopers and effect boxes, but he soon encountered a problem. As his music demanded many different actions almost at the same time, he would have needed many hands and legs to control his computer. As he was no spider, he needed another idea. So he decided to develop his own custom magic, he called it software, to be able to play the music he heard in his head. At first, he tried using the Chuck programming language. Chuck possessed a very interesting property. In this language, time was a first-class citizen, so you could reason about time very easily. For instance, it was very straightforward to wait for a MIDI event to come in. The sound processing would just go on, but the control code would wait until the expected event would happen. waiting for a given time fixed or computed dynamically was also very easy this was very nice and it worked pretty well but the syntax of Chuck looked like it had been designed by a drunken sailor on a full moon night and the language suffered several severe drawbacks so the minstrel started to look for a better solution one night his fairy godmother appeared to him and said, you already possess the magic of the snake, why not try Pio? It happened that Pio was a very powerful piece of magic that allowed to program complex treatments very easily, like this example of a full program for a real Ottawa effect on a guitar. Just plug a guitar into your computer and jam away. It seems I don't have sound anymore. And this is really all the code that was involved in recording this effect. Video provides an audio engine implemented in C that can be controlled from Python. It combines the efficiency of C with the versatility of Python. With this tool, the augmented minstrel was able to play the music he wanted, and he thought he would live happily ever after. However, after some time, he stumbled upon an unexpected problem. In Python with PyO, time is managed very differently from the Chuck programming language. Most time related features use callbacks. For instance, if you want to execute something after a delay of two seconds, you would create a call after object that will file the callback at an appropriate time. Similarly, if you want to execute something every time a button is pressed on your foot controller, you would create a trick fun object to register a callback. This works very well for expressing something like whenever X do Y, but it's less convenient to say wait until X happens. Suppose for instance you want to express something like, in state A, wait until the foot controller's button 1 is pressed, then switch to state B. You could try to write something like this. In state A, listen for button 1. When it is pressed, switch to state B. In state B, stop listening to button 1. Except that, of course, this code wouldn't work because the variable tf is local to the functions a and b. If you put tf in the global scope, it kind of works. But don't we all love globals? But now suppose you want something slightly more complicated. In state A, wait either for button 1 to be pressed or for 2 seconds, whatever comes first. The code you see here works perfectly. However, it has at least two major problems. First, although the structure of the code reflects quite closely the structure of the state machine, The readability of this kind of code decreases quickly with the number of states and transitions. Second, inserting a new state between two existing ones necessitates many code changes in many places, leading to bad maintainability. For instance, state B has to know that it comes after state A through transition Tf. It also has to know the full list of transitions going out of A in order to stop them. It would be even worse if B was the successor of several different states. When composing a piece of music, the approach is usually very incremental. So being able to easily modify and complexify the structure of the code is of utmost importance. And this is a very simplistic example. Here is a sketch of a state machine for a real piece of music that was created last year. two parallel state machines totalizing 21 state and 35 transitions just imagine the readability and maintainability of a naive callback based implementation of this but even in this simple case this is much less readable than the Chuck version we had before wait wasn't Python supposed to be the coolest language in the world wouldn't it be so much better to be able to write something like this? Of course, readability and maintainability would be much better. But supposing it could exist, the function waitUntilFirstOf would be either blocking, and this would block the audio processing, or non-blocking, and this would simply not work. This is why Pio uses callbacks in the first place. But still, is there really no better way? The augmented minstrel was at a loss. He was using one of the most powerful magic in the universe, but ended up writing ugly code all the same. He tried to contact his fairy godmother, but for some reason his email was classified as spam, and he did never get an answer. So he decided to go and see an oracle. He said the magic words he had learned from his great-great-grandfather. And the oracle appeared. No, not this one. Yes, that's better. And he chanted his question. How many callbacks should a dev set up before it works like it should? And please, don't answer 42, that wouldn't be helpful. The oracle answered, The answer, my friend, is readability counts. Yes, I know that. But how? the minstrel said. Oh, yes, you're not Dutch, the oracle answered. Look into generators. And he disappeared into nothingness. So the minstrel opened his book of spells and stayed up all night reading about generators. He learned that a generator looks like a function that contains the keyword yield. It returns a so-called generator iterator. What's this? Well, basically a thing that's able to suspend its execution and resume at a later point in time. Wait. Does that mean that it could be a kind of non-blocking blocking code? The minister thought. Hmm, definitely sounds interesting. Let's see a couple of examples. This is a simple generator that behaves roughly like a simplified version of the built-in range. It can be used in a for loop, but that's not what the minstrel was interested in. You can also use it with next, and this is getting interesting. The execution of the generator is suspended at each yield, and it resumes with each call to next. But it can get even better. Yield is in fact an expression that can get a value. Which value? Whatever one you sent to it. In this use case, after creating the generator iterator, you first have to bootstrap its execution up to the first yield by sending it none. Here, it will go to the yield sum. yielding a zero, and suspending literally in the middle of the line. When you send one, the yielded expression's value will be one, and it will add one to the variable sum, then start a new iteration of the while loop, suspending at the next yield, yielding the new value of sum, namely one, et cetera. Actually, if you can get your head around this example, you've got pretty much everything it takes to simplify the minstrel code. Remember the code the minstrel wanted to write but could not. Maybe we can get pretty close by replacing the hypothetical wait until first of with a very real yield. We will yield the events we are waiting for and be sent back the index of the event that actually fired. What would it take to make this work? Obviously, we'd need to define a scenario class we can inherit from. Here, in the init method, we define two pools of PyO callback objects that we will be able to reuse for each transition of our state machine. This is admittedly rather specific to PyO, but the ideas behind the code would certainly work with other callback-based frameworks like web frameworks, GUIs, and such. Whether it makes sense to do so heavily depends on what you are trying to achieve, though. As a rule of thumb, I'd suggest that when you're trying to express something like wait until instead of whenever, you should consider using this technique. All you really need is a way to register and unregister callbacks. Anyway, in the init method, we also have a call to self.setup, and we build and bootstrap the generator iterator by sending it none. We also define two methods that will need to be overridden the chai classes. Setup, which will contain the code necessary to initialize our scenario and steps a generator that describes our state machine the heart of the implementation is the step method at each step we first stop listening to all the events we had subscribed to then we send the index of the event that filed the callback to the steps generator you know the one that must be defined in a subclass. The generator executes whatever it wants and yields the list of events it is waiting for. We store that in the wait for variable. Then we ensure this is a tuple and set up the new callbacks depending on the type of events we are waiting for. This is actually just for convenience. Yielding a button object will wait for a button press, yielding a number n will wait for n seconds, etc. This allows for very economic client code. Note that all callbacks are set up to call this very same step method. So now we just have to wait that the framework calls back the step method again, with the index of the event at the parameter. And it all starts again. We stop listening to the event we had subscribed to, we send the index to the step generator, and so on and so forth. In his implementation, the augmented minstrel is not using the step generator directly, but he wraps it in another generator. This is simply because he wants a mechanism to reset any scenario to its initial state without having to code it explicitly in the scenario itself. This is very useful, for example, in rehearsals when you practice the first few bars of a piece 20 times in a row to be really sure you can get it right on the first time when the public is there. Well, that's pretty all you need to be able to write callback-based code without any explicit callback. For instance, consider the rather complex state machine you saw a few minutes ago. For now, focus on this part. The code looks roughly like this. These lines are pretty magical. They mean something like begin recording a loop, wait for a given time, and stop recording. But if button 2 is pressed before the end of the recording, cancel the recording, wait for button 1 to be pressed, and start again from the top of the while true block. Note that we can also cancel the recording after it's finished. Pressing button 2 will start again from the top, but pressing button 1 or 8 will go on with the rest of the code. Which button was pressed gets stored in the next variable for later use. Now you might have noticed that five parts of the state machine share the same structure. So if we wrap the code you just saw in a for loop, we can very easily extend our code to a much broader part of the state machine. The final states of the machine are quite easy to implement, so we can now sketch the implementation of the whole state machine. This is, of course, only the structure. To make it fit on a single slide, I removed all the operational code. But still, one can see that the result is really nice and tidy. And yes, the structure of this code really implements the whole structure of this mess. This is tremendously more readable than a version written with many functions and callbacks. But even more importantly, if you want to modify the code and add a state between two existing ones, or suppress one state or anything like that, all changes are completely local. You don't need to modify things all over the place. The augmented minstrel was happy. He had found an elegant way to explain to his computer what magic it was supposed to perform while he played his music. So he went from town to town, playing music and bringing joy to the inhabitants all over the country, and he lived happily ever after. Ever after? That is, until he started considering to use the motions of a dancer to control the effects on his instrument. © transcript Emily Beynon © transcript Emily Beynon But this is another tale and shall be told another time. I thank you for your attention.
+
+**Speaker 2** _[22:16]_
+
+Thank you very much for this fascinating talk. Right now we only have one question, but we have six minutes for further questions, so if you have any idea to ask something, please write your question now into Slido. The question that we have already is, are you planning to extend the solution to add a graphical interface for writing down compositions as finite state machines?
+
+**Speaker 1** _[22:44]_
+
+Well, that's an interesting question. Actually, no, I'm not planning to do it, definitely not. But the reason is that I really think that this is more readable and more tractable than this. So I'm not very interested in developing a GUI for writing this when I can write something like this. another reason is that I don't like programming but so no but I think it could be done quite easily is there another question
+
+**Speaker 2** _[23:28]_
+
+Not yet via Slido. Any spontaneous questions from the room?
+
+**Speaker 3** _[23:36]_
+
+On the, if you go back to the slide, you're on with the final.
+
+**Speaker 1** _[23:39]_
+
+but yeah
+
+**Speaker 3** _[23:42]_
+
+Could you expand slightly on what's going on after the stop rec line? I've not seen that usage of the yield operator in this kind of context of the Walrus operator and the yield A, B, C. What's going on with that syntax? Sorry? Could you explain what's going on with the syntax on the if next Walrus yield B1, B8, B2? How does that work?
+
+**Speaker 1** _[24:08]_
+
+that you you know the walrus operator yeah okay so if I if I cut it into pieces I will first yield three three button objects so the code will be suspended until I press B button one or eight or two on my foot controller. And the code will be, will resume with the yield getting the value of the index of the button being pressed. So it will be zero if I press button one, it will be one if I press button eight, et cetera, okay? And I store that in the next variable and if the button was 2 which is the button for cancelling the recording I will yield b1 so wait for button 1 to be pressed and then start from the top of the loop here and if it was button 1 or 8 I will go to this I I will have a break, so I will exit from this loop and begin here. This is where I test which button was pressed between 1 and 8.
+
+**Speaker 2** _[25:31]_
+
+OK, we are getting more questions.
+
+**Speaker 1** _[25:34]_
+
+Oh, really? Yeah.
+
+**Speaker 2** _[25:36]_
+
+Would you use this coding style to replace other finite state machines eg instead of regex?
+
+**Speaker 1** _[25:45]_
+
+I actually do like regex though, so I'm not sure I would Yeah, I know but Well, they are obviously heavily optimized so I don't think it would be a good idea to implement regex in in true Python but If you go to to my blog post which is mentioned here, there's a link to a presentation by David Bessely, you probably know, a core Python developer, a presentation about generators and creative uses of generators, and you will find some inspiration as to where it can be used in addition to this kind of situation.
+
+**Speaker 2** _[26:39]_
+
+Okay, do you have any suggestions for Python packages that create state machines using generators in general?
+
+**Speaker 1** _[26:48]_
+
+No, because I don't think this technique is widely used or even known. So I define almost no reference to it on the internet, except from the talks from David Bessely. So no, but if anyone wants to come up with a package, of course.
+
+**Speaker 2** _[27:18]_
+
+Have you collaborated with others on code right written in this style?
+
+**Speaker 1** _[27:24]_
+
+No, actually, in our collective, we are several musicians, but I'm the only developer, so I can write whatever code I want, and as long as I understand myself, it's okay. But I do agree that this could be problematic in some teams, yeah.
+
+**Speaker 2** _[27:48]_
+
+Okay, thank you very much. I think we are through with the questions. Then let's give another thanks to Mathieu and enjoy the rest of the conference.
+
+---
+transcript_status: auto
+---
+transcript_language: en

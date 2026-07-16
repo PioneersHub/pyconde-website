@@ -1,0 +1,264 @@
+title: Contributing to an open-source content library for NLP
+---
+description: Bricks is an open-source content library for natural language processing, which provides the building blocks to quickly and easily enrich, transform or…
+---
+created: 2023-03-27
+---
+code: MECPWF
+---
+slug: contributing-to-an-open-source-content-library-for-nlp
+---
+speaker_names: Leonard Püttmann
+---
+speakers:
+
+
+
+### Leonard Püttmann
+
+Leonard Püttmann studied economics at the Hochschule Düsseldorf. During a specialization course there he fell in love with all things ML, especially when it comes to natural language processing. After studying, he joined the company Kern AI as a data scientist and now works as a developer advocate, where he is connecting people to topics like ML and programming.
+---
+abstract:
+
+
+Bricks is an open-source content library for natural language processing, which provides the building blocks to quickly and easily enrich, transform or analyze text data for machine learning projects. For many Pythonistas, contributing to an open-source project seems scary and intimidating. In this tutorial, we offer a hands-on experience in which programmers and data scientists learn how to code their own building blocks and share their creations with the community with ease.
+---
+full_description:
+
+
+We will prepare some easy-to-use cases so that attendees with novice machine learning and NLP skills can participate in the session. A basic understanding of Python is required, but everyone who wants to learn more about machine learning, NLP, or open-source contributions is welcome.
+
+A brick is a modular piece of software that enriches, transforms, or analyzes text data for natural language processing, a sub-domain of machine learning. What sets a brick apart from a simple code snippet is its suitability for multiple execution environments. A brick module can also be executed in a demo playground, allowing users to try out different inputs to see if the brick meets their needs. 
+
+In this session, we will begin by outlining some ideas for building a brick. After substantiating our ideas, we will make the code usable in different environments, such as the playground for testing inputs. Since SpaCy is commonly used in many NLP projects, we will also build a variant of the code that takes a SpaCy document as input. Add some documentation, and voila! You now have a brick.
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2023-04-19
+---
+start_time: 14:10
+---
+end_time: 15:40
+---
+slot_id:
+---
+track: Natural Language Processing
+---
+tags:
+---
+submission_type: tutorial
+---
+submission_type_label: Tutorial
+---
+submission_type_id: 2522
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Novice
+---
+supporting_material_url: https://github.com/code-kern-ai/bricks
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/MECPWF.png
+---
+youtube_id: 4JlKh3NeKv0
+---
+video_link: https://www.youtube.com/watch?v=4JlKh3NeKv0
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT1H24S
+---
+video_thumbnail: https://i.ytimg.com/vi/4JlKh3NeKv0/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Thank you. Yeah, just let's wait for a couple of more minutes. Maybe someone will join in. And if not, that's also fine. Cool. Yeah, thank you. Yeah, so if you want to check it out, it's bricks.kern.ai. Maybe I can make it a little larger, but I don't think it will enlarge the bar on top. Okay, then let's get going. A warm welcome from my side as well. I'm Leonard and very happy to have you all here. Also welcome to people who are watching online. So today I'm going to show you our really cool open-source tool, which is called Brics. It's an open-source content library for natural language processing and in Brics you can find a lot of really useful modular components to transform or to enrich or to extract data from from your texts. First of all, a short question. Who of you has some level of expertise in natural language processing any of you okay some okay that's that's right that's that's totally fine I'm going to keep this talk relatively basic so if you don't have any domain knowledge in NLP or just very little that's totally fine you should probably be able to take along just fine so let me maybe start with a short outline of today's session what we're going to look at today we just did the introduction part very nice next I'm going to show you around in our open source tool going to show you what you can do and what the cool features of our tool are after that I'm going to tell you how our modular components which we call brick how they are structured and why they are structured in the way that they are and how we basically build all of these modular components. Then after that we're going to head over to our GitHub page where you can find all the source code for our tool and where you can also find a whole lot of ideas for new components or you can find pages for the modular components that have already been integrated in the past and we're going to pick a cool use case that we can then later on integrate together. So we're going to build a new brick module together today as well. All right. After that, we're going to do some we're going to check out some prerequisites, what you need if you want to contribute, if you want to build such a module yourself. It's very easy. It's very simple. We're then going to do some standard development things like setting up a virtual environment and installing requirements, all that kind of thing. After that, we're going to write some code, going to test out some ideas, and then we're going to embed a brick module into an endpoint service. What that is all about, I'm going to show you later on, but it's a very important feature of a brick module. Then we're going to add a code snippet that users can then copy from bricks and then embed into their own projects. So another very important step. And as with any software, we also need to write some documentation then as well and set some configuration so that everything's working fine. And after that, of course, some further testing to ensure that everything works well and that everything is set up as intended. Then we're going to create a pull request and hopefully at the end have a new working component for our open source content library and yeah, have great success. Cool. Before we jump into some code, allow me to show you some of our brick modules. So our content library is divided into three larger sections. The first one being classifiers. So the name here is very self-explanatory, I would say. So whenever you have some text input where you, for example, want to get the sentiment from or you want to find out if the text contains any profanity, if you want to find out how subjective it is, then you can use these components to classify your text. So, for example, here we have a specific sentiment classifier. and on the upper right of each brick component you have a small window if i maybe enlarge it we can see it a little better and here this is really your playground to test all of these models out and to see if it's the right one for you here for example we have a an example input saying world peace announced by the united nations that is very obviously very positive so if we run that brick module it says okay yeah it's positive but sometimes you maybe have cases where it's not that obvious and you want to try out if the module is working as you think it does then you can try it out here so i can put something else in here like pycon is really cool with lots of nice people can try that out as well and it's obviously again a positive sentiment again but i can also try it with a negative sentence like the coffee was really bad and it started to rain oh no and let's see what the sentiment classifier thinks about this and I would say it's negative yeah I agree so let's say you scrape some some data from Twitter social media you have a question right there yeah let's let's find it out I would guess it would then return a neutral sentiment but let's find out so what was the sentence pi con is really whoops really great but the people are nasty those are not my words by the way I don't agree this is just for testing purposes then it would say yeah it's negative so that's over weighing again this is just one of the sentiment classifiers that you can use and if you say okay this one is not accurate enough for me then yeah you can try it out another one but you don't have to integrate anything into your environment or something you can test it out right here but if you say okay this module looks really cool I want to to use it then you have the source code available right here you can just copy paste the snippet we also always provide an example implementation so that you get some examples to try it out on and yeah you can basically just copy paste this and run it and see and how it works as well and directly integrated then into your project yes of course Vader yes so Vader this is not like only for Star Wars content or something but no Vader is like the name of the algorithm that we use in this specific brick module so Vader sense for it it's right here it stands for a valence of air dictionary sentiment reasoner. So it's a rule-based system that's basically looking at all the words in the in the text and then determining the sentiment of the text. But we also have other components that work a little differently. Yes, please. I'm not entirely sure how it does it, but I would guess, yeah, that it's like counting all the words in a text corpus and then also tries to do some context space matching but it's not as good like a GPT model or something like if you need a really robust model then this is not the way to go but it's very lightweight and for a lot of use cases it's really good so yeah and I think sentiment classification is also like a tangible use case it's kind of easy to understand okay but we don't only have brick modules for classification we also have things to do extraction so whenever you want to retrieve certain entities from a text data like for example addresses codes certain numbers credit card numbers dates you can use the brick modules for that as well so for example I have here a module for date extraction, and I have a text with a lot of different dates, and if I run it, the extraction modules will then return the position in which it found the entities so that I can then later work with it. We do it in that way because we use a lot of spaCy for our work in NLP, so if you don't know spaCy, it's a very popular library for natural language processing, and if we have position of the extracted values, we can then use these to then further down the road process them with the spaCy library. Okay. And last but not least, if you're not doing any classification, or if you're not doing any extraction work, you're probably dealing with a generator. So with the generators, you can do cool things like, for example, language translation, basically whenever you have some form of input and the input is changed and you have a different output like language translation you can do search with google or bing using these modules you can clean your text data so if you have a lot of html fragments in your data then you can use some of these modules as well and yeah that's that's basically the generators in a nutshell all right very cool so any questions so far or should I should I move on okay yes right yes absolutely okay late maybe let me get back to the Vader sentiment classifier so the difference between just a simple code snippet and like a brick module as we call it it's not only that we have this playground but we have like the whole open source let's say platform behind it so when I click on the github button that every brick module has it will take me to the dedicated issue page on GitHub that every of our components has. Basically the process is that if you have any idea for a new module, for a new brick component, you write down your idea and say, okay, I want to do this, I want to do that. Maybe you already have a draft or first version of the code that you would like to share where you say okay I can do this with this code you don't have to provide any code but you can always of course share it here as well and you can also provide some additional context here for example share a certain Python library that you found or an article it could be anything that could be used to then build this component then and the great thing about the github pages here is that you can also use them to ask questions for example here my colleague Johannes he was not really sure about how to use this sentiment classify he was not really sure how it's how it's working and he just could use github then to ask a question you can also use the page here to say okay contains a buck or it can be improved by doing something and then you have this platform to talk about. Okay, before we jump into all the ideas that are currently open, maybe let me tell you how all of these models, all of the modules are currently structured. So to build a brick module we need at least four files here. First we need a file called init.py and this is basically containing all the code that you see that is run when we run the example input so this is not computed locally or something this is like running on an endpoint service that we provide and all of this code is then contained in the init.py file then we We also need a file for the code snippet that you then have here, oops, where's my mouse? That you see here. And the code in the code snippet that the user then sees is a little bit different than the code for the actual endpoint that you can then run. And so these need to be in different files. And also we store the code snippet in a markdown file. don't want it to be executable so that's fine and it's also way easier for us to pass and then put in our content management system otherwise this would be just a normal Python file or something then we also have a config file nothing wild going on here either just to for example set the links for the github pages or the or like hashtags we have that we also recently included a a batch if a brick module is GDPR compliant or not. Not really that important for, say, private users. But if you are a company, then this might be really good information to have if a module is using some sort of API, for example, and you don't know really where the data is going, then you maybe shouldn't use that component then. And last but not least, some documentation in the readme file which ends up here at the top where you basically can say how to use this module, if there's anything special you need to keep in mind when using it, some sources, what library was used, these things. and optionally we also provide always a second code snippet which is based on spaCy for all the modules we do this because we use spaCy a lot so the library for NLP I mentioned earlier we use that in our tools and our other tools a lot and so to ensure that you can use all the brick modules in our other tools we provide it as well but I'm going to skip that for today you don't really need to work on that it's totally optional if you like to include that and feel free to do so but you totally don't have to yes of course always roughly yes so the actual code that is run on the text data is the same but everything around that is a little bit different I'll talk more about this later on but it's similar yes so all the brick modules they take in a normal string as an input and that is not the case for the code that we use with spacey. So all the spacey code snippets, they expect a spacey document as an input. Basically that's already a little bit pre-processed, and we do that so we can later down the road do a little bit of more processing. But yeah, the only difference is really the input that function is then expecting. And yeah, to avoid that, you always need to create the spaCy input yourself, we also provide like a regular Python input, if that's a little bit clearer now. Okay, cool. Then we have that. What are the prerequisites? If you would like to build one of these modules on your own. It's very easy. You only need Python. I mean, we're at PyCon, what a surprise. You need Git and GitHub, of course, to be able to create an issue for all the modules. You need our GitHub repository, which you can simply clone. In the future, we might include a pip command as well so that you can just pip install bricks, but we haven't done that so far. And of course, I think it's always important to have fun when working on things like open source because otherwise, what's the point? So yeah, not really a prerequisite, but I highly, highly recommend it. Okay. Then I'm going to jump right back into GitHub, where we have an issue page. If you would like to check out our GitHub page, it's github.com slash code minus kern minus ai slash bricks. And here you can find all the source code for all these components as well. So if you would like to use them in your own projects, you have that accessible here. And you can also check the issue page where we have some ideas open for brick modules that haven't been implemented yet. So for example, one of our community members, he said, okay, I want to build a brick module that is able to detect what frameworks are mentioned in a text, for example. Or my colleague Johannes, he suggested to build a brick module for OCR, autocorrection, so really cool things. And I recently stumbled upon a very cool library which is called Sumi, which you can use to well summarize texts and works really really well and it's also very easy to use so I think I'm going to use that one to then build a brick module also have provided some of the code here as well and so we can take that and then build a brick out of that spoiler alert it's not going to be as good as like again a GPT model, but it's again very lightweight, very easy solution, and it's also free. So I think it's worth building a module out of that. And the special thing also is that I want to use this library to summarize websites. So I don't want to have a whole text as an input, but I want to first scrape some data, For example, from a blog article or from Wikipedia, to then get a summary of a website. And to do that, I'm going to use the Wikipedia page for capybaras. If you don't know capybaras, very cute animals, really, really like them. And I think I'm not the only one who likes capybaras, because the text for them is really long, so people seem to really like them. But maybe I don't have the time to read all of that. Then I might be using the module. Going to refill my glass of water and then we can jump into some code. Are there any questions already or maybe online?
+
+**Speaker 2** _[22:18]_
+
+You can also use Slido to post the questions.
+
+**Speaker 1** _[22:32]_
+
+Ah, from the session before. OK, no, I can't answer those. I can try, but.
+
+**Speaker 2** _[22:36]_
+
+Yeah, we'll archive them. I think someone should be.
+
+**Speaker 1** _[22:41]_
+
+Okay, so if you like, you can tag along, but of course you don't have to. To develop, I'm not going to use Windows. I'm going to use what's called a Windows subsystem for Linux. So basically I have a Linux kernel running inside of my Windows OS. And so I'm going to use that to actually build the module. So, first, what you would do then, of course, is go to our really cool GitHub page, and then clone the repository, so you would do, like, git clone, and do that, I already have the repository on my machine, so I'm not going to execute that, instead, I'm going to head over to the repository, then what you would do is create, for example, virtual environment with conda I'm always using the built-in tool from Python and then create a virtual environment already have done that as well let's activate that cool and then you would pip install all the requirements because there are quite some Oops, requirements.txt, yes, you can see I came prepared and, yeah, don't have to download everything. Cool. Let's open up the directory or the bricks with Visual Studio Code. I'm using Visual Studio Code. You can use other IDEs, of course, as well, or code editors. I think it's a little bit small, right? It's hard to see. Maybe I can enlarge it a little bit. I hope. Tab size. Is that better? No. I think this just increases the size of the code, right? Font size, where you have that? Oh yeah, it's only increasing the font size. I don't know, okay, I guess I'll just explain what you can see here. So just like you have on the front-end side, the three categories of classifiers, extractors and generators, you have basically the same structure in the code, the underlying code. So you have one folder containing all the classifiers, and you have one folder containing all the extractors, and one folder for the generators. And in each of these folders, we group bricks by a logical structure. So for example, if we have multiple brick modules for sentiment classification, they would then go into a folder called sentiment where we have like the Vader sentiment classifier we saw earlier and another sentiment classifier that you can use and so on and if you want to contribute a brick module you can either search for a directory if it's already existing and fitting to the use case that you have or you can of course feel free to create a new directory and put your brick module in there then. So we want to build a brick module that is able to summarize texts and so we have some form of input in our case that's an URL to a website and we want to get as a result the summarized text of that website. So our brick module would fall into the category of summarization and we already have some modules for summarization for example we have one module you can use to remove small talk from texts. Basically it's trying to look at how many stop words are in a given sentence and then removes sentences that only consist out of stop words. We have another brick module for just summarizing normal texts and now I want to build a brick module to summarize websites. Like in every good cooking show I also came prepared so I prepared something we already have the init.py file to some degree at least which will run the code that is hosted on our endpoint you can see the actual function is still missing we're going to build that together later on and I'm going to explain what we need this for then we have the code snippet which also requires a little bit of a a certain structure. Here again, the actual function code is still missing. I'm going to build that two together. Then the config and the readme is also still empty. And we're going to fill that with live as well. So maybe let's start with the init.py file. What's important about this file is that you need to ensure that the input that the function receives is in a certain format. And for that we're using a library called Pydantic. If you don't know what Pydantic is, maybe you do. I think we also had some sessions at PyCon about Pydantic. It's a library in a nutshell to ensure that the format of the input that we receive, for example, for a web service is in a certain format. And that's all we do here, really. We import the base model function, the base model class from PyIdentic and then pass it to a specific function for our brick module, in our case that is called the Sumi website summariser model and here we lay out the whole expected input. So we of course expect a URL, it should be a string, we can set the language of the text that we want to summarise, in our case we have defaulted that to English but you can and also then use it to summarize German texts or whatever other languages the SAMI library supports. And we also have a parameter for the sentence count. Basically, that's the length of the summary. So if I set this to five, then we have five sentences in our summary. If I set this to 10, it would be a little bit longer. Right. And then we pass that Sumi website summarizer model into our actual function. And here, we can then retrieve the information from that class. So we're going to do that. We also need to include some doc strings before we get to coding. So yeah, thank you, GitHub co-pilot. This is just a small, short summary that will then be displayed in the actual website here under the name of the function so that we have a very short description of what the module is able to do. Cool. And then after that, we first set up a parser, because the difference with this summarization model and the other ones is that we first want to scrape data from the internet, like Wikipedia or a blog article. Luckily, Sumi has a built-in function for that so that we can just pass HTML from a URL. We put in a tokenizer, which will then preprocess a little bit the scraped data. After that, we're also going to use something called a stemmer. If you don't know what a stemmer is, stemmer returns a word like for example doing to its space form so doing would then be converted into the word do and the stemmer tries to do this for all the words so that we don't have like duplicates because doing and do would otherwise be counted as two words but we want to treat it as one word that's what the stemmer in a nutshell is doing Then we actually instantiate our summarizer, pass the summer to our summarizer and we also remove stop words because how Sumi is working under the hood it's also counting how many stop words for example are there it's a little bit more than that but it's not super complicated but we also need to remove the stop words of the language that we want to summarize. Then the summariser gets our document, and after that I think we need to do some list comprehension, because I think this is not completely right, yeah, this should be right, the summary is then a list of tuples which contain the extracted sentences and we need to put that together so that we can get a normal text as an output. Okay that's really it, that's the whole code we need for our brick module to be able to to run in the on the example input site it's only 29 lines of code so very easy here no rocket science needed I'm going to going to try out yes you have question it's a third-party library oh yeah maybe I should have spoken in more detail about that. Yeah, it's a library you can find on GitHub. We can take a look at the library. I think I have posted the link here as well.
+
+**Speaker 2** _[33:15]_
+
+So on the Discord channel, actually, there is a room for where this tutorial is happening. And there I am also updating the links which are mentioned in the talk. So on the Discord channel.
+
+**Speaker 1** _[33:27]_
+
+Yeah, you can for example find it on the discord or just Google Sumi, then you can go to the page on github It's quite popular. So it has a lot of stars and it's very lightweight again. And yeah, it's not something from bricks itself So it's just a third party open source library We're also using in this case for our brick module as well. We could have built this ourselves, but yeah Yes, they have to install SAMI first, yes. It will, if you clone our repository and then do a pip install requirements, it will then, because we will add SAMI then also to the requirements of BRICS, and then you should be able to run all BRIC modules. So, yeah.
+
+**Speaker 2** _[34:19]_
+
+Maybe you can show it in your requirements file.
+
+**Speaker 1** _[34:22]_
+
+It's not there yet because we well haven't implemented it, but yeah, we have a file called requirements
+
+**Speaker 2** _[34:30]_
+
+Yeah, here, I think.
+
+**Speaker 1** _[34:31]_
+
+TXT here are all the requirements needed for bricks and if we want to add then the New brick module using Sumi we would then add I don't know Sumi 0.9 0.9 and then save that and then commit that as well. So yeah, but a good question Okay, we now have the init.py ready we're going to test it out later on as well or we can test it out now before we then finish up with the code snippet because we use pydantic to check the input we can just hit run and run the script to see if it's working what we need to do is we need to kind of simulate this and kind of treat it like it's already running in the actual endpoint because yeah this is not then executed locally but in a remote web service and to do that we're using fast API and you can simply spin everything up again fast API should also be already installed if you install all the requirements and you can spin up that service by running ubicorn API API and do a reload so that if we make changes it will then restart the service and then if we go to localhost 8000 docs we then have a graphical user interface this is again nothing from bricks itself this is provided by fast API so the service we use to then access the the components and then we can search for sumi it's not here because we also need to add the name of the function into another init file so each of the so the generator the classifier and the extractors they also have an init file and here we need to first import that component so that fast API is able to find that that's why we also need to name it init.py so that it gets It's recognized as a name package. And here we also have the other sentiment summarization modules. Just going to add that here. And now FastAPI should restart. And then we should be able to test it out. And hopefully it directly works. Okay, let's go back to FastAPI, search for, maybe reload the page. Okay, it's not here, that's, okay, I've got something. All right, let's retry again. FastAPI should be restarting. application startup complete let's load again cool and here it is so we're now able to use the code we just wrote via an api and thankfully fast api is really great to use and we have the ability to try it out here we already have the schema that we have supplied so So earlier in the code, we have provided like the schema here, and this is what we can then see here. Now let's grab our link to the Capybara page and see if it's actually working. Fingers crossed. If not, that's also fine. Yeah. And it's actually working. So we have set the sentence count to five. So our module has now summarized the whole Wikipedia page for capybaras, which is quite long, into just five sentences. Can go over it, okay. They have some different names and other countries. We have some sources here which are probably not that necessary for our summarization. But yeah. And it was also super quick. I mean, I can try to run it again. And it probably just takes like a second or so. So it's a really easy and lightweight solution to summarize your texts. Yeah, I mean, GPT would be probably a lot better, but also more expensive. And you can't run it on your local machine. So that's great. That's then the part for the endpoint service. We can close fast API here again. That is all fine. That's working. let's maybe spend some time in the code snippet file that the user will then be actually able to execute. I have prepared some of the code here already in the Markdown file, and because we can't develop in the Markdown file, maybe we need to change it in the future. But yeah, ideally you can test it out in a Jupyter notebook or a normal Python script, whatever you feel comfortable developing in, I'm going to use a Jupyter notebook for this today. And really the difference is that we don't need to use the pydantic base model. We also have the import statements here. And also, again, the function in the code snippet is expecting a different input than the function in the init file. So here we need to set all the parameters. we also ask every contributor to include some typing so that you know what data type is expected for the inputs and that you should also type the output. So in this case, everything is a string. No, the sentence count should be an integer. Cool. And ideally, you should also provide some documentation you can simply know say what the params are doing so the URL is the URL of the website you want to have summarized then we need to set the language of course sentence count nothing crazy here and yeah then we basically do the same thing we did as with our init file for the endpoint we instantiate the parser to scrape the data from the website, then set up the stemmer to then return words to their base form, summarize everything. I'm happy that I have GitHub Copilot, I don't need to do anything really. Yeah, extract the stop words, create a summary of our text, and after that do some joining and some yes joining and some list comprehension and that's our brick module what we also always ask users to provide in the code snippet is an example implementation and we quite clearly divide both so the actual implementation in code and some example integration if you want to use this brick module you don't really need the example integration but it's really great to provide that for every brick so that the users can directly see okay what is an example how can the inputs for that function look like so that you can directly use it so if we then execute this okay took about 2.3 seconds so not too bad and then yeah you have basically the same output as you had in the fast API dashboard so the summarized text here nothing crazy it's a little bit weirdly formatted but yeah we have that working as well then we can simply copy all of it cool paste it into the code snippet so that the users will then be able to see it on the bricks website and that's almost all there is to it then we need to configure some configuration. For that I'm just going to a template folder that we have here as well and grab some of the code. You don't need all of it. Implement that as well here. So what configuration do we need to provide for our brick module of course we need the name so the name is sumi website summarizer oops put that in here we then also have a field for the issue id we need that so that on bricks itself we can get a link to the github page so this is then what you will see up here if you press the button it will basically direct you to the issue page and we have already created one for our brick module that we are working on it's the number 284 284 then you can also set like an icon but that's not too important here at the moment as well some minimum required version for our other tools also not too important the type is probably a little bit more important because if you're using some form of API that you need to pay for we need to set this as a premium brick so we let the users know that if you need to pay for a service that is running in the background then you can see that it is a premium model but we are not using anything like this in our case so you can just leave it as a normal Python function also flag for GDPR compliance I would say it's also totally fine and yeah that's really all we need to configure and then for the readme we can also write a short description like this brick module is using the sumi library from github to summarize texts that that were scraped from websites like Wikipedia or blog articles, blog articles, okay. Then we might also include the link to the third-party library that we use so that people can jump into some documentation there if they like cool save everything and that's basically it you would then of course do your git add and git commit edit module for summarizing websites push that and I'm going to create a new branch you probably then would have to fork it but it's very similar okay yeah then you can open up a pull request say okay I have built this really cool module to oh this is not my library, oops, yeah, open up a new pull request for the PyCon branch I have created and then ask some of my co-workers, for example, to look over it, then it gets joined and then you can already use it on our brick service, yeah, that's really it, we now have a cool new brick module. All right. Thank you, I guess. If you have any questions, then feel free to ask. You can also, like, come to me after the session if you like. And yeah, thank you for your attention. And I hope you enjoyed it. We can do the questions.
+
+**Speaker 2** _[47:18]_
+
+do the questions i mean there will be hands-on session after this right or we are done with the hands-on session too
+
+**Speaker 1** _[47:24]_
+
+session? Yeah, yeah. That's a little bit fast, I think. Sorry.
+
+**Speaker 2** _[47:34]_
+
+Okay, we have a lot of time for the discussions, almost.
+
+**Speaker 1** _[47:37]_
+
+Yeah, feel free to bombard me.
+
+**Speaker 2** _[47:39]_
+
+Are there any questions? Anyone wants to start? Okay. Do you have any questions?
+
+**Speaker 1** _[47:45]_
+
+Yeah. Yeah. Yeah, great. Well, I would like to ask you if you could come back to the moment where you added the first API line in this bugger. Yes. Because it was kind of magic, like okay, three seconds the theme was there. Okay, yeah, sorry, I think I rushed through a little bit. So where did I miss you when I started up the fast API service? So you create the code. You have the pointers there, and now you use the, you put the API up with uvicorn. Yes, yes. But fast API was kind of nowhere, but still, it was the backing up the whole thing, I guess. Yes, sure. So yeah, you're completely right. We have put all the code here in the init.py file. And then we start up fast API with the uvicorn command. So if we type in uv-coron-api, again, we don't need to set up anything else. All the rest is handled by Bricks. We have already set up everything in the tool itself. And then we just need to start FastAPI with this command. This will spin up everything that we have. We don't need to do anything more, really. It's downloading everything that it needs, setting up everything that it needs. All of that is handled by Brics. And now we have that running locally on our computer just to test it out. But in theory, that is exactly the same thing that would then happen on a server in the cloud to then execute all the code for the actual website Brics. Okay, is that a little bit more clear? Yeah. Okay. And yeah, after we have started then FastAPI, We can go to localhost 8000 slash docs, where we then have a graphical user interface where we can test out everything. So this is basically like one layer below the actual Bricks website, you can maybe say. So what we can test out here on the fast API, that is basically the same thing that we are pushing like into the example input here and the same thing we would get as an endpoint response here. So this is like just a layer on top of everything. But because we don't want to like clone the front end and everything as well, we use FastAPI for this. Yeah, I have a question. Maybe it's me being dense. How do I actually use a brick in practice? Yeah, sure. So what you can do is, you can call the endpoint directly. So you can, like, call the URL of the actual brick. Or what you can do is, you can simply copy the code snippet that you have here. So if you say, this is actually a functionality that I would like to implement in my own project, you can simply copy the code, implement it in your project, and then use it right away. So these are the two options you have. Yes, because... Yeah, please, sorry. So, thank you very much. I know that you also have this product refinery where you basically can enhance your data and stuff, and I think... At least I thought that the idea of bricks is also a little bit enhancing this with having modular systems and stuff. It is, yeah. It's kind of both. So all the bricks we have, you can use them in Refinery as well. So Refinery is another tool of current that you can use to label your data, to transform data you have. And you can use all the brick modules that we have in our other tools as well. But you don't need to. So if you just have some normal NLP project and you would just like to go hunting for some cool code snippets, that's also totally fine. So you don't need to use these brick modules in our other products, but you of course always have the possibility to do so. So it's kind of for both.
+
+**Speaker 2** _[52:26]_
+
+Can you explain the AV con is it is it also part of the bricks itself? It's just loading the fast API, right? It's only the deployment of the API
+
+**Speaker 1** _[52:34]_
+
+API yeah exactly so here on the live website we have a like web service a server running and that server has fast API loaded in all the endpoints are ready to go and whenever you call an endpoint it just executes the code that we have written and then provides you with the output
+
+**Speaker 2** _[52:54]_
+
+If people want to do hands-on, can they start? Is there any link which you could post so that they can start working on specially?
+
+**Speaker 1** _[53:03]_
+
+Yes, so everything I basically told you, you have also on our GitHub repository, we have a lot of videos on our YouTube channel where you can check that out as well.
+
+**Speaker 2** _[53:03]_
+
+Yes.
+
+**Speaker 1** _[53:15]_
+
+We have a file called contributing.md in our GitHub repository as well, where you have a long and detailed description of all the steps you need to take to contribute, where all of the files are then also explained and where you can then do this yourself then too. Yes. So everything you need is already in our repository and, yeah, no one can stop you from building a brick then. Okay. Can you pip install bricks? Like, pip install bricks and then... Not yet. Okay. but we we will definitely implement that in the future so that you can simply pip install bricks and then have everything ready to go so i would be able to use like 10 bricks like instruct address extract numbers yes and you will then yeah and you will then be able to also import a brick as a class so for example like here the um summarization um brick you could then import like a normal class like pip install bricks and then from bricks import like summarizer. Yeah, summary website, whatever. Yes, but yeah, it's work in progress, but something that will come in the future. Cool. Sorry, I mean, you were saying we can run it using URL, but if I look at the brick for cosine similarity in the list of bricks, there's no indication how to call that using an API. yes so what you would need to do is we don't have it written out in the documentation so but what you can do is you can call the content management system that we have set up for bricks and then basically say okay I want a classy fire and then the name of the the brick so for example Vader sentiment classifier and then include the data in the URL here as well but yeah didn't prepare that because that wasn't a really part of the session but it's definitely possible but that being said it's also just meant for playing around but we are thinking about setting this up for production workloads in the future as well so that you can also pass a lot of data through that
+
+**Speaker 2** _[55:45]_
+
+Is it in production like are there any examples in the production use case mm-hmm?
+
+**Speaker 1** _[55:51]_
+
+Yeah, so as I previously mentioned, we also use these bricks and other tools of us, like our main tool, which is called Kern AI Refinery. And yeah, a lot of our customers are using these brick modules to then process data, transform data, enrich data. And yeah, so far we have found them very, very useful.
+
+**Speaker 2** _[56:16]_
+
+And when do you plan to make it as in Python, like in package?
+
+**Speaker 1** _[56:20]_
+
+I can't really say at the moment, as soon as possible, definitely, but yeah, need some more time.
+
+**Speaker 2** _[56:30]_
+
+So you have one of the core developer of yes
+
+**Speaker 1** _[56:32]_
+
+Yes, I'm one of the developers for Brics. I'm mainly spending my time working on this.
+
+**Speaker 2** _[56:40]_
+
+How do people start contributing? Is it easier or do you have like a much layer or is it only exclusively for your own company people to know?
+
+**Speaker 1** _[56:50]_
+
+No, everyone is open to contribute. It's basically everything I just showed you. That's it to contribute a brick module. And you don't even have to contribute a whole module. What you can also do is you can go to our GitHub page and then simply open an issue. So if you have an idea for a new module, but you're maybe not really sure if it's a good idea of can be really useful just share your idea on our GitHub page and then we can maybe take a look at it or maybe you have some implementation but you need feedback on to really make it work and you can post it here as well so you don't even need to contribute whole modules we are happy for for everything
+
+**Speaker 2** _[57:34]_
+
+Are there any more questions?
+
+**Speaker 1** _[57:37]_
+
+When you use the brick with spaCy, do you do something else than classifying span text and labeling the span text? Is there any other use case or way to use spaCy? Yeah, there are a lot of use cases for spaCy as well, which could probably fill a whole session on its own. but really we use it to tokenize the text and then pre-process it further down the road so that's really all of it that's to it for us at least but what I mean is that when you do extraction of for instance dates in text when you use spaCy you create a document where the dates are labeled I guess Yes. And you can label them with spaCy. But the way we use it is we have, like, imagine you have a sentence, and then when we tokenize it with spaCy, you have, like, a list where every word is, like, a part of this list. And you have kind of, like, an index for that then. And so we can use the output of the extraction modules, for example, here, to find out the position of the extracted dates in this example. That makes sense? Yeah, yeah. Okay. I like the meat. Okay.
+
+**Speaker 2** _[59:11]_
+
+Anything else? Okay. So if not, I think we can end the session. Cool. Thank you very much. We would like to thank the speaker again, Leonel.
+
+**Speaker 1** _[59:24]_
+
+Thank you.
+
+**Speaker 2** _[59:27]_
+
+Where would you put your Notion link?
+
+**Speaker 1** _[59:32]_
+
+I can add it to our GitHub page if you want. Apart from that, everything you need to know, like the requirements, the steps to contribute, they are already on GitHub, so you will find everything else there.
+
+**Speaker 2** _[59:46]_
+
+Yeah. So...
+
+**Speaker 1** _[59:47]_
+
+And I can also share it on the Discord side of PyCon, if you like.
+
+**Speaker 2** _[59:48]_
+
+And I... Yeah, in the PyCon there is a channel for the room and there I posted some links and you can also put the Notion link so that they can have access.
+
+**Speaker 1** _[60:00]_
+
+Yeah, sure, I will post everything there then as well.
+
+**Speaker 2** _[60:02]_
+
+So I think that ends the tutorial session. It was quite fast and quite cool and So I think there's gonna be a closing session at the cupons also pleased to attend it and yeah Thank you for attending
+
+**Speaker 1** _[60:18]_
+
+Have a nice day
+
+---
+transcript_status: auto
+---
+transcript_language: en

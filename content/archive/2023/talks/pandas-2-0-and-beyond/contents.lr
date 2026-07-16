@@ -1,0 +1,292 @@
+title: Pandas 2.0 and beyond
+---
+description: Pandas has reached a 2.0 milestone in 2023. But what does that mean? And what is coming after 2.0? This talk will give an overview of what happened in the…
+---
+created: 2023-01-05
+---
+code: DB3KC7
+---
+slug: pandas-2-0-and-beyond
+---
+speaker_names: Joris Van den Bossche, Patrick Hoefler
+---
+speakers:
+
+
+
+### Joris Van den Bossche
+
+_About — in the speaker's own words_
+
+I am a core contributor to Pandas and Apache Arrow, and maintainer of GeoPandas. I did a PhD at Ghent University and VITO in air quality research and worked at the Paris-Saclay Center for Data Science. Currently, I work at Voltron Data, contributing to Apache Arrow, and am a freelance teacher of python (pandas) at Ghent University.
+
+### Patrick Hoefler
+
+_About — in the speaker's own words_
+
+I am a member of the pandas core team since early 2021. I am a regular contributor of pandas since early 2020. I am currently working at Coiled as a Senior Software Engineer. I hold a Masters degree in Mathematics and I am currently studying towards a Software Engineering degree.
+---
+abstract:
+
+
+Pandas has reached a 2.0 milestone in 2023. But what does that mean? And what is coming after 2.0? This talk will give an overview of what happened in the latest releases of pandas and highlight some topics and major new features the pandas project is working on.
+---
+full_description:
+
+
+The pandas 2.0 release is targeted for the first quarter of 2023. This is a major milestone for the pandas project, and this talk will start  with an overview of this release. Pandas 2.0 includes some new (experimental) features, but mostly means enforcing deprecations that have been accumulated in the 1.x series, along with some necessary breaking changes.
+
+But that doesn’t mean there are no interesting features to talk about! The main part of the presentation will showcase some new features, both already released as opt-in features or to come in future releases. 
+Support for non-nanosecond resolution datetimes, allowing time spans ranging over a billion of years. Improved support for nullable data types, including easy opt-in options for I/O functions. Experimental integration with pyarrow to back columns of a DataFrame (beyond the string dtype). 
+A major change that is under way is a change to the copy and view semantics of operations in pandas (related to the well-known (or hated) SettingWithCopyWarning). This is already available as an experimental opt-in to test and use the new behaviour, and will probably be a highlight of pandas 3.0.
+---
+room:
+---
+day: Monday
+---
+slot_date: 2023-04-17
+---
+start_time: 10:50
+---
+end_time: 11:35
+---
+slot_id:
+---
+track: PyData & Scientific Libraries Stack
+---
+tags:
+---
+submission_type: talk_long
+---
+submission_type_label: Talk (Long)
+---
+submission_type_id: 2520
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link: https://phofl.github.io/pydata-berlin/pydata-berlin-2023/intro.html#1
+---
+social_card_image: /static/media/social/talks/DB3KC7.png
+---
+youtube_id: 7QQZ1hrHG1s
+---
+video_link: https://www.youtube.com/watch?v=7QQZ1hrHG1s
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT37M7S
+---
+video_thumbnail: https://i.ytimg.com/vi/7QQZ1hrHG1s/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:02]_
+
+Good morning everyone. So we are going to talk about some things Pandas but let's briefly introduce ourselves. I'm Joris. I'm from Belgium. I'm involved in several open-source projects. I'm a core developer of Pandas.
+
+**Speaker 2** _[00:20]_
+
+Um, if you...
+
+**Speaker 1** _[00:21]_
+
+If you're working with geospatial data, Geopanel Shapely, I'm very happy to chat about that as well. And currently I'm working on Apache Arrow and mostly on the Python bindings at Voltron Data where we are building Arrow-native data analytics.
+
+**Speaker 3** _[00:40]_
+
+Good morning from me as well. I'm Patrick. I'm also a Pandas call contributor. I'm currently working at Coil, mostly on Dask. Coil and Dask scale your Python code, and Dask mostly works on all the PyData libraries, while Coil provides distributed infrastructure in the cloud. But, Joris and I will talk about the Pandas 2.0 release. The actual release happened two weeks ago, on April 3rd. Thank you. We will go briefly over a couple of features that are already turned on by default, like Pandas 2.0 supports arbitrarily numerical numpy D-types in indexes, which wasn't possible before. Then we introduced non-nanosecond daytime resolutions and a consistent daytime parsing mechanism. And afterwards, Joris will talk about copy and write, which is still optional. And I will talk about arrow-backed data frames, which are also optional right now. Up until Pandas 2.0, it wasn't possible to create timestamps that were not represented in nanosecond resolutions. Nanosecond resolution means that every timestamp is represented in nanoseconds starting from the 1st of January 1970. This means that because of N64 range, that it was not possible to represent timestamps outside of the 1677 and 2262. If you tried this, you always got an out of bounds daytime error. Looks like this. In Pandas 2.0, we were able to lift this restriction, and we support now several different resolutions. The lowest one is seconds, and then we have milliseconds, microseconds, and nanoseconds. With seconds, you're able to represent timestamps over a range of 290 billion years, which should be plenty, I hope. Let's look a bit into how you can enable the new resolution. It's still new and that's a lot of work so it's not supported everywhere yet. Date range, at least for me, is a popular function to instantiate like a time series for testing purposes, but it does not support the non-nanosecond resolution yet. So you'll always get an index that is still represented in nanoseconds. You can easily convert between different resolutions with sUnit. That's a new method that was added for Pandas 2.0. So SUnit with seconds simply converts your datetime index to second resolution. There's also an option to do this with SType, but personally I would recommend to use SUnit if you just want to switch between different resolutions, simply because SType was built for something more and actually casting your data types and not only converting different resolutions. One of the breaking changes with pandas 2.0 is previously if a user provided a numpy array with any data 64d type, the resolution was always cast to nanoseconds because pandas didn't support anything else. Starting with pandas 2.0, the resolution is preserved as long as it's possible, meaning if it's seconds, microseconds, milliseconds, or nanoseconds, we keep it, and otherwise we cast to the closest resolution available. like day would be cast to seconds, and not nanoseconds anymore. So you have to be careful. If you don't want that, then you will have to adjust your code. Some caveats about nanosecond support in Pandas. It's new. It was developed between 1.5 and 2.0, so it's only like six months of development work. And it's not supported yet in every part of the API. The assumption that a timestamp is represented in nanoseconds was deeply baked into the Pandas internals. You can find this everywhere if you're dealing with timestamps, so it will take a bit of time to get rid of that everywhere. So please, if you run into something that's not working as expected, then just file a bug report, and we'll take care of it as soon as possible. This is something I ran into after the 2.0 release came out. If you are comparing with smaller or smaller and equal, then to series with different nanosecond resolutions, this is still relatively slow. We are now doing our best effort to convert to a consistent resolution, but this is not always possible if the accuracy is different, for example. So, yeah, we would like you to try it out and give us feedback on this. This brings us to a related item, an enhancement proposal for Panhas that was implemented for 2.0, tried to streamline the daytime parsing mechanism. Before 2.0, if you had scalars like we see here, 12.01.2013 and 13.01.2000, it would try to parse them with month first. That means it would infer that the 12 in the beginning is the month, followed by the day, and then the year, obviously. So you get the first of December. The second scalar doesn't fit this notation, though, because 13 is not a valid month. So it would switch in the middle to infer day as the first element and use 01 as the month. So you would get the first of December and the 13th of January, which is not very nice. In Pandas 2.0, if no format is provided, then it will always use the format it's inferred from the first scalar and use this for every other scalar that's in your provided list. If this doesn't work at some point, then we throw an error instead of like mixing formats up in the middle. You can read more about the pdip in general on our website.
+
+**Speaker 1** _[06:55]_
+
+Okay, I will now go a bit into more detail on the first experimental feature that is included in PANAS 2.0. copy view semantics behavior in pandas or How we can get rid of the the setting with copy warning I assume that if you use pandas you probably have seen this warning have run into it You can also find a lot of lengthy blog posts online Explaining where it comes from how you can solve it Etc. So I will try to do a very brief attempt to explain the context here, and that's, so the example
+
+**Speaker 2** _[07:38]_
+
+I'm still, I'm
+
+**Speaker 1** _[07:38]_
+
+I'm creating a small data frame, I'm filtering the data frame using a boolean filtering masking operation, I get a subset and then I modify another column of this subset. This triggers the warning and the reason that this warning exists here is that...
+
+**Speaker 2** _[07:56]_
+
+It's a good thing.
+
+**Speaker 1** _[07:57]_
+
+It's the question, if I modify this subset, do I intend to modify the original data frame DF as well? And so, to know the answer to that question, you need to know something about copies and views. Very briefly, if you have a data frame, DF1, and you have a second data frame, which is a view, that means that they, under the hood, share the same data. data. While if you have a copy, DF2 is a copy, then it has its own data in memory. And so if you then modify such a view, if I modify DF2, since they actually share the same data in memory, if you modify it in place, of course, you also modify the original data frame. While In the case of a copy, that's not the case. But as a consequence, this
+
+**Speaker 2** _[08:48]_
+
+Yeah.
+
+**Speaker 1** _[08:49]_
+
+introduces some confusing behavior. You need to be aware of this copy versus view. You also need to be aware of how NumPy works with that. For example, slicing gives a view. Selecting with the mask or with the list gives a copy. And in addition, Pandas also does more than NumPy, so the rules get a bit more complicated. And so, for example, if we...
+
+**Speaker 2** _[09:22]_
+
+Thank you.
+
+**Speaker 1** _[09:24]_
+
+So, the reason that the warning was originally introduced is for a case like this, where the rules around copy and views gives a confusing behavior. And that's what is called chained assignment. So, I'm trying to modify a data frame, but I'm doing that using a chain of operations. So, I have a small data frame and I want to modify the values of the column C based on some row selection. We can do that in those two ways. One works and the other doesn't work.
+
+**Speaker 2** _[10:02]_
+
+Um, if...
+
+**Speaker 1** _[10:03]_
+
+If you rewrite the second case, what you're actually doing, because it's chained in two steps, you can write that also in two lines. So first, we are selecting the rows. That gives us a temporary object. And this temporary object, we then modify that column.
+
+**Speaker 2** _[10:19]_
+
+Um...
+
+**Speaker 1** _[10:20]_
+
+But in this case, it's a boolean mask and that gives a copy. So we're actually modifying the column of a copy So that yeah that doesn't work to update the original data frame And so that's the reason that the setting with copy running was introduced to warn you about this But of course also like if I take the previous example where I created this subset Explicitly and not just as a temporary object implicitly
+
+**Speaker 2** _[10:49]_
+
+Thank you.
+
+**Speaker 1** _[10:50]_
+
+I now also get this warning because pandas doesn't know if you're modifying subset that you want to modify DF or not And so in general What do people say? How can you solve this warning that?
+
+**Speaker 2** _[11:02]_
+
+that's
+
+**Speaker 1** _[11:04]_
+
+either If your intent was to update the original data frame you can use you should avoid this change assignment You can do that in one go using that lock Providing your row selection column section in one go So that's one option or you could also use a method like assign to update values
+
+**Speaker 2** _[11:25]_
+
+Um,
+
+**Speaker 1** _[11:26]_
+
+On the other hand, if you didn't care about the original data frame, you just created a subset that you further want to work with, but you want to get rid of that warning, and typically the recommendation was you add an explicit copy. But that means that you're actually doing an unnecessary copy because the subset was already a copy to start with so That brings me to a final like draw a drawback about this current situation is that you both the user Does unnecessary copying but also in pandas internally we will do Yeah, there we do more copying than what is needed so how can we improve this? Can we do better? And so the experimental feature that is included in Pandas 2.0 is based on the single rule that is described here, so that any data frame or series that was derived in some way from another, so through an indexing operation as I showed in the example, or as a result of a method always behaves as a copy.
+
+**Speaker 2** _[12:40]_
+
+If you have any questions, please feel free to ask them in the Q&A box.
+
+**Speaker 1** _[12:41]_
+
+If you rewrite this in terms of the consequence of this is that if you want to, if you do change a data frame, if you mutate a data frame or a series, its values, it only changes that object itself and never any other. So if you want to modify a data frame, you need to directly modify that data frame and you can't do that through some. other data frame we think this It simplifies things and has some advantages to start a simpler, more consistent user experience. So if we go back to the first example that I showed, where I have my data frame, I create a subset, I modify the subset. The question is now, I'm modifying a subset, but did the original data frame, the f, change? The answer is very simple, no, because subset is a different object. I derived it from the original data frame through an indexing operation in this case, so mutating the data frame subset will never modify indirectly another data frame. So the f wasn't changed. And the answer is the same regardless how I created subsets, whether I did that with a Boolean mask as in this case, or with a slice, or with a column selection, or with a method, etc. So that should simplify things. As a result of this, we can actually also get rid of the setting with copy warning. So going back to the example that we showed for the setting with copy warning, with the current behavior of pandas, the one line, like the one order of operations works, the The other doesn't work. With the new behavior neither of those examples work
+
+**Speaker 2** _[14:35]_
+
+Um...
+
+**Speaker 1** _[14:36]_
+
+Very simple The reason so if we if you look at The the first one that currently does work if you also rewrite this in two lines We have a temporary object we select a column and then we modify that column But in this case also this temporary like this series that we got from the data frame is a new object Modifying that object will not modify the original data frame So that means that this change assignment essentially never works.
+
+**Speaker 2** _[15:08]_
+
+So,
+
+**Speaker 1** _[15:09]_
+
+As a result, since it never works, we also don't need to warn about other cases where you might have done something similarly. So we can, in general, we can get rid of the setting with copy warning. Of course, for upgrading, there were cases where change assignment did work. And people are, of course, using that. And it won't work anymore in the future. So to help with that transition and also in general to warn users in the future that they are doing something that will never work, there is a new warning. And potentially in the future we could make this an error. But the good thing about this one is that it's always, if you see that warning, you're doing something that doesn't work. And so in general, you should never see it if you avoid this pattern. That was for the case where you wanted to modify the data frame, and so the other case where you didn't care and you added this additional copy method just to get rid of the warning. The good news here is that you no longer need this additional copy to get rid of the warning. So this, yeah, this unnecessary copy is no longer needed. It's no longer needed for you as a user in your code, but also internally in Pandas we we can avoid a lot of defensive copying, improving the memory usage and performance of Pandas. And so how does this work? Is that because the single rule that they have here at the top, it says that it should behave as a copy. It doesn't say that it should be a copy from the start, only that it behaves as a copy. And so under the hood in Pandas, we can, for operations that allow it, we can avoid actually making a copy directly when it's not needed. And only later on, if you would modify something and to ensure that we, yeah, we make this guarantee of that it behaves as a copy, that mutating one data frame doesn't change the other, only then we would make a copy through what we call copy and write. To show you a small example of the impact of this, very quick benchmark, data frame, two million rows, 30 columns with some different data types. We do some, yeah, a chain, a method chain of renaming some columns, adding a new column, dropping some columns, changing on types, changing the index.
+
+**Speaker 2** _[17:47]_
+
+Thank you.
+
+**Speaker 1** _[17:49]_
+
+If I time that on my laptop with the default behavior of pandas, it takes around 2.4 seconds. If we enable this new feature, that goes down to 13 milliseconds. I know this is... I have to be honest, it's a little bit contrived example where we explicitly took all methods that don't really change actual data, but only like labels or adding new columns. So, it are all methods that currently each step that we show here currently takes a full copy of your data. With the new behavior, we never copy the data here. And so, the difference in what you see here in performance is purely by avoiding all those copies. A little bit more in detail, how does this exactly work? So, with this copy on right, So, assume that you have an operation that actually makes a copy. For example, the copy methods. At that moment, both the first data frame and the resulting data frame of the methods, they have their own data. They reference their own and own its own data. But if you do an operation that could be a view, for example, a reset index, most of the columns can be shared between the calling data frame and the resulting data frame. So in that case, for the columns that are shared, we keep track of the fact that they share the same data. And only when you would then modify a data frame, DF2 or DF1, either of them, we can see that the data that they reference are being shared by multiple data frames. And so to ensure that we make this guarantee of it should behave as it is a copy, only at the moment that we modify either of those data frames, at that moment, we copy the data so that each, again, has its own data and we can modify DF2 without modifying DF1. But because in practice you much more often do operations where we can avoid this copy than actual mutating operations, we can avoid a lot of those copies in practice. One last small thing, if you didn't care about triggering this copy because you don't care about keeping this original data frame, what you can always do is reassign to the same variable. For example, here, df1 reset index, and I reassigned it to df1. At that moment, because the original object, so I'm still returning a new data frame, I just assign it to the same variable. This original object goes out of scope, and at the end, the new df1 still is the only data frame that references its data, and so we won't trigger this copy when modifying it. To conclude this part How do I try this out? It's included in partners 2.0. You can enable it through that option
+
+**Speaker 2** _[21:05]_
+
+Thank you very much.
+
+**Speaker 1** _[21:06]_
+
+We very much want to encourage you to try it out
+
+**Speaker 2** _[21:09]_
+
+Thank you.
+
+**Speaker 1** _[21:11]_
+
+Based on your feedback, we hope and expect that it will become the default in a future version of Pandas. There are some links here with some more details.
+
+**Speaker 3** _[21:38]_
+
+So, now we come to another experimental feature, data frames that are no longer backed by NumPy arrays, they can be backed by PyArrow arrays now. The development for this has been ongoing since 1.5, but it got a lot more stable with the 2.0 release. PyArrow provides another mechanism to store data in memory. I won't go into more depth here, and Joris gives a talk on Wednesday if you want to learn more about Arrow and how they help improve the performance of DataFrame libraries. As I said, this is still experimental, so if you want to opt in, you have to do this explicitly. There's no mechanism right now where you can get PyArrow Dtypes everywhere. There are two ways to do this. You can either use the Arrow Dtype constructor, which is an extension Dtype in Pandas, or you can declare it as a string with the Dtype and PyArrow followed in brackets. Both of these notations are completely equivalent, except in one case that we'll look later at. And you can choose whatever you prefer. If our data frame is backed by PyArrow arrays, then we'll try to utilize PyArrow compute functionality, which is, depending on the use case, significantly faster than NumPy, or on par or a bit slower. We'll look into explicit examples on the next couple of slides. The actual implementation on the pandas side is done by the extension array interface. This interface was initially added in pandas 1.0 and was among others used to represent pandas nullability types. And this is used to dispatch to Pyros compute functions where they are available. If you look at the small performance example, if you create a series with five million entries, integers between one and 100, so we get plenty of duplicates, and we calculate the unique values, then NumPy runs in around 10.6 milliseconds. PyArrow gets this down to like 6.7, so we get performance improvement from around 40%. That said, if you do a lot of numerical aggregations, then you're probably better off using NumPy because it's highly optimized for this, while PyArrow has other advantages. And also, not every method of pandas has an equivalent compute function in PyArrow, so we have to work around this in some areas which might cause performance benefits, penalties, not benefits. One of the bigger benefits of PyArrow is that it has more built-in D-type support than NumPy. For example, in NumPy, if you have an integer array and you try to set missing values into this array, then you will upcast to float. This is not necessary in any of the PyROD types. All of them have a missing value indicator, so you can keep your integer columns or Boolean or whatever. One of the benefits that Pandas utilizes since version 1.3 is an efficient string data type implementation, with NumPy, Pandas uses the NumPy object D type, which isn't very efficient if you want to operate on the single strings. PyArrow represents them contiguous in memory, which makes iterating over them so much faster. Couple of more D types that come available through PyArrow are, for example, bytes or decimal D types that are especially helpful when you try to avoid floating point problems. An explicit null data type and nested data structures that aren't very well supported in pandas yet. That said, there's still some work to be done to support them properly. We focused mostly on the D-types that have a NumPy equivalent up until now. The string D-type is implemented in pandas through the same notation as we've seen before. But these are not equivalent yet. The PD arrow D type implementation, the second one over there, is newer than the original string pi arrow implementation. So they will probably become equivalent in one of the next versions. What we've seen in our performance benchmarks is that we get significantly improved performance compared to NumPy's object D type, which is like logical conclusion about when you take the memory layout into account. And also they take significantly less space in memory. I brought a small example for this. A series with one million entries that has completely random strings. The length of the strings is between 10 and 100 so that we get a good variety. And we look at two examples of the pandas string accessor to these series objects. If you look at the length function that computes the length of every individual object, we get a performance improvement from around, from the factor of five. The startSwift function is even more drastic. This computes the first character of all your strings, which is around ten times faster. So we saw this for most methods that we get a decent speedup with PyArrow. Another thing is the memory footprint. In this specific example, the PyArrow string representation takes up around half of the space of the NumPy object representation. This might vary, though, depending on your series. If you have lots of duplicates, it could actually be that the NumPy object representation is smaller in memory. As I said earlier, you have to opt into PyArrow Dtypes explicitly for now to make this a bit easier and also to improve performance, we added a dtype backend keyword for most IO methods. We tried to cover every one that we are aware of that is commonly used, where you can request PyRO dtypes specifically. One of the advantages of doing this within the IO method compared to afterwards is that we can use PyRO inference, dtype inference, while reading the data, which avoids costly conversions from your file to NumPy and then to PyArrow which might trigger a copy depending on your data. A quick example with short CSV file object. We have three columns, one integer with a missing value, one float column and one string column. If you would read in with NumPy first, then we would get column A as a float column back and then we would have to copy it over to an integer column in PyArrow. The same for the string column, we would get object before and then we would have to copy it over. With a D-type backend we can use the PyArrow D-types from the beginning. As I said earlier, not all methods have this yet. If you encounter a method that doesn't have a D-type backend option, then you can use convert D-types afterwards to do the conversion in two steps, like reading first and then and converting to PyArrow. Just a bit slower, but if you want to work with the PyArrow details, it's not too bad. A bit tied into our Arrow work is something we have done for a couple of I.O. methods until now. The Arrow framework offers parsing options and parsers for text files. They are multi-threaded by default which means that you get decent speed ups depending on the size of your file when you're using it. We added this for read CSV and read JSON, that are the two file formats for which it is available right now. And also read Parquet and read ORC used Pyro natively, that's the default engine there. So, a colleague from the pandas core team from us wrote a blog post about this and he saw about 50-70% speedups when using the arrow engine for large CSV files. This is mostly because of the multi-threading. The default CSV and readjson engines are custom implementations from pandas itself. When you're using the arrow backend, you get zero copy because we get arrow objects back from these parsers and can just store them in our extension arrays which is really really cheap. But you also see performance improvement if you use these engines with the NumPy backend enabled. You might trigger some copies but the performance improvement during reading is still bigger than the penalty you get from copying the data once. So, after we've seen all this, um, potential advantages of the PyROD types, we still have to give you a bit of a warning. Um, this is similar to the nanosecond resolution. Um, the Pandas API is huge and we are trying to adopt it everywhere, but we are not there yet. Um, this will take us, like, at least one more release. Um, so, you might encounter some problems because we have to cast to NumPy, simply because the PyArrow implementation is either not available or not yet supported from Pandas. Also, in these areas, our test coverage is probably not that great because we simply didn't get to it yet, so you might encounter potential bugs. Two things I've seen on Reddit, Stack Overflow and Medium, like a couple of times since 2.0 came out, that group buy and merge are slow. This is expected for now, but will get better in the future. Also, what we've seen, we got like probably 30 different issues about PyArrow support over the last two weeks. A couple of them are because of bugs in Arrow itself. So they need to be fixed by yours and this team before we can use them properly in Pandas. So a small medium-term roadmap, what we are planning on over the next couple of months. Our first goal is to make sure that Arrow and NumPy are basically equivalent. and so if you switch between both of them, you shouldn't encounter any problems. As I said, there's still some work to be done. And then the next step, we want to support the new D-types properly, like Decimal by its nested data structures is something I'm interested in personally. And then as a second step, we'll probably provide an option that allows users to opt into the arrow D-type more easily. Right now, you have to request them explicitly everywhere, which might be a bit bothersome in the long run. But yeah, we encourage feedback and also if you encounter something that's not working as expected, please file an issue so that we can get to it and fix it.
+
+**Speaker 1** _[33:09]_
+
+So, for the last few minutes of our presentation, I want to say something about plan's announcement proposals.
+
+**Speaker 2** _[33:18]_
+
+Thank you very much.
+
+**Speaker 1** _[33:19]_
+
+Acronym PDEP or however you pronounce it you will already have seen it appear a few times in our presentation, but so it's
+
+**Speaker 2** _[33:27]_
+
+Thank you very much.
+
+**Speaker 1** _[33:28]_
+
+A new process that was introduced in the Pandas community last year, very much similar as you have Python enhancement proposals, PEPS, or NumPy as NEPS and some other...
+
+**Speaker 2** _[33:40]_
+
+project.
+
+**Speaker 1** _[33:41]_
+
+Projects have their version, so they are meant for larger changes or changes that have a big impact on users to write it down, have a discussion about it and be more transparent about those upcoming changes. You can find more details about the process in PDEP 1.
+
+**Speaker 2** _[34:01]_
+
+And
+
+**Speaker 1** _[34:02]_
+
+And you can also find all the PDEPs on the roadmap page of our website. The currently open ones are those four, so the ones that are being discussed. I don't have time to explain them all. The PDEP 7 is the one that we already went into in detail before. And I briefly want to mention PDEP 8 about in place. So in place is a keyboard that I think in general the Pandas developers are not very fond about, although it's used a lot. It's mostly a synthetic trigger for reassigning the results to the calling data frame and only very few methods actually work in place on the data itself. And so the proposal, but to be explicit it's only a proposal, it's still being discussed, is to actually deprecate and remove most of the cases where the in-place keyword exists and only keep it in certain places where the actual operation can work in place on the data and not just the container object. For example, fill-na is an example for that. All the other cases, for example, reset-index currently has an in-place keyword, and how you would write this instead, if you are now using in-place keyword, is just reassign it to the original variable. And that's essentially what happens under the hood. But it just complicates Pandas having this keyword in many places where it's not that useful. And that's the link where you can find the full explanation for that. To end, I want to make it clear that although Patrick and I showed you some things about Pandas, it's not because we talked here that we did all that work. It's only possible, all those new features and developments, because of the whole community of contributors.
+
+**Speaker 2** _[36:04]_
+
+Um, I put the...
+
+**Speaker 1** _[36:05]_
+
+I put one number there for the 2.0 release, but there are, of course, even more people actually contributing to Pandas. Moreover, you can also become part of this community. Tomorrow is a good opportunity to get started. There is a workshop in the afternoon to learn how to start contributing to Pandas. So that's the end of our presentation. you can find the slides in that repo with all the information and links. And so we are happy to answer a few questions.
+
+**Speaker 3** _[36:51]_
+
+sad news. We don't, because we started late, we don't have time for questions, but I hope the speakers will be open to just answer your question maybe in the hallway or whenever you see them.
+
+---
+transcript_status: auto
+---
+transcript_language: en

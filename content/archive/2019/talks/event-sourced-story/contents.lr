@@ -1,0 +1,196 @@
+title: Event-Sourced Story
+---
+description: After three years of utilizing event sourcing in [Growbots](http://growbots.com), I want to introduce to you its basics and share our experience acquired…
+---
+created: 2019-06-09
+---
+code: SXSE8D
+---
+slug: event-sourced-story
+---
+speaker_names: Jacek Kołodziej
+---
+speakers:
+
+
+
+### Jacek Kołodziej
+
+[Python back end developer](http://stackoverflow.com/story/unit03) at [Growbots](https://www.growbots.com/). Aspires to be A Programmer - that'd be a lot to unpack to describe it, let's talk. :)
+
+[Photographs](https://www.facebook.com/UnitFoto), runs, [wanders from one concert to another](http://www.last.fm/user/Unit03) and from one hill to another, too. Plays drums occasionally.
+---
+abstract:
+
+
+After three years of utilizing event sourcing in [Growbots](http://growbots.com), I want to introduce to you its basics and share our experience acquired over that time - including complexity involved - so you can better assess whether it's a tool wo
+---
+full_description:
+
+
+Popularity of event sourcing among Python developers seems to be moderate but growing. It can be seen as an enterprise architectural pattern, not worth considering in "smaller" applications.
+
+The goal of this talk is to spread the knowledge about what the event sourcing is, what hides behind the corner of an initial implementation and to help decide whether your code will benefit from it enough to be worth the cost. As any other tool, event sourcing is not a silver bullet and it won't be portrayed as such - it has its drawbacks and introduces a fair amount of complexity.
+
+Only small amount of code will be shown during the talk - and more to visualise the idea than to prescribe a specific implementation. These and all other topics will be backed by over three years of practice in designing, developing and running applications equipped with event-sourcing-based storage under production traffic - which, I believe, gave us enough real-life examples to showcase ES' strong sides and associated stumbling blocks.
+
+Last note: while these are strongly related topics, I will be only briefly mentioning DDD, CQRS and EDA and - ES will be the main focus.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: PyConDE
+---
+tags:
+---
+submission_type: talk_long
+---
+submission_type_label: Talk (Long)
+---
+submission_type_id: 96
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: none
+---
+domain_expertise: none
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/SXSE8D.png
+---
+youtube_id: AdlmA6iHnfA
+---
+video_link: https://www.youtube.com/watch?v=AdlmA6iHnfA
+---
+video_published_at: 2019-12-16
+---
+video_duration_iso: PT30M8S
+---
+video_thumbnail: https://i.ytimg.com/vi/AdlmA6iHnfA/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+In our applications, we often deal with objects, be it invoices or shopping baskets, all kinds of documents, what have you. Oftentimes, we store them more or less persistently, for example, in the form of a database table. And we are so used to store their current state. Now, imagine that if instead of the current state, we would store their history, each individual transition that led to their current state. if with this data only we are still able to reconstruct the current state and if we are still able to perform new actions on these objects that would lead to new transitions new events this is basically where we have event sourcing now with event sourcing we no longer just call these objects objects we call them aggregates. You may think of it as an aggregation of events. An aggregate is basically a class that knows how to reconstruct the current state from events. It uses event handlers for that. It also knows how to perform, how to handle commands that are being executed on an aggregate. And this looks very fancy at all but why would you would we actually do this so you see even sourcing is often being explained using an example of an account balance you see the money going in money going out very pretty trivial commands very trivial event handlers and we are not here to talk about trivial examples I'm Jacek. I'm a first-row concert attendee. I run long distances. I'm also a mountain hiker. I like to take my camera with me. And also I share the apartment with these two guys on the right. And also I'm a software developer at Growbots, where we have an outbound sales platform. What that means is we maintain a database of contacts within companies, we automate outreach to these contacts and we also have a CRM integration among other things. So what may seem relevant to the topic of event sourcing is that we are a web application, basically a software as a service platform. Our application is divided into services. These services often communicate via events in some way and these services use RDBMSes, mostly PostgreSQL and MySQL databases as their storage. That may seem relevant but it's really not. You can employ event sourcing in all kinds of applications as long as there are some things happening so most of the software I guess and with all our application well at least this these two these two parts this outreach part in the CRM integration part we had problems our objects basically basically these contacts which we call prospects think of this as a prospective buyer they have a decently complicated lifecycle. The business logic behind them grew and grew and even got that hungry that it needed more and more insight into what happened previously to any object. So we started to cram this history data into like arbitrary JSON fields in their tables and it got pretty messy pretty quick. Also with all this logic we had bugs of course or issues and depending on for example the logs coverage around this code sometimes it was hard to trace what exactly happened to any object. Sometimes it was even impossible just depending on the logs coverage. And at some point our our users decided that they also want to have more insight into what what is happening to their prospects, like, of course. So we introduced another storage that would basically store just that events. But we didn't use this table, this data for the business logic itself at this point. So having all of having all of that, We thought that, okay, we are almost at the point where we want to use this all event stuff for the logic itself. And there's a pattern for all of that. And that's event sourcing itself. So we learned. Learned how to properly introduce event sourcing into an application. We got pretty passionate. We read a lot. We watched a lot of talks. We even attended a training session. Next, we talked a lot about whether this would be economical for us to go into event sourcing. We talked a lot, and by we, I mean not only between developers, but also with product owners, with designers. and this had value in and of itself even even without even sourcing because we got our ubiquitous language and DDD term much better we understood each other much more because of this process so after all this talking and learning stuff we needed to actually do some work so we started to define or rather redefine what the domains are for the specific services where we wanted to introduce event sourcing. What that means in this area means we needed to define what our events are and what our aggregates are and this might look trivial because well I know what our events are for example for prospects we like we send an email for example we receive an email I don't know prospect decides that okay I'm not into your products and go away and at first it is trivial then you this you need to decide how to how do this events relate to aggregates so again this may look trivial like my prospect is an aggregate of course and yet it's really not because we have prospects that have this many-to-many relation with something we call campaign and we do this via the middle thing called thread so really the prospect is the aggregate maybe thread maybe they are both what I mean by that is if at first defining the aggregates and events for you look trivial think twice it's very well worth it it's very well worth investing more time upfront because it's pretty hard to change it later and also that means that defining events has an influence over what your aggregates are and vice versa sometimes you decide on a set of events how do I relate to aggregates and then see that this not really fits very well into one picture. You need to redefine some of events. We had our events decided on, it came time to decide where we would be putting them. So we could use our beloved RDBMSS. There are also some specialized stores for events. there's at least one called event store, just that, I will link to that later. You can use other types of storages. But we stayed with our beloved Postgres for that. Just because it was enough, we knew how to operate it, we knew how to use it basically. And it's still enough after these three years, after this decision so what do we have in an event log we have a few columns versus ID that's basic auto incremented I integer idea of an event we have an aggregate ID because all all events needs to know I need to know which aggregate they are connected to. And there's a version column. This is a number designated which event, well the ordinal number for the event in an aggregate. And these two columns have an index over them. First it is for fetching events for an aggregate you need that to replay the current state of an aggregate and also this is for concurrency control I will go back to this later and the last thing here is payload stored as an arbitrary column arbitrary JSON or even a string containing JSON whatever and not structuring this in an event log like in more rigid schema is pretty important I think I will go back to the later also. We have some more fields that are pretty much optional. The event type and timestamp could go to the payload as well, no problem with that. And also we are a multi tenant application, so pretty much all of our tables have the tenant ID column. So I said something about concurrency. What's up? More often than not you will need to have an ordering between your events. You need to know whether an event A happened before event B. There are some situations when you not care about the order, but most often you will. And to have an absolute ordering you will need some form of concurrency control. Basically, this means you need to limit simultaneous transactions inserting new events into one aggregate. And depending on the service, we use one or the other concurrency control form. One is pessimistic concurrency, which basically means we lock an aggregate before trying to execute a transaction command on this aggregate. We are just locking on some separate table. Or optimistic concurrency. And this is where this index comes into play, where if two simultaneous transactions would succeed, like, I mean, would try to insert a new event into this aggregate, into event log, they would have the same version number, so the database will handle the concurrency for us. It will reject the second transaction to do so. we had decided on the event store but when writing code for all of that well, how do I query the aggregates? How do I query them by their attributes? I can't query the whole event log at every operation. So there's a tool for that and these are called projections or views or red models. And what these are? They are stored result of any function over events, any subset of events you want. And this may take a simplest form of, for example, a data table with one row per aggregate. This is a simple example, but you can have it any way you want, store it anywhere you want. it doesn't need to be the same database. If it is in the same database and if it is in a one row per aggregate form you can build these red models synchronously. I mean synchronously to the same transaction that adds new events. You can update the red model in the same transaction. But most often than not you will need to do it asynchronously in some separate process. basically separate database transaction. And this of course leads to eventual consistency. Here's one hard truth here and there. The sooner you will learn how to deal with eventual consistency basically the better for you. We didn't found any like magical way around it. But this allowed us to build more fancy stuff over these thread models. No application is born perfect from the get-go. You will need your event types to evolve. I mean you will need new event types, you will need to modify existing event types. For example you will need to store some new attributes with these events. So having this payload thing as an arbitrary column, arbitrary JSON in a database with no schema enforced on the database level will help you a lot here. If you had some schema on the database level with any change of event types attributes you would need to perform some database migration and you pretty much don't want to do this on the event log. Also some event types, we sometimes add new attributes, modified existing ones and sometimes these changes were so big that we wanted to version our event types and we haven't introduced any new columns for that, we just slapped some v2 or v3 at the end of the event type string. Please note that this is of course a huge debt factory because anytime you introduce a change into into some event type or add a new one or get rid of the existing one well it's not like it's not like you you can just get rid of the code that that is connected with some existing event handler as long as you store event of that type. So you will need to maintain maintain code for that event types as long as you have event of that type. We had our application in production for quite some time and more and more we needed to actually look what's in our data. We or our customer support team for example. And when when storing current state of any object it's pretty easy to see the current state. Just go and look at the database. With events it's a little bit harder because you need to somehow reconstruct this current state. And this is next hard truth. Either you build a red model for inspecting data or you build tooling that would fetch events for for example any aggregate or something and then you can then you can see the current state so more work but also more more chance to more chance to have more features for example you can have a point-in-time view of any aggregate you can see how it evolved over time speaking of evolving over time event logs are treated as an immutable thing, because events are history and history is immutable. And that's true, at least as long as the application itself is concerned. We had a few bugs that led us to store some, for example, some invalid ID in the events. And we needed to do something about it, so that other parts of the application won't be like influenced by this bug but we could either we could either implement some corrective events and then add these events into the event log so we needed to teach our application to to interpret this new type of event or we could just yellow the changes into the event log and that's what we may that's what we did in all of these cases it was for us at least it was more economical it was doable at first and what I mean please consider it an option basically not so we didn't we didn't implement any corrective events throughout this time there is more that more stuff that we don't do that is connected with event sourcing. Second thing is snapshotting. Our aggregates are very very short. The median amount of events per aggregate is 17 if I remember correctly. So there's absolutely no point in snapshotting for us. Also we don't use any existing library or framework and there's really no very big reason behind this. I I think it was reasonable enough at that point in time where we decided to start implementing these services.
+
+**Speaker 2** _[19:09]_
+
+Thanks for watching!
+
+**Speaker 1** _[19:10]_
+
+And I think it would still be somehow reasonable today to go the same path. But there are definitely libraries worth considering. I will also link them later. And I was talking about two services that use event sourcing in our application. And we have many, many more that don't use it. Because most often than... Well, most often. I don't know. So for us, more services are too basic, their domain is too small, too simple for the event sourcing, to benefit from event sourcing. So we didn't employ it everywhere, we employed it only into two or three maybe small services. So, to sum up. There are, of course, disadvantages for event sourcing and there's a big one named complexity because, well, eventual consistency stuff is not very easy to go around, but it's perfectly doable. You will have this unremovable event handlers as long as you store event of any particular type. you still need to maintain the code, the event handler's code for that and the architectural overhead is significant. To employ event sourcing you will need to at least glance over or get more familiar with like a bunch of topics which I would love to go into but you can catch me later after the talk. But of course there are some advantages to event sourcing and having history as a first class citizen is the first and the biggest of them. Either your application stores enough data to reconstruct current state of objects or it simply doesn't work. So it's not like with logging where you can omit some log lines and well the application still works but you lose data. You can think of an applications for this data it may be outside of the application itself think data science I said that our our business logic was pretty complicated and with when structuring this this logic around events well the complexity didn't disappear mmm event sourcing is not magic in any way but it got it got significantly better in terms of structuring it. It made us as developers better at thinking about our aggregates in terms of time. How do they evolve? How do these changes interact between each other? And this all led us to better understanding of the domain as a whole. I've said I will link to a few things later including these slides all of this is under this this link above and including some code snippets I didn't have time to show you any code but in any case if you would like if you would see the code there it's not like the one perfect solution one perfect implementation it's just a hint it's just a hint how it can look like basically that's all for me thank Thank you.
+
+**Speaker 2** _[22:55]_
+
+Okay, time for questions.
+
+**Speaker 3** _[23:09]_
+
+All right. Thanks for covering the topic. I've never worked with event sourcing, but I do have a question about when you're storing your events, if your business logic changes at some point, how do you account for that in your application? Because I would have no idea how to approach that off the top of my head.
+
+**Speaker 1** _[23:29]_
+
+Some next hard truths, I guess. If your logic changes to the point where you would interpret your events in a different way, that should point you out to having a new event type. Like a new version of an event type. Like I mentioned slapping some v2 at the end of the event type was good enough, at least for us. And having tests for all these event types. definitely helps.
+
+**Speaker 4** _[24:01]_
+
+Hi, thanks for the talk. I was wondering what your thoughts are on the best mechanisms to constrain state transitions in event sourcing.
+
+**Speaker 1** _[24:14]_
+
+I'm not sure if I understand the question.
+
+**Speaker 4** _[24:17]_
+
+Like, for example, an order can't go from delivered to open, and if you try to snap an event on it, that would do this illegal state transition that it's prevented from being executed.
+
+**Speaker 1** _[24:30]_
+
+So this is a responsibility of an aggregate, of its code. You don't just add events like this onto the aggregate, you execute commands on it. So then the responsibility for the aggregate is to validate whether this transition is valid, whether this command can be handled at this point. So it can either go with the command and issue new event or events or or like raise an exception if that's not a valid transition at this point in time
+
+**Speaker 2** _[25:07]_
+
+More questions?
+
+**Speaker 1** _[25:11]_
+
+There's a question over there. Oh, sorry. How do you...
+
+**Speaker 5** _[25:26]_
+
+How do you...
+
+**Speaker 1** _[25:27]_
+
+manage
+
+**Speaker 5** _[25:28]_
+
+When some event will break the logic, but the new ones are still needed to be processed, you go to a dead letter and then you need everything to be depotent. Does it fix the thing or you go back and process everything again?
+
+**Speaker 1** _[25:51]_
+
+If I understood correctly, we do either of those, depending on the place. Sometimes we retry a command because that code knows that it's important enough that this action should happen. So it will be retried. And sometimes, okay, I can't handle this event right now. this goes basically to century and that's that I don't have very clear action like action point here at the very least it would be event sourcing is not some kind of magical arc like enterprise pattern that only belongs to a Java world or any enterprise world. At the very least the action point here is patterns like event sourcing and a few others are tools to be used to be at least considered and also in Python applications that grows bigger and bigger each year.
+
+**Speaker 2** _[27:08]_
+
+Okay, so I have the last question. So I don't know if you're familiar with the machine learning pipeline, but how do you recommend the use of event sourcing for storing every decision that a data science team makes on what types of data they are collecting, the feature generation process, what features go into a specific model, how to manage all these metadata in terms of kind of event-based sourcing? Thank you.
+
+**Speaker 1** _[27:39]_
+
+hmm that kind of looks like an application that would be for documenting the the process is that right
+
+**Speaker 2** _[27:49]_
+
+It's kind of a process itself because it's more about you have a team of people making actions and these actions are about machine learning, like what features to calculate. It's not really about the source data but more on starting the process of a team developing a model and maintaining the model.
+
+**Speaker 1** _[28:10]_
+
+so you can definitely have an application that could be could be storing these decisions in the forms of in the form of events at the very at first it would need like modeling what event types are for this and yeah basically writing applications for that I don't have any like a deeper insight the things it is.
+
+**Speaker 2** _[28:37]_
+
+Okay, thank you for a... Oh, we have one question.
+
+**Speaker 6** _[28:47]_
+
+I also have a question about use cases for machine learning. So in machine learning, when we extract these features for the models, it's quite easy to come up with these features. What are the values now when I execute these queries? But then often we use some data that is maybe one to three years old. And then it's not very easy to get what was the value of this feature then. And I wonder if you can recommend some solutions or some examples how it was solved with perhaps event sourcing.
+
+**Speaker 1** _[29:22]_
+
+So event sourcing at the very least would provide you with a source of data that basically is a history of any object as long, of course, as you retain this data. This is also a very important topic here. and structuring it more as a source for for data science well this is a very interesting topic I would like to like discuss later I have no no no more Thank you, Max, for that.
+
+**Speaker 2** _[29:59]_
+
+Okay, so we are done. Thank you so much for listening.
+
+**Speaker 1** _[30:03]_
+
+Again, thank you.
+
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -1,0 +1,164 @@
+title: How Chatbots work – We need to talk!
+---
+description: Chatbots are fun to use, ranging from simple chit-chat (“How are you today?”) to more sophisticated use cases like shopping assistants, or the diagnosis…
+---
+created: 2023-01-05
+---
+code: AKXXQD
+---
+slug: how-chatbots-work-we-need-to-talk
+---
+speaker_names: Yuqiong Weng, Katrin Reininger
+---
+speakers:
+
+
+
+### Yuqiong Weng
+
+Yuqiong recently received her master's degree in data science. She is now working as a junior data scientist at I-WUNDER GmbH, where she deals with data and develops machine learning models. NLP is one of the fields that catches her interest, out of which she developed a chatbot in the domain of E-Mobility to help with information-retrieval tasks.
+
+### Katrin Reininger
+
+With a background in physics, Katrin discovered her enthusiasm for data analysis while exploring laser-molecule interactions during her PhD. Hence, she left science to become a consultant at I-WUNDER. Since 2020 she mainly manages projects in the area of data science and software development. Besides, Katrin has a passion for exploring new (project) management techniques and running workshops.
+---
+abstract:
+
+
+Chatbots are fun to use, ranging from simple chit-chat (“How are you today?”) to more sophisticated use cases like shopping assistants, or the diagnosis of technical or medical problems. Despite their mostly simple user interaction, chatbots must combine various complex NLP concepts to deliver convincing, intelligent, or even witty results. 
+
+With the advancing development of machine learning models and the availability of open source frameworks and libraries, chatbots are becoming more powerful every day and at the same time easier to implement. Yet, depending on the concrete use case, the implementation must be approached in specific ways. In the design process of chatbots it is crucial to define the language processing tasks thoroughly and to choose from a variety of techniques wisely. 
+
+In this talk, we will look together at common concepts and techniques in modern chatbot implementation as well as practical experiences from an E-mobility bot that was developed using the Rasa framework.
+---
+full_description:
+
+
+Chatbots are fun to use, ranging from simple chit-chat (“How are you today?”) to more sophisticated use cases like shopping assistants, or the diagnosis of technical or medical problems. Despite their mostly simple user interaction, chatbots must combine various complex NLP concepts to deliver convincing, intelligent, or even witty results. 
+
+With the advancing development of machine learning models and the availability of open source frameworks and libraries, chatbots are becoming more powerful every day and at the same time easier to implement. Yet, depending on the concrete use case, the implementation must be approached in specific ways. In the design process of chatbots it is crucial to define the language processing tasks thoroughly and to choose from a variety of techniques wisely. 
+
+In this talk, we will look together at common concepts and techniques in modern chatbot implementation as well as practical experiences from an E-mobility bot that was developed using the Rasa framework.
+---
+room:
+---
+day: Tuesday
+---
+slot_date: 2023-04-18
+---
+start_time: 11:05
+---
+end_time: 11:35
+---
+slot_id:
+---
+track: Natural Language Processing
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 2521
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: None
+---
+domain_expertise: Novice
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/AKXXQD.png
+---
+youtube_id: qipgC8tT-FU
+---
+video_link: https://www.youtube.com/watch?v=qipgC8tT-FU
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT30M10S
+---
+video_thumbnail: https://i.ytimg.com/vi/qipgC8tT-FU/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:02]_
+
+Yeah, thanks and hello everybody. I am Katrin. I am head of consulting at iWonder and I'm here today with my colleague and data scientist Yu Zhong. And we want to talk with you about chatbots today. Now, chatbots have received a lot of attention lately due to the release of chat GPT. But also beside that innovation, there exists a variety of chatbots ranging from simple chit-chat to more sophisticated use cases like the diagnosis of technical or medical problems. In our case, we wanted to build a chatbot for the retrieval of data as an add-on to an existing web app informing about the e-mobility infrastructure in Germany. So besides just showing the KPIs we regard as interesting to the user we wanted to give them the possibility to extract exactly the data interesting for them. Hence Yuchun built a chatbot based on the Python Rasa framework and she will explain now in more detail how she did this.
+
+**Speaker 2** _[01:07]_
+
+Yes, thank you. So before I really dive into the implementation details, I want to first talk about the big concept behind chatbot, and that is NLP. So we know that chatbot is just one application of NLP and there are also many more other NLP tasks such as sentiment analysis where we detect the sentiment from a text or we classify the text based on into the topics. And we also use translators every day to understand other languages as well as auto-completion when we try to type words more quickly. and yeah so but behind all these tasks there's something in common that is the machines needs to understand the information and content in the raw data which whether it is a text or sound or image they need to all be converted into into numeric representations. And this is the most important concept I will say in NLP, and I will come back to it shortly again. So now, say we have such a sentence, electric cars are the futures. The first step we usually do is to get the tokens out of it. And there are many different ways to do it. The most simple way is that we use whitespace as delimiter and in the end we will get the tokens as individual words or characters. And a token is not necessarily a word but it can also be a subword. And as long as we have the tokens, we can now think about again how we want to represent them. And again, there are also different ways to do it. let's start with something more simple like on the sparse representations so the typical sparse representations include one-hot encoding where we generate a vector which has the same length as the length of the vocabulary in the text and at the index where this word is located in the vocabulary we will have a 1, all the other elements are zeros. And if we now want to generate directly our representation for the whole sentence, we can use the bag of words, which basically count the frequency of the words in the text. Now we see that although these sparse representations are easy to understand and implement they have obvious drawbacks. First we have a lot of zeros in our representations which means we need a lot of memory to store this kind of usefulness information and this kind of representation is typically not so rich in the information it contains. It captures the synthetic information but not the semantic. Therefore we have to use the dense representations. And let's first have a look at the static embeddings. One of the most commonly used technique is word2vec and it can be achieved by using two different algorithms. The first is Siebel and the second is SkipGram and I want to here quickly explain how skip gram works so we have again this sentence and the core idea of it is we want to predict the context word given an input word so let's say we have a window size of one we slide the window from left to right and so for the first input word electric which is marked in yellow we consider one word before it and one word after it. In this world, we generate the training pairs, and after we get all these training pairs, we can train a shallow neural network to calculate the errors, and then what we care about in the end is local metrics. In this local metrics, Each row represents a word representation for individual words in the text. During the inference, if we want to generate a representation for a word, we simply input the one-hot encoding of that word and then we will multiply it with this local matrix and we get what we want as dense representations. And although static embeddings works quite well, but it does not take into consideration about the context. So in some situations, we will have examples like this where words may have different meanings in different contexts. And if we want to have different representations for the word in different contexts, we have to consider using dynamic embeddings. Dynamic embeddings usually uses bi-directional structure while training and then during inference. The way it works is by not putting the word itself but putting the whole sentence. In this way the model can capture the context information. So far we have talked about the most important concept in ALP. I think it's time to have a look at what kind of chatbots are there. So I have this classification based on this implementation of chatbots and the most simple chatbot has a quite simple structure and it is purely rule-based. based, this type of chatbot usually has a list of questions and a list of answers and we match your questions and answers using keywords. Rule-based chatbot is suitable for customer service and use cases where we have a limited number of questions but if we want to now add more functionalities to the chatbot it is not so optimal. But luckily we have another solution for that which can help us reduce the complexity when we define the rules. So that is our intent-based chatbot. So our intent-based chatbot first classifies questions into intents and we only need to define answers based on the intents but not for each of these questions. And our immobility chatbot that I developed is also an intent-based chatbot. So now finally I would like to explain how I implemented our immobility chatbot using Rasa framework. Here is a real example that I took from a conversation so we know that in a conversation we have a lot of terms it can be from the user and it can also from the chatbot and for each of the user input we will classify our intent for it and in some cases we also care about the small pieces of information that are contained in the user input, and so we extract the entities from it. In our case, for example, in the intent KPI query, we have to extract three different informations, the KPI place and time, and if we want to then use this information later During our conversations, we need to use a slot to store them. From the chatbot side, every response is associated with an action. An action is where our business logic goes. It can execute events as simple as generating a response, or it can also make an API call, querying the database, or setting a slot value. And afterwards, we have to also define stories for our chatbots, as well as rules, if necessary. A story is a bunch of intents and actions in order. This is a kind of abstraction where our conversation should look like and rules is a special form of stories but it is stricter which means that the chatbot would always follow the rules first and then the stories. So after we defined all the necessary elements we have to think about how we want to train the chatbot. Rasa provides an NLU pipeline so it is straightforward to see that when a text comes in, we should first use a tokenizer to tokenize it into tokens, then we use a featurizer to get the embeddings from it. In the end, the two main tasks for the chatbot is to classify the intents and extract the entities. And for each of the components in this pipeline, there are different options for which we can choose which model we want to use and also this pipeline is highly customized. For example, in our case we want to also extract the name of the place which is sometimes containing a worm lot so I have to develop my own component for it, which is here the rapid force anti-extractors for place, but in general this pipeline can be adjusted according to our needs. Also we have to train the model to train the chatbot to follow our policies, which tells it to choose which step it should take next. There are different types of policies. For example, the rule policies, which has the highest priorities. So the chatbot would always follow the rules if we define one. And the memorization policies tells the chatbot to follow the stories. But there are also hyperparameters that we can tune, for example, to let the model to be more generalized. Also if both of these policies do not work we can consider using a TED policy which is machine learning based and it will predict the next action based on all the information from the conversation so far like the user input, the slot value and so on. Now let's have quick look at how our immobility chatbot looks like. Our chatbot is very user friendly so at beginning the chatbot will always greet the users and it will provide a main menu where the chat and the user can choose which service they want to use. If they choose KPI query then the chatbot will provide a list of KPIs so which the user can query and as well as examples how the users can ask their own queries and then the user comes up with their own query and chatbot will get the information from the input and then query the database in the end gives back the response. Also some users are extremely interested in knowing how many charging points are located around a certain place so we also have developed this nearby search service where it's based on an overpass API and so the users only needs to give the address of the search center as well as search areas radius then the chatbot will displace address in text as well as gives back a map which displays where these charging points are located. Of course our chatbot is also capable of answering immobility related questions and it is achieved by using a sentence transformer where the chatbot has a knowledge base and whenever the user asks questions, it will search the knowledge base and gets back the answer which has the highest probability.
+
+**Speaker 1** _[15:18]_
+
+So, with this approach, we have built a chatbot which is successfully running and answering questions. However, we also discovered some limitations of our approach. And I want to start with intents here. So, a main task for an intent-based chatbot is to detect the right intent. And that can be challenging. So, here you see an example conversation of failure. The user starts with choosing the service e-mobility FAQ, hence the chatbot asks them, what do you want to know more about e-mobility? So far, so good. The user continues with asking which country has the most electric vehicles, which is a classic FAQ in principle. However, the structure of the sentence looks similar than sentences we have in our training sample classified with the intent KPI query which leads to a wrong intent classification and hence to a wrong answer and the conversation fails. This problem might be mitigated by a larger training sample, however imagine all the questions users could ask, this might also be a challenge. Another thing with intents is that you lose contextual information. So in this conversation here, the user asks two times about the number of charging points in Berlin at two different dates, which is easy to answer. But the chatbot fails then afterwards when it gets asked to compare the two results because it does not know about the context of the last question. So these were two examples where we have challenges with intents, but I want to name two more things we face. The first one is about the training data. So if you have a domain-specific chatbot like our immobility bot, you also need domain-specific training data, and depending on the domain, this might not be available in a large number and hence can lead to some effort in collecting it. Second, we predefine the answers of the chatbot and we also restrict the user in the way they can ask questions. This helps the chatbot to better understand the user and to react correctly, but at the same time it also leads to kind of a robotic impression for the user. But there are also other ways how chatbots can be built and I think it's time in the end to have a quick look at large language models and how they could maybe help us also with our issues here.
+
+**Speaker 2** _[17:51]_
+
+Yes, nowadays it's just not feeling so right if we don't talk about ChatGPT and large language model. But it indeed gave us also some inspirations how we can improve our chatbots. So let's start with the definitions of large language model. So a large language model is a large neural network with billions of parameters trained on large quantities of unlabeled text. And let's take BERT as an example, and this also applies to many more other large language models. Usually the training takes place in two steps. First is the pre-training step where the model is asked to do two tasks which will help it in getting more meaningful representations of the text. Then after we get these meaningful representations, we can use it to fine-tune downstream tasks such as text classification. And so, how exactly can large language model help to overcome some of our challenges we discovered for our chatbot? The first thing that we could do is to use a large language model to generate a dataset for us. Now, during the implementation of immobility chatbot, I actually generated the dataset manually, which is not really the type of work I would like to do, but I had to. But luckily we now have the chat GPT to help us. So the way it works is like you create a prompt and you basically tell the chat GPT, okay, so imagine you are a user who is now exploring this dataset, And we also provide example questions, how many charging points did Burling have, for example. And then we ask chatGPT to generate three different but similar questions. And if we want to add conditions, we can also write it in the prompt. In this way, we get back three answers from chatGPT, where the grammar is correct, and it also sounds very natural. So in this way, we can generate a data set in a short time. And we can also use large-language model to reduce the robotic impressions. And there are three different approaches at least I can think of. So for the first approach, now we have the predefined response template. So the chatbot was always trying to answer the questions using same structure of the response, but once we have chat GPT, we can ask it to rephrase the predefined template. And for the second approach, we get rid of this predefined template and we just give chat GPT the data that we get back from the database and we give it also the user questions. And we ask chat GPT to generate a response on its own. And the third approach is a bit more advanced where the chat GPT has also to generate a SQL query and query the database also get the data back and generate a response. So from the top to the bottom the control is less but we have more automation in our process. I also played around myself with the first approaches and here are the results. So for the first approach, I simply asked ChatGPT to always rephrase the text that we gave it. So now if every time the user asks a similar questions, we have different variations of answers from the chatbot. In this way, okay, so the user won't feel like it's kind of robotic. And I also tested the second approach where the data that we give ChaiGPT is basically the questions from the user as well as the information which is the raw data that we get back from the database. So it is not pre-processed and we can see all the brackets are on the numbers but surprisingly, ChargeGPT can give us the correct, can extract the numbers from it and also give us the correct response. And here it took me actually more time to create a prompt because we know that ChargeGPT was trained based on data that was until September 2021. So if a user asks a question like how many fast charging points they'd buy in half in december 2022 then chat gpt would say okay with i don't have the data um from december 2022 so we we have to explicitly tell the chatbot the information that is given to you always corresponds to the time the question asks also we have to tell the chatbots please don't mention the word information or data in your reply because otherwise the chatbots would all just say based on the information that I get I can say buying had 1715 fast charging points so we have to always tweak the prompt a little bit to get the correct answers but in general I will see the first approaches both possible to do and also has its pretensions also even with the third approach I did not try it myself but I I could imagine that it is also possible to do it for example using the recently very popular library like lanching, so it has this ability to generate SQL queries, actually. But one thing we have to keep in mind is that large-language model is not a fix for all, and it also has its own drawbacks, because the more we trust on it, the more control we are giving away and we sometimes also want to ensure that the quality of the response is always good so we would need some kind of evaluation after um we're getting the response from the large range model and also in the real cases many companies they cannot train their own large-ranging model so they are always dependent on a third-party supplier also we have to think about the data privacy problems the model is up and just provided as an API and it is not open sourced so we don't have the chance to address models for our needs.
+
+**Speaker 1** _[25:44]_
+
+Okay, so we're at the end of our talk, so let me quickly sum up what you've heard about in the last 25 minutes. There is a variety of ways how chatbots can be built. One example we have shown is to classify user questions in intents using Rasa, and large language models open the way for truly intelligent chatbots.
+
+**Speaker 3** _[26:22]_
+
+Thank you. Nice presentation about the underhoods of the chatbot. Is there some questions? There's no on Slido. Is there someone who has a question we have some time to answer? Yes? I will rephrase after you say it for the people online. Sure. So one of the challenges is that it's not open source. But if you experimented with open source LLMs, like how advanced and how good it is compared to OpenAI and GPU models. So have you experimented a non-closed source large language model? Yeah.
+
+**Speaker 2** _[27:03]_
+
+Now I'm the source
+
+**Speaker 3** _[27:06]_
+
+Have you experimented open-source model like chat GPT but open-source versions and not tragedy, but
+
+**Speaker 2** _[27:14]_
+
+Not really. I mean, so far I only played around with this GPT 3.5 API. Okay. But I guess the open-sourced models will have worse performance, probably, than this non-open-sourced model.
+
+**Speaker 3** _[27:37]_
+
+ANTONY PASSEMARDER- Another one, yeah. How is the acceptance of the chatbot from the end users? ANTONY PASSEMARDER- So how was the acceptance about the chatbot from the end user? OK. Do they like using chatbots or a natural input, or do they just want to see a map with the number? ANTONY PASSEMARDER- OK, so do they prefer the chatbot instead of a map with the information at self-service?
+
+**Speaker 2** _[28:01]_
+
+Yeah, this is something we still have to do because so far I developed a chatbot and it's a prototype and we will have to do the user test later on. And this chatbot was developed when I was writing my master thesis and it changed a little bit on the functionalities. At that time, what we get from the user is like the responses are more kind of robotic. So we try to fix all these issues later.
+
+**Speaker 3** _[28:33]_
+
+Sorry. You. Yeah. Okay. So the question is about integrating ChatGPT into the chatbot and restricting the information what we want for the e-mobility.
+
+**Speaker 2** _[29:05]_
+
+Actually, we don't let the chat GPT to freely give us a response, but we always use it for a smaller functionality. For example, when we just gave it the question and we gave it the data, and we asked it to generate a response just based on these two informations. So in this way, I don't think there will be like some hallucination or kind of fancy stuff that is not being taught, but it still comes up with itself.
+
+**Speaker 3** _[29:42]_
+
+Okay, thank you. We have we are running short of time if your question is really important you can go but otherwise I would So can we find the chat bot online
+
+**Speaker 2** _[29:56]_
+
+Not yet, but I'm sure we will put it online.
+
+**Speaker 3** _[30:01]_
+
+Cool. Thank you. A round of applause for our presenters.
+
+---
+transcript_status: auto
+---
+transcript_language: en

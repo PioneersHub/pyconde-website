@@ -111,6 +111,11 @@ blockquote {
     --space-3xl: clamp(5rem, 4rem + 4vw, 10rem);              /* 80px → 160px */
     --space-page-margin: clamp(1.25rem, 5vw, 4rem);
 
+    /* Motion — Design Rules §11 (guide easing + durations) */
+    --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+    --t-fast: 120ms;
+    --t-normal: 240ms;
+
     /* Neutral palette for minimalist sections */
     --white: #ffffff;
     --off-white: #fafafa;
@@ -466,6 +471,23 @@ a {
     display: block;
 }
 
+/* Seven-colour brand bar — Design Rules §05 / guide footer motif.
+   Fixed colour order: yellow · cyan · blue · green · orange · lime · silver.
+   Order and colours must not be altered. */
+.brand-bar {
+    display: flex;
+    height: 14px;
+    width: 100%;
+}
+.brand-bar span { flex: 1; }
+.brand-bar span:nth-child(1) { background: var(--yellow); }
+.brand-bar span:nth-child(2) { background: var(--blue-light); }   /* cyan */
+.brand-bar span:nth-child(3) { background: var(--blue); }
+.brand-bar span:nth-child(4) { background: var(--green); }
+.brand-bar span:nth-child(5) { background: var(--orange); }
+.brand-bar span:nth-child(6) { background: var(--green-light); }  /* lime */
+.brand-bar span:nth-child(7) { background: var(--grey); }         /* silver */
+
 .footer-outro .content {
     padding: 0;
 }
@@ -481,13 +503,15 @@ a {
     background-color: var(--blue);
     color: white;
     width: 100%;
-    min-height: 100vh;
-    min-height: 100svh;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
     overflow: hidden;
+    /* Sized by its content (logo, dates, CTA) instead of the viewport —
+       no filler whitespace at any width. The larger bottom padding keeps
+       the absolute-positioned scroll hint clear of the CTA. */
+    padding: clamp(1.5rem, 4vh, 3rem) 0 clamp(2.75rem, 7vh, 4.5rem);
 }
 
 .intro .content {
@@ -500,7 +524,7 @@ a {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: var(--space-lg);
+    gap: var(--space-md);
 }
 
 .intro__logo {
@@ -526,18 +550,22 @@ a {
     gap: 0.35em;
 }
 
+/* Solid white + soft shadow: the details sit on busy photos, so no
+   transparency — hierarchy comes from weight, readability from the
+   shadow + the scrim gradient on .intro__slideshow::after. */
 .intro__location {
     font-size: var(--font-size-xl);
     font-weight: 400;
-    opacity: 0.9;
     margin-bottom: var(--space-sm);
     letter-spacing: 0.01em;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
 }
 
 .intro__date {
-    color: rgba(255, 255, 255, 0.8);
+    color: white;
     font-weight: 400;
     font-size: var(--font-size-md);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
 }
 
 .intro__date strong {
@@ -575,24 +603,36 @@ a {
 .intro__slide {
     position: absolute;
     inset: 0;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+}
+
+/* The <picture> wrapper is only a positioning box — the sizing must
+   apply to the <img> itself, or it falls back to the global
+   max-width/height:auto reset and never fills the section. */
+.intro__slide img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: center 30%;
-    opacity: 0;
-    transition: opacity 1.5s ease-in-out;
 }
 
 .intro__slide.active {
     opacity: 1;
 }
 
-/* Semi-transparent brand overlay for text readability */
+/* Brand-hued scrim for text readability — light at the top so the photo
+   stays visible, deepening to navy where the text sits. */
 .intro__slideshow::after {
     content: '';
     position: absolute;
     inset: 0;
-    background-color: rgba(55, 120, 190, 0.65);
+    background: linear-gradient(
+        180deg,
+        rgba(55, 120, 190, 0.35) 0%,
+        rgba(30, 52, 90, 0.55) 45%,
+        rgba(30, 52, 90, 0.6) 100%
+    );
     z-index: 1;
 }
 
@@ -722,7 +762,6 @@ p.conference-date {
 .content-block a,
 .why-attend a,
 .keydates a,
-.stats-bar a,
 .newsletter a,
 .footer-social a,
 .footer-links a {
@@ -2096,42 +2135,6 @@ a.newsletter.cta {
 .topics__pill--red-light { background: var(--red-light); }
 .topics__pill--grey     { background: #555; }
 
-/* ─── Stats Bar — bold numbers on blue ──────────────────── */
-
-.stats-bar {
-    padding: var(--space-2xl) 0;
-    background: var(--blue);
-    color: white;
-}
-
-.stats-bar__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: var(--space-lg);
-    text-align: center;
-}
-
-.stats-bar__item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.15rem;
-}
-
-.stats-bar__value {
-    font-size: var(--font-size-4xl);
-    font-weight: 700;
-    line-height: 1;
-    letter-spacing: -0.02em;
-    color: white;
-}
-
-.stats-bar__label {
-    font-size: var(--font-size-sm);
-    color: rgba(255, 255, 255, 0.85);
-    font-weight: 400;
-}
-
 /* ─── Community Spotlight — on green-lighter ──────────── */
 
 .community {
@@ -2153,6 +2156,12 @@ a.newsletter.cta {
     max-width: var(--content-width-narrow);
     color: #333;
     margin-bottom: var(--space-lg);
+}
+
+/* Paragraphized body (see macros/community.html) — the global p + p
+   margin (0.15em) is too tight for readable paragraph breaks. */
+.community__body p + p {
+    margin-top: var(--space-sm);
 }
 
 .community__link {
@@ -2261,7 +2270,7 @@ a.newsletter.cta {
 /* ─── Key Dates — bold on dark background ─────────────── */
 
 .keydates {
-    padding: var(--space-2xl) 0;
+    padding: var(--space-xl) 0;
     background: #1a1a1a;
     color: white;
 }
@@ -2270,49 +2279,50 @@ a.newsletter.cta {
     font-size: var(--font-size-2xl);
     font-weight: 700;
     color: white;
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-md);
     text-align: center;
 }
 
+/* Compact table of dates: rows of "date | label", flowing into two
+   columns on wide screens (chronological: down first, then across),
+   a single column on mobile. */
 .keydates__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: var(--space-md);
-    text-align: center;
+    column-gap: var(--space-2xl);
+}
+
+@media screen and (min-width: 800px) {
+    .keydates__grid {
+        columns: 2;
+    }
 }
 
 .keydates__item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-sm);
-    padding: var(--space-lg) var(--space-md);
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: background 0.2s ease;
-}
-
-.keydates__item:hover {
-    background: rgba(255, 255, 255, 0.1);
+    display: grid;
+    /* Fixed date column so rows align like a table */
+    grid-template-columns: clamp(9em, 34%, 11em) 1fr;
+    column-gap: var(--space-sm);
+    align-items: baseline;
+    padding: var(--space-xs) var(--space-sm);
+    /* Colour spine — Design Rules §06 card accent bar, kept slim */
+    border-left: 4px solid var(--yellow);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    break-inside: avoid;
 }
 
 .keydates__date {
-    font-size: var(--font-size-md);
+    font-size: var(--font-size-sm);
     font-weight: 700;
-    display: inline-block;
-    padding: 0.3em 0.7em;
-    border-radius: 4px;
     color: white;
 }
 
-.keydates__date--blue       { background: var(--blue); }
-.keydates__date--green-light { background: var(--green); }
-.keydates__date--orange     { background: var(--orange); }
-.keydates__date--pink       { background: var(--pink); }
-.keydates__date--yellow     { background: var(--yellow); color: var(--text-primary); }
-.keydates__date--green      { background: var(--green); }
-.keydates__date--red        { background: var(--red); }
+/* Colour spine matches the date badge (§06 card accent bar) */
+.keydates__item--blue        { border-left-color: var(--blue); }
+.keydates__item--green-light { border-left-color: var(--green); }
+.keydates__item--orange      { border-left-color: var(--orange); }
+.keydates__item--pink        { border-left-color: var(--pink); }
+.keydates__item--yellow      { border-left-color: var(--yellow); }
+.keydates__item--green       { border-left-color: var(--green); }
+.keydates__item--red         { border-left-color: var(--red); }
 
 .keydates__label {
     font-size: var(--font-size-sm);
@@ -2373,6 +2383,8 @@ a.newsletter.cta {
     font-size: var(--font-size-sm);
     color: rgba(255, 255, 255, 0.85);
     font-weight: 400;
+    /* Labels may carry deliberate line breaks (label: | in the databag) */
+    white-space: pre-line;
 }
 
 .why-attend__testimonials {
@@ -2415,9 +2427,13 @@ a.newsletter.cta {
 
 .newsletter {
     padding: var(--space-2xl) 0;
-    background: var(--blue-light);
+    /* Green colour field (§02 text-safe) — single source of truth for
+       the newsletter background; snake artwork excludes this colour. */
+    background: var(--green);
     color: white;
-    text-align: center;
+    /* Left-aligned to match the other front-page sections (latest videos,
+       blog, sponsoring). */
+    text-align: left;
 }
 
 .newsletter__title {
@@ -2429,28 +2445,12 @@ a.newsletter.cta {
 
 .newsletter__body {
     font-size: var(--font-size-lg);
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.92);
     max-width: 500px;
-    margin: 0 auto var(--space-lg);
+    margin: 0 0 var(--space-lg);
     line-height: 1.55;
     font-weight: 400;
 }
 
-.newsletter a.newsletter__cta {
-    display: inline-block;
-    padding: 0.8em 2.2em;
-    background: var(--white);
-    color: #1a1a1a;
-    font-weight: 600;
-    font-size: var(--font-size-base);
-    border-radius: 4px;
-    text-decoration: none;
-    transition: background 0.2s, transform 0.1s;
-}
-
-.newsletter__cta:hover,
-.newsletter__cta:focus {
-    background: var(--yellow);
-    color: #1a1a1a;
-    transform: translateY(-1px);
-}
+/* Newsletter CTA styling lives in custom.css (§06 button spec) —
+   single source of truth; hover stays flat per §10. */

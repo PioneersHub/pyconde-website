@@ -1,0 +1,224 @@
+title: Unlocking Information - Creating Synthetic Data for Open Access.
+---
+description: Many good project ideas fail before they even start due to the sensitive personal data required. The good news: a synthetic version of this data does not…
+---
+created: 2023-01-02
+---
+code: J9KRKZ
+---
+slug: unlocking-information-creating-synthetic-data-for-open-access
+---
+speaker_names: Antonia Scherz
+---
+speakers:
+
+
+
+### Antonia Scherz
+
+Antonia Scherz is machine learning engineer and consultant at PD - Berater der öffentlichen Hand in Berlin. At PD she builds proof of concept tools and assists in software development for machine learning applications in public administration. She is passionate about making machine leanring and open software tools widely used by public administration and fascinated by how new tools can be integrated in old structures for the public good.
+---
+abstract:
+
+
+Many good project ideas fail before they even start due to the sensitive personal data required. The good news: a synthetic version of this data does not need protection. Synthetic data copies the actual data's structure and statistical properties without recreating personally identifiable information. The bad news: It is difficult to create synthetic data for open-access use, without recreating the exact copy of actual data.
+This talk will give hands-on insights into synthetic data creation and challenges along its lifecycle. We will learn how to create and evaluate synthetic data for any use case using the open-source package Synthetic Data Vault. We will find answers to why it takes so long to synthesize the huge amount of data dormant in public administration. The talk addresses owners who want to create access to their private data as well as analysts looking to use synthetic data. After this session, listeners will know which steps to take to generate synthetic data for multi-purpose use and its limitations for real-world analyses.
+---
+full_description:
+
+
+A vast amount of private data lies dormant in public institutions, hidden from the research community. Synthesizing complex, anonymized data could allow researchers access without disclosing personally identifiable information while keeping information loss minimal. The tools to do this exist, but why is it still difficult to realize synthetic solutions? One challenge is to reach the minimum viable quality to serve as many use cases as possible. Ideally, the synthetic data allows data exploration with equal results as the real data. We will guide you through the challenges of creating synthetic data and shine a light on its lifecycle. We will explore the different levels of quality of generated structured data and discuss their potential. Finally, we will link these issues to the domain of public administration, but the main insights are generally applicable to all kinds of domains. In particular, we will focus on four key questions:
+ 
+1. How can we create synthetic data from private data?
+2. How can synthetic data creation be integrated into institutions that sit on piles of unused highly private data?
+3. Can SOTA methods for synthetic data fulfill all needs of the research community? When is access to the actual, private data needed?
+4. Which quality measures are adequate for synthetic data?
+ 
+As we address these questions, we'll use the Synthetic Data Vault to create and evaluate synthetic data. After the talk listeners will have understood the concept of synthetic data and will be able to evaluate synthetic data for a plethora of use cases. As a plus, they will also gain a deeper understanding of why open data access is (not yet) solved by synthetic data.
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2023-04-19
+---
+start_time: 10:50
+---
+end_time: 11:20
+---
+slot_id:
+---
+track: PyData & Scientific Libraries Stack
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 2521
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url: https://github.com/Scherzan
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/J9KRKZ.png
+---
+youtube_id: N1i_Z-WKaRs
+---
+video_link: https://www.youtube.com/watch?v=N1i_Z-WKaRs
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT29M50S
+---
+video_thumbnail: https://i.ytimg.com/vi/N1i_Z-WKaRs/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Hi everyone and thank you for being here. So when working in the public sector my colleagues and I often encounter a problem and I'm sure many of you have encountered it at some point too. It's we don't get access to the data. Meaning there's a lot of data in public institution and in public administration but they cannot give it out because of GDPR regulations. So when I came across synthetic data I was quite curious and I was also a bit skeptical that you could just replace the real data with the synthetic version and then go on with your application that you want to use. But when I got into the topic of synthetic data I actually discovered that I could be quite confident that that's a good solution for quite some problems there are in public administration. And we're going to go looking into this today. So quick introduction of me, I'm Antonia, based in Berlin and I'm working at PD Berater der Öffentlichen Hand as a consultant and data scientist. And basically what we do is public sector consultancy, but the team I'm on in my unit we are exploring new technologies and how they can be valuable for the public sector or public administration actually. And a project I've been working on quite some time is synthesizing public administration data in cooperation with academia and seeing how you can use this. So today we were looking at tabular data, I hope you guessed it, so I know image data is quite popular these days like these synthetic images going around all the time, but we're going to be looking into structured data and what we can do with this. We're going to look at a demo exercise and how to generate and evaluate the data. We're going to get an overview on metrics and evaluation strategies and I'm going to give you some learnings from our project. So what is synthetic data? You can think of synthetic data as a version of real data where you transfer the format, meaning you have the same columns and features, and you transfer the information, hopefully, right? So you have the same distribution of categories or certain statistical moments that are exactly, well, not copied but the same, but you don't transfer any personal identifiable information. So when you look into the synthetic data and you look at single records, you cannot pinpoint any information you find there to a real person in the world. And this is the huge benefit of synthetic data, because you can actually share the data without it being under GDPR rules. Not yet, at least. And these are the advantages that you can actually use. So often, you can use synthetic data instead of real data. This is only possible to some extent, but it's quite popular in publishing census data. You can also use synthetic data to enhance your initial data if you have any predictive analysis or if you work in ML, you mostly need large data sets. And here you can create synthetic samples, especially also categories that might be not that well represented in order to enhance your data basis and then have a better performance for example. And also a huge application in the public sector is often creating synthetic data for software testing because you need a data set that is as realistic as it can be to test your software on. So a point that people often ask is why don't you just anonymise the data? You take away the personal information and then you can kind of use the real one. So in this example, you can see quite illustrative what changes when you do anonymization techniques. So this can be transferred actually to tabular data, but you can see it better in images. So if you take the example if you want to see what is the distribution of blue and brown eyes maybe in a population, you can see if you use anonymization techniques taking out the eyes or blurring the images, these inferences are quite difficult to do because you somehow change a bit the format of the data and this child you can see here is actually synthetically generated so it's not a real child but you can see that you can use this image in a quite different way like you can use all the details that there are and you can maybe do this inference and you can also imagine that if you then if you train your model for example on this data and then you get the real data in it will perform better if it had this image from the beginning on. So, how do we generate synthetic data? I bet you can guess. You use a model to do this. There are some ways also besides machine learning to generate synthetic data, for example simulation, but often a problem when simulating synthetic data is that you need a quite high domain knowledge in order to be able to formulate this approximation of the real data distribution that you want to have. So we're going to be looking into generative models today to use it. But how do we actually, what does this actually look like when we are coding it? So here we have an example data set. It's a healthcare data set and it's about child patients. You can see a summary of the data types. These are just pandas objects. So we We can see that you have numeric variables, and you have categorical variables, and you have even some missings in the data. We can see here an ID column with four digits. We can here see the missing values, and otherwise I think it looks pretty basic. The next step you need to do is you need to choose a model, and we're going to be using the synthetic data world package, and these are the options they give us. many more out there and there are many models like catered to different types of tabular data but these four options are given in this package we're going to be using and you can see Coppola synthesizer which is a statistical method. We're going to be using the CTGAN which is based on the general adversarial network technique which is also often used in image generation but you could also use the variation autoencoder or here's some experimental synthesis between the copula and the GAN. So just shortly on how the GAN works, why it learns like the distribution of the real data, it is actually based off two neural networks and you have the first network that gets random noise or just numbers as input and then learns to generate your synthetic samples and then you have a second network that is getting the real data and the synthetic version, and it learns to distinguish them and gives the feedback back to the generator in order to make the generator improve on creating the synthetic samples. And this is actually a quite interesting thing for GDPR regulation because we're just using the generator afterwards, which is actually not trained on the real data, so the model hasn't seen the real data before, for, which is quite good for, I'm not going to go into detail in why this is beneficial but I hope you just trust me. So looking at the code, just a few lines of code and actually quite simple. So we just have some imports and then we load the data, then we specify some metadata in order to tell the model what types of columns we do have in our data set, then we define the model and train it on our data, and then we tell the model to sample and just generate number of rows that we want to have. So, okay, let's look into how this looks like. Here we have the synthetic version of it, and I would say it looks quite decent. On the first side, at least. So, we can see the numbers are represented. We have these, like, .00, their integer, where there's an integer column. We can see here, though, that the ID column, it's only one integer, and our real data set was like four, so maybe we should do something here. But yeah, I think it looks pretty good from the first site. But still, I've learned that I shouldn't trust my first site, so we should look into how to actually evaluate how good the quality of this data is. And because this is quite an important step, we're going to take a step back and just look at what metrics there are, how we can evaluate what we actually see. And please don't be afraid, it's going to be a bit complex, we're just going to look into a few metrics here. So I'm using this paper as a basis, I added some more metrics. But basically what often is done is there are these three metrics that we're looking at. So we're looking at resemblance analysis, which is just comparing distributions and statistical features of both data sets and looking how similar they look. The second thing you can do is looking at the utility, meaning that you're training a downstream task, let's say a regression, you're trying to estimate one variable based on all the other variables in the data set. And then you see how this algorithm performs trained on the real data and how it performs trained on the synthetic data. And you can also do privacy evaluations, looking into different attacks on your synthetic data and how this data is actually performing or preserving the privacy you want to have. Digging a bit deeper into the statistical and resemblance analysis, you can do univariate comparisons, multivariate comparisons, dimensional comparisons, looking how they react when you do dimension reduction techniques, and data labelling, which is essentially doing what the discriminator already does, meaning just trying to distinguish between the real and synthetic versions, and you can see how this performs. And we're going to be looking into some statistical tests, and into the visual comparison, because it's a quite intuitive way to see how the quality is. And we're also going to be looking a bit into these overall metrics. These metrics actually only combine like certain combinations of the upper three categories in metrics in order to try to give you like one metric that you can specify and tell the data quality on. So we're going to be using this quality score, but there are many more, as you can see. So let's dive right in. Well, not quite yet, because the second thing that is really important to do when you want to create synthetic data is to define a strategy and to know what you're going to use your data on before. So there are different metrics that cater to different needs that you may have for your data. So here you can, for example, see if you want to use it for ML applications, you will want the quality, like, the distributional things to be very well represented. If you use it for software testing, you have other priorities, and based on what your priorities are, you can choose, like, a set of metrics catering to your needs. So, but let's look into our data that we had before. So if you look at the overall quality score, you can see it's It's 0.8, 1, and 1 is the best, 0 is the worst, so it might be performing quite decent. This overall quality score is made up of these two metrics, these are column shapes which are just comparing the univariate distribution among the real column and the synthetic column, And then averaging over all these scores. And it's also taking the column pair trends and averaging over all of these. So what it does here is it's taking two columns in the real data and calculating the correlation. And then it does the same thing for the synthetic data. And then it's comparing how the correlations look. And then computing this correlation similarity score. So already here, we can see that it's using the ID column to compare the quality, which might not really be what we want because ID is actually not a numerical or content column, I would say. So it's just there to identify the samples. And now we can look into the visual inspection. We can here, for example, see the distribution, how they compare. So we're taking the height column, and then we can see we want the turquoise curve kind of to be exactly on the dark one. And here we can actually see it's not that good. So they're quite off. There is some intersection, but it's not how we maybe want it to be. We can also use this for categorical variables here. I would say it's quite decent. that's almost close, both of the bars, and now we can also look how it looks if we look at two variables and how they interact, so here we have height and weight, and we can see again that the synthetic dots are not really aligned, and they don't really look real, I would say. Just because in here, you can also do these for categorical variables, then the plot would be looking a bit more like this, and you would kind of want the colors to match. So we saw that there's quite some problems, and we're going back to our data set and looking what we can do. So within the STV package, or in general, we can describe the data a bit better. So we have this automatic detection function that is telling us what data type our columns are. And here, we can already, for example, see that this ID column is numerical. And we actually want it as and have it as an ID. So what we're going to do here, we're just going to tell to update the metadata. And we're telling it it's an ID column, so quite simple. The second thing we can do is defining constraints. I'm using an illustrative example. Here we have the BMI column and you can actually calculate it from height and weight, so we're going to use this formula and then you have an extra file where you specify your validation function and this form is preset by the package. You define this custom constraint class and then when you train your model, you load it and then you tell it what columns to use, and then you add these constraints to the model. Then there are quite many more things you can do. So you can tune your model. You can modify the data transformations that are done before the model is trained. You can also anonymize sensitive data on top. You can also define distribution of columns or use conditions when sampling. The last one is very helpful if you want to, if you have like seldom categories and you want many of those created, you can tell it to use, for example, create some with a specific category in mind. So let's look at how the data is doing when we're actually improving it. I'm gonna use the visual thing because we can see it way easier. So when we add the metadata, we can see the distribution changes somehow for this column. It's a bit better. When we use constraints, it's actually even more better. And remember, we were using a constraint actually including this column. With tuning, we can actually be quite happy with this, I think. It's very overlapping. And if you use everything together, I'm not sure if it's better or not, but looking at the score, it tells us that on average, it should be better. Here it's at 8.9, and if we tune, it's at 8.7, I think. So average over all the columns, it seems to do better. So one more thing. If you look at the mutual distribution, I think this is really interesting. We can already here also see that it starts to overlap more, and we can kind of get a feeling for, oh, it could actually be possible to model this kind of mutual distribution so coming to the end I just this is the point I wanted to talk about a little bit because I love not wasting but spending many hours on looking at the data and how to improve it but there are some issues in the public sector that you're gonna find and And maybe you also have encountered them yourself. So we sometimes cannot work with an in-house data science team. This is not a problem at the moment, but in the long run, in public institutions, they should include these. And often we don't have any access to the data. And this is a problem if you want to create synthetic data out of it. But we are thinking about creating some Dockerized solutions where we actually only look at the metrics and generate data over this, not looking at the data, but just taking the data into the Docker and then creating the synthetic data, evaluating it. And for me, the most important learning was that you really need to look into what the synthetic data is going to be used for. So as I showed you before, this evaluation strategy and the metrics you're going to be using, these are the most important things you must have in mind when you select your generation strategy and you generate the data. So, summing up, we heard about synthetic data, quite easy to generate. Less easier is evaluating it, so we only looked into this very superficially. You should choose your own strategy and this is the most important thing I want you to take with you home. So, two notes how to go next. The Satellite Data World has an amazing package, amazing documentation, and a very active Slack community, so in case you even want answers to your questions for your specific use case, I recommend going there. And, yeah, that's it. So, thank you for listening.
+
+**Speaker 2** _[20:06]_
+
+Thank you so much for your talk. We have a couple of questions in 10 minutes. So how do you make sure that the learned model does not bleed real data into the synthetic data set?
+
+**Speaker 1** _[20:20]_
+
+That's actually a very good question. So you have some metrics that can actually control for this, so you can check for duplicates between the real and the synthetic version, and the basis, for example, for this GAN modelling is that you take random numbers and the model doesn't actually see the data, so if you would take the discriminator, it has information from the real data because it was trained on this real data. The generator just gets feedback, and this is why there shouldn't be any information in there. There are additionally these privacy metrics that you can control for. So how well can you, for example, reconstruction attack or something. But yeah, so you would need to check for it.
+
+**Speaker 2** _[21:13]_
+
+Okay, an anonymous is asking how did you do your slides?
+
+**Speaker 1** _[21:19]_
+
+That seems to be a quite common question. I'm happy. I did it in Streamlit. So yeah, I recommend checking it out. It's quite easy.
+
+**Speaker 2** _[21:28]_
+
+Okay, how computationally expensive is this method on large data sets that is hundreds of gigabyte? Is it possible to run it on spark?
+
+**Speaker 1** _[21:39]_
+
+We've not tried it with Spark. I know that the STV package is parallelizing and having GPU support, so that's definitely an advantage. We were running hyperparameter tuning in parallel, so we're using also multiple GPUs. We were combining it with Ray, but I haven't tried Spark yet, so.
+
+**Speaker 2** _[22:03]_
+
+Okay, how do you avoid your walls trained on a synthetic data to only learn the characteristics of the synthesizer? Again, how do you avoid your models trained on a synthetic data to only learn the characteristics of the synthesizer? So I guess it's like how do you not let your models over fit to the synthetic data generator?
+
+**Speaker 1** _[22:32]_
+
+I'm not sure whether I got the question right. So with the overfitting, not overfitting on the real one, but overfitting on the synthetic
+
+**Speaker 2** _[22:41]_
+
+That's how I would interpret it, yeah.
+
+**Speaker 1** _[22:41]_
+
+data? Okay, so we're actually not training on the synthetic data, so the only thing I would think about if you're using a downstream task and you're seeing how it performs on synthetic and how it performs on the real data, you would use basic machine learning techniques in order to control for overfitting, I guess.
+
+**Speaker 2** _[23:12]_
+
+Okay Then the next one is can the model guarantee that some conditions still apply For example, I ignore the state before truck prescription a date in the healthcare example
+
+**Speaker 1** _[23:28]_
+
+So, this was the part on custom conditions, they're called. Custom constraints, actually. And here you can specify, like, the constraint you have in mind. So you can tell it, you can, the package supports daytime format columns, and there you can just tell the model what columns should be before or after. also often have the use case where you have like a column should always be larger than another one these kind of things you can tell the model to do
+
+**Speaker 2** _[24:03]_
+
+Okay, then there's one could you elaborate on synthetic time series generation and the corresponding difficulties?
+
+**Speaker 1** _[24:14]_
+
+We're actually not using time series data, but I know that the STV package has a model for it. I think it's called HMA1 or something. So this model is specifically for using time series data, but I know also that I've read some papers that also look specifically into time series. But I think besides the one model provided in this package, you would either have to to look up another model yourself, or maybe...
+
+**Speaker 2** _[24:48]_
+
+Then another one, how about text column? So not categorical but like free text.
+
+**Speaker 1** _[24:55]_
+
+In the STV package, it's not supported. I know that you can create synthetic data on text data, but this is not the use case for this package.
+
+**Speaker 2** _[25:09]_
+
+Okay. From Ike, to generate a good synthetic data set, you need to have a good understanding of the original data set. Isn't your job done when you created a good generative model?
+
+**Speaker 1** _[25:25]_
+
+That's actually a thing that often comes up. I think The answer I have to this is that often People that want to work with the synthetic data. They wouldn't know how to work with the model So in theory, yes, so the generator would know the whole distribution and you could like create Samples out of it, but if you for example publishes For example, if you take the census data set and you have people wanting to look into it They actually want to work with the data and see what's in the data and the data formatted was they know so they might Not know how to work with a trained model and how to get the information they need out of this
+
+**Speaker 2** _[26:06]_
+
+Okay, then how do you communicate to stakeholders the fact that the data is synthetic? Are there any blockers to the usage of such data?
+
+**Speaker 1** _[26:17]_
+
+mainly these things often concern quality and privacy and here of course you have to tell them what's in there but I think using these metrics and quantifying how large the risk might be or quantifying how good the quality actually is really helps to communicate this to stakeholders and often they actually want to publish their data and get the data to use because they benefit from it, so they're often very open to these arguments.
+
+**Speaker 2** _[26:51]_
+
+Okay, then will you be sharing your slides with us?
+
+**Speaker 1** _[26:56]_
+
+I have a github. I'm gonna upload them and I'm gonna put them in the discord channel
+
+**Speaker 2** _[27:00]_
+
+Great, thank you for that. How does the model deal with outliers when using a data set for anomaly detection?
+
+**Speaker 1** _[27:10]_
+
+Again, the starting of the question.
+
+**Speaker 2** _[27:12]_
+
+How does the model deal with outliers when using data sets for anomaly detection?
+
+**Speaker 1** _[27:21]_
+
+So, it can handle few, like it can handle examples of, for example, categories that are especially populated, so I would say it depends on the kind of anomaly detection task you're looking into. If you want, like, for example, if you have a data set on, let's say, age, and you have an age variable in there, and you have just a few that are really old, you can create samples or more samples that are in this age, even though you have few samples in your real data that you trained on. But if you have like really completely different type of across all columns, for example, this is an outlier, it might be difficult for the model to learn these characteristics.
+
+**Speaker 2** _[28:13]_
+
+Okay, then can we get similarly good results with purely statistical approaches?
+
+**Speaker 1** _[28:22]_
+
+Again, it depends, I would say. It depends on what models are out there and what kind of data you have and whether there's already a statistical approach to the kind of modelling you want to do. So if you would have to start from scratch, I can imagine it's going to take a long time. For some problems, especially in physics, simulations do quite well. So there you might be good in looking at simulations that are out there. But I would say if you encounter new data and you don't know much about how to simulate it, this method would be a go-to first, maybe.
+
+**Speaker 2** _[29:03]_
+
+Okay, then I want from Thomas. How do you make sure that you don't lose characteristics of the data that you might not know about yet and that are part of the research question?
+
+**Speaker 1** _[29:17]_
+
+That's in the question actually, so if you know it's part of the research question, you should know that It's like you should look for it in the data or check for it So you should find a method that kind of gives you the information On this feature and how to value it in the synthetic data
+
+**Speaker 2** _[29:37]_
+
+Okay, thank you so much for answering all the questions, and I think you will be around for a couple of
+
+---
+transcript_status: auto
+---
+transcript_language: en

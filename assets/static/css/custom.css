@@ -791,23 +791,26 @@ button.pretix-widget-button[type="submit"] {
    Design customizations v3–v9 (consolidated 2026-03-01)
    ══════════════════════════════════════════════════════════════ */
 
+/* §06 primary button — yellow fill, ink text + border (authoritative for the
+   newsletter CTA; more specific than the shared .newsletter__cta group). */
 .newsletter a.newsletter__cta {
     display: inline-block;
     padding: 0.8em 2.2em;
-    background: var(--white);
-    color: #1a1a1a;
-    font-weight: 600;
+    background: var(--yellow);
+    color: var(--text-primary);
+    border: 2px solid var(--text-primary);
+    font-weight: 700;
     font-size: var(--font-size-base);
     border-radius: 0;
     text-decoration: none;
-    transition: background 0.2s, transform 0.1s;
+    transition: all var(--t-fast) var(--ease);
 }
 
+/* Hover: 10 % darker yellow, transform stays flat (§06 / §10). */
 .newsletter__cta:hover,
 .newsletter__cta:focus {
-    background: var(--yellow);
-    color: #1a1a1a;
-    transform: translateY(-1px);
+    background: #e0b300;
+    color: var(--text-primary);
 }
 
 /* ── Persistent Desktop Top Nav ─────────────────────────── */
@@ -838,8 +841,11 @@ button.pretix-widget-button[type="submit"] {
 
 .topnav__links {
     display: flex;
-    gap: var(--space-md);
+    gap: var(--space-sm);
     align-items: center;
+    flex-wrap: nowrap;       /* topnav must stay on one line */
+    white-space: nowrap;
+    min-width: 0;
 }
 
 .topnav__links a {
@@ -871,15 +877,32 @@ button.pretix-widget-button[type="submit"] {
     transition: background 0.15s ease, transform 0.1s ease;
 }
 
+.topnav__search {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    transition: color 0.15s ease;
+    flex-shrink: 0;
+}
+.topnav__search:hover,
+.topnav__search:focus {
+    color: var(--white);
+}
+
 .topnav__cta:hover,
 .topnav__cta:focus {
     background: var(--orange);
     transform: translateY(-1px);
 }
 
-@media (min-width: 769px) {
+@media (min-width: 1024px) {
     .topnav {
         display: flex;
+        flex-wrap: nowrap;
     }
     .hamburger-menu {
         display: none !important;
@@ -1179,20 +1202,203 @@ button.pretix-widget-button[type="submit"] {
     color: var(--text-primary) !important;
 }
 
+.tickets-cta__price {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0.5rem 0 0;
+}
+.tickets-cta__price-strike {
+    margin-left: 0.6rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: line-through;
+    opacity: 0.85;
+}
+
+/* Persistent archive funnel-CTA (rides the active/inactive switch). */
+.funnel-cta {
+    background: var(--blue);
+    color: var(--white);
+}
+.funnel-cta__content {
+    max-width: var(--content-max-width, 900px);
+    margin-inline: auto;
+    padding: clamp(1.5rem, 3vw, 2.5rem) var(--page-padding, 1.5rem);
+}
+.funnel-cta__headline {
+    font-size: var(--font-size-lg, 1.25rem);
+    font-weight: 700;
+    margin: 0 0 0.35rem;
+}
+.funnel-cta__sub,
+.funnel-cta__deadline {
+    margin: 0 0 0.25rem;
+    opacity: 0.92;
+}
+.funnel-cta__deadline {
+    font-size: 0.95rem;
+}
+.funnel-cta__link {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    background: var(--yellow);
+    color: var(--text-primary) !important;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+/* Inline newsletter capture on archive surfaces. */
+.newsletter-inline {
+    background: var(--neutral-50, #f6f7f8);
+    border-top: 1px solid var(--neutral-200, #e2e6ea);
+    border-bottom: 1px solid var(--neutral-200, #e2e6ea);
+}
+.newsletter-inline__content {
+    max-width: var(--content-max-width, 900px);
+    margin-inline: auto;
+    padding: clamp(1.25rem, 2.5vw, 2rem) var(--page-padding, 1.5rem);
+}
+.newsletter-inline__title {
+    font-size: var(--font-size-lg, 1.25rem);
+    font-weight: 700;
+    margin: 0 0 0.3rem;
+}
+.newsletter-inline__body {
+    margin: 0 0 0.6rem;
+    color: var(--text-secondary, #555);
+}
+.newsletter-inline__link {
+    display: inline-block;
+    padding: 0.5rem 1.1rem;
+    border-radius: 4px;
+    background: var(--blue);
+    color: var(--white) !important;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+/* Programme status band (active homepage milestone messaging). */
+.programme-status {
+    background: var(--neutral-50, #f6f7f8);
+    border-block: 1px solid var(--neutral-200, #e2e6ea);
+}
+.programme-status__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+    max-width: var(--content-max-width, 900px);
+    margin-inline: auto;
+    padding: clamp(1rem, 2.5vw, 1.75rem) var(--page-padding, 1.5rem);
+}
+.programme-status__headline {
+    font-size: var(--font-size-lg, 1.25rem);
+    font-weight: 700;
+    margin: 0;
+}
+.programme-status__sub {
+    margin: 0;
+    color: var(--text-secondary, #555);
+    flex: 1 1 16rem;
+}
+.programme-status__count {
+    margin: 0;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4rem;
+}
+.programme-status__count-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--blue);
+}
+.programme-status__count-label {
+    color: var(--text-secondary, #555);
+}
+.programme-status__cta {
+    display: inline-block;
+    padding: 0.5rem 1.1rem;
+    border-radius: 4px;
+    background: var(--blue);
+    color: var(--white) !important;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+/* Keynote reveal teaser band (active homepage). */
+.keynote-teaser {
+    background: var(--white);
+}
+.keynote-teaser__title {
+    font-size: var(--font-size-3xl, 2rem);
+    margin: 0 0 1.25rem;
+}
+.keynote-teaser__grid {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+.keynote-teaser__card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--neutral-200, #e2e6ea);
+    border-radius: 6px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    background: var(--neutral-50, #f6f7f8);
+}
+.keynote-teaser__card:hover {
+    border-color: var(--blue);
+}
+.keynote-teaser__image {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    display: block;
+}
+.keynote-teaser__info {
+    padding: 1rem 1.1rem 1.25rem;
+}
+.keynote-teaser__name {
+    font-size: 1.15rem;
+    font-weight: 800;
+    margin: 0 0 0.2rem;
+}
+.keynote-teaser__role {
+    margin: 0 0 0.5rem;
+    color: var(--text-secondary, #555);
+    font-size: 0.9rem;
+}
+.keynote-teaser__talk {
+    margin: 0 0 0.4rem;
+    font-weight: 600;
+}
+.keynote-teaser__date {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--text-secondary, #555);
+}
+
+/* §00 large colour field — blue primary, white text (§02 text-safe). */
 .sponsoring-cta {
-    background: var(--neutral-50);
-    color: var(--text-primary);
+    background: var(--blue);
+    color: var(--white);
 }
 
 .sponsoring-cta__title,
 .sponsoring-cta__body {
-    color: var(--text-primary);
-}
-
-.newsletter {
-    background: var(--text-primary);
     color: var(--white);
 }
+
+.sponsoring-cta__title {
+    margin-top: 0;
+}
+
+/* Newsletter band colour lives in main.css (.newsletter — green
+   colour field); no override needed here. */
 
 /* ── v4: Team Photo Standardization ─────────────────────── */
 .team-member > img,
@@ -1795,7 +2001,7 @@ section.subsite.team .content {
 }
 
 /* ── Consistent link styling in content areas ───────────── */
-.subsite .content a:not(.button):not(.slide-cta):not(.blog-card):not(.talk) {
+.subsite .content a:not(.button):not(.slide-cta):not(.blog-card):not(.talk):not(.archive-edition__subnav-link) {
     color: var(--blue);
     text-decoration: underline;
     text-decoration-thickness: 1px;
@@ -1803,7 +2009,7 @@ section.subsite.team .content {
     transition: color 0.15s ease;
 }
 
-.subsite .content a:hover {
+.subsite .content a:not(.archive-edition__subnav-link):hover {
     color: var(--text-primary);
 }
 
@@ -1869,42 +2075,78 @@ section.subsite.team .content {
     text-transform: uppercase;
     letter-spacing: 0.08em;
     text-decoration: none;
-    transition: background 0.15s ease, color 0.15s ease;
+    /* §06 button motion — guide easing, 120 ms */
+    transition: all var(--t-fast) var(--ease);
 }
 
-/* Primary CTA — filled */
+/* Primary CTA — filled yellow, ink border (§06 .btn-primary) */
 .tickets-cta__link,
 .newsletter__cta {
     background: var(--yellow);
     color: var(--text-primary);
-    border: 2px solid var(--yellow);
+    border: 2px solid var(--text-primary);
 }
 
+/* Hover: 10 % darker yellow (§06) */
 .tickets-cta__link:hover,
 .newsletter__cta:hover {
-    background: var(--white);
+    background: #e0b300;
     color: var(--text-primary);
 }
 
 /* Secondary CTA — outlined */
-.community__link,
-.sponsoring-cta__link {
+.community__link {
     background: transparent;
     color: var(--blue);
     border: 2px solid var(--blue);
 }
 
-.community__link:hover,
-.sponsoring-cta__link:hover {
+.community__link:hover {
     background: var(--blue);
     color: var(--white);
 }
 
+/* Ghost button on the blue sponsoring field (§06 .btn-ghost) */
+.sponsoring-cta__link {
+    background: transparent;
+    color: var(--white);
+    border: 2px solid var(--white);
+}
+
+.sponsoring-cta__link:hover {
+    background: var(--white);
+    color: var(--blue);
+}
+
+/* §10 — hover stays flat: background changes, transform does not */
+.tickets-cta__link:hover,
+.community__link:hover,
+.newsletter__cta:hover,
+.sponsoring-cta__link:hover {
+    transform: none;
+}
+
+/* §06 button states — active press + keyboard focus ring (all CTAs) */
+.tickets-cta__link:active,
+.community__link:active,
+.newsletter__cta:active,
+.sponsoring-cta__link:active {
+    transform: scale(0.97);
+}
+
+.tickets-cta__link:focus-visible,
+.community__link:focus-visible,
+.newsletter__cta:focus-visible,
+.sponsoring-cta__link:focus-visible {
+    outline: 3px solid var(--orange);
+    outline-offset: 2px;
+}
+
 /* ── Footer: Consistent with site design language ───────── */
+/* Top accent is the seven-colour brand bar (see .brand-bar); no single-colour border. */
 footer {
     background: var(--text-primary);
     color: rgba(255, 255, 255, 0.8);
-    border-top: 4px solid var(--yellow);
 }
 
 footer a {
@@ -2430,6 +2672,35 @@ footer a:hover {
     background-color: var(--orange);
 }
 
+/* Satellite-events carousel badges */
+.slide-badge--sprint {
+    background-color: var(--green);
+}
+
+.slide-badge--meetup {
+    background-color: var(--pink);
+}
+
+/* Carousel footer CTA (e.g. "Propose a satellite event") */
+.carousel-cta {
+    text-align: center;
+    margin: var(--space-md) 0 0;
+}
+
+.carousel-cta__link {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background: var(--blue, #00c8e1);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+.carousel-cta__link:hover {
+    filter: brightness(1.05);
+}
+
 /* ── No all-caps headings — normal casing per style guide ── */
 h1, h2, h3, h4, h5, h6,
 .subsite-title h2,
@@ -2636,6 +2907,750 @@ h1, h2, h3, h4, h5, h6,
 .cert-share__link--telegram { background: #229ed9; }
 .cert-share__link--email    { background: var(--blue); }
 
+/* ── A11y skip-to-content link ──────────────────────────────────────── */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  z-index: 10000;
+  background: var(--blue, #00c8e1);
+  color: #fff;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0 0 6px 0;
+  transition: top 120ms ease-out;
+}
+.skip-link:focus {
+  top: 0;
+  outline: 2px solid #fff;
+  outline-offset: -4px;
+}
+main:focus { outline: none; }
+
+/* ── Talk recording embed ──────────────────────────────────────────── */
+.talk-recording {
+  background: #f5f7f9;
+  padding: 2rem 0;
+}
+.talk-recording figure {
+  margin: 0;
+  max-width: 880px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.talk-recording figure > iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: 8px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+  display: block;
+}
+.talk-recording figcaption {
+  margin-top: 0.6rem;
+  font-size: 0.9rem;
+  color: #4a5660;
+  text-align: center;
+}
+
+/* External recording (non-YouTube, e.g. 2016 LMU-hosted videos): a button
+   link instead of an embedded player. */
+.talk-recording--external {
+  text-align: center;
+}
+.talk-recording__external-link {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: var(--blue, #00c8e1);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 0;
+}
+.talk-recording__external-link:hover,
+.talk-recording__external-link:focus {
+  filter: brightness(1.05);
+}
+
+/* ── Recording-available badge in talks list ───────────────────────── */
+.recording-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--blue, #00c8e1);
+  color: #fff;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  margin-left: 0.4rem;
+  white-space: nowrap;
+}
+
+/* ── Archive context ───────────────────────────────────────────────── */
+.archive-banner {
+  background: #f4f3ee;
+  border-bottom: 1px solid #e0ddd2;
+  color: #3a2d1d;
+  padding: 0.85rem 0;
+  font-size: 0.95rem;
+  text-align: center;
+}
+.archive-banner strong {
+  color: #6a4f1f;
+  margin-right: 0.4rem;
+}
+.archive-banner a {
+  color: #6a4f1f;
+  text-decoration: underline;
+}
+
+.archive-editions {
+  list-style: none;
+  padding: 0;
+  margin: 2rem 0;
+  display: grid;
+  gap: 1rem;
+}
+.archive-edition-card {
+  display: block;
+  padding: 1.2rem 1.5rem;
+  background: #fff;
+  border: 1px solid #e0ddd2;
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 120ms ease-out;
+}
+.archive-edition-card:hover {
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+.archive-edition__title {
+  margin: 0 0 0.3rem 0;
+  font-size: 1.4rem;
+}
+.archive-edition__dates,
+.archive-edition__stats {
+  margin: 0.2rem 0;
+  color: #4a5660;
+  font-size: 0.95rem;
+}
+
+/* ── Speaker pages ─────────────────────────────────────────────────── */
+.speaker-header {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.speaker-avatar {
+  width: 240px;
+  height: 240px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+}
+.speaker-meta {
+  flex: 1 1 280px;
+}
+/* The speaker header sits on the dark/blue subsite-title hero;
+   pronoun / role / location lines must read as light text on dark to
+   clear WCAG AA. The base `.subsite .content p` rule wins on
+   specificity over a single-class `.speaker-meta`, so we chain
+   `.subsite .subsite-title` to get a (0,3,1) selector that beats
+   it. */
+.subsite .subsite-title .speaker-meta,
+.subsite .subsite-title .speaker-meta p {
+  color: #fff;
+}
+.speaker-name { margin: 0 0 0.4rem 0; }
+.speaker-pronouns {
+  margin: 0 0 0.2rem 0;
+  font-size: 0.95rem;
+  /* opacity 0.85 keeps the subtle visual hierarchy without dropping
+     contrast below the 4.5:1 threshold for normal text against the
+     blue hero. */
+  opacity: 0.85;
+}
+.speaker-role {
+  margin: 0 0 0.2rem 0;
+  font-weight: 500;
+}
+.speaker-location {
+  margin: 0;
+  opacity: 0.85;
+}
+.speaker-badge {
+  display: inline-block;
+  margin-top: 0.6rem;
+  padding: 0.3rem 0.7rem;
+  background: var(--blue, #00c8e1);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 999px;
+}
+
+.speaker-socials {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.speaker-socials a {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  padding: 0.45rem 0.9rem;
+  background: #f0f3f5;
+  color: inherit;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  border: 1px solid #d5dadd;
+  transition: background 0.15s, border-color 0.15s;
+  max-width: 22rem;
+}
+.speaker-socials a:hover,
+.speaker-socials a:focus {
+  background: #e7ebed;
+  border-color: var(--blue, #00c8e1);
+}
+.speaker-social__label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary, #555);
+  font-weight: 700;
+}
+.speaker-social__handle {
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.speaker-talks-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.speaker-talks-list li { margin-bottom: 0.6rem; }
+.speaker-talks-list a {
+  display: block;
+  padding: 0.8rem 1rem;
+  background: #fff;
+  border: 1px solid #e0ddd2;
+  border-radius: 6px;
+  text-decoration: none;
+  color: inherit;
+}
+.speaker-talks-list a:hover {
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.talk-list__title { display: block; font-weight: 600; }
+.talk-list__track {
+  display: inline-block;
+  margin-top: 0.2rem;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+/* ── Speakers index grid ───────────────────────────────────────────── */
+.speakers-count {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  opacity: 0.85;
+}
+.speakers-grid {
+  list-style: none;
+  padding: 0;
+  margin: 2rem 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
+.speaker-card {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid #e0ddd2;
+  border-radius: 8px;
+  transition: box-shadow 120ms ease-out;
+}
+.speaker-card:hover {
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+.speaker-card__avatar {
+  display: block;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 0.8rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.speaker-card__avatar--placeholder {
+  background: var(--blue, #00c8e1);
+  color: #fff;
+  font-size: 3rem;
+  line-height: 120px;
+  font-weight: 700;
+}
+.speaker-card__name {
+  display: block;
+  font-weight: 600;
+}
+.speaker-card__company {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+/* ── Past Editions homepage block ──────────────────────────────────── */
+.past-editions {
+  padding: var(--space-xl) 0;
+  background: linear-gradient(180deg, #f7f5ee 0%, #fff 100%);
+  border-top: 1px solid #e0ddd2;
+}
+.past-editions__heading {
+  text-align: center;
+  margin: 0 0 0.6rem;
+  font-size: 2rem;
+}
+.past-editions__subheading {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 2.5rem;
+  color: #4a5660;
+  font-size: 1.05rem;
+}
+/* Compact table of editions: rows of "year | place", flowing into
+   two columns on wide screens (down first, then across), a single
+   column on mobile. */
+.past-editions__grid {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+  column-gap: var(--space-2xl);
+}
+
+@media screen and (min-width: 800px) {
+  .past-editions__grid {
+    columns: 2;
+  }
+}
+
+.past-editions__item {
+  break-inside: avoid;
+}
+
+.past-editions__row {
+  display: grid;
+  /* Fixed year column so rows align like a table */
+  grid-template-columns: 4.5em 1fr;
+  column-gap: var(--space-sm);
+  align-items: baseline;
+  padding: var(--space-xs) var(--space-sm);
+  border-bottom: 1px solid #e0ddd2;
+  text-decoration: none;
+  color: inherit;
+}
+
+a.past-editions__row:hover .past-editions__location {
+  text-decoration: underline;
+}
+
+.past-editions__year {
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  color: var(--blue, #00c8e1);
+}
+
+.past-editions__location {
+  font-size: var(--font-size-sm);
+  color: #6a7480;
+}
+.past-editions__cta {
+  text-align: center;
+  margin: 2rem 0 0;
+}
+.past-editions__cta-link {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: var(--blue, #00c8e1);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 6px;
+}
+.past-editions__cta-link:hover { filter: brightness(1.05); }
+
+/* ── Archive pointer on /talks/ + /speakers/ ───────────────────────── */
+.archive-pointer {
+  margin-top: 0.6rem;
+  font-size: 0.95rem;
+  color: #4a5660;
+}
+.archive-pointer a {
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* ── Tracks index + per-track pages ─────────────────────────────────── */
+.tracks-intro {
+  margin: 0.4rem 0 0;
+  color: var(--text-secondary, #555);
+}
+.tracks-grid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.75rem;
+}
+.tracks-grid__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1.1rem 1.25rem;
+  background: #fff;
+  border: 1px solid var(--neutral-200, #e2e6ea);
+  border-left: 4px solid var(--blue, #00c8e1);
+  text-decoration: none;
+  color: var(--text-primary, #111);
+  transition: border-color 0.15s, transform 0.1s, background 0.15s;
+}
+.tracks-grid__card:hover,
+.tracks-grid__card:focus {
+  border-color: var(--blue, #00c8e1);
+  border-left-color: var(--text-primary, #111);
+  transform: translateY(-1px);
+}
+.tracks-grid__name {
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.3;
+}
+.tracks-grid__count {
+  font-size: 0.78rem;
+  color: var(--text-secondary, #555);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Speaker: other editions ────────────────────────────────────────── */
+.speaker-other-editions {
+  background: var(--neutral-50, #f6f7f8);
+  border-top: 3px solid var(--blue, #00c8e1);
+  padding: 1.5rem 0 2rem;
+  margin-top: 2rem;
+}
+.speaker-other-editions h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.25rem;
+}
+.speaker-other-editions__intro {
+  margin: 0 0 1rem;
+  color: var(--text-secondary, #555);
+}
+.speaker-other-editions__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.speaker-other-editions__link {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.75rem 1.25rem;
+  background: #fff;
+  border: 1px solid var(--neutral-200, #e2e6ea);
+  text-decoration: none;
+  color: var(--text-primary, #111);
+  min-width: 5.5rem;
+  transition: border-color 0.15s, transform 0.1s;
+}
+.speaker-other-editions__link:hover,
+.speaker-other-editions__link:focus {
+  border-color: var(--blue, #00c8e1);
+  transform: translateY(-1px);
+}
+.speaker-other-editions__year {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+.speaker-other-editions__count {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #555);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Related talks ──────────────────────────────────────────────────── */
+.related-talks {
+  background: var(--neutral-50, #f6f7f8);
+  border-top: 3px solid var(--blue, #00c8e1);
+  padding: 2rem 0 2.5rem;
+  margin-top: 2rem;
+}
+.related-talks .content {
+  max-width: var(--content-width-wide, 72rem);
+  margin: 0 auto;
+  padding: 0 var(--space-page-margin, 1.5rem);
+}
+.related-talks__heading {
+  margin: 0 0 1.5rem;
+  font-size: 1.5rem;
+  letter-spacing: -0.01em;
+}
+.related-talks__group {
+  margin-bottom: 1.75rem;
+}
+.related-talks__group:last-child { margin-bottom: 0; }
+.related-talks__subheading {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary, #555);
+  font-weight: 700;
+}
+.related-talks__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.5rem;
+}
+.related-talks__item a {
+  display: block;
+  padding: 0.85rem 1rem;
+  background: #fff;
+  border: 1px solid var(--neutral-200, #e2e6ea);
+  text-decoration: none;
+  color: var(--text-primary, #111);
+  transition: border-color 0.15s, transform 0.1s;
+  height: 100%;
+}
+.related-talks__item a:hover,
+.related-talks__item a:focus {
+  border-color: var(--blue, #00c8e1);
+  transform: translateY(-1px);
+}
+.related-talks__title {
+  display: block;
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  margin-bottom: 0.35rem;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.related-talks__track,
+.related-talks__meta {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary, #555);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Breadcrumbs ────────────────────────────────────────────────────── */
+.breadcrumb {
+  max-width: var(--content-width-wide, 72rem);
+  margin: 0 auto;
+  padding: 0.75rem var(--space-page-margin, 1.5rem) 0;
+  font-size: 0.85rem;
+}
+.breadcrumb__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+  align-items: center;
+}
+.breadcrumb__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-secondary, #555);
+}
+.breadcrumb__item + .breadcrumb__item::before {
+  content: "/";
+  color: var(--neutral-200, #c2c8d0);
+  font-weight: 400;
+}
+.breadcrumb__link {
+  color: var(--blue, #00c8e1);
+  text-decoration: none;
+}
+.breadcrumb__link:hover,
+.breadcrumb__link:focus {
+  text-decoration: underline;
+}
+.breadcrumb__current {
+  color: var(--text-primary, #111);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 40ch;
+  min-width: 0;
+}
+
+/* Mobile: the persistent hamburger menu sits at top-left ~18px from
+   the edge. The breadcrumb's first item collides with it without
+   extra left padding. Tighten max-width on the current-page label
+   so long talk titles get a clean ellipsis instead of being clipped
+   at the right edge. */
+@media (max-width: 1023px) {
+  .breadcrumb {
+    padding-left: 4rem;
+    padding-right: 1rem;
+  }
+  .breadcrumb__current {
+    max-width: calc(100vw - 11rem);
+  }
+}
+
+/* ── Talk transcript section ────────────────────────────────────────── */
+.talk-transcript {
+  margin: 1.5rem 0 2rem;
+}
+.talk-transcript__details {
+  border: 1px solid var(--neutral-200, #e2e6ea);
+  border-left: 4px solid var(--blue, #00c8e1);
+  padding: 1rem 1.25rem;
+  background: var(--neutral-50, #f6f7f8);
+}
+.talk-transcript__summary {
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1.1rem;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.talk-transcript__summary::-webkit-details-marker { display: none; }
+.talk-transcript__summary::before {
+  content: "▸";
+  display: inline-block;
+  transition: transform 0.15s ease;
+  color: var(--blue, #00c8e1);
+}
+.talk-transcript__details[open] .talk-transcript__summary::before {
+  transform: rotate(90deg);
+}
+.talk-transcript__status {
+  font-weight: 400;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #555);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.talk-transcript__note {
+  margin: 0.75rem 0 1rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(0, 0, 0, 0.04);
+  border-left: 2px solid var(--neutral-200, #e2e6ea);
+  font-size: 0.85rem;
+  color: var(--text-secondary, #555);
+}
+.talk-transcript__body {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+.talk-transcript__body p { margin: 0 0 0.9em; }
+.talk-transcript__body strong { color: var(--text-primary, #111); }
+.talk-transcript__body em { color: var(--text-secondary, #555); }
+
+/* ── Archive edition sub-nav (Talks / Speakers) ────────────────────── */
+.archive-edition__subnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--neutral-200);
+}
+.archive-edition__subnav a.archive-edition__subnav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1rem;
+  background: var(--blue, #00c8e1);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.2;
+}
+.archive-edition__subnav a.archive-edition__subnav-link:hover,
+.archive-edition__subnav a.archive-edition__subnav-link:focus {
+  background: var(--text-primary, #111);
+  color: #fff;
+  filter: none;
+}
+.archive-edition__subnav-count {
+  font-weight: 500;
+  opacity: 0.85;
+  font-size: 0.85rem;
+}
+
+/* ── Footer Archive (previous editions) ────────────────────────────── */
+.footer-links__editions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.9rem;
+}
+.footer-links__editions a {
+  font-size: 0.95rem;
+}
+.footer-links__editions-label {
+  margin-right: 0.25rem;
+  font-size: 1rem;
+}
+.footer-links__editions-label strong {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.footer-links__editions-all {
+  margin-left: auto;
+  font-weight: 600;
+}
+@media (max-width: 768px) {
+  .footer-links__editions {
+    gap: 0.5rem 1rem;
+  }
+  .footer-links__editions-all {
+    margin-left: 0;
+  }
+}
+
 /* Loading + error states for JS-driven cert share page */
 .cert-card__loading,
 .cert-card__error {
@@ -2669,4 +3684,239 @@ h1, h2, h3, h4, h5, h6,
 
 .cert-toast[hidden] {
     display: none;
+}
+
+/* Links inside the dark/blue subsite-title hero need a light colour
+   to stay visible. The default site link colour is the same blue
+   as the hero background, so an unstyled <a> reads as invisible
+   text — only the trailing period was rendering on /talks/'s
+   archive-pointer paragraph because the parent text colour is
+   black inside that span. White with an underline keeps semantics
+   + WCAG. The :not() chain matches the specificity of the
+   existing `.subsite .content a:not(...)` rule above so the
+   later declaration wins on source order; an extra `.subsite-title`
+   class would also win on its own, but we keep the symmetric form
+   to make the intent obvious. */
+.subsite .subsite-title .content a:not(.button):not(.slide-cta):not(.blog-card):not(.talk):not(.archive-edition__subnav-link),
+.subsite-title .content a {
+  color: #fff;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.subsite .subsite-title .content a:not(.archive-edition__subnav-link):hover,
+.subsite-title .content a:hover,
+.subsite-title .content a:focus {
+  color: var(--yellow, #ffc34d);
+  text-decoration-thickness: 2px;
+}
+
+/* ── Mobile: speakers-grid two-column override ───────────────────────
+   Lives at the end of the file so it comes AFTER every default
+   .speakers-grid / .speaker-card__avatar rule and wins on
+   source-order tie-breaking. At ≤599px the default
+   minmax(180px, 1fr) only fits one column on a 375 px phone; this
+   drops to two equal columns with a smaller avatar to keep the
+   181-speaker grid scannable. */
+@media (max-width: 599px) {
+  /* minmax(0, 1fr) instead of plain 1fr — 1fr defaults to minmax(auto,
+     1fr) which falls back to content min-width, so long company names
+     in cards push columns to ≈180–210 px and overflow the 285 px
+     container. Forcing min=0 lets the columns shrink to half-container
+     and the long text inside wraps cleanly. */
+  .speakers-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+  .speaker-card__avatar {
+    width: 96px;
+    height: 96px;
+  }
+  .speaker-card__avatar--placeholder {
+    font-size: 2.5rem;
+    line-height: 96px;
+  }
+  .speaker-card__company {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+}
+
+/* 2027 hero logo is a portrait SVG — size by height, not the legacy
+   width-led max-width caps in main.css. */
+.intro__logo[src$="logo-2027-white.svg"] {
+    height: clamp(140px, 22vw, 220px);
+    width: auto;
+    max-width: none;
+}
+
+/* Latest talks / past-conference video release — horizontal slider,
+   one row, latest-first, scroll-snap (styled like the masterclass cards). */
+.latest-videos__title {
+    font-size: var(--font-size-3xl, 2rem);
+    margin: 0 0 1.25rem;
+}
+.latest-videos__track {
+    display: flex;
+    gap: 1.25rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.75rem;
+    scrollbar-width: thin;
+}
+.latest-videos__card {
+    flex: 0 0 auto;
+    width: clamp(15rem, 30vw, 20rem);
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid var(--neutral-200, #e2e6ea);
+    /* §11 — the brand has square corners */
+    border-radius: 0;
+    overflow: hidden;
+    background: var(--neutral-50, #f6f7f8);
+}
+.latest-videos__card:hover { border-color: var(--blue); }
+.latest-videos__thumb-wrap {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 9;
+}
+.latest-videos__thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.latest-videos__play {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-size: 1.75rem;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+}
+.latest-videos__info {
+    padding: 0.75rem 0.9rem 1rem;
+}
+.latest-videos__name {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+}
+.latest-videos__meta {
+    display: block;
+    color: var(--text-secondary, #555);
+    font-size: 0.9rem;
+}
+
+/* Latest blog post cards — same layout as the latest-videos card
+   (preview image on top, then title + meta). Up to `max_posts` cards
+   in a responsive grid; single column on narrow screens. */
+.latest-blog__title {
+    font-size: var(--font-size-3xl, 2rem);
+    margin: 0 0 1.25rem;
+}
+.latest-blog__grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+    gap: 1rem;
+    max-width: 64rem;
+}
+.latest-blog__card {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid var(--neutral-200, #e2e6ea);
+    /* §11 — the brand has square corners */
+    border-radius: 0;
+    overflow: hidden;
+    background: var(--neutral-50, #f6f7f8);
+    transition: border-color var(--t-fast) var(--ease);
+}
+.latest-blog__card:hover { border-color: var(--blue); }
+.latest-blog__thumb-wrap {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 9;
+}
+.latest-blog__thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.latest-blog__info { padding: 0.75rem 0.9rem 1rem; }
+.latest-blog__name { display: block; font-weight: 700; margin-bottom: 0.2rem; }
+.latest-blog__meta { display: block; color: var(--text-secondary, #555); font-size: var(--font-size-sm); }
+
+/* ══════════════════════════════════════════════════════════════
+   v11: Design-rules esprit pass (front page)
+   ══════════════════════════════════════════════════════════════ */
+
+/* §02 — body text sits on white/black/blue/green/orange, never on
+   silver. The front page ground becomes paper-white; colour comes
+   from the section fields, not the page background. */
+body.front-page {
+    background-color: var(--white);
+}
+
+/* Blog card brand fallback — python on a blue colour field (§05). */
+.latest-blog__thumb-wrap--brand {
+    background: var(--blue);
+}
+
+.latest-blog__thumb--python {
+    object-fit: contain;
+    padding: 8% 12%;
+}
+
+/* §06 hero voice — display headline + one CTA on the intro. */
+.intro__headline {
+    font-size: calc(var(--font-size-5xl) / 2);
+    font-weight: 700;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+    color: var(--white);
+    max-width: 32ch;
+    margin: 0;
+}
+
+.intro__cta {
+    display: inline-block;
+    padding: var(--space-sm) var(--space-xl);
+    background: var(--yellow);
+    color: var(--text-primary) !important; /* beat the .intro a { color: white } rule */
+    border: 2px solid var(--text-primary);
+    font-weight: 700;
+    font-size: var(--font-size-md);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    transition: all var(--t-fast) var(--ease);
+}
+
+.intro__cta:hover {
+    background: #e0b300;
+}
+
+.intro__cta:active {
+    transform: scale(0.97);
+}
+
+.intro__cta:focus-visible {
+    outline: 3px solid var(--orange);
+    outline-offset: 2px;
 }

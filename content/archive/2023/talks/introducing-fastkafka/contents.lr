@@ -1,0 +1,212 @@
+title: Introducing FastKafka
+---
+description: FastKafka is a Python library that makes it easy to connect to Apache Kafka queues and send and receive messages. In this talk, we will introduce the…
+---
+created: 2023-01-05
+---
+code: HLMGHX
+---
+slug: introducing-fastkafka
+---
+speaker_names: Tvrtko Sternak
+---
+speakers:
+
+
+
+### Tvrtko Sternak
+
+_About — in the speaker's own words_
+
+I am currently working as a Python developer at airt. In the past three years, I have gained valuable experience in the industry, including a year working on a microservice product that uses Apache Kafka for communication between services.
+
+I am a strong believer in the power of open source software, and I enjoy learning from the open source community, hopefully also contributing more this year :). My interests in the field at the moment include machine learning, model deployment, Apache Kafka, and advanced Python programming.
+
+In my free time, I enjoy reading fantasy books, staying active through biking and hitting the gym, and watching comedy-drama TV shows. I am always looking for new ways to expand my knowledge and skills, and I am excited to continue growing as a developer in the years ahead.
+---
+abstract:
+
+
+FastKafka is a Python library that makes it easy to connect to Apache Kafka queues and send and receive messages. In this talk, we will introduce the library and its features for working with Kafka queues in Python. We will discuss the motivations for creating the library, how it compares to other Kafka client libraries, and how to use its decorators to define functions for consuming and producing messages. We will also demonstrate how to use these functions to build a simple application that sends and receives messages from the queue. This talk will be of interest to Python developers looking for an easy-to-use solution for working with Kafka.
+
+The documentation of the library can be found here: https://fastkafka.airt.ai/
+---
+full_description:
+
+
+FastKafka is a Python library that simplifies the process of connecting to Apache Kafka queues and sending and receiving messages. It follows a decorator-based approach inspired by the popular FastAPI library, making it easy to define functions for consuming messages from the queue and producing and sending new ones.
+
+In this talk, we will introduce FastKafka and its features for working with Kafka in Python. We will start by discussing the motivations for creating the library and how it compares to other Kafka client libraries. We will then delve into a live demonstration of the library's features, showing how to use the decorators to define functions for consuming and producing messages, and how to use these functions to build a simple application that sends and receives messages from the queue.
+
+Finally, we will discuss some real-world use cases for FastKafka and how it can be used to build scalable, high-performance applications that need to process and transmit large amounts of data. This talk will be of particular interest to Python developers looking for an easy-to-use solution for working with Kafka.
+---
+room:
+---
+day: Tuesday
+---
+slot_date: 2023-04-18
+---
+start_time: 16:00
+---
+end_time: 16:30
+---
+slot_id:
+---
+track: Libraries
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 2521
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Novice
+---
+supporting_material_url: https://github.com/airtai/fastkafka
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/HLMGHX.png
+---
+youtube_id: M18bhWVizjI
+---
+video_link: https://www.youtube.com/watch?v=M18bhWVizjI
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT23M57S
+---
+video_thumbnail: https://i.ytimg.com/vi/M18bhWVizjI/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:02]_
+
+A little bit of introduction, so I'm a software engineer at ERT and I'm really excited to show you what we have been working on for the past previous months. So just to indulge my curiosity, could you please raise your hand who has ever used Apache Kafka in their development? Okay, so we have a knowledgeable crowd and could you please raise your hand if you have already tried out at least a bit of Fast Kafka. Okay. Great. Today we will possibly enlarge that number. So Fast Kafka is a library that will hopefully give you the ability to quickly develop, test and document the applications for connecting to Kafka topics. So let's start with our motivation why we did it. So we developed a churn prediction model which does just that, it predicts, and we had to somehow deploy our model, and if you already haven't figured out from the name of the library, we are big fans of fast API, and we wrapped our model in a simple get, And FastAPI does everything else for us. So it handles the message routing, it handles the input data, it handles the output data. But there was a problem, so a customer came to us and they said they have their data stored in Kafka topics, so we need to find a way to connect our model to Kafka. And we wanted to do something like this. After some exploration, there was no library that was able to do something as clean as this, so we decided that we need to have this ability to easily write code, to have testability, to have automatic documentation generation and hopefully to have a high performance library. We didn't find anything that satisfied all those needs, so we used Pydentic and we built our decorators on top of AIO Kafka and to generate the documentation, we used ASIC API. So combining these three things mainly, we built Fast Kafka. So let's go through consuming. So you can see we have developed something that looks quite like fast API, so you create your application and with the decorator consume, you can decorate your function which will consume from the input data topic and then decode the input messages that are arriving in JSON into Python class. So if for any reason you would like to use any of the advanced options with AIO Kafka, we have exposed them all in our consumer decorator, so if you want to do some advanced things, you can always override the underlying AIO Kafka consumer. Then we got our first feedback. So people liked it, but they needed some other Avro support tests, so they didn't like the JSON, only JSON encoding and decoding, so we did just that. So right now, as a default, you have decoding of JSON formats, but if you want to use Avro, you can always define that in the consume decorator. Also you can pass a custom function that decodes bytes and it will inject the decoded message into your function, but that's a bit more advanced for now. So let's go in the same way through producing. So we wanted to also have a producer's endpoint and to look like this, so we implemented it, And it does quite simply so the producers will do all the background work for you. It will connect this function to a topic and it will decode the prediction into a JSON and when you decorate your function with the Kafka produces as a side effect of calling these two predictions function, the return value will also be sent to a Kafka topic. If you want to encode your messages in any other decoder, we support others as a default, but you can always implement your own. Next big thing for us was we had the data of customers split in parts, and we wanted to be sure that all the data for one customer is contained in one particular partition, and in Kafka this is solved by using keys when producing messages to topics. So we did a simple implementation, so if you want to use keys, you just wrap your return value into a Kafka event and define the key that you want to use. You can define any dynamic key you want, it just needs to be in bytes, here it's my key, but you can use the score, you can use anything from your message, so it's up to you. testing, we wanted to be able to test our app, so we've designed something like this. So you have a tester class to which you pass your Kafka app, and the tester class creates mirrors of consumers and producers, so where your Kafka app is producing, the tester can consume and vice versa, so where your app can consume, the tester can produce. To check If everything was sent, we also create mockups that you can assert and check if you gained any messages to your topics. And lastly, tester runs an instance of Kafka in background. But our next feedback was that you really don't want to use real Kafka in the background because the start-up and the tear-down of a real broker really takes much time and for each test, the tests would take enormously long to reproduce. So we took some time and we've implemented a fully functional Kafka broker that is running in memory and it has a fast set-up and tear-down, it's like under a second, it's instantaneous and it reroutes your consumers and producers to this in-memory broker and by using the tester as a async context manager you will get no side effects from the tests in between so it doesn't work as it runs an instance of real Kafka but it runs an in-memory Kafka mock-up but what if you want to use the real Kafka in your tests so for some integration tests or you really really want to be sure that everything is working as it's supposed to. We didn't toss the code that we developed, but we've extended our testers so you can use local Kafka or you can use local Red Panda brokers to test your application if you're really sure that you're fine with long startup and teardown, but you want to be sure that everything works completely fine. After that, when you have your application generated and tested, you would possibly want to generate some documentation for it. So, Fast Kafka comes with a CLI, so when you install it, you get Fast Kafka docs command with which you can generate and serve the documentation in ACK API format. So, to generate, we generate a YAML file which you copy paste and use on the ACKPI website but if you want to don't want to use that you when you serve the documentation you get something like this so have your subscription or consumers documented so we are reading from input data and also have the example JSON example of what is located located and what the consumer will consume. Also, you have your producers documented and you have examples of what they will possibly produce. Lastly, you have the title of your application and also a list of all the servers that you have defined that your application can connect to. If you want to use the GitHub actions to quickly generate the documentation of your application, we've prepared also a GitHub action that will when you use it, generate the documentation, publish it on GitHub pages. Next thing, to use the application, we use fast Kafka run command so you you pass the application or a application.py file that contains the Kafka app symbol and quite simply and you just run this command and it should start up your your application in another process if want to have some horizontally scaling you can define the number of workers so this This will clone your application and run it in the amount of threads that you want to run it. So this is something we are quite proud of. This enables us to quickly increase the throughput of our application if they are written correctly. Next thing, we want to see how fast our application really is. So we've designed an app.benchmark decorator which you can use and you can decorate your application, it will benchmark your end points and write out into the logs the quickness of your consuming and producing functions. So after doing some initial background benchmarks, we wanted to find out how much overhead we really put on AR Kafka. So this is the worst case performance penalty. We are not using, we are not doing any advanced processing in the consuming and producing functions. We are just encoding and decoding a simple JSON and AR Kafka is quite optimised. So anything we did reduced it by 30%, but in real-life cases, if you would do some computing inside your consuming and producing functions, this would quite quickly drop to below 10 or possibly close to 0%. So some future steps, before that, you can see that we are quite active on GitHub, so it's five of us, and you can see that we have on average at least one pull request daily, and we are working on a two-week release cycle. So every two weeks you will get a minor release that almost definitely has some new additions in the feature domain for our application. What we plan to implement in the future months is we want to add transactional logic. So at the moment when you consume the message, you automatically commit the offset that the message has been consumed and if your application for any reason crashes, that offset is already committed and you will lose that message. But we want to add the app.process decorator which will combine your consumers and producers And if you don't get the desired outcome of your function, so if it doesn't go completely, we won't commit the offsets and you won't lose the messages. Next thing, we want to add support for other messaging protocols such as RabbitMQ. This has been requested some time from the Reddit users. And right now we are building on top of AIO Kafka, but we also want to support libraries like Confluent or Python Kafka so that you can choose which one do you want to use. And yeah, we want to do the performance improvements, so we are planning to possibly rewrite our consumers and producers in Rust to enhance the speed of our producing and consuming. And last but not least, a lot of the features in the past few months have come from the community feedback. At first we did something that worked for us and implemented the features that we needed, but as you saw with the Avro and the startup and the teardown of the tester, you request is our command, so we would really be happy to hear more from you and to find out what can we do to make Fast Kafka work for you. What's important for us, we are actively looking for collaborators, so here you have a QR code which leads to our GitHub page, and if you would like to collaborate with us on constructing a better fast Kafka application, we will be delighted to hear from you. And also, in the past few months, when we did the release, we've seen that we are quite star greedy, so we are checking our GitHub every day for new stars. So we would like, if you like our application, please star and more importantly comment and join the discussion of how to make Fast Kafka better. And also here you have, but you can find it also on our GitHub and in our documentation you have a Discord link. So if you want to chat with us or discuss collaboration, please contact us here. So that's pretty much it and I'm ready for questions.
+
+**Speaker 2** _[16:05]_
+
+Hello
+
+**Speaker 1** _[16:43]_
+
+Yeah, so there any
+
+**Speaker 2** _[16:50]_
+
+Are there any possibility of disabling pydentic validation to deserialize quickly?
+
+**Speaker 1** _[17:01]_
+
+realise quickly? At the moment, no. But, yeah, it will be planned soon. The first thing we wanted to do is if you want to just put out bytes and consume them and do any of your thing that you want to do, this is like planned in the next release, it's not a big issue, but yeah, the disabling of validation is quite a good idea, so this is something we will plan quite soon. At the moment, we don't have that option.
+
+**Speaker 2** _[17:37]_
+
+Any other questions here? Then I will start talking about like, so someone online asked, did you do a comparison with files?
+
+**Speaker 1** _[17:51]_
+
+So we've heard about Faust, but the benchmark was, so our benchmark decorator was implemented in the previous release, so last Friday, and we did the benchmarking over the weekend, so we wanted to just be sure that we didn't completely ruin AI or Kafka by our work, but we plan to do the benchmarks in the future.
+
+**Speaker 2** _[18:16]_
+
+Okay, and also someone else asked, do you provide integration with start SD or similar things?
+
+**Speaker 1** _[18:24]_
+
+With?
+
+**Speaker 2** _[18:26]_
+
+start SD
+
+**Speaker 1** _[18:27]_
+
+Not that I know of.
+
+**Speaker 2** _[18:28]_
+
+Like for metrics monitoring, this kind of thing?
+
+**Speaker 1** _[18:30]_
+
+No, not yet.
+
+**Speaker 2** _[18:31]_
+
+Not yet, okay. And how up-to-date is the underlying Kafka client implementation?
+
+**Speaker 1** _[18:31]_
+
+Not yet, okay.
+
+**Speaker 2** _[18:38]_
+
+For example, AIO Kafka is based on Kafka Python, which hasn't had a release for two years.
+
+**Speaker 1** _[18:44]_
+
+Yeah, so we are quite familiar with that issue. So at first, one of our needs was that the library is well maintained, and it's quite funny that we've built on a library that is not quite well maintained, but so we do have a plan to reimplement our consumers and producers and to disconnect ourselves from the AIO Kafka. We are using the latest version, but, yeah, it has this mentioned issue. So, yeah, our Our plan was to put it on its two feet as soon as we can, so we needed to use an existing library, but the plan is to have everything in-house so that we are sure that everything is up to date. But we are aware about the issue of Python Kafka and Kafka.
+
+**Speaker 2** _[19:57]_
+
+also like someone also asked can I run multiple in memory Kafka instances in parallel to parallelize
+
+**Speaker 1** _[20:07]_
+
+Well, the in memory broker is like simply a class instance object in Python so you can most definitely run it in parallel. So multiple tests running in parallel don't have any effect on each other. This was one of the reasons why we did it because if we start up and shut down multiple Kafka's and we need to handle the ports, it really is quite a mess. So Dean Memory Broker can be run in parallel.
+
+**Speaker 2** _[20:39]_
+
+Okay, and last question, how did you achieve the speed improvements? I think this is...
+
+**Speaker 1** _[20:48]_
+
+Yeah, so the speed improvements weren't achieved. We're a bit slower with the overhead, but we plan to achieve speed improvements in the future.
+
+**Speaker 2** _[21:03]_
+
+That's it if no question come true anymore in is there any question from offline participant
+
+**Speaker 1** _[21:16]_
+
+Do you have to plan to support protobuf messages or just just bytes as messages and Do I also get the key as a consumer? Okay Yeah, when you're consuming at this moment, you just get the message but we This is just because we are not passing into into into your function We in the background we have the information about the key and the partition and everything else so it's it's more of an like two-hour issue to just pass it into your function and then deploy it so we need to add it into release and yeah when we when we get the feedback that it's necessary we are quite happy to do it quickly
+
+**Speaker 3** _[22:07]_
+
+So far, I've seen that the messages are kind of independent in the way that they're processed. So it's just about processing a message. What if we have a scenario where we actually care about the order of the messages across multiple partitions or across even multiple topics? Is there any thought about this in the future or currently?
+
+**Speaker 1** _[22:27]_
+
+As far as I know, if you care about the order of the messages, you need to have them in the same partition, so you can solve it with a key. At the moment, the messages, like in this most simple form, the functions consume message by message, but nothing is stopping you to have some global list or dictionary or something that tracks all the messages that came in. So in its nature, the consumes and produces function are just Python functions and you can treat them as that, and then you put on the decorators and they just get called when the messages come in and they get produced into topics. So, yeah.
+
+**Speaker 2** _[23:16]_
+
+Any more questions here? Okay, doesn't look like it and someone asked you what's your expectation for pedantic 2.0 and
+
+**Speaker 1** _[23:28]_
+
+Yeah, we are building on top of it, so we are quite happy to hear that it's going to be, I think they said 50 times faster, we'll see, but yeah, we are eagerly expecting it.
+
+**Speaker 2** _[23:44]_
+
+So thank you so much for the very interesting talk, and we will end here. Please give him a loud applause.
+
+---
+transcript_status: auto
+---
+transcript_language: en

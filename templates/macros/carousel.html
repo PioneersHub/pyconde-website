@@ -23,12 +23,14 @@
     section_label – accessible label for the carousel section
     header_title  – optional heading displayed above the slides
     header_teaser – optional teaser line below the heading
+    cta_text      – optional footer CTA button label (needs cta_url)
+    cta_url       – optional footer CTA button destination
 
   Item schema (all databags use the same format):
     - id, type, name, title, teaser, image, image_alt, link_text, link_url
 #}
 
-{% macro render_carousel(items, carousel_id='carousel', mode='multi', image_dir='featured', section_label='Carousel', header_title='', header_teaser='') %}
+{% macro render_carousel(items, carousel_id='carousel', mode='multi', image_dir='featured', section_label='Carousel', header_title='', header_teaser='', cta_text='', cta_url='') %}
 
 {% if items and items|length > 0 %}
 
@@ -71,7 +73,7 @@
           <span class="slide-badge slide-badge--{{ item.type }}">
             {{ item.type|capitalize }}
           </span>
-          <h2 class="slide-title">{{ item.title }}</h2>
+          <p class="slide-title">{{ item.title }}</p>
           <p class="slide-teaser">{{ item.teaser }}</p>
           {% if item.link_url %}
           <a href="{{ item.link_url }}" class="slide-cta">
@@ -118,6 +120,13 @@
     id="carousel-status-{{ carousel_id }}">
     Slide 1 of {{ items|length }}
   </div>
+  {% endif %}
+
+  {# ── Optional footer CTA ── #}
+  {% if cta_text and cta_url %}
+  <p class="carousel-cta">
+    <a href="{{ cta_url }}" class="carousel-cta__link">{{ cta_text }}</a>
+  </p>
   {% endif %}
 
 </section>

@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+{% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
+
+{% block title %}Topics{% endblock %}
+{% block og_type %}website{% endblock %}
+
+{%- set branding = bag('branding') -%}
+{%- set host = branding['canonical_host'] -%}
+
+{% block structured_data %}
+{{ super() }}
+{%- set crumb_trail = [] -%}
+{%- set _ = crumb_trail.append(('/archive/', 'Archive')) -%}
+{%- set _ = crumb_trail.append((this.url_path, 'Topics')) -%}
+{{ breadcrumb_jsonld(crumb_trail) }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "@id": "{{ host }}{{ this.url_path }}#topics",
+  "url": "{{ host }}{{ this.url_path }}",
+  "name": "Topics",
+  "isPartOf": { "@id": "{{ host }}/#website" },
+  "hasPart": [
+    {%- for hub in this.children|sort(attribute='title') -%}
+    { "@id": "{{ host }}{{ hub|url }}#topic" }{{ "," if not loop.last }}
+    {%- endfor -%}
+  ]
+}
+</script>
+{% endblock %}
+
+{% block body %}
+{%- set visible_trail = [] -%}
+{%- set _ = visible_trail.append(('/archive/', 'Archive')) -%}
+{%- set _ = visible_trail.append((none, 'Topics')) -%}
+{{ breadcrumb(visible_trail) }}
+
+<div class="subsite">
+  <div class="subsite-title">
+    <section class="content">
+      <h1>Topics</h1>
+      <p class="tracks-intro">
+        Standing collections of talks across every edition of PyCon DE &amp; PyData.
+      </p>
+    </section>
+  </div>
+</div>
+
+<section class="subsite">
+  <ul class="talks">
+    {%- for hub in this.children|sort(attribute='title') %}
+    <li>
+      <a href="{{ hub|url }}" class="content talk">
+        <h2 class="talk-title">{{ hub.title }}</h2>
+        {% if hub.description %}
+        <p class="talk-abstract">{{ hub.description }}</p>
+        {% endif %}
+        <p class="talk-speakers">{{ hub.talk_count|default(0) }} talks across all editions</p>
+      </a>
+    </li>
+    {%- endfor %}
+  </ul>
+</section>
+{% endblock %}

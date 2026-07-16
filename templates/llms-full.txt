@@ -1,0 +1,29 @@
+{%- set branding = bag('branding') -%}
+{%- set host = branding['canonical_host'] -%}
+{%- set talks = bag('talks')['talks'] -%}
+# {{ site.config.PROJECT.name }} — full talks corpus
+
+{{ branding['claim']['en'] }}.
+{{ branding['dates']['conference'] }}, {{ branding['location']['venue'] }}, {{ branding['location']['city'] }}, Germany.
+
+This file lists every confirmed talk with title, speakers, track, skill levels and abstract.
+Plain text, no markup. Source: {{ host }}/talks/.
+
+Total talks: {{ talks|length }}.
+
+{% for talk in talks|sort(attribute='title') %}
+---
+
+## {{ talk.title }}
+
+- URL: {{ host }}/talks/{{ talk.code }}/
+- Speakers: {{ talk.speaker_names }}
+- Track: {{ talk.track }}
+- Type: {{ talk.submission_type_label or talk.submission_type or 'Talk' }}
+{% if talk.python_skill %}- Python skill: {{ talk.python_skill }}{% endif %}
+{% if talk.domain_expertise %}- Domain expertise: {{ talk.domain_expertise }}{% endif %}
+{% if talk.day and talk.start_time %}- When: {{ talk.day }} {{ talk.start_time }}{% if talk.end_time %}-{{ talk.end_time }}{% endif %}{% endif %}
+{% if talk.room %}- Room: {{ talk.room }}{% endif %}
+
+{{ talk.abstract|striptags }}
+{% endfor %}

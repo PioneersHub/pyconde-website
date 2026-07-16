@@ -1,0 +1,186 @@
+title: What I learned from monitoring more than 30 Machine Learning Use Cases
+---
+description: This talk summarizes the most important insights I gained from running more than 30 machine learning use cases in production. We will take a loan…
+---
+created: 2021-12-23
+---
+code: SEXPKA
+---
+slug: what-i-learned-from-monitoring-more-than-30-machine-learning-use-cases
+---
+speaker_names: Lina Weichbrodt
+---
+speakers:
+
+
+
+### Lina Weichbrodt
+
+Lina has 10+ years of industry experience in developing scalable machine learning models and bringing them into production. She currently works as the Machine Learning Lead Engineer in the data science group of the German online bank DKB. She previously worked at Zalando, one of Europe’s biggest online fashion retailers, where she developed real-time, deep learning personalization models for more than 32M users.
+---
+abstract:
+
+
+This talk summarizes the most important insights I gained from running more than 30 machine learning use cases in production. We will take a loan prediction model as an example use case and cover questions like:
+
+- What is the difference between metrics for model training and metrics for model monitoring?
+- Which metrics are generally useful to be monitored?  
+- Which metrics should you prioritize?
+- How can monitoring be set up using a traditional software monitoring stack (tools like Grafana and Prometheus)?
+
+This talk will be useful for you if you:
+- are a hands-on engineer or data scientist
+- want to use your team's or company's existing monitoring and dashboarding infrastructure to monitor machine learning stacks 
+- are a beginner or intermediate in MLOPs
+---
+full_description:
+
+
+Traditional software monitoring best practices are not enough to detect problems with machine learning stacks. How can you detect issues and be alerted in real-time? This talk will give you a practical guide on how to do machine learning monitoring: which metrics should you implement and in which order? Can you use your team's existing monitoring and dashboard tools, or do you need an MLOps Platform?
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: Production
+---
+tags:
+---
+submission_type: talk_long
+---
+submission_type_label: Talk (Long)
+---
+submission_type_id: 1701
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: none
+---
+domain_expertise: some
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/SEXPKA.png
+---
+youtube_id: wWxqnZb-LSk
+---
+video_link: https://www.youtube.com/watch?v=wWxqnZb-LSk
+---
+video_published_at: 2022-05-06
+---
+video_duration_iso: PT36M40S
+---
+video_thumbnail: https://i.ytimg.com/vi/wWxqnZb-LSk/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+Hey guys, so today I'm going to talk to you about my experiences monitoring models in production. I'm Lina, I'm the machine learning lead engineer at DKB Bank here in Berlin. Before I was a senior research engineer at Zalando. And you might be wondering what the 3D models were about. So it was a variety of models, a lot of recommender systems, personalization, NLP in customer service and some finance related models. And they're mostly large-scale production systems. So I hope what I learned can be useful for you Okay, so if you look at some of the machine learning tooling you might get a little overwhelmed because the space is really large Developing kind of fast and there are many different tools out there So what I'm showing you today is my monitoring blueprint Which is a much simplified version that I found useful for my projects and production So I will cover first implementing basic software back-end monitoring, then adding ML monitoring and how you can use relatively simply tooling to do it. So let's start with the basic software monitoring. So I want to cover the basis here, especially for the pure data scientists, maybe lacking a little bit of production experience. That's why I'm going to cover it real brief. So everybody experiences incidents. So even the really big professional software companies like Google or AWS have regular incidents. That's why they have a health dashboard where they show, okay, this service is experiencing slowdown or worse. And this is when it's coming back up. So you can see that this is unavoidable. It's an unavoidable problem that you will have problems. and the difference between the good companies and the companies which could improve still a little bit is that you detect it fast and that you act on these problems based on their severity. So you want to know, are your customers experiencing a slowdown or do they get weird responses? And maybe you're even losing money immediately or one of your customers is losing money. So it's really important that you detect fast and then you act based on the severity. Typically, there are three types of severities. There's like severity level one, which is critical with a high impact and you need to react immediately. Then you have level two, which is major and significant and you want to react kind of fast, but you have a little bit more time. And then there's level three. It's a bit more minor, so you have more time to fix it, but you still want to detect it. So how fast do you serve a request? The traffic, how much requests do you get per second? second, and the errors. So do any of these requests fail? And fourth signal is saturation, which means what's the load on your network and on your service. As you can see, we're focusing on symptoms of something, not the cause. So this means probably your end users are feeling some pain if you get one of these alerts. So they have a slowdown or they're experiencing errors. And if you have saturation gives an error, it means the pain is coming soon and you get a bit of a head start. I recommend to use this for all of your products. This also applies in the batch use case. So if you don't have a production service that gets regular requests but you process it in batch, let's say once a night, you still want to check your latency. So how much time do you typically take and monitor it? If it takes usually an hour and then it suddenly takes six hours, you want to know that. Is it in in time for when your customers want to consume your predictions. Traffic is identical. How much traffic do you get? Is it sometimes a lot more, a lot less? That can point to a problem. And errors, especially interesting in batch processing, libraries handle this differently. Some libraries fail if there is one point in the batch that has an issue. And other libraries just silently eat this error or give you a warning that you might miss. So you want to find out how to collect these errors and have them as a metric. OK, so how can you monitor these four metrics? These are like the ground metrics that you should have. Typically, you have a live dashboard. This is one I brought to you. This particular one is Grafana, but there are many different dashboard tools. You can also play with it. It's at play.grafana. And you can Google for the four golden signals. So you can play with this dashboard. You can adjust the time frame. It's really neat. And we typically use that to show your performance over time or check possible issues during an incident. And you can also use it to do regular performance reviews of your application. So how fast is it? Does it have spikes, et cetera? Next, what you do is, if you have such metrics, is you put an alert. So alert means you want to get notified if one of these metrics is too high or too low. I put here an example by CloudWatch, which is by AWS. But many different vendors or whatever you have probably have a similar functionality. There's also one in Grafana. You can basically say, this is the metric. And if it is over or under this threshold, please alert me. And then you have different options. You can get an SMS, an email, a pager. And if it's an important alert, this often goes to 24-7 on-call people who immediately look at your application. For example, it's down and it shouldn't be down. But then there are other alerts. Maybe you fix them when you come into the office the next day. So is this kind of traditional monitoring enough for machine learning applications? I brought you a picture here from a Google paper called Machine Learning Test Score for Production. you can see that the complexity of machine learning applications is higher than classic back-end software engineering and that's mostly because there are diverse data related things that you have to monitor for example the data itself skew between training and production the model model updates the model training pipelines etc so you can see it becomes more complex and i can testify to that from my personal experience that we had diverse set of bugs that were not covered by the traditional monitoring and i gave you give you some examples here for example what happens what can happen is that the input data changes so the client called us and it was a fraud model and for some reason the unit of one of the numerical input was changed and this doesn't give an exception because it's still a number but the unit changed from seconds to milliseconds and this was a very important feature so the model immediately lost prediction quality and this caused a lot of commercial yeah commercial costs because fraud was not detected and as you can see from the previous monitoring slide this wouldn't be covered another time we had an external service which migrated their data storage which we called for to get article metadata and they migrated their storage and the new storage had some of the fields less filled so immediately when we switched over to the new endpoint we had we used these fields and they were less filled so immediately we had quality degradation so we could detect and switch back and tell them to please populate these fields before we try this again another reason is aggressive post filters so in many applications you have the model but then there are some filters applied on top of what your model says for example we had the case where this was an optional field and if it's an optional field and it's not there nobody is going to log a warning so if it goes away over time you want to know that another another example is we had had an on-sale filter that worked really well when it was created, which happened to be doing sale season. And then we moved into non-sale season. There were barely any articles on sale, so this module looked really bad. So how are you going to detect this? And then I have some other examples. You can have some bugs in your own code, like simple bugs, like we wanted to get the last 10 orders, but we got the last 10 articles instead, so just mistakes you make. Or the model is automatically trained and released if you have continuous release of models. But the newest batch is worse, for example, because the training data had a problem and you didn't catch it. We also had funny examples where the TensorFlow version was updated and we didn't have it properly pinned. So you can have all kinds of these issues in production. And the last example is, especially in bigger companies or when your client is external, they don't always tell you how they're going to use your model downstream. So sometimes they make changes. In this case, the client suddenly used the model in the non-login area. So we got a bunch of completely differently distributed traffic than we got before. And maybe you need to adapt your training data to the new situation, but you definitely want to know if something like this happens. OK, so this was a bunch of examples just to tell you that there's a lot of things that can go wrong. And none of these are caught by traditional monitoring, which is also important. You should have it, but it's not caught. These things are not caught. And very funny is that these things cause a bigger commercial impact than most of the modeling that you work on. So if you don't catch that, you work on improving the model by 3% or something like this. But such a bug can easily cost you a lot more, 10% more, and you won't notice, you will think it's devolved over time or something like that. Okay, that's why we need additional machine learning monitoring. Let's have a look at a practical example that I brought that we can walk through. So this is one of my use cases. I'm currently working at a bank, so we have some private loan offers that you can compare via a comparison website it's one of our offers so you go to check24 for example and say i would like a loan for my new car and then what this platform does it calls a bunch of banks in the background and they all call the credit bureau because they want to know what's your credit score do you have pre-existing credits and that's not so great for the banks because we all call this credit bureau they all charge us and the uptake rate of course you're at most going to take one credit and maybe you're just looking what you can get as an interest rate and you try a few times so this is very expensive for us so it would be nice if we could tell with a really high certainty which people will be rejected and we reject them without calling the um the credit office so that was the idea could we develop a model for that that predicts if the loan is rejected or accepted we have application data from the last month and we don't know the unknown in this problem is the credit agency response so it's existing loans at other banks credit scores and maybe you defaulted in the past stuff like that and we have a bunch of fields application information like how much money do you want what's your income what's your rent what's your employment status um some configuration from the process age limits current risk configuration past applications by the same person and some other fields like is it a customer what type of loan etc so this remember this will be our example and let's now walk through what we should monitor for this okay generally my argument would be that we would like to do symptom-based monitoring very similar to what we do in backend engineering we want to catch the customer pain so i would say we prioritize our monitoring backwards from the output and we start to the right and i will walk you through each of these stages and let's start with evaluation metrics in production and stakeholder concerns okay so one common question i get when i talk to other data scientists they want to put the model into production is, is there a way that I can monitor what I evaluated on the evaluation set also in production? For example in this case precision and recall and maybe you can, it depends on the type of application that you have. So do you know the target of your prediction close in time? there's some problems in production that where you cannot have it typically is a it could be an unknown result so in the case of fraud you get a request and of course if you think it's fraud what are you going to do you're going to decline this loan you're not going to have a look typically and because that's the purpose of the model so in some cases the purpose of the model is to reject something or to make a decision and then you don't know the target value. In this case you would have an unknown result. Then sometimes you have machine learning models where you have a delayed result. Let's say you're predicting how fast a parcel is going to be delivered and you say it's going to be three days and then after three days or whenever the parcel arrives to get a callback and say, okay, this path arrived in four days, or in two days, and then you have your ground truth, and you can compare against it, but it's delayed, so that's not useful for real-time alerting if you get a bug, or if you release a problem, and then third problem you can have is sort of a filter bubble effect, where the algorithm decides what to show, and you don't know the outcome on unseen options. So this means also you might not know the ground truth for all the predictions you might be interested in. So my summary is, you can monitor the evaluation metrics in production for some use cases, like namely if you don't have these challenges that I just explained. So if you can, you should do that. You should store the prediction and you store the target when it arrives, hopefully close in time. Then you calculate the evaluation metrics that you also use during model development. For example, this could be a batch drop or maybe you have an endpoint on the service that you call customer clicked now, something like this, and then you have the metrics in your application. And then you add the metrics to the dashboard, to the same dashboard that I showed earlier. So you have all your metrics, these classical backend metrics and the other ones on your dashboard and then you create an alert. For our example of the loan prediction, I already said actually we wouldn't have this information because if someone has let's say a 99 percentage probability to not get the loan, we would reject this request and then we wouldn't know if we made a mistake or not. So what we did here is we created the production evaluation data of a few percent of users where the model is called but it's not used for decision making. And for this data we're letting these people through even when the model says 99% rejection probability and then we record the actual result and calculate metrics and compare them to the expected performance. This is a dashboard of such a situation of evaluation metrics and production, so I have precision and I have recall here. Every 10 minutes this job runs on these people we let through, and then we can have real-time monitoring to see if the model still works as expected. And we also have an alert, so if it surpasses a certain level, then we get an email and we can have a look what happened. Okay, so let's get to my second recommendation of monitoring priority one is stakeholder fear signals. So often when you talk to stakeholders, they're not only looking at the upside of adding a model, they're also kind of worried to add machine learning to their product. So things that could go wrong are often front of their mind, not just the upside. So what I typically recommend is that you ask them for their worst case scenarios. So maybe they're worried if the service makes the wrong decision, or they're worried that it's uncertain, or that it's slow, or what should they do if it's not available, if it's down or has slowness and timeouts. So I would put these fears into metrics and demo them, okay, now we are pretending the services down or no we're having like a really weird input let's see what happens and then you also add these two to the dashboard and have alerting so for example with my loan prediction stakeholders they were of course very worried that we would reject people who would actually get a loan and then the machine learning model would make wrong decisions they would lose business and the people would be unfairly treated so we added this live holdout set and said if the precision goes below 95%. We get an alert, we immediately look at it, and we could take the model offline, etc. And then there's a second fear. They were worried that it would be slow. Of course, we knew that it wouldn't be slow, but you still have to cover their fears, right? So we added an alert. If the P95 percentile of speed is below, for example, 300 milliseconds, then we would also get an alert. Okay, so let's look at priority number two. Priority number two is the service response, model predictions, and quality heuristics. Let's start with an insight that I had when talking to many of you that were a little bit confused when I was talking about monitoring metrics because they only partly overlap with the training metrics. so the purpose of the training metrics was is usually to estimate the quality of our model so this could be precision recall and ECG it depends on your problem and they are only available if you can calculate the prediction against the outcome in production but if they're not available or not available in real time we need the second set of metrics for ML monitoring which is monitoring metrics. And the purpose of these metrics is not at all to measure the quality of your model. This is like a fundamental shift in how you think about metrics. The purpose is not measuring the quality, but to detect something. So this means it's easier. They just must be related to quality, but they're not necessarily indicative of the absolute quality of your model. And they're much easier to implement. Okay this or the following things are such metrics that detection metrics not absolute quality metrics. So one thing you should do is monitor the response distribution. So let's say your model gives an output and then there's prediction and after this prediction there could be potential next step, like a filter or some post-processing, what you want to do is you monitor the very last output that goes to the customer, because when this thing changes, it means something changes for your downstream users. This is a good catch-all technique, because you don't need to wait for the true signal, and you can also use it if it's delayed. This can detect sudden shifts for example let's say your median or your 95 quantile of your score was at some value and suddenly it's always been at this value and suddenly it dropped a lot so probably something happened then you can start investigating what the issue is and it can also detect slow shifts so if you say typically we reject 30 percent and then you say okay once this drops over 25 i want to be alerted this can be sudden but this could also be slow over time and then but you you're definitely sure you get alerted and then you can have a look what happened this is also nice because this is more clearly related to a customer experience change than monitoring the input if you have so data input monitoring right we all talk about it but it's not very clear if you have let's say 80 inputs and one of them changed significantly you're not entirely sure if this has a significant impact on your output of your model or maybe it's a less important feature so this is very direct customer related so i would always start with that as priority two how do you do this there's different ways to do this so there are the rule-based distance metrics which are which is what mostly everyone does it's quite easy. You look at quantiles, medians, you look at share of empty or insufficient outputs. You could also use a distance metric, for example, a Kolmogorov-Smirnov statistic, or D1 distance. This is what Google uses in their production stack for monitoring. Or population stability index, they're different ones. Some of them are quite nice. I gave you an example here. So this is the one that Google uses, the D1 metric. It's basically similar to a histogram comparison. So if you have one distribution, it could be your distribution during training. It could also be yesterday or the same day last week. And then you have to the right the black distribution. And you want to measure how much the height of this bar changed. And this is how you can even visually see, like, are they the same or are they different? It's actually quite simple, but that's what they used. seem to work surprisingly okay. Then there's a second priority that I recommend because it's based more on human common sense which I call heuristic quality and it means that you create a use case specific human understandable quality indicator if your response is really good or maybe it's really terrible or something that's just based on a common sense. So this doesn't have to be a great indicator of quality it's just more like a baseline or something that should be fulfilled. I give you some examples so when I was at Zalando I used something like this for a personalized use case the share of actually personalized responses because maybe we don't know the user or the algorithm didn't have enough articles and a really bad response would be if the response is less articles and requested or if it's like a fallback like a top-selling product that would be bad and I also said once in a talk by Spotify and they do a personalized homepage ranking and they had a heuristic that was the rank of the users most used carousel so if you always let's say click on your favorite band or you always click on 80s songs or your favorite playlist or something like that that would be your most used carousel and then would be common sense if you have a personalized ranker that it shouldn't rank your most favorably used thing at the bottom so this would be a nice baseline that you could monitor. What's the rank of your favorite one? No matter what personalized recommender you develop for the homepage, you can all benchmark them and if one of them, a release makes a drop, that's probably a problem. Okay, and then I have my third priority. That's actually very confusing to me. Everybody talks about that monitoring the input data. That seems to be on everybody's mind, but I would strongly argue to start monitoring your output data. So for me this is priority three. It's very useful but I would only start tackling it once you covered your other bases and you're fine with it and they're working and you're detecting things because this creates more noise and it's not directly user pain related to your downstream user. So this is also useful especially if you're more mature in your ops practices and what you do is you monitor your input and feature distribution and so okay just to be clear I do recommend you do this but not as the first thing you can start later and once you're clear that everybody knows what to do you already detecting incidents it's clear who will fix etc okay so what you do is you compare the difference between serving and training especially relevant when you go live you You have to do this at least once. But for ongoing monitoring, it's priority three. You can also train on features that you locked. That's in the Google rules of machine learning. So they started this in YouTube, that they actually got their features, calculated them, locked them in a way. And instead of learning from a different pipeline, they learned from their own features that they locked. So if you have a high traffic important application, you can do that. And you can also compare the serving distribution over time, especially if there's a sudden shift that can indicate a bug. And if you can, it would be also good to monitor on sub-segments. So sometimes only certain segments go blind, certain countries or certain payment option or whatever in your case if you have different clients, Android breaks but not iOS, stuff like that. The same rules apply. So we can use the same metrics, rule-based metrics or statistical distance metrics. metrics. Okay, some hints on how to implement these ML metrics. Do you need a machine learning monitoring tool? There's a bunch of them in the market. There are full-featured tools, SageMaker, Selden, and then there are special ones just for monitoring. I'm in contact with many ML Ops practitioners, and I try to find out what they're doing, and it appears to me that everybody is like kind of interested but not fully convinced that this is needed right now so my current stance is that you start simple and you re-evaluate later if you need one of these solutions if you have a pure data science product or if you're starting from scratch or maybe you're very advanced then you consider a full-featured platform might be worth it but if your customer already offers monitoring services so you don't need to set them up some alerting some dashboarding i would actually recommend that you use what your company has that has several advantages you don't need to introduce a new tool you can immediately start you have everything in one dashboard and it's usually sufficient unless your type of product really means that you need to do a lot of machine learning debugging then probably at some point you need like more advanced tooling and also I think it's kind of developing fast at the moment maybe give it some time to mature okay how do you implement it in practice an example like some example code so I use Prometheus you maybe have some other libraries where you can create a metric so this is a new inference code and now basically we move from batch to single point prediction so So it comes in and then you call a model predict and you get a score back and then you have a histogram that you just increase, say, okay, now I saw a score of, I don't know, 0.3, for example. And then you can later create a dashboard and alert if your histogram changes its distribution. For more complicated calculations, so maybe you want to do these statistical measures, you can also lock each response of your model to storage, like a database or maybe S3, and then you run a script, let's say every 10 minutes, and you calculate raw metrics that you also put either in a database or into a monitoring solution, and then you monitor on that metric. So it's like from IT-wise, it's not very complicated, but I wanted to show you an example. Okay, takeaways. You should monitor the four golden signals and you should monitor some machine learning metrics. You should prioritize, in my opinion, the output metrics like response monitoring or if you can, evaluation metrics in production. And you don't need a new tool. you can use the tools that you already have and you add a few metrics okay so if one of you is now spontaneously motivated to join my team we are also looking for a machine learning lead engineer and you can ask me privately any questions and I'm also generally interested to talk about your ops practices and there's a very cool machine learning ops slack from people from all over the world I put you an invite here if you want to join it I'm there different nice people are there. Okay, thank you. No questions.
+
+**Speaker 2** _[30:46]_
+
+Thank you very much Lina. So now we come to the Q&A session. As I said before, we use Slido. So the QR code is in front of the entrance or you go to slido.com and then you enter piber and then you can ask your question. So I think we have the first question, Lina. Which metric would you recommend to monitor model input for perception data like images?
+
+**Speaker 1** _[31:15]_
+
+like I said I would monitor the output and I have not monitored images I would have to have a look I also have a friend who works in a start-up to monitor I would probably ask him so sorry no image based monitoring but I read yeah googling and but I would focus on your outputs first if you have that not covered
+
+**Speaker 2** _[31:36]_
+
+Okay, the next question comes from Jonas. Where do you store your model predictions, including metadata needed for debugging like model service version, input data, ETC, relational database, NoSQL, DB, any other?
+
+**Speaker 1** _[31:51]_
+
+No, we don't store it in a database, so we lock the outputs and predictions and features away on S3. And the service version is typically monitored with an endpoint on the service.
+
+**Speaker 2** _[32:09]_
+
+Okay, the next question is, how do you prevent alarm hell?
+
+**Speaker 1** _[32:16]_
+
+Yeah, that's the whole point of my talk. So if you monitor the output, you're already sure that it is related to something changing for the customer. And then you slowly start adding stuff because especially with data, people get very easily fatigued if there are too many alarms. So start with the output.
+
+**Speaker 2** _[32:38]_
+
+The next question is, how would you evaluate online models?
+
+**Speaker 1** _[32:44]_
+
+Haven't had that case, would need to think about it, can't tell you spontaneously.
+
+**Speaker 2** _[32:49]_
+
+Okay, so we have two more questions. How do you monitor fairness and biases?
+
+**Speaker 1** _[33:00]_
+
+We currently don't.
+
+**Speaker 2** _[33:03]_
+
+Okay.
+
+**Speaker 1** _[33:07]_
+
+So, okay, I can give you a longer answer for this. So I can give you a longer answer. This is not easy, right? It has to, you have to know what exactly you're monitoring. For example, I looked once, and we found out that women get more rejected in the credits. Okay, but women also have a lower income in these requests. So you could make a reasonable case that if you have a lower income, and it's just correlated. So I would say fairness and bias is always very, very domain specific. I cannot say that this is unfair, right? Because as a bank, if you have a certain income, you get a certain loan, right? So it's very tricky and you need to make this very domain specific and you need to think what exactly you want to capture and how you want to react with it. So I would say it's a worthwhile undertaking, but it depends on your domain a lot. So that's my more less flippant answer.
+
+**Speaker 2** _[34:09]_
+
+Okay, so the next question is regarding alerts. Are the ML engineers in your team also on call duty or only when the issue has escalated?
+
+**Speaker 1** _[34:18]_
+
+We are not on call now. It's a little bit funny. I also always used to think that maybe we should be, also for some other cases, but for some reason these data-related products are not entirely sure to management that is it always that important and so on, because you can't always immediately see, right? There is no one calling, the service is not down and so on, but so far in many companies, DML, people are not on call. they fix when they come into the offices.
+
+**Speaker 2** _[34:52]_
+
+Okay, the next question is, what's your take on open source tooling for MLOps, especially metric monitoring, any promising packages?
+
+**Speaker 1** _[35:02]_
+
+I am trying them all. I have not yet seen one that I find very convincing, but there are some really promising starts.
+
+**Speaker 2** _[35:10]_
+
+Okay, how do you act upon performance decrease? How do you decide to trigger an alert?
+
+**Speaker 1** _[35:16]_
+
+So, normally I just look at the performance over time from the past, so I either calculate it on the offline metrics, or I implement the alert and look at it for a while, and then I just eyeball, say, okay, this doesn't go below 90%, then I alert on 88, and if I get too many alerts, I alert on a little bit less, so it's quite heuristic. I've seen some slides by Berkeley where someone calls for research how to optimally design a better alerting system, but so far it's just based on looking at what the metric does and then setting a reasonable threshold. And Grafana just released also some ML-based detection, so they're actually trying to forecast your graph and to find out when it's weird, you know. So that is also a nice thing to actually apply machine learning to our monitoring statistics. So I think some things, some cool things are going to come in this space.
+
+**Speaker 2** _[36:21]_
+
+Okay, I think we have time for one more question. So do you recommend outlier and drift detection to monitor models in production?
+
+**Speaker 1** _[36:30]_
+
+haven't needed it so far
+
+**Speaker 2** _[36:33]_
+
+Okay, thank you very much, Lina.
+
+---
+transcript_status: auto
+---
+transcript_language: en

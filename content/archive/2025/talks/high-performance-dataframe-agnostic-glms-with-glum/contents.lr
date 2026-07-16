@@ -1,0 +1,159 @@
+title: High-performance dataframe-agnostic GLMs with glum
+---
+description: Generalized linear models (GLMs) are interpretable, relatively quick to train, and specifying them helps the modeler understand the main effects in the…
+---
+created: 2025-01-04
+---
+code: JUQ9JJ
+---
+slug: high-performance-dataframe-agnostic-glms-with-glum
+---
+speaker_names: Martin Stancsics
+---
+speakers:
+
+
+
+### Martin Stancsics
+
+Martin is a data-scientist/engineer at QuantCo. He is mainly working on developing the software packages that Quantco uses for insurance risk modeling and pricing. This includes QuantCo's open-source generalized linear modeling package, glum.
+
+He has a background in economics, and has previously worked at the Central Bank of Hungary as an applied researcher. He also taught a number of 'Programming for Economists' courses for college and PhD students.
+---
+abstract:
+
+
+Generalized linear models (GLMs) are interpretable, relatively quick to train, and specifying them helps the modeler understand the main effects in the data. This makes them a popular choice today to complement other machine-learning approaches. `glum` was conceived with the aim of offering the community an efficient, feature-rich, and Python-first GLM library with a scikit-learn-style API. More recently, we are striving to keep up with PyData community's ongoing push for dataframe-agnosticism.
+While `glum` was originally heavily based on `pandas`, with the help of `narwhals`, we are close to being able to fit models on any dataset that the latter supports. This talk presents our experiences with achieving this goal.
+---
+full_description:
+
+
+Arguably, `glum`'s standout feature is its ability to efficiently handle datasets consisting of a mix of dense, sparse and categorical features. To facilitate this, it relies on our (similarly open-source) `tabmat` library, which provides classes and useful methods for mixed-sparsity data. `glum` fits models by first converting input data to `tabmat` matrices, and then using those matrices to do the necessary computations.
+
+Therefore, dataframe-agnostism in our case mostly boils down to handling the conversion of different dataframes to `tabmat` matrices (which themselves store data in `numpy` arrays and sparse `scipy` matrices) in an efficient manner. Most of it is rather smooth and straightforward due to `narwhals` providing a convenient compatibility layer for a wide range of dataframe functionality. However, we have encountered a couple of pain points that might be of interest to other package maintainers and the PyData community. In particular,
+
+- We heavily rely on manipulating the category order and encoding of categorical variables, for which there is somewhat limited support. This is due to various dataframe libraries handling cateegorical columns somewhat differently.
+- Most dataframe libraries do not support sparse columns, while for us, it is important to be able to accept sparse inputs.
+
+In this talk I demonstrate how we used `narwhals` to easily accept multiple types of dataframes. I will go into details about categorical and sparse columns, and present the challenges we encountered with those. I will also examine the benefits and challenges of supporting sparse columns in dataframe libraries and the Arrow stardard. These points are meant to facilitate discussion among the participants and in the PyData community.
+
+At the end of the talk I will also briefly mention potential future plans for `glum` and `tabmat`, including the possibility to do computations directly on Arrow objects without converting them to `numpy` and `scipy` arrays. 
+
+### Outline
+
+1. A short intro to `glum`, it's backend library `tabmat`, and the main ideas that make them performant.
+2. Making `glum` dataframe-agnostic.
+    - Showcase how `narwhals` simplifies handling a wide variety of dataframes.
+    - Discuss handling categorical (and enum/dictionary) columns.
+    - Talk about representing sparse columns in dataframes.
+3. Concluding remarks and potential future plans.
+
+### Target audience
+- Basic understanding of the scientific Python ecosystem (with a focus on dataframe libraries) is recommended.
+- While some familiarity with linear models might be useful to get the most out of this talk, it is by no means required.
+
+### Main takeaways
+
+- How `glum` efficiently handles mixed-sparsity data
+- How `narwhals` helps to achieve dataframe-agnosticism with little effort
+- Differences between categorical types in various packages and the Apache Arrow specification.
+- How support for sparse column could be incorporated into dataframe libraries and the Arrow Columnar Format
+---
+room:
+---
+day: Friday
+---
+slot_date: 2025-04-25
+---
+start_time: 10:55
+---
+end_time: 11:25
+---
+slot_id:
+---
+track: PyData & Scientific Libraries Stack
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url: https://github.com/Quantco/glum/pulls
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/JUQ9JJ.png
+---
+youtube_id: pLGoPOGpSUI
+---
+video_link: https://www.youtube.com/watch?v=pLGoPOGpSUI
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/pLGoPOGpSUI/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+I'm Martin. I work at Quantco. I work as a data scientist. My background is in economics. My actual job is closer to data engineering, so it's a bit of a mix. And what I'd like to talk to you about is our open source package for estimating generalized linear models, which is called GLAM. So the outline of the talk, first I'd like to talk a bit about what GLMs actually are. Maybe just quick show of hands, how many of you know what GLMs are or have used GLMs? Okay, that's super cool. How many of you have used a logistic regression? Okay, so you almost know what GLMs are. That's very good. So, yeah, just start with a quick bit of introduction to GLMs, then I'll talk about how to estimate GLMs, and then I'll turn to GLAM and how we do it in GLAM. The latest thing we have been working on with regards to GLAM is how to make it Dataframe-agnostic. So that's going to be the second part of my talk. And then I also have this optional section. I have this vision in my head, like how we could make things even better. We might or might not have time for that. But if we don't, I'm super happy to chat about it with anyone who's finally after the talk. So let's jump right into it. So what is a general linear model? Let's start with what a linear model is. There's going to be a couple of equations, but not that many. So don't worry. and not super important. But a linear model is basically you have a number of features. Let's call them XJ. And you assume that the conditional expectation of your response is linear. It's just a linear combination of these features. This is what a linear model is. You usually estimate it. Oh, I shouldn't work. You usually estimate it by minimizing, for example, the square error between your predictions and the outcomes. The other ways to do it, this is the most usual thing. You can also panelize it. You can add L1 panelization, L2 panelization, something else. If you are a data scientist, if you are an economist, you probably just don't do that. So this is what a linear model is, what a generalized linear model is. So we generalize it by making the expectation a nonlinear function of this linear combination. So instead of having just this sum, we put it in some function, let's call it g. It can be any function. And n is a bit misleading, but it can be some nonlinear function. Now, reality is a bit more complicated than that, because in addition to just specifying this conditional expectation, we also have to specify the whole conditional distribution of y conditional on x. But the main idea is we make it somewhat nonlinear, not fully nonparametric, but somewhat nonlinear. Now, why do we care about GLMs? in the era of machine learning, they do have a number of advantages. First of all, they are usually super fast to train, especially if you use GLAM. They are super interpretable because you still have a linear combination, so it's easy to understand what the effect of your features is on the outcome. We have a very good theoretical understanding of GLMs. We have decades of statistics and statistical papers and econometric papers deriving properties of GLMs and all that, which can be very, very useful if you want to understand what you are doing. And they are not that prone to overfitting because we don't have that many parameters. The number of parameters is the number of features, which is not that many. And for these reasons, they are popular in a number of industries, old-school industries like banking, insurance. At least those are the ones that I have experience with. Chad GP tells me they are also popular in epidemiology and probably in other places too. Why do we care about them at Quantco? So maybe let me just talk for a few seconds about Quantco. If you look at our website, you can see that we get value from data. It's strikingly uninformative. What we actually do is we do algorithm pricing, forecasting, claims management, and a number of other things too. And for many of these, we need to do predictions or causal inference. And for those, GLMs are super useful. We don't only use GLMs, we use modern fancy tools, too. We do deep learning, we do computer vision, we do natural language processing, and all that. But GLMs are still a core part of our toolkit. For example, they are super useful as a benchmark for more complex models. GLMs are often what clients have when we arrive there, and we need to reproduce what they already do, just to compare what we do against them. Now, the question is how to train GLMs. So let's jump to the slide. It's going to be the last slide with equations, but it's unavoidable, I'm afraid. So I mentioned that we don't only need to specify this conditional expectation. We actually need this likelihood function. A likelihood is basically the probability of observing your outcomes conditional on your features, or conditional on x. And we usually assume a specific form for it. is called an exponential dispersion model. It has some nice properties, mostly that it's separable. So the features only enter in this capital A function. And they enter it in a very specific way. Basically, we have a linear combination of the features. We call that the linear predictor. We plug that into this g function that I've talked about as the link function. And then we plug the whole thing into a likelihood. And if we have a likelihood that looks like it, then we can exploit the structure to train it a bit faster, more efficiently. How to actually estimate it? We use something called the maximum likelihood. So this is the likelihood. So maximum likelihood is obviously just maximizing this thing, or more precisely maximizing the logarithm of this thing, because that's a bit easier to do and gives you the same result. So the likelihood is basically your loss function, if you come from data science, or the inverse of your loss function, because you maximize it, not minimize it. So you could just use any off-the-shelf optimization algorithm to do that. For example, from SciPy, you could use some trust-region-based algorithm. You could use the LPFGS solver, which is also very popular. But the chemical thing to do with GLMs is to use this thing which is called an iteratively reweighted list squares, which sounds fancy, but it is basically just Newton-Raphson in disguise. And what happens if you use this algorithm and use this specific exponential dispersion family is that you will find that there's this specific product, which is called the sandwich product, for quite obvious reasons. So this turns up quite often. And it turns out you have to evaluate it a lot in every step of the optimization process. So it's really worth it to make it efficient and fast. Now this is how we train GLMs. So if I can go to the end. How to quickly train GLMs? There are two things you can do, two broad categories that you can do. First of all, you can focus on the optimization itself, use efficient algorithms, compile the likelihood functions. For example, in GLAM, we use CITON, but you could just as well use C, for example, or just in-time compilation or something like that. It doesn't really matter. Pay attention to the usual things that you should pay attention to, like your algorithm should be numerically stable, and all that kind of things. And we do this in this package called Glam. But the other thing you can do is to take this sandwich product and make it really, really, really fast and efficient. And we have a company library called TabMet, which basically acts as a backend for Glam, and okay, it's a bit reductive, but the main purpose of TabMet is to calculate the sandwich product writing fast. And we do this using highly optimized algorithms written in C++ because we did it in, not me, but we did it in 2020. If we did it today, it might be in rest. And we can also exploit the structure of the sandwich product. So it's not just a general matrix multiplication. It has some more structure, and if we exploit it, we make it faster. So we can be faster than NumPy for this specific product. And the big party trick of TabNet is that it can handle mixed sparsity data. So if your data has a mix of dense columns, sparse columns, or even categorical columns, it automatically uses the most efficient algorithm for each of those parts. So let's look at the history of these packages. It started out as a scikit-learn PR by this guy called Christian Lorentzen, who is a scikit-learn core maintainer. And it aimed to add general GLM functionality to scikit-learn in addition to logistic regression, gamma regression, whatever they have already. And some parts were merged, but at some point it was clear that the whole thing is not going to be merged. And so Quantco created, at that point, Quantco internal package called Quantco GLM, which was based on the scikit-learn PR, but it went way beyond that. So it was really production-ready and just a bit more advanced. So there were some big improvements. That's in 2020. And in 2021, we decided to open source it. This was one of the first big open source contributions of Quantico, and I think it has been a success story. For example, when we open sourced it, we got some input and some help from Christian Lorenzen. And in turn, as far as I know, he also uses it either for work or for hobby reasons, I'm not sure, but basically it was a big win-win, and we also felt good about it, which is nice. Now in 2024 we had the last major release, not last, the latest major release of GLAM and TabMath, where we focused on user friendliness and classical statistics. So GLAM was mostly designed for prediction, but GLMs are also good for causal inference or statistical inference. So we added things that statisticians care about, like world tests, confidence intervals, things like that, and we added a formula interface. If you have ever used R, for example, even stats models, you might know what a formula interface is. It's just a super user-friendly way to specify models, and we have that too now. What we are working on right now is making GLAM data frame agnostic. So right now, it needs a Pandas data frame, or an AmpliMatrix, but most often it's a Pandas data frame to do its computations on, but PoloS is having a good time these days. But we also have many alternative data frames, and we have requests, internal and external requests to support those. So that's what I'll be talking about in the second half of this presentation. Now just to show you how we handle mixed sparsity data in TabMet, and just to showcase how fast it is. Let's say that we have a data frame which contains dense columns, which are like the blue columns. Dense just means that it doesn't have too many zeros. We have sparse columns. Those are green. It just means that most of the elements are zeros. And we have categories, which is a relatively small number of distinct values. What we do is first we convert it to a tab mat. It's called a split matrix because it's split into a dense part, a sparse part, and a categorical parts, so basically we pull out the dense parts from this Pandas data frame, put them together in a NumPy array, and also store the original indices so that we can reconstruct the original data frame later on if we want. We do the same with sparse parts, but we don't store them as a NumPy array, we store them as a SciPy matrix, and we also pull out the categorical ones and we store them in a similar way to how pandas stores categorical columns, but we use our own class for that. And why is it useful? It's useful because if we want to calculate this x prime wx that I've talked about, prime might be missing there, so if we want to calculate that, then we can do it part by part. For example, we first calculate the sandwich product of the blue part with itself, then we calculate the sandwich product of the blue part and the green part, and so on. We do it for all pairs, and for each pair we can use the most efficient algorithm that exploits the sparsity, or density, or categoricalness of the specific subproblem. And it really does matter, so let me show it to you through an example. So let's say we have a matrix which is just a categorical vector with 200 categories and a hundred thousand elements, nothing too big, but it's fine for demonstration purposes. We would like to calculate the sandwich product of its one-hot encoded version, which is like you have to one-hot encode categories if you want to estimate GLMs or like most other things. So if we measure... The timings only relate to the actual product part, not the get-damage part. So if we convert it to a NumPy matrix and do this transpose, so we calculate x prime diagonal X in a naive way, which is not that naive to begin with, because if you notice it's not an actual diagonal matrix, we multiply it as if it was a vector, so it's already slightly optimised. So it takes like 55 milliseconds. The absolute value is not important, just relative values of course. So if we convert it to dense matrix, which is like the dense part of a split matrix, instead of NumPy matrix, we do it in like a third of the time. So at At this point we haven't exploited the sparsity of the problem at all, it's just using the fact that tabmat is optimised for this sandwich product as opposed to the general matrix product. So it's quite a big speedup, but if we know that the input is actually categorical and we exploit the categoricalness of the problem, we can do it in like 74 nanoseconds, which is like almost a thousand times the speedup. So if your data set contains many categories, you get really, really, really big speed-ups. Now let me continue with how we made GLAM, or how we are in the process of making GLAM Dataframe-agnostic, but also focusing on TabMath and the sandwich product. So in general, it was a super nice process. we got some requests that that should support Polar's data frames and maybe other kinds of data frames as well. And we found this library called Narwhals. Marco, who is the author of Narwhals, is having a presentation right now in a different room about Narwhals. What Narwhals does is it provides a Polar's-like API, a compatibility layer with Polar's-like API, so you don't have to worry about what kind of DataFrame you get. You can use the same API and it translates basically the operations to the native API of your Amberlang DataFrame. It's very nice. If you are interested in it, I say you should go to this talk, but unfortunately it's happening right now. But maybe you should just watch this presentation or the recording. So we found this library. We made a PR to implement Polar and other data frame support using Narwhals. The thing to notice here is that it was a relatively small PR, just a couple of hundred lines of changes, and it also included, like, changes in our log file by adding a new dependency, so it was really, really a small change. So Narwhals is really super nice. Another open source success story part. When we had this PR, we also got a drive-by review from Michael himself, with a couple of tips. So it was just super nice that we got some support from the author of narwhals when converting gram-to-use narwhals. And now, instead of the from pandas method or function that we had earlier, we have this from df method, which can handle arbitrary data frames. I still have some time, so let's go a bit into details about how we actually do it. So just remember what we need to do is we take a data frame, we break it down into dense parts, sparse parts, and categorical parts, and store them as NumPy or SciPy arrays. Basically when we do narwhals, we just have to use this narwhalify decorator, which means that by the time we get the data frame, it's not a Pandas data frame or Polar's data frame or whatever, but a Narvel's data frame. The underlying data is not changed, it's just a compatibility layer, but on this Narvel's data frame, we can use Polar's API. For example, if we would like to figure out whether a column is string, we don't have to check for Pandas strings, polar strings, and so on separately, we just need to check whether it's an instance of a Nervous object type. The same for categoricals and enums, for example. So we use the same API also. It has a mean method, for example. A main is maybe not that interesting because Polars and Tundas uses mean for the same thing, but if there's a data frame that Nervous supports and uses, I don't know, average instance mean, the narwhals will translate mean into average, so it's just very, very nice. So this is the good part. There are a couple of edge cases related to categoricals and sparse columns, so let me also show you those, not to give you an overly optimistic idea of how easy it is to make your library's data frame agnostic. It is nice, but we also want to separate categorical columns and convert them into representation where we just store the list of categories that we have, plus an integer vector with the indices for each observation, like which category it belongs to. And for that, we need to factorize this series into indices and categories. And we can do it in a data-frame-agnostic way. It does work. If we have Pandas, we can even use Pandas factorize, which is nice. We don't always do this, because now that we use Narwhals, you don't even have to install pandas in order to use tabmat. So if we don't have pandas, we just use our own function, which is a bit less performance. But it's not amazing. So the DataFrameAgnosticSolution is not amazing from a performance point of view. And the reason for that is that pandas and polars already store categories in a factorized way internally. So if we know that we have a pandas dataframe and pandas categories, then we just pull out the properties called indices and categories. If we know that we have a polars dataframe, we just pull out the corresponding paths. So if we know what kind of dataframe we have, then we can just rely on the underlying physical representation of the data. The good thing about Narwhals is that we can do that. So it's easy to use data frame agnostic paths when you want, but it's also easy to drop down to the native data frame when you need to. So when we extract these codes and categories, then we special case the Pendless and Polar's cases and just use a more performance version of the algorithm for those. And these conversions, like these two native or two narwhals, these basically don't take time at all, because the data frame is not converted, it's just a compatibility layer, it's just a new object with a new API, so it's fast, so you don't have to worry about the performance impact of the two native at all. The other small pitfall is sparse columns. So I've mentioned that in TabMet we support storing sparse columns separately. The way we do that is we find the indices of the columns which only contain a small number of non-zero elements. A small number is parametrizable. So even if we have dense columns in the input, if we find that it only contains a couple of non-zeros, we convert it into a sparse array, which is fine. And we can do it in a data-frame-agnostic way, with that, that's all good. What happens, though, is Pandas already has support for sparse columns, right? You can have sparse columns in Pandas, and we want to make sure that if a column is originally sparse in your Pandas data frame, it never gets converted into dense columns. So again, with a special case Pandas, and if we have a sparse Pandas column, we also treat it as a sparse tabmat column. And we can do it. And we can easily drop down to native representation when we have to, or when we want to. The work is not over yet, though. So TabMath is more or less Dataframe-agnostic, at least using this FromDF interface. But we also have a formula interface since TabMath 4, as I've mentioned, which is this R-like interface. We implemented this relaying in this fantastic library called Formulaic, which is a replacement of Patsy, if you have ever used it before. It's a very nice library, and it has recently merged support for DataFrame Agnosticum, also using narwhals, but it hasn't been released yet, so we are still waiting for their next release in order to actually implement it in GLAM and TabMath. The other thing that we have been waiting for is that in GLAM, we also have to reshuffle the categories sometimes to make sure that when you do prediction, your categories are in the same order as they were when you did training, otherwise your one-hot encoding would just not be correct. And in order to do that, we have to align the categories at some point if they are different than what we saw at training, and for that we need support for enums. And Narwhal did have support for enums, but we couldn't set the categories explicitly up until this PR was merged last week or the week before last week. It's also not released yet, but I'm hoping it's released soon and then we can finally add proper pollers and so on support to Glam as well and not just TabNet. Now what the future holds, basically we are still converting everything into a numpy array or a scipy array which is fine because we only have to do it once but doesn't feel optimal at least from a software engineering perspective. So it would be great if we could avoid conversion. And we have this nice spec called the apache-arrow format which is basically a specification for data frame, in-memory data frame representations, it would be super cool if instead of converting to we could just work directly on the physical representation of these data frames that conform to the Apogee error standard. We cannot do that yet, and it will take longer if it ever happens, but... So we need better categorical support and sparse support in the Apogee error specification, But that's what I'm personally looking very forward to. And now to wrap it up, what we learned when doing this exercise, so data frame agnosticism is not that hard. When I say not that hard, it's not that hard when you can use narwhals. And I'm sure narwhals is like not an easy thing to create. But using it is just super nice. And you can be data frame agnostic when you want to be, and you can drop down to native API when you want to. There are some edge cases that you need to be careful with, which are almost always related to things that differ between these libraries, like it's related to sparse columns or categorical representations. Now, for GLAM and TabMet itself, so I'll say that if you are a practitioner or a data scientist and if you are in need of a fast Python-first GLM package, you should give a try to GLAM. It's nice. If you want to write your own GLAM or if you need a matrix library, a specialized matrix library which is fast and handles mixed-pass data, maybe give TabNet a try. If you do any of this, feedback is always appreciated, so just get in touch with us. If you'd like to contribute, we love contributions, so we have an issue tracker on GitHub for both packages, so if you find a bug or feature request, just leave us a message. We are always, always very welcome. And if you just like to know where to get started, just get in touch with us about any questions or any comments. And I'd like to thank you all for your attention. This concludes my presentation. Maybe start us on GitHub if you'd like. Thank you so much.
+
+**Speaker 2** _[26:08]_
+
+Thank you so much, especially amazing the contributions you guys are doing to the open source community. And it was really great to see slashing more than 50% of the performance, the one which you showed. I've got a couple of questions here. Can TabMet handle 3D n-dimensional data arrays? Would it make sense for this library?
+
+**Speaker 1** _[26:29]_
+
+It cannot. It would certainly make sense, I imagine. So for our purposes and for GLMs, we always work with tabular data, so it's not something we have explored. It would certainly make sense to have a library that has a similar mixed sparsity support platform for n-dimensional matrices.
+
+**Speaker 2** _[26:49]_
+
+Thank you. If you end up adding lots of if pandas everywhere, won't you end up doing the same for other backends or is this narrowing the API gap?
+
+**Speaker 1** _[27:01]_
+
+So we only have if pandas and if polars parts because those add libraries which we want to support a bit more in terms of performance. So if we have a pandas input or polars input, we'd like to make sure that we do the most efficient thing there. Yeah, I imagine if you wanted to add more support or more performance for CUDF input then you could have if CUDF parts. But I wouldn't say it's an API gap, it's just when we want to really use the physical representation of the data that might be DataFrame specific, then you just need to do that.
+
+**Speaker 2** _[27:41]_
+
+The next one is a tab match still faster for other matrix operations or just sandwich operations?
+
+**Speaker 1** _[27:47]_
+
+It's also fast for the matrix vector operation and the transpose matrix vector operation, so x beta and beta x prime, but it's not a general matrix library in the sense that it has only a fraction of the functionality that NumPy has, for example. So we only have a handful of operations, those are fast, and what's not fast, we don't even I thought that was better.
+
+**Speaker 2** _[28:10]_
+
+Perfect. And I have the last question. So what are the advantages of GLMs over generalized additive models like explainable boosting machines that are highly accurate and interpretable at the same time?
+
+**Speaker 1** _[28:22]_
+
+I think GLMs are still somewhat faster to train, and there's a small theory around them. For example, in terms of statistical inference, you can have things like confidence intervals or p-values, which statisticians and economists like me tend to like. But in terms of predictive performance, yeah, three base methods, B to GLMs.
+
+**Speaker 2** _[28:45]_
+
+So thank you so much for the great explanation and yeah, so please give a round of applause to Martin
+---
+transcript_status: auto
+---
+transcript_language: en

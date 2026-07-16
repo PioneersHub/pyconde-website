@@ -1,0 +1,215 @@
+title: Forecast of Hourly Train Counts on Rail Routes Affected by Construction Work
+---
+description: Construction work in national railroad networks often disrupts train traffic, making it vital to estimate hourly train numbers for effective re-routing.…
+---
+created: 2024-12-04
+---
+code: RAHBEP
+---
+slug: forecast-of-hourly-train-counts-on-rail-routes-affected-by-construction-work
+---
+speaker_names: Sebastian Folz, Dr Maren Westermann
+---
+speakers:
+
+
+
+### Sebastian Folz
+
+Sebastian Folz works as a machine learning engineer at DB Systel GmbH. His tasks also include project management and contributing in works groups around AI topics. He also has contributed to open source projects in the past. Sebastian can often be found at meet-ups around Python and machine learning in Karlsruhe.
+
+### Dr Maren Westermann
+
+Dr Maren Westermann works as a machine learning engineer at DB Systel GmbH and holds a PhD in environmental science. She is a self taught Pythonista, a member of the documentation and contributor experience team, respectively at the open source machine learning library scikit-learn, and a team member of the open source library Narwhals. She is also a co-organiser of PyLadies Berlin where she mainly hosts open source hack nights.
+---
+abstract:
+
+
+Construction work in national railroad networks often disrupts train traffic, making it vital to estimate hourly train numbers for effective re-routing. Traditionally managed by humans, this process has been automated due to staff shortages and demographic changes. DB Systel GmbH, Deutsche Bahn's IT provider, leveraged machine learning and artificial intelligence to estimate train traffic during construction. Using Python and frameworks like Pandas, scikit-learn, NumPy, PyTorch and Polars, their solution demonstrated significant benefits in performance and efficiency.
+---
+full_description:
+
+
+Within a national railroad network, construction work for maintenance and modernization is unavoidable - as is train traffic on the affected sections under certain circumstances. Although there are fixed timetables for passenger rail transport that are planned well in advance and are set very early, there are still many freight transports and special trains that are registered at short notice and cause a dynamic traffic situation on the rail network. Therefore, the capacity utilisation of the rail routes is unknown until shortly before the journey takes place. It is therefore important to estimate the number of trains that will run over the affected tracks in order to establish a sensible re-routing strategy. Until now, this process has been in the hands of human decision-makers for decades or even more than a century.
+
+Demographic change and staff shortages are increasingly forcing companies to automate activities intelligently. This is where machine learning and artificial intelligence come into play.
+
+As Deutsche Bahn's IT service provider, DB Systel GmbH was able to successfully implement an example of intelligent automation of this process and estimate train numbers on sections of tracks affected by construction using modern ML and AI methods. Python as well as various established frameworks (Pandas, scikit-learn, NumPy, PyTorch) and new frameworks (Polars, Ruff) were used in this project. A success and performance measurement clearly demonstrated the benefits of ML automation.
+---
+room:
+---
+day: Friday
+---
+slot_date: 2025-04-25
+---
+start_time: 14:00
+---
+end_time: 14:30
+---
+slot_id:
+---
+track: Machine Learning & Deep Learning & Statistics
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Novice
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/RAHBEP.png
+---
+youtube_id: gH5T9A_x-Ug
+---
+video_link: https://www.youtube.com/watch?v=gH5T9A_x-Ug
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/gH5T9A_x-Ug/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+Hello together, I'm Sebastian and this is my colleague Maren. I'm understandably excited to be here. This is my first talk at PyData and PyCon. Maren, on the other hand, is quite well known in the open source world. And we were together working on a project last year for DB and we want to share it with you. It's about forecasting hourly train counts on rail routes affected by construction work. And let's have a brief look at our agenda.
+
+**Speaker 2** _[00:44]_
+
+So, the agenda of today consists of four parts. So, first we'll have a look at the challenge of capacity management at Deutsche Bahn. And then we'll have a look at our data-driven solution. Then we'll go over to lessons learned. And finally, we'll finish with the conclusion, where we'll give you some take-home messages.
+
+**Speaker 1** _[01:04]_
+
+Thank you very much. Okay, to understand the project we were working on, you first need to understand the problem that needs to be solved by this project. And the problem is one of DB's everyday challenge in operating trains. It's the challenge of capacity management. So, most of you know DB as a transportation provider, and maybe it's late, But DB also operates a giant rail network, the largest one in Europe. We're talking about 33,350 kilometers of rail network. And imagine that 40,000 train connections are operating on this network every day. And according to these numbers, it's not so difficult to imagine that 1,169 of these network kilometers are currently overloaded. Each construction site places additional pressure on the entire rail network. And it will create bottlenecks and, of course, impact punctuality. So, if I look around, how many of you are here by train? Nice. How many have been late? Okay, it's not a secret, we are fully aware of that. And yeah, that's one of our challenges, and this is the challenge of capacity management. We don't try to keep the trains in time. Well, over the last decade, it became apparent that the historical control parameters were no longer sufficient to operate trains with the lowest possible delays. As a result of this, the operations now are controlled based on the capacity of a route as the one control variable as part of the capacity and punctuality program. So, the nominal capacity of a route became the new control variable. model. This means various effects can affect the capacity of a railroad or of a track section. But only construction works as such effects can be planned. This means we will never be able to predict the runaway cow from walking on the rails and causing trains to stop. Okay, to understand this a little bit better, let's have a look how a rail route is built up. So, as I told you, we have a network, but we will not have a look at the complete network, that's too complex. But we will have a look at a few track sections. And a track section consists of two tracks for each direction one track. Now, for this rail route, we can say it has a nominal capacity of 22 trains per hour. So, the nominal capacity is 22 trains, means 10, or in this case, we have 20 trains requested. So, it would mean a utilization of 91%, and it means 10 trains per direction. So, simple case, 10 trains come, 10 trains go the other direction, and now let's put a little pressure on that. Now we have the case of construction work. Let's assume one of the two tracks gets closed completely. This means we have still a request of 10 trains traveling here, but how will it affect our capacity? It would mean that our capacity in this case will shrink. The nominal capacity shrinks to a maximum of one third of the original nominal capacity. This would mean 6.6 trains are possible, 20 trains are requested. This would be a utilization of 303%, which is impossible to serve. And, of course, this is caused because the trains of the other direction also have to pass the one track that now serves two directions. This is why we don't have half of the capacity, because of the interchanging traffic, it's at maximum one third. So, the solution. Of course, there cannot operate these 20 trains. needs to be reduced somehow. And this is the work of one of our colleagues, a construction operations planner. This colleague takes a look at the situation, looks at the construction situation and estimates or determines how many trains can go there. In this example it would mean there are only three trains per direction means on the track section affected by the construction work there are six trains in both directions. So this is one part of the challenge of capacity management. And now imagine this colleague who does that has to do this for every kilometer of rail route affected by a construction site for every day in holidays and ordinary work days at weekends or on days when there are special trains maybe to a football match. This is a lot. This task is very complex and these colleagues of construction operations planning have a lot of work. This was reason enough for Deutsche Bahn to try to automate their work and to support them adequately. This is why we projected a data-driven solution. So this project did not start from scratch. The project we were working on was separated from an ongoing project. This means we had also data from this project that was ongoing, but it was data from very old systems and they for example could only provide CSV exports. We already had an existing storage in the Amazon Web Services in the AWS cloud, and it has been adopted and expanded. And the first step for this project was, of course, converting all the legacy formats like CSV data into Parquet files. Of course, we also did a little bit of cleaning and pre-processing. These systems were very specialized. Ok, which data did we need to perform this project? Of course it was a prediction project and there was a lot of machine learning involved, but it all starts with data. And in our case we needed of course very specialized data, like data from the construction site planning, or data from the timetables. Also data from our infrastructure for the local situations and of course data of the train control system. Each of these systems is very complex and I could tell you a lot of it about it. But what you need to know here is timetables are the normal timetables as you know it from every station. But there's more than one timetable but you only know that one timetable. So there are many timetables. And the train control system is exactly what it sounds like. It knows as single system the count of all trains. Yeah, this data we processed and the second step was to connect it by keeping the temporal relations of all this data and put it into one big data frame. This big data frame, we also called it data frame. It was the source for our machine learning approach. We needed, of course, some reprocessing, and we applied feature engineering. I will not go so deeply into detail, but what we, of course, did is cleaning. You always have to deal with missing data, for example. We needed many different kinds of encoding, and it took us a while until we found the best encoding, for example, for dates or for times. In the end it was something like sine and cosine encoding. And of course we had to do a scaling. In the end after applying our feature engineering to this one flat data frame we got three things. Of course we got training data, we got validation data. The train and validation split was 70-30 and we got one thing more. We got a joblib object, because we had to somehow materialize our feature engineering pipeline, which was also configured in a way by processing the training data. And exactly this object we needed later for the predictions. And the data later for the predictions needed to be transformed in exactly the same way. Maybe you already asked why we used a droplib library for this and not something more fancy like ONNX or something more adequate. We will come to this later. On the other side, there was the inference pipeline. It's not that complex. It looks pretty clear. It starts in this case with our droplib object from the process before and with a frame of inference data. And now this inference data comes from the other project I mentioned before, the ongoing project because they already had to produce a data frame in exactly this shape. And now it was pretty easy to apply our pre-processing on that and our feature engineering and we did exactly the same things as for the training and the validation data. And after this pre-processing, we put the data into another bucket on AWS and we applied our pre-trained model on this data. About the pre-trained model, Maren will tell you a little bit more in a few seconds. But what's to say else is what we got out of the model was our forecast data. And we also had to do some post-processing. We had to do things like calculating train sums by traffic kinds. We had to clip some predictions, because the models sometimes gave us too large numbers and we exactly know it's not possible to operate 200 trains on one track in one hour. We had to do things like rounding, because nobody ever saw 1.3 trains on a track and things like that. There was also a special case of tracks running in parallel, so we have more than one track. This was also some kind of special handling, but this was just algorithmic and it was boring. And to prevent getting bored, Maren will now tell you a little bit more interesting stuff about machine learning.
+
+**Speaker 2** _[12:54]_
+
+Thank you So we used machine learning for identifying patterns in our data And we started or we did an iterative search for the best machine learning model And we started with a dummy model which just returned the mean so we had something to evaluate our results against and Then we used an auto ML library So auto machine learning library for helping us with selecting the best model So there are different kinds of AutoML libraries out there, and they help you with feature engineering and hyperparameter optimization and algorithm selection. And we used MLJAR AutoML because it covers a wide range of machine learning models, for example, from Scikit-learn and XGBoost. And we selected a light GBM model. This was the best model after hyperparameter tuning and best algorithm selection. and this is a model developed by Microsoft. And I'll go a bit more into detail about the light GBM model. So the light GBM model was a regressor model and the boosting type was a gradient boosting decision tree. And our target variable was the number of trains per hour per track section. So following from what Sebastian just explained, we have different track sections and there can be a varying number of trains on all these different track sections. So this is a very simplified graphic. In reality, it's actually a big network. And so we applied the slide GBM model to this logic, and it actually worked fairly well, but we were faced with some challenges, and I'll talk about this in more detail now. So, for example, what we noticed was that we had a prediction bias towards low numbers of trains. So we had many track sections where there was per a given hour either no train or maybe there was one train or maybe two trains, especially in areas where there's a low population density. And we didn't have so many track sections with higher numbers of trains per hour. And so our models tended to predict lower number of trains compared to the reality. And as a fun fact, I found a train that was running on just one day per year. And I was like, okay, what kind of train runs just on one day per year? And I had a look into it, and it was a special train that was carrying passengers to the hurricane festival in Chesse. And then another problem that we had was that the light GBM model assumes a normal distribution of the data, but we had a Poisson distribution. And so we looked for some alternatives, and we found the histogram-based gradient boosting regression tree from scikit-learn. This model is actually inspired by the light GBM model. It aims at addressing the shortcomings of the light GBM model. And so with this histogram-based gradient-boosting regression tree model, you can adjust the sample weights, so you can give your target variable different weights to correct for this bias that I talked about. And you also have the option of choosing different loss functions in the regression tree model. And we chose the Poisson loss, which better accommodated our data distribution. And what we found was that the scikit-learn model performed equally well compared to the light GBM model, but not better. And one main reason for that was that the sample weight feature in scikit-learn is currently not working correctly for a number of estimators. There's an issue on the scikit-learn repo for this, and it's currently undergoing fixing, and it's still a work in progress at this point. And so we didn't follow with the histogram based gradient boosting regression tree model, but we thought, okay, what other alternatives do we have? And we thought, wouldn't it be nice to use graph neural networks since our railway network is basically a graph structure? And so that's what we did. And we used the PyTorch geometric library for this, and we tried different networks. We tried the graph attention network, the graph isomorphism network, and the graph convolutional neural network, and the graph SAGE network. And on the left-hand side, you can see here a nice visualization of the hyperparameter optimization process. This is a nice graphic that our colleague Tommy Markstein made. I quite like it, actually. And you can see on the left-hand side the different kinds of algorithms, and then you You can see the different batch sizes, the dropout rates, the number of epochs, epsilon, which is a term for numerical stability, then the size of the hidden channels, the learning rate, the number of layers, the weight decay, and then all the way towards the right you see the loss. And then the winner of this process was a graph sage model, and I'll talk a bit more about the graph sage model now. So this is a simplified overview of the architecture. So on the left-hand side, you have your input data, and then you do a Sage convolution followed by ReLU, so rectified linear unit, and you do this a bunch of times. And then you get to a linear layer, you apply a sigmoid function, and you get your output. And so did the neural network perform better compared to the light GBM model? This is what we found. As a reminder, our target variable was the number of trains per hour per track section. And we used two different metrics for comparing our models, the mean squared error and the R squared value. And we divided the traffic by traffic type because we found that the different traffic types behave differently. They have different features. And so when you look at the local traffic type, you can see that the light GBM model actually performed better because it has a lower mean squared error and a higher R squared value. And then when we look at the long distance trains, we can see a similar pattern. The mean squared error is lower. The R squared value is higher. Then when we look at the freight trains, we don't really get a clear picture. And the mean squared error is lower for the graph sage model, and the R squared value is higher for the light GBM model. So there isn't really a clear answer to the question which model is actually better. And I'll leave you with this for now, and ask the question, how useful are our models in practice? So this goes into the direction of KPIs, so key performance indicators, and we could show that compared to human estimation, our models predict real-time capacity more accurately by up to 15%, which can stabilize the operations process and also reduce the delays, which is great, which is what we want. And we could also show that our tool can actually provide a good assisted automation, which reduces the manual labor of the construction operation planners, so they can actually focus more on the crucial parts of their work. And I'll hand back over to my colleague Sebastian.
+
+**Speaker 1** _[20:37]_
+
+Yeah at this point we have to talk about lessons we learned. Yes of course we paid attention to many things but I don't need to tell you every data project is different and you can learn very much from your data though you think you know it. In this case Maren told you we split the train counts by traffic types and in this case we we found a traffic type miscellaneous, which resulted out of a misunderstanding. So we were handling that for months before somebody told us, you know that this is just a data error. Oh, OK, thank you. So always question your data. What we also learned was that being pedantic on master data is not always good. In this case, it led to we were collecting too much data. And of course it ended in having wrong data. And the issue was that we were collecting all master data for example about train stations and their GPS coordinates that we can somewhere find. But we did not consider that there are also like train stations who are not operating anymore. So we had to remove a lot of the data again and we could have had it so much easier. What we learned was precision can also mean to reduce data. And one cool thing that we learned was that Polars, the Polars framework really rocks. Because we were training our models and doing our feature engineering and data pre-processing everything in the cloud. And in the cloud, of course, always your resources are limited. And we had some issues with memory problems. We were running out of memory with the industry standard frameworks and somebody said oh let's test Polars on that and we could cover these problems very quickly. This was pretty cool because Polars, we were really happy with it and it solved our performance issues. This was what we learned.
+
+**Speaker 2** _[22:53]_
+
+Yeah, and then I would like to talk a bit more about the challenges we face. So we learned that graph neural networks are not trivial because neural networks are notoriously hard when it comes to explainability. And so we saw that we had a varying performance between the light GBM and the neural network model. And it's difficult to tell why exactly. So because neural networks are hard to explain, it's also hard to optimize them, or it can be hard to optimize them. And then we had some problems with object persistence. We used JobLib because it's really good in terms of performance, but you have to pay attention to the environment because your inference and training environment need to be identical, otherwise you run into errors. And there are also some security risks with JobLib. When you load a JobLib object, this can execute arbitrary code. This was not so much of a concern in our case because we only used our own models that we developed and not any external models, but generally this is a risk. And an alternative would have been to use ONNX, but PyTorch Geometric does not support ONNX, so that was not an option for us. And if you would like to dive deeper into object persistence, there's a really good overview actually on the Scikit-learn website with different libraries and all the pros and cons. So if you just Google scikit-learn object persistence, you can find that. And now we come to the conclusion. So what have we learned in summary? So first of all, we could show that an important task which is done exclusively by human decision makers so far can be automated as assisted decision making. then we saw that modern frameworks for data processing are much faster and more performant compared to the general industry standard and we saw that graph neural networks show an interesting potential for our use case that can be explored further and finally we could show that AI based automation can actually help with mitigating the general labor shortage and this This is the end of our talk, so these are our references, and we would like to thank you for listening, and we look forward to your questions.
+
+**Speaker 3** _[25:27]_
+
+Thank you very much. We have 29 questions, so I'm going to go by rating. The first question I have to ask this, it says 21 likes, is will RB67 be on time? I understand you may not be able to answer this. Feel free to not answer this.
+
+**Speaker 2** _[25:43]_
+
+answer this. Could you repeat that?
+
+**Speaker 3** _[25:45]_
+
+Will RB67 be on time? That was the first question with 20 likes. I have to ask this. I'm sorry.
+
+**Speaker 1** _[25:52]_
+
+We cannot answer that particular question, but if you use dbNavigator, it can.
+
+**Speaker 3** _[26:00]_
+
+Okay, I apologize to the audience if I will go through all the how many cows are on the rails kinds of comments.
+
+**Speaker 2** _[26:07]_
+
+I can chip in a fun fact. So when it comes to local traffic, the punctuality is actually 96%. So you have a fairly high chance of your train being on time.
+
+**Speaker 3** _[26:18]_
+
+Great, thank you. Second reasonable question is, did you also consider using external data like weather data, for instance?
+
+**Speaker 1** _[26:28]_
+
+Of course, we were talking about which data to use, but in the end, weather data is not a solution because trains operate during sunshine, during rain, when there's fog, when there's snow, mostly when there's snow. But as far, it really needs a catastrophical weather to stop trains, usually.
+
+**Speaker 3** _[26:52]_
+
+Thank you. Next question is, LGBM also supports custom losses and Poisson losses as well as sample weights. So why go back to Scikit?
+
+**Speaker 2** _[27:02]_
+
+Does it now I need to check I didn't see it maybe this
+
+**Speaker 3** _[27:07]_
+
+Does it? I guess. Okay.
+
+**Speaker 2** _[27:13]_
+
+Need to check.
+
+**Speaker 3** _[27:14]_
+
+Okay, the next question is, does the DB have a simulation of the track system could be used to generate and validate synthetic data?
+
+**Speaker 1** _[27:23]_
+
+And generally simulation of train movements is part of the normal operations at DB. But in the end we didn't use this data to train our models. We had enough real-time data and there was no need to go to simulation data.
+
+**Speaker 3** _[27:41]_
+
+Okay, thank you. Next one is, what exactly do you predict considering two facts? You have train schedule in advance and maintenance schedules also. So the question is, what is the prediction?
+
+**Speaker 1** _[27:54]_
+
+Okay, the prediction in particular is difficult to understand. I'll try to explain it simple. There are more than one schedule. So, in fact, the real schedule for a track can be changed every day until two or three weeks before the traffic happens. And for this schedule, you need to reduce the number of trains for tracks that are affected by construction sites. The limitations are known far in advance, but the actual number of trains needs to be reduced because there are many train operating companies who have a claim to operate a train on this section. And this needs to be reduced by the construction operations planner. and this colleague has to estimate or to determine how many trains can drive there in this hour and this colleague also will reduce the capacity. And this decision he does was what we tried to forecast because the colleagues have to know all the local situations for each day in each situation and this is what we tried to automate by this neural network or by LightGVM.
+
+**Speaker 3** _[29:12]_
+
+Thank you. Then there's a question about cows. I'm going to skip this one. And then, how come there are nuns and holes in data that is coming from your own systems? This is the next question. Sorry? How come there are holes and nuns in the data that is coming from your own systems?
+
+**Speaker 1** _[29:30]_
+
+That's a good question. But as I said, we have many legacy systems and they deliver or they produce CSV exports data. And sometimes it has a certain meaning that there is no number, but it's not always so clear what this now means. So for forecasting, for prediction, for training, we remove data that's difficult to interpret. So we reduce to clear situations that we can train clear model that does not show an unforeseen behavior.
+
+**Speaker 3** _[30:09]_
+
+Thank you, I think we have time for one more question and the one on top is why Exactly, do we do predictions is not your problem and optimization problem rather than prediction
+
+**Speaker 2** _[30:22]_
+
+So why it's not an optimization problem?
+
+**Speaker 3** _[30:24]_
+
+Yes, exactly.
+
+**Speaker 2** _[30:24]_
+
+Yes, exactly. So, I mean, the problem is that it's really hard to tell where these delays will happen. So, like, where the overcapacities will build up. So, that depends always a bit, like, on the day, because you have the regular schedule. Then on top of that, you have freight trains coming in. And then on top of that, you have delays on the day, for example. Like, I don't know, a door doesn't close on the train. And so, it's tricky to predict where these delays happen. And so when you have overcapacities building up, then also that creates a ripple effect. And so we also try to cover these ripple effects. So this is why we went with the machine learning approach.
+
+**Speaker 3** _[31:06]_
+
+Okay, thank you very much with this. We are over time. Let's thank the speakers again
+
+**Speaker 1** _[31:11]_
+
+Thank you.
+---
+transcript_status: auto
+---
+transcript_language: en

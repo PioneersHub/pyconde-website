@@ -1,0 +1,206 @@
+title: Lessons learned from deploying Machine Learning in an old-fashioned heavy industry
+---
+description: About 5 years ago my co-founder and I launched alcemy, a Machine Learning startup to help decarbonize the cement and concrete supply chain. I experienced…
+---
+created: 2023-12-20
+---
+code: UGJJMP
+---
+slug: lessons-learned-from-deploying-machine-learning-in-an-old-fashioned-heavy-industry
+---
+speaker_names: Robert Meyer
+---
+speakers:
+
+
+
+### Robert Meyer
+
+Robert Meyer is a Data Scientist and Neuroscience researcher by training. He completed his PhD at TU Berlin and simulated parts of the cat brain.
+
+After working for the German unicorn Flixbus for two and half years building an automated bus ticket pricing pipeline, he joined the Entrepreneur First incubator. There he met his co-founder Leopold Spenner and together they started alcemy, a Machine Learning startup to accelerate the decarbonization of the cement and concrete supply chain
+---
+abstract:
+
+
+About 5 years ago my co-founder and I launched alcemy, a Machine Learning startup to help decarbonize the cement and concrete supply chain. I experienced first hand moving from a simple proof of concept, a ML model inside a Jupyter notebook, to a full-fledged pipeline running 24/7 and steering massive amounts of cement production in real plants. I can tell you the road was long and winding. I want to share some of the hard lessons we learned along the way with you. If you are an aspiring ML or Software Engineer, Data Scientist, Entrepreneur, or you are just wondering how Machine Learning applied in the wild looks like this talk is for you. No prior knowledge is required except some familiarity with basic concepts and terminology of Machine Learning.
+---
+full_description:
+
+
+Introduction
+------------------
+**Cement alone is responsible for about 8% of worldwide CO2 emissions**. Fortunately, we have quickly learned that low-carbon alternatives to "conventional" cement and concrete already exist. For instance, 60% of carbon emissions can be avoided if burnt limestone, the main ingredient for cement, is replaced partly by limestone powder (which isn't burnt, and therefore doesn't release carbon into the atmosphere). Yet, these low-carbon cement recipes have a substantial shortcoming: They react much more sensitive to changes, e.g. changes in weather conditions or in the chemical and mineralogical composition of ingredients. As a consequence, low-carbon cements and the resulting concrete (made by mixing cement with sand and water) can only be reliably produced under laboratory conditions. 
+
+We are changing this. We use data intelligence and predictive Machine Learning control to optimize production processes such that low-carbon cement and concrete can be manufactured in real plants and at scale. I will quickly introduce our solution that is already deployed in 5 cement plants. Moreover, we are currently prototyping to move into concrete production as well. Of course, we do this (mostly) in Python.
+
+Part 1: Machine Learning
+-------------------------------------
+Machine Learning in production is vastly different from solving a kaggle challenge. In fact, the particular choice of Machine Learning model is much less important than you think. I will cover the benefits of using rather simple models such as random forests or even linear regression in comparison to deep learning. If stuff goes wrong, and it will, interpretable and debuggable models are far superior to complex architectures. Also having proper model evaluation that reflects production requirements, and good baselines for comparison are always crucial first steps and pay off in the long run. It was surprising how much less time we spent on the core Machine Learning algorithms in comparison to infrastructure, such as deployments on AWS fargate or k8s, re-training processes, proper database layout, or home-brewed tooling to allow easier configurations of dozens of ML models.
+
+Part 2: Data
+------------------
+We quickly learned that data is way more important than models. Some might have heard the phrase *Garbage in garbage out* coined by programmers in the 50s. This is even more important when it comes to today's widespread usage of Machine Learning. We run ML not on our own data, but on data provided by our customers. While the level of data-maintenance and quality that our customers are used to allows for in-house bookkeeping and short analyses, it does not necessarily suffice for ML. I will discuss why and how we spend a good amount of time cleaning and really drilling into the data provided by our customers.
+
+Moreover, differences between training and real-time inference data can be a real challenge. For example, it is not guaranteed that the location where samples are drawn from cement mills, i.e. the live data used for inference, is as representative of the actual cement as silo samples that can be used for training. Fine particles might not be captured simply due to the physical properties of the sample site. To tackle problems like these as a Machine Learning engineer you have to become an expert in the domain your models are applied. You really need to understand the data in every detail and know how it is generated by your customers and understand the context and consequences of all of your customers' processes.
+
+Part 3: Customers and Business
+-----------------------------------------------
+Our customers are, of course, no Machine Learning experts. Why should they be? If they were, they wouldn't need us anyway. However, oftentimes we as Machine Learning engineers forget the ramifications of this. I will talk about customer relations and their interactions with our Machine Learning models. For example, we had to deal with a rather skeptical customer not believing our models' predictions. They pretty much went against all recommendations made by the model. Although it is nice if in the end the model predictions turn out to be right, your customer does not necessarily feel the same way. In contrast, the customer does not enjoy being wrong and may even feel mocked by a machine. Having a strong customer success team, who knows both how ML works and, of course, how the customer operates and thinks, is often more valuable than "rockstar" Machine Learning engineers.
+
+Lastly, a tough lesson to learn was that Machine Learning as a service should not be mistaken for a software as a service business model. Our marginal costs are not zero. Besides a great deal of consulting that is needed for every customer, on-boarding a new customer is time consuming and needs a lot of work. Integrating into existing infrastructure of cement plants (who are not top-notch IT companies) can be tough or plain-right frustrating at times. Therefore, scaling a Machine Learning startup can be hard, and we learned to better go hunting for elephants, i.e. few high paying customers, than for mice, many low paying ones.
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2024-04-24
+---
+start_time: 11:40
+---
+end_time: 12:10
+---
+slot_id:
+---
+track: Machine Learning & Deep Learning & Stats
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 3578
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Novice
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/UGJJMP.png
+---
+youtube_id: CZqlHH-KZqw
+---
+video_link: https://www.youtube.com/watch?v=CZqlHH-KZqw
+---
+video_published_at: 2024-06-23
+---
+video_duration_iso: PT31M27S
+---
+video_thumbnail: https://i.ytimg.com/vi/CZqlHH-KZqw/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:05]_
+
+Thanks for having me a second time. So this is my actual talk, so it's not the replacement talk. That's what I'm originally here for. Who has seen the first one? Ah, great. A lot of people came back. Amazing. For those who haven't, it's not a requirement. It was rather a bit of a different topic. It was giving more of the broader motivation about climate change and the climate crisis. But this talk will actually be more relevant to this conference, I'd say, because it will be actually about machine learning and how we utilise machine learning to help cement and concrete to better their big carbon footprint and mitigate their carbon emissions. So it's roughly split into three things. So the first one is the big problem that we're tackling in cement and concrete. Then, of course, I'll talk about our machine learning solution, but the major part will be about all the lessons that we learned by actually deploying this machine learning in this old-fashioned heavy industry. So the big problem is the following. So concrete is the most used building material across the planet. So in fact, the only thing that humankind consumes more of by volume is water. And it's just getting bigger, right? So it's expected that the world's building stock is going to double until 2060. That means every month from now until then, we will pretty much rebuild New York City, right? That's good on one hand, because that means we create infrastructure and housing for an ever-growing population on this planet, but it comes with a heavy price tag. And by price tag, I don't mean the costs to actually assemble the building, but the carbon footprint, right? So cement and concrete alone are responsible for 8% of worldwide emissions, and if they were a country, they would be the third largest emitter. So for the ones that saw my talk before, this is CO2, not CO2e. So it's actually 8% of CO2 emissions. And this is kind of problematic. But before we can go into what we can do about this, let's quickly understand how cement is made and how concrete is made. So it all starts in a quarry, in a limestone quarry to be precise. And that's pretty good because limestone is abundantly available on the earth crust, meaning it's available in these quantities that we need to build the world. Then this limestone is taken into a cement plant, and there it's refined into cement. The cement is shipped to a concrete batching plant. There you add some sand, water, and gravel, and you have this gray paste that you put into these concrete trucks, and then you drive it to your construction site, and you build bridges, houses, you name it, with it. And interestingly, if you look at this entire supply chain, right, then the vast majority of all the carbon emissions in this entire supply chain are just happening or are just originating from a single processing step inside the cement plant. So even inside the cement plant, it's one particular step, and that is the rotating kiln. So the rotating kiln takes the limestone and burns it to 1,450 degrees centigrade, and what you can get out of it at the other end is something called clinker. It's like super pure cement. But what happens inside the kiln is that the CO2 that was bound in the limestone like millions and billions of years ago gets released into the atmosphere. So these CO2 emissions are inherent to the production process, meaning renewable energy. So even if you could power that kiln with renewable energy, the vast majority of emissions would still be there because the CO2 is coming from the limestone, right? So if renewable energy isn't a solution here, what potentially is, and what we're proposing is something relatively straightforward. So we don't have a solution that goes to complete decarbonization, but we have a solution that pretty much can cut the carbon emissions by more than half. So this is how it goes. So this is regular concrete, right? It has a bit of water, admixture, sand aggregates. And then the most important ingredient, the cement, which gives us its nice properties that it can get strong and hard and you can build all the buildings with it. So then if we look, take a deeper look into cement, cement is basically just two things, right? It's this clinker that's coming out of the kiln, like the pure cement and so-called supplementary cementitious materials, which is just filler materials, right? And the clinker is the one that is basically almost exclusively responsible for the entire carbon footprint. So if this is the culprit, there's a rather straightforward solution to cut a lot of the carbon emissions, just use less of it. It's rather straightforward. So if this is regular concrete with regular cement, with loads of clinker and loads of CO2, with a neat little trick, just replacing most of the clinker with more filler materials, like limestone flour or calcined clay, using a little bit less water and a little bit more admixtures, you actually can cut the carbon emissions by 60% and get a building material that is kind of identical. And, I mean, we haven't invented this. This has been known in the literature for a while. So it's, like, for decades now. It's just we pretty much pick this up and help our partners to apply this on large scale. And we've done it, right? So we did loads and loads of tests in the laboratory. We used this kind of concrete, this low-carbon concrete with low-carbon cement, on actual construction sites. So the skyscraper, the new skyscraper, the Edge East Side Tower here in Berlin, the top two floors, for example, were poured with this kind of low-carbon concrete. So that's pretty cool. So this stuff exists. We can use it. We can actually save a lot of carbon emissions. That's pretty cool. You might be wondering, that's cool, but what does that have to do with machine learning? That's a fair question. And here is what that has to do with machine learning. So the general idea that we've proposed is we want to reduce the clinker in our concrete and our cement mixes. And as I said, it's kind of identical. But if we're actually honest to ourselves, what we get is we have less robust cement and less robust concrete because we replaced the clinker with just filler material. And clinker is basically the purest form of cement that gives it all its nice properties. And that's kind of difficult and challenging because it makes our mix designs a little bit more brittle. And what I mean by that is that any errors in my production process are getting amplified in these low-carbon recipes. So, for example, if we look at the core property of cement, over time, for different batches of production, this core property, its compressive strength, right, which makes our buildings stand out bright, actually is varying quite a lot from production batch to production batch. And the reason is, I mean, it's a material coming from nature, right? is made out of limestone. Every cubic meter of limestone might have a different mineralogy and chemistry. So the cement that I produce on a Tuesday might have slightly different properties than on a Wednesday. And so the Tuesday cement might not get that strong, but the Wednesday actually does because I have better limestone. And the problem is now if I have this kind of fluctuations already in my cement, and if I do then load carbon recipes with this, these fluctuations get even amplified in my final concrete recipe. So one of the major prerequisites to actually apply these low-carbon recipes in the wild is not to have this anymore, but rather have really consistent cement strength, right? So this should be a flat line rather than this wobbly line. But this is actually really, really hard to achieve in reality because, I mean, cement is a powder and concrete is sort of this gray paste, right? How do you measure the strength of this? And it turns out actually measuring strength of cement requires you to make some concrete and let it harden for 28 days, and then you crush it to actually measure this. So it really looks like this. So you create... Does that work? I hope the video lived. Yes, it does. So you actually have to form one of these cubes, let it harden for 28 days, put it in a press, and then crush it and destroy it, and then you know how much compressive strength it can actually withstand, right? So this whole thing takes a whole month to complete up until I can actually put it in there. And of course, this sort of delay of a full month makes it really hard to pinpoint the strength. So the idea is, instead of waiting for a full month to know how strong my cement's going to get, let's use machine learning to predict the strength so we can actually counteract any problems already during production and not a month later, right? So the basic idea is, if I have cement that is kind of varying in strength from production batch to production batch because its mineralogy and chemistry is varying, let's try to counterbalance this. And we can. So, for example, if we have limestone that gets you very strong cement, we can actually counterbalance this by grinding the final cement material, right? Cement is powder, so we grind it. So if we grind it a bit more coarser, it has less surface area to react with water, and coarser grinding gives you weaker cement. So basically, we can then counterbalance these fluctuations stemming from nature with fluctuations in something that we have control of, and that's the fineness of the material, to get something that is very flat in the end. That's the basic idea. And this is how it works. So this is the last step of cement production. It's a cement mill where you have your clinker and your supplementary cementitious materials here. They are put into the cement mill. They are ground very, very finely. then there's a sort of separator step or filter step where you just like very fine material is then finished cement and stuff that isn't fine enough yet has to take some detour through the cement mill and that's basically the very last step and then in the end here you have your finished cement and this finished cement is regularly sampled like one hour every hour or every four hours and put into machinery in a cement laboratory in machinery that such as x-ray diffractomy, extra fluorescence, and a particle size analyzer. And this really gives you the full picture of this material because that's the mineralogy, that's the chemistry, and it's the actual particle size distribution. The only thing that's still missing, of course, is the strength because that takes 28 days to complete. But nevertheless, you have to do these strength tests because of the norm. So basically what we can now use is a machine learning algorithm to actually correlate these measurements with the strength, train it, and make predictions, right? So they sample the cement, they run it through the laboratory, they export it into our cloud, so we run a prediction algorithm, and then we can say, hey, the cement that you're currently producing gets to 55 megapascals. Actually, they want something that is 50 megapascals, so now we can use that prediction to compute optimal set points and say, okay, 55, we're a bit too strong, please grind more coarsely, and then they adjust the fineness of the mill, or the expert system adjusts the fineness of the mill, and then this control loop basically keeps running 24-7 in a cement plant, and we can then adjust all our production on the go to actually counterbalance any strength variations due to mineralogy and chemistry. Right, and it's like classical machine learning. It's not a deep learning gas, it's classical machine learning. This is like tabular data for like a standard Kegel competition. So you have your target variable, which is your compressive strength, which takes 28 days for measuring, so you have quite some delay in your true label. You have some stuff about the particle size distribution, you have some stuff about the mineralogy, and you have some stuff about the... Sorry, this is the chemistry and this is the mineralogy, and you can then use this data to train a machine learning algorithm. And when you do this and then you apply this in this control loop, you can... This is, like, each and every black dot here is one of these actual strength measurements where they took one of these concrete cubes and crushed it and measured the strength and as you can see there's quite some variation from production batch to production batch and then once our algorithm is applied I mean it's machine learning it's not magic right we can actually reduce the variations not get them completely to zero but we can usually reduce them on the order of like 20 to 30% and that means roughly for average cement plant savings on the order of up to half a million for like different factors they can save on grinding energy they can actually reduce their clinker composition and save from CO2 certificates and so on and so forth. So that's basically what we do. So we've been doing this now for five years, and there were quite some learnings on the way, and I want to share them with you. And the first learning is probably the most depressing one for machine learning practitioners and data scientists, is do not spend too much time on too complex models. Because, I mean, we tried a lot of stuff, because it's fun to try, right? It's like models, it's the fun stuff about machine learning. So, of course, as I said, it's not a deep learning data set. It's like 5,000, 10,000 samples. Nevertheless, we tried deep learning. Why not? Because PyTorch is really fun to tinker with. We used support vector machines, Gaussian processes, XGBoost, you name it. Problem is, all of these gave pretty much none to marginal improvements at best, but usually they pose very black boxes. What we actually have deployed in real life is, I'm not kidding you, is linear regression plus a random forest. So basically, linear regression and then the error by the linear model is corrected by the random forest. And that's kind of nice because it's easy to debug. You could just look at the coefficients of your linear model to see if it picks up something meaningful, right? Because, I mean, we use our model in an actual control loop. So we actually require our model to learn causal relationships rather than just some spurious correlation. So if we can see, for example, that fineness fosters strength, right, because we steer with fineness, this should actually come out in our model. We know that we can actually deploy this and use this. If that wasn't the case, we would be kind of screwed. Or stuff that is, for example, known to process engineers in the cement industry, like titanium dioxide reduces strength, or clinker composition can actually increase the strength, and that kind of stuff. That's pretty neat. another thing that we learned is simple models are cool but then also realistic module evaluation is key right if you look at this data so these these black dots again correspond to actual strength measurements you can see that this data is quite varying over time right and you can see that this there's quite some temporal correlation right if i have a very high measure it's very likely that my following measure is also very high in strength right there's a huge temporal correlation so that means if we actually wanted to evaluate our model performance on this we couldn't do random cross-validation because that would be huge data leakage right so what we have to do instead is temporal cross-validation right so that means we take like an interval of data as a training data and then only following intervals as validation data so that we respect the order of time and for us just regular temporal cross-validation wouldn't be enough because remember measuring the true label, the strength, takes a month, like 28 days. So we even have to bake in this 28-day delay in order to actually get a realistic evaluation of the performance of our model in a production setting. If you wouldn't do this, the MAE would be 30% better if we would fool ourselves by random cross-validation. And I mean, there's nothing more embarrassing for a machine learning practitioner to figure out that the cool model that you had in your notebook performs poorly in a production setting because your metrics were wrong. Another sour lesson to learn is also machine learning is only the tip of the iceberg I think probably a lot of people have seen this paper so if this is your machine learning code this is actually all of the other stuff that you need it's a pretty cool paper from 2015 it's like machine learning is only this teeny tiny part most of the stuff is like your serving infrastructure your model registry, a lot of monitoring configuration stuff of your machine learning models, your data collection and data ingest, and all this kind of stuff. And Nico, I think he's somewhere here in the audience, did a great job to actually visualize that once for our code base. And you can see that the model part is actually a rather small part of our cement product. And even there, the vast majority of this model part is our very big preprocessing pipeline. Yeah, next unfortunate lesson that we have to learn, running machine learning on customer-provided data is especially hard, right? Because, I mean, the machinery and the data that we get is not our data, right? It's the data from the cement laboratories. So, and to be frank, I mean, cement plants are not the most tech-savvy ones, so you can't really expect them to have software engineers that, for example, can actually implement against an API to ship the data. So, yes, for some customers, for a while, we relied on Excel exports or CSV exports. That's what reality is. And then you have to be prepared for this kind of stuff. It's like changes in the date format. Yeah. But the most classical one is because, I mean, some of our customer base is, of course, initially was German, and now we've also gone internationally. But the classic that's happening is, especially in Germany, because in Germany the decimal separator is a comma, and in English it's a dot, and we have customers that keep changing this again and again and again. I don't know why, but probably it's kind of fun to do this. Change your language settings of your laptop for once in a while, and your entire system. One of the issues that we tackled in the first place was humans actually prettifying the data, right? So if you are a cement producer and you produce cement that is not strong enough, that kind of makes you look bad. So we had the case that some people then were a bit generous on the actual measurement and made it a little bit higher than it actually was or a little bit lower if you're at the norm boundaries of the cement. And that, of course, is a complete killer for any machine learning algorithm because you don't have a ground truth anymore. So you really have to convince your customers, stop doing this. because otherwise it's not going to work. But there are fair cases of actual concept and data drift. So these devices that I talked about, the X-ray diffractomy and the X-ray fluorescence and the particle size analyzer, they get occasionally recalibrated. I mean, cement is a very dirty material. It's powder. Everything clocks, and you have to clean it. You have to replace parts. Stuff breaks. So you have the occasional recalibration, and that, of course, can lead to huge data and concept drifts. It's like you have to end these jumps in these measurements where people recalibrate your stuff, and you have to be able to deal with this. And I think if I can give you one tip for starting a machine learning company, try really to be the governor of your own data and don't do what we do, swallowing data from your customers. Because in cement, we have the particles, like these devices, PSD, XRD, XRF, they belong to our customers, and they send us the data, and they also maintain their own devices and their own calibrations meaning unfortunately so far from the experiments that we run pooling the data wasn't very successful yet because I mean these devices might actually differ from plant to plant in their configurations so it's not given that the cement measured in plant A if you send this to plant B they will measure very different values unfortunately so good thing is we have a second product where we do also stuff in concrete, and there we equip trucks with our, like, not own sensors, but we buy the sensors, but all of the trucks get the same sensors, and there you can pool data. So if you start a machine learning company, and if you want to save you some headache, try to be the governor of your own data, right? Because running on customer data is really, really hard. Final lesson, machine learning as a service is unfortunately not really software as a service. I hope there are no VCs in the audience because VCs like to invest into software as a service because they have huge profit margins and growth, very easy to achieve. Turns out machine learning as a service doesn't completely work that way. One of the things that is very much different is there's not so much a minimum viable product. In software, it's kind of nice that you can start with something very simple and then you iteratively grow your product. You start with a skateboard because you just need to get people from A to B, and then eventually it's a scooter, a cycle, motorcycle, and then e-vehicle. And the problem is machine learning products don't work that way because before you actually have a product that can be used by your customer, you need all the bells and whistles, right? So you need already some sort of data export. You need model registers. You need retraining procedures, and you need a way to actually serve the data back into wherever your customer sits. So basically you never start with a skateboard, but usually with a bike or a motorcycle right away, which means there's loads and loads of engineering before you actually have something that you can really show and give to a customer. And then as I said, for example, with this prettifying example, there's loads and loads of consulting involved. You just can't throw a machine learning algorithm at your customer and expect that they know how to use it or make sense of it, so you will encounter people who are completely sceptical and question everything, or you will have customers that will take everything at face value, and machine learning is not magic, it's just a prediction. This is also, of course, wrong. So getting this at a right balance requires a lot of consulting, and that means one of the most important positions that we have aren't machine learning engineers, sorry, but are our customer success personnel. So these are the people who actually help our customers use our machine learning algorithms a lot to their advantage. And this is the most difficult to fill positions, but also the most important one, because you need to be able to speak your customer language, so in our case, cement and concrete, but also understand all these machine learning mumbo-jumbo, because they will hammer you with questions. So, that was pretty much it. Quick summarising, so concrete is responsible for 8% of worldwide CO2 emissions. I think if it's CO2e, it's 5% to 6%. Low-carbon concrete actually works. It's there, but it requires reliable cement strength. And machine learning can be used to actually achieve this. And the major lessons that we learned is avoid complex models. Use linear regression. Try to evaluate models as realistically as possible. Build algorithms that reflect reality. Most of the stuff is not machine learning, but all the infrastructure around this. customer data is really difficult and one of the major pain points and machine learning as a service is much more difficult to scale than software as a service. Thanks. And as I said before, we're hiring, sorry.
+
+**Speaker 2** _[23:51]_
+
+Thank you. We have a lot of questions, so I can tell that we're not going to get through all, but feel free. I guess you'll be around so people can find you and ask. Okay, so first question, the most popular question. What about sand? As it is also a very limited resource, only seafoam sand can be used, not desert sand. So sand content should also be reduced.
+
+**Speaker 1** _[24:16]_
+
+Yes, sand content should also be reduced, but different companies. There are companies, I think there's also a company that tries to make stuff with desert sand. So, yeah, should be, but it's not us.
+
+**Speaker 2** _[24:29]_
+
+Next question, how is Random Forest more simple than XGBoost?
+
+**Speaker 1** _[24:35]_
+
+Well, I mean, the simple part is that, I mean, you could probably very easily exchange it to you, but the very simple part is that we use the linear model as a first place and just use then a more complex model just to correct the error of the linear model so that the linear model learns, like, the general concept of how cement works. But, yeah, XGBoost probably would work there as well. But if you use linear regression and random forest, you can just use sklearn, so... Less dependencies. Thank you.
+
+**Speaker 2** _[25:06]_
+
+Do you get maintenance recalibration information from the customers to adjust and retrain the models? If not, how do you detect these events?
+
+**Speaker 1** _[25:13]_
+
+So we have regular meetings with our customers and of course they should tell us when they recalibrate and generally we retrain our models at least weekly sometimes even more so because it's not just I mean the recalibration stuff is easy because at least they can tell us if they don't forget but then other stuff in a plant might break so yeah so one of the major things to actually battle this is retraining and monitoring
+
+**Speaker 2** _[25:41]_
+
+Did you also try hybrid models instead of these black box models something like physics informed since there are relations from raw material to the final?
+
+**Speaker 1** _[25:51]_
+
+That would be pretty cool to try out, so we haven't, no.
+
+**Speaker 2** _[25:55]_
+
+How do you convince more old-fashioned stakeholders to at least try ML solutions for a production problem?
+
+**Speaker 1** _[26:02]_
+
+In general, or I mean in cement and concrete, it's actually not that difficult anymore because they fall under the carbon certificate trading in the EU, meaning they have to decarbonize. There's a monetary incentive that actually makes the convincing, especially on the upper management, not so difficult. But where we require, of course, more convincing is the field workers that actually then later use the product. There is different levels depending on where your customer... It also depends on what kind of customer you have. If you have like a little company or like a family owned plant, then pretty much the entire staff is totally on board and they want to advance this because they love this. If you're like a major corporate, then people are very less eager to move or do something because they are afraid that whenever they move, it might actually negatively affect them. So the complex answer is that always depends.
+
+**Speaker 2** _[26:57]_
+
+It looks like the temporal variation in quality could include seasonal weather or similar effects. Did you try these environmental features in your models?
+
+**Speaker 1** _[27:06]_
+
+your models and yes they are seasonal effects like weathering and temperature and we have surrogate variables that try to encode time features
+
+**Speaker 2** _[27:16]_
+
+Different kind of question. How much does low carbon cement cost in dollars, euros, compared to normal cement?
+
+**Speaker 1** _[27:26]_
+
+It's practically, so I can't name numbers right now because confidentiality, but usually you can like roughly say like a ton of cement is between 50 and 80 euros depending on where you are in the world. But in fact like these low carbon alternatives are for now, they're actually cheaper because limestone flour is much, much cheaper than clinker. If you replace clinker, that's the most expensive ingredient by production and also by the carbon certificates. So they are usually cheaper. But if you're, of course, having these lighthouse projects and you produce everything still in smaller quantities, they are still a little bit more expensive. But the idea is that they will grow large scale, and we already have now customers who roll out these cements as their regular product portfolio, and there they actually become cheaper. Sorry, yes, there's a green alternative that is actually cheaper.
+
+**Speaker 2** _[28:26]_
+
+I realize that we're officially out of time, but we session chairs were told that we're allowed to stay a few minutes if you're lucky to be just before our break. So I'll maybe read out the next few questions if you're okay with it, because we have a lot more still. Have you managed to correlate sudden changes in quality with any changes in process? For example, some kind of change point detection.
+
+**Speaker 1** _[28:50]_
+
+I mean, we know that if they change a lot in their recipes or if their clinker gets bad That there are some Yeah effects on the quality. Yes But I don't know if we did automatic change point detection of this but we probably should
+
+**Speaker 2** _[29:07]_
+
+Next question. Why not just have a big silo and mix together the different batches so they even out each other?
+
+**Speaker 1** _[29:12]_
+
+I mean, yes, this is basically how cement production works. Every step, because you have such a naturally varying product, your job as a cement process engineer is like homogenization at every step. It's like they have these big mixing bags where they try to homogenize the different raw limestone, and they try to homogenize the slag that they buy from steel manufacturers. So in every step of the way, you try to homogenize. They already do this, but still you have these huge variations in there.
+
+**Speaker 2** _[29:50]_
+
+How did you calibrate your offline evaluation? Did you learn it by expensively failing in real situations?
+
+**Speaker 1** _[29:58]_
+
+No, we did this right from the start, but we expensively failed already. I mean, we had, I think in the very beginning, we had a very expensive failure where we blindly imputed all of the values, and then they had some errors measuring their cement samples where they basically just measured the strength but forgot to fill in all the other values, and we happily imputed this, and then the model just learned averages, and then, yes, you can expensively fail. But the model evaluation, that was right there from the start.
+
+**Speaker 2** _[30:27]_
+
+And then maybe I'll finish with this one. How did you ensure causality in your interpretation? Have there been controlled experiments in addition to training on pure historical data?
+
+**Speaker 1** _[30:36]_
+
+data? No, there haven't been any controlled experiments. I mean, there have been controlled experiments in the sense that they constantly test the cement and they constantly actually have to measure the strength, have to measure the mineralogy and the chemistry so we can see whether the predictions actually pick something up that is actually meaningful to the users. So, for example, we display the feature importances and the direction of the features to our users so they can actually you get an idea of does that make sense.
+
+**Speaker 2** _[31:08]_
+
+Thank you, so I think the questions will stay in Slido until the end of the lunch break So if you'd like to ask Robert some of these many questions you can find him at lunch Thank you
+
+---
+transcript_status: auto
+---
+transcript_language: en

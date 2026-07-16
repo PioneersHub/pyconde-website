@@ -1,0 +1,201 @@
+title: Is your LLM any good at writing? Benchmarking on creative writing and editing tasks
+---
+description: Many LLM benchmarks focus on reasoning and coding tasks. These are exciting tasks! But the majority of LLM usage is still in writing and editing related…
+---
+created: 2025-01-05
+---
+code: P8GUWG
+---
+slug: is-your-llm-any-good-at-writing-benchmarking-on-creative-writing-and-editing-tasks
+---
+speaker_names: Azamat Omuraliev
+---
+speakers:
+
+
+
+### Azamat Omuraliev
+
+_About — in the speaker's own words_
+
+Incoming Solutions Architect at Databricks. 
+
+Before April 2025, AI engineer at Typetone, where I'm taming LLMs to automate end-to-end marketing. 
+
+We help unburden SMEs and solopreneurs from doing their content marketing, and this task is surprisingly hard for LLMs to solve yet!
+
+In past lives personalized marketing at ING as a data scientist and ran a non-profit in Kyrgyzstan.
+---
+abstract:
+
+
+Many LLM benchmarks focus on reasoning and coding tasks. These are exciting tasks! But the majority of LLM usage is still in writing and editing related tasks, and there's a surprising lack of benchmarks on these. 
+
+In this talk you'll learn what it took to create a writing benchmark, and which model performs best!
+---
+full_description:
+
+
+Large Language Models (LLMs) have demonstrated impressive capabilities in generating human-quality text, but how do we objectively measure their performance on complex writing and editing tasks? This talk explores the challenges of benchmarking LLMs for these tasks and presents a novel framework for evaluating their effectiveness. 
+
+The talk will provide practical guidance on how to evaluate and compare the performance of different LLMs. Basic familiarity with language models is required for this talk. 
+
+**Outline:**
+
+Introduction
+
+- Briefly introduce LLMs and their growing role in writing and editing.
+- Highlight the need for standardized benchmarks to compare and improve LLM performance. Majority of LLM usage is still on writing tasks*! 
+
+*Source: https://arxiv.org/pdf/2405.01470
+
+Challenges in benchmarking LLMs for writing and editing:
+
+- Defining objective metrics for subjective tasks like writing quality and editing accuracy.
+- Addressing the issue of bias in training data and its impact on evaluation.
+- Accounting for the diverse range of writing and editing tasks.
+
+A framework for evaluating LLM performance:
+
+- Proposing a set of key metrics that encompass fluency, coherence, accuracy, and style.
+- Introducing a methodology for constructing diverse and representative test datasets.
+
+Results:
+
+- Showcasing examples of how the proposed framework can be applied to evaluate different LLMs.
+- Presenting findings from recent benchmarking studies and discussing their implications.
+
+Future directions:
+
+- Exploring the potential of LLMs to assist with increasingly complex writing and editing tasks.
+- Identifying areas for future research and development in LLM benchmarking.
+---
+room:
+---
+day: Friday
+---
+slot_date: 2025-04-25
+---
+start_time: 13:20
+---
+end_time: 13:50
+---
+slot_id:
+---
+track: Natural Language Processing & Audio (incl. Generative AI NLP)
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: None
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/P8GUWG.png
+---
+youtube_id: pZ3bdLW0e-A
+---
+video_link: https://www.youtube.com/watch?v=pZ3bdLW0e-A
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/pZ3bdLW0e-A/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+so let's start with the interactive aspect what do you guys use chat GPT or plot or just shout or raise our hands yeah research okay writing okay yeah creative writing okay oh good crowd here yeah coding yeah that's a big one coding as well yeah okay so I think probably overall in the room there's a bit of so it's good to hear there's writing people use it for writing but I think there's a lot of bias towards using this for coding especially us as like software engineers data scientists machine learning engineers but it's not necessarily the thing that most people use chat GPT and quad for and there's actually some interesting stats about this 62% this number is back from early 2024 so maybe it reduced a bit but 62% of all chat GPT requests were related to writing and editing tasks and here you can have see some examples of real conversations so here someone asked to write 700 word book presentation here we write something using the English skills of ninth grade students and here to write an essay so a lot of students probably abused this as well but this kind of shows that there's this big bias in usage towards writing but when you look at how kind of the field is developing there seems to be that there's not as much focus on this application right so models seem to become better it's everything there's new stuff coming out open AI announcing 01, 03, 04 mini, cloud coming out with new Sonnet models, but when they report kind of the improvements, there is a bigger focus on these agentic capabilities and coding and actually on writing tasks, the newest 01 model, so it's not the newest anymore, but the 01 model improved on all tasks except for personal writing, so it kind of shows that kind of The industry itself is also, despite the fact that so much of the usage on the kind of personal side comes from, on this retail product comes around writing, there's a bit of this bias towards these more reasoning-based kind of data analysis, math, and computer programming applications. And you see it not only in kind of what the models report on how they're improving, but also on what do we as an industry kind of benchmark all of these LLMs. right so this is these are some screenshots from kind of the major public benchmarks that are out there this is LLM sys arena that maybe some of you have heard about this is seal by scale AI where they aggregate a bunch of tasks and most of them are also not writing related there's a rag application benchmark there's towel bench for agentic stuff software engineering bench. So a lot of these benchmarks are kind of testing different capabilities of these models. But again, it doesn't reflect the fact that the majority of the usage is writing related. And this was a problem for us at Typetown. So I was part of a early stage startup where we were automating end-to-end content marketing. So we had an LLM that created kind of content that we could push for our customers to their LinkedIn feeds or to their Facebook feeds, and these were our digital workers. So Sarah was the one responsible for marketing content. And the problem was that we were trying to test different LLMs, but there was no public benchmark available that we could just use. So we figured out that beyond just vibe checking, if we want to do this right, we have to approach it a bit more structurally. so that nudged us to look into a bit of benchmarking this also a small nudge to tell a bit more about myself so these are the AI workers that we had not an AI worker at least for now I'm an AI engineer and I've been at this early stage startup for a year but since next week I'm moving to Databricks so this is kind of my last contribution to type tone but I'm still in the data and AI space so what are the problems that LLMs experience when it comes to writing I think one that probably stands out to a lot of you especially if you spent anywhere more than two minutes on LinkedIn is that AI content is very easy to recognize because of all these words that they use right the first one I think that made it to everyone was Delph because the first iterations of chat GPT really abused that word I think more recently there's a lot of harness, a lot of game changer, tapestry off, or in the fast-changing world, all these kind of things right there kind of give away when a content has been written by an LLM. And there's a bunch of research that kind of tries to identify these words more programmatically and more systematically, but in general kind of there's just this very distinct style and it's relatively easy to see when something has been created by an LLM. So this is one of the kind of first problems. Another problem is that these models aren't necessarily very good at following style instructions or writing instructions. So this is for instance a prompt that you can give to any LLM for an API or when you host it yourself. You ask it not to greet the reader and you ask it not to start a post before it's like wow and boom and then what happens gets creative finds a synonym looks very similar but this is a real example and this is stuff that we kind of saw when we were testing the different elements and we're like okay so how much does this happen right but the problem gets actually worse because beyond just kind of coming up with creative synonyms when you're asking it A certain instruction. In other cases, it's kind of More blatantly violated. So if you give it a list of Words not to use and explicitly ask not to use any of these in The output, every once in a while, it actually still ends up Using the word. So this is also a real example. You give a prompt, the lm creates something, and then, Like, it uses the words that you explicitly ask it to ignore. So it seems like these models are not very good at following certain style instructions, especially negative style instructions, but the examples go beyond this. So it's not just about using or not using certain words, but we kind of in our usage saw that they struggle with our instructions as well. And from our perspective, these two kind of things mean that, A, the LLMs have a very recognizable style when they're writing something. But because they don't follow the style instructions, you can't really push them out of this valley, out of this uncanny valley of sounding like LLMs. So because of that, they keep on using the words like tapestry or harness and delf. And readers know that the content has been AI generated. So obviously, that was a problem for us as a startup. But like with any good kind of ML problem, before you can solve the problem, you need to quantify it. So that's when we knew, OK, let's really invest our kind of time and effort and create this benchmark. So we picked a bunch of tasks that we thought are relevant for creating good content. Some of these are something that i already showed to you, like blacklisted words. So that's when you give this kind of list of words not to use and ask the llm to avoid them. Another would be writing concise sentences. So asking each sentence to be no longer than 15 words or something like that. and a bunch of others. The nice thing or the philosophy of which we approached these tasks was we wanted each of these to be quantifiable by a Python simple Python function like a regex function because LLMs like using LLMs to judge the output of LLMs also doesn't really work very well there's a bunch of research around that so that's how we picked all of these different mini tasks So the way it goes in the benchmark is you first sample Some of these instructions because you want to have kind Of like a diversity and variety of these tasks. You create this prompt. You pass this prompt with a Topic or, yeah, you pass this prompt with a topic to an llm. All right. And then you evaluate the task Adherence with a simple python function. The nice thing is that this just gives you this binary Outcome, right, has the model succeeded or not succeeded in Following your instruction on each of those prompts. And by running this kind of task over and over, you get a Nice distribution and you get a benchmark where you can compare where you can compare how the different models perform on all of these tasks so some of these tasks turned out to be easy for all models we benchmarked models from a bunch of the kind of major API provide LLM providers and so we had the open AI models like o3 mini GPT 4o we had the quad models like haiku and saunas we had Gemini we had deep seek QN also some of the llama models in total think we have 18 models here and on two tasks so date and greeting all of them performed with a hundred percent success rate so this was about formatting dates in a certain format and this was to start a post with a greeting like hi or hey so these tasks were easy for any model of any size from any provider then And some tasks were easy only for some models. So for instance, the conciseness task, which was about keeping every sentence in the text at a smaller than a certain length, so let's say no sentence with more than 15 words. The only models that were really good at it were the kind of reasoning models. And that makes sense because they could kind of plan ahead about how they should structure the sentence and because of this o3 mini for instance got a 99 success rate on this task whereas bpt 4.0 mini which doesn't really have this like reasoning capabilities it struggled on this one another interesting task where for some reason it turned out to be challenging maybe it has to do with the tokenization or something about the kind of just the pre-training data set but Using emojis in a text, again, not like a very sophisticated instruction, but it was easy for most models. But for some of them, for instance, Mistral, in half the posts, it just ignored this instruction altogether. So you ask it to use emojis, it doesn't use emojis. But then some tasks were hard for all models. So there's a blacklisted word instruction where you ask the model not to use certain words like game changer and harness. not a single model scored more than 85, 86% on this specific task and maybe if you use it in kind of like day-to-day this is somewhat acceptable because you can edit it yourself but in a kind of production application where you really want that accuracy to be higher we realized that none of these models is suitable so we have to do something about it on our side and this was a very Kind of nice signal to really get. Because when you do things just Like vibe checking, right, you can't really easily, like, Notice that this is something that's happening. So if we just, like, manually tested clot versus gpt4o, it Might have been that, you know, we tested on ten different Samples and ten of the times clot would be the best at Following this instruction but then we would ship it to Production and that wouldn't really hold. So doing this benchmark was really one of the kind of force multipliers for us because it gave us a good baseline of where we're standing, and it also allowed us to kind of define the vector in which we should move to improve our product. This is what the total distribution looked like. So all of the different tasks against all of the different models. And in total, on the style instructions, the model that performed the best was O3 Mini. The other interesting thing here is that when you try to visualize this, I don't have a nice visual for this here, but when you try to plot the models, their success rate against their size, usually on most of the tasks like software engineering or general knowledge, the bigger the model, the better the performance. In this case, that doesn't really hold, and I found an interesting paper that kind of stipulates about why this might be happening. And it has to do with these negative instructions, right? So, for instance, this blacklisted word instruction when you're asking an LLM not to do something, those kind of tasks are actually harder for bigger models. And the smaller models, it's not very intuitive, but the smaller models, which are in general less good at task adherence, they are better at following negative instructions. And this is something that, like, a bit of it, but you could see it here as well. So this concludes the first part on writing instructions. But there was another problem that I think also for you might be familiar. And that is that the LLMs, even if you ask them to write different kinds of content about different topics, they will use the same words or they will use the same sentence structures to write about it, right? So in the world of changing data, in the world of increasing pressure, in the world of rapidly advancing technologies, these are all different posts. But let's say ChatGPT would start, you know, 60% of all the posts with this structure. that's a problem if that's happening because again in a product like ours we want to kind of mimic how a person would be writing LinkedIn post for a company and that's not what you would do right you would want to diversify it a little bit so this was the first problem and here it's kind of obvious that there's some repetition because it uses the same words so that's an indication of a low vocabulary diversity but there's also like a different version of this problem and you can see it in these examples so these are three different kind of sentences from three different posts and they look they use different words but they are still somewhat similar right so creating a strong online presence finding the perfect pair of shoes or saving money these are all what are called your own noun phrases and this is kind of a concept from linguistics when You can try to kind of process a sentence as a dependency parse tree. And it gives you this, not on the token level, but kind of more on the phrase level in the sentence. It gives you like this nice tree that shows kind of how the sentence is structured. And the other thing that we realized is that the LLMs are not very good at this as well, At kind of creating diverse Syntactic parse trees either So this was an indication Of the other side of the problem And that is that the LLMs in general Produce or have low syntactic diversity So again, right, you have two different Tasks here And if we visualize it This is the distribution of the models And you can see that there's no kind of Clear winner, looks a bit like a Pareto distribution, but in general Of the models that were best at this task were dpt 4.0 and Cloud 3.5 Sonnet. And some of the models were Much worse, either on the syntax or on the vocabulary diversity. So this was another interesting kind of result because, yeah, We wanted our content for our companies to be diverse enough that they, you know, keep on using it month after month after month. And this allowed us to kind of pick them, just vanilla model that kind of tries to satisfy the best of both worlds. But again, it also gave us this playground from which we could improve kind of how these models perform in terms of diversity too. So kind of bringing it all together, we had four big families of tasks on which we benchmarked the models. One was writing instruction adherence, so that's the first part about all of these instructions. Avoiding LLM-typical words and phrases. Stylistic and vocabulary diversity. And the last one, which I didn't cover in this presentation, is the self-evaluation capability. So can an LLM, for instance, spot if it hasn't adhered to an instruction about, let's say, not using the word harness? And if we bring all these four together, the overall best one was O3 Mini. But we went with QuadSonic 3.5 because at the time kind of diversity was a bit more of a priority for us. So and it was one of the best models performing on that one. But in general, kind of we have this ranking of all of these 18 models. And I'll have a QR code a bit later, but you can check it out for yourself. And yeah, it shows a pretty nice distribution. before we conclude i guess there's the question of why does this happen and one interesting kind of piece of information that i found in my research is that it might have to do with this step about reinforcement learning with human feedback so if in general you're familiar with how these models are trained that you have this large internet size corpus of data and you pre-train on that and then you start doing this fine-tuning and part of it is on specific data sets so let's say coding or something like that and the other is on human feedback where human raters they see two different kind of outputs from a model and they have to pick the one they prefer researchers from I think Meta showed that once you apply our LHF the diversity of the Content really collapses because you push all of the content kind of in a certain direction and Maybe it has to do with the human feedback also not being like varied enough but this was one Cool print that we found out and indeed if you try to use the non-rlhs models they're generally Not available for apis but you can get them through hugging phase this situation becomes a Bit better but then these models are also not as good as instruction following so there's no silver bullet but this was one interesting finding and the other I think kind of ties back to what I started with and that is that a big focus of improving these LLMs is on coding tasks, on reasoning tasks, on agenting tasks and not as much on writing related tasks. So this is for instance the data mix summary from the LAMA free paper and it shows that especially if you plot it over time more and more focus is dedicated to math and code and less and less focus is dedicated to these writing kind of related tasks so if you want to see the results for yourself this is the QR codes to the benchmark and it has this table with all the different tasks and the different models and there's also a technical blog post with a bit more of the details 15 tasks most models Kind of major api providers and no metrics using lm as a judge Hopefully maybe for some of you this will be interesting also in The work that you do. If it is, then please reach Out. I'm curious to see what people Use this for. And otherwise, that's it. Thank you.
+
+**Speaker 2** _[22:01]_
+
+Thank you for the talk and now it's time for the Q&A session. So the first question is how did you quantify syntactic diversity?
+
+**Speaker 1** _[22:12]_
+
+Good question and I have to put a disclaimer that I'm not a linguist and we do not have any linguists in our team So we're kind of winging it a bit For Vocabulary we found a paper where they used Diversity of tokens used they had this metric expectation adjusted token diversity and we modified this to look at the diversity of the first phrase in the syntactic parse tree so if you think back to those sentences right this gerunds noun phrase we can have found what is the first phrase in each of the sentences gives you a distribution and then you calculate this metric which is a bit similar to calculating entropy of a distribution and then we just rank on that
+
+**Speaker 2** _[22:59]_
+
+All right. The next question is, can you comment on the moral perspective on trying to hide, obscure that contact comes from an LLM?
+
+**Speaker 1** _[23:10]_
+
+So could you repeat that?
+
+**Speaker 2** _[23:11]_
+
+Can you comment on the moral perspective on trying to hide that content, I'm just reading, comes from an LLM? I will show you that.
+
+**Speaker 1** _[23:12]_
+
+Can you? oh yeah I guess I think if we were definitely a bigger company there would be a bit more kind of yeah a bit more work or focus around that I think as a startup right you're trying to do what your customers are asking you to we first started off just as a kind of assistant tool where you put in a text And then we give you an improved version of it. And then you can decide for yourself whether you want to kind of publish it with indicating that it's AI or not. In this case, we don't. But at least from the perspective of our customers, that's kind of what they're asking us to do as well. So I guess there's different ways of looking at it morally. But as a startup, we're focusing on what the customers wanted. And that's what they asked.
+
+**Speaker 2** _[24:18]_
+
+Yep. So the next question is, it's more likely AI generated, but it was up-weighted. So, wow, do you think a deeper delve into ways of harnessing the rich tapestry of good style will elevate AI writing to become a true game changer?
+
+**Speaker 1** _[24:38]_
+
+it's a very nicely phrased question um but to answer to to the question itself uh of course this is not the only problem that llms have in terms of writing so this just kind of focuses on the operational side of it is it following the instructions does it sound like ai the bigger problem that both we encountered but i think in general many labs and many startups are facing is that these models are not very creative or maybe even kind of put it differently they don't really have this taste they're not very good at like coming up with some or knowing when something is potentially interesting or potentially novel um so we had this because uh kind of that's the feedback that we get from our customers but um i've been also reading some papers where for instance with these reasoning models like all free that's also a problem because in the reasoning they can kind of generate the correct solution to a problem but then skip over it because they keep on kind of searching so that's I think currently one of the big problems that in general the LLMs are facing that they're not very creative they don't really have this kind of matter of taste but yeah that's a much more difficult problem both to tackle but also to quantify but it'd be great if yeah there's a benchmark on this if anyone knows that I'm happy to hear about it
+
+**Speaker 2** _[26:05]_
+
+So how the data you used for evaluating LLMs was generated?
+
+**Speaker 1** _[26:10]_
+
+Yeah, good question. It's just the data from our customers. So we had a bunch of businesses that were using our platform. And then the way the platform is structured, you get onboarded, we scrape a bunch of information about your company, and we propose you topics to write about. and then they approved the topics and the topics that got approved we kind of picked for the benchmark. So these are kind of real world kind of valid examples that made it into the benchmark.
+
+**Speaker 2** _[26:43]_
+
+Would it be possible for you to fine-tune a model to improve on your target style metrics?
+
+**Speaker 1** _[26:50]_
+
+Good question. So our founders decided that this is something that should be kept as a kind of proprietary technology. It's not super, super advanced, but we do have an approach that kind of beats all of those metrics. So also the blacklisted words and it is not fine tuning. So fine tuning did not make it for us.
+
+**Speaker 2** _[27:17]_
+
+What about using different models for each post to get some diverse outputs?
+
+**Speaker 1** _[27:22]_
+
+That's a good one. And in practice, it's probably one of the better ways to move forward, but it comes with a bunch of this kind of additional overhead because we're a small team. We don't host any of the APIs ourselves. And in general, we also kind of prioritize rate limits and availability. And on those two, it's hard to beat the open AI and cloud. So we keep on using those.
+
+**Speaker 2** _[27:51]_
+
+And we will take one more question before wrapping up. Do you think LLM as judge is particularly bad at evaluating writing tasks, or do you not approve of LLM as judge in all cases?
+
+**Speaker 1** _[28:05]_
+
+so I can't so on our tasks it was bad so on writing tasks yeah the thing is you can also for a lot of these things kind of replicate it with regex or something like that so it just didn't really make sense we didn't try it ourselves on our applications but I did hear that for instance for rag again for kind of like evaluating if the response contains the information that was in the context anecdotally I heard that it's also bad at stuff like this so in those cases of course it's harder to do a regex check because if you ask it to write about PI data and then it never uses the word conference but your regex checker is on the word conference you have to kind of work a bit around that but in general I would say just start first with what you can where you control it like regex and only then explore LLM as a judge because then you have something to benchmark it against as well right kind of benchmarking the evaluators you can try to see on how many of the cases does the LLM as a judge does at least as good as a simple regex check
+
+**Speaker 2** _[29:11]_
+
+Thank you so much, and please, let's give a warm applause to this speaker.
+---
+transcript_status: auto
+---
+transcript_language: en

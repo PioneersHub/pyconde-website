@@ -1,0 +1,156 @@
+title: Optimize your network inference time with OpenVINO
+---
+description: During the talk, I'll present the OpenVINO™ Toolkit. You'll learn how to automatically convert the model using Model Optimizer and how to run the…
+---
+created: 2022-03-02
+---
+code: PKERX8
+---
+slug: optimize-your-network-inference-time-with-openvino
+---
+speaker_names: Adrian Boguszewski
+---
+speakers:
+
+
+
+### Adrian Boguszewski
+
+AI Software Evangelist at Intel. Adrian graduated from the Gdansk University of Technology in the field of Computer Science 5 years ago. After that, he started his career in computer vision and deep learning. For the last two years, as a team leader of data scientists and Android developers, Adrian was responsible for an application to take a professional photo (for an ID card or passport) without leaving home. He is a co-author of the LandCover.ai dataset and he was teaching people how to do deep learning. His current role is to educate people about OpenVINO Toolkit. In his free time, he’s a traveler. You can also talk with him about finance, especially savings and investments.
+---
+abstract:
+
+
+During the talk, I'll present the OpenVINO™ Toolkit. You'll learn how to automatically convert the model using Model Optimizer and how to run the inference with OpenVINO Runtime to infer your model with low latency on the CPU and iGPU you already have. The magic with only a few lines of code.
+---
+full_description:
+
+
+You’ve already trained your great neural network. It reaches 99.9% of accuracy and saves the world. You would like to deploy it. However, you don’t have a server with expensive discrete GPUs. Moreover, you don’t want to build an API. After all, you are a Data Scientist, not a Web Developer… So, is it possible to automatically optimize and run the network on both CPU and iGPU you have already? Let’s check! During the talk, I'll present the OpenVINO™ Toolkit. You'll learn how to automatically convert the model using Model Optimizer and how to run the inference with OpenVINO Runtime. The magic with only a few lines of code. After all, you'll get a step-by-step jupyter notebook, so you can try it at home.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: Deep Learning
+---
+tags:
+---
+submission_type: sponsored
+---
+submission_type_label: Sponsored Talk
+---
+submission_type_id: 1806
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: some
+---
+domain_expertise: some
+---
+supporting_material_url: https://github.com/openvinotoolkit/openvino_notebooks
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/PKERX8.png
+---
+youtube_id: z2kjm3xbhbA
+---
+video_link: https://www.youtube.com/watch?v=z2kjm3xbhbA
+---
+video_published_at: 2022-05-06
+---
+video_duration_iso: PT22M39S
+---
+video_thumbnail: https://i.ytimg.com/vi/z2kjm3xbhbA/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Hi everyone, my name is Adrian and today I would like to tell you how to optimize your network inference time with OpenVINO Toolkit. I was deep learning and computer vision engineer for last five years and now as an AI software evangelist I am part of a bigger team spread out across the world. So together with Raymond, Paula and Juwo we are talking about OpenVINO, we are teaching people how to use OpenVINO. So firstly, a few words about the challenge. Why do you need OpenVINO? Let's assume this is you, a superhero. You already trained your great neural network and you are sure it can save the world. But to do it, you need to deploy it. And what is your choice? Of course, GPU. But wait, you need only 15 frames per second and you don't want to spend a lot of money, so I think GPU is rather overkiller. So maybe cloud, but in this case you need to build an API, you need to rely on internet connection and still wait some time for the results. So there is question, what if you would like to deploy on a Raspberry like device is there something cheaper and available on the edge so maybe just cpu you probably probably have already but running on cpu is slow almost every deep learning engineer yeah it was but is this still a true let's check so if you would like to deploy your network on the edge on your your computer, on your laptop, and you don't want to buy additional GPU card and build an API, I have the solution for you. OpenVINO. OpenVINO, which is open source toolkit for optimizing and deploying AI inference. And OpenVINO means open visual inference and neural network optimization. But it's not only for computer vision. It's also for NLP, audio processing, time forecasting, and so on. So let's start our OpenVINO developer journey. How to use OpenVINO? Let's assume you trained your model in one of these frameworks. TensorFlow, Keras, PyTorch, ONNX, Cafe, MXNet, or PaddlePaddle. I must admit here that we don't support PyTorch directly for now. We are working on this. But you can easily port your PyTorch model to ONNX. So then you convert your model to OpenVINO and you are able to run on Intel's hardware like CPU, Core, Atom, Xeon, GPU and when I say GPU I don't mean any discrete GPU card. I mean this GPU already integrated into your CPU like Intel HD graphics, Intel UHD graphics, Iris, Iris Max. Or you can run on VPU which means, for example, Movidius, it's like Neural Compute Stick 2. It's a USB accelerator you can plug into your USB port, and you have external acceleration, so you don't need to use the resources of your CPU or GPU. You can use just this device. And to use OpenVINO, you need just three simple steps. Oh, sorry, I forgot to mention. It works on any operating system, Windows, Linux, Macs. Okay, let's go to the three simple steps. The first step is, of course, install OpenVINO. If you would like to get OpenVINO, scan this QR code, and there is a selector tool you can configure your environment, and you will download, for example, installer. But there are many other ways to install OpenVINO. You can use package managers like APT from Ubuntu, YAM from Fedora, Red Hat, CentOS. You can install OpenVINO using PIP. It's the easiest way to install OpenVINO. PIP install OpenVINO, PIP install OpenVINODEV for development package, or you can use Docker or Anaconda. So the first step, install OpenVINO. The next step is use Model Optimizer. And Model Optimizer converts your model from your framework into intermediate representation, which consists of two files, xml with architecture and binary file with weights and biases but model optimizer not only converts your model it also performs some number of optimizations so there is graph pruning there is fusing some operations like batch norm into convolutions and so on so if you would like to use model optimizer use mo command line tool from open vino development package and give some parameters like path to your model or desired data type what data type can you put here floating point 32 floating point 16. as i mentioned the product of optimization step is intermediate representation so from this to this much more simpler much more faster to run the inference but if you need even more performance better performance you can also use post-training optimization tool to quantize your network so just give your intermediate representation model plus a representative data set use post-training optimization tool and you will get int aid version of your quantized model so first step install open vino second step use model optimizer And now it's time for the last step. Use OpenVINO runtime. Import OpenVINO. Load your image or any data. It could be text, it could be audio, it could be any data. Initialize OpenVINO. Read model from these files. Compile model for the specific device, in this case CPU, get the handle to the output layer and run the inference giving your input and getting the output from the output layer. So in the case of image classification from this to this in just seven lines of code. But there is question what device can you put here? Well we support many different Intel's hardware like CPU, Core, Atom, Xeon, GPU and once again it's not any additional discrete GPU card, it's a GPU already integrated into your CPU. Myriad. Myriad means run on neural compute stick too. But you can also put here Hetero if you would like to split your graph into some parts and run some operations on GPU for example and some operation on CPU. Why that? Because some operation could be faster on the GPU and some of them could be faster on CPU. What else can you put here? Multi. Multi means copy my model across devices to increase my throughput. So if you have many frames per second you can schedule some of them them on GPU and some of them on CPU and process them in parallel. So we have higher throughput. And I think the best device is auto. Auto means you don't want to select your device manually. You don't want to configure this device. You just put auto and auto automatically select the best device for you based on your hints. And Auto also handles the exec logic on multiple devices. So, for example, Auto will select CPU for you or GPU base if you care about latency or if you care about throughput. But Auto has also a nice feature. Let's assume that the best device in your case is GPU. But startup time for GPU is much longer than for CPU because you need to compile OpenCL kernels and so on so what auto does auto firstly compile network for cpu then run inference on cpu meanwhile compiling and loading network on gpu and when gpu is ready it switches the inference from cpu to gpu and release resources on cpu so your inference starts immediately and after some time when GPU is ready it's switched to GPU to have the best performance. We have and share more than 270 pre-trained and optimized models like object detection, POST estimation. Action recognition. Monodef estimation. OCR. So you can use, for example, Chinese language. And many, many more. So if you just start your journey with deep learning and you don't have your own trained model, you can use one of ours, all of them are available on our GitHub repository. Just scan QR code to get all of them. And there was a question, its running on CPU is still slow like it was before. So to answer this question, we prepared some performance benchmarks. We selected three different networks, ResNet-50 for image classification, YOLOv3-tiny for object detection, and DeepLabv3 for image segmentation. And we performed these benchmarks on a standard computer. It wasn't overclocked, it wasn't water-cooled, it's just a standard computer like yours with batch size equals one. And we measured throughput in frames per second for floating point 32 model. Of course, the best results are for Intel Core i7 11th generation CPU and iGPU altogether. Slightly worse results for iGPU and CPU of the same CPU, But what's the most important here? That you don't have to modern Intel CPU, even if you have Intel Core 8th generation from 2017, which is five years old, you still have very good results. In case of image classification and object detection, you are better than real-time performance. And when I say real-time, I mean 30 frames per second. Even in case of cheapest intel core i3 and the most difficult case of image segmentation you still have more than 15 frames per second what i think is enough in most cases to learn more about different models about different devices please scan qr code and if you would like to benchmark your own model you already converted to OpenVINO, you can use benchmark app command line utility from OpenVINO development package. And now it's time to run the live demo. This is one of our notebooks. We have a repository here at GitHub so you can go there OpenVINO, OpenVINO notebooks and you can try OpenVINO yourself at your local computer so I'm going to run this notebook okay and explain you some code so firstly we need to import some packages especially open vino here then we need to download our model and as we downloading this model from open model Zoo, we can use OMZ Downloader command line tool. OMZ Downloader is able to download any model from OpenModelZoo, any of these 270 models. But we would like to download SSD Lite MobileNet v2 because we are going to do object detection. Then, this downloaded model is in TensorFlow format as i mentioned before we need to convert it to open vino intermediate representation so that's the reason we are using omz converter omz converter is another command line tool to convert your model from open model zoo to intermediate representation but if you would like to convert your model you need to use model optimizer directly omz converter is only for open model zoo models and i specify precision here so i would like to have floating point 16 and then we need to initialize open vino read model from intermediate representation compile model we are compiling for cpu get input and output nodes get input size here and then we specify the classes we would like to detect, colors for these classes. We have post-processing function to create boxes around detected objects with no maximum suppression to get rid of many overlapping entities and draw boxes on the image. There is of course main processing function, so we are creating video player on some source, it could be webcam stream, it could be video file, so we are getting frame by frame. Then we are resizing this frame to fit neural network input size. We are creating batch size equals one and then doing the inference with time measurement. Post-processing results to get boxes, draw boxes on the image. Calculating mean processing time, put the inference time on the image and then show everything directly here in the notebook. And it works. As you can see, the label detected is person. I think it's correct. I can, of course, show something else, for example, cell phone. But what's important here? I think the time is most important and I cannot see time now. It's 18 milliseconds, which gives 55 frames per second. And I'm just using my CPU, so I'm not using any additional GPU cards. And object detection is better than real-time. But let's see what performance will we get if we change just one line of code and compile our network for GPU this time. so I'm changing CPU to GPU as you can see startup time is longer than before because we need to compile OpenCL kernels but after that I think the performance will be better so we had 55 frames per second let's see how many frames per second we will have now. It's 65. 65 frames per second just changing one line of code. I didn't buy any card, any discrete GPU card. I just changed one line of code and I'm using this GPU I have in my CPU. And if you would like to try it, of course, no problem. If you don't If you don't have webcam, you can also run on, for example, video file. Just put URL here and you can see the results below. OK, let's go back to presentation. So demo I presented to you is available in our OpenVINO Notebooks repository. To get all these notebooks, just scan QR code. And you need to Do these four steps, create the environment, clone the repository, install requirements, and launch the notebooks. So after that, you can do the same. There are more than 30 different notebooks teaching you about different aspects of OpenVINO, so I recommend you to try. And of course, new ones appear all the time. So once again, scan QR code to get these notebooks. But what if you don't want to install anything locally, for example, or you cannot install, or even you would like to try different Intel's hardware without buying it? You can use Intel DevCloud for the Edge. It's a free service to perform OpenVINO experiments in JupyterLab environment. So you can test your OpenVINO code across different Intel's hardware without buying it. So, just scan QR code to get the free access. So, my main takeaway for today is don't just believe me. Try it yourself. Give it a try. Clone a repository. See the performance on your hardware. Maybe it's OpenVINO solution for your problems. Maybe you wanted to deploy on Raspberry-like device or you wanted to deploy on CPU, but the performance was bad. So maybe OpenVINO solves your problem. And these are platform configurations for performance benchmarks. If you would like to learn more, just scan QR code. These are notices and disclaimers I must share with you. And this is all from my side. Thank you. If you have some questions.
+
+**Speaker 2** _[19:23]_
+
+All right, so thanks, Adrian, for the introduction of the OpenVINO. So I'm going to now announce some questions from the Slido. First one, is OpenVINO compatible with only Intel CPUs and GPUs? What architectures and extension does it rely on?
+
+**Speaker 1** _[19:40]_
+
+OpenVINO also works with any CPU because it's, you know, every CPU has the same instruction set, so it's optimized for Intel CPU, but it works for any CPU. But it doesn't work, for example, for Nvidia GPU, it works only for Intel integrated GPUs.
+
+**Speaker 2** _[20:01]_
+
+second one does OpenVINO provide model monitoring and maintenance like to take care of model data drift or it is out of the scope here
+
+**Speaker 1** _[20:11]_
+
+Well, OpenVINO is a framework for inference, so, you know, how to increase your performance. So I think it's out of the scope.
+
+**Speaker 2** _[20:20]_
+
+How does OpenVINO compare against a dedicated GPU and TensorRT?
+
+**Speaker 1** _[20:27]_
+
+Well, we have some performance benchmark internally, but for now, I cannot share with you the results, unfortunately.
+
+**Speaker 2** _[20:38]_
+
+What are the main differences between OpenVINO and ONNX?
+
+**Speaker 1** _[20:43]_
+
+So, ONNX is another framework and ONNX could be run directly in OpenVINO because you can port ONNX model to OpenVINO, but you can also run ONNX model directly in OpenVINO without any conversion. So, you don't need to use model optimizer in this case when using ONNX model. So, the difference is, I think, ONX is a format for storing neural networks on the disk. And OpenVINO is a framework to run the inference.
+
+**Speaker 2** _[21:22]_
+
+Does OpenVINO support custom operations in deep learning models, for example, custom layers?
+
+**Speaker 1** _[21:29]_
+
+Well, OpenVINO is an open source, so you can implement it yourself if something is not supported. OpenVINO is available on our GitHub repository. Just go to OpenVINO toolkit, OpenVINO, and then you have source code. So if something is not supported, you can implement it yourself.
+
+**Speaker 2** _[21:50]_
+
+Can the optimized model be serialized and reloaded?
+
+**Speaker 1** _[21:55]_
+
+Yes, I think so. I think optimized model is already kind of serialized when it's on the disk, so I think it is.
+
+**Speaker 2** _[22:07]_
+
+I think that's all the questions from Slido. If anyone has some questions, I could pass the mic down.
+
+**Speaker 1** _[22:22]_
+
+So if you have questions after this talk, you can find me at LinkedIn you can drop me an email and we can conversate
+
+**Speaker 2** _[22:32]_
+
+You're right, I think that's the reason.
+
+**Speaker 1** _[22:33]_
+
+Thank you. Thank you.
+
+---
+transcript_status: auto
+---
+transcript_language: en

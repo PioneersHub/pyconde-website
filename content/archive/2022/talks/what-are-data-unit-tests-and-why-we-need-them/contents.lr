@@ -1,0 +1,202 @@
+title: What are data unit tests and why we need them
+---
+description: I will introduce the concept of data unit tests and why they are important in the workflow of data scientists when building data products. In this talk,…
+---
+created: 2022-01-13
+---
+code: MPWLWP
+---
+slug: what-are-data-unit-tests-and-why-we-need-them
+---
+speaker_names: Theodore Meynard
+---
+speakers:
+
+
+
+### Theodore Meynard
+
+Theodore Meynard is a data scientist at GetYourGuide. He works on our recommender system to help customers to find the best activities to book and locations to explore. Before GetYourGuide, he was building the recommendation system at plista to help online newspapers to monetize their content. When he is not programming, he loves to ride his bike looking for the best bakery-patisserie in town.
+---
+abstract:
+
+
+I will introduce the concept of data unit tests and why they are important in the workflow of data scientists when building data products. In this talk, you will learn a new tool you can use to ensure the quality of the products you build.
+---
+full_description:
+
+
+When data scientists build data products, they usually need to combine multiple data sources to train their models and then serve predictions. Making sure that the code and the data will be as expected throughout the full lifetime of the project is complex. To ensure the quality of the code, it is a best practice in software engineering to use automatic testing, this has a large corpus of support material. However, ensuring the quality of the data input and output holistically is not yet as well covered. 
+
+In this talk, I will explain the concept of data unit tests and why they are important. Then I will present an overview of the current libraries helping to build data unit tests. Finally, I will explain how we integrated it into our workflow at GetYourGuide.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: Data Handling
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 1702
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: some
+---
+domain_expertise: some
+---
+supporting_material_url:
+---
+slides_link: https://docs.google.com/presentation/d/14n2zMhcWwwkQJiFhdRDCxrIhTU9q8Cj_EoFaek0CydA/edit?usp=sharing
+---
+social_card_image: /static/media/social/talks/MPWLWP.png
+---
+youtube_id: Kshch2G8AB4
+---
+video_link: https://www.youtube.com/watch?v=Kshch2G8AB4
+---
+video_published_at: 2022-05-06
+---
+video_duration_iso: PT34M10S
+---
+video_thumbnail: https://i.ytimg.com/vi/Kshch2G8AB4/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Thank you. Welcome, everyone. Welcome to this presentation. So today, I will talk about data unit tests and what they are exactly and why we need them. But first, let me ask a really quick question. Who is having data quality issues? Please raise your hand. Yes, exactly. I'm also in the... Yeah. So let's go into the agenda. and I will begin with a short introduction and with that I will define what are data unit tests and explain their importance and especially when we want to build data products. Then I will present some frameworks that you can use to perform data unit tests and I will also show some live code, and then in third I will explain how we tackle it at GetYourGuide, my company. And finally I will conclude and open for questions and also discussions, yes, let's get started. So as Leda said, I will present myself, so I'm Theodore, data scientist at GetYourGuide, And actually, in my company, what we do is we build a marketplace for travel experiences. And especially in my team, we are responsible for the recommendations and the ranking of the experiences on the platform. So that means that we actually rely heavily on the data that we have to achieve our goals. That means that we're building data products. And that's why today I want to talk about data unit tests. Because data products actually combine the code and the data. And you need both to have something that is useful for the business at the end. Actually in classical software development, it's a common practice to ensure the quality of your product with automated tests. actually here you focus on testing the code. However, if you want to ensure the quality of your data product, then you need to validate not only the code, but you should validate the data. Makes sense, right? And one way to validate the data, then, is to have tests. Well, data unit tests. And let's step back, actually. If you work on an organisation that have multiple engineering teams, probably the code is owned by the team that you are working on, and you probably have the one that has the most context around the data product that you're building, so when you are changing it, you know that you are changing it and you have the full context around it. However, if the company or organisation is a certain size, the data that you are using is not produced by you and not transformed by you, it's transformed by other teams, right? And they probably do not have the full context of how you are using the data afterwards. And just an example in my company, and I think we are pretty normal here, for our ranking and our recommended algorithm, we are combining around 15 different data sources, but we are not owning the production of this data or the transformation of this data. So what are data unit tests? Data unit tests, let's dive into a more precise definition, is some kind of expectations that you have on your production data, so the data you will use for your data products. I think you have to make a clear distinction between testing, for example, if you want to test that your algorithm is able to handle some null value, that's a unit test, like a normal unit test, a code unit test. You should do that. That's great. However, testing that the data set you will use to train your model or to pass your pipeline does not have null, this is where you need data unit tests to be sure that it's not happening. And so some examples of things that you might want to check. For example, you might want to check that the mean, the max of the average of a column value is OK. You might want to check that you do not have null value, or at least not too many missing values. You might accept to have some null, but not expect to have more than 50% of them. You might verify that you do not have too many duplicates column, or that you do not have duplicates column or not too many of them. It depends on what you expect from your data. And another example, the number of samples that you have is reasonable. You probably have some expectation all around that. And that's the kind of thing that you can check with data unit tests. Great. So now that we have a more precise idea of data unit tests, then let's look at the main frameworks that you can use to perform them. And I think the first one I want to talk about is Great Expectations. So it's the most active projects, and it supports actually most of the formats. So you can use SQL, you can connect it with databases, and you can also use Pandas, and also PySpark. So that's, I think, one of the main formats that people are using, so that's pretty great. They also render some data documentation, So it's a kind of human-readable documentation around the data that's around the data expectation that you have. So the data unit tests that you are building with them. Then we have Pandera, which is also quite active, and actually, that has no company behind, to the opposite of great expectations. So it's like open source maintained by many more people. And the thing it's mainly built for pandas. They just added the PySpark support very recently, and actually they are using the PySpark.pandas API to do that, so they are transforming everything into pandas to do this check. And here the thing is they are more focused on validating the schema, whereas Great Expectation is more taking global approach and taking more things than just the schema. And also they do not have visualizations like the kind of data documentation that Great Expectations proposes. Then we have also TensorFlow data validation, which is part of TensorFlow Extended, where I was quite surprised. So it still has some stars, but actually not very active at the moment. And I think another drawback is also it's quite integrated with the TensorFlow ecosystem. So if you're not full in TensorFlow, then probably it's hard to integrate it with something else with the rest of your infrastructure. And finally, Soda, which is what I researched, very similar to Great Expectations. It's a more recent project. They also propose SQL, PySpark, but also they are newer, so I think also why they have less poverty on GitHub and everything, but I see them really in the same space than Great Expectations. To conclude, I think the most mature and the most feature-complete library is Great Expectations, And then I will just focus on that to explain a bit more how you can build expectations and show the live code. So let's dive into some of the main features of great expectation. So first, you have this concept of expectation. So it's kind of a session about the data, and that's basically what we call this data unit test. The most common use case actually are already implemented in the library, so you don't have to do it. So if you want to check that a colon do not have null, that colon min and max are in these values, that the mean, the median, et cetera, all these kind of basic things are already implemented there, and also they render this, sorry, and of course, if you have some very specific use case, then you can always add them, so you can add your specific use case specific assertion that you want to do, you can also implement them by yourself. And what I also have is data profiling, so what you can do is actually load a data set that you know is good, that you manual check, and then basically pass it through this profiling and that will give you a draft of expectation that you can use. You will still need to modify them, it's not perfect, but at least you don't start from scratch. Then they also have, of course, when you have all this data, this expectation, then you want to do some validation, and so you can validate new data sets with a defined collection of expectations that you built before. And you can also get some other things via email, Slack, if something is going wrong. And finally, data documentation. can think of, so it's auto-rendered documentation of the data that you are checking, and you can think of a constantly updated data quality report. But I think that code is worth more than 1,000 slides, so I will show you how to create some data unit tests using great expectation, and yes, because I'm French actually, you might have heard from the accent, so I will talk about wine. So I took the wine quality data set, so actually it's composed of two data sets, the red wine data set that we will use to generate the test, and then we will load the white wine dataset, and that's the one we will try to validate based on the test that we'll build on the red wine. So here I'm using Databricks, which is something that we heavily use in my company, but you can work actually with other clouds, or it's actually Jupyter notebook-based more than Databricks-based. Yeah, so let's get started. So we need to install Great Expectations. and we need to import the thing in the library, and then we can load the red wine data set. Basically, we have different columns, and at the end, about some measurement about the wine, and at the end, we have a quality score, which is an integer between 0 and 10. So we'll focus on two main columns, the sulfates here, and the quality. That's the two ones that I will focus on for this presentation. Then let's set up to run Great Expectations on Databricks. And for the sake of time, actually, so we can dive into the code. So you will have the link. I will share the slide at the end. And you have the link to this notebook. And so you can also clone it, run it, check the code itself. But for the sake of science, I will not go into the code to set up a great expectation on Databricks. But what's important is at the end, we get a validator, which is basically an object which we can use to build tests. And in here, you already have the data set, the red wine data set attached to this object. And you can run directly there. And so let's build data unit tests. So the first one, as part of the documentation, indeed, we expect the column quality to be in the range between 0 and 10, so it should be an integer in this range. So let's do the test, and actually it will run on this red wine dataset. And it did, yes, the observed values are between 3 and 8 actually, not the full scale, and we get some results and the tests succeed. Great. Looks good. Then let's run the second test. And so for that, what we will do is we want to expect the SOFAT distribution on the data set to be fixed. So first, we will build an histogram from the current data set, And then we'll perform a callback library divergence test. So in practice that means that if the distribution of the data set that you put is very different from this histogram, then the test will fail. So basically just check that you have the same distribution. And so we can run this test also. And yes, and we get like the different bins and things like that. So when we are done, what we can do basically is save the expectation suite so that the collection of expectation that we just built. And once it's done, then we can actually generate some documentation about the code that we just put. And here what we have basically is a human readable format where HTML that can basically explain like what we just built. So actually the quality, we expect the value to be between 0 and 10, and we expect the distribution to be similar to this, which is great. I think that's something that you can share with any of your stakeholders, and they don't need to go into the code to say, that's exactly, I mean, you can show them something much nicer than some GitHub code base. So now we are done. Let's load the new, the white wine data sets. And yes, and the C, pretty similar, they have the same columns, and also software and quality, and let's run the test on this wine dataset. So here, perfect, and let's run the test also. And at the end, what you get is an automatic report. So basically, you have another HTML, and here, you will get a C, we have like 50%, so actually we have one failure. So let's look into the report. So the quality is indeed between 0 and 10. Also actually we see we also have the value 9 that appeared that we didn't have before. And then actually the soffits, what happened is the Cobalt-Liber divergence test failed, and we can see directly that the expectation that we had about the distribution and the of cert value is different that made the test fail. And also, that's pretty nice. You start with that when you want to debug what's happening in your data set. And yeah, that's it. So I'll show you how you can start this off the live code. I still go back to the presentation. So, show you how you can build data unit tests. I will now share a bit more how we tackle that at Get-Your-Guide. And so for that, I will explain, I would like to explain how we introduce the data unit tests. But first, let me share some of the incidents that actually trigger these initiatives. And if that feels similar to what are things that could happen to your company, yeah, that's probably time to add things like that. So actually what happened in the past is like, for example, we have a change in the data structure that led actually to introduce some duplicates in our recommendations. We also had another time where we discovered that we had a missing feature that we use for our daily prediction data sets, and also what happened once is that we used the wrong column actually, that was to select for the scoring of our recommendations, so that's not a great thing, that's a thing that you can prevent, and so actually we took action to make sure that this kind of thing did not happen again. And what we did is actually, for example, great expectation now, we used it to validate our recommendations and before we push them to production. We also introduce some in-house validator with actually some integration with Datadog that push, sorry, that push some metrics to Datadog and set some other thing if we have something that are going wrong, so that we use to validate our main events that we use for our pipeline and also to our output predictions. And finally, recently we also introduced some health check as part of our continuous integration pipeline, and also that is also run daily in our runs to do our predictions. And yes, with that conclusion. So here in this presentation, I try to share the importance of testing your data, especially in your data products. It's actually commonly accepted that you should test your code, but I think that we don't discuss enough about testing the data, but it's as important, or maybe even more, and I think that's a moment that needs more awareness. And I think from what we have, we don't have a server bullet that we use at GetYoga at the moment, so that we can use to validate all the data that we have, but as you see, we tested multiple approaches, but there is no clear winner that we say, oh, we can use that for all use cases. And yes, it's quite exciting to see the space evolving, there are libraries that pop up and that evolves and yeah looking looking forward to the future of this space thank you It's better otherwise, I don't think the people online will hear.
+
+**Speaker 2** _[20:38]_
+
+I'm coming up.
+
+**Speaker 3** _[20:42]_
+
+You were talking about pandera as an alternative, but we were actually looking at using both great expectations and pandera Just because of this difference in like runtime checks kind of thing, especially for services I guess pandera can do some stuff that you could miss if you run daily with great expectations or something Just wondering if you had any thoughts on it
+
+**Speaker 1** _[21:01]_
+
+So in using pandera and great expectation together, yeah So I think there is still some overlap was like great expectation can actually also check that's a column is an integer or this thing Yeah, but I I Agree I I I didn't, so I was more deeper into great expectation than Pandera, but when I looked into the API, it felt more like it was more oriented with thing with going to Pydentic and like checking each row more than, like if you look at all the checks that you can do about like statistical tests that you can do about like the the distribution of your column and things like that, I think great expectation is much more advanced than that Pandera, but using both, I mean, I think more tests you have, safer you are, I think, and they cover more different use cases, you can solve some better with one parent library and some with the others, and actually, we have a big problem, we are mainly using PySpark, and last time I checked, and when we looked at it, it didn't have support for PySpark, And that was a no-go for us, so now that they introduced that, I will look deeper into that.
+
+**Speaker 2** _[22:34]_
+
+Thank you, thank you for the presentation. So do you find that introducing extra data tests besides the unit tests increases deployment time or how do you manage that? So since you said that you include these data tests in the continuous integration, do you find that the deployment time becomes unmanageably slow?
+
+**Speaker 1** _[23:03]_
+
+So it depends so we have two use cases where we're using it and actually You you can sample your data when you want to do that Or you run on everything and if you have a larger set and it's taking time So in one of the use cases we we can easily sample it and actually it's running like two three minutes. So Great, we don't need that. I mean we don't have this problem The other one is taking quite some time and the problem is we don't have a good way to sample it smartly but we prefer to wait like four hours and make sure that it makes sense like the data set makes sense instead of just pushing it and hoping that the next day it will it will work so and four hours actually if you if you have a PR usually the time that someone else review it and everything it's not well it's like it's not a one week that you need so it's still reasonable but yes It's showing us this and this.
+
+**Speaker 2** _[24:04]_
+
+Yeah, thank you. Any more questions? You can raise your hand. Okay, I think you had your hand raised for a while.
+
+**Speaker 3** _[24:12]_
+
+I'll do a quick one. So thank you. I've never used this, and it's quite interesting. But you said at the very end that it's no silver bullet. So I guess there are some limitations, and I'd like to hear your words on what can't it do. Yeah.
+
+**Speaker 1** _[24:26]_
+
+So actually, I expect, so I, yes, so great expectation, actually, we did some, I did
+
+**Speaker 3** _[24:26]_
+
+So I
+
+**Speaker 1** _[24:40]_
+
+some presentation, and totally, like, it's actually great for PySpark, and it's also integrated with Airflow that we're using, send detailed report by email, and, like, you can directly see what are the expectations that fail, and this is pretty exciting, so I don't know if everyone has a problem with documentation of data, the data is changing, the documentation is not changing as fast. But one thing that is quite tough is the Databricks integration. I think that's pretty, like I skipped through, you can look into the code, but everything is based on a Jupyter notebook, basically, and if you want to integrate the Databricks, they have their own notebook, which are not Jupyter notebook, and that makes things more complicated. possible, actually, but then you have to understand much better the great expectation library. The second thing is actually it's quite an infrastructure investment, actually. It's not like in five, ten minutes you will get it running and you can put that in production. It's a huge machine, and they have a lot of concepts that you need to understand. You have this expectation, you have this data slicing, these data sources that you need to combine with other things, so it's taking time. And actually it's also evolving quite fast, so they changed the API, some parts have been updated, some other parts have not been updated, and I suspect it will continue to change. So that's the main challenge that we have with Great Expectations. The other approaches are handmade, but then we don't have all the great features that you have with a nice library like that.
+
+**Speaker 2** _[26:16]_
+
+anyone else has questions please raise your hands many people get we have time
+
+**Speaker 1** _[26:22]_
+
+I think he was asking for quite some time.
+
+**Speaker 3** _[26:29]_
+
+Short question, do you have
+
+**Speaker 1** _[26:30]_
+
+Next question, do you have experience on data tests with text data? Great question. No, we don't have so much text that we are testing, but you will need to write your own test. I haven't seen anything in the Great Expectations library about testing that.
+
+**Speaker 2** _[26:57]_
+
+If you can raise your hands again, please. Okay, I will start with him.
+
+**Speaker 1** _[27:04]_
+
+thank you can you elaborate on like the different use cases where you could apply data unit tests and where you found it most useful for example like validating new input data or maybe validating like different test sets for being a fit for actually your training yeah so we are we are mainly using it for input and output. Input, for example, is in-house event validator that we use. We have events that we use to train our model. We need to know how many people view these activities. We need to know how many people click on it, how many people book them afterwards. Then we need to pipe them together. This is the visitor ID. We need to combine it with somewhere else and that's how we want to check that if the schema is changing in some way and that suddenly we have a problem and we don't have any match anymore, we want to be alerted of that. That means that some team somewhere changed the way they handle or send the events and we should alert that because then suddenly we don't have any more bookings or something like that. So that's how we use that on the input and on the output is like we want to make sure that the final prediction that we make after we train our model, that makes sense. That's actually where a great expectation made a lot of sense. We already had some kind of we call it canary step, but it was handmade and it was failing, but we didn't know why exactly it was failing, and that great expectation really helped us to when it's failing now Now we know exactly what is failing. We know, like, oh, this was a distribution that we had before. This is the distribution, I mean, that's the distribution that we expect. That's what we have. It's just zero. There is something wrong. We should directly check that. And that's how that helps us here. That answer your question?
+
+**Speaker 2** _[29:08]_
+
+I think, yeah.
+
+**Speaker 4** _[29:13]_
+
+Yeah, thank you for the presentation. I was wondering if you can share your experience regarding testing the producer contracts, for example. Because you're now talking mostly about the data has already landed somewhere, for example, in S3 or some data storage. And then you start to use it inside the machine learning algorithm. Could you share maybe your experience, how can you avoid having faulty data in the data lake itself. I don't know if you have some contact between the producer of the data or something else in place.
+
+**Speaker 1** _[29:49]_
+
+So if we if we have just to make sure I understand the question you are asking if we have some kind of contracts between the producer and Yes, we we have of course and that's that's we we have that we have documentation around the data and we expect our consumer like the products team that are building the different components or the website to send certain type of events and that we could use them and we also had also have to say When they do some kind of migration because other product evolved Things change and we we need to They do some announcements, and we have this kind of rollback the thing is You probably if you see someone that's one by email Are you sure that's the data structure change that they propose will not affect your algorithm like what we had in the past? like the change of that structure, we say, well, that's fine. I mean, and then we had some, like we discovered that actually we introduced some duplicates because we were adding the same columns multiple times. It was communicated before that we saw this information, so all the contracts were there, but did we spend, did we have like the really full picture of how this change will impact our algorithm? Like you basically have to reread all your code suddenly to see, okay, now I might have this thing duplicates here, how will that happen? And actually what happened is we started joining with other data frame, and we always expect to have the spine to be unique, and the other join was always not unique. And every time we are multiplying the things because they are the same one. And it's not something that was trivial to check because we always expect that when we build a code, and when we say they change the data structure, We did not think, oh, that will change this part of the code. That's the expectation that we had at some point. So I think it's better to have this test. And actually, that's why you write data unit tests, right? Sorry, unit tests also. You want to make sure that the thing that you built, the expectation that you have, will still stand in the future. Sure. One. Oh, yes.
+
+**Speaker 2** _[32:07]_
+
+Okay, I think we have time for one last question.
+
+**Speaker 1** _[32:08]_
+
+Okay.
+
+**Speaker 2** _[32:10]_
+
+Yeah, I'll try to get to you. Could you please pass him the...
+
+**Speaker 5** _[32:22]_
+
+Thanks a lot for the great talk. I'm wondering, what are the consequences of an error? Is it just an alert in a Slack channel everybody has muted anyway? Or is it really like there's a data scientist that is on pager duty, and then there's a severity check, and then if things really get out of hand, there's a whole team that then, I don't know, gets to it? Or what processes have you defined when there's actually a data error?
+
+**Speaker 1** _[32:47]_
+
+It depends like that's a good question because it really depend on the error right if you if you expect to have 10,000 rows and you have 10,000 one are probably not the same error than if you have 10 million suddenly so what we what we do actually is in This in this case what we do is we basically don't push to production like if you have a test basically we stay Well prefer use the data of yesterday than using the data of today And so we will not push the new the new version with the test that failed so that give us some time And we we know that it's not ideal to have the data of yesterday and still be running it today But it's probably much better than having something Having something that might be completely wrong. So that's the way we handle that in general and And basically, then that gives us the day or two days that we need. We know that it's not ideal, but we are not shutting down everything because we cannot push an inversion. And we get alert by email and Slack this way. Yes, and if you are, by the way, we are hiring, so if you're interested, do not hesitate to come. Yes.
+
+**Speaker 2** _[34:02]_
+
+I think that was the last question.
+
+**Speaker 1** _[34:02]_
+
+Sorry.
+
+**Speaker 2** _[34:04]_
+
+Thank you.
+
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -1,0 +1,107 @@
+title: Satellite Image Segmentation Photovoltaic Potential Estimation
+---
+description: Using Google Cloud Machine Learning Engine to built a model that help in estimating photovoltaic system design. An end-to-end python based deep learning…
+---
+created: 2018-06-01
+---
+code: WSMVVU
+---
+slug: satellite-image-segmentation-photovoltaic-potential-estimation
+---
+speaker_names: Johannes Oos
+---
+speakers:
+
+
+
+### Johannes Oos
+
+About the Author:
+•	10 years of experience in the solar industry (majorly Europe and East Africa)
+•	3 years of experience in Software Development and Artificial Intelligence
+•	Presentation @ Geopython 2018 on Classification of Satellite Images
+•	Masterthesis on the Estimation of the Potential of Roof Top Solar Systems in Luxemburg
+•	Diplomathesis on Measurement and Simulation of a solar pumping station in Egypt
+---
+abstract:
+
+
+Using Google Cloud Machine Learning Engine to built a model that help in estimating photovoltaic system design. An end-to-end python based deep learning application.
+---
+full_description:
+
+
+The used technologies are python based and include:
+MongoDB
+tensorflow
+Flask
+google.cloud python API
+
+A dataset of labelled satellite images is created. 
+Several networks are trained and tested on this dataset.
+The network is deployed on a production server.
+
+The results of the classification/segmentaion are used to feed python based photovotlaic simulation libaries. The output is displayed and the results (the potential) evaluated.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track:
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 10
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: basic
+---
+domain_expertise: some
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/WSMVVU.png
+---
+youtube_id: SoJuk08u0DI
+---
+video_link: https://www.youtube.com/watch?v=SoJuk08u0DI
+---
+video_published_at: 2018-11-05
+---
+video_duration_iso: PT26M1S
+---
+video_thumbnail: https://i.ytimg.com/vi/SoJuk08u0DI/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+Yeah, hi. My name is Johannes. Basically, I'm going to give you a quick introduction to a project I'm working on at the moment that is partly deployed already. It's about segmentation algorithms and classification algorithms on Google Cloud Platform. So, first, I said I'd try, but I'm not trying hard enough, clearly. So, first of all, the purpose and the input data of the project, then a quick overview over some models and the state of computer vision, then how I'm using AutoML, which is the Google Cloud Platform service in that project, and a quick summary. The purpose is very straightforward. I myself am an energy engineer, so I spend a lot of my working time designing solar power systems basically how you can see them here those blue glass thingies on that roof basically what you need to do in that job is you decide how many of those panels fit on that roof that is a task that so far always took a lot of time from trained or semi-trained people but basically all you do is you enter an address and you get out the size of a system and the energy yield so the idea of that project is to automate as much of that as possible to give you an idea of well what you need for that you enter an address in the top left corner then you get geolocation from it through a normal rest service call you get an image of an area which you can see there the first the first image basically that is now the point when the segmentation algorithm kicks in where from that image you now cut out or crop out all of the single roofs now with this cropped out image of a roof that you can see next to it the classification algorithms are applied to get more information about that roof so it's basically a stack of different models that are working on top of each other the other stuff so the actual solar engineering stuff is not really of interest at that conference i thought i still listed um the first step getting your input data basically is done through a google maps api call where you just send in an address could be any address on the planet i've only tested it for europe but i was told that it works pretty much everywhere. The one that translates the address to latitude, longitude coordinates is very Python friendly and easy to use. The one where you get your image is a bit more awkward. You have to do some parsing of the address. It still works. So we are here at Lorenzstrasse 17. So if you give this to that rest call basically gives you back a dictionary or dictionary like object with latitude and longitude specified if you send this is now the call that with those latitude longitude information can gives you an image you see in line 13 basically is a very important part where you specify that You want a satellite image, and you specify the resolution of that image. Those are parameters that are quite important later on for that model. So you want, at the same time, to have quite a good resolution if you want to take information out of your image, but at the same time, you don't want it to be too detailed because you will just see blur. and yeah maybe some yeah so if you combine that basically now form an address low-range trusses 17 you get an image of several roofs the building we are sitting in now which then you can use for further analysis and so until now there is no deep learning machine learning involved so that kicks in now So basically, with an image, it's funny that the previous speaker also had an elephant. Normally, it's cats and dogs. So what you can do with an image are different things. In the deep learning part of computer vision takes up a lot of attention at the moment. And the three main techniques that we are using here is classification, where you ask, I have now this image, which in our case are three channel and one value per pixel, so about per image, I don't know, 800 times 800 times three values, turn that into a percentage if that is an elephant or not. That's what classification does. The detection says where is my region of interest, so where is my elephant? I get two values for a rectangle, a top left corner, a bottom right corner, and the segmentation actually gives me a per-pixel level classification. These images here are taken from the COCO dataset, which is a really great project. I think it's mostly driven by Microsoft, where there's a lot of data available for segmentation algorithms. now the segmentation algorithm is quite data hungry so you need a lot of images it's very hard to use pre-trained algorithms and adjust them to your needs so basically what we've done or what i've done is i trained it from scratch um so i couldn't use autumn ll for that but the three classification algorithms are not very data intense. You can easily do it with a few hundreds or a thousand labeled images. So they were perfectly fine fit to actually put onto AutoML. The segmentation model that we used is based on MaskRCNN. That is one of the architectures that was released, I think, in the last 12 months or two years, I'm not sure. It's a TensorFlow implementation and it seems to be working very well and is implementing quite a few projects. The specific implementation that I have used is done by a company called Metapod. I'm not sure if I pronounced that correctly. I found that very easy to use. I still remember TensorFlow from 2016, where it was a bit, it's very verbose, let's say. And now using the implementation that they've done, I find very easy to adjust to my needs. What it then does is you have the picture on the one side of the, or you have the image on the one side of the presentation showing some roofs. that's now just a random picture chosen from the data set if you apply that mask rcnn to it you get several or you should get all of the roofs that are in that image classified and all of the pixels marked that make that roof as you can see here it is not perfect there is for example this third small red dot which apparently is a mini house in between which clearly is a mistake And the blue shape, if you look at it, it's not really covering the entire roof, but it's more or less good enough for the purpose that it is supposed to serve. The next step now from that image with that segmentation mask is to just count all of the pixels that make up that roof. and with the zoom level that we've classified prior when we collected the image you can now easily calculate how big that roof is. So you can make a lot more out of that priorly stupid static image. You all of a sudden get some information that weren't there before. Furthermore, it gives you that bounding box. It's a bit tricky to see. It's a very thin rectangle there. This is going to be used to take a crop of that specific roof for the analysis with the classification algorithms. The classifications algorithms are all hosted on Google Cloud Platform. I first started implementing them on this machine and retraining in ImageNet. But then AutoML Beta was released, I think, four, five, six months ago. And it was a good opportunity to just test that service. Basically, what retraining is, is that you use a model that is already good for one task. Let's say, I don't know, elephant classification, all of those elephant models. And then you cut off the classes that it used to be predicting for and adjust your input feature. retrain only those two layers to come to your purpose build model that can now predict whatever you want. And the basic theoretical assumption there is that the content that we are classified before, let's say animals or whatever it is, should have some relation to the new objects that you are classifying. now deploying that on auto ml vision removes all of that stress of finding a model that is pre-trained of deploying that model like we've seen before can be quite a hassle of keeping it up to date of of keeping track of what you've done so far managing your data sets and so on So, AutoML is a service by Google Cloud, so you have to pay for it, it doesn't come free. It targets people somewhere in between data scientists and app developers, so you don't need to be able to read the latest papers on deep learning and at the same time you You can still customize existing good models. I assume the models are good from Google, to your needs. The services so far available there is Vision, Natural Language, and Translate. Good use case for Translate, for example, is if you have your own purpose job-specific language. Let's say you're only talking with other engineers So you you have your own kind of dictionary that develops and you just want to build your own translation model We're using the vision API obviously because we have an an image to analyze There is like with every other cloud provider. There's a The startup is not Easy you have to do a lot of boring admin stuff So you have to set up your account Of course you have to put in your credit card details and you have to enable authorization You have to enable the API and so on. I'm not going to go too much into detail, but once you have understood what they actually want from you, it's not that hard. You basically just need to set a system environment that the API knows who's calling. And you have to enable the API in the Google Cloud Platform interface on that specific project. now the other thing that that autumn l comes with is not only the model but also the data management infrastructure so i had that in previous projects implemented in flask and mongodb which works nicely but it's still a lot of work to only keep your own infrastructure of data management of labeling of keeping track of your data up and running already consumes a fair amount of resources where you can better spend somewhere else. So here it's working for me this one worked quite intuitively for me. You just upload all of your images then you can click on them and give them a label and work through your data set step by step. You can even share the access code to that specific data set so that you can make your interns in your company do all of the labeling. Once you have a labeled data set, you can then train it. Training now becomes an even less time-intensive job than it was before. You only have to click a button now. You can't even select the appropriate model. And as you can see here, it was a very small trial, 400 images. Therefore, the position is pretty bad, about 80%. percent that's majorly due to the fact that there are so few images. Once you have all of your models trained, the models are then basically being locked. So every version that you train is locked. You can keep it, you can obviously delete it, but this way you can basically retrain every week or every month or whatever your application needs. You can, each model is identified by an ID and is callable through an external service with that ID. So now this model that you have trained is directly available through an API to make a prediction. You just need to copy this number here with the 24 at the end into a client. And yeah, so it's very easy. So all of this hard work of infrastructure basically falls away. So what happens then is you send in that image to a service where that model is hosted and you get back an object from that service. The object is somewhere in between a list and a dictionary. I'm not sure what those developers thought, but it's a bit odd. but anyways it is it works it is accessible and it's still in beta mode so maybe it's going to change the time is uh it is not as slow as it's not the fastest call depending on um i don't know depending on what but i've seen that for example in the mornings it was a bit slower in the evenings it was a bit faster i don't know why um the timing is between one and three seconds for one call so if you are having something that is user interactive let's say you want to i don't you know, sell a shoe to a teenager, that is obviously way, way too slow. But if you have something that is a bit more faced with other tasks or even automated tasks, that is an acceptable time. The call itself is also not difficult. Basically, you only have to remember your model. So, like you see here, it's just that same number with the 24 at the end. You have to define where your service is located. Again, I don't know why, but most of the services, or all of the services, are located on servers that are located in America. At some point, maybe to gain some speed, they also have some data centers here. I think there is one in Frankfurt that has TPUs. But so far on AutoML, everything runs through America. And the call then itself becomes, again, fairly straightforward, and you can do your classification tasks just like that. So all of that stuff that was described before of having to deploy the model and having to make sure your service runs falls away completely. once you have everything set up together you have now several models of that sort stacked upon each other you basically achieve what the what the what the what the purpose was of the of the whole project so from the entrance of an address you end up through the different images with a system design, and that then takes, depending on how the system actually goes and how many models are used, about 10 to 20 seconds to run through that entire pipeline. So that step is then automated, or basically the entire design is then automated, and that is already it. So I was a bit quicker than I thought. I even deleted some slides before, so maybe either I talk too quickly or I have too little to say. so maybe one more sentence on autumn L it's still in beta mode it's fairly cheap still so at least it's cheaper than hiring data scientists the I find it very comfortable to use especially the data management and the infrastructure needs that it fulfills it's good for classification tasks but it's pretty much useless for everything else. I think the main reason for that is that classification tasks are easy to be transferred from one domain to another while segmentation tasks or detection tasks are a bit more topic specific and take in way more data because the model architecture is way more complex and then the last point is that you can't optimize for speed if you design if you have your own architecture let's say you choose a model that is very lightweight and have very has very little operation like a i don't know an inception v4 or something um you can optimize that for operation or you can even use devices that can run on on mobile phones so they're even smaller and therefore a bit less accurate but that is like a trade-off you can then choose and here you can't choose any of that you're basically up to mercy of whatever gets gets decided on by someone else which is a trade-off that you do less control also means less work i guess so happy for questions No, since I had to spend an unfortunate amount of time measuring and looking at those images myself, I just had a number of labeled data. I just had like 1,000, 2,000 of those roofs lying around. So it's, well, yeah. Yeah, there is, that is a possibility. The thing is that for the validation, I think that could work. for the actual collecting of data I think it would be a bit too intense but for the validation definitely it would work yeah that is a good point especially because the roof tilt normally is one and stays one for quite some time so it doesn't really matter if you're a bit out of date Yeah, that is a good point. Thank you. So when I signed up for AutoML, I got a $300 voucher, and so far it's only half used, and that is only one of the smaller projects. So I find it pretty cheap. So maybe that entire project now has occurred costs of $40, $50. That is major. The main cost there is not on AutoML itself, But to be allowed to use AutoML, you need to create your data on Google Cloud Buckets. So you basically have to use their cloud storage, which then becomes the costing. That is the part that then in the end costs the money if you have a lot of traffic. If it's just lying around and you don't update, change your data a lot, it's not too bad. But if you swap it around because you have some local stuff, some stuff there, you have to move it, it can become a bit more costlier. But so far for that project, $40, $50. How do you get paid, sorry? Not for the amount of requests that I have. So as long as you stay under a certain value, I think that is in the range of, don't let me lie, but I think between $1,000 and $10,000 per day. There is no fee that comes. If you have high traffic requests, there will definitely be a fee because while you are running a TPU for three seconds has a certain power cost and they need to cover themselves. So, the question is regarding segmentation for 3D images of biology data, of cells, is that right? Microscopy. Microscopy. I have absolutely no clue. I know that, so I've majorly worked with 2D data, I know that there is an implementation of a similar algorithm also from Metaport for 3D segmentation I have not used that myself but if you check out that link through their GitHub repository you will also find their 3D algorithm as far as I understand that is still very scientific while this stuff is by now accessible for normal people that 3D stuff is still pretty hardcore from what I understand So the question is regarding the uncertainties I have no real value for that from a rough idea if i compare to layouts that we've done then for solar systems by hand the variation is in the range of up to 10 percent but not really with a bias from what we've seen so it's a bit random so for example this this blue roof here the main influencing factor here is like which pixel is getting determined as being element of the roof. The actual tilting and orientation of the roof works pretty well within, so if you say you have it, you don't do that, how do you say, you don't do that continuously, but you do it in buckets, so you have from zero to 5% tilt and from five to 10% tilt, then it works pretty well. For the roof segmentation algorithm, As you can see, stuff like this here, sometimes that is out, and stuff here. So the green thing is there's a bit more classified as roof than there is extra roof. So in sum, I would say it stays under 10%. Roof-specific, maybe it can be even a bit more. But yeah, that's the range I've seen. Thank you.
+
+---
+transcript_status: auto
+---
+transcript_language: en

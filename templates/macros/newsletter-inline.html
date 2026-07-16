@@ -1,0 +1,41 @@
+{#
+  Inline newsletter capture
+  ─────────────────────────
+  Compact, content-framed capture for archive surfaces (talk, track,
+  speaker, search). Turns a transcript reader into an owned-audience
+  lead with one click through to /newsletter/ (the Brevo iframe page).
+
+  Usage:
+    {% from "macros/newsletter-inline.html" import render_newsletter_inline %}
+    {{ render_newsletter_inline(bag('newsletter')) }}
+
+  Databag schema (newsletter.yaml):
+    inline_title: "Get the next drops in your inbox"
+    inline_body:  "New 2026 video + transcript releases …"
+    inline_link_text: "Subscribe"
+    link_url:     /newsletter/
+
+  Self-hides when inline_body is empty.
+#}
+
+{% macro render_newsletter_inline(data, section_label='Newsletter signup') %}
+
+{% if data and data.inline_body %}
+
+<aside class="newsletter-inline" aria-label="{{ section_label }}">
+  <div class="newsletter-inline__content">
+    {% if data.inline_title %}
+    <p class="newsletter-inline__title">{{ data.inline_title }}</p>
+    {% endif %}
+    <p class="newsletter-inline__body">{{ data.inline_body }}</p>
+    {% if data.inline_link_text and data.link_url %}
+    <a href="{{ data.link_url }}" class="newsletter-inline__link">
+      {{ data.inline_link_text }}
+    </a>
+    {% endif %}
+  </div>
+</aside>
+
+{% endif %}
+
+{% endmacro %}

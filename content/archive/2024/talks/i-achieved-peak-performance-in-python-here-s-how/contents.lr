@@ -1,0 +1,310 @@
+title: I achieved peak performance in python, here's how ...
+---
+description: In the ever-evolving landscape of software development, crafting code that not only functions flawlessly but also operates at peak performance is a skill…
+---
+created: 2023-12-18
+---
+code: RKDSK7
+---
+slug: i-achieved-peak-performance-in-python-here-s-how
+---
+speaker_names: Dishant Sethi
+---
+speakers:
+
+
+
+### Dishant Sethi
+
+Dishant is software engineer who is equipped with the experience in Web Development, Cloud Engineering, DevOps and MLOps. He started Prodinit, a software consultancy, after successfully freelancing for a long period of time.
+
+Talk to him about:
+♦ Product Engineering
+♦ Dev/ML Ops
+---
+abstract:
+
+
+In the ever-evolving landscape of software development, crafting code that not only functions flawlessly but also operates at peak performance is a skill that sets exceptional developers apart. This talk delves into the art of optimizing Python code, exploring techniques and strategies to fine-tune your programs for maximum speed and minimal resource consumption, with a particular focus on memory efficiency.
+---
+full_description:
+
+
+In this session, we will embark on a journey and refine the phases of development in python.
+1. Functional Execution
+2. Rigorous Testing and Accuracy
+3. Performance Optimization
+
+We will discuss common bottlenecks in unoptimized code
+1. inefficient Coding Practices can negatively impact performance
+2. Memory Leaks
+3. Suboptimal Data Structures and Algorithms
+4. Lack of Vectorization
+5. Overlooked Parallelization
+
+We'll further look into the benefits of profiling the code
+1. Profiling the code with cProfile/sentry
+2. Profiling the Code with timeit
+3. Memory Profiler
+
+Finally, for data driven application, we'll look into strategies to achieve peak performance
+1. Efficient DataFrame Storage with Parquet Files
+2. Handling Categorical Data Type
+3. Looping Techniques and How to Choose Between Different Looping Techniques?
+4. String concatenation (joins and cleanup)
+
+[Attendees takeaway]
+Whether you're a seasoned developer looking to enhance your optimization skills or a newcomer eager to understand the principles behind efficient Python code, this talk offers valuable insights and practical takeaways.
+
+[Pre-requisites]
+Basics of Python
+
+[who-am-i]
+Name: Dishant Sethi
+Email: dishantsethi14@gmail.com
+Phone no: +919582565371
+Designation: Software Consultant and Founder @prodinit.com
+
+[Previous Talks]
+PyconDE and Pydata Berlin: https://youtu.be/osGGX3tcwkc
+Gophercon India 2023: https://youtu.be/zuzTN3ibrCM?si=GEo31lE_Q8h4hzTR
+PyDelhi: https://youtu.be/6h9I3iyqyu4
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2024-04-24
+---
+start_time: 11:05
+---
+end_time: 11:35
+---
+slot_id:
+---
+track: Programming & Software Engineering
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 3578
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/RKDSK7.png
+---
+youtube_id: wMnU_tR5-84
+---
+video_link: https://www.youtube.com/watch?v=wMnU_tR5-84
+---
+video_published_at: 2024-10-28
+---
+video_duration_iso: PT25M2S
+---
+video_thumbnail: https://i.ytimg.com/vi/wMnU_tR5-84/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:05]_
+
+Yeah finally I'm so glad to see a lot of people. Third day of the conference I was not expecting to see a lot of people so energy. This is actually my second time speaking at this conference.
+
+**Speaker 2** _[00:17]_
+
+Uh...
+
+**Speaker 1** _[00:18]_
+
+I spoke last year as well. I spoke about asynchronous programming. And this year, I'll be talking about, as you can already see, I'll be talking about peak performance in Python. So a little bit about me before I start. So who am I?
+
+**Speaker 2** _[00:34]_
+
+Thank you.
+
+**Speaker 1** _[00:35]_
+
+If you have not guessed already, I'm a software engineer. I am someone who turns these moments of, I don't have any idea what I'm doing, to moments like, I cannot believe I've done this. I am someone who turns coffee into code. I'm someone who turns pizzas into programs. I'm someone who turns bugs into successful CI builds. And this is what my career path looks like. I started as a backend software engineer, worked as a senior backend engineer, and last year only I left my full-time job and got into consulting, started consulting a couple of US-based startups, and recently registered a technology consulting company, and I'm trying to grow and trying to scale. And a couple of things which I've worked on over the past couple of years are web applications. I have worked on DevOps, MLOps, and LLMOps pipelines, and I've recently built a couple of JNI applications as well. I guess enough about me.
+
+**Speaker 2** _[01:43]_
+
+I
+
+**Speaker 1** _[01:44]_
+
+I guess we are already running short on time. I have to cover 50 slides. So I guess we can get started. So let's start. So what is the agenda for this particular talk? So actually, I don't have any agenda for this particular talk. But rather, I have a motivation for this talk. But motivation for what? I have a motivation to be a better developer. Motivation to write optimized code. Motivation to ensure that we are using minimal resources of underlying infrastructure. Motivation to build fast executable systems. Motivation to actually think of going beyond the functionality and just not writing code. And eventually motivation to achieve peak performance. And whenever you think about optimizing, refactoring the code which you have already written, it's always better to set a benchmark. It's better to set a baseline to compare the performance improvement. So when you're trying to set that particular baseline, there are only two things which you have to take care of and ask yourself. First is, what is your performance looks like today? And while you're optimizing or after your optimization, you have to figure out that are you making things better or worse? These are the only two things which you have to take care of. Okay. Now, we know what we have to take care of while we are thinking of optimizing. But how do we find that particular baseline? To figure out there is one simple, easy solution to find a baseline is just use profilers. There are multiple profilers available in the industry. So what a profiler does is you can use a profiler to know the exact time taken by a function to execute. It could be the function or a program or a complete system. But use profilers to know how much time your current program is currently taking. So there are a couple of inbuilt profilers called C profile. C profile does the job pretty well. I've been using that since a very long time.
+
+**Speaker 2** _[03:51]_
+
+Uh,
+
+**Speaker 1** _[03:51]_
+
+There are a couple of libraries which you can use to visualize and have a UI output of C profile and have a better UI understanding of how your performance is of your current application. And there are a couple of external profiling libraries as well, like Austin, which allows you to actually do line-level profiling as well. So in C profile, it gives you an option to profile each function or a script or whatever you're trying to write. But using external libraries like Austin, you can actually profile by line level and actually figure out how much time is taken by Python to execute one particular line. So yeah, profiler, you can use to set that particular baseline. And now that we know how to set a baseline for optimizing anything, here are some of my learnings for code optimisation. First is, don't just start refactoring code in the first go.
+
+**Speaker 2** _[04:54]_
+
+So
+
+**Speaker 1** _[04:55]_
+
+You might be knowing that when you write a piece of code, there are small chunk of programs you are writing. So instead of refactoring the whole code base in one go, you would rather want to wear a product manager's hat and figure out...
+
+**Speaker 2** _[05:11]_
+
+uh
+
+**Speaker 1** _[05:12]_
+
+out the priority of each and every piece of code.
+
+**Speaker 2** _[05:17]_
+
+Uh, give it to me.
+
+**Speaker 1** _[05:18]_
+
+So, keep it small, keep it atomic, pick small programs to optimise, pick small programs to refactor, and do it one by one, prioritise it. And why do I say so? It's because when you start refactoring your codebase in one go, the whole codebase in one go, you would not want to see performance improvements at one particular piece of code, and a slowdown at another. And it's very hard to debug in these particular cases that what actually causes that slowdown at the other program. The other point is actually try to reproduce the change and test the optimisation in different CPUs. CPUs can have multiple processes running at a time. So you cannot be sure of improved performance just by running it once on one single CPU. So test it on different CPUs, test it on different machines, test it on different servers or whatever you're comfortable with. Third is don't assume that the impact of the changes will be same across all Python versions. Next is if your performance so we have the baseline. If your performance improvement is less than 10%, I guess in that particular case, improving your infrastructure is a better idea than messing your head around writing better code. So focus on infrastructure in these particular cases. And the last is don't test the optimization on random dummy data. Try to test it with as realistic data as you can. Think of it as a production application and try to replicate the data which you have in production. Maybe pick the data from staging or testing environment or used Faker as discussed in previous talk. So, yeah, let's start with the basic. I have some simple scenarios on how we can improve on code. So let's start with the simple basic scenarios. So if you see this particular simple piece of code, we are trying to import and operating a library called OS, and we are trying to run and figure out if the path exists inside a for loop. A simple better way to write this particular piece of code is instead of importing the library, import the function of this library and call the function inside the loop. Very simple. Though it will not, like, help in performance improvement, which is exponentially better, but when you're at that particular scale, this can help. The other scenario could be when you're trying to have a try except block inside a for loop. A better way to write this particular piece of code is just have that particular for loop inside the try except blog instead of the other case. The next simple scenario would be let's suppose you have a function in which you are expecting some key word arguments, and you're sure that what are those key word arguments are. So just replace those key word arguments with parameters. So just directly use A and B as parameters instead of key word arguments. This is when you know what are the parameters you are expecting in this particular function. The next simple scenario is you have this particular for loop in which you are trying to append something inside a list. A better and simple way of writing this is just use this comprehension, why to complicate things, why to have multiple lines of code when you can just write in one single line. Next is, for example, if you have a function called add, and it has one single line of statement which just returns an operation, and you're calling that particular function inside a for loop. A better way to write this is just like this. You actually don't need a function when it is not going to add anything, add any value to it. is just going to return something, why not eliminate the function?
+
+**Speaker 2** _[09:27]_
+
+Uh,
+
+**Speaker 1** _[09:28]_
+
+I think if I keep on saying all these simple scenarios, I'll be kicked out of this room. And I'll wrap this quickly. So for the next example, let's suppose we have a list of strings. And in this particular case, you're trying to calculate the list of strings inside a for loop. So why calculate the length every time inside for loop? Rather calculate it outside the loop, store it in a variable, and use that variable inside the loop. This is a better, not so simple scenario. So there is a keyword called slots when you talk about classes in Python. These slots store data variables of what data variables inside the class. So on the right side, you can see where I'm not using any slots to store the data variables. And when I try to call the object of this class, it takes around 0.10 seconds. And on the other hand, if I use slots and declare what data variables I have in this particular class, and then try to call the object of this particular class, it takes a little less time. So use slots for faster data access. The next simple scenario, not so simple scenario, could be when you're dealing with data classes. So what I believe is, and what I have experienced is, named tuples are actually better in terms of performance if you compare it to data classes. And we as engineers, I guess we try to over-optimize the data structure. So let's just not over-optimize the data structure for simple scenarios like these. In my opinion, for simple scenarios, simple dictionary could be a lot better than a class to store data. could be a better option than named tuples, and named tuples could be a better option than data classes. So do not over-optimize it. Just keep it simple, and you can see a better performance in your code. This is one of my favorite slides. So readability matters. Anybody here can guess what this particular piece of code is doing? No? And what if I tell you it's just a simple factorial function? So the naming convention makes it look like it's a very complex function. Even though it's doing nothing, it's just a simple factorial function. But you have to name it in such a way that you are able to optimise it. The piece of code which is not even readable, how can we even think of optimising it? So make sure you are following these principles, writing code which can be readable, which Which can other engineers understand. Not related to optimization, but readability matters. So I think enough of basics. I don't want to get out of this room. So we'll talk about applications where Python is being used. So I'll try to cover three types of applications, web applications, data applications, and gen AI applications. So the first is web applications. So when you are trying to build a web application, you would probably be building some back-end APIs, you will be writing some business logic, and those APIs will probably be interacting with the database. So, this is a simple architecture of a web application. You have a client. You have a server. You have a database. The client sends the request to the server, extracts the data from the database, performs some business calculations, and responds back with the data to the client. But the question is, how do we optimize it? How do we optimize Python web applications? So, if you ask a software engineer on how to optimize a web application, they will straight up, come up with this. Just go async, and you will optimise the performance. You will have a better performance. But I don't think it's a direct answer. It's not a good answer. Because what I think...
+
+**Speaker 2** _[13:33]_
+
+Thank you very much.
+
+**Speaker 1** _[13:34]_
+
+Async could be a way to improve performance of a web application. But what I also think bottlenecks of those web applications decide the area of improvements. Bottlenecks of those web applications decide which piece of web application is to be picked to improve the performance. So there could be multiple modules of a web app. So, you could either improve on the architecture of the web application, you could either improve on the infrastructure side of the web application, or you could the last one is obviously code improvements where the processes of multiprocessing, multithreading, or implementing like background jobs, async, this comes after the optimization of architecture and infrastructure. So in this talk, we'll be talking about optimizing code and not the architecture and infrastructure, but assuming that you have a better architecture. And code is the only bottleneck.
+
+**Speaker 2** _[14:35]_
+
+obviously,
+
+**Speaker 1** _[14:36]_
+
+Optimizing code is of no help if you have a bad architecture, so that should be the first focus when you're building a web app. Here are some of my learnings for optimizing code for a Python web application. Let's assume you're using Django framework to build the web app.
+
+**Speaker 2** _[14:57]_
+
+for
+
+**Speaker 1** _[14:58]_
+
+First, which we have already discussed, use profiling to analyze the software bottlenecks. Next is use context managers to hide or hide function codes. It will actually not block the memory, and yeah. Use built-in functions. I understand everybody here is a great software engineer, but it's really hard to beat the underlying libraries. So use underlying libraries, use built-in functions. Try to avoid global variables. So to better keep a track of scopes and unnecessary memory usages.
+
+**Speaker 2** _[15:41]_
+
+when
+
+**Speaker 1** _[15:43]_
+
+When you're trying to build a web application, when you're trying to build an API, it's
+
+**Speaker 2** _[15:46]_
+
+Thank you very much.
+
+**Speaker 1** _[15:48]_
+
+The first step is to validate the data request, the request data you are getting. So instead of using FLs to validate that particular request, use serializers. Serializers is a great way to validate the data you are trying to get. It actually converts that into JSON and then validates it.
+
+**Speaker 2** _[16:06]_
+
+Uh...
+
+**Speaker 1** _[16:08]_
+
+So, considering we are using Django framework to build the web application, try to use base classes available. Use libraries such as Django framework to use built-in base API classes which are available for create, update, destroy, and there are a number of base API classes available in that particular library. Use those libraries, take full use of that, and try to build simple and modular APIs. The next is exit early. Try to leave the function as soon as you know that it cannot add any more meaningful work. Eventually, then it comes to adding async processes. Now it could be you could use multiple libraries, multi-threading, multi-processing. You could use AsyncIO. You could use architecture combination of Redis and Celery to have background processes, background jobs. And also, to figure out when to use So, these parallel processes is also a very great challenge, is also a very good challenge. And not parallelizing tasks which can be executed concurrently. It actually underutilizes the computational resource. So we should not ignore parallelizing tasks. So figuring out when to use it is very important.
+
+**Speaker 2** _[17:42]_
+
+Thank you.
+
+**Speaker 1** _[17:44]_
+
+Though we are discussing the optimizations of Python web application, but what if the bottleneck is database? So there can be a number of problems when you're dealing with database. First is make sure that the database connection pooling is on point. You're not draining any connections when you're building the web app. Use proper indexing techniques for data when you're designing the database architecture. There are some cool techniques of sharding and partitioning. You could implement these, but I don't think they would be required for a really long time. You would have to have at a very high scale to implement these techniques like sharding and partitioning.
+
+**Speaker 2** _[18:30]_
+
+Thank you.
+
+**Speaker 1** _[18:31]_
+
+the next is make sure you have read read replicas and write replicas and again you you would not need this at the beginning of your projects this is required when you are at a very high scale
+
+**Speaker 2** _[18:43]_
+
+Thank you.
+
+**Speaker 1** _[18:44]_
+
+And the most important thing is architect the database application in such a way that the database is not a bottleneck. So the architecture matters the most. The next type of applications are data applications. So I have drawn down three, four scenarios of these data applications. So the data application involves large data frames, involves large CSV files. The first scenario could be a memory-efficient way of loading a CSV file. So when you load a CSV file, the complete CSV file is being loaded into the memory. The memory is limited. It may happen when you have a large CSV file that you could exceed the available memory resource. So, however, a better option would be to use this particular flag called low memory equal to true. It would improve the performance, prevent memory issues, especially if you are running a number of other processes in your CPU. The other scenario is chunking of large CSV files. So assuming CSV file of millions and millions of rows, you cannot load that particular CSV into a data frame in one go. You would have to chunk those CSV files into n number of pieces and load those pieces one by one to avoid memory limitations, to tackle those memory limitations of the underlying resource. The next scenario is there are a few great computational libraries available like Dask, XR, which can be used. to load data which could be of petabytes of scale. So if you're using Dask, it reads the CSV file in parallel and can leverage multiple cores of your system for faster processing. So it's like an asynchronous thing implemented inside the library just to read the CSV files.
+
+**Speaker 2** _[20:56]_
+
+I'd
+
+**Speaker 1** _[20:57]_
+
+Other examples would be looping techniques for data frame. So there are multiple looping techniques. You could use either ITER rows or ITER tuples to loop a data frame. But when you have to apply a custom logic to a particular data frame row or even all the data frame rows, a very simple way could be just use the supply function, use an anonymous lambda function, write that custom logic in that particular lambda function, and this works very, very great. It's very simple.
+
+**Speaker 2** _[21:31]_
+
+Thank you.
+
+**Speaker 1** _[21:33]_
+
+concise, and it works actually better than having a for loop and iterating over the data frame one by one.
+
+**Speaker 2** _[21:42]_
+
+Thank you.
+
+**Speaker 1** _[21:43]_
+
+So, yeah, I've added a time check slide, and I know we are running short on time. So we are actually talking about Python optimizations, and there is a great handbook called the Zen of Python by Tim Peters, and if you don't talk about this, it will be of it is going to be of great insult. It is a very great handbook. If anybody here have a laptop, if you just want to open your terminal Python shell, just write this particular statement, import this, and you will see a handbook of statements written under the Zen of Python by Tim Peters. And I'll go through this handbook line by line. The first is beautiful is better than ugly. Explicit is better than implicit. Simple is better than complex, obviously. Complex is rather better than complicated. Flat is better than nested. Sparse is better than dense. Readability counts, as we have already seen. None of you was able to guess that particular function was a factorial function.
+
+**Speaker 2** _[22:46]_
+
+Next.
+
+**Speaker 1** _[22:46]_
+
+Next, special cases aren't special enough to break the rules. Although practicality beats purity, errors should never pass silently unless explicitly silenced. In the face of ambiguity, refuse the temptation to guess. There should be one and preferably only one obvious way to do it. Although that way may not be very obvious at the very first place. Now is better than never. Although never can often be better than right now. Because you would have to take your time to think about the problem plan accordingly. If the implementation is hard to explain, it's a bad idea. If the implementation is easy to explain, it may be a good idea. Namespaces. Namespaces are a honking good idea. We should do that more often. game tech again, I think, yeah.
+
+**Speaker 2** _[23:47]_
+
+I actually
+
+**Speaker 1** _[23:48]_
+
+I actually wanted to talk about JNI-based optimization of JNI-based application. So we are running very short on time. Hit me up after this talk. We can talk about these optimizations as well. And we have approached towards the end of the talk. So I need the attention of everybody here. This is the most important part of the talk. So we'll have a countdown. Three, two, one. And why not zero? We are engineers. And feedback. So I'm trying to collect feedback from each and every one. I'm trying to collect feedback from each and every conference I'm speaking at. It is for me. It is for me to figure out the areas I can improve on. If you could quickly scan this QR code and give feedback, it will be of great help. I'm trying to grow. I'm trying to scale. If you want to work with me, hit me up. I'm open to discuss your projects. I'm reachable at LinkedIn, Twitter. you can connect me at the social media's email. And, yeah, thank you. I'm open to questions. Thank you so much.
+
+---
+transcript_status: auto
+---
+transcript_language: en

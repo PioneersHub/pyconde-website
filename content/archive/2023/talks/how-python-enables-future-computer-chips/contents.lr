@@ -1,0 +1,188 @@
+title: How Python enables future computer chips
+---
+description: At the semiconductor division of Carl Zeiss it's our mission to continuously make computer chips faster and more energy efficient. To do so, we go to the…
+---
+created: 2023-02-28
+---
+code: VRGANP
+---
+slug: how-python-enables-future-computer-chips
+---
+speaker_names: Tim Hoffmann
+---
+speakers:
+
+
+
+### Tim Hoffmann
+
+Tim Hoffmann is a physicist and software expert passionate to bring science and high-quality software together. He works as Simulation Architect Digital Twin at Carl Zeiss, where he covers all aspects from coding, architecture, training up to software strategy. Tim is an active contributor in the Python open source community. In particular, he is core developer and API lead for the visualization library matplotlib.
+---
+abstract:
+
+
+At the semiconductor division of Carl Zeiss it's our mission to continuously make computer chips faster and more energy efficient. To do so, we go to the very limits of what is possible, both physically and technologically. This is only possible through massive research and development efforts.
+
+In this talk, we tell the story how Python became a central tool for our R&D activities. This includes technical aspects as well as organization and culture. How do you make sure that hundreds of people work in consistent environments? – How do you get all people on board to work together with Python? – You have lots of domain experts without much software background. How do you prevent them from creating a mess when projects get larger?
+---
+full_description:
+
+
+At the semiconductor division of Carl Zeiss it's our mission to continuously make computer chips faster and more energy efficient. To do so, we go to the very limits of what is possible, both physically and technologically. This is only possible through massive research and development efforts.
+
+In this talk, we tell the story how Python became a central tool for our R&D activities. This includes technical aspects as well as organization and culture. How do you make sure that hundreds of people work in consistent environments? – How do you get all people on board to work together with Python? – You have lots of domain experts without much software background. How do you prevent them from creating a mess when projects get larger?
+---
+room:
+---
+day: Tuesday
+---
+slot_date: 2023-04-18
+---
+start_time: 11:40
+---
+end_time: 12:10
+---
+slot_id:
+---
+track: Sponsor
+---
+tags:
+---
+submission_type: sponsored
+---
+submission_type_label: Sponsored Talk
+---
+submission_type_id: 2525
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Novice
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/VRGANP.png
+---
+youtube_id: 0soZf5v6NsA
+---
+video_link: https://www.youtube.com/watch?v=0soZf5v6NsA
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT30M44S
+---
+video_thumbnail: https://i.ytimg.com/vi/0soZf5v6NsA/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+So, welcome. Today, I'm going to explain to you how we use Python to enable the next generation of computer chips. I'm Tim Helfmann. I work at Carl Zeiss as a simulation architect. I'm a father of two children, and in between, I'm a core developer of Matplotlib. So, before we can get started to understand the relation between today's Python, tomorrow's computer chips, we have to go into the past and we'll get to know this guy. This is Carl Zeiss. 175 years ago he was a device maker so he built some mechanical and optical devices and in particular he also built microscopes and at that time building microscopes was basically a trial and error thing. You had some glass lenses laying around on your table. You took some, put them together, checked. Does it make a good picture? No. I adjust them. Still not a good picture. Okay, I'll take something out, put something else in. So this was not very efficient. And he said, there has to be a better way of doing this. We should be able to really understand how a microscope works and to calculate that. And in fact, then he founded a company and it was a great success because they could deterministically build good optical devices. So this company grew and he decided that after his death, this company would be transferred to a foundation. And the foundation has three goals. First goal is make sure that the company stays alive. Second goal is promote the social security of your employees. And third goal is fund science and research from what you earn with your company. And at that time, this is a really strong proposition of value. So it's clear if the company doesn't survive, there's nothing else to do. So, this is the first thing. Second thing is care for your employees, and if there's anything left, give that to science. And actually, this worked for 175 years. We're still there, we have still the same structure. We have the Carl Zeiss Foundation, which owns the company. The company has grown a bit since then. We have now 38,000 employees. We make a bit of money, And we have four major areas we work in. It's still all optic-related. And probably most of these things you don't know because these are business-to-business areas where an end customer doesn't see what's going on. But I think most of you have been in touch with devices that were somehow in contact with size equipment from all of these business markets. For example, consumer markets, these are lenses. Not everyone wears a lens, but everybody looks movies, and among other things, we produce high-quality cinema lenses, and a lot of Hollywood blockbuster movies are made with size lenses. Second thing is industrial quality and research. You maybe have used a microscope from Zeiss at some point, probably not, but you all have been sitting in a car, and very many car manufacturers use our surface measurement technologies to measure the shapes of their cars. Third area is medical technology. I hope you have not been in touch with that, probably not, but some might be. There's a story from last year's We Are Developers conference where we had a booth and some person came along and he said, oh Carl Zeiss, that's a great company. I had eye surgery on one of your laser systems and now my vision is great again. And fourth area is semiconductor manufacturing technology. Almost all of the computer chips, so in your phone, in your laptop, are made on our machines. And this is what I'm going to talk about today. So let's talk about computer chips. You probably have heard about Moore's law, which means the number of transistors in computer chips doubles every two years. And this has been the case for a very long time and still will be the case for at least 10 to 15 years, probably longer. The key ingredient for that is you cannot just make more chips because you don't want to grow the size of your devices. If you want to have more transistors, you have to make each transistor smaller. And this shrinkage process is really the key to the advancements in semiconductors. So how do you make these small structures? Actually it's not that hard to make small structures, there are a number of technologies where you can write very small structures up to atomic level, but the difficult task is you just want to make a few of them. You want to have billions of transistors on your chip, and you want to make billions of chips. And with a technology that's like a pencil where you write everything else, that just doesn't work. So what you need is an extremely fast copying machine. And this is lithography. You write the chip once, and you use this template or mask, and you use optics to project that from the mask onto the silicon wafer and then you can make hundreds of copies on a silicon wafer and this is a very, very fast process. It's basically like stamping. And to give you an analogy, so this is really like the transition from handwriting to the book press where you can make arbitrary many copies in almost no time. So lithography is really the key factor in making industrial-scale computer chips. And this is then again where we come into play as an optics company. So this digital book press machine, it's a lithography scanner. it's called, it looks like this, and in the center part there's a lot of stuff and electronics going out on the outside. The center part is really the imaging optics, so you have the mask at the top and you have the wafer there at the bottom. And to give you an idea what it means to build something like this, we we want to make very small, we want to image very small structures. This means our optics has to be ultra-high precision. And what ultra-high precision means is on a surface area of, say, about a meter, I have to have deviations from a defined shape that are less than a tenth of a nanometer. Now, probably you don't have really an intuition what it means, what a tenth of a nanometer is. So just to make a scale comparison, if I would blow up the size of this mirror to the size of Germany, we would have to manufacture the surface of Germany up to a position of about the size of a hair. and yeah that's that's the challenge in the technology so how do we do that when when we go into developing such a machine we have to find out what system do I want to build? How can I achieve the precision? And that really is strongly interdependent with my manufacturing process for that machine, because I can have some theoretical idea how I want to build something, but I have to be able to build that in production as well. So, to be able to build these machines, you again need specialized machines to build that. So we cannot, for some things we can, but for many things we cannot buy machines off the shelves because they don't have the requirements we need. Sometimes we can order them custom builds, but more often than not we have to build our own machines for our production sites, because they are very specialized machines. So if we do that, we have an interdependent cycle between the design for the lithography optics, the process, the design for the machines which I want to build for the process, and this is a large circle. So when you look into classical, and there's not just one machine you build, you have to build a whole factory of different machines. So when you look into a classical development process, you come up with some ideas how you want to solve it, or some requirements, then you think of a solution and you build a prototype and you iterate that for a couple of times, check what's good on the prototype, what you still have to do better, and then at some point you say, now we're good enough, we go into production. The problem here is, if we wanted to build a prototype for our lithography optics, we would have to build a factory with specialized machines which we would have to create to build the prototype. And in the next iteration on the prototype, we would have to throw away half the factory because the next prototype had changed, and this is just not feasible. It's not feasible economically, and it's not feasible because of iteration cycles. You cannot have prototype iteration cycles of multiple years. So, what we do is we don't build prototypes. That means we have to simulate everything and all of a sudden from a very hardware related topic you end up in a world of software. You end up with a lot of simulations, you end up with a lot of data, with a lot of data analysis and that's really a large change we are currently making in our development processes because they are more and more getting just digital, yeah? And so we really, in our R&D departments, have to think about software a lot. And how do we have to think about software? Our domain experts, our engineers, have typically two different tasks, two different kinds of categories. There are standard tasks where you get some data, have a known solution, you want to evaluate something, maybe you get something from production, from existing tools, and you just want to have standard analysis. You want to have, in that case, the engineers want to have fixed tools where they put the data in, get the result out, or maybe it's even automated and nobody works in pipelines and nobody has to do anything manually anymore. On the other hand, in R&D, you have these exploratory topics. When we design a new system, we usually don't know what we have to do at the start. So the solution is unknown, and of course we build from existing knowledge, but we have to do modifications, we have to do additions, and step by step we have to try out solutions. And to be able to do that, you sort of need some building blocks in your analysis tooling. You don't want to build everything from scratch. And it also has to be interactive because you do something, you look at the data that produces, and then based on that, you decide what's the next step. And both of this can be supported by a software ecosystem. And there are three properties in our case which are essential to such an ecosystem. The first thing is, because this ecosystem is for research engineers, it has to be domain language. We want to speak, we want to express our ideas of our problems in the domain language. Second is, it has to be hierarchical, because we have very complex systems which we can analyze on a very high level, say what's the overall performance of the whole system, but sometimes we have to go into the very details of the system. So you have to manage that complexity in this hierarchical structure. And the third aspect of the software ecosystem is it needs to be flexible because in R&D we never know what's the next idea and we have to adapt to that. And this all can very well be solved with Python actually. So this is our basic conceptual setup of this ecosystem. We have a lot of Python libraries. We use, of course, public Python libraries like NumPy and so on, but we build on our own specialized libraries on top. And I will have a complete slide on libraries on the next slide again. Then we use these libraries to build the standard tools. We also have more complex frameworks for simulation, for example, which we build on these libraries. And we also use these libraries to interface with all kinds of third-party software, be it simple things like MATLAB or Excel or other very specialized simulation solutions like finite elements, optic simulation, computational fluid dynamics, and anything else you need there. Now, this ecosystem is used by our domain experts to solve their domain-specific problems. And it can be that they have a problem, that's solved by a standard tool, so they just take the standard tool out of the box and use the problem. But more often than not, if they are in this development mode, they take some of the libraries, they build some software additional to that, they make some modifications there, and build the customized solution to their current domain problem. so speaking of libraries maybe you have seen this image the scientific python ecosystem is sort of organized in layers at the foundational level you have python and the standard library then you have something like core libraries for data structures and visualization Then you have some specialized logic libraries, like for image processing, for statistic models, for machine learning. And on the outer scope, you have domain-specific libraries. This is now the public Python ecosystem, so there's something like for astrophysics, for biophysics and these things. And actually, in our internal Python ecosystem, we do the same. We use what's in there, mainly from the, of course not from the outer layer, because we're not interested in astrophysics usually, but from the inner layers, and we build our own libraries next to that, which interact with this ecosystem. And this approach is really something, I mean, we have seen it working in the Python ecosystem, this works very well. We have the foundational libraries, and if you use, for example, scikit-image, they use NumPy as the data format, and it all just works too well together. So then there's one further aspect which I want to mention. A key thing to build suitable software tools is that you have to bring together the domain knowledge and the software engineering expertise to do so. And as I said, this whole ecosystem setup we have is targeted at our domain experts. They are not software experts. We sort of have to guarantee that this software is still developed in the right way. And when you have a research scientist, they usually have a lot of domain knowledge and maybe have a bit of programming knowledge. They sort of can solve their problem, but the code is probably not that elegant, not that fast, not that maintainable. And if things get more complex, the code starts to get to be a big ball of mud. And this is something also the scientific research community has experienced. And the idea here I present is actually inspired by the concept of research software engineering. In academia, they have exactly the same problem. They have hard domain-specific problems, and they use data science, machine learning, software toolings more and more. and it's hard for them to work with external software developers because they usually don't understand the problem correctly. And the idea behind research software engineering is that you have a second person on the other side which still has some domain knowledge but has a lot of software engineering knowledge. And I think this is the key idea in this understanding that we don't have this strict separation and say, this is the domain role. You only have domain knowledge. You don't have any software expertise. And on the other hand, you have the software expert with just the software knowledge and no domain expertise, but you leverage the differences to a certain extent. You still have your core field of competence, but you are aware of the way of thinking and the fundamental ideas of the other field. And this appears to be really a concept to address hard domain problems with suitable software. Okay, so I think I'll skip this. If you want to know about environment management, you can talk to me later. So then I would like to conclude. and we have seen that we have an interplay between what Carl Zeiss does with Python and computer chips. You can read this actually in two ways. You can say what I just showed you, we at Zeiss use Python to enable the R&D for the next generation of computer chips, but the interdependence is also the other way around because we have invested so much in chip technology and we is not only size but the whole industry. We as software developers are able to afford being ineffective with Python to a certain extent to have a convenient interface. And this is really something because computer chips are so powerful, we can afford Python. so to sum up I want to conclude with a quote from Isaac Newton if I have seen further than others it's by standing on the shoulders of giants it's really an interplay between different industries between different generations and we are all just here because many clever people have worked together in great ways so thank you very much We have a booth at the other side of the building. If you want to come to us, do so. We also have interesting job offers. Thank you.
+
+**Speaker 2** _[22:52]_
+
+Thank you, Mr. Hoffman, for the great presentation. Now we can come to some questions. If you have any questions, just write them down at Slido or vote up questions already existing. And we come to question number one. For optic simulations, do you use an in-house simulation solver or a commercial solution? If it is commercial, which one?
+
+**Speaker 1** _[23:16]_
+
+We actually have in-house optic simulation software because the commercial software is not good enough for the needs we have.
+
+**Speaker 2** _[23:28]_
+
+Could you show us an example of a software solution for a physical prototype?
+
+**Speaker 1** _[23:36]_
+
+Sort of. If it takes too long, just...
+
+**Speaker 2** _[23:44]_
+
+If it takes too long, just feel free to.
+
+**Speaker 1** _[23:45]_
+
+just feel free to do it in your book. So, this machine here... Okay.
+
+**Speaker 2** _[23:56]_
+
+Okay, we will go to another question.
+
+**Speaker 1** _[24:02]_
+
+Yeah, next question, please
+
+**Speaker 2** _[24:06]_
+
+How do you take scientists programming and those becoming research software engineers?
+
+**Speaker 1** _[24:12]_
+
+Yeah, that's an interesting question. So there are two approaches. You can either take people with domain knowledge and start to teach them some software practices, and that's what we've been doing a lot. You can also do the different way and say, I'll hire some software experts and educate them in our domain topics. That's something we are currently doing more and more because we want to strengthen also the software side more, just not from the existing in-house nodes. Then I'll just give a brief answer to the previous question. So this machine here is the machine. So you see here two people. It's a bit larger machine to measure this surface accuracy of 0.1 nanometers. And to be able to do that, in a very short, we have to understand the machine perfectly to get rid of any side effects. So we have a complex simulation system to build that machine. And this is what I've also been working on the last two years.
+
+**Speaker 2** _[25:20]_
+
+A question I think is very interesting. What do you think? When will Moore's Law finally fail?
+
+**Speaker 1** _[25:29]_
+
+At some point, we are not there, so the development, Moore's law, is not by coincidence. It's an agreement by the semiconductor industry, and the industry agrees on a roadmap. The roadmap goes currently 15 years upwards, so not before 2038.
+
+**Speaker 2** _[25:54]_
+
+Next question. From the transistor structure point of view, where does the journey go at the moment? Still filling FETs or are GAA FETs the future?
+
+**Speaker 1** _[26:08]_
+
+The transistor structure gets more and more complex. I'm not the expert on the individual structures. FinFETs are now sort of state of the art. Nanotubes are something that's coming up. And in general, if you put more effort in the complex 3D design of a transistor, you usually get some additional benefits compared to size and performance.
+
+**Speaker 2** _[26:38]_
+
+processes do you have established in-house to ensure the details about for example Python software packaging are out of the way for your develops
+
+**Speaker 1** _[26:49]_
+
+Yeah, so that's actually the thing I didn't mention. We try to give as little as possible environment management to the end users. So we have predefined environments which contain all our tools, which are directly installed to the engineers, they can just take them and use them and we have a central management for that, including also versioning and other things.
+
+**Speaker 2** _[27:29]_
+
+What kind of products you develop in the astrophysics or space engineering field?
+
+**Speaker 1** _[27:35]_
+
+We, as a ZEISS semiconductor manufacturing technology, none. As a company, we have some sort of smaller side projects, like mirrors for telescopes and in satellites. But these are smaller, almost pet projects, I would say.
+
+**Speaker 2** _[28:04]_
+
+Did you observe friction between research engineers trying to develop their own software solutions and the S-team thinking that they do the right code?
+
+**Speaker 1** _[28:16]_
+
+Yes, so that's very common and it happens all the time. One important thing is to make people aware of their limits and their boundaries in a positive sense. So it's not your task to build a complex simulation framework if you just script some parts of Python. So if you don't have any idea about software architecture, about DevOps and these things, leave these things to the people who know what they are doing. And on the other hand, we as a team have to make sure that these are taken care of so that the research experts don't start to mess about with these because it's not their main interest. They just do it if they don't have anybody else who does it for them. So if you help them, if you give them the right tools, they are happy to use them.
+
+**Speaker 2** _[29:24]_
+
+There's still more time for one more question before lunch break Can you give some insights how domain experts and software engineers collaborate at size?
+
+**Speaker 1** _[29:36]_
+
+So what's the best thing to say? So we have this idea also between software domain experts and software engineers or research software engineers. This has evolved over time. So historically, we just had the domain experts and they programmed a bit. And 10 years ago, things were much simpler. That was enough. then things became more and more complex and the domain exports had to do more and more and at some point it started failing because things got too complex because the software got too complex and at that point we really had to realise we need additional competencies and we sort of tried to build that up internally currently Yeah, maybe that's the...
+
+**Speaker 2** _[30:34]_
+
+Thank you for your talk, for your presentation.
+
+---
+transcript_status: auto
+---
+transcript_language: en

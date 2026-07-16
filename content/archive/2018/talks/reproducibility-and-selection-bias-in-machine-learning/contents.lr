@@ -1,0 +1,208 @@
+title: Reproducibility, and Selection Bias in Machine Learning
+---
+description: In this talk I will provide a solid introduction to the topics of reproducibility and selection bias, with examples taken from the biomedical research, in…
+---
+created: 2018-06-03
+---
+code: TUMAN8
+---
+slug: reproducibility-and-selection-bias-in-machine-learning
+---
+speaker_names: Valerio Maggio
+---
+speakers:
+
+
+
+### Valerio Maggio
+
+Valerio Maggio has a Ph.D. in Computational Science from the University of Naples “Federico II” and he is currently a Postdoc researcher in the FBK – MPBA team in Trento, Italy.  His research interests are focused on Machine Learning, Deep Learning and Big Data Analysis. 
+Valerio is very much involved in the scientific Python community, and he is an active speaker at many Python conference including EuroPython and EuroScipy. 
+He uses Python as the mainstream language for his deep/machine learning code, 
+making an intensive use of (especially) Numpy-based packages (e.g. scikit-learn) to crunch, munge, and analyse data.
+Valerio is a member of the Italian Python community, and the lead organiser of the PyData Italy conferences, held in Florence since 2015. He also enjoys playing basketball and drinking tea.
+---
+abstract:
+
+
+In this talk I will provide a solid introduction to the topics of reproducibility and selection bias, with examples taken from the biomedical research, in which reliability of estimator models is paramount.
+---
+full_description:
+
+
+_Reproducibility_ - the ability to recompute results — and _replicability_—
+the chances other experimenters will achieve a consistent result[1]- are
+among the main important beliefs of the _scientific method_.
+
+Surprisingly, these two aspects are often
+underestimated or not even considered when setting up scientific
+experimental pipelines. In this, one of the main threat to replicability
+is the _selection bias_, that is the
+error in choosing the individuals or groups to take part in a study.
+Selection bias may come in different flavours: the selection of the
+population of samples in the dataset (_sample bias_);
+the selection of features used by the learning models,
+particularly sensible in case of high dimensionality; the selection
+of hyper parameter best performing on specific dataset(s).
+If not properly considered, the selection bias may strongly affect the
+validity of derived conclusions, as well as the reliability of the learning
+model.
+
+In this talk I will provide a solid introduction to the topics of
+reproducibility and selection bias, with examples taken from the
+biomedical research, in which reliability is paramount.
+
+From a more technological perspective, to date the scientific Python
+ecosystem still misses tools to consolidate the experimental pipelines in
+in research, that can be used together with Machine and Deep learning frameworks
+(e.g. `sklearn` and `keras`).
+In this talk, I will present `reproducible-lern`, a new Python frameworks for
+reproducible research to be used for machine and deep learning.
+
+During the talk, the main features of the framework will be presented,
+along with several examples, technical insights and implementation
+choices to be discussed with the audience.
+
+The talk is intended for *intermediate* PyData researchers and practitioners.
+Basic prior knowledge of the main Machine Learning concepts is assumed
+for the first part of the talk.
+On the other hand, good proficiency with the Python language and with
+scientific python libraries (e.g. `numpy`, `sklearn`) are required for
+the second part.
+
+
+
+--
+[1](http://www.pnas.org/content/112/6/1645.full)
+_Reproducible research can still be wrong: Adopting a prevention approach_ by
+Jeffrey T. Leek, and Roger D. Peng
+
+[2](https://www.cancer.gov/publications/dictionaries/cancer-terms?CdrID=44087)
+Dictionary of Cancer Terms -> "selection bias"
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track:
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 10
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: basic
+---
+domain_expertise: some
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/TUMAN8.png
+---
+youtube_id: MOBs6MNepDk
+---
+video_link: https://www.youtube.com/watch?v=MOBs6MNepDk
+---
+video_published_at: 2018-11-05
+---
+video_duration_iso: PT34M30S
+---
+video_thumbnail: https://i.ytimg.com/vi/MOBs6MNepDk/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:02]_
+
+Thank you very much for being here. So the idea I have with this talk today is talking about two main topics I really care. And in particular, it's about reproducibility and selection bias, or bias in particular, in the very beginning. And the contest is machine learning. First of all, a few words about who I am. I am basically, I define myself as a software engineer and a data scientist, whatever does it mean. I do really work in a research center in Italy. It's called FBK, down there. And in particular, the research group I joined two years ago, this one is the MPBA. So we do machine learning for biomedicine. And in particular, this is exactly what I'm going to share with you, some experience I got in these two years. So I'm very nerd, so this is how I am. And indeed, we're a group of very serious people, actually. So if you're interested in working with us, we have open positions, so feel free to get in touch. Anyway, so let's back to the main topic of this talk. One possible payoff of this title would have been reproducibility and selection bias in machine learning when only cross-validation is not enough. And so, as I told you, this talk is going to be divided into two parts. I would like to emphasize first, and also, sorry, also talking about what's the relationship between reproducibility and selection bias I have in mind. So I would like to emphasize in the very beginning to the reproducibility part. And I would like to say that reproducibility is very related to the building blocks of scientific method we all use here as a scientist. So the scientific method is based on those pillars, just like that we want to recompute the results we got, and we aim and we strive for replicability of our results. The replicability means that there should be chances that other experiments conducted separately by different groups maybe will achieve consistent result. There's a very nice reference I'd like to point out, and I took the next slide from this reference. There's a very nice talk, and it's publicly available. It's called Barriers to Reproducible Research. And it makes a clear difference on what it means to talk about reproducible results and replicable results. I found this representation very clear. So if you think about the data and the code, and you consider having same data, same code, you can talk about reproducible results. If you strive for replicable results, actually, you want to keep the same code but change the data. In the other hand, if you have the same data but you have different code, you can say, well, my code is robust enough. And in the very end, when you have different data and different code, you can say, okay, my approach is quite generalizable. There's the reference down there, so please check out this slide. They're very well done. So let's focus for a bit about reproducing. So let's talk about the concept of having the same code and the same data. I think we all agree that making a paper nowadays is very different from what it was 10 days ago, 5 years ago, sorry. In the sense that the classical paper is not yet enough. Typically, especially in machine learning, or deep learning now is very hyped so when you release a new paper about deep learning typically you want to also release the source code or something that should be so if we think about the kingstones and the tools we have for reproducibility actually we can think about combining this is the general case, I would say the 95% you can have GitHub repository and Jupyter Notebooks I thought about it, and I basically put down a list of steps to reproducibility, and I also tried to make it fun. And so if you think maybe you already got it, actually it's a brain-expanding meme. So, well, if you create a public repository when you're done with your paper, well, you're quite in the average of researcher. That should be done every time. Well, then, if you freeze the development with a specific git tag, that also improves a lot the reproducibility, because you can reference a specific tag. And when you say, okay, I freeze the development on this repository because this was exactly the state of the code, the snapshot of the code I used to produce the results I published. then you want also to share the virtual environments with all pythonistas here so we're talking about python actually we have plenty of of options uh the least you can do is to include in your repository a requirements file this is very important and i'm of course i'm i put down this list based on my own experience of uh let's say uh bad patterns or horrors i could I like to call it, in the sense that some repositories typically don't ship with the requirements, so you have to figure out what kind of libraries you need to install to replicate the results. Also, you can have condo environments you can use, so it's pretty easy as well. You're even more expert and wise if you also share the Python version. Sharing the Python version is something I feel people tend to forget. And in my personal opinion, this is very wrong, especially if you're talking about deep learning. Deep learning libraries have very specific requirements. I'm thinking about TensorFlow, for instance. The latest version of Python is Python 3.7, but the latest version supported by TensorFlow is 3.6. So you have to specify, for instance, that's a very stupid example, but you have to specify what's the version used for Python. It could make a difference. You also have this very nice project. It's been cited as well yesterday in a couple of talks. PyM is a very nice project. In case you don't want to have an Aconda Python installed, and so you want to specify also with standard Python distribution, PyM allows you, and it's tightly integrated with VirtualAmp. It allows you to specify what version of patch you want in your specific environment. And so, finally, if you also create the container, you can have Docker images, you can have singularity. That's another nice project. Well, you're basically done in sharing repository. I also had the last point in this. Well, if you're talking about deep learning, specifying the CUDA version used and the kudian version library you used that's another point and these really makes a difference i will tell you in a bit uh why i'm saying this as well and for the 80s guys in the public maybe you already recognize the the meme in the end right so now let's talk about reproducing machine learning results so the the the the list was basically general so you can actually apply this list to all the kind of experiments. I want to focus more on machine learning now. And so I made this slide thinking, okay, how can I explain machine learning to dummies, aka machine learning explained to computer scientists, who basically, by the way, I am computer scientist, or I am a dummy in the picture, and I thought, okay, machine learning can be expressed as a combination of matrix simplification and random number generation. That's the core of machine learning. And if you even take this up to the power of t, which is a number in 2 to the k, and k very big, that's basically deep learning. So in the 90% of it, you basically can reduce and summarize deep learning in this way. I found this very nice. Anyway, and not because I did. Okay, right. So where's the randomness in machine learning? I can show you just very quick examples. In the random forest classifier, well, that's expected. It's called random. Maybe there's random in it. And actually, this is what I can learn. When you create random forest classifier, there's a parameter, it's just called random state. Actually, that's the random happening. But you also have randomness in logistic regression, very simple and stupid model. You also have in SVM, for instance, and that's for classifiers. But you also have randomness when you do model selection in scikit-learn. You have the randomness in the train test split, you have in the shuffle split, k-fold, stratified k-fold, all of them have this random state parameter. What about deep learning? I took Keras as an example. When you create, so the dense layer, for those of you knowing Keras, actually it's quite popular, I expected you know it. The dense object, dense layer, is the fully connected layer. Among the parameters, if you take a look at the API, basically the dense layer has this parameter, which is called kernel initializer, which is a string by default. But if you look more carefully, actually, the glottal initializer is a function that Keras calls for you without you requiring to import anything and stuff, which is this one, which has a seed parameter. So you also have hidden states in which you have randomness that you have to be really careful about. And so how can we handle with randomness? Well, typically, the general rule of thumb is, okay, you can set the random seed. So far, far enough, this is Python, actually. In Python 3 also, I discovered just a few days ago, actually, that there's also another option since this version, so since 3.2.3, that there is also this environment variable, typically sets to none or to zero, sorry, to random, which allows to, so basically these avoids to have, it's applied to the hashes calculation in Python, and this may affect the replicability when you serialize objects, typically. So if you set this variable to a specific number, you're basically requiring Python and guaranteeing that Python will generate consistently the same number for hashing. We're data scientists here, And so we have NumPy for the rescue. And for NumPy, it's basically the same thing. We have a random package and the seed, so we can set the seed. What about deep learning? Well, Haskell-Theano, basically Theano framework, which is not very popular nowadays, but it is a very nice framework. Its support is very well integrated with NumPy seed. So setting the seed in NumPy would also do the job for Theano. There is also a specific function in TensorFlow called setsRandomSeed. You can call it, you set this random seed in TensorFlow, and the same applies also to PyTorch. Actually, PyTorch has two options. You can use the manual seed for CPU computation, and also there is a manual seed and manual seed all for the CUDA package. So you can set a seed for GPU computation or CPU computation. So, if you want to run, for instance, a Keras model here, the rule of thumb is, before importing anything from Keras, I am assuming TensorFlow, in this case, has a back-end, before importing anything, you typically set up the NumPy seed, then the TensorFlow seed, and then you can do whatever you want. And in particular, if you're creating a simple model like this one, and you create dense layer, you can explicitly call the initialization function in passing the seed you want. In this case, you're basically fixing all the seeds you can have. But what about QDNN? Well, that's another topic. And QDNN, this is QDNN documentation. That's official. I just checked this this morning. basically nvidia says that the deterministic reproducibility of some operations in cuda cannot be guaranteed for sure it cannot be totally guaranteed if you change the version because of the cdnn and the cuda because the implementation may change and so this is why i told you it's very important that you fix the uh that you fix the the the version you want and also there are specific operations that you cannot control. These sets of operations are not guaranteed. This is specifically for convolutional layers and convolutional operations. They cannot be guaranteed to be reproducible completely. For this reason, actually, Tiano has some configurations you can set. I just checked out this very recently, so I looked a lot into it, and I just discovered that, the ANO is very flexible. You can actually set in the configuration file or manually, these two parameters as deterministic for instance, and so you will guarantee to have the same result on. It will affect a bit the performance, but it allows you to guarantee these. As for TensorFlow, the situation is completely different, and the most I can get was two pull requests and issues, actually, not pull requests. are basically asking for features. The thing I can say right now, as far as I know, that the situation in TensorFlow is very complicated. You cannot control this parameter. And so the complete reproducibility on some operations or convolution on GPU cannot be guaranteed. I tried. I will publish some results, scripts I did, and you are just demonstrating this cannot be achieved, as far as I know. As for the CPU, you can do something. Actually, TensorFlow has these two options, intra-OP parallelism and inter-OP parallelism. Basically, if you fix these parameters to one, this controls the problems you can have between the same operation, just like matrix multiplication. So these can be parallelized internally in one single operation. This is the parallelism for operations that can go separately, so it can be parallelized without dependency. If you set these to one, basically you're guaranteed that you have reproducibility also in convolution, but for CPU. And finally, I found this one for PyTorch. I found this very nice because it's deterministic convolution is non-deterministically being non-deterministic on kudianen. I saw your faces, and that's exactly my face when I read it. But when I happily discovered that this had been fixed, and actually I think, I don't know if Adam is here, but I can confirm it, but since PyTorch version 0.3, this has been fixed in PyTorch. So PyTorch should be a deterministic and convolutional operation. I didn't try that. Anyway, so what about reproducibility in machine learning? So the kind of reproducibility I have in mind is as a measure of confidence for machine learning models. So, let's talk about now about the selection bias and bias in general. So, when we build machine learning models, basically we want to keep the error as low as possible. That's what we strive to. And we have two major sources of error, and those errors are called bias and variance. Can I have a quick question for the audience? How many of you does know what bias-variance problem is? Okay, so I will skip a bit. Okay, so the idea is that if we manage to reduce these two errors, basically we could build more accurate models. And this rule generally applies if you have... So, garbage in, garbage out always applies. So, the point now here is how we diagnose bias and variance, and what action should be taken in this case. So the idea is generalization. And the very first solution is the holdout method. The holdout method basically says, okay, I have my data. I split these data in two sets, training and test. I'm using the training. There's a nice function in Scikit-learn to do it. And I use the training data to train the model and the test data to evaluate the performance. Well, so in the bias-bias concentration, basically, we have this function, the unknown function, f. f typically is completely unknown. And we want to find this function by generalizing this function using a machine learning model. So we expect some data in, and we want the prediction out. Typically, we can have different training sets and so different estimates. So we have TS1, TS2, TS3, different training sets. And talking about the variance, basically the variance is the amount by which the model varies depending on the different data we use. This is called variance. As for the bias, basically the bias reflects the amount of assumptions we do when we define, when we create the model. So let's have some examples. Basically, on the top, we can see a model, HEF, HEF-HAT, which has been built with high values in mind. So regardless what the configuration of the data is, we keep on predicting basically the same thing. that's a linear model for non-linear data, so that's quite expected. On the other hand, we also have a model here which has been built with low bias. So this means that the model highly changes depending on the data we use. And so we know basically that we have this trade-off to cope with, the bias-variance trade-off, and it's always a trade-off. So we have to compensate on one hand to get from the other one. When we have high bias, low variance, basically we strive to pick all the errors in one place. But on the other hand, when we have low bias but high variance, basically we try to adopt a bottle depending on the data, and this is not going to work anyway. So one possible solution is to have an additional data set that's called validation data sets. And with these validation data sets, we actually can compute something which is typically underestimated in machine learning experiments, which is the learning curve. So you can actually evaluate how the model changes the performance depending on the different splits on the data you have. And also, you can actually evaluate the performance depending on... So you have an error in the training and in the validation sets, and you can actually evaluate the performance depending on how many samples you get in the different sets. so uh you may end up in a configuration like this so you have uh errors and in the training test size and so you have a low gap here so you have a low variance case uh you have a very large gap here you basically have a high variance case but the problem the difference here is is in the the error you get in the training basically and in the validation um but there's something we We cannot avoid to say that, as I told you, it's basically a compensation problem, so you have to always think that the irreducible error is there, so you have to make some decisions. For those of you who never tried it, actually, Scikit-Learn has a very nice function, which is called LearningCube. You can use it to generate this kind of thing. So finally, the typical solution to cope with this problem, when you have the power and the time to do it, is the cross-validation. The general principle of cross-validation is this one. So when you have cross-validation, you divide the data into different folds, and you use, in different rounds, one fold for the validation, the rest of it for the training set. I show you very quickly what's the effect in Scikit-learn of having different options. You have the shuffle split, which is the very general one to have shuffle splitting and random picking, okay? So you can have different splits, five splits here. The test size is 20%, and this is one configuration of shuffle split. If you increase the number of splits to 20, this is another configuration of shuffle split. The yellow dots are those selected, the picked in each of the splits into the validation set. We also have K-fold, and the K-fold is basically the configuration I showed you previously, so you can have five splits or ten splits. Increasing the splits basically increases the number of folds you take in the training set. And finally, you also have the stratified k-fold. The stratified k-fold is a very nice tool to use. It's different in the behavior from the k-fold when you have imbalanced at eight sets, which is typically the case, at least in my own case. The stratified k-fault takes into account how many samples you have in the classification problem, for instance, how many samples you have for each of the class, and so the generation of faults will be taken into account, between training and validation, will take into account this distribution as well. If you strive for replicable cross-validation, of course, the trick is always the same. Fix the seed. So if we concentrate more on the selection bias, the selection bias is a very specific kind of bias and it affects basically the selection of data used to train and to validate your model. The general rule of thumb we know that for basic machine learning is that we have to make sure that a data in the validation set will never be used in training sets unless you're doing cross-validation. But when you do cross-validation, the model you create in every single fold is a new one. And that's very important to think about and to remember, especially when we talk about deep learning. So if we have selection bias or the selection bias is not considered, the conclusion cannot be accurate. And this is a problem I'm very sensible about, and it's very important when you work in biomedicine in general and with biomedical data, especially when you're generating predictions on the survival of patients. You have healthy patients, you have sick, unfortunately, patients, and you have to generate predictive models to generate survival. And you want to understand to what extent you can rely on those predictions. So one approach is doing nested cross-validation. So cross-validation is not enough. You want to increase the statistics you have. And so, again, the general rule is you do stratified K-fold multiple times. And every single time you do, basically you keep on fixing the seed. And using different seeds every time guarantees you to have different splits. Taking from textbooks, basically, the classical configuration for nested cross-validation is five times three-fold cross-validation for hyperparameter search and ten times five-fold cross-validation for selection bias or generally nested cross-validation for experimenting. So the to-do list for nested cross-validation is this one. You have to initialize and set random seeds. You have to be sure that you create a new model at each run. And this is particularly important when you do deep learning. When you do deep learning for cross-validation, you have to make sure that the graph, or thinking about Keras and TensorFlow, for instance, you have to make sure that the model is a new one. You don't have to keep on fitting and fitting again the same model. Otherwise, it doesn't make any sense. You have to calculate the error metric at each run and average and get the confidence interval. Getting those confidence intervals also is another topic. Unfortunately, I don't have the time to explain it a bit more into details, but feel free to ask me afterwards. Typically, the general message I want to give you here, that standard deviation here or different simple statistics are not really enough because the average can change. So typically, a bootstrapping approach would be better. And finally, you have to save your models and checkpoint. So when you do these kind of things, Basically, you end up doing lots of boilerplate code. So you have generates model independently and create models every time. You have to be easily tunable depending if you're experimenting with machine learning and deep learning. And also you can apply feature normalization every time. You can have feature selection. This is another thing we typically do since the kind of machine learning problem we have is in the case of genetic expression, for instance. So you have lots and lots of features, but of course the number of features you use is by far greater than the number of samples you have. And so I would just present you a project I'm working on. It's an ongoing project, so I recently released it. It's called Reproducible Learn, but I'm also working on the name. I don't really like it. So it's on GitHub, and in the last minute I have, I just want to share with you what's the plan. This is the, we call it data analysis protocol, actually. DAP has been referenced in the paper some years ago. This has been built with some configurability in mind. There's a setting file. You can set mostly all the settings for machine learning. And also specific configurations for deep learning as well. And the general idea is this one. So you have the training sets and the test sets to be used in the very end. So in the training set, you do 10 times in the default configuration, 10 times 5-fold cross-validation. You have internal training and internal validation. You have the generation of classification model. You test on validation. So you generate the performance evaluation. At the same time, you rank the biomarkers, thinking about genetic information. And in the very end, when you end up with this, you select the features you want to use in the final model by doing some rankings and statistics on the features in the different models you have. So here we have 50 different models, but if you also do feature selection, you can also end up with more models. And so you generate the prediction for the test set. I will skip this. Basically, this is software engineering I did with a template method in mind, so it's highly configurable. And also it ships with already predefined runners for machine learning. So if you want to test a random forest, you just have to feed the data and it's everything already set up. So the to-do list for the future are have to improve parallelization. All these operations are definitely embarrassingly parallel. Integrate DB analytics to have some dashboard analytics. So far it's not really ongoing. It's framework agnostic for deep learning. So far Keras and TensorFlow are the most support. And integrate multiple metrics for different kind of problems. And I think that's it. So thank you very much for your attention. If you have questions, feel free.
+
+**Speaker 2** _[30:07]_
+
+Thank you very much, Valeria, for these useful insights. I'm actually amazed that random seed is not typically implemented. Are there any questions? I've walked the wrong side. Thanks very much for that talk. Very interesting. I really like the idea of doing representable research or reproducible research. I try to do that, too. One remark, actually, is that the random seed of Python is not threat-safe. Especially if you do multiprocessing, you will not end up with that reproducible you thought of. And in NumPy, there's even a special thing called random state, which you can use. Thank you. That's just for best practice for those who may use that information.
+
+**Speaker 1** _[30:51]_
+
+may use that information. Thank you very much. Actually, that's a very nice plug. Yeah, totally agree.
+
+**Speaker 2** _[30:57]_
+
+More questions?
+
+**Speaker 1** _[31:05]_
+
+Thank you.
+
+**Speaker 2** _[31:06]_
+
+Regarding reproducibility, did you also check
+
+**Speaker 1** _[31:10]_
+
+check hardware, because I remember in the beginning of GPU computation,
+
+**Speaker 2** _[31:15]_
+
+computation there was a lot of different floating-point arithmetics implementations and so GPU to GPU could result in different
+
+**Speaker 1** _[31:23]_
+
+results and also
+
+**Speaker 2** _[31:24]_
+
+And also maybe CPU. I don't know there was virtualization also. That's what the whole yeah
+
+**Speaker 1** _[31:29]_
+
+That's a whole different game. I did not, but I have in mind to collect all these recipes in one public GitHub repository. So I think I will share on the telegram these repositories. So any suggestion or idea or maybe code you already have will be definitely appreciated. So thank you very much for the plug.
+
+**Speaker 2** _[31:50]_
+
+Just a side note, today all GPUs are compliant with the IEEE standard, so that's not a big issue anymore. Thank you, Valerio. Fantastic. I'm coming from the numerical simulation, and we have compliance issues. There was an accident in the US, and you know the lawyers, there was a suit against, I think, Volvo, and they had to validate that they had built a car right. So the simulations were back to the 90s, and they didn't have simulation tools, they didn't have the operating system and so on, but there was one company. I don't want to mention now, but they could prove that Volvo or Saab, they were right with this code and so on there, fit everything compliant. But what is the case in this case? If you're looking for the next 10 years and there's a issue, something, how can you prove this? Because I think this is really impossible, or do you have any suggestions? Because this is trust and the guts, and even, yeah, the lawyers and the courts. This is a big problem, I think.
+
+**Speaker 1** _[32:52]_
+
+Yeah, the thing is that, so it's a twofold problem. To be numerically deterministic, I think it's a hot topic, maybe a bit, my feeling is a bit under-considered by a researcher in general. So it definitely deserves more attention. I told you about the NVIDIA thing. NVIDIA actually publicly in the documentation says, if you change the version, we do not guarantee anything, right? On the other hand, the trustability of the predictions we do on machine learning, we try to compensate this issue by doing statistics. The problem is that sometimes you cannot be completely reproducible, but in the very end, even if you don't get the exact numbers, maybe you will get the same statistics. So having lots of, depending of course, but having lots of lots of samples where you can use to generate some insights on how the model barriers, for instance, depending on the data, is very precious. Because in the very end you can say, okay, because when you do statistics you have the confidence interval and you say, okay, if the model in the test set, whatever it is, is within this range, that's fine.
+
+**Speaker 2** _[34:16]_
+
+will be sufficient in the legal term.
+
+**Speaker 1** _[34:17]_
+
+In the legal side, I don't know.
+
+**Speaker 2** _[34:19]_
+
+We have to move on. I'm very sorry. We have to take just a coffee break. Thank you very much again for this conversation.
+
+**Speaker 1** _[34:24]_
+
+Thank you for this great talk.
+
+---
+transcript_status: auto
+---
+transcript_language: en

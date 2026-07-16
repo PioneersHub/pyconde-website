@@ -1,0 +1,291 @@
+title: The key to reliability - Testing in the field of ML-Ops
+---
+description: Testing is a de facto standard in modern software development. With increasing awareness that comes with ML-Ops, testing becomes more important for the…
+---
+created: 2023-12-21
+---
+code: 9PZSBS
+---
+slug: the-key-to-reliability-testing-in-the-field-of-ml-ops
+---
+speaker_names: Gunar Maiwald, Tobias Senst
+---
+speakers:
+
+
+
+### Gunar Maiwald
+
+Gunar Maiwald has a background in Computer Science. For the last 4 years he worked as an ML engineer at idealo.de. His professional programming path led him from Perl via TypeScript to Python.
+
+* LinkedIn: https://de.linkedin.com/in/gunar-maiwald-6a5aa6194
+
+### Tobias Senst
+
+Tobias Senst is a Senior Machine Learning Engineer at idealo internet GmbH. Tobias Senst received his PhD in 2019 from the Technische Universität Berlin under the supervision of Prof. Thomas Sikora. He has more than 10 years of experience in Computer Vision and Video Analytics research.
+
+At idealo, he switched from the world of images and videos to Natural Language Processing and is responsible for the operation and development of machine learning models in a productive environment.
+
+* LinkedIn: https://linkedin.com/in/tobias-senst-08090b192
+* Github: https://github.com/tsenst
+* Medium: https://medium.com/@tsenst
+* Google Scholar: https://scholar.google.de/citations?user=NKQ8Y9oAAAAJ&hl=de
+---
+abstract:
+
+
+Testing is a de facto standard in modern software development. With increasing awareness that comes with ML-Ops, testing becomes more important for the development and operation of machine learning-based components. In this talk we would like to share our view and solution for testing in the field of machine learning. We will present the applied testing strategy used and the lessons learned from the last four years of experience in operating idealo’s cataloging system.
+---
+full_description:
+
+
+idealo.de offers a price comparison service for millions of products from a wide variety of categories. It navigates the dynamic landscape of about 3.7 billion offerings from 50,000+ shops, our central challenge is cataloging this huge offer automatically. Machine learning plays a crucial role for us in processing data.   
+
+Machine learning components must be considered as a part of a more complex domain. In our domain those components are part of an event driven asynchronous architecture. The need to continuously develop, deliver, and train accompanied by the capability to smoothly work together with traditional software components raises high demands on stable software development and operations. Testing plays a crucial role and brings up many open questions in the field of machine learning.   
+
+In this talk we want to share and present our holistic approach to testing in machine learning.  The following aspects are taken into account:   
+- Introduction into our machine learning lifecycle   
+- Testing in context of traditional software development comprising unit tests, code coverage, contract tests, tests on infrastructure as code    
+- Specific challenges of testing in the machine learning domain comprising end-to-end test of training pipelines, deployment testing of inference endpoints in operational modes 
+- The role of logging and monitoring for safe operations  
+
+The presented test strategy is based on our 4 years' experience in operating idealo's cataloging system. Examples will be aligned along our tech stack consisting of e.g., PyTest,  CDK , Pactman,  AWS Sagemaker, Github Actions, OpenSearch Kibana and Grafana.
+---
+room:
+---
+day: Tuesday
+---
+slot_date: 2024-04-23
+---
+start_time: 14:45
+---
+end_time: 15:30
+---
+slot_id:
+---
+track: MLOps & DevOps
+---
+tags:
+---
+submission_type: talk_long
+---
+submission_type_label: Talk (Long)
+---
+submission_type_id: 3579
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/9PZSBS.png
+---
+youtube_id: 1bUZXfB06z0
+---
+video_link: https://www.youtube.com/watch?v=1bUZXfB06z0
+---
+video_published_at: 2024-10-28
+---
+video_duration_iso: PT44M45S
+---
+video_thumbnail: https://i.ytimg.com/vi/1bUZXfB06z0/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:06]_
+
+So, hello from our side and welcome to our talk about testing in the field of MLOps. Okay, let's start. We have to start with a sorry. If you expect this talk about general tests in AI, this is not the focus of our talk. This means model validation, model evaluation, model performance, or even machine learning metrics are not central topics of our talk. So all these topics are big enough to fill thousands of other talks, but it's not our focus. So if you're very, very disappointed now, we can make you an offer. Stay here and listen to our talk, because we got plenty of nice other topics. You have the chance to listen on our perspective of machine learning ops-specific tests, And this means we give you a brief overview of how TESS helps us in our daily work. And in detail, we'll talk about unit tests, about code quality, contract tests, what else, infrastructure tests, pipeline tests, endpoint deployment tests, and last but not least, a few slides about monitoring and logging. So quite a bunch. And before we jump in, let's introduce ourselves. Tobias, standing next to me, Tobias got a PhD in computer vision and has been working with Idealo as a machine learning engineer for the last four years. My name is Gunnar. I got a diploma in computer science and have been working at Idealo for almost nine years now and also work as a machine learning engineer. Okay, so Idealo. Here are a few key facts about Idealo. Idealo is a price comparison from Berlin with more than 20 years of experience now. And in our manually curated catalog, users can find more than 4 million online products within 2,000 categories. So quite a lot. And Idealo collects all these offers from over 50,000 shops. And, what happens to these offers, they are processed and then presented to our users that they feel well informed and, yeah, they got good hints about their shopping decision. And one of our key tasks is cataloguing the whole shop offers and this means processing and this is how it works in general, but simplified. So Idealo imports all the offers from very different shops. Yes, there are small shops, there are big shops, there are very big shops, tiny shops, so all sizes of shops. And these shop offers may contain a description text, for instance, some identifier, or even suggestions for our cataloging system. And our task now is to map these offers, the shop offers, into our catalog. And cataloging can be divided into several subtasks. There's category classification, and there's attribute recognition. So, for instance, extract the color or size of a T-shirt, for instance, or some technical attributes of a washing machine or photo camera or what else.
+
+**Speaker 2** _[03:47]_
+
+or what else.
+
+**Speaker 1** _[03:49]_
+
+and there's also offer product matching, so shop offer product matching. This means matching product within our catalogue within shop offer. And there are also a few more subtasks of cataloguing, and what's cool is that all these subtasks can be solved by machine learning, so our domain. And if you look at machine learning, The use of machine learning is usually very specific, and it varies from case to use case. So you've got early project phases where the use case or the business goal is more on focus. And later, the exploratory data analysis is more important. And once these things have been clarified, then other things such as selecting a suitable algorithm or generating the features become more important. And even later, it's about getting things running, deploying the model and ensuring that operations run. And as soon as operations are stable, it is a matter of continuously updating the model and feeding it with new data and continually deploying new models. And this continuous sequence of repeating steps, this can be represented by the so-called machine learning operations lifecycle. So our team implemented this MLOps lifecycle and ended up in a machine learning pipeline for our category classification task, for instance. And in detail, the whole ML pipeline works like this. According to the lifecycle, there are separate components for data, one for model and one component for the endpoint and each component got a separate code base and this separate code bases allow us a great flexibility and also a good development speed by the way we use Renovate to update our third party libraries and we even allow Renovate to deploy our components yeah, continuously and what else? yeah, some more aspects our training pipeline is triggered every two weeks, continuously the endpoint is running 24-7, so all day all night, and we process up to 2 billion of us per week in peak time so, and as you can imagine a 24-7 running system should be as stable as possible and otherwise you get might a call at midnight or your colleagues might get a call at midnight and this is something nobody wants and there's another aspect that each component depends not only on its code base but also on the output of its prior component and a minor change at the beginning of the pipeline might have a huge impact on the whole running system and therefore the life cycle might be good in theory but it can be quite fraggle in practice. So if you end up like this, what shall you do? Can you put things in the right order or is there a way to fix the life cycle? And with these questions I hand over to Tobias who hopefully helps us to find an answer.
+
+**Speaker 2** _[07:35]_
+
+The answer that we want to give to that is testing. In the following, I would like to share our experiences in testing with machine learning. So why is testing important? For a software developer, testing is a daily business and forms the basis for a maintainable and reliable software product. But as a former researcher, which I was, I struggled a bit in applying testing concept to machine learning. But when we put machine learning pipelines into production, testing becomes unavoidable. However, writing tests in machine learning domain
+
+**Speaker 1** _[08:08]_
+
+is
+
+**Speaker 2** _[08:09]_
+
+are very challenging, because the testing behavior of a machine learning system not only depends on the code, it also depends on the data and on the model artifacts. And these artifacts are not available at TESM most of the times, if they are very big. Yeah. I would like to give you an overview about tests we use in this talk. I put our tests in this testing permit. The higher you get in the pyramid, the longer the processing time will take and we hope that we can detect errors on a very early stage here in the place below, but also the higher you get in the testing pyramid, the more
+
+**Speaker 1** _[08:56]_
+
+the more
+
+**Speaker 2** _[08:58]_
+
+certain you are that the software is correct. In our case, we identified three testing domains, which is in black. These are classical software tests, which are unit tests, contract tests, and we put also linting here. And then we have tests that are related to our cloud setup, which are the infrastructure as code tests and pipeline tests. And finally, what we do is machine learning related tests. So we test the data, the model, and we do kind of end-to-end point tests for our classifier services. As Gunnar said, we will not dig very deep into model testing and we will also not present some sophisticated deep learning related tests because, of course, this field is evolving a lot in the recent years, but we want to concentrate on the operational point of use. If you'd like to read further in the topic, I brought you here below a link. This was a nice presentation on the last year conference, on this year, in this conference, which is explicitly about deep learning tests. Okay, I would like to start in our pyramid with unit tests and linting. Both apply directly to the code base, and unit tests especially run on individual components of the code. That means they are quite fast, and they allow you to identify errors at a very early stage. I brought you an example of a classifier endpoint implementation which is very simplified what we're doing here is that we want to predict a category for an ideal offer we have an input scheme which is due to our inference services and we do some pre-processing where we connect like title and description to a text and we put this text in an SQL learning an SQL learning model this can be support vector machine or whatever you like and this is a unit test code for this example we are doing unit tests with pi tests and here we want to show you some techniques which we like the first technique is called fixtures fixtures run before the test only runs and then they can be used to initialize data and also objects. In this case we initialize a dummy classification object where we do some configuration loading, data loading, data pre-processing, and you can use the fixture method to pass it directly into our testing function as argument and then work with that. And this is only done once for all the tests that you use. The second thing is the parametrization decorator. This decorator allows you to run the test function multiple times with multiple data points which can be also edge cases. In our case here we test the the internal pre-processing function and provide some input data and text data for that. Yeah as I said the nice thing is that you don't have to implement a loop which goes over all the data point you just have to use can use this parameter and the tasks are run parallel. Yeah and the most important technique that we like to to use is mocking. Mocking allows you to override specific function. Especially for large models, as I said, we are not able to load them during the test time. And we use mocking most of the time to fake the model output predictions. The pytestmocks allows you to mock the output. I mean, you provide a return value of the mocked function. And in our case here we just checked if the return value of the model is passed correctly with our classifier function. And mocks also allow to check the input argument of our mocked function. In this case, we checked if the preprocessing return value was passed correctly in the mocked function. However, mocking has to be really taken with care, because if you mock everything, and that could sometimes be by accident, then you remove all the logic tests in your code. So mocking can be tricky. Okay. The next method I would like to speak about is linting. Lintings or linters are tools to improve the code quality. That means they can check typings, they can check formattings and spellings, and we have good experiences with the SuperLinter, which is a package that contains a lot of linters. We like, for example, the Flake 8, Blake, iSort, and MyPyLinter. And another advantage of this package is that they offer a GitHub action, which makes it really, really easy to integrate it to a CICD pipeline. And when we start using linting, we found that it also helps us to detect errors in a code on a very early stage. In this example, you see that somehow we forgot to implement the preprocessing function. And this was detected by the MyPyLinter because the input argument which is in the preprocessing which is directly passed in the output does not fit from the type. And this is detected by myPy, so linting can be also an additional safeguard. All right. The next test I want to talk about is contract tests. In our case, we have to consider that the classifier server is only a small part of our cataloging domain. Although the domain is owned by our team, but most of the components are integrated in an event-driven asynchronous architecture. That means they connect to Kafka and MongoDB and all the stuff and they run on an EKS cluster. And most of the services are not implemented in Python, they are implemented in Kotlin and most of the services are not implemented by Gunnar and myself.
+
+**Speaker 1** _[14:59]_
+
+I couldn't have myself.
+
+**Speaker 2** _[15:00]_
+
+They are implemented by our colleagues, which are experiment software developers. And although we work very closely together, there are differences in the Python world and in the Kotlin world or in other languages' worlds. And these differences can lead to misunderstandings. And therefore, we take care that we define our interfaces with care, but as human beings, we make mistakes. And one case that we had is that there was an error in the transmission of an ID, so we expected an int and got a string, and this error led then to errors in the conversation, so the model predicted an offer based on wrong ID, and this screwed up totally our classification. And this was, for us, really difficult to detect because a long time we thought that it depends on the model. We have screwed up some things with the training, but this was just this conversation error in the interface. And contract tests are a nice solution to test the interactions between services. How does they work? Contract tests exchange contracts, and these contracts are similar to API specification files. They are exchanged with a broker, and we use the PactFlow server for that. And in our case, the consumer, which is within Kotlin, defines this API specification and then we have to verify this contract on the classification side. The nice thing about contract tests is that they are run at unit test level. That means they execute really fast. So we don't have to do some complex integrations tests here. And in the above example, I brought you a piece of code where we implemented this verification this package was called Pacman in Python as you see what you have to do there is that you implement a dummy server, then you have the verification method and then you can get a verification response which contains the content of the contract and this we validate in our input scheme against this verification server response and we see if everything is okay but APIs are not the only place in our pipeline where the consistency of data formats plays an important role. In our machine learning life cycle the training and validation and test data is processed in several services and these services are developed independently and this can result to unexpected data changes and this can make problems. A case that we had is that we had problems in our auxiliary validation data, and this leads to problems in the training. The problem here was that we only recognized this error at the end of the model training, and for us this takes two days. So the code crashed after two days, which was really annoying, and that was due to wrong data format. Therefore, we implement data consistency checks, and these checks are applied to all the data that goes in or out of the service, and this is data which is stored in an S3 bucket, like CSV files or Parquet files. And we concentrate on validating data schemes, and our idea was to implement a very, very simplified data contract. In fact, we use the same framework. We use a Pectra server, and we create contracts that contain data scheme definitions. and we can use these definitions to synchronize the data we store on model training with the data collection service. One thing is here that everything runs with unit tests and another advantage of this approach is that on both sides in the model training and the data collection we now have the data screen and we can use the scheme to generate mocking data so also the data we use to mocking in both services are synchronized, which makes the unit test better at the end. And with that, I would like to hand over to Gunnar again, who will explain next.
+
+**Speaker 1** _[19:16]_
+
+Next test we do our infrastructure as code test with snapshot test. As you can imagine, all our infrastructure of the pipeline is in the cloud, is running in the cloud, and in our case, infrastructure means that we use CloudWatch for logging and monitoring our SageMaker components. The SageMaker pipeline itself is part of the infrastructure, we have several buckets for our data and even our models are stored in buckets. The SageMaker endpoint is part of our infrastructure and last but not least, all the access management is also part of our code and our infrastructure. So as we said, all infrastructure is defined as code. What does it mean? We get some code, and this code is filled via configuration parameters, and then it will be deployed. And this allows us a very great flexibility, scalability, and much more. And by the way, we use the Cloud Development Kit, CDK for short, that has been established in our team on both sides, Kotlin developers and Python developers. So what does it mean? The current state of the deployed infrastructure is defined in a snapshot. So the snapshot is the state of the infrastructure we want to deploy. And a snapshot test means if I deploy my coded infrastructure now, does it match with my current snapshot? And if it matches, it's cool. But if not, then there are two options. It's intended, then it's cool as well. but if it's unattended, then you've got a problem. So if there are unattended changes, maybe in the configuration that you don't want. For instance, a typo might lead to an unwanted instance to be deployed. And this instance might be much too large for your use case. And a much too large instance type generates a bunch of unwanted calls. So a real problem. This is an example of our CDK implementation. So on the left side you see this CDK code. And we have for testing purposes we replaced config parameter just by a fixed stream. Just for testing. And unfortunately we didn't revert our changes. So it was as it was and the wrong name was still in our code base. This might happen sometime. And luckily we had this snapshot test and before the next deployment came it was failed and you can see on the right side the output of the snapshot test and it's like a diff, you can read it like a diff. So the difference between the snapshot and the state of the infrastructure that you want
+
+**Speaker 2** _[22:35]_
+
+want to deploy.
+
+**Speaker 1** _[22:36]_
+
+to deploy. Yeah, so the unwanted name change was detected by the snapshot test and we were fine Okay, so let's jump to the next level of the pyramid as You have seen SageMaker pipelines are a very essential part of our lifecycle and therefore it's very important that they are stable and In case of changes of our code base. We always want to make sure that the pipeline is still running And on the right side, you see a screenshot of one of our model building pipelines. So it contains multiple steps and branches at each single point. And some of these steps are running on dedicated instances. And those instances might have a three-minute warm-up phase. So as you can imagine, the whole pipeline, it takes a while to process from start till end. And therefore, we assembled a very, very tiny data set that runs through the whole pipeline. And in error case, we want to get notified as soon as possible. Then model test. Yeah, so as Tobias said, we identified some edge cases. Our model is confrontated from time to time. So maybe a shop offer might be corrupted, and this means the information it contains makes no sense. Or a shop offer might have a lack of information. There is no relevant feature that might be extracted. This is called an unseen sample. So, in our case it's a model that classifies a shop offer as a rebuild or a no rebuild. So what's a rebuild? There are some categories where rebuild products are quite common, printer cartridges or vacuum cleaner bags, just to mention some of them. And the question arises in such edge cases, what shall the model predict? And the answer should always be driven by your use case. So what we did was we expect the model classification to be an error. And the question is, what error has the lowest cost? And make the error with the lowest cost as the default prediction of your model. So in our case, the default answer is no rebuild, because if we misclassify a rebuild as no rebuild, the cost is not as high as if we misclassify a no rebuild offer as rebuild. But it depends, of course, on the use case. Okay, we reached the top of the pyramid, endpoint deployment tests. As we already mentioned, model and deployment are developed independently and have separate code bases. And both code bases reference the same third-party libraries, TensorFlow, Pandas, NumPy, just to mention some. And there might be from time to time a version difference between the two code bases, because they are independent of each other, and this can result in this situation, the service provides a slightly modified result than the model provides. For instance, a different class on the same shop data or same class but different confidence score. And it's hard to detect such a difference because everything runs smooth. But that makes it quite dangerous. But we detected this behavior and we eliminated those inconsistencies with doing the following. When we deliver our model, we always deliver it with a reduced set of validation data. And this contains the input data and the output of our model to deploy.
+
+**Speaker 2** _[26:54]_
+
+model to deploy.
+
+**Speaker 1** _[26:55]_
+
+And before we deploy a model to the production endpoint, we always take the input data and throw it against the endpoint and then compare the model results with the endpoint results. And if there is a difference, we stop the deployment and have to look what's the reason for it. But if the difference is not, then we are sure that endpoint and model are consistent. Then we have model stress test. So in regular intervals, we have a very high traffic on our systems. As we mentioned, in peak times, we have to process up to 2 billion shop offers by week. And our services on the other side process offers in batches for faster processing. And if we got huge traffic, the batch size will increase to be able to possess all the additional data in an acceptable time. And what might happen is that the increased batch size can lead to a following situation. There are some machine learning models that use sparse matrices for calculation, support vector machine, for instance. And sparse matrixes are very, very large vector spaces with many, many zeros inside. And to save space on this, they are compressed. But during runtime, they are full decompressed and require the full space in the memory of the instance for a fast calculation. And what happens is when big traffic comes, then the batch size will increase. And with increased batch size, the memory requirement of our deployed instance will also increase and sometimes the required memory exceeds the memory of the instance where the model shall run and what happens is that the service stops working and can no longer be initiated. This shall not be, so AWS on the other side offers or they
+
+**Speaker 2** _[29:08]_
+
+They've been...
+
+**Speaker 1** _[29:09]_
+
+Thank you. When you deploy models via SageMaker and AWS, this is done by blue-green model deployment. This means a new model is deployed on the same infrastructure as the old one, and if it's stable, then the old model is removed gradually. That's good, but does not prevent us in such an edge case. So what we do, we stress our model before we deploy it, And this means we take a multiple of typical traffic and see if instance type is able to host our model under stress. And if test pass, cool, model is good and instance type is big enough to hold a model. If not, we think about a bigger instance type or try to build a smaller model. Okay, that's it from our test perspective. but there is still one aspect left to have a stable and reliable system and Tobias will tell you more about this.
+
+**Speaker 2** _[30:16]_
+
+Yeah, this aspect is monitoring and logging. From our point of view, monitoring and logging is essential for a safe operation of software product. But I think it's nothing new for most of you. But it's not only important to create nice boards, it's also important to check the boards on a regular base and create nice routines to doing that. For example, we check our boards every morning in our dailies, and we nominate something which is called like a watcher or babysitter of the week who is responsible for the boards in that week. And this is also the product owner and the team lead, they are involved too. For monitoring, we use Grafana in combination with the CloudWatch metrics on AWS, we classify our metrics in operational metrics, training data metrics, and model metrics, and the difference between operational matrix and the other matrix is that they have to be monitored on different timescales. This figure here shows operational matrix and we are interested in the last 24 hours. These operational matrix contain some classical DevOps matrix like the CPU load, memory load and latency of the endpoint, but we also have machine learning-related metrics. A very useful metric for us is the prediction score of the classifier. The score tells us something about the likelihood of the model output. And although we could not use this to detect if a prediction was correct or not, by observing the plot, this is, for us, a really good indicator if there were some bugs in the model or in the service if we deploy it again. And then the graph will suddenly change. Other metrics that we use are, for example, training data metrics here on the top. We are, for example, interested in distribution of classes, in training statistics like the distribution of the classes to understand our classification problem better. What I mean with that, we have to mention our catalogue is not constant, it's constantly changing, because we have content colleagues which can add classes, which can delete classes, for example, categories, and by observing the distributions of the categories, we see if the evaluation matrix makes sense or if the drop is caused by another issue. And on the below, you see some model matrix, on the left side you see a typical F1 score And on the right side, the long-term prediction score. These metrics are measured over months because our training period takes about two weeks. And these metrics, not the prediction, but the F1 score is measured by annotated offline data. On the left side, on this F1 score, you see a nice example of a model drift. And in the middle, you see that there were some manual investigations where we fixed the model drift. and on the prediction score side you see there like this drop this the drop in the prediction score this was actually not an error in the model or service, here we had a shop which was recomputed and this shop had I would say bad offers, offers that do not fit so well to our classification, the classifier and there we had some problems so as you see, these are nice indicators to do further investigations to see, okay, there was something wrong. Do I have to look in the model or into the data? All right. Another important technique is logging, of course. Logging helps us to keep an eye on our services. We log to an open search cluster, and we create these nice Kibana boards. And we use open search because it allows us to build central dashboards that contain Python and Kotlin services so that all of our team can be represented in one board. And the goal of these boards is that they can be monitored and interpreted by each of our colleagues, as I said, regardless if the person works in Kotlin or Python, is our product owner or our team lead. And with that, I would like to come to an end. I hope that we could give you some insights about our testing strategies. and, of course, there exist a lot of more tests in the field of machine learning and in the field of software testing, but finding a good balance between the amount of work putting into the tests and into the development is very challenging. And this balance point differs from use case to use case. That's something that we learned. We identified three test domains, traditional software tests, the cloud related tests and also the machine learning related tests and we hope that we could show you a little bit that of course monitoring and logging is very important for a safe and stable life cycle and finally let me show you this observation in the recent years we see that AI has attracted a great deal of attention in lots of areas, not at least because of the accessibility of generative AI of the accessibility of models on hugging phase or packages that we could use but we find that solidating the test strategy in ai will be a necessary next step we want to put if we if you want to put research outcomes into productions and if you want to make reliable systems out of them so we are looking very forward when there will be more standardized paradigm in testing because we we believe that testing is a key for a reliable, secure, and maintainable software product. OK, thank you very much. I forgot to mention that the slides are available at the prelux site.
+
+**Speaker 3** _[36:37]_
+
+Thank you. So we ended early. So we have time for a couple of questions. And also, I've been waiting to make this joke. So that's a pyramid scheme of safety that you shared with us today. And with that, let's get to the questions. The first one, could you implement contract tests with something like Pydantic or JSON schema?
+
+**Speaker 2** _[37:01]_
+
+We use PIDANTIC to define our schemes and then also PANDERA to, I don't know PANDERA for the contract test, PANDERA for the data validation, but we use PIDANTIC.
+
+**Speaker 3** _[37:14]_
+
+Okay, thank you. Next, you mentioned you automatically update your dependencies and requirements. How often do you encounter compatibility issues with ML-related libraries?
+
+**Speaker 1** _[37:27]_
+
+Quite often, yeah, and if this happens we have to fix it by hand so by manual Investigation see what's a real problem. Yeah, but this happens at least a few times a week
+
+**Speaker 3** _[37:42]_
+
+That sounds painful. Do you have a team of MLOps engineers and DataOps engineers to help you with all the works? If so, how big are the teams?
+
+**Speaker 2** _[37:53]_
+
+No, actually, Ideal is structured so that the team has an end-to-end responsibilities. We have a kind of a machine learning core team which helps us with the start of a machine learning product, but MLOps and also the further development in machine learning is done by the teams, which from my point of view is a great advantage because we could be really, really fast. The disadvantage is that you need different kind of persons in a team.
+
+**Speaker 3** _[38:22]_
+
+You regularly retrain models. Are they pushed to production automatically or require manual intervention or quality check?
+
+**Speaker 1** _[38:30]_
+
+In most use cases we deploy it automatically, but of course we got some validation limit if the model doesn't if the model does not fit the validation test then it will not be deployed but in usual cases it's gonna be deployed online.
+
+**Speaker 3** _[38:56]_
+
+Where and when do you run the different types of tests?
+
+**Speaker 1** _[39:01]_
+
+Um, actually,
+
+**Speaker 2** _[39:02]_
+
+Actually, everything is run by GitHub Actions. We're starting with unit tests, linting, and contract tests because we want to fail them fast, and also data validation. Then the infrastructure as code tests and the pipeline end-to-end tests. So infrastructure as code tests is also in a similar level on GitHub Actions. Then if we see if everything works, then we run the pipeline tests because they take a while. and the deployment end-to-end test is like the last piece in the deployment pipeline where we deploy our services because then we have like the stress tests and all the stuff
+
+**Speaker 3** _[39:45]_
+
+Are you applying these steps on all of your use cases, or is this just a very mature, long-running solution already?
+
+**Speaker 1** _[39:53]_
+
+We started with one use case and we felt it looks good, we felt safe with this solution and then we on a way to extend it to all other use cases. But started once where we thought it's the biggest need.
+
+**Speaker 3** _[40:11]_
+
+There is a room for an additional triangle in your pyramid. How do you manage integration tests going from dev database to database and then prod? Integration tests from dev to prod.
+
+**Speaker 2** _[40:27]_
+
+Actually, what we are doing is like we have everything in our production environment. The problem, because we are running like 24-7, and we are not able to create a staging system because this would be too expensive. So that's why we try to secure as much as possible and to add as much as possible tests so that if the model is production, we are really, really sure that it works. It could be that the performance is a bit lower, but it works in general. So no, we don't. Actually, the place is just because we want to have a
+
+**Speaker 3** _[41:03]_
+
+We appreciate that. If you depend on an endpoint of another team, how do you test or enforce that they not change the scheme without you noticing?
+
+**Speaker 2** _[41:15]_
+
+So we do not depend on endpoints, we depend on Kafka use and this is done by our software colleagues and they are far more experienced in all the testing and their tests are more solidated. So we use contract tests and if another team wants to change something, then the contract test has to be passed because we define the scheme. So, you know, so there's a communication between that.
+
+**Speaker 3** _[41:41]_
+
+Which tool, library, or package do you use for snapshot tests?
+
+**Speaker 1** _[41:48]_
+
+Snapshot test is done by NPM and CDK.
+
+**Speaker 3** _[41:55]_
+
+In which scenarios do your deployment endpoint and model predictions differ?
+
+**Speaker 2** _[42:04]_
+
+If you mentioned what Gunnar said, so we had a case that we trained a classifier with an XGBoost version. And so we stored this model somewhere, and then because this was an early phase, then we deployed this model. And something went wrong. What we didn't take care of is that XGBoost improved. So there was a bug fix in XGBoost, and we used the improved version for the service deployment. So at the end, the predictions which came out of the classifier are different from the model training although we didn't have changed the code and this makes us curious and that's why we every time keep a little bit of data and test it during the deployment.
+
+**Speaker 3** _[42:46]_
+
+Are you performing all the monitoring and logging, or is that part of the responsibility of some other team?
+
+**Speaker 1** _[42:52]_
+
+No, it's it's our responsibility. So we implement the We think about the metrics we want to monitor and logging is all an out here
+
+**Speaker 2** _[43:06]_
+
+Thing is because we are kind of diverse team in terms of what we're doing So we have experienced software engineers who can set up this cluster for us And we just using it and we do it because they have done it before with their software engineering skills
+
+**Speaker 3** _[43:21]_
+
+It would be painful without them, right? Yeah. Have you considered to use SageMaker auto-scaling to cope with high traffic volume? Wouldn't this make model stress tests...
+
+**Speaker 2** _[43:33]_
+
+We do use autoscaling, but this doesn't make the stress test obsolete because the problem on the stress test is that our batches can be, so we compute everything at Idealo in like three weeks, and then we get really, really high batches. And we thought that these batches, because of these batches, it came to memory break. So it tried to allocate more memory than we had. And this cannot be, also the auto-scaling wouldn't work so much because auto-scaling takes a while. I guess the problem here is that we want to make our services, or we want to fit our models so tight in the service. So we try to allocate small instances because of pricing and all sorts. so this is like we did the testing and you do all the scaling
+
+**Speaker 3** _[44:27]_
+
+there are just a few more questions but I think we're up on time we're around here if you have more questions find them
+
+---
+transcript_status: auto
+---
+transcript_language: en

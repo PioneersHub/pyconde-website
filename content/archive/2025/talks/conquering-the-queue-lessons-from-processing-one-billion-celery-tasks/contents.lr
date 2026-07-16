@@ -1,0 +1,149 @@
+title: Conquering the Queue: Lessons from processing one billion Celery tasks
+---
+description: At Userlike, Celery is the backbone of our application, orchestrating over a 100 million tasks per month. In this talk, I’ll share real-world insights…
+---
+created: 2024-12-22
+---
+code: J8FLDN
+---
+slug: conquering-the-queue-lessons-from-processing-one-billion-celery-tasks
+---
+speaker_names: Daniel Hepper
+---
+speakers:
+
+
+
+### Daniel Hepper
+
+Daniel is the CTO at Userlike, a leading SaaS company providing innovative customer communication solutions. He has a degree in Computer Science from the University of Karlsruhe and has been writing software professionally for over 20 years. He enjoys sharing his experiences and helping fellow developers level up their software development skills, and presented before at various Django and Python conferences throughout Europe. When not in front of a keyboard, he can be found training for his next marathon or building intricate Lego contraptions with his son.
+---
+abstract:
+
+
+At Userlike, Celery is the backbone of our application, orchestrating over a 100 million tasks per month. In this talk, I’ll share real-world insights into scaling Celery, optimizing performance, avoiding common pitfalls, handling failures, and building a resilient architecture.
+---
+full_description:
+
+
+At Userlike, Celery plays a critical role as the backbone of our Django-based SaaS application, orchestrating over 100 million tasks per month with speed, reliability, and precision. In this talk, I’ll share the lessons we’ve learned while scaling Celery to handle massive workloads and support the needs of a growing user base. From optimizing performance and avoiding common pitfalls to handling failures gracefully and ensuring a resilient architecture, this session will provide actionable insights for developers and architects working with distributed task queues.
+
+Whether you’re just starting with Celery or looking to scale an established system, you’ll walk away with practical tips, battle-tested strategies, and a deeper understanding of how to harness Celery’s full potential in real-world scenarios.
+
+Outline:
+
+•	Introduction: Why Userlike needs a task queue, and why you need one too
+•	Fundamental concepts: latency, throughput, failure modes
+•	Optimizing Performance: Strategies for faster and more efficient task execution
+•	Avoiding Pitfalls: Common mistakes and how to mitigate them
+•	Handling Failures: Building fault-tolerant workflows and monitoring systems
+•	Resilient Architecture: Designing for reliability and scalability
+•	Key Takeaways: Practical tips for implementing and scaling Celery in your own projects
+
+This talk is designed to be technical, engaging, and packed with real-world experiences to help you conquer the queue in your own applications.
+---
+room:
+---
+day: Thursday
+---
+slot_date: 2025-04-24
+---
+start_time: 16:15
+---
+end_time: 16:45
+---
+slot_id:
+---
+track: Django & Web
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/J8FLDN.png
+---
+youtube_id: mb7a_WErTck
+---
+video_link: https://www.youtube.com/watch?v=mb7a_WErTck
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/mb7a_WErTck/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:09]_
+
+Hi everyone. Thanks for coming. I'm happy to see so many people interested in this topic. So what are we going to talk about today? So we're going to quickly look at what Celery is and why you might need it. We talk about handling failures, optimizing performance, avoiding some common pitfalls, and achieving resiliency in your application. And in the end, we quickly touch upon some alternatives to Celery. Before we get to that, a few words about me. So my name is Daniel Hepper. I'm in Cologne, Germany with my wife and my son. I'm the CTO at Userlike since 2023. And I've been at Pythonista for almost 20 years. And I've also been using Django for quite a while now. A few words about Userlike to give you a context where this experience with Celery comes from. So Userlike is a customer messaging solution. We have multiple messaging channels. For example, a website chat where you embed a widget on your website and then your customers can chat with your support or salespeople. And besides the website messenger, we have multiple other channels, most notably WhatsApp, which is very popular in Germany. And on the back office side, we have a React application that your support agents use and work with all day. That's their bread and butter So we are also based in Cologne On a nice day. It's very nice today. It's probably as gloomy as it is in Darmstadt We are about 50 people with 15 people working in tech Engineering DevOps and so on and since we are a Cologne comedy. We love our carnival And the company has been around for a while So we've been founded in 2011 and it has been acquired by lime, which is the Swedish CRM company in 2021 that's also the reason why I'm wearing a lime hoodie and with that out of the way we dive right into what Celery is and why you might need it. So what is Celery? Celery is a vegetable of very questionable taste but that's not what we're talking about today we are talking about Celery the distributed task queue. You might know the thing from different names like job queue or background job framework so generally speaking what is a task queue at the core of a task queue is a queue so queue you put things in normally in the front and they come out in the back and the service or application that is managing that queue is usually called a broker and then you have producers which create tasks and send them to the broker which puts it the queue the broker then distributes these tasks to workers which execute the tasks and since we're talking about a distributed tasks you usually have multiple producers and multiple workers so with the general concept what is salary exactly so in the on the producer side it's a library to define and then dispatch tasks. So to define a task in the simplest way is actually relatively straightforward. So you have a little bit of boilerplate to set up in Celery application and then you just decorate a function. As you can imagine it gets more complicated the deeper you dive but that's how you start. And then to To dispatch that task, you use that task object, that decorated function, and call delay on it passing any arguments the function needs. And then Celery handles all the underlying magic of serializing the arguments and sending it to the broker and so on. Then on the worker side, it's a framework to fetch these tasks from the broker and execute them. Usually, you don't have to mess with that too much. It's just a matter of starting the worker. You can do that in a terminal, but in production, you would usually, I don't know, run them with system D or in a container and on your Kubernetes, whatsoever. But that's the salary part of it. What salary is not, that's a broker. So you have to bring your own broker. Celery supports multiple brokers. One of them is Redis, an alternative is RabbitMQ, and you can also use AWS SQS. Those are the three that are the primary built-in supported ones, but you can also bring your own broker adapters and use whatever tickles your fancies. So one thing that is also not exactly part of Celery, but which Celery has adapters for, is then result stores to store the results of your tasks. And that could be also Redis. It could be a database, a relational database, Postgres, MySQL, or whatever you write an adapter for. So why would you use a task queue in the first place? In a web application context, the reason is to execute any kind of long-running or potentially long-running task outside of your request sender. So you want your request senders to be relatively quick. And if you do something that takes long, it's better to offload that task to task queue. What are examples for that? So AI, obviously, which in the context of a web application is an external API call, and the external API calls in general are prone to be slow or can be unpredictable, especially when you talk with external systems outside of your control. File operations is also a prime candidate for offloading them to a task queue. It could be creating thumbnails, copying files around, and so on. Sending email could also be considered an external API, but it's also something that is usually fast, but sometimes mail servers can be unpredictable and be slow. And any kind of batch job where you process large amounts of data, you also usually do not want to synchronously in your request handler. And you can probably imagine many more use cases for long-running tasks. Another thing that is maybe not quite as obvious is to gracefully handle workload spikes. So if you offload work to a job queue, you have that queue as a buffer in the middle. So your web application stays responsive while your queue maybe increases in length and the tasks take a little bit longer to process, but your application still handles that gracefully and doesn't grind to a halt with people looking at loading pages or even worse, blank pages or errors like gateway errors and so on. And then finally, you have the opportunity to schedule tasks for later executions, but in the context of salary, we have to put a little asterisk on that, that we get to later. So, let's quickly talk about the user-like architecture. So, the application has been around for a while. So, as you can imagine, any architecture diagram is slightly simplified. So on the one side you have a client that is either that messenger widget or the message center. All these messaging channels like WhatsApp, those are basically webhooks. So we ignore them in this picture here. And these clients talk to a web server via HTTP and the WebSocket server with a WebSocket. And the web server offloads some tasks to Redis. And the interesting part is that every WebSocket message we receive, so that's a customer writing a message, but also something like a typing state, when somebody starts and stops typing, that is a WebSocket message, which then also triggers a Celery task. So the WebSocket server itself doesn't do much. It just offloads incoming WebSocket messages to Celery and to Redis as our broker. And then we have quite a few Celery workers that process these messages. We don't use the Celery result store. It's a Django application, so we just write with the Django ORM in the Postgres database that we use. If a Celery worker or a Web server request wants wants to communicate something via WebSocket back to the clients, there's an internal HTTP interface for the WebSocket server. Celery is really at the core of our architecture. Here's a diagram from the last 30 days of use. We have like 6 million Celery tasks per day, which adds up quite quickly, so the title with a billion Celery tasks is actually underselling it a little bit. It's not quite Google scale or anything, obviously, but I think that probably makes it more relevant for most people because most people are not Google. So, yeah, with so many tasks, things can go wrong. So how can they go wrong? Basically, everything in this diagram can break, so your task can crash. It can raise an exception. Your worker can also crash, so either the worker in the sense of the salary application that the application has a bug, or the system that executes the task. Your queue can run full, or your broker crashes, and you can also have network issues between Between your producer and your broker, or between the broker and the workers. So how do you handle these failure scenarios? When a task crashes, you just, yeah, that's the one you have most control over, because that's your code that runs, and you do proper exception handling and maybe retries. And that's just regular software engineering. Now if the broker crashes, the impact depends a lot on the broker configuration. If you use a broker that is only in memory, like Redis in the default configuration, all the tasks that are still in the broker are gone. So you have to decide if that's acceptable in your application or if you need a broker like RabbitMQ or a different Redis setup, which is resilient to these kind of failures. You can also have worker crashes. The solution to that can be that you late acknowledge tasks, which means you only consider a task processed once it's actually done, and by default, Celery considers tasks processed as soon as they go to the worker. But if you do that, you also have to make sure that your task can be executed twice without negative side effects. So that's also something you have to carefully balance. When the application can't connect to the broker, that's actually quite a nasty one. There are a bunch of automatic retries built into Celery. But after that, you're basically left on your own. And in theory, you would have to wrap every Celery task dispatch in a manual exception handling, which probably nobody does. So yeah, that's something to look out for. Whoops. In general, the right mental image is to think of your tasks as cattle, not as pets. So don't treat them with too much love and maybe live with it if some get lost along the way. So now let's talk about performance. First, we define some fundamental metrics. So we have throughput, which is how many tasks are executed per time unit. Then you have latency, how long it takes to start a task. And finally, you have the turnaround time, which is how long it takes to finish the task. So that's the latency plus the actual execution time of the task. Now, your instinct might be to pick a broker and have them battle it out in artificial benchmarks. But as exciting as this sounds, picking the broker is probably not the biggest lever performance-wise when it comes to salary. Picking a broker is more, yeah, maybe the simplicity or complexity of the setup is more a driver so a simple Redis setup is simple where RabbitMQ comes with a bit of a higher learning curve. There are a few more concepts to understand but even this difference evens out or maybe even reverses when you want to go for a high availability setup with with a broker and then you try to make your Redis highly available so yeah depends on where you want to go but also switching out the broker at some point is probably relatively straightforward more important is intelligent queue design so a good core principle is to avoid mixing short and long running tasks or tasks which have high variability in execution time so let's illustrate that why it's a bad idea so let's say you have a queue and that queue is currently filled with four tasks two of type A and two of type B and the type A tasks take three seconds to execute and the type B tasks one second so we have two workers and both workers now fetch a task worker one fetches a one worker two fetches B one because they were the first in the queue and then they execute them so the remaining time reduces and after one second b1 is complete and let me step back so then after one second b1 is complete worker 2 grabs tasks a2 and b2 remains in the queue then after three seconds a1 is finished and after four seconds both tasks are finished now from From a resource usage perspective, that was a quite optimal scenario. Both workers were fully loaded and then finished at the same time. But if you look at the average turnaround time, it's 3.5 seconds for task of type A, which might be OK. I mean, the task itself takes three seconds. There's not much you can do about that. But the turnaround time for the task B, which takes only one second to execute, is two and a half seconds. So one and a half seconds was spent waiting because the workers were blocked with longer running tasks. And not always, but usually, for these faster tasks, you also want low latency. For example, if you have something like a typing state, then that might change within a second or two. So it's unacceptable to have that task wait for 10 seconds because some image conversion is blocking a queue. So if we now have separate queues or separate tasks, we distribute those tasks separately. So worker one executes tasks of type A and worker two executes tasks of type B. Task B1 is finished after one second and task B2 is finished after two seconds. Now it's finished after six seconds, so the total execution time is longer, but the latency for task of type B is much lower, but you pay the price of uneven resource or not optimal resource usage. something you have to balance the next thing you can play with is your worker setup so with salary workers you have to understand that there are worker processes and there is the concurrency of each worker process so how many tasks each worker process can execute in parallel and then you can also have for for these workers different pool types. So that defines how the tasks are actually executed in parallel. So for something that is very I.O. intense, you might consider an event-based pool type where that doesn't really make sense for something that is computationally intensive, where you want a prefork-based pool, which then can be executed and really executed in parallel. So for Userlike, we are currently using seven worker machines. They're quite big machines. We're hosting on dedicated machines with each at least 64 gigabytes of RAM, and we are aiming at 50% utilization max, so we over-provision quite a bit. And we're running 7 to 10 worker processes on four core machines. We usually have one queue per worker. So to avoid this scenario where different kinds of tasks block each other. And each worker has a concurrency of 30 to 50. And we are mostly using pre-fork as our worker type. Then also an interesting concept that can be quite surprising when you first get in touch with it is a task prefetching. So let's look at this again. So with a prefetch of one it means that a worker always fetches one additional task. The reasoning behind that is that the fetching itself is overhead. and if you have many really small tasks, that overhead might be substantial. But if you have longer-running tasks in the second range, that overhead might not make much difference, and it has quite severe side effects. So what actually happens with the prefetch of one and two workers is that both workers fetch two tasks when they're empty, and as you can now see, Now see, our B tasks are stuck behind these long-running tasks, long-running A-type tasks, in the queue. So now A1 and A2 get started without any latency, but the B1 and B2 tasks suddenly have a latency of three seconds and take, on average, four seconds to execute. Then when it comes to performance, the thing to consider is that Python is Python, and Python is still quite slow. So your code is most likely the bottleneck, and if it's not your code, it's probably your database accesses. So have a way to inspect performance issues. That means monitoring, logging metrics to whatever you're using. Now let's quickly talk about some common pitfalls. One of them is passing stale states. So, my example that I had in the beginning was prone to that. So, let's say image is something like a Django object that you loaded from the database. And by the time it gets to your salary tasks, that object might have changed because you did some changes in the meantime. or yeah so so this object would get serialized and then sent to celery and celery would use this object so what you actually want to do is pass things by reference so in this case you pass a database ID and then your task would refetch the object from the database. Refetching the object is also not without pitfalls. So let's say you're using transactions, which you hopefully do. So let's say you're creating your image in a database transaction, and then you schedule a task. If your system is fast enough, it might start executing executing your task before your image is saved in the database before the transaction has been committed so the way we are handling this is that we collect all delayed tasks or that we want to schedule and then have a hook at the end of a transaction and only then send them to the database that also addresses the issue that yeah the transaction might roll back because something crashes further down the line and then your system is maybe in an inconsistent state. Then we come to that point of a task scheduling and using or overusing it. So the way task scheduling is implemented in Celery is that Celery workers fetch everything and then if they notice that or if the task is marked for later execution it actually keeps it in memory in the worker. So So if you use that feature excessively, then your workers might actually run out of memory from tasks that are scheduled for later execution. And then there's the fun topic of deployment and versioning. So if you deploy a new version of your code and you don't take your whole system down, you have to make sure that your salary workers are compatible with whatever task you still have in the queue or newly put in the queue if you update your web application before the salary workers or vice versa and then there's there's a special thing which is fairness in multi tenant applications so let's say you have a really big tenant with thousands of users that might drown out smaller users with maybe smaller customers with only one one user and that's a little bit of an unsolved problem for us. We solve it by over-provisioning, so we always have enough capacity, but it's something to keep an eye out for. Now, achieving resiliency, some aspects of that are relatively straightforward and nothing new, so you want proper monitoring and alerting. That means task run times, queue length, but also general system health, Something like CPU temperatures in case someone forgets to plug the fan back in. Ask me how I know. Then you have horizontal scaling. Ideally you have multiple workers instead of one big worker. So if one of the workers dies or needs maintenance or whatever, the other workers can pick up the slack, so to say. There is also autoscaling in Celery itself, but that only scales the concurrency of the workers, which might actually make your trouble worse. So if your system is at capacity and then Celery decides to spin up more workers, it might not do you any good. So you probably need some scaling based on queue length if you're running in a cloud environment that it puts up additional instances. At some point you might have to make your brokers highly available and you might consider using multiple brokers. So on top of multiple queues you can also have multiple brokers, basically separate salary application instances. And then it's always good to have a cleanup job to clean up the mess that might be left behind by incomplete jobs or tasks that crashed. Yeah, and then there's graceful degradation that you should build in the application so that your application does not screech to a halt if a task is failing. I'm very quickly going through some alternatives. So there's RQ, which is simpler. It just uses Redis as a broker. There's Django background task, which doesn't use a broker at all. It uses the Django database to store tasks. There's Hatchet, which is a relatively new thing with a lot of promising features. And now there's also a Django enhancement proposal to bring tasks into Django itself, and I'm watching it with great interest. Yeah, if all of that is not what you came for, here's a tasty celery recipe. and yeah if you have any questions put them in CEDAW now we have two and a half minutes left
+
+**Speaker 2** _[27:16]_
+
+Yeah, we have three minutes.
+
+**Speaker 1** _[27:16]_
+
+yeah we have
+
+**Speaker 2** _[27:17]_
+
+There are 17 questions. I've never seen that many questions. Some of them were posted before you got to a particular slide. So I will post these questions that are not going to get answered in Discord. So we'll get to them. One that also got four likes. Do you use Flour for monitoring?
+
+**Speaker 1** _[27:36]_
+
+Yes, but it also comes with a bit of overhead and the special thing about Flora is that it only shows the tasks that are actually running right now, so we are not heavily relying on it.
+
+**Speaker 2** _[27:53]_
+
+How do you gracefully handle situations when the worker crashes, but Celery considers the text to be done?
+
+**Speaker 1** _[28:01]_
+
+Yeah, it depends on the task. So, I mean, if... And also, yeah, maybe you have a database transaction, and so your task doesn't end in some kind of dirty state. Maybe it's something that you can just redo, like converting a thumbnail and uploading it to S3. That's safe to redo, but it really depends on your task. Okay.
+
+**Speaker 2** _[28:29]_
+
+Okay, one last question. I'm going to combine two. Some people asked about alternatives. Had you considered Huey or NATS?
+
+**Speaker 1** _[28:38]_
+
+So the short answer for us is no. We've started with this architecture like five years ago and just went deeper down the rabbit hole. Yeah, I'm not familiar with these two in particular, but definitely something to look into.
+
+**Speaker 2** _[28:57]_
+
+Okay, one last one if you use task prefetching or the prefetch tasks lost when the worker crashes
+
+**Speaker 1** _[29:04]_
+
+Yes, if you are not using late acknowledgement, they will be lost.
+
+**Speaker 2** _[29:12]_
+
+OK, we'll end there. That's right on time. And I will post these and the three more that just came in. I will post those on 20 questions. This clearly could have been a 45-minute talk. Thanks, everybody. Thanks, Daniel.
+---
+transcript_status: auto
+---
+transcript_language: en

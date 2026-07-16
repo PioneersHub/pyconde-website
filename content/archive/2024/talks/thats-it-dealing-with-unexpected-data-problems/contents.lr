@@ -1,0 +1,164 @@
+title: That’s it?! Dealing with unexpected data problems
+---
+description: Drawing on experience with multiple consulting projects, this talk shares experiences on how to deal with unexpected data problems. We are discussing how…
+---
+created: 2023-12-20
+---
+code: JKWBBR
+---
+slug: thats-it-dealing-with-unexpected-data-problems
+---
+speaker_names: Simon Pressler
+---
+speakers:
+
+
+
+### Simon Pressler
+
+_About — in the speaker's own words_
+
+I hold a Masters's Degree in Comparative and International Studies from ETH-Zürich, as well as a Data Science Master from the University of Mannheim. Since March this year I work as a full-time Data Scientist for the Königsweg AI GmbH after being with the team for 2,5 years part time. Also, I enjoy long-distance hiking.
+---
+abstract:
+
+
+Drawing on experience with multiple consulting projects, this talk shares experiences on how to deal with unexpected data problems. We are discussing how fare purely technical solutions as well as domain knowledge can be deployed to compensate for lacking data quality or quantity and when it might be better to scale down the original project scope.
+---
+full_description:
+
+
+And it was such a nice idea! Nearly everybody working with data has felt this sentiment at least once in their career. The promising idea for a cool new data tool meets the reality of lacking data quality or quantity.  This talk wants to provide you with some options on what else you can do in this kind of situations instead of giving up and filing the project away for the non-foreseeable future.  
+
+Drawing on experience from multiple consulting projects we are discussing what is realistically possible and how to make the most out of the limited data you might find yourself confronted with. The talk covers a brief recap of the limitations arising from unexpectedly little and/or unclean data, before moving on to share lessons learned. We are going to discuss how fare purely technical solutions might be able to provide fixes to some of the issues, before moving on to consider how domain knowledge can be deployed to compensate for lacking data quality or quantity.  Next, this talk addresses under which circumstances it makes sense to keep pursuing your original goal and when it might be better to down-size expectations. The talk concludes, by arguing that despite all the problems arising from unexpected data scarcity, potential answers to important business problems can be found in small data settings if the right questions are asked.
+---
+room:
+---
+day: Tuesday
+---
+slot_date: 2024-04-23
+---
+start_time: 11:40
+---
+end_time: 12:10
+---
+slot_id:
+---
+track: Machine Learning & Deep Learning & Stats
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 3578
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/JKWBBR.png
+---
+youtube_id: R7oLrkUrHYM
+---
+video_link: https://www.youtube.com/watch?v=R7oLrkUrHYM
+---
+video_published_at: 2024-06-23
+---
+video_duration_iso: PT27M54S
+---
+video_thumbnail: https://i.ytimg.com/vi/R7oLrkUrHYM/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:06]_
+
+Well, thank you very much for such a nice introduction. As previously said, I'm Simon, and I'm going to try to give you a guidance on what you can do if you run into unexpected data trouble in your data science project. And when I was preparing this talk, I was having the following scene in mind. It usually goes something like this. You start off having a great idea, or somebody else in your team has a great idea, anyway there is something you need to do. Project sounds super cool, you get started, you get people on board, you involve stakeholders, you might have a customer, maybe it's a university project, you tell your professor, and then you open the data for the first time, because when you should have been doing due diligence, There was a lot of hand waving, yeah, data, data, we have data, easy, no problem. And you find something? Definitely not what you expected to find, at least. And this talk... Do I still have sound? Yeah. And the idea behind this talk was to give you a bit of a guidance on what you can do in these kind of situations, because from my personal experience, there are three kind of approaches here. A, close the laptop, I'm done, project over, was a nice idea, sorry. The second category, category in which I would classify myself, you immediately have thousands of ideas, okay maybe I can tinker with this, maybe I can do this, maybe I can adjust the model a little bit, but it's a bit of, it's a bit chaotic, and then there's the third group of people who have a very structured approach, and I'm trying to push you all to towards this more structured approach systematically escalating what you can do. So this talk is going to stay on the rather abstract level because I know that all of your projects are in the end precious little snowflakes, all individual, all unique in a way. So this is just going to be giving you a guideline on how to escalate the severity of your measures basically. If you're wondering how I get myself into these kind of situations, a few words about me. So, as previously said, I'm Simon. I'm working as a data scientist for Königsweg. And Königsweg is a consulting company. And we consult on everything data-related, from giving you an assessment, how tech-savvy your company already is in terms of data and AI, via devising a data governance strategy for your company, to really being elbow deep in your data and trying to realize an AI prototype with you together. And as you can guess, customer data tends to be as diverse in terms of quality as our customers tend to be diverse. So you see a lot of different things. And the other part of my background I'm going to draw upon in this talk is that I used to study political science for five years. And if you've ever worked with social scientific data sets, you know they can be as complicated as humans tend to be you can't just force people to have an opinion just because one day you show up with a questionnaire so without further ado this is the agenda we've already set through the introduction i'm going to move on to a guide i'll have a couple of closing remarks and then we can move into the q a the slides will be made available on the prelux page so where you found the abstract of this talk after the talk. I'm not going to promise you how much after the talk but after the talk. So as I previously said, I've been into these kind of situations multiple times and when I was preparing this talk I was thinking back how did I see other people approach the same kind of situation and there's a huge variety and diversity and measures people have taken. So I needed to structure this somehow. And I came up with the following basic thing. We're going to start with measures that are more like applying a band-aid. So you don't have to fundamentally change the nature of the project, but rather you're fixing your data issue relatively surface level to, okay, I need to make severe surgery on my project. Maybe I can still get something out of it, even though it's not what I originally intended to get out of it. And then I came up with the following approach. First, we're going to have a look at fixing the data as we're talking about data issues. That's the more intuitive approach. And second, we're going to have a look at how can I adjust my project to still have some value even though my data can't really be fixed. and I'm going to start with the data aspect because as I previously said this is the more convenient approach you don't need to restructure the entire project it's easy to explain to stakeholders people tend to be very understanding if you tell them garbage in, garbage out I need two more weeks because the data you gave to me could be improved and there's a wide variety and range of standard tools and domain expertise you can leverage here and talking about standard tools that's actually the first thing I want to address purely technical fixes and here I'm thinking about everything that's part of the classic data engineering tool kit. Think imputation, data normalization, outlier detection, type conversions, correcting typos, deduplication, up or down sampling if you have biases in your data, all of these kind of things. Because as I previously said, I tend to rush a little bit if I run into data problems and try to make adjustments to the model. And this is a brief reminder for you to be systematic and stay on the lowest level for as long as you can. So, try to fix the data issues in your data set first. Be systematic. Get yourself a profiling tool, such as the one included in Pandas. Make a list of, I have the following problems, all of which need to be addressed. And then systematically work your way through the stack. So, the idea behind this slide is be systematic in what you're addressing and don't jump around too much. if you have exhausted the standard data engineering toolkit there is another resource that should be available to you and which you should definitely exhaust and I can't stress the importance of that resource enough and that is domain expertise get yourself, if you're still having data problems, get yourself the person in your team, preferably who created the data. And if you can't find this person in your organization because they retired or they changed company or anything like that, get yourself somebody who has been working with this data on a daily basis. Add them to your team if possible. At least set up repeating touch points so you can challenge the ideas you're having in regards to what you're going to do with the data. because you'd be surprised about the things you can learn. And on the next slide, I've given you a couple of examples of things I would always want to inquire about with domain experts and about some of the surprises I've seen. So, first thing you want to make sure to understand is the provenance of the data and the hidden logics within it. Who collected the data for what purpose, over which time scale? what was the initial idea when the data was collected. Make sure you understand this because sometimes this can help you to decipher stuff that's not particularly striking as being data. To give you an example, I was working with a data set with a lot of missings in a column and I thought maybe I can impute this, maybe I can just drop the column. Anyway, there's nothing in here. And I started to talk to the domain expert and he was like yeah, we never enter anything into this data because it's basically the default case. Everybody knows that it's just dead and dead value. Nice that you tell me. So make sure you understand all of these kind of hidden logics. Or another example, I got a data table, had a bit of a weird identifier, but you know, just long number happens. Turned out to be a compound of three important pieces of information about the unit of observation. Who cares about the first normal form, I guess? Anyway, another thing you want to understand is data usage and related data. How are the people working with the data using the data on a daily basis? And here I give you an example from a project we have been working on recently. We were trying to automate to automate a kind of resource allocation question there would be project planners how many resources should we staff on a certain project and we were trying to provide them with a model to do this and our model didn't perform that well so we asked hey how do you come up with the solutions and then they told us yeah we're using the data that you're using but did nobody tell you about this other database over here And by the way, there's this external website with data that you might need that nobody mentioned before. So make sure you really have everything you need for your project. And last, which I think is a very much underutilized option you have, consider data collection. I'm fully aware if you're working with hours, hours and hours of sensor data, you might not be able to run your, let's say, printer for another 9,000 hours. but in particular in those cases where it's more about a lack of digitized documents or something consider how much money it would cost to get it done and how much money you can save if you improve the prediction of one KPI in your organization by just one percent and then consider how quickly that would amortize. It's often surprising how much data collection can actually contribute in terms of overall gain from your project. So now I would like to move on from the data aspect to design aspect. So by now you've probably also mentally exhausted your domain experts with all your questions, you've applied all your technical knowledge that you have and still the project is just not going to fly. You might want to close the laptop now but I would argue you that before you do this, you should consider adjusting the design. But here things become a little bit more painful because we're diverting from the original idea which was communicated with the stakeholder to begin with. So you need to inform potentially your boss, potentially the customer, hey, this is not going to work as expected, but we're considering the following downscaling options. What can we still get out of this? Problematically, there are no longer standard solutions now. Therefore, I would like to draw your attention to two things specifically, and the first one is application scope. One of the key questions I found myself asking is, okay, this is not going to work for the entire scope, which I envisioned, but is the data quality for a certain subset sufficient? Imagine you're working in a federated organization. Everybody has been doing their own thing with their data for the last two decades. There, of course, is going to be significant heterogeneity in terms of data quality. Maybe you find a certain workable subset and then I would argue it's better to have a model which predicts well for, let's say, only your business locations in Bavaria than to not have a model at all. Another thing you might want to consider is changing the level of aggregation. So instead of predicting sales for each store individually, because maybe data is a little bit patchy. Can you predict sales for all the stores in a certain part of town? Not as useful as you potentially wanted it to be, but still better than having no working model at all. And last, maybe somebody else has working data, just you don't happen to have something, so consider transfer learning. Maybe you can turn your problem into a few-shot or even zero-shot situation. It depends on your project, really. The next thing I would like to point you towards is maybe you can adjust your model. In an ideal scenario, it would be great if we can have great predictive performance and at the same time our model is telling us something which we didn't know about the data. But if we've made it so far in the escalation chain this is probably not going to happen. So maybe you need to give your model a little bit more of a guideline. So consider shrinking down the size of the search space by giving your model more restrictions to work with. Because greater freedom comes with a greater need for data so maybe let's point our model gently in the right direction. To give you an example what I'm thinking about here is the same use case I've been talking about before we were trying to automate the resource allocation for a project and we learned that project planners would have a standard distribution from which they could then come to a more or less similar conclusion so same model should produce not say model same project should be roughly the same estimate even though it has been manually done by different project planners and the idea here was to provide the output of this standard approach into our model and let our model only focus on making upwards or downwards adjustments instead of modeling the whole distribution completely another thing you might want to consider is use a more restricted model because you've spent a lot of time talking to the main experts, by now you should have a pretty clear understanding of how the data generating process actually works. So if you already have that intuition, why not try to explicitly model it instead of relying on a machine learning model to implicitly pick up on it. Good example here is going back to simpler methods like regression models where you can explicitly make assumptions about the outcome distribution, about interaction terms, non-linearities, stuff like this. And last, consider and that's really the worst case scenario, consider going back to a logic-based approach. Happened to me once where I was promised we got plenty of contracts and then it turned out plenty of contracts meant four blanks because of data protection reasons. At this point, they still insisted they wanted me to automate their process, and I was left with nothing but if-else statements and regex. So that's the worst-case scenario. If you can profit from automation, consider it, but otherwise I guess the project is dead by now. Which brings us to the interesting question. This has been the third step on my overview slide, what is left if the project is already dead now? and I would argue what's left is recycling because just because your project isn't working doesn't mean there isn't anything to be learned from your project. I mean you need to communicate all of this to your stakeholders you need to tell people hey what we wanted to do is definitely not going to work but maybe there's still something that you can take away from your project and I want to give you a couple of starting points for your consideration here. Maybe you can formalize some insights which you gained during the process. In the example I was telling you about before with the project planners, everybody knew that they were kind of planning somehow, but nobody could really tell you how. And just by formalizing this process and making it available to the entire organization via the intranet, we could create some value. another thing you might want to do is use your failed project as leverage in your organization because remember people were on board with this project idea at the very beginning so somebody really had an interest in getting an improvement done so leverage that interest to push for increased quality in the data landscape in your organization another thing you should do is document why the project didn't succeed that's especially important for your colleagues in the same data science team because otherwise ideas tend to come up over a certain time span again and again and again and you want to help people avoid wasting resources by trying the same thing over and over maybe every five years or so and last thing that's particularly close to my heart if you have a teeny tiny data set and you don't see how any value could come from this maybe consider searching for a natural experiment in that sometimes a small data set with 60 data points can provide you with more profound insights than a bigger data set with multiple thousand could if you can manage to find a good natural experiment within your data unfortunately I can't really go into details of this because this question alone would warrant its own talk but let me know if you would be interested in a talk about small data and natural experiments for the future and let me come to some concluding remarks obviously this guide has no claim to completeness the idea was to give you escalation steps to go through before you have to decide if your project is really not going to work or if there's nothing to be derived from your project, even though it sounded like such a great idea and you invested that many resources. Domain knowledge is super important in all of the steps, so make sure you get yourself a domain expert as soon as possible and get a firm grasp not only about the data but also about the processes behind the data. And on a positive note, oftentimes additional solutions emerge in the process which you didn't expect just by talking to people. Talk to as many people as you can about the problems you're facing and you will find unexpected solutions. I'm being a little bit early but I'm done. we can move on to the Q&A now thank you very much if you want to find me you can find me on LinkedIn and I'll be hanging around here
+
+**Speaker 2** _[20:50]_
+
+And yeah, unsurprisingly, there are a lot of questions coming up for people, so it's good that we have a lot of time to answer them. So the most popular question was, when do I fix the data in the model too much? When do I just admit there's nothing there?
+
+**Speaker 1** _[21:08]_
+
+Oh, that's a good one. That's a really good one. I'd make that dependent on the outcome, if possible. I mean, you can fiddle with the data as much as you like. If the model doesn't perform on an independent test set, then there is just nothing you can do. And what was the second half of the question? Fiddling with the data and...
+
+**Speaker 2** _[21:33]_
+
+When do I just admit there's nothing there and when when do when have I done it too much and when when it's When is the time to actually close the laptop as you say?
+
+**Speaker 1** _[21:44]_
+
+I guess that's dependent on the budget you have. If it's a project you're doing as a hobby, you can basically go on it indefinitely if you feel like it. If people need to get paid, I would systematically and relatively quickly go through these steps, talk to the main expert, and if the domain expert already tells me, yeah, either it's going to work like this or there's no value in it at all because we don't need a different kind of model on a different aggregation scale or anything because what am I supposed to do with it than just kick it.
+
+**Speaker 2** _[22:21]_
+
+And the next time my slider is refreshing make sure I have all the questions so related to this How does this apply to very complex data? Can I be sure I don't create other problems by fixing data?
+
+**Speaker 1** _[22:33]_
+
+Ooh, that's a very good question. I'd say you can never rule out that you're creating new problems by fixing the old ones, but I guess that goes to highlight how important it is to be systematic about what you're doing. If you have a systematic approach to these kind of questions and you maybe reprofile your data after you've done a certain fix, you should at least be aware if you are just fixing something then you move on to making other adjustments chances are if you have created a problem you'll never find it so just goes to speak about being you know, systematic and strict about it
+
+**Speaker 2** _[23:21]_
+
+And the question that gathered a lot of votes, can you give one example of a natural experiment? So I know you said you can talk about it for a while, perhaps at the next PyCon, but now maybe just an example for the audience.
+
+**Speaker 1** _[23:34]_
+
+Something I always like to mention is a regression discontinuity design. Are you familiar by any chance? Anybody familiar? Okay. So picture the following scenario. You have a population of data points and at one point, usually it's over time, something happens and there is basically no correlation between the data point and the external stimulus. So let's say five events are going to be held today, five events are going to be held tomorrow, overnight, half of Berlin burns down. We can come to a really good conclusive estimate how this affected the overall attendance rate in our panels. Assuming that the talks have been selected in a way that the talks are comparable on both sides of the cutoff. So assuming equal distribution of quality of the talks across the conference, which I assume.
+
+**Speaker 2** _[24:44]_
+
+an equal, I guess, probability that the speakers or audience would be among the ones who have burned down.
+
+**Speaker 1** _[24:51]_
+
+That's the interesting thing with natural experiments, little data but a lot of things to actively consider.
+
+**Speaker 2** _[25:00]_
+
+Thank you. The next question we have is the unknown unknowns. How would you know you don't have all the data if nobody tells you?
+
+**Speaker 1** _[25:10]_
+
+That's why you've got to ask people, because as I said previously, there is no way of knowing if you know everything. That's the problem we ran into when we were trying to automate this resource allocation question, and we had quite a lot of different data sets, and then we went to the domain experts and asked, is this actually everything that you were using? And they told us, oh, no, are you crazy? No. So ask the practitioners, if you have practitioners who are doing the same thing, and if not, get yourself the domain experts who is closest to the question you want to answer. Because we are experts in data questions, and we need the domain knowledge to not accidentally do more harm than good.
+
+**Speaker 2** _[26:02]_
+
+Then this may be the last set of questions that we have, but they all concern the same topic, so I'll read them all out. They basically all require kind of documentation and communication in a way. So in the important question slide, most problems seem to involve active communication with domain experts. What would be a good tool to document this info? And the related question, how do you do documentation for the lessons learned from the failed project?
+
+**Speaker 1** _[26:31]_
+
+Lessons learned from the failed project documentation, that is something that's up to you. Sorry. You got to establish in your team some form of way to pass down knowledge within your organization. It doesn't have to be much. Just a two-pager, maybe you have a shared folder. It can be very simple. Create yourself a GitHub repo with project reports. Just something and make it searchable. That's an important thing. So people can go back to it and consider, has somebody else done it before? And with the domain experts, that's actually a really good question because it is hard. You're having a conversation with somebody, it takes about an hour, and you're pretty sure you got everything, you write it down afterwards, and still there's stuff you've forgotten about. Just extensive note-keeping, note-sharing.
+
+**Speaker 2** _[27:30]_
+
+Thank you. Again, apologies for those who didn't get their questions answered, and I guess you will be around so people can come and find you during lunch break.
+
+**Speaker 1** _[27:41]_
+
+I'll be around for the rest of the day for the social event for the bar after the social event I'll be around
+
+**Speaker 2** _[27:45]_
+
+I'll be around. Lots of time.
+
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -1,0 +1,227 @@
+title: Benchmarking Time Series Foundation Models with sktime
+---
+description: Recent time series foundation models such as LagLlama, Chronos, Moirai, and TinyTimesMixer promise zero-shot forecasting for arbitrary time series. One…
+---
+created: 2024-12-22
+---
+code: GUKTNX
+---
+slug: benchmarking-time-series-foundation-models-with-sktime
+---
+speaker_names: Benedikt Heidrich
+---
+speakers:
+
+
+
+### Benedikt Heidrich
+
+_About — in the speaker's own words_
+
+I completed my PhD in deep learning based time series forecasting in 2023 with the Karlsruhe Institute of Technology. In sktime, I am focusing on forecasting methods (mainly deep learning based ones) and implementing pipelines.
+---
+abstract:
+
+
+Recent time series foundation models such as LagLlama, Chronos, Moirai, and TinyTimesMixer promise zero-shot forecasting for arbitrary time series. One central claim of foundation models is their ability to perform zero-shot forecasting, that is, to perform well with no training data. However, performance claims of foundation models are difficult to verify, as public benchmark datasets may have been a part of the training data, and only the already trained weights are available to the user.
+
+Therefore, performance in specific use cases must be verified based on the use case data itself to ensure a reliable assessment of forecasting performance. sktime allows users to easily produce a performance benchmark of any collection of forecasting models, foundation models, simple baselines, or custom methods on their internal use case data.
+---
+full_description:
+
+
+In the past years, time series foundation models emerged. They have the potential to change time series forecasting. For example, multiple time series models such as LagLlama, Chronos, Moirai, and TinyTimesMixer promise zero-shot forecasting for arbitrary time series. Furthermore, also sktime started to unify the interfaces of the various foundation models to make the usage of those models easy. 
+However, whether these time series foundation models provide added value to various forecasting applications is still unclear. Thus, benchmarking is necessary. In sktime, we have implemented a benchmarking module enabling easy comparison of those time series foundation models on custom datasets and with arbitrary metrics.
+
+Our talk will outline how sktime’s benchmarking module works and how users can use it to evaluate time series foundation models. 
+We will show how to combine the benchmarking module with the time series foundation models.
+We will show the results of a small benchmarking study using time series foundation models and statistical time series models. 
+We will outline our roadmap for time series foundation models. 
+
+sktime is developed by an open community with the aim of ecosystem integration in a commercially neutral, charitable space. We welcome contributions or donations and seek to provide opportunities for anyone worldwide.
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2025-04-23
+---
+start_time: 14:30
+---
+end_time: 15:00
+---
+slot_id:
+---
+track: Machine Learning & Deep Learning & Statistics
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Intermediate
+---
+supporting_material_url: https://www.sktime.net/en/stable/get_started.html
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/GUKTNX.png
+---
+youtube_id: tbDgPppdvCU
+---
+video_link: https://www.youtube.com/watch?v=tbDgPppdvCU
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/tbDgPppdvCU/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+Thank you for the nice introduction. My name is, as mentioned, Benedikt Haltrich, and it's a pleasure that I can present to you today how you can benchmark time series foundation model within SKTime. So who of you is familiar with SKTime? A few of you, or more than a few of you, but let's repeat what SKTime is. So scikit-learn is an open-source toolbox for time-series machine learning. It offers unified Python interfaces for different estimators for different tasks, like in scikit-learn. So for each task type, such as classification, forecasting, we have a unified interface. All of these estimators are composable and modular. You can build up pipelines using transformations like DC signalization and then forecasting algorithms. You can do composition. This means building ensemble models out from arbitrary other estimators or using scikit-learn regressors within SKTime, which is called Reduction. It's permissive license, easily extensible by third-party libraries, also in closed environments. So if you have a commercial product, you can also use SKTime. And we have an open library policy. So if you have something nice you would like to contribute, we will merge it if it's well documented and credit given. But SKTime is more than that. SKTime is also a community and a mentoring upskilling platform. we have mentoring programs, organized work streams, such as benchmarking and regular meetups with research talks, deaf discussion, collaboration sessions, and so on. And finally, we are also openly governed in contrast to many other open source packages. We have elective roles as core developers, council members, and these are merit-based and not because you are in a group, so if you are interested in contributing also in a governance structure, then you are invited. to do so and all of this governance is very transparent. But enough of advertising, now let's dive into foundation models within SK time. So foundation models also now enter the, I think one or two years ago, the space of time series forecasting. Without foundation models, you have to fit one model per time series batch. So if you have a set of training time series and an untrained model, you train this model on these training time series, and then you can forecast these time series. If you have another batch, you need an additional untrained model, train it again, and so on and so on. In contrast with the foundation model, the promise is you have one fitted model for all time series. So this is the foundation model that's already pre-trained. You can fetch the weights from hugging phase and then you need to provide a context time series and then you can predict this context time series, forecast this context time series and you can just add a new time series but use always the same model. In SKTime, we have a multiple time series foundation models that are supported. For example, we have MORAI, TinyTimesMixer, Kronos, KronosBolt, TimesFM, TimeMOE, and this list is growing. So we have also several open pull requests. I added LagLama and MomentFM here. And some of them are zero-shot. For example, MomentFM would not be zero-shot capable, and some of them are supporting also exogenous features, some of them not. So in SKTime, we are already supporting multiple foundation models. And now you might ask, do they work for me? And if you take a look into the literature, then you see some blog posts, some posts on LinkedIn that are very hyped and excited about time series foundation models and saying that this is a great revolution in AI forecasting or that's that there is a boom of time series foundation models for forecasting however there are also very skeptical comments for example the blog post transformers are what you do not need from Valerie Mannerkin or a blog post from Christoph Bergmayer, who is quite famous also. And now if you check this literature and check the advantages or disadvantages, there are some obvious advantages so you do not need to train them before applying them so I think that's quite cool. And if you trust all the papers then the performance of the models is quite promising according to the reported numbers. However there are also disadvantages so if you need to train them by yourself it's very expensive since they are large for time series models for LLMs in general they are pretty small but it still takes some time. After the small discussion of advantages or disadvantages the question arises should I use them or not? It depends is the answer obviously and it depends on your data so your data might be special and this is the reason why you cannot always trust the public leaderboards because they might not be representative for you. The ranking of the foundation models might differ. So in one case, Kronos could be better, in the other case, Mori or Times FM. Simpler models might work equally well for you on your data. And there might also be additional requirements, memory, compute costs, runtime, you have to consider and this is the reason why you cannot know in advance if which model is the best and if you should apply foundation models. This is the reason why you need benchmarking. And this is where SKTime comes into the game. SKTime is the only framework that on the one hand exposes most foundation models under a unified API and on the other hand also provides a robust benchmarking on your data. And this is what I want to show you now. So what are key requirements of a forecasting benchmark or benchmarking module? It should be reproducible and verifiable so there are you should have access to intermediate results so that you can verify what's happening under but also other researchers use the module to support different hardware and operating systems in the means that you should be able to reproduce the results no matter what hardware or operation system you are using and you should also and yeah obviously results should be reproducible it should be easy to use so this means it should be extendable in a way that if you want to add an additional or new forecaster to your benchmarking study, you should just be able to edit without changing any code within the benchmarking system. It should be easy to set up. You should be possible to export results in different file formats and interoperability should also be possible. So if you have an old state of your benchmarking, it should be possible for you to recover from that old state. In SKTime, how does it look like? We have basically three methods that are important, addEstimator, addTask, and benchmark.run. With addEstimator, you can add different forecasting algorithms as Kronos Forecaster or any other SKTime-compatible Forecaster. You can add different tasks. A task in the sense of forecasting benchmark means that you have a data set loader and different cross validations and metrics that measure how well your forecasts are. And then with benchmark run you can start your benchmark. Let's check how this works on the example of energy forecasting. A short disclaimer, this is not an extensive study. It's just an exemplary usage of the benchmarking module. We used here the Australian electricity demand data set, which represents half our electricity demand of five different states in Australia. And we have here the so-called panel data. data in SKTime consists of multi-index. In that case, we have two indexes. The first index is the name of the time series, so five time series here, and the names are the five states that are covered by this data set. And the second index in this example, but In general, the last index of the multi-index are the timestamps. And then, finally, we have the columns, and these are the values of the time series. And we are here just covering one column, which means we have one univariate time series. Okay, so if you now would like to create your forecaster, you need to define a data loader, which is returning a data frame and then you need to create the benchmarking object just by creating a forecasting benchmark object and then you can add the tasks. A task as mentioned before consists of a data loader that's T1 here we have cross validations in that case we need three splitters that are creating the cross validation sets I will explain it in a few slides what this means and we have scorers in that case we have the mean squared error and root mean squared error and the mean absolute error here we set by index equals true this means we can we are investigating how the error error depends on the forecasting horizon. And then you add as many estimators as you like, and finally you can perform benchmark run. In that case, the results will be stored in an energy benchmark in JSON. From what you also can recover, if you have already this energy benchmark JSON file existing, benchmarking module would try to recover from that state. So the cross validation is crucial in in all benchmarking or evaluation and for time series it's a bit difficult or more difficult I think than for normal data. We have here three folds and the first split that is applied is the global CV global which is an instant splitter so it means that it splits that from the set of all time series the time series into training and test data. So for each pole the training set differs and the time series that is used for testing is also not part of the training time series. This is done by the instance splitter. Then the second one is the global temporal splitter. The The global temporal splitter is often forgotten in time series benchmarking. It is important to avoid data leakage across different time series. So with the CV-Global, with the instant splitter, we would ensure that the training time series and the test time series differ. there might be effects for example covet that which can be part of the training time series but also of the testing time series and then you would have a data leakage even if this time series was not part of your training time series and then finally we have the normal cross validation which is splitting the test time series into a training and into a context and into a target part and with that we can perform a benchmarking and here we have the the root mean squared error plotted and you see that on this particular data set the chronos forecasters perform quite well while tiny times mixers is a bit worse and mora is the worst of these five models interesting i added also as a reference here n beats which is a quite popular and deep learning based time series model and this was n beats with the default parameter sets offered in sk time and we see it's not that bad compared to the foundation models and yeah it's even better than mori a bit worse than tiny times mixer so probably if you tune n beats probably you you are getting a model that perhaps even outperforms chronos i mentioned you can also get more insights from the sk time benchmarking module um so in that case we have four um five time series and for each one day ahead forecast and we could also investigate how the forecast depends on on the forecasting horizon this is done by setting by index equals true and the mean absolute error and then we are getting such a plot that which is the error over time all the time and here we see that the red line which is murray has a quite huge error between 8 am and i think 5 pm and also chronos the chronos forecaster seems to be quite seems to have a higher error in the evening hours between 6 pm and 9 pm so it's quite interesting to see to get such insights also for all of your forecasting models and finally it's also we are also tracking run times fit time prediction time note here is a log y scale because the call of the fit method is quite cheap for the foundation models because we do not do any fitting here or training here and come in contrast to n-beats which require requires training okay but we can also apply the same on hierarchical data forecasting on hierarchical data forecasting we have multiple hierarchical hierarchical levels in this example we have have two agency and sku and we have also aggregations that's That's basically the sum over all SKUs or agency in the combinations. And we have, again, the columns as the values of the time series. And now here, again, the root mean squared error and the mean squared error, not here, not over the time, but for each combination of agency and SKU. And in that case, compared to the energy time series forecasting, Kronos is much worse than the other models, and N-beats is even the best in this evaluation. So it shows, do your benchmarking before applying your foundation model, or your time series model in general. Okay, now coming to the conclusion and to the outlook. The current state of the benchmarking model is that we revised it during the past months, and also extend it to be compatible to global forecasters and the next steps would be to extend it for other tasks as classification, anomaly detection and so on and also perhaps to set up a leaderboard on HuggingFace so that's also some kind of call of action for you so if you're interested in doing that or if you have interesting data to be shared that are not publicly available available, then reach out to us. If you are, in general, interested in starting with SKTime, we have plenty of tutorials, video introductions, or you just install SKTime and try it out. If you'd like to contribute, join our Discord, follow us on LinkedIn. We have a contributor guide. We also have several opportunities, especially for the students, if there are some students here. We have free mentoring or internship for young scientists and students. And you can also present all of your use cases in our meetups. The last opportunity I want to highlight is that we are also part of the European Summer of Code. So the European Summer of Code is comparable to the Google Summer of Code. have stipends for contributors that are new to open source and if you are interested in this then you you can apply also companies can apply to offer their projects or other open source other open source projects and currently i think we have these six projects and if you would appear here it would be cool if you if you apply with your open source package okay then i would thank Thank you for your attention, but also all of the SKTIME contributors, because I'm just presenting some work of mine, but the nature of the work is done by other contributors. So also thank you to all of these contributors.
+
+**Speaker 2** _[19:42]_
+
+All right. Thank you for the amazing talk. We have a lot of questions. So while I'm going to read the first one, please take the time to upvote on the questions that you would like to see answered here, otherwise they are going to be posted to the archive and you can continue your conversation later or via Discord. Okay. Let's start. A question by Anne. How do foundation models compare to simple statistical models?
+
+**Speaker 1** _[20:07]_
+
+You need to do benchmarking for comparing them. So I think that's the short answer. And yeah, it depends who you are asking. So I know that there are people at Amazon, at Zalando, that are using transformers to predict their retail and their demand. But I also know people that are saying, transformers are not working for time series in general so it really depends and yeah so do your benchmarking on your data to figure out if statistical models are better than foundation models
+
+**Speaker 2** _[20:47]_
+
+All right next one is it possible to fine-tune the models before applying them?
+
+**Speaker 1** _[20:51]_
+
+Within SK time, currently not, but we are trying to extend it to build a compositor here.
+
+**Speaker 2** _[21:00]_
+
+Let's go. Can I use the SKTM forecasting benchmark in combination with experiment tracking tools like MLflow?
+
+**Speaker 1** _[21:06]_
+
+This is something on our roadmap.
+
+**Speaker 2** _[21:11]_
+
+All right, sorry next question by Max Can you share examples of successful industry applications of the promising studies around time series foundation models that report? positive results in science
+
+**Speaker 1** _[21:22]_
+
+Whoa, tough question. I'm not, for a forecasting foundation model, I'm not aware that for industry projects that they are used within different industry projects. But I knew that, for example, AdRectorLux is using forecasting models from SK time. So in the scientific space, not by heart, sorry.
+
+**Speaker 2** _[21:52]_
+
+All right, next one by Someone Anonymous. Can SKTime also be useful for time series classification?
+
+**Speaker 1** _[21:58]_
+
+Yes.
+
+**Speaker 2** _[21:59]_
+
+Yes. Right. Next one. Amazing. Just keep it going. Does it offer more models than darts or auto-gluing?
+
+**Speaker 1** _[22:09]_
+
+A tough question, I have no idea how many models are implemented in Darts or AutoClue. Yes, by a large margin, 400. Okay, thank you, Franz.
+
+**Speaker 2** _[22:19]_
+
+You got it. All right. Do you think time series foundation models will at some point become as powerful as foundation LLMs?
+
+**Speaker 1** _[22:19]_
+
+You got it. I would prefer to not answer this question right now.
+
+**Speaker 2** _[22:37]_
+
+All right Did you identify any trends which kinds of data were better suited for foundation models and which performed better on a task specific model? No Here we go do the foundation models offered by SK time differ in input output requirements such as horizon lengths in parentheses long short horizon
+
+**Speaker 1** _[22:59]_
+
+short horizons okay so we are supporting um the model the foundation models um as they are trained so most of the foundation model has a limit in the context length and the forecasting horizon however if you are specifying input that is larger or a forecasting horizon that's that's larger than the maximum prediction length of the models, then in SK-Time, we try to retrain the output, the head of the model, that it matches the prediction length. So we are trying our best that it's possible, but then it's some kind of retraining necessary.
+
+**Speaker 2** _[23:51]_
+
+all right then we have something is the time series of them in general than a black box i think it's can you look inside anyhow follow-up question can we understand reasons why the forecasts look like they are like they do essentially
+
+**Speaker 1** _[24:03]_
+
+They are deep learning models, so no.
+
+**Speaker 2** _[24:06]_
+
+Alright. Question by Tom. Can I use this benchmarking module also for hyperparameter optimization?
+
+**Speaker 1** _[24:12]_
+
+In SK-Time we have a distinguished package or module for hyperparameter optimisation, grid search, and I think we are also collaborating with HyperActive, which is a toolbox for optimisation.
+
+**Speaker 2** _[24:31]_
+
+All right. Next one. Do I need to specify the benchmarking dataset on my own, or is there a default dataset being used when not specified?
+
+**Speaker 1** _[24:40]_
+
+you can use all the data loaders that are implemented in SK time for trying out the benchmarking module so
+
+**Speaker 2** _[24:49]_
+
+Alright, can I define my own error over the target?
+
+**Speaker 1** _[24:54]_
+
+Yes, you can define your own error matrix by inheriting from the base metric implemented in SKTIM, but probably you just need to implement the evaluate method, I think. An object with evaluate method should be enough.
+
+**Speaker 2** _[25:11]_
+
+All right, which data or datasets are you suited well for the analysis with time FM in other words on which data Does it work best?
+
+**Speaker 1** _[25:23]_
+
+I think that's something you have to look up in the paper and take a look into the reported numbers. So in general, you should benchmark on the data that are suitable for your use case and not looking on which data a certain model performs best.
+
+**Speaker 2** _[25:42]_
+
+All right, last question rapid-fire. What is the main advantage of SK time compared to SK learn?
+
+**Speaker 1** _[25:48]_
+
+SKTime is about time series and SKLearn is about machine learning, tabular data.
+
+**Speaker 2** _[25:55]_
+
+Yes. All right. How can you be sure that the shown data set is not in the training set of the foundation models?
+
+**Speaker 1** _[26:03]_
+
+That's not possible because you to a certain amount we have to trust the providers of the foundation model that some time series are not included, but I Hope that if you are having an internal use case on your own data that this data is not part of the data set of the provider, so yeah
+
+**Speaker 2** _[26:23]_
+
+Yeah, okay, let's just hope that. With that, we're out of time. Thanks to our speaker again for this amazing talk.
+---
+transcript_status: auto
+---
+transcript_language: en

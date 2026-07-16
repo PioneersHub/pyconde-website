@@ -1,0 +1,170 @@
+title: GitMLOps – How we are managing 100+ ML pipelines in AWS SageMaker
+---
+description: Scaling machine learning pipelines is no small feat - especially when you’re managing over 100 of them on AWS SageMaker. In this talk, I’ll take you…
+---
+created: 2024-12-16
+---
+code: DPAPUA
+---
+slug: gitmlops-how-we-are-managing-100-ml-pipelines-in-aws-sagemaker
+---
+speaker_names: Bogdan Girman
+---
+speakers:
+
+
+
+### Bogdan Girman
+
+Bogdan Girman is an expert in Machine Learning and DevOps, with extensive experience in implementing scalable, reproducible ML systems. He is passionate about bridging the gap between development and operations in AI.
+---
+abstract:
+
+
+Scaling machine learning pipelines is no small feat - especially when you’re managing over 100 of them on AWS SageMaker. In this talk, I’ll take you behind the scenes of how our team at idealo built a Git-based MLOps framework that powers millions of real-time recommendations every minute.
+
+I’ll share the challenges we faced, the solutions we implemented, and the lessons we learned while streamlining model versioning, deployment, and monitoring. This session is packed with actionable takeaways for ML engineers, data scientists, and DevOps professionals looking to simplify their MLOps workflows and operate efficiently at scale.
+
+Whether you’re running a handful of pipelines or preparing to scale up, this talk will equip you with the tools and strategies to tackle MLOps with confidence.
+---
+full_description:
+
+
+In 2022, idealo’s Machine Learning Engineering (MLE) team took on a bold mission: to transform and scale the recommendation systems powering the idealo website. Fast forward to today, we’re delivering over 1 million recommendations per minute across 20 key user touchpoints - driving seamless, personalized experiences at scale.
+
+But how do you manage over 100 machine learning pipelines without breaking a sweat? In this talk, I’ll reveal the three core principles that helped us build a sustainable and efficient MLOps workflow in AWS SageMaker:
+
+* Decoupling pipeline releases from deployments for ultimate flexibility
+* Testing pipelines to ensure seamless performance
+* Centrally managing infrastructure as code for full control and scalability
+If you’re ready to supercharge your MLOps game, this session will leave you with practical strategies and battle-tested solutions for running ML pipelines like a pro.
+---
+room:
+---
+day: Friday
+---
+slot_date: 2025-04-25
+---
+start_time: 11:35
+---
+end_time: 12:05
+---
+slot_id:
+---
+track: MLOps & DevOps
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: yes
+---
+python_skill: Novice
+---
+domain_expertise: Advanced
+---
+supporting_material_url:
+---
+slides_link: https://pretalx.com/media/pyconde-pydata-2025/submissions/DPAPUA/resources/GitMLO_kGDOqix.pdf
+---
+social_card_image: /static/media/social/talks/DPAPUA.png
+---
+youtube_id: kkEFux6uek8
+---
+video_link: https://www.youtube.com/watch?v=kkEFux6uek8
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/kkEFux6uek8/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+Yeah, my name is Bohdan. I'm working for Idealo. Do you know Idealo? Thank you. Thank you. But Idealo, we can also tell you about this a little bit in numbers. So we're operating in six European countries. We have 76 million visits per month. 4.5 billion offer imports and updates per day to make our inventory bigger and satisfy you with buying the best product with the good prices. And we have 5 million active products. So this is something from where we can review the recommendations. And we certified in climate neutral and price comparison portal. So good for our Earth. But for those who doesn't know about Idealo, So what we're doing, we're scraping internet and trying to find the best offer for you by price and also some additional for that it is the delivery cost. So we're also checking if the delivery cost is too high and so on and we can give you this best price. And very important feature that you can see how the price change over the time and we have this price tracker. So you can set up alert and with this alert you can say what price you want to buy the product and then we can give you this alert when the price will be dropped. Okay, this is about Idealo and what we're doing there at Idealo in order to make you happy, we're sending you recommendations. Yeah, because we hope that these recommendations will help you to make decisions. And we, as machine learning engineers, we're making these recommendations. Most of the time, it's like our main focus to make these recommendations. And in order to do this, all of these recommendations, it's kind of a hypothesis that happens in the mind. Like very easy hypothesis is if we send you just best seller products and then probably you will buy them, but also we wanted to add some personalization for that. This is another hypothesis that we wanted to evaluate and check. Also, maybe the color of the products is something that you would like, like this Mario, for instance, controller for the switch. We have this recommendation not only in the mail campaigns, but we also have this recommendation on the website, on the also mobile portal, and you see that different recommendations happen at a different stage. For instance, we can recommend you some bargains, we can recommend you some products based on your visited history, if you allow us to use your visited history. and also we can create some kind of like local offers because sometimes we can offer better for the delivery from specific like local regions like from the Berlin and also similar products and all of this hypothesis it is what is standing behind it it is a pipeline yeah that we need to kind of create we need to kind of first of all identify yeah what is the idea yeah and we have this quote we are not just limited by technology but by our ideas and our experimentation and how quickly we can try things and for us when we're doing the recommendations we don't want to have a limitation we wanted that everybody in our company can come up with the idea and we can just implement this idea and try and see does it work on the target groups not like on the all the users but on the target groups and for that what we need to do we need to run kind of like a beer test experiments or maybe somehow at the very beginning of course we try to measure if this idea works good with the offline metrics where we can analyze and how it works here we have business needs we have a data that we can try then what the next step it is develop a model and then we train model then we test model deploy model connect this to the business applications if it's like a marketing campaign we're sending this into their emails if it's on the web page it's showing on the web page and then we monitor optimize see the results and we try this cycle every time and like over and over and the idea to make this cycle as fast as possible because if you have idea and you wanted to see how this idea performs you don't want to wait months is like years you want to have it as quickly as possible and the amount of ideas that you can use and implement this is also something that we need to be able to parallelize yeah the number of the ideas that we can evaluate at the same time and I have my background it is DevOps so it looks like very good match yeah so even the color is the same so we have like also plan yeah and then we code plan is our business needs yeah then we code it we build the model with as the model we release it deploy operate monitor and continue so it's like very nice match yeah like our machine learning lifecycle and devops lifecycle so everything works good and now let's take a look how we can apply this DevOps practices which working already for quite a lot a long time and how we can apply this with our machine learning pipelines okay first part yeah this plan code build test so for the plan it's just idea people come up with idea say okay let's today try to show like the product that user over you see it's a valid idea so let's just enable them with the product they already see and then we go in with the code we're going to build and then the question is who if we coded where we gonna to deploy it yeah and in recent years we migrated all our infrastructure into the AWS and at AWS we have AWS SageMaker pipelines which is before it was just SageMaker pipeline now it is SageMaker AI pipeline where you can see that all of the steps is as independent container and each of this independent container it has input data and produce output data pretty simple architecture and you can combine all of these containers in some of the chains you can see this can be like a tree it can run several steps in parallel there can be different steps in order to code it in order to code it it's quite simple so you can just say hey this is my input it is my output the processing step and then you put like this inputs outputs and then the processing step and what is the processing step it is only this the processing code which is which is running here it's a simple Python script and the Python script gets as the input parameters it is all inputs and then where to store it and then after you create all of the steps you need to combine them together in some of the pipeline and this is the pipeline also very simple interface as you can see it is like few lines of code and how you can define your pipeline you have parameters instance type training type all of this input data the batch data and then also the steps how they join together but in order to check all of the steps we also need to test them yeah because for us we select the spy test BDD framework where we test in each step and because we have also a lot of the different pipelines different hypotheses different people working on these pipelines it is also very fast to communicate because if you're looking into the code sometimes it's like quite chatty and it is hard to read the code but this BDD test we find out that this is quite easy to read understand and for most of you I guess it's also understandable what it's actually doing yeah so it is getting some input data it there is a temporary directory which contains the data when we call our post-process results by with these arguments we can then expecting that there are some like output CSV files and and this is the way how we communicate also between like different teams inside the team that instead of like checking the code checking all of the steps we can just read this simple test case and kind of like a documentation okay this is the pipeline also in order to run these pipelines what we find difficult pipeline needs to spin up a new instance every time it takes approximately like 60 seconds maybe two minutes depending on the instance type because we're using also GPU instances it takes a little bit longer and in order to do this in AWS they provide local pipeline session which allows you to run all of these docker containers on your local environment. Under the hood, it runs everything as a docker compose and then everything running inside. What is the benefit for us? It is speed up our integration tests dramatically. So it took us, instead of waiting when it's starting several minutes, like five ten minutes when it goes on the AWS infrastructure on the local computer it takes several seconds and we can also test it most of the cases where we find it's difficult it is how we combine all of this processing steps together because sometimes you expect in like CC file sometimes you expect in different file names as the input and they have not connected very well together and waiting this on AWS infrastructure takes a lot of time and this you can test easily manually locally quite fast. What we then decided that if we create each pipeline we decided that for the each pipeline it is nice to have it as a separate wrapper. Why? Because separate wrapper we can also run for this separate repo specific github actions we can install specific packages versions of the packages as you know the problem was the packages that sometimes when they update them it doesn't mean that they work better they sometimes work they add some additional bugs or some additional not expected behavior and if you have like hundreds of different pipelines managing it is like in one big chunk it's hard this is why we decided to separate and each pipeline has its separate repository as you can see we have like different pipelines like we have GPU train it and GPU training on the tracking ID GPU training on the product ID this is also something that we come up with our naming conventions that helps us to understand what is what is about yeah what what changes there okay so what is cool you don't see anything from there my fault sorry the wrong colors so the test should be simple at fast everyone should be able to understand the test this is why we're using this BDD framework and we have to test only what is matters if you have input and you test output it is nice because you don't test implementation you test actually how the system behaves with the data the second part it is how we manage releases deployment operations and how we do monitoring so what from the DevOps we find out that each pipeline it is simple artifact it contains everything inside it contains all of the scripts, it contains all of the artifact that it's necessary to run, also we pack libraries together and how it helps us that when we run it we exactly knows that it runs with exactly the same code, with exactly the same libraries and if it fails we can just take this artifact, run this locally and check and verify what actually the problem happening and when we deploy we're quite confident because it does not break on the production yeah so it's running exactly the same code the only the way why it can fail maybe the data change it or maybe I don't know just instance crush it for some reason how we then deploy this as a code because each of this pipeline definition and this can be version on it and for the each pipeline we create a separate repo we can create a very easy release process because it is just functions in the github we can just click a button release and then it will be automatically release it for us and in order to deliver it to the AWS we use terraform for that yeah so terraform it is declarative it is very nice because you define what you want and then the terraform tries to achieve this state so this is why we using terraform for that and because we have a lot of the pipelines we run in different pipelines in different accounts so it means that if one account is failed or some problems we don't have like the problems with the noisy neighbors where we can for instance put a lot of data in one account and then it's on the reason it does not work so we can really deploy which version of the pipeline in which account and also track the amount of the money was spent for the specific account which is for them cost analysis is quite important and in order to operate Terraform we use Terragrant Terragrant it is very nice because in the Terraform if you have a lot of pipelines all of these pipelines takes quite a lot of time to apply this Terra Terraform configuration because Terraform under the hood what it needs it every time calls AWS API and ask if there are some changes or not if there are some changes or not and then try to match and then create a plan with the Terragrant we operated on the level where it is only checking the changes for the specific pipeline run everything in parallel and this is yeah we need for that bigger machines because it runs several in parallel but it will increase the time we need and if we need to only deploy and check one pipeline we can easily do this was in this entire ground configuration and last but not least this is github to monitor the changes so everybody is creating a pull request we verify if this pull request is good and we can see then at the end the history of the changes on our infrastructure so instead of going into the AWS and checks what was wrong we can see okay who did the change when this change was done and what exactly was changed in our infrastructure and we use GitHub history also as a tool for for us to understand what is going on with our current pipeline okay oh yeah this still some so what is important to understand when we have a pipeline as artifact it is that each pipeline is well-defined everybody can take this pipeline and run locally with the local mode and check if something doesn't work of course these are problems if you don't have GPU specific then it does not work one-to-one then when we deploy the specific version of the pipeline for us it is important that we can easily roll back and roll back it takes literally seconds because you just change the version of the pipeline that you want to deploy do the pull request approve the pull request and then it will immediately goes into the production and the specific version and what we then if we have this everything version it and packed we don't have side effects everything which is running with the specific version we know that it would be run all the time exactly the same yeah what we can do it is we can deploy develop independently everybody can develop its own hypothesis they can develop its own pipeline version verify and deploy and release they independently because when we release in it doesn't mean that it is already in production when we deploy in this in the production this only happens there so it means that everybody can push into the main without any problems changes for the pipeline but only these changes will be on the production when they release an artifact and when this artifact will be deployed into the architecture infrastructure and because each pipeline independent we can use different frameworks if you like PyTorch TensorFlow you can use this if you like different languages you can use different languages the only that we have to use this BDD framework when we can easily see what the input what the script we run and what the output so downsides because we have different pipelines we have a lot of code duplications and resource usage is not optimal sometimes you have hypothesis where you can say okay I wanted to run only for this specific group of the product and for them we need to train specific model for that what it means it It means that if we write everything from the scratch, we just copy the code from the pipeline, create exactly the same, and then see if it's working, this hypothesis is good. Then we archive the previous repository. But during the time when we're verifying, we still have two code bases, which is almost exactly the same, but with some small changes inside. So it is the code duplications. The way how we're trying to make it, we're creating some libraries. but yeah this is how we try to avoid this code duplications and resource usage is not optimal because if you have exactly the same pipeline you need to think about the caching but maybe for some pipeline you have different query parameters different data sources so caching is not always the same but yeah in resources you need to sometimes to duplicate okay and And that's it. Please, questions.
+
+**Speaker 2** _[21:31]_
+
+Thank you so much Shabogdan. So you are exactly right on time. I was about to like, you know, show you the card But then you are like, okay I've got a quite few questions. Oh More than 15 not really sure if we can manage all of them, but let's see how many you can answer So the first one is what is idealos? business model
+
+**Speaker 1** _[21:52]_
+
+Oh, nice question. I'm not the right person to answer this, but in short, we have contracts with merchants, with the shops, with big shops, with small shops, and they send in us data. Then also we have another possibility to have like an open catalog where we get all of the offers from the internet. The problem is when we have a contract with the shops, we have very well structured data when we have open catalog. Data is not well structured, so we cannot really recognize all the offers. For that, we're using machine learning. We're trying to recognize offers by description, by some attributes, and image recognition. So if we recognize some images, we can say it's the same product or it is different products. And then from you, what is important is that it's not necessary for you to register on our website. the only registration is needed if you wanted to have notifications and email campaigns but if you wanted to have notifications you just need to install the app and then that would be push notifications without any registrations needed which is which is I guess good
+
+**Speaker 2** _[23:06]_
+
+Perfect. Thank you. And the next one, do you need to deal with sensitive customer data at IDLO? And if yes, how do you solve privacy issues when working with AWS Cloud?
+
+**Speaker 1** _[23:17]_
+
+Yeah, so for us, we do not store and do not use any user data, even like a sensitive user data. So there are some interactions that we see in our system, but they anonymize. So we don't have any connections between who you are and so on. and in order to have this email campaign you need to register and you need to click a button that you wanted to get this email notifications and then we use your email hash so we don't know even your email we only use email hashes so it's like pretty safe
+
+**Speaker 2** _[23:59]_
+
+Thank you The next one if you have a separate repo for each pipeline How do you manage to keep standards and learn and improve the code and structure from new projects?
+
+**Speaker 1** _[24:13]_
+
+Yeah, the problem was the it's still code duplications and for the standards We use automatically automated linters automated the test and In order to communicate we communicate in inside The team with the test suites as you can see it is like very simple And we do not really care about what framework you're using but what we care that this is should be reproducible and replicated whenever you run this was with the testing like we have integration test it should just yeah just do be well tested and for the test coverage we have the metrics like it's like 90% for the test coverage which is trying to touch you
+
+**Speaker 2** _[25:10]_
+
+Thank you. Do you have ML pipeline sharing common steps? How do you realize that if they are stored in different repositories?
+
+**Speaker 1** _[25:19]_
+
+Yeah, this is the problem with the usage, not optimal usage for the resources. In order to have the common steps, what we're doing, we're creating our own caching mechanism. When we call the pipeline step, each pipeline step, it has its own unique hash based on the query parameter that we have in this step and the version of the step. and then we can reuse this step so it is not aligned because if it works very good in the SageMaker if you have one big pipeline then you can cache steps but if we use different modern like different pipelines we cannot really cache the steps so we created our own own view for this
+
+**Speaker 2** _[26:07]_
+
+Perfect, thank you. I think this is also my favorite question. So are you fully satisfied with the cloud resources, or sometimes want to return back to on-prem things?
+
+**Speaker 1** _[26:17]_
+
+Oh, yeah. What I like, I like that it is everything fully managed. And when we need some support from AWS, they're quite open. And they always fully support us because we have this business support. And this is like, very nice. but what I see sometimes if you have a product which you really like and then AWS change this product which doesn't happen so often so you don't have any possibility you have to also change and sometimes it's not so easy to change everything if you have hundreds pipelines.
+
+**Speaker 2** _[26:59]_
+
+Agreed. And the next one, could you elaborate on your multi-user approach when it comes to running pipeline pipelines?
+
+**Speaker 1** _[27:08]_
+
+Multi-users, I think it's multi-accounts, yeah? Maybe, yeah, so multi-user approach. When we have multi-accounts, it means that we can easily check which account to which team belongs, which product we're calculating, and we can also see how much cost we're spending on this particular campaign, on this particular slider that we have on the website on the mobile application and this is how we solve it with the multi accounts and also for the multi accounts we have different data sources and different data permissions that we can also manage
+
+**Speaker 2** _[27:54]_
+
+How do data scientists write their code for processing and training steps? Do they use SageMaker Studio or personal laptops?
+
+**Speaker 1** _[28:02]_
+
+SageMaker Studio. So everything, all of the Jupyter notebooks we run in on the SageMaker Studio. Right now the new version of the SageMaker Studio works quite fast, well, and yeah, it just works. So you don't need to run it on your local computer anymore.
+
+**Speaker 2** _[28:20]_
+
+Yeah, so looking at the time, we have one last minute. Most probably we might not finish all the questions, but we'll try to cover them in Discord. The last one, if the pipeline tests run locally, what about intermediate results that are very large and would usually be stored remotely? Do you mock test data?
+
+**Speaker 1** _[28:39]_
+
+So what we're doing, of course, you cannot download on your laptop like 60 gigabytes of the data of the products that you have. What we're doing for the integration test, we're running with the small data sets. So we're using like very small data sets, like 10 megabytes data set, which we're running on local computer. And on local computer, it works quite fast. and also of course the problem that if you don't have GPU and you wanted to run and test GPU code which is running on your local computer we using for that some kind of like a wrappers which not 100% tell you that it will work in production so this is something that we cannot do and if it's running on your silicon processor it has also some problems with the different architectures so something also needs to be considered what we tested in integration test only that all of the components connected together and all of the interfaces that we just define they works together so this is what we test an integration test
+
+**Speaker 2** _[29:45]_
+
+Yeah, perfect. So thank you so much for those amazing answers. And with that question, we would like to conclude. And please give a round of applause to Bogdan.
+---
+transcript_status: auto
+---
+transcript_language: en

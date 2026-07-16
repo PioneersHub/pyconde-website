@@ -1,0 +1,68 @@
+{#
+  Analytics & retargeting pixels
+  ──────────────────────────────
+  Injects Meta Pixel, LinkedIn Insight Tag, and Google Analytics 4
+  into <head> so the year-round archive audience is pooled into
+  retargeting lists well before the Nov 19 launch.
+
+  Usage (once, in templates/layout.html <head>):
+    {% from "macros/analytics-head.html" import render_analytics_head %}
+    {{ render_analytics_head(bag('analytics'), bag('seo')) }}
+
+  Guards:
+    - Emits nothing unless seo.env == 'production' (local dev safe).
+    - Emits nothing unless analytics.enabled is true.
+    - Each provider self-hides when its own enabled is false or its
+      id field is empty.
+
+  Databag schema (analytics.yaml):
+    enabled: true
+    meta:    { enabled: true, pixel_id: "123..." }
+    linkedin:{ enabled: true, partner_id: "1234567" }
+    google:  { enabled: true, measurement_id: "G-XXXXXXX" }
+#}
+
+{% macro render_analytics_head(analytics, seo) %}
+
+{% if seo and seo.env == 'production' and analytics and analytics.enabled %}
+
+  {# Meta (Facebook) Pixel #}
+  {% if analytics.meta and analytics.meta.enabled and analytics.meta.pixel_id %}
+  <script>
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+  document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', {{ analytics.meta.pixel_id|tojson }});
+  fbq('track', 'PageView');
+  </script>
+  {% endif %}
+
+  {# LinkedIn Insight Tag #}
+  {% if analytics.linkedin and analytics.linkedin.enabled and analytics.linkedin.partner_id %}
+  <script>
+  _linkedin_partner_id = {{ analytics.linkedin.partner_id|tojson }};
+  window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
+  window._linkedin_data_partner_ids.push(_linkedin_partner_id);
+  (function(){var s=document.getElementsByTagName("script")[0];
+  var b=document.createElement("script");b.type="text/javascript";b.async=true;
+  b.src="https://snap.licdn.com/li.lms-analytics/insight.min.js";
+  s.parentNode.insertBefore(b,s);})();
+  </script>
+  {% endif %}
+
+  {# Google Analytics 4 #}
+  {% if analytics.google and analytics.google.enabled and analytics.google.measurement_id %}
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ analytics.google.measurement_id }}"></script>
+  <script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', {{ analytics.google.measurement_id|tojson }});
+  </script>
+  {% endif %}
+
+{% endif %}
+
+{% endmacro %}

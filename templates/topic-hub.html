@@ -1,0 +1,104 @@
+{% extends "layout.html" %}
+{% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
+{% from "macros/funnel-cta.html" import render_funnel_cta %}
+{% from "macros/newsletter-inline.html" import render_newsletter_inline %}
+
+{% block title %}{{ this.title }}{% endblock %}
+{% block og_type %}website{% endblock %}
+
+{%- set branding = bag('branding') -%}
+{%- set host = branding['canonical_host'] -%}
+{%- set cur_year = site.config.PROJECT.year|string -%}
+
+{% block structured_data %}
+{{ super() }}
+{%- set crumb_trail = [] -%}
+{%- set _ = crumb_trail.append(('/archive/', 'Archive')) -%}
+{%- set _ = crumb_trail.append(('/topics/', 'Topics')) -%}
+{%- set _ = crumb_trail.append((this.url_path, this.title)) -%}
+{{ breadcrumb_jsonld(crumb_trail) }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "@id": "{{ host }}{{ this.url_path }}#topic",
+  "url": "{{ host }}{{ this.url_path }}",
+  "name": {{ this.title|tojson }},
+  "description": {{ (this.description or '')|tojson }},
+  "isPartOf": { "@id": "{{ host }}/#website" },
+  "breadcrumb": { "@id": "{{ host }}{{ this.url_path }}#breadcrumb" },
+  "numberOfItems": {{ this.talk_count|default(0) }},
+  "mainEntity": {
+    "@type": "ItemList",
+    "@id": "{{ host }}{{ this.url_path }}#itemlist",
+    "numberOfItems": {{ this.talk_count|default(0) }},
+    "itemListElement": [
+      {%- for path in this.talk_paths or [] -%}
+      {%- set t = site.get(path) -%}
+      {%- if t -%}
+      {
+        "@type": "ListItem",
+        "position": {{ loop.index }},
+        "url": "{{ host }}{{ t|url }}",
+        "name": {{ t.title|tojson }}
+      }{{ "," if not loop.last }}
+      {%- endif -%}
+      {%- endfor -%}
+    ]
+  }
+}
+</script>
+{% endblock %}
+
+{% block body %}
+{%- set visible_trail = [] -%}
+{%- set _ = visible_trail.append(('/archive/', 'Archive')) -%}
+{%- set _ = visible_trail.append(('/topics/', 'Topics')) -%}
+{%- set _ = visible_trail.append((none, this.title)) -%}
+{{ breadcrumb(visible_trail) }}
+
+<div class="subsite">
+  <div class="subsite-title">
+    <section class="content">
+      <h1>{{ this.title }}</h1>
+      {% if this.description %}
+      <p class="tracks-intro">{{ this.description }}</p>
+      {% endif %}
+      <p class="tracks-intro">
+        {{ this.talk_count|default(0) }} talk{{ '' if (this.talk_count|default(0)) == 1 else 's' }}
+        across all editions.
+      </p>
+    </section>
+  </div>
+</div>
+
+<section class="subsite">
+  <ul class="talks">
+    {%- for path in this.talk_paths or [] %}
+    {%- set t = site.get(path) %}
+    {%- if t and t['_model'] != 'redirect' %}
+    {%- set parts = path.rstrip('/').split('/') -%}
+    {%- set is_archive = '/archive/' in path -%}
+    {%- set year = parts[2] if is_archive else cur_year %}
+    <li>
+      <a href="{{ t|url }}" class="content talk">
+        <h2 class="talk-title">
+          {{ t.title }}
+          {% if t.youtube_id and not t.do_not_record %}<span class="recording-badge" title="Recording available on YouTube">▶ Recording</span>{% endif %}
+          {% if t.transcript and not t.do_not_record %}<span class="recording-badge" title="Full transcript available">📝 Transcript</span>{% endif %}
+        </h2>
+        <p class="talk-speakers">{{ t.speaker_names }} · {{ year }}</p>
+        {%- if t.abstract %}
+        <p class="talk-abstract">{{ t.abstract|striptags|truncate(220) }}</p>
+        {%- endif %}
+      </a>
+    </li>
+    {%- endif %}
+    {%- endfor %}
+  </ul>
+</section>
+
+{{ render_funnel_cta(bag('site_state')) }}
+
+{{ render_newsletter_inline(bag('frontpage/sections/newsletter')) }}
+{% endblock %}

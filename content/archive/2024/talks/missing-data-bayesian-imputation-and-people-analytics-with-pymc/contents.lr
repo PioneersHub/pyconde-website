@@ -1,0 +1,180 @@
+title: Missing Data, Bayesian Imputation and People Analytics with PyMC
+---
+description: We demonstrate a range of different approaches to missing data imputation in employee engagement survey data. Contrasting frequentist style full-…
+---
+created: 2023-12-18
+---
+code: KXU7Q8
+---
+slug: missing-data-bayesian-imputation-and-people-analytics-with-pymc
+---
+speaker_names: Nathaniel Forde
+---
+speakers:
+
+
+
+### Nathaniel Forde
+
+_About — in the speaker's own words_
+
+I'm a data scientist from Dublin, working at Personio on a range of revenue or customer focused areas. Previously I worked with CarTrawler on pricing and insurance risk modelling, and with Marsh and McLennan in areas of re-insurance and catastrophic risk. Before this i worked in Paddy Power Betfair on models of risk indicators for gambling as part of a responsible gambling initiative. I''m broadly interested in problems of risk and confounding.
+---
+abstract:
+
+
+We demonstrate a range of different approaches to missing data imputation in employee engagement survey data. Contrasting frequentist style full-information maximum likelihood approaches with more direct Bayesian imputation and chained equation methods, we highlight how the different assumptions regarding the missing-data license different inferences about the imputed values and ultimately the plausible causal narratives which can be expressed in PyMC. In particular we avail of the hierarchical nature of employee engagement data to justify a hierarchical approach to justifying the (MAR) missing-at-random assumption for imputation schemes in People Analytics.
+---
+full_description:
+
+
+There is no "agnostic statistics" when approaching the question of missing data. Theory quickly breaks against reality in the context people-analytics.  All imputation schemes need to justify their assumptions of "strong-ignorability" or "missing-at-random" reasons for missing data. This is easier and cleaner in a Bayesian setting than in frequentist alternatives. This transparency is important when dealing with HR data. We will demonstrate both full information maximum likelihood (FIML) and Bayesian imputation by chained equation approaches to the imputation of missing data in the context of employee engagement survey data.
+
+We will use the probabilistic programming language PyMC to articulate the structures and conditional probabilities around missing data in hierarchical organisations. Non-response bias in engagement survey data often corrupts the overall picture of organisational health and modelling of the non-response bias helps uncover patterns or trends in the patterns of missing-ness.  These insights can be used diagnostically to locate the source of problems within the organisation, but we need to be willing to commit to the assumptions that license genuine causal inference.  In this way we present the problem of missing-data as a gate-way to an organisational focus on causal inference problems. Somewhat ironically, the lack of data can actually makes the problems of causal inference more concrete for business stakeholders.
+---
+room:
+---
+day: Tuesday
+---
+slot_date: 2024-04-23
+---
+start_time: 11:05
+---
+end_time: 11:35
+---
+slot_id:
+---
+track: Machine Learning & Deep Learning & Stats
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 3578
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Novice
+---
+supporting_material_url: https://github.com/pymc-devs/pymc-examples/pull/500
+---
+slides_link: https://nathanielf.github.io/talks/missing_data/missing_data_causal.html#/title-slide
+---
+social_card_image: /static/media/social/talks/KXU7Q8.png
+---
+youtube_id: XUo_Z6a4d7c
+---
+video_link: https://www.youtube.com/watch?v=XUo_Z6a4d7c
+---
+video_published_at: 2024-06-23
+---
+video_duration_iso: PT26M36S
+---
+video_thumbnail: https://i.ytimg.com/vi/XUo_Z6a4d7c/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:05]_
+
+Thank you, folks. Not quite a maintainer, but a contributor to PyMC, just to clarify that bit. But nevertheless, just broad preliminaries here. I'm a data scientist working with Personio. Reform philosopher, logician, find my website there. The disclaimer, none of the data we're looking at here is Personio's data. And finally, probably the most important point, is the code and all the examples behind this presentation can be found at the following link there, but it's also available on PyMC examples website. If you just Google missing data imputation, you should find it. The broad pitch of this talk here is that causal inference techniques are required for mitigating non-response bias in people analytics survey data. I'm going to argue that Bayesian imputation methods are state of the art for theory-informed imputation, and that more broadly missing data imputation is just important. The agenda is going to take the shape of something like this. So we're going to cover the broad typology of missingness in data. We're going to then look at sort of a frequentist or standard approach to handling missing data using full information maximum likelihood techniques then we will look at Bayesian imputation approaches via chained equations so this is kind of similar to the sort of mice approach if you've ever come across that and then we will look at hierarchical hierarchical structures that impact missingness and how to deal with that in a Bayesian context and we will kind of conclude with sort of the role in imputation around causal narratives and then conclude and so sort of typology of missingness This is sort of, I think, famously put together initially by Rubin many, many moons ago. But there are three types of sort of missing data. So the first one we're going to look at is called MCAR, or missing completely at random. So the random variable we're interested in here is Y. And the type of missingness, whether i.e. missing is M equals true or M equals 1, is determined entirely by the haphazard circumstance of the world phi. So missingness cannot be predicted or is not a function of any aspect of the y variable in question. So missing completely at random, that is the typology we're interested in there. The second one is missing at random. And this differs slightly in that the missingness is a function or can be predicted in some sense from the y variable or the observed features of the Y variable and the haphazard circumstances of the world phi. And the worst and sort of most pernicious form of missingness is missing not at random or MNAR for Y where this is a sort of non-ignorable missingness which is driven by both features of the world and features of the variable in question. And we really need to account if we're in a circumstance where we fear that the variable has missing data which is a function of missing not at random, we really need to account for why the data is missing for this one to recover a sort of more healthy missing at random circumstance for our data project or for our analysis. So the reason here is sort of around identifiability under missingness. So for both the MCAR and MAR circumstances, there do exist consistent identifiable estimators for functions of Y. under MNAR, there does not in general exist a consistent estimator for functionals of Y. And that's a problem. We cannot use data itself or bootstrap ourselves a solution from the data to determine which cases are MNAR versus MCAR or MAR. We are required to make assumptions about the nature of the missingness and then make steps in our modelling or analysis routines to try and account for the missingness. So that's a lot by way of preamble and that's the sort of set up of the problem space. We're going to now look at full information hood, maximum likely approaches to handling missing data. Fundamentally this is a sort of multivariate technique and we're going to look at an employee engagement survey data set for looking at this. So this is fundamentally survey data you're looking at here. You're going to have measures of the individual team member, the individual employee, you're going to have demographic features like their gender, for instance, and you're also going to have three measurements which we're going to focus on today, which is a score for empowerment, so employee empowerment, and there's this variable LMX, which is leader member exchange. This is a measure of your relationship with your boss, in effect. It's the healthiness of your relationship with your boss, and we're going to look at work satisfaction scoring. So in all of these measures we're going to look at sort of missing data or gaps in the data that are due to non-response bias in the surveys. So the three variables we're going to look at here look like this. And so how we might handle that with full informationhood, full information maximum likelihood approach is to try to estimate the parameters of the multivariate normal distribution which we take to be governing or informing our data generating process. So there's different patterns of missingness in the data and we're going to pull out each of the individual patterns. So say we have three variables here. You could have a pattern of missingness where one of the columns is missing a value, two of the columns are missing a value, or three for instance. And the way this algorithm is going to work is it's to focus on building a log likelihood score for the different patterns of missingness available in your data matrix. And it's maybe a bit abstract. Kind of what it looks like in code is first we take our data matrix, which is our X matrix or whatever, we split it into different patterns of missingness, whether it was two missing from the first two columns, two missing from the latter two columns or whatever, and we build a multivariate normal distribution which can take data of that shape and we add them all together in this way, adding is probably not the right way, we combine them all in a way to optimise a log likelihood by characterising the different covariance structures and the sort of mu vectors in our multivariate normal distribution. We run that through an optimiser, just SciPy in this case, and that will give us fits for the multivariate normal distribution, which we argue is generating this data. That will give you the parameters you're interested in. You will be able to sample from this data, so that's kind of interesting. You should be able to recover the shapes or the filled-in distributions of your variables. But the approach sort of lacks control in some sense, is what I'm going to argue, an insight into what was driving the missingness in the first place. And you're kind of limited in this approach because you can't directly handle MNAR situations or you can't be very explicit on how you're handling it. So this is why I'm going to say we should look at Bayesian imputation methods by chained equations in which we can sort of directly sample probable values for each of the missing observations in our variables, conditional and flexibly specifiable models. And what this sort of looks like, or rather say, the bigger idea here, right, so is when there are gaps in survey data that are not random, we need to understand the drivers of those missingness, the drivers of the missingness in our data, and the sort of topology around the gaps, the related filled in variables around the gaps, give us clues on how to fill in the missing values, and Bayesian inference routines will help us impute the probable kind of shapes of the filled-in variables. So in our employee engagement data, the question becomes what are the environmental influences on the probable responses within the employee base? So to make this more concrete, what we do is we start with the observation that our data matrix for the three variables of interest here, so this is empowerment, leader-member exchange climate and the gender variable here can be decomposed in the following fashion that you see on the board here and this and this decomposition can then be expressed as a set of linear models that we can kind of collectively model within a piMC context with multiple likelihoods and the calibration of our model for the sort of better parameters in this in this linear phrasing of the three component models will be estimated with uncertainty. That's useful. So the obligatory slide here for the typical Bayesian equation, we will be estimating these models using MCMC. It's worthwhile calling out for why perhaps a Bayesian context is quite useful for this. First, like any Bayesian problem, you get to use priors to regularize your data around sort of hard-to-fit, complicated models. That's very useful. Secondly, you kind of get a built-in sort of sensitivity analysis to different realizations of your parameter space when you're looking at a Bayesian model and a Bayesian model fit for imputed values. So the imputed values that you will see will vary as a function of the parameters derived in your posterior and this is kind of helpful to think about how sensitive are your imputation results to the realizations of your model fit so what this looks like in code and so so to make that idea concrete I'm going to fit this model or have fit this model with two different sort of prior specifications in the first case I'm using I'm using priors that I've set with normal distributions for the variables of interest in our chained equation approach and then I'm also going to use uniform priors on the same variables for the sake of argument. We will push forward these prior specifications into our model and we will determine the parameters of the model that we want. We will fit a likelihood term for the variables with missing data. We will also sort of feed that forward into each of the parameters, each of the variables that have missing data, we fit likelihood terms for them directly, and we have the final empowerment likelihood term, which is a combination of the sequence of previous model fits effectively, all going on in the same model. So we're effectively fitting the joint distribution of the three variables at hand, we're doing it in one model and doing it one variable at a time, making each variable a linear function of the previous data. It doesn't always need to be a linear function, I should say as well. It doesn't always need to be a regression fit, you can use a logistic fit for categorical variables if you want as well. Anyway, in a graph, that's what this model looks like. Sort of more intimidatingly complex than it perhaps should be, but basically the idea what I've said. You fit the variables in a sequence, you feed it forward into your focal regression, which is the last regression in the sequence of chained equations. In our case, we're trying to focus on empowerment as the variable we want to pull out. This is the result of the model fit and the imputed values on the model fit when you change the priors that I specified from normal distribution priors to uniform distribution priors. What's nice about this is that imputation models are sort of hard to think about how do I get it right, like what's the right value to fill in here. But if you put it in this setting, then predictive, like basically it falls into the typical Bayesian workflow and model assessment workflow. It turns your problem into what is a good predictive model for the outcome variable of interest that I care about at the moment, and you can use all typical measures of Bayesian model adequacy to assess different parameterizations of these chained equations. So you can evaluate your model outcomes with weekly applicable information criterion, you can do leave one out cross-validation, whatever you think is preferable. In this particular instance, the normal priors was far better than the uniform priors. But that need not always be the case, and by phrasing this as a Bayesian modelling problem, you get for free the Bayesian workflow for model adequacy assessment, which is good. So we're going to add a complication now by looking at the hierarchical structures in our data that can impact missingness. In particular, this is useful in an industry context because industries are structured by hierarchies. So we want to consider in this final model how management and team structure can influence the non-response patterns in the employee engagement. So our data set conveniently has about 30 teams across the employee base. Some of them have values, some of them don't. And you can use a hierarchical model to add random effects or hierarchical effects for team membership across the data set to induce better, more reflective variation and turn what could be an MNAR situation into an MR situation. So that's missing not at random to a missing at random conditional on our model. So it's sort of conditionally ignorable inference using random effects. And the kind of idea there is that the cause for the missingness gets absorbed into the random effect terms per each team. And the broad argument for that is that power relationships and hierarchies sort of structure the human world very broadly. and we should be aware of how those hierarchies are going to determine the outcomes for all members of the team within a business or the soldiers within an army or the proletariat in society, for instance. What this looks like in code is you specify a sort of typical hierarchical model with an intercept term, for instance here, for the company. intercept terms or modifications to the company intercept for each team in the company you can also do the same sort of hierarchical shenanigans for the better parameter for the better parameter on the leader membership exchange variable so remember the leader membership exchange variable is a measure of trust between you and your boss so you want to have a sort of team specific modification to the beta coefficient for the leader membership exchange variable. You put that together in the typical fashion, for those who are not familiar with hierarchical modelling in any circumstance, I do recommend the PyMC examples web page for a ton of examples of hierarchical modelling that are useful, but I'm going to assume the basic knowledge of it. The model structure for this final hierarchical model looks something like this, again we're trying to focus on the empowerment variable at the end, but the benefit of having this hierarchical structure is that we can pull out team-specific parameters which are modifications to the intercept term for empowerment, our empowerment model. So the deviations from the norm here, deviations from zero, in this case, like strong deviations I think mean a high degree of trust for that team, like it's driven like a good working operating team. Low scores mean that there might be something gone wrong and mismatch between manager and employee. This is insight into the nature of the team and the structure within your organisation that might be useful for you to add sort of correctives. This is the imputation value under our hierarchical model. It's quite healthy. Okay, good. I'm I'm going to wrap up quickly. I think I have like five minutes or something left. So imputation and causal narratives. I'll be quick. But very broadly here, industry questions are generally causal questions. This table on the left here, the fundamental problem of causal inference. Phrase as causal inference fundamentally is an imputation problem. You're looking to impute the value of your why under different counterfactual treatment conditions. I'll just skip these down. But very broadly, the heart of causal inference is understanding the risk of confounding influence on your data generating process. And the suggestion here for employee non-response data is that confounding could be a function of the hierarchy in your team and the relationships among the participants of your team. And to try to account for that risk of confounding, I'm suggesting you build a hierarchical model to account for that, or helping you move from MNAR to MAR circumstances. Having an explainable causal model which captures the reality of the data generating process in some way is vital in human centric domains where decisions need to be justifiable. Decisions about a person's career need to be justifiable, it can't be a black box model that determines the outcome for someone. You want to be able to answer counterfactual questions of like how do the patterns of employee engagement change across your different teams if we intervene on these relationships with management in the structures. Okay good. So to recap and conclude, we have seen an application of missing data analysis to survey data in the context of people analytics. Multivariate approaches are effective but but can't help address confounding bias easily. Bayesian models are flexible. They can be highly tailored to the appropriate complexity of your problem. Hierarchical structures pervade business and industry. They're conduits for leadership influence and communication and preference. Hierarchical modeling can isolate estimates of these impacts. It can reveal inefficiencies in your organization, mismatches between team and management you can address imputation value so this is the dramatic conclusion whatever imputation imputation gives voice to the missing and in the same way that inverse propensity weighting corrects and upweights under representative sampling in data both are correctives for selection effect bias and arguably missing data imputation is the more fundamental correction you need to make that's me
+
+**Speaker 2** _[20:18]_
+
+Thanks a lot for that great talk. That was really nice. We got a lot of questions. Audience is really interested in your stuff. First question. What essentially is the difference between predicting missing values and predicting why?
+
+**Speaker 1** _[20:34]_
+
+predicting missing values, I'm predicting y. The variable y. So in the example that I gave, you have less information in the structured chain of equations to predict the input variables to your model of y. Your model of y wants to be a function of all the input variables. But to impute the input variables, you will have less data to predict the input variables, unless you do it one at a time. you could do it one at a time and kind of reverse the what becomes why and stack stack all your imputations and average them certainly an approach um close to multiple imputation schemes um but it's not one i've demonstrated here so you can do both but it's a similar problem and i think i've argued that basically you want to phrase an imputation problem as a predictive problem because then you get the criterion of model model adequacy that we are familiar with
+
+**Speaker 2** _[21:30]_
+
+Thank you. Could you handle long tail distributions this way or would that be a problem because outliers might be imputed?
+
+**Speaker 1** _[21:38]_
+
+You can handle long tail distributions this way like especially using a Bayesian context because you can kind of Tailor the construction of your model and the likelihood terms in your model for the components of models as you go So long tail distributions can can be handled in a Bayesian context and you can regularize your parameters as need be to fit them well
+
+**Speaker 2** _[22:01]_
+
+Now to I guess more classic question, how do we select a prior, especially when my data looks like multiple different gaussian?
+
+**Speaker 1** _[22:12]_
+
+It's a tough problem. Lots of shoe leather, lots of footwork, talking to subject matter experts, like build your understanding of the data generating process, run experiments, validate your models, repeat, do the scientific enterprise. There is no shortcuts.
+
+**Speaker 2** _[22:31]_
+
+Connected to that, in what sense was the Gaussian prior better than a uniform prior?
+
+**Speaker 1** _[22:36]_
+
+The uniform prior was too widely spread, and it just imputed implausible values. It's just too loose. The normal prior centered it around reasonable realizations of the data in this case. It won't always be the case, and maybe there's arguments in some use cases for directly having the uniform prior, but it just didn't work quite as well in the data that I had.
+
+**Speaker 2** _[23:03]_
+
+Now a question if someone might call the police. Is it even legal in Bayesian statistics to estimate prior parameters from data?
+
+**Speaker 1** _[23:21]_
+
+Is it legal? I mean, you should have a workflow where you do a pilot experiment to get plausible information about how you set priors for your full experiment, would be the way I would approach it. But you could certainly double dip if that is your preference.
+
+**Speaker 2** _[23:42]_
+
+Is it possible to use this model when multivariate data is composed of different distributions?
+
+**Speaker 1** _[23:49]_
+
+Yes. So in the example I've given, all the input variables were continuous measures. You can also have, especially common in survey data, where the outcome variables are categorical judgments, right? And so what's nice about the Bayesian approach to, or just what's nice about this trained equation approach to these models is that you can have an equation which is trying of logistic regression to predict a categorical variable or a multinomial regression, and you can build that into your chain sequence of models to feed forward in terms. So you can have multiple types of distribution in your model. They don't need to be multi-threaded.
+
+**Speaker 2** _[24:31]_
+
+Thank you. How would you handle missing input variables this way? In the given example, what if demographic data is missing rather than the survey responses?
+
+**Speaker 1** _[24:41]_
+
+you try to order it in degrees of missingness in how you start the chained equation sequence. In my data set, the gender variable was completely filled in. So I start the first equation in my chain as a function of the gender variable. But if you have a different distribution of missingness throughout your different random variables, you structure the chain differently. And you try to maximize the amount of input at the lowest rung of the chain and move up.
+
+**Speaker 2** _[25:12]_
+
+Thank you. What are these Bayesian integrals that you need to evaluate with MCMC?
+
+**Speaker 1** _[25:21]_
+
+I don't really understand the question. Me neither.
+
+**Speaker 2** _[25:24]_
+
+Could you do this if you then wanted to run a mixed effects model on the corrected data set, or would you risk attributing real effects to missing data?
+
+**Speaker 1** _[25:35]_
+
+I mean it depends on so if I understand that question correctly it's like after you've run the imputation scheme do you then run a mixed effects model on top of it too um I think you certainly could chain those kind of operations that way but it depends on how happy you are with the adequacy of your first model which is the imputation model but if you have learned to trust your imputation scheme through a series of pilot programs I don't see there's any reason why not to use that in the exact same way in the same way that you're using say inverse propensity weighting schemes to upweight misrepresentative samples you're using imputation schemes to modify your data set to be more reflective of what you believe to be the data generating process
+
+**Speaker 2** _[26:17]_
+
+Thank you. Last question, not at all connected to Bayesian statistics. What did you use for the code examples of your presentation? A quarter.
+
+**Speaker 1** _[26:25]_
+
+at quarto.
+
+**Speaker 2** _[26:28]_
+
+And that's it. Thanks a lot for all the questions. Thanks a lot for your answers.
+
+---
+transcript_status: auto
+---
+transcript_language: en

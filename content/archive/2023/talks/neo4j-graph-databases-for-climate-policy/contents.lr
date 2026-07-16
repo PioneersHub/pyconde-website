@@ -1,0 +1,162 @@
+title: Neo4j graph databases for climate policy
+---
+description: In this talk we walkthrough our experience using Neo4j and Python to model climate policy as a graph database. We discuss how we did it, some of the…
+---
+created: 2023-01-04
+---
+code: YTHXML
+---
+slug: neo4j-graph-databases-for-climate-policy
+---
+speaker_names: Marcus Tedesco
+---
+speakers:
+
+
+
+### Marcus Tedesco
+
+Tech Lead at Briink, accelerating sustainable finance with machine learning!
+
+Previously Senior Software Engineer at Babbel and Senior Software Engineer and Cloud Architect on the Emerging Technology team at Accenture.
+---
+abstract:
+
+
+In this talk we walkthrough our experience using Neo4j and Python to model climate policy as a graph database. We discuss how we did it, some of the challenges we faced, and what we learnt along the way!
+---
+full_description:
+
+
+As the ambition and complexity of climate regulations and policies grows, it is becoming increasingly difficult to represent them in relational databases. For example the EU Sustainable Taxonomy regulation contains thousands of interrelated legal clauses, many of which also reference other legal texts and entities. 
+
+Graph databases such as Neo4j present a possible alternative well suited to model the complicated, interrelated and evolving structure of climate regulations. 
+
+In this talk we walkthrough our experience using Neo4j and Python to model climate policy such as the EU Sustainable Taxonomy as a graph database. We discuss how we did it, some of the challenges we faced, and what we learnt along the way!
+---
+room:
+---
+day: Tuesday
+---
+slot_date: 2023-04-18
+---
+start_time: 16:35
+---
+end_time: 17:05
+---
+slot_id:
+---
+track: Data Handling
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 2521
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/YTHXML.png
+---
+youtube_id: gJ8-aTsVFSA
+---
+video_link: https://www.youtube.com/watch?v=gJ8-aTsVFSA
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT36M19S
+---
+video_thumbnail: https://i.ytimg.com/vi/gJ8-aTsVFSA/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:02]_
+
+My name is Marcus Tedesco, and I lead the engineering team at a startup called Brink. We're based here in Berlin. I've lived here since 2021, and I previously came here from sunny San Francisco. So what are we going to talk about today? We're going to do a brief intro to graph database concepts. We'll talk about what graphs are good at, and then we'll use climate policy as an example use case and how we have used Neo4j to build our graph database. So what are graph databases? Graph databases, graphs in general, are basically the main components of them are nodes, which represent entities, usually things like nouns, any type of object, people, places, businesses, policies things like that and they also have edges which are also called relationships depending on the type of database you use and these are the connections between the nodes in Neo4j they also have the concept of properties which are basically key value pairs that are stored on both objects like the nodes and the edges as well in graph databases relationships or edges have equal importance as nodes and i like to think of graph databases something like in the middle between no sql databases and relational sql databases so they have relationships between entities like tables do with foreign keys. And many graph databases also support indexes for faster retrieval and constraints for enforcing schemas, but they are much more flexible like a NoSQL database. I think technically Neo4j is considered a NoSQL database, but it has a few more properties that allow it to be used similar to how a relational database would be used. Graph databases have a number of different query languages, such as Cypher, Gremlin, and Sparkle. Neo4j uses the Cypher query language. Let's do a little side-by-side of some of the properties of graph databases versus relational databases. Relational databases are much more established, whereas graph databases still have some maturing to do. The community is much larger for graph databases and has standardized the query language that's used with relational databases to use some dialect of SQL, whereas there's not one standard across all types of graph databases. In terms of scalability, graphs are nice because they allow fast retrieval even as the database grows as long as you're querying connected data elements. If you're looking for random entities throughout the whole database, depending on your query, that could be slower. But if the data is connected, it's fairly fast. and with relational databases as your data set grows depending on what type of query you're doing you could face performance issues and joining multiple tables and and then the last thing we're going to compare is the visualization i think graph databases out of the box provide some very interesting visualization tools. Relational databases can also be visualized but require plugins to be able to do so. So what are some of the advantages of graph databases? Data modeling is very intuitive. Most of the time when you draw or if you're you're doing some type of data modeling on a new domain um you end up drawing a graph on on a whiteboard or uh or such and these are graphs so the there's many cases where the the real world is naturally modeled by a graph they're also very flexible uh it's easy to change and evolve your schema over time they are very efficient in querying connected data. And because graph algorithms work natively with graph databases, there's some very interesting patterns that can be discovered that might be harder to do with relational databases. So things like clustering, pathfinding, or community detection. using these algorithms you can also get real-time insights so you could do similarity between nodes in real time which might be harder to do for classification with a with a relational database we also use this we also use our graph database we query it via GraphQL, and we use that as our API layer. And graphs just in general play very well with GraphQL since they were designed for graph databases. And lastly, the data visualization and the fact that the data models themselves can be quite intuitive, can actually keep business and engineering teams in sync when talking about complex business topics. What are some good use cases for graphs? Of course, knowledge graphs, it's in the name, social networks, which many people are aware of. Recommendation engines, especially real-time recommendation engines, can benefit from graph databases. in financial industries fraud detection is a big use case for graphs as well as supply chain management transportation networks we use it for law and regulation which we'll show shortly and communication networks as well as things in the natural world like molecular structures so chemistry and biology can be used as well. What are some things to consider when you are deciding whether a graph database is right for you? Data segregation does get more difficult in a graph. You need to decide whether you're logically or physically separating your data and where in a relational database architecture, you may have either separate databases or tables to physically separate your data. Doing so with a graph comes with some trade-offs. You, in many cases, need to decide whether you're going to use one large interconnected graph or many small, essentially, subgraphs or disconnected graphs, you do lose some of the advantages of the graph algorithms when you separate them. But if that is a requirement for your data use case, you can separate them into smaller graphs. access access control is more difficult when all the data is in a single graph so whereas you might restrict access to certain tables to certain certain users or user types in a business having everything in one graph does make it a bit more challenging there are some role-based access control measures you can put in place. But just the nature of the connectivity between entities in the graph means that access control is just a bit harder to manage. Another thing to consider is schema management as the graph gets bigger. Um, both one of the positive and negative things about having a very flexible schema means that, um, you can change it and you can change it often and, uh, keeping track of, of different versions of, um, of your schema, how things are connected, what type of labels you use on the nodes and the relationships can get cumbersome. One of my biggest pains right now is that there's no concept of views in a graph database like Neo4j. I find those very useful in a relational database. So if you rely on those heavily, uh graph databases or at least neo4j uh might not be the right solution for you they do allow stored procedures but um not in their uh hosted their hosted versions uh graph databases uh in general are just less mature as we discussed briefly a minute ago um there's just fewer tools fewer integrations less community support um altogether it's more of a more niche uh there there there certainly are many tools out there many integrations and and there is community support it's just not as robust as uh as a relational database so if you rely on those kinds of things heavily um and want some out of the box features or plugins and such, those are going to be fewer with graph databases. But graph databases are excellent for many use cases, but they're not right for all use cases. If you're thinking about using a graph database, you may want to consider a hybrid solution. um so you could potentially uh keep uh most of your data where where it currently resides but if you want to uh model the the relationships between um large sets of data you could store certain amount certain pieces of metadata in a graph and um you know update those you know daily You could keep them in sync either with an event-based architecture and do that in real time, or you could do batch jobs with ETL jobs daily and find patterns on top of the data that you already have. um so now that we've gone over uh graphs in general um want to uh briefly talk about our our use case at brink so um brink is a startup um we are building tools for companies and private equity to basically understand how their business aligns with environmental and social sustainability goals of the EU. So if you're from Germany and familiar with tax fix, think about tax fix for companies for climate and social practices regulation. We're focused on something called the Sustainable Finance Disclosure Regulation, which has many different parts. We're going to talk about the EU taxonomy mostly today, But they also have something called principal adverse impacts and other many other forms of regulation that it references. So why did we choose a graph database? Why did we choose Neo4j? So we because we are working with climate regulation, we recognize that climate regulation is very complicated. It also is very interconnected, as we'll see shortly, and it is also continually changing. So versioning the different kind of checkpoints of the regulation over time is very important that we know which version you assess your business against. we also are building a collaborative platform so that companies and their investors can work together to assess their their business so we take advantage of some of the social some of the same features of graph databases that social networks use also neo4j comes with graphql out of the box which was super helpful for us Unfortunately, that is currently a JavaScript implementation, but still quite useful for rapidly prototyping new ideas and trying out new data models. We also needed flexibility when finding product market fit. Our business and our product has changed over time, and we wanted to be able to quickly iterate on things without having to, for instance, migrate database schemas all the time and things like that. This is also a Greenfield project. Since we are a startup, we had the opportunity to build this however we found fit. So we didn't have any of the traditional kind of business lock-in that some businesses might have. So let's dive in. So we're going to do an example of how we model the EU taxonomy in a graph, but first we need to understand what the EU taxonomy is. So it's a classification system for establishing a list of environmentally sustainable economic activities. So it came into existence as part of the European Green Deal. The original version was a 349-page document that outlined 111 different economic activities that businesses assessed themselves by. In the last few months, they've added six more activities, just as an example of how this is constantly changing. They've released this the regulation in several different formats. We just saw it as a as a PDF. They've also released it as in this tabular form format. So you can see the different activities, the different activities, descriptions about them. also what sector they're in, NACE codes, which are economic activity classification system that's used internationally. And we will dive into this a little bit more. So they also released this as an online tool called the EU Taxonomy Compass. As we can see here, each activity falls into a specific sector. Activity has a name. And then also, these six columns at the end are the primary objectives of the EU taxonomy. So these are objectives in which the activity can contribute to. So the main objective of mitigating climate change is the number one objective. And then you can also assess your business against the rest of these or access that specific activity against these objectives. As you can see, these plus signs indicate that this is an objective that this activity contributes to. Some of these have one. So these first three have one objective, which is climate adaptation. And then we have these down here that have both mitigation and adaptation. So businesses can actually choose which one or more that they assess their business against. So let's click into one of these and see what this looks like. So we're looking at one of the economic activities that's manufacture of low carbon technologies for transport. So if we were whiteboarding this out, it might start out looking something like this. We have one activity, manufacture of low carbon transport. and then as we go down this list we see that there's this primary one of the primary objectives so contributing to climate mitigation so again if we were whiteboarding this it might look like something like this this activity has this objective and then we get into this this section which is the description. So this is actually a description of this activity, as it relates to that specific objective. Now, when we try to model this, we don't necessarily want to put it on, put that description on the objective, because the objective is actually shared by many different activities. So in this case, what we do is we create a new node that has a description. It's called a match. The term match is not unique to, it's not, it has nothing to do with graph databases. It's just what the EU taxonomy calls the combination of an activity and an objective. It's called a match. So underneath of a specific objective, so in this case mitigation there are two main categories of criteria that you assess your business against one is called substantial contribution criteria and the other is called do no significant harm criteria so the substantial contribution criteria basically is how you substantially contribute positively to the the objective that you're assessing So in this case, how does your business, when doing the activity of manufacture of low-carbon technologies for transport, how does that positively contribute to mitigation, the mitigation objective? So if we model that out, it might look something like this. so you've got this this match which is the combination of mitigation and the manufacturer of transport activity and it has this criteria and that criteria contributes to the the objective so the match and the the substantial contribution criteria both have the same uh both have the the same objective. Now let's keep going. So if we drill into this substantial contribution criteria, we can see that there's several different clauses here. And we want to break this into more manageable parts so that we can assess our business by it. So what might that look like? We say this as a clause, and then these clauses may have sub clauses, as these are lists and sub lists, nested lists. And they also reference other pieces of regulation. So if we go back and look at the previous slide, you can see that the regulation is referenced in here, And some of these have sub lists. So now we look at the do no significant harm criteria. Now, these basically are the criteria that say when doing your substantial contribution criteria toward that main objective, you cannot harm any of the other objectives. So this is what it looks like here. If we modeled this as a graph, it might look something like this, where we have these two different types of criteria. and then we now are we have these two blue objectives uh one of them is contributing to an objective and the other one is saying it does not harm the other objectives we also have clauses and then we also can reference other other things like in this case we're referencing an appendix but as you can see the graph is growing and we have lots of different types uh, of, of nodes and different types of relationships here. Um, so what, what would that maybe look like? Uh, this is basically, um, an example of what our, uh, graph for a single activity looks like in our database. So this is the actual query that I used to, to find this. So we are just matching on, on an activity type where the name of the activity is the manufacturer of low carbon technologies for transport and then we're finding the the matches we are matching the criteria and then we are looking for all the clause uh children which are these blue um and uh then we're getting all the references so this is just what one specific activity looks like and there are um 107 activities and then those all reference other regulations. And so the graph actually grows quite a bit. This is the same picture, but with some labels here. So as you can see, the activity starts here, and then we've got the matches on either side. And then on each one of those, the green node is the substantial contribution criteria and then the red ones are all the do no significant harm so we're saying this is the the main objective and then these are the all the other objectives that you can't harm and then they all have their clauses which have to be individually assessed and those on all the all the yellow are referencing other regulation which may also be referenced by other activities so So how do we use this in Python? Neo4j actually comes with a Python driver. As you can see in this example, it basically allows you to write cipher queries like we saw, but in Python strings and then send those as transactions. I actually prefer to use another package like this called NeoModel, which, as you can see, is doing the same thing, but it's much cleaner and much, in my opinion, much easier to read. So we can create structured nodes that have types, and then we can create relationships between them like this. So we've got a book type, an author type, and then the author has a relationship, or a book rather, has a relationship to an author. And then on the other side, authors have relationships to books. So a book might only have one author, but an author may have many books. um and then when if you wanted to create instances of each one of those you can you can do that like this you can save the nodes um give them names and variable or variable names in in python and then you can actually say okay this is a book type the the book.author uh connect that to this author and the Neo4j NeoModel package will automatically create the relationship between there with whatever the label is specified in the definition of the type. Now it's time for Q&A, and I will see you live.
+
+**Speaker 2** _[26:43]_
+
+So, thank you for the interesting talk. We have some questions on Slido. So, first question is, did you ever have an issue with Neo4j? Thank you for the interesting talk. Okay, sorry. Did you ever have any issue with Neo4j only allowing for directed graph? We have some questions. So how did you solve it? So first question is, did you ever have an issue with a new coach? Thank you for the interesting thought.
+
+**Speaker 1** _[27:22]_
+
+Thank you.
+
+**Speaker 2** _[27:22]_
+
+Okay, so, sorry, did you ever have any issue with Neo for the only allowing for directed draft? We have some questions. So, how did you solve it? So, first question is, did you ever have... Sorry. Is it working?
+
+**Speaker 1** _[27:47]_
+
+Is it working?
+
+**Speaker 2** _[27:53]_
+
+Okay. Did you ever have any issue with Neo4j only allowing for directed graph?
+
+**Speaker 1** _[28:01]_
+
+I can't hear or see anyone anymore, but you can hear me allowing for directed Thank you, guys. What happened? He can't hear us, I suppose. Right? I think we're Fuck. So he cannot hear anything? Why he cannot hear us? That's the question, bro. Yeah, what is the question? I can't write him. Is it working?
+
+**Speaker 2** _[28:54]_
+
+Just stick the top ones.
+
+**Speaker 1** _[29:05]_
+
+Hello, Marcos.
+
+**Speaker 2** _[29:12]_
+
+Marcos, we can hear you.
+
+**Speaker 1** _[29:13]_
+
+We can hear you.
+
+**Speaker 2** _[29:14]_
+
+Yeah, I will.
+
+**Speaker 1** _[29:15]_
+
+I will write down one question.
+
+**Speaker 2** _[29:17]_
+
+question so to avoid the echo
+
+**Speaker 1** _[29:20]_
+
+Okay, that worked. Did you ever have an issue with Neo4j only, Alhamdulillah? No, I'm not sure if there's a follow-up to that question. I'd love to hear it, but I'll answer how I understand it. It allows for directed and undirected relationships, so in the example that I posted of that query, you can either have, you basically can have an arrow on either side of the relationship or no arrow at all, and it will find any relationship, whatever, there, or you could have it bidirectional as well. So there is flexibility there. So no, it doesn't have to be directed. It doesn't have to be undirected. Every relationship is independent. So you could have some that are directed and some undirected, unless you put constraints on it and force it to certain types of relationships to only be a certain way. And how do you keep track of data quality in a graph? That's a great question. It's kind of one of the things that I was alluding to in one of those bullet points about data management.
+
+**Speaker 2** _[30:55]_
+
+in your company as well.
+
+**Speaker 1** _[30:56]_
+
+I think that that's kind of an issue with every every type of database and big company is data management. You can add constraints so you can say certain types of nodes are required to have certain properties and you can't insert them into the database or or retrieve them without those properties existing. So that's how you can kind of force the schema. But I think documentation and kind of having a team that understands the importance of data schema management is definitely not an easy thing to do, but it's definitely necessary. um did you look into apache age and why neo is better than it uh i did very briefly um but uh neo4j i think is probably the most used uh and most um both in terms of just like number of companies and and businesses using it um but they also are a company that will give full support. So we actually, you know, as a startup, one of the things I try not to do is add extra work for our engineering team if we don't need it. So we use the managed Neo4j solution from Neo4j through GCP, which takes away some of the overhead there. And that wasn't something that I could find with the Apache solution. Did you run a hybrid approach or your company as well? Do you make sure that... so right now we we do use a hybrid approach in terms of like our data storage uh but not uh at the moment we we're not using something like a sql database and a graph database we're using um things like cloud storage or or like s3 buckets um if you're familiar with or if you're using aws um so that's where we do like object storage for files and things like that and then we store the metadata about it or the references as an index in the database to say this is the person who owns this file or this company owns it or what it's been attached to and then we also use some vector embedding as well like elastic search for for some of our machine learning stuff so we do use a couple different solutions but um the side by side sql and uh graph we we don't currently use um if i were to um it like if if you were going to do something like i described in the talk um where you had a sql database and then you um and then you wanted to get extra insights from it i probably wouldn't um i would i would start simple and do it as kind of like a batch of where you're you're putting updates in at regular intervals but not relying on it as a real-time system um but if you if it became something where you needed to make it a real-time system i would probably use um like uh um an event-based system and use change data capture on my SQL database and then put the changes into the graph. How do you version your graph? That's a great question. One of the, I kind of, I probably should have showed that as you can, there's kind of like two levels. Like if you were going to like change the whole data schema, that would be like changing the actual version of your data model. And to keep track of that, you would do it similarly to how you do it with like in SQL, where you probably have like some type of migration scripts or some type of migration tooling that can run to kind of like replay the actions of changes you've made to your tables and migrating data to tables. so you can kind of have a list of those um but um looks like we are out of time and i appreciate y'all coming i'm sorry i couldn't be there in person um but thanks again
+
+---
+transcript_status: auto
+---
+transcript_language: en

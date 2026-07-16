@@ -1,36 +1,34 @@
 {% extends "layout.html" %}
 {% from "macros/team.html" import render_team_member_image, render_team_member_role, render_team_member_socials %}
 
-{% block title %}
-{{ this.title }}
-{% endblock %}
+{% block title %}{{ this.title }}{% endblock %}
 
 {% block body %}
 
 <div class="subsite">
   <div class="subsite-title">
     <section class="content">
-      <h2>{{ this.title }}</h2>
+      <h1>{{ this.title }}</h1>
     </section>
   </div>
 </div>
 
 <section class="subsite team">
   <div class="content">
-    {{ this.body }}
+    {{ this.body|shift_headings }}
   </div>
 
   <div class="content">
     {% for team_type in bag('team')['types'] %}
     {% if team_type.members %}
-    <h3>{{ team_type.name }}</h3>
+    <h2>{{ team_type.name }}</h2>
     {% endif %}
 
     <div class="members">
     {% for member in team_type.members %}
       <div class="team-member">
         {{ render_team_member_image(member.image_name) }}
-        <h4 class="member-name">{{ member.name }}</h4>
+        <h3 class="member-name">{{ member.name }}</h3>
         {{ render_team_member_role(member.role, team_type.name) }}
         {{ render_team_member_socials(member) }}
       </div>

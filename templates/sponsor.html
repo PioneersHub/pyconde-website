@@ -1,17 +1,75 @@
 {% extends "layout.html" %}
+{% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
 
-{% block title %}
-{{ this.title }}
+{% block title %}{{ this.title }}{% endblock %}
+
+{%- set branding = bag('branding') -%}
+{%- set host = branding['canonical_host'] -%}
+{%- set sponsor_url = host ~ this.url_path -%}
+{%- set sponsor_id = sponsor_url ~ '#organization' -%}
+{%- set event_id = host ~ '/#event-' ~ site.config.PROJECT.year|string -%}
+
+{% block structured_data %}
+{{ super() }}
+{# Sponsor-specific Organization. The site-wide layout already emits the
+   PyCon DE & PyData Organization + WebSite. This block adds the sponsor
+   as its own first-class entity so search engines treat the sponsor's
+   logo / name / URL as a verifiable knowledge-graph claim and so the
+   site links its sponsor relationship back to the conference Event. #}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": "{{ sponsor_id }}",
+  "name": {{ this.name|tojson }},
+  {%- if this.website %}
+  "url": {{ this.website|tojson }},
+  {%- endif %}
+  {%- if this.logo %}
+  "logo": "{{ host }}{{ this.logo }}",
+  {%- endif %}
+  {%- if this.full_description %}
+  "description": {{ (this.full_description|string|striptags|truncate(400))|tojson }},
+  {%- endif %}
+  "subjectOf": {
+    "@type": "WebPage",
+    "@id": "{{ sponsor_url }}",
+    "url": "{{ sponsor_url }}",
+    "name": {{ this.title|tojson }}
+  },
+  "sponsor": { "@id": "{{ event_id }}" }
+}
+</script>
+{# Sponsorship relation — the Event has this Org as a sponsor. Schema.org
+   accepts `sponsor` on both sides as a direct relation, so emit the
+   reciprocal too. #}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Event",
+  "@id": "{{ event_id }}",
+  "sponsor": { "@id": "{{ sponsor_id }}" }
+}
+</script>
+{%- set crumb_trail = [
+    ('/sponsors/', 'Sponsors'),
+    (this.url_path, this.name)
+] -%}
+{{ breadcrumb_jsonld(crumb_trail) }}
 {% endblock %}
 
 {% block body %}
+{{ breadcrumb([
+    ('/sponsors/', 'Sponsors'),
+    (none, this.name)
+]) }}
 
 <div class="subsite">
   <div class="subsite-title">
     <section class="content">
       <img src="{{this.logo }}" alt="{{this.name}} logo" class="sponsor-logo">
-      <h2 class="title">{{ this.name }}</h2>
-      <h4 class="title">{{ this.type }} of PyCon DE & PyData {{ site.config.PROJECT.year }}</h4>
+      <h1 class="title">{{ this.name }}</h1>
+      <p class="title">{{ this.type }} of PyCon DE &amp; PyData {{ site.config.PROJECT.year }}</p>
     </section>
   </div>
 </div>
@@ -21,7 +79,7 @@
     {{ this.full_description }}
 
     {% if this.website %}
-    <div><a href="{{ this.website }}" class="sponsor-website">{{ this.website }}</a></div>
+    <div><a href="{{ this.website }}" class="sponsor-website" rel="noopener" target="_blank">{{ this.website }}</a></div>
     {% endif %}
   </div>
 </section>

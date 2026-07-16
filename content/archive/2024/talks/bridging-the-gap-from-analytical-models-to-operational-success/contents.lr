@@ -1,0 +1,150 @@
+title: Bridging the Gap: From Analytical Models to Operational Success
+---
+description: Deploying machine learning models in production carries its own unique set of challenges. Some challenges stem from different, and sometimes conflicting,…
+---
+created: 2024-02-12
+---
+code: XNY3HX
+---
+slug: bridging-the-gap-from-analytical-models-to-operational-success
+---
+speaker_names: Ignacio Vergara, Nick Harmening
+---
+speakers:
+
+
+
+### Ignacio Vergara
+
+
+
+### Nick Harmening
+
+_About — in the speaker's own words_
+
+Software Engineer at QuantCo, former Cloud Architect and DevOps team lead at BMW Group. I love building and running systems as well as fostering a collaborative working culture.
+---
+abstract:
+
+
+Deploying machine learning models in production carries its own unique set of challenges. Some challenges stem from different, and sometimes conflicting, objectives between analytics and production. Others arise from technological limitations, business requirements, and even regulatory needs.
+
+In this talk, we will focus on the part of the problem surrounding the handover of models from analytics to production.  We expect data scientists, operation specialists, and product owners to benefit from our stories.
+---
+full_description:
+
+
+Deploying machine learning models in production carries its own unique set of challenges. Some challenges stem from different, and sometimes conflicting, objectives between analytics and production. Others arise from technological limitations, business requirements, and even regulatory needs.
+
+In this talk, we will focus on the part of the problem surrounding the handover of models from analytics to production. This process has multiple facets, with tasks executed at different points in time and with different degrees of automation possible. To name a few: model packaging, inference reproducibility, establishing what needs to be deployed, and deployment-related actions. 
+
+We'll share some of our experiences and strategies to tackle these challenges. For example, how we tackle the topic of contracts, interfaces, and responsibilities between modeling and production. Or how the role of automation in the pre-deployment process ensures a smooth and efficient model transition from an analytics model store to something ready for production once a model is approved.
+
+Whether you are a data scientist developing models, an operations specialist tasked with deploying them, or a product/project owner supervising the process, we aim to ignite engaging and fruitful discussions. For data scientists, to have a window into what happens after they are done with training a model. For operations specialists, to gain some strategies to improve their experience and success rate. And for a product owner, to get a framework on how to drive alignment.
+---
+room:
+---
+day: Monday
+---
+slot_date: 2024-04-22
+---
+start_time: 15:35
+---
+end_time: 16:05
+---
+slot_id:
+---
+track: Sponsor
+---
+tags:
+---
+submission_type: sponsored
+---
+submission_type_label: Sponsored Talk
+---
+submission_type_id: 3576
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/XNY3HX.png
+---
+youtube_id: BSSxjcgCN8o
+---
+video_link: https://www.youtube.com/watch?v=BSSxjcgCN8o
+---
+video_published_at: 2024-06-23
+---
+video_duration_iso: PT27M31S
+---
+video_thumbnail: https://i.ytimg.com/vi/BSSxjcgCN8o/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:05]_
+
+Thank you, everyone. So we are from Quantco, and we are going to discuss a bit on how we see and how we proceed on trying to bridge the gap between moving from an analytics environment to a production one, which probably for most of you might have some experience on that. So, I'm Ignacio, he's Nick, both of us are software engineers at Quantco, we are a data science oriented company where we help our clients to solve challenging problems, and one of them is actually going to production. For a bit of context, in general these clients and the type of work tends to be highly complex because there is regulatory issues, business requirements, and technology constraints that you can imagine in big corporations and in, for example, highly regulated environments like insurances. So raise your hand who goes to deployment writing some Python code like this? For whom this is kind of what they deploy? Yes. So sometimes this is enough. I mean, we have a very simple FASAPI application here where we load a model and then basically we expose an endpoint and we just get a payload that the payload has to look like what the model is expecting. We have to load it in pandas and then we do a predict on this model with this data frame. However, as I said, in our line of business, this is usually not enough and you need more complexity. you need more because you need more things to take care of for example what happens if you want to have more than one model being hosted at the same time in your service or what happens if you have different models and these models need to be there for a long time and they have different environments trained and when you have different environments that they are trained in, maybe when you put a model trained five years ago or even one month ago into a new one, you don't get reproduction of your outcomes. Let's say in insurance, you want to have reproduction of prices up to the cent, and if you change, let's say, your MKL version of your fast mathematical library, and then you get, let's say, two cents off, that's not good. But you still want to have them all together in the same deployment What even more what you can have different models and you can say well I want I could have them in different endpoints and with that you can say well I can deploy them in different containers fine but what happens if you want actually to put them in one single endpoint with a common schema and actually not separate in different containers because let's say technology constraints goals constraints, whatever and And, even more, you want to give them some configuration when you deploy them. And that configuration is not necessarily via code, so then we start adding complexity and complexity and complexity. And furthermore, in cases, for example, where data science is closer to business than IT, we as, let's say, data engineers or the people in operations that we are trying to put machine learning models into production, we would like to have more flexibility, more control of what is happening in the application. So for us, when we talk about bridging this gap between analytics and production, for us it means basically taming the complexity that arises when all of these different elements are considered. And we are going to focus mainly on these three topics. One is about interfaces and contracts, how they can help us in diminishing complexity or managing this complexity. How to lean into automation. And third is focusing on how to try to bring work from after you decide to deploy something to work being done before the deployment. And with that, I leave you with Nick to explain about the interfaces and contracts.
+
+**Speaker 2** _[04:41]_
+
+Exactly. So also a warm welcome from my end. Happy to have you all here. When we look into interfaces, there are several approaches how you can view interfaces and how you can make use of them. And in the next slides, we're going to dive into how we can use these interfaces in order to handle the complexity of several IT systems communicating, teams collaborating on interfaces, and also how we're going to handle multiple models there. so let's split or let's view a technical interface or interfaces from different directions the most intuitive approach is basically to see an interface as a technical implementation for example an external api schema that's called by the upstream service that calls us then you could also have an interface for the model that abstracts away all the feature engineering and modeling logic behind it these are technical interfaces that you need in order to run your system. But at the same time, these technical interfaces can also be seen out of an organisational perspective. For example, the model interface could be the interface between the modelling team or data science team and the engineering team. And the same also holds for the external interface, where you basically have the intersection between the engineering team of a specific service and some other IT system. So we're going to look into how we can use these interfaces in order to tame the complexity that Ignacio has just shown. In order to make this a bit more tangible let's start with an example. So on the left you can see the example we've just looked into and on the right we can see a payload. So let's assume we are in the area of e-commerce and we have everyone will be built in an algorithm that basically can predict the price for product based on some customer attributes here in this case we have an id for a customer name and age a category that a preference category price sensitivity and maybe some experimental group so this example is totally made up no guarantee here that that every attribute this is required is actually there but in this case with the flat payload we can directly plug it into the model and let's hope that the attribute names match the names that the model expects and everything is fine but usually in the web native world, you don't really have a flat payload and names probably also won't match up. So in order to actually get this to the model, we need a mapping. So on the left, you can see this nested human readable web native payload. And this also represents the external API schema of our web service. And let's just call this or let's just take this as the operational world on the left. In order to bring this to the analytical world where the actual inference happens we need to do a translation and this can be a flattening it can be a renaming for But it can also be adding some values likes for example the experimental group here and This already is a first step of decoupling So we are now able with having this translation in place between the two interfaces to at least a bit more independently work on the streams as long as we have this translation in the middle the engineering can more freely work on the external interface and the analytical team behind the model interface if we now just have one model deployed maybe having this translation in place doesn't seem to add so much benefit you might not directly see the gain we get by this for that reason let us look into an example of how much flexibility this actually brings us. So for our example of the e-commerce store, let's assume we want to do some A-B testing. So we want, based on certain rules, give different clients different results and evaluate how good our model performs. We could, for example, do this by an upstream service calling our web service and within the payload we have the model name that we actually want to use, that could be model A or model B, and then our API service routes based on this model name to a certain model. So far so good. The complexity in this case is that you have several IT systems involved in it. And as soon as this is the case, you need to migrate interfaces, change them, extend them, and you're a lot slower in fastly setting up experiments. So it would be pretty nice to kind of get rid of this, and as a first step what we can do is for example in this mapping that we've just shown at the logic of inferring where we want to route the traffic to so in this case now we just take the overall payload of the upstream service we don't need the model name anymore but we could based on some logic if we want to do some random mapping we could just use a modulo on on the id or maybe there's some from a business perspective more sensible way of splitting the groups we can then infer with the function which model we want to route to so this would be the case of adding this model name to the model interface and then calling the specific model it's nice now within the team of operating the web service we can tweak things test things quite fastly without managing the external schema or without changing it but we can be even smarter in this case so here we see the the example let's assume the model the different models that we've deployed that represent the experiment only differ by a factor of scaling in this case there's no need to actually deploy several models we could just extract the scaling factor into our mapping function and now compute based on a key the certain factor that should be applied, you know, put into the model. So, yeah, this is basically, it doesn't really change now a lot in the external interface anymore, but this also helps us then to get a lower footprint of our application. And I think just by having this translation in place, you already have seen what freedom it gives us to design our architecture. So now let's take a step back. What we've been looking into, let's turn it a bit better now, is the service interface. So it's external, it's public, it's hierarchical and nested. It has proper names that is agreed upon between several IT systems usually, and it is maintained by engineers. So that means here it's entirely the task and also the freedom of the engineering team to take care of extending it, scheduling migrations with other upstream IT services. And then we have the model interface, which is the internal schema. It's private in terms of being within this web service. It's flat. It translated into the data science world, let's say. And it might have odd names. What do we mean by this? So sometimes you get extracts somewhere. They might be in German with column names. Then you translate them to English. Then the model has English input names. And, yeah, they start to diverge from actually the names that is the common agreement between systems. So there also mapping is needed. And then this model interface, and this is one key aspect, even though it's just a tiny dimension here on the slide, is the shared responsibility of this interface. So how we do this in our team is it is mainly on the maintenance of the engineers, but the data science team contributes to this. And this is basically how we make sure that we collaborate jointly on this, and this is our common understanding of how this model interface should look like. So having shared responsibility sounds something like overhead and extra communication and extra effort. And in this case, it adds friction. And in general, you mainly want to remove friction to make things more efficient. But here we explicitly want to add it in order to gain speed afterwards. Because if we have a common understanding about this interface and how we extend it, we can make sure that later on when we want to deploy things that the models comply to a certain schema and that we early on, for example, add attributes to the schema which of course can evolve but it shouldn't be like changing every time entirely. So this is kind of a common ground for engineering and data science to extend this. And one thing where Ignacio will talk a bit more later about one thing how you can make very early on sure that things don't start to diverge, as soon as the modeling team pushes some model somewhere into registry or Git or wherever you version your models, you could run CI checks to pull this currently built or currently valid model interface or the branch of this model interface that should be released with the next release and directly check if things align. Then you don't need to later on, yeah, in a short time, extend your external interface to get new values, but you have a good view on what you need to change. in order to get the next model deployed. So let's take a step back and just review what we've seen. So we think the benefits of having the split in this translation between the two worlds gives us a lot of flexibility and speed. It allows these interfaces to independently evolve. We add friction exactly at the place where we want it to have, to have a common understanding of how we translate from operational world into the analytical world. therefore we can go faster and smoother to production. Obviously, it has the overhead of developing and maintaining this mapping for maybe versioned interfaces as we add or remove attributes from our external schema. So, yeah, with this, I would hand over to my colleague.
+
+**Speaker 1** _[14:36]_
+
+Yes, so after we saw now about contracts and interfaces, I'm going to talk about workflows. And when we think about workflows, we can see them in two dimensions. The first dimension is the degree of automation that a workflow or particular tasks in a workflow can have, that they can go from something very manual to something completely automated. The other dimension or degree of freedom that you can have in a workflow is, I call it relatively execution time, which means basically when this task or part of a workflow executed from the point of view of when you decide to go to production, when you decide to deploy. So there is a very particular time point where you say, hey, I want to deploy, and that defines before and after. of a process. So of course if we have these two dimensions, we can do the obvious thing to plot them on a plane, and then you have four quadrants, which probably for anyone that does product management, operations staff, it's very familiar. And the idea is that we would like to get away as much as possible from the lowest right corner, meaning we want to get out from a place where things are being done manually, because that includes more errors, it's cumbersome, it's slow, and we want to get away from things being decided or being performed after the decision to go to production. Of course, it's impossible to get rid of all of that, but at least we can try to basically do the following, move away from it. Before I continue with this workflow part, I want to discuss something very key on how we think about workflows, which is what we called a model ledger. Basically, a model ledger is a table, in a way. It's a definition, primarily, and hopefully, append only that defines in our case when a model is being active so we are even going a step further we are not only when we deploy we deploy a model we also specify when that model will be active and that gives us also flexibility on deciding oh well we are going to deploy now despite that our models we are not are not going to be active until a week from now but it gives are some flexibility on deciding. And again, it's the coupling of the decision to deploy something and the decision of when is this active. So this model, usually, it's valuable for tracking changes. If you are in a highly regulated environment, it might be a way of being controlled and audited. So usually, it might be a good idea. And it has to be human readable. So it's a way for us to convey what we want to do. And this basically triggers a lot of the automation to decide, oh, what we want to deploy when and configure applications. So that's why what is this ledger for? It specifies when a model is active, provides a way to configure. Like Nick told you, we want to, for example, certain people in certain conditions that they were defined for the experimental groups, we want to give them different scalings, or maybe we want to give them a discount. You don't know. And this also helps us to avoid a lot of recomputations for each deployment. So this is something how basically a model ledger could look like. In our case, it's a set of rows where there is a start and ending. In this example, basically we are covering the month of February 2022, And it says, well, we have three groups, we configure three groups, one, two, three, and all of them, they have a factor of scaling one, and basically we are saying, and sending them to models A, B, C. And that means basically the model has all the logic on what to do with them. Let's say you want to provide different prices if you are in an e-commerce for whatever reason, depending on this experimental groups. But then, let's say now, after the 14th of February, it's already after Valentine's Day, you decide to give everyone a discount of 10% discount, and you send them to a new model, which is the Model D. So here you can convey, and you can keep track, and in a human-readable way, to communicate basically for product owners how you're going to production. And the whole point is that we have to build automation around this definition to then actually produce the deployment artifacts that we want. Let's say configuration, packaging, and building models that can be very broad, and the generation of images if you're deploying something like in a Kubernetes environment or something that is a container orchestration. Now, the situation usually, as I said, in our context, we have some time pain points. And probably you also have them. So the process usually is very time consuming, is error prone, there is a lot of recomputations happening for each deployment, and a lot of this can be solved by trying to automate or trying to work ahead of the deployment point in time. And as I said early on, on why this very simple Python service, it's not cutting it, is because we want many models, we want them to be all together, so yeah. And here we can see mapped into these four quadrants a lot of different tasks that basically would be involved in one of these processes of going to production. And we see that it's heavily towards being defined after the point of time that deciding to go to the production, and also highly manual. In this case, this manual means manual execution of certain scripts, but still it's quite manual. And it's error prone, it's low. Then if we try to work our way out, and basically we made a strong effort in trying to improve our situation in one example, we managed to move most of the things out of the second quadrant. Sadly, we couldn't move a lot of these things to the fourth quadrant in the top left, which would be before deployment decision and automated, but at least now we have one single action which is the actual deployment, that it's fully manual and it's done after the decision to go to production, and basically now it's much nicer for operations. The result of doing this change for us is that it improved the reliability of our deployments, reduced the time to deploy, we were spending like eight hours in one single deployment and we managed to reduce it to two, and now basically we enable a product owner or a business owner to basically be able to drive this deployment, and you don't need an engineer anymore. So this leads to less issues at deployment time, deployments more frequently, and freed engineering resources. Now, we didn't only stop there, and this is kind of a shameless plug here a bit. This is not the end of the story. We have invested even more on this and to make deployments simpler and easier for us. And we are going down the route of using ONIX. So if you are really interested in ONIX and how it can help you in simplifying deployments, I recommend you to look at these two talks that colleagues of mine have done previous years, particularly the one on the left that is more operational, whereas the right one it's more on the side of how to use tooling that we have created to actually represent machine learning components in ONNX, in the ONNX ecosystem. So, to finish and wrap it up, lean on automation. Lean on trying to work ahead of the deployment decision and to prepare work before you want to deploy because then you can catch problems problems before you want to deploy and it's less firefighting, less stress and all the good stuff. Use interfaces as a way to convey how you want to communicate. And last is, as Nick said, sometimes friction is useful and use it. And with that, we're done. Thank you for your attention and now we have some time for questions.
+
+**Speaker 3** _[24:03]_
+
+Thank you, Ignacio, thank you, Nick, for your presentation. Yeah, we have some questions. The first one is, we have a model which wins a lot from request batching techniques. Do you have any idea how it might be implemented?
+
+**Speaker 1** _[24:24]_
+
+In our case, usually we are not working with batch because we get single requests. Now, if you want to batch them because your model performs much better and you have the time to be able to do that, because for us it's a constraint, we cannot take too much time to answer. We have certain timing constraints there. You can basically accumulate them and then send them to your model. Then you have to play with how much you can wait. that's difficult to say upfront without knowing your business case.
+
+**Speaker 3** _[24:58]_
+
+And might be the interface you've shown, might it also contain some parameters for such kind of batching?
+
+**Speaker 1** _[25:06]_
+
+of batching? I mean, of course, you can do whatever you want in your interface, and if your interface, you said, well, instead of a single payload, instead of having one single payload defined here, you can say, well, actually what you have it's a list or a collection of these requests in a single time, and then you have to process them on your service. Of course, you can do that, and being batch or not doesn't change the fact that you have a decoupling between an internal representation on how the models should behave from how you receive data from external upstream callers.
+
+**Speaker 3** _[25:46]_
+
+Good, thank you. Which role plays testing when putting models into production? Do you have any tips for test methods or maybe tools?
+
+**Speaker 1** _[25:58]_
+
+No, we struggle with that too, sadly. We are still learning there and making mistakes and trying to do it better, but we don't have a recipe there yet, sorry.
+
+**Speaker 3** _[26:09]_
+
+But you show a way how to deploy many, like, multiple models at the same time with this interface. Might it be utilized to maybe route a part of traffic right after the deployment to test if it works and roll it back the other way around?
+
+**Speaker 1** _[26:27]_
+
+I mean, of course, you should be having some sort of staging area where you do testing, and that's kind of a no-brainer. But a more sophisticated approach or a systematic approach on how to do testing in a better way, as I said, we also struggle. And we have used that many different ways because we really have to reproduce certain results from analytics and production up to the cent. So we strike with that too.
+
+**Speaker 3** _[27:00]_
+
+Okay, good. Let's hope our community and our developments somehow will find a way how to not struggle from this problem. Okay, and we are done. Thank you, guys.
+
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -1,0 +1,211 @@
+title: You shall not share!
+---
+description: Online social network users frequently share personal information online. While each post is targeted to a certain audience, it is not always easy to…
+---
+created: 2021-12-24
+---
+code: KG3LKN
+---
+slug: you-shall-not-share
+---
+speaker_names: Gönül Aycı
+---
+speakers:
+
+
+
+### Gönül Aycı
+
+Gönül Aycı is a Ph.D. candidate at Bogazici University and a researcher at Utrecht University (from Dec. 2021 to Dec. 2022). Her research interests include privacy in online social networks and uncertainty modeling. She is a content creator about AI on YouTube. She is a co-organizer of Django Girls Istanbul and PyCon Turkey. She is also Grace Hopper Celebration scholar for 2020 and 2021.
+---
+abstract:
+
+
+Online social network users frequently share personal information online. While each post is targeted to a certain audience, it is not always easy to judge what the privacy implications of shared content will be. To ensure that privacy is preserved, each user has to think through these implications before sharing content, which is difficult at best. Recent work advocates the use of intelligent systems that can help people preserve their privacy by helping users decide whether a content is private or not so that the user can take an action accordingly; e.g., only share with family as opposed to publicly. 
+
+In this talk, I propose an agent that helps its user to determine the privacy of content she is willing to share. The agent uses only the content that the user has shared before, without discriminating between the content modality (e.g., image, text, and so on). Each content in the system is only represented with tags. The tags can be automatically created using a tool such as Clarifai, where 20 tags would automatically be assigned to an image. Alternatively, the user might herself choose to tag the content. This enables our approach to make use of content from different online social networks as long as tags are associated with the content. The agent learns the privacy label of a content using random forests, a well-known machine learning technique. The features are extracted using the Term Frequency–Relevance Frequency (TF-RF) method.
+---
+full_description:
+
+
+In this talk, I propose a robust approach for recommending privacy labels by extracting features based on TF-RF method using small data sets. Random Forest classifier predicts privacy settings of images using TF-RF method. However, if a tag of a test image does not exist in the set of unique tags of the training data, the classifier does not have any information about the
+privacy status of this tag. Each tag has vector representations by using pre-trained word embedding models such as BERT, Word2Vec, GloVe.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: Machine Learning & Stats
+---
+tags:
+---
+submission_type: talk_long
+---
+submission_type_label: Talk (Long)
+---
+submission_type_id: 1701
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: some
+---
+domain_expertise: some
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/KG3LKN.png
+---
+youtube_id: v2ZucdZj3bY
+---
+video_link: https://www.youtube.com/watch?v=v2ZucdZj3bY
+---
+video_published_at: 2022-05-06
+---
+video_duration_iso: PT26M13S
+---
+video_thumbnail: https://i.ytimg.com/vi/v2ZucdZj3bY/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Hello everyone, I am Gönül. Actually I'm a PhD candidate at Boğaziçi University in Istanbul and now I'm a visiting PhD researcher at Utrecht University and my advisor is Arjun Özgür and co-advisor is Pınar Yolun and in this talk I will share a Gandalf message about sharing privacy. So let's assume that Frodo wants to share a content in his online social network accounts. What kind of content? Let's think that this content can be an image of a ring, but Gandalf doesn't think that this is a great idea. Why? Because maybe this sharing action can have some catastrophic consequences like if Frodo shares this image in his online social network account and then maybe his life will be in danger because maybe there are some bad people or some evil eyes desire this ring. So online I mean, social networks enable users to share content online with others. But in this case, users need to manage their privacy while sharing activity. And these kind of activities require more efforts to detect, to observe elements that the content contains. And these are time consuming and error prone. So we need a system. We need to have a system that recommends privacy labels instead of a user accurately. And in literature, most of the existing approaches are centralized, which means that they use the data which has shared by many users. And one important aspect of privacy is subjectivity. So a content can be identified as a private by certain individuals. But others do not think that this is a private content. So we need a subjective approach. I mean, yeah, we need this kind of approach. And we do not have access all of people's data. But always, I have access to my own data. So we need to have a system to preserve our privacy that recommends privacy labels for a given content by learning its users' privacy preferences, and then warn its user whether the content is public or private. So we propose an approach, which is PESH, Price Estimation from Short History. It's agent-based approach, which means that each of the online social network users is represented by an agent. And we can, yeah, PESH can access on the user's data. And when the system relies on only small data set, I mean if the system use only user's data, which means that it uses a small data set while classifying content in machine learning. This is better than a centralized approach because we need to preserve privacy of online social network users. And we have only access to the user's data. So our aim is we are trying to predict labels of a new image. So yeah, for this task, we make use of TF-RF, Turn Frequency Relevance Frequency method. I think TF-IDF is more popular one. Maybe you are familiar with TF-IDF. It is a sister or brother of TF-IDF. It's TF-RF. We use TF-RF because we care about the frequency of tags, I will mention about tag. Frequency of tags in public and private images. I mean, yeah, we use term frequency-relevance frequency method. And in our system, each image has 20 different tags, which are descriptive tags about images. Tags are constructed by users or generated by tools like Clarify. So in this approach, we have images, and we have 20 different tags for each image, which describe these images. And in this formula, basically, we have some terms like R, S, and TF. These denote basically the number of occurrences of a selected tag in all images, in all public images, in all private images. And then other term counts the number of occurrences of a selected tag in a specific image. So the benefits of this method is you have public images, you have private images, and you have tags for each images. And you prepare your input for the classifier using this method. How? Using this formula. And I will show a sample scenario after this slide. And then, yes, in here, you count the number of occurrences in public and private images, in the relevant images. And yes, yeah. And these are the popular vector representations. Actually, we have image. We have tags for images. And we can use TFRF method to represent images as a vector, or we can also use vector representations like word embedding methods to create a vector to represent images as a vector format. Using these word embedding methods, you can also have a vector representation for each tag, And then you can combine tags for each image. And in here, yeah, we have BERT in the literature. We have BERT embedding, Word2Vec, sorry, and Glow. And using these BERT embedding methods, actually, we can create feature vectors, like, yeah, feature vectors, and then use them as an input for the classifier. And since the learning is done, maybe some text has not seen in the training phase, at the training phase. In this case, we do not have any representation for unseen text. So in PESH, we propose a similar text using cosine similarity metric. It means if the tag has not seen in the training phase, but we have in the test phase, we find the most similar tag for this unseen tag based on a cosine similarity metric. So yeah, this is a sample scenario. Let's assume that we have three different online social network users, like on the left side. And then in this method, in this proposed approach, actual patch, we have a software agent for each of the user. And let's say one of our users has three different images, and these images have four tags in this sample scenario. OK. OK, let's say one of user has three different images, and all of the three images has five different tags. And the agent of the user can reach these images. It's their labels and tags. So this agent knows everything about its users. User shares every information with the agent. And then this user has two new images. And tags are, yeah, you have shown the tags in this slide. And yeah, in the previous images, we have adult, child, fun, one, something like these tags. But in here, we have girl tag. And this tag has not seen in previous images. So this is new for us. This is new for that agent. So using PESH, we can recommend the most similar tag with the girl tag, which is woman, using cosine similarity metric. And these are the matrices, actually inputs for the machine learning classifier for this example. Actually, we have five images in here. Three of them are for training phase. Two of them are for the test phase. And in here, we construct, actually, at this step, We count the number of occurrences that occurs in the public and private images. Columns correspond to the text, like we have adult, child, concert, blah, blah, blah, woman. And rows correspond to the images. We have five images, so we have five rows. And at the bottom, we construct matrices using public images. I mean, the first image in the matrix 1, 1 index, the first image has adult tag. And adult tag occurs only one time in public images. So the cell value, the index, is the 1. And you can use the same logic to complete all of the cells of the metrics. And this one keeps the occurrences among the private images. And then using TFRF formula, we calculate the weight of tags. Actually, we assign weight value using TFRF method to each tag. And tags represent the images. We use a subset of PicAlert data set. PicAlert data set consists of Flickr images on various topics. and which are labeled as public or private by external viewers. And in here, actually, you have shown an example for public and private classes. On the left side, you show the public class example. And this one is for private class. And you show 20 different tags for each images. And these are really descriptive. And these texts are created using by Clarify app. Yes, in our simulation, we have 59 agents. And as a classifier, as a learning algorithm, we use random forest with 100 estimators. We have epsilon value. Actually, in TFRF formula, in the previous TFRF formula, in the original one, we do not have epsilon value. But if the tag does not occur in public or private classes, so we have a division by zero problem. So we add epsilon value, which is very close to zero. And we have cosine similarity threshold, because we can recommend a tag for unseen tags. And we can define the threshold value for the similarity. I mean, if the similarity of the text bigger than 0.7, yes, it's very similar for me. So you can recommend this tag to do unsyntag. And we execute our scripts 10 times and take the average of the results. Yeah, I use Python. As expected! I really like Python. These are the libraries. Pandas, NumPy, Scikit-learn, Pickle, Math, Random, System, NLTK. For birth and mating, we have birth and mating library. And if you want to use TF-IDF model, you can use Gansim and so on. I also use Mathplotlib, But I forget to add this. So yeah, you can use these libraries for this work. Or you can code with yourself. I don't know. And I picked some results for this approach for showing the performance of our proposed approach page. Yes, we can prepare inputs using word embedding methods, like BERT, GLOBE, or Word2Vec. Or we use TFRF methods to assign a weight value for tags. And if we recommend a tag for the unseen tags, this is PESH. So you can show the performance of different approach here. So if we do not recommend any tags for the unseen tag, the performance is very similar, is the same, actually, for the accuracy metric, GLOW, Word2Vec, and TFRF. But if we recommend a new tag, not new, if we recommend a tag from our training data set for the unseen tag, the performance is increasing for all of the metrics. And yeah, this is another. We rank the tags in the frequency of relevant classes, like public and private classes. So yellow ones are for public class, and blue ones are for private class. You show the most frequently used tags on the x-axis, and you show the frequency of the tags on the y-axis. So I think this is important for me, because I didn't like this result. Because when we look at this result, we show that people tag is more frequently used in the public classes. But yeah, actually, these are the most frequently used tags for public and private classes. So these are common tags for our classes. And yeah, people is used in private classes more than public classes, but it's very common tag for both classes. And for women, it's also like private class tags because the ratio of the private class and public class is, yeah, the difference is huge for the woman tag. And yes, some tags are more frequently used in a relevant class. This shows this difference, this similarity, or this information. Actually, this is a work, and we published a workshop paper in AI for Privacy workshop. So if you want to get more information about this work, you can scan this code and go to website and find the PDF version of the whole work. That's all for my presentation. If you have any questions or comments or feedbacks, I would like to answer all of them. Thank you for listening.
+
+**Speaker 2** _[19:00]_
+
+Thank you for your talk. And we have one question online and then...
+
+**Speaker 3** _[19:04]_
+
+And then I'll.
+
+**Speaker 2** _[19:05]_
+
+I'll give it again to the room. Two questions. Instead of replacing singleton text with its closest one, wouldn't it be possible to sum the embeddings of all terms in a pic to get a feature vector?
+
+**Speaker 1** _[19:18]_
+
+Yeah, can you repeat your question after the... Okay, can you repeat your question?
+
+**Speaker 2** _[19:23]_
+
+Yes, instead of replacing singleton tags with its closest one, wouldn't it be possible to sum the embeddings of all terms in a PIC to get a feature vector?
+
+**Speaker 1** _[19:23]_
+
+Yes. for the tag, or I don't get the point.
+
+**Speaker 2** _[19:41]_
+
+Is this question out? Is this your? Okay, then I'll give you the mic.
+
+**Speaker 1** _[19:51]_
+
+Yeah, you you can do
+
+**Speaker 3** _[19:57]_
+
+Hi. Thanks for your talk. Great talk.
+
+**Speaker 1** _[19:59]_
+
+and
+
+**Speaker 3** _[20:00]_
+
+So the second question was also mine, so how do you...
+
+**Speaker 1** _[20:02]_
+
+Okay, sorry.
+
+**Speaker 3** _[20:03]_
+
+Maybe this should have been the first question. So how do you compute the feature representation using large language models? Using? Large language models. So you compare your baselines are BERT and...
+
+**Speaker 1** _[20:16]_
+
+Yes, the word emitting methods.
+
+**Speaker 3** _[20:17]_
+
+Yeah. You have this table, right, where you show the metrics of the other?
+
+**Speaker 1** _[20:29]_
+
+Power Forms.
+
+**Speaker 3** _[20:30]_
+
+yeah that one yeah okay so when you use these approaches how do you compute the
+
+**Speaker 1** _[20:30]_
+
+Yeah.
+
+**Speaker 3** _[20:35]_
+
+feature vectors for your pictures
+
+**Speaker 1** _[20:39]_
+
+So, yeah, we have an image, we have 20 different tags, and each tag can, yeah, we have a vector representation for each tag using word embedding methods, like one of them, like glow has 200 dimensional vector, or bird has different dimensional vector. so we have feature vectors and then we can combine, we combine 20 different vectors to get only one feature vector for each one, yes.
+
+**Speaker 3** _[21:15]_
+
+too much yes okay so there's something yeah okay but that was the question yeah okay perfect
+
+**Speaker 2** _[21:26]_
+
+Okay, second question. What does the name PESH stand for?
+
+**Speaker 1** _[21:36]_
+
+privacy estimation from short history because we only use users data so we have small data set and we only use the past experiences we only learn features or learn Sharing behaviors on the users past experiences, so we use short history
+
+**Speaker 2** _[22:03]_
+
+Okay, any questions from the audience in the room? First you, then I'll come to you.
+
+**Speaker 4** _[22:16]_
+
+Yes, my question, thank you for your presentation, yes. My question is, do you recommend privacy or public tech? But you said at the beginning that it has a subjective point of view. So has the user a last will to say, okay yeah the PESH has recommended me to tag this photo as private but I think it's a public one so I would like to learn I mean is there a feedback loop where
+
+**Speaker 1** _[22:58]_
+
+Right now, no. But it would be a great idea, yeah. It would be nice to be capable of this thing. Right now, we do not have any feedback mechanism like this.
+
+**Speaker 5** _[23:22]_
+
+hi so yeah great talk again it was really really interesting from that table for with the results with a precision f1 and recall and accuracy I'm surprised that Bert got the lowest results there given that it's if you into an LP it's like the that thing that everybody should be using right so I was curious how exactly did he use Bert in this because Bert provides like vectors with the context right given a sentence yes but did you apply it like on the single word and then use that vector or did you provide like a chunk of words or tags I don't know exactly how you use it to get those vectors because if you use glove or word2vec etc like it doesn't have context so I'm very surprised by the results yes
+
+**Speaker 1** _[24:13]_
+
+Actually, yeah, thank you. That's a very great question. I use for BERT, I use this one, which I use BERT model, BERT embedding model, who's trained on contextualized version and you can reach this from this. So the The result, I think, depends on the pre-trained models. I mean, for the second one, I use a model who trained on the Google News Corpus. Actually, none of them are trained on private news or private documents. So the performance of the bird, bird to wake, Glove, based on their pre-trained documents. Yeah, BERT yields very great performance and yields better performance than other popular methods in literature. And when I use this version, Contextualized Word Embedding model so I can get the results on the table so it depends on the pre-trained documents
+
+**Speaker 2** _[25:43]_
+
+any more questions we have enough time for questions I don't see anyone raising the hand so I think we're done thank you again for your presentation for answering questions thank you for being here and yeah have fun at lunch
+
+---
+transcript_status: auto
+---
+transcript_language: en

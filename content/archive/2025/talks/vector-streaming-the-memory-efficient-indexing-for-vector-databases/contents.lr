@@ -1,0 +1,167 @@
+title: Vector Streaming: The Memory Efficient Indexing for Vector Databases
+---
+description: Vector databases are everywhere, powering LLMs. But indexing embeddings, especially multivector embeddings like ColPali and Colbert, at a bulk is memory…
+---
+created: 2024-12-22
+---
+code: SFDRTR
+---
+slug: vector-streaming-the-memory-efficient-indexing-for-vector-databases
+---
+speaker_names: Sonam Pankaj, Akshay Ballal
+---
+speakers:
+
+
+
+### Sonam Pankaj
+
+Sonam is the creator of the open-source library called Embed-Anything, which helps to create local and multimodal embeddings and index them efficiently to vector databases, it’s built in rust and thus it’s more greener and efficient. She works as the GenerativeAI Evangelist at Articul8, spun-off of Interl, Articul8 is the go-to generativeAI platform for enterprise.
+
+### Akshay Ballal
+
+_About — in the speaker's own words_
+
+I am and AI developer who loves Rust. I want to bring Rust to the AI Community. I am the author of EmbedAnything and Lumo.
+---
+abstract:
+
+
+Vector databases are everywhere, powering LLMs. But indexing embeddings, especially multivector embeddings like ColPali and Colbert, at a bulk is memory intensive. Vector streaming solves this problem by parallelizing the tasks of parsing, chunking, and embedding generation and indexing it continuously chunk by chunk instead of bulk. This not only increase the speed but also makes the whole task more optimized and memory efficient.
+
+The library gives many vector database supports, like Pinecone, Weavaite, and Elastic.
+---
+full_description:
+
+
+Embedding creation is mostly done synchronously; a lot of time is wasted while the chunks are being created, as chunking is not a compute-heavy operation. As the chunks are being made, passing them to the embedding model would be efficient. This problem further intensifies with late interaction embeddings like CoLBert or ColPali.
+
+The solution is to create an asynchronous chunking and embedding task. We can effectively spawn threads to handle this task using Rust's concurrency patterns and thread safety. This is done using Rust's MPSC (Multi-producer Single Consumer) module, which passes messages between threads. Thus, this creates a stream of chunks passed into the embedding thread with a buffer. Once the buffer is complete, it embeds the chunks and sends the embeddings back to the main thread, where they are sent to the vector database. This ensures no time is wasted on a single operation and no bottlenecks. Moreover, only the chunks and embeddings in the buffer are stored in the system memory. They are erased from the memory once moved to the vector database.
+
+All this is then bound into Python using pyo3 and maturin, so it's easily accessible from Python, but the core is still asynchronous with rust.
+---
+room:
+---
+day: Friday
+---
+slot_date: 2025-04-25
+---
+start_time: 13:20
+---
+end_time: 13:50
+---
+slot_id:
+---
+track: Rust
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: yes
+---
+python_skill: Advanced
+---
+domain_expertise: Intermediate
+---
+supporting_material_url: https://github.com/StarlightSearch/EmbedAnything
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/SFDRTR.png
+---
+youtube_id: KRhdQ4kzsZ4
+---
+video_link: https://www.youtube.com/watch?v=KRhdQ4kzsZ4
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/KRhdQ4kzsZ4/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+So, I'm Sonam, and we are going to present today Vector Streaming, a method that we developed for memory-efficient indexing. So, these are two speakers. Akshay comes from T.Y. in the Wayne, and I work as Article 8, Agile and AI Evangelist. That means I have to take out research and development to the market. Plus, I'm the creator of Embedded in a Thing, and I love to go for a hike. Akshay loves to go for biking. Despite of our differences, we have one thing in common. That is obsession with optimization. So vectors. So how many of you have used RAG? How many of you have deployed it in production? Cool. So just for introduction, what are embeddings? So these are numerical representation of your unstructured data. It could be text, images, audio, et cetera, in a numerical space. And this is an example of a TSNE MNIST data set, which has been clustered, the digits, according to how they look. And we have been using embeddings for so long for information retrieval, for context injection in language models, search, recommendation systems, classification, classical machine learning tasks like anomaly detection, et cetera. So embeddings are everywhere. Embedding models are everywhere. So there are different types of embeddings, right? There are dense, there's sparse. And these days, we also have late interaction embeddings. So embedding supports all of them. It supports dense, sparse, late interaction, re-ranking embeddings as well. And for the past six months, we have crossed over 200 plus downloads and 500 plus stars. And we are completely built in public. That is, we started just with inference and ingestion. And it was extremely community driven. That is, whatever community asked us, we built for them. So I'll tell you, there are so many discussions that I'll share with you that will tell how vector streaming came into existence. Because we didn't start with vector streaming initially. We started just with inference and ingestion. So embedding a thing is inference, ingestion, and indexing pipeline. So we do end-to-end embedding generation and indexing it to vector database, et cetera, from any kind of unstructured source. PDF images, et cetera. So we have collaborated with multiple vector databases, Elastic, Vaviate, Quadrant, et cetera. Can you see which vector database you use? And it's not there. It's very easy to add your own adapter as well. There are multiple blogs written over there that how you can use, how you can write adapter for your own vector database, right? So a little bit about motivation for Embed Anything. So we started by building an application, a local application that can do semantic search on your local data. And we did try Python, like Clamindex backend, like Clamindex and LanChain, but that had too many dependencies, plus we also ran into a deep issue that was all the Python required was a different server implementation. It needs a different spin-off of server, and plus the CPU bound task was not asynchronous. So these are the two issues that we faced, along with non-existent libraries that has less dependency. And so we wanted to build in Rust, and there was no Rust library that existed. So we took it out on ourselves and said, let's build it ourselves, right? So I will be sharing with you the design requirements of Embed Anything, like what was going on and why we designed it the way it is. Because if you see different vector databases, right, there are no dependencies of those vector databases at Embed Anything. So those vector databases are not dependent on Embed Anything. So when you do pip install Embed Anything, those vector databases doesn't get installed with Embed Anything. They are separate. So what are the design requirements and how Rust has enabled those design requirements in our software? So that is kind of a major discussion. So the first design requirement is run asynchronously. So as I told you, the major problem that we were running into was CPU-bound asynchronous task was not possible with Python. And why? Because we needed to spin off separate server, because of Jill, the true concurrency, and yes. And this is, this part of Caveat is in FastAPI background task. So you can go ahead and read this if you are interested in it, and it tells you how difficult it is to run a background task with FastAPI, and you need to use other services like Celery for you to run those background tasks. So what could be that background task? One could be generating embeddings, right? OK, so the design requirement two was small memory footprint. Embedded thing doesn't have any PyTorch dependency. So PyTorch, if you have compiled it, it comes about 230 MB plus 1.8 GB of CUDA dependency. Whereas Embedded Think compiles with, I think, 15 MB, which is like 15 times smaller. And where does small, I mean, why we need small size of these compilations? Because if you want to run into Docker image, you want to run a Docker image in the cloud, a smaller is better. Plus the memory safety. By the way, this meme was made by me, because it's like all the best way of memory management. It has taken it from other languages, like C++, JS, and Haskell. So Rust has a stack and heap memory management. It doesn't have dangling pointers, because it avoids any kind of memory allocation. This one is kind of an important one, Because we all know tech debts are quite everywhere in most of the software. So to avoid tech debt, so initially we started, when we started, we thought of, like, we will keep it bare bones. That means we will keep only the dependencies that are very, very essential for the library. And as I told you, this was very community-driven. This was very discussion-driven with other people. So this discussion was opened on GitHub page. And he said, I love your library, really, but please do not integrate with other vector database. We had kept it in our roadmap that we will in the future integrate with other vector databases because that will only bloat your library. And I said, like, we do not want to bloat our library. So we came up with vector streaming method. That will be explained in the pipeline in some time. Okay. So the fourth requirement was hardware agnostic. That means if you are running a local app, it should run anywhere, right, Mac, at different hardware architecture. So the fourth hardware requirement was, yeah, and Rust actually comes inherently with hardware agnostic because it can be compiled with any CPU architecture. It can run from supercomputers to your microcontrollers. And someone was building an iOS app with embedded in a thing, and that was, like, really cool to see. And yeah, so it could be compiled for an iOS application, for MacBook, and for different other Linux as well, any kind of other hardwares. So the fifth design requirement is faster inference. We have done quite different benchmarks for embedded editing, and this is quite lenient. And it only measures the speed on the ONX runtime, and it has been repeated hundreds of times to kind of simulate large amount of data, and it is available on our benchmarks on our GitHub page. So yeah, why it is important, why all these four points that I mentioned is important for your design software, because you do not want to run into difficulty during production. We designed this application, and this application matters. So to get deeper into the pipeline, I invite Akshay Belal for it.
+
+**Speaker 2** _[10:27]_
+
+Thank you. Hey, everyone. Yeah. Is the mic on? Yeah. Yeah. So now let's get into RAG, and we get into vector streaming very soon. So before that, I just want you to go through some of the things that are present in a pipenance. If you want to do some kind of embedding, so what all goes into doing that? So first is the ingestion. So you have these different files. So we need to support different data modes, so text, images, audio. So text could be HTML, PDF documents, Word documents, those things. Then you need to chunk them. You need to break them down into smaller pieces so that when you do retrieval, you get those pieces as context injection into your LLM. And then you need to clean up text. You never get clean data. So the idea is to get this raw data, clean it up in some way, remove white spaces, and do some metadata extraction. So if you're doing PDF, how many pages does that PDF have? what is the name of the file, when was it created, modified. So those kind of metadata extraction is required. So that will be added together with the vector embeddings itself to do some filtering on the metadata itself. So we support a lot of file extensions. So these are just the text files, but we also support images and audio. And for PDFs, we also have support for Testrack OCR. We're looking to add more backends for the OCR itself in the future. Then you need some inference. So once these chunks are made, you need to somehow put them through a transformer model, which is an embedding model. And there are a couple of backends right now that we support. So one is Candle. I'll talk a bit more about that because it's a big, we depend on it a lot. And then there's ONNX, which is more widely known. Like a lot of people who are running embedding workloads are already using ONNX. But why we use Candle? So one, Candle, it's maintained by Hugging Face, so it's quite a nascent library. It's about one year old, but it already has 18,000 stars and a lot of downloads. So it's built in Rust from scratch. So the idea is that it is a complete rewrite of Torch in Rust. So every CUDA kernel, every MPS, so that's the metal kernels, are written from scratch and supported with Rust. So you don't have to ship your whole torch when you're shipping your application. So you can just ship the candle, which comes down to a very small 10 to 15 MB sort of thing without the CUDA. So when you have CUDA runtime, it adds a lot more to it. So that's about a GB. But if you're just doing it for, let's say, CPU, it's a very small compilation. And also, it supports Wasm. And because Candle supports Wasm, Embed Anything also supports Wasm, so you can run this embedding workloads in the browser itself. And lastly, once you make the embeddings, you need to store it somewhere, right? So we have support for different databases, which we showed. But yeah, this is the databases we have right now, but you can obviously add anything you want. Finally, getting into the topic, so vector streaming. So this whole pipeline, as such, if you do it synchronously, like one by one, it's not going to be efficient. And I'll show you why that's not efficient. So a common way to do like a naive approach to doing any index in a very simple way would be like let's say you fetch some PDF files. You then extract text out of it so it could be done with OCR or you just do some parsed raw text out of it. And then you do the chunking and then you do embedding, put them through a transformer model like a BERT model, a GNI embedding model or anything like that. And then you upset, which is a word for like pushing it into the vector database itself. So this is a very common way to do this. If you have used something like Langchain or Lama index, this is what it does. So you feed in the documents, it creates nodes out of it, and those nodes are then embedded, and then you put it into a vector database. But the problem here is if you do it like this, the embedding step alone takes most of the time, because that is the most CPU-intensive task out of all this. And when that is happening, your other stuff stops. Let's say you're doing OCR or something like that. If you just follow this, you basically, your process gets blocked at embedding. So if there are, like, thousands of files, you're not processing them while the embedding is happening. So that's one key issue. The other issue is that let's say you have a lot of files, and when you put them through this, you get a lot of chunks. And then when you do embedding, you have, like, OpenAI's models are 1536 embedding dimensions. So when you take those chunks, put it through this, you have so many floating points. And then you push those floating points essentially to the vector databases. But commonly what happens is these are not erased out of the memory. So they still stay around, like, the floating points. They don't get thrown away or removed from the memory. Then you face issues like this. So if you just look at a lot of embedding libraries, you will see many issues like this who have actually used this in production and with large amounts of text. You will see that there is high memory usage, memory leaks everywhere. So that's the issue on Hugging Face. Then you have, again, memory leaks. So people do gc.collect, run the garbage collector manually to remove, but still it doesn't work. So that's the issue that you face. The solution that we came up with is very simple, actually. It's not hard. But I think that's where Rust comes into making Python libraries. So Embed Anything is a Python library at the end, also a Rust library. But I think this is the key thing that is unlocked by Rust for that library. So the solution is just run embedding in a separate process. So we have the main thread over here, which is just fetching the files, extracting text, chunking everything. Then you spawn a different thread, which is just doing the embedding. So the embedding model is basically loaded into that. And then you just set up a MPSC channel, which basically does the communication between the two threads. So you buffer the chunks. So when you start, you collect the chunks. Once a number of chunks are collected, you throw it to the embedding model, which runs it in a batch. And once enough embeddings are made out of it, you transfer it back here. And then you do up-cert it into the database. So up-certing to database is not a compute-heavy task. Because if you're doing it through a remote vector database, you just have to basically send it there. So none of the left-hand tasks are compute-heavy as such. If you're using OCR, maybe extract text could be compute-heavy. But this could just keep running continuously. And as the chunks are being queued up, they're sent to the embedding. So this is completely non-blocking. So you can keep creating embeddings and this together. So in Rust, it's a very simple implementation. So you just define the function, set up the MPSC channels. And this is just collecting the files. This is a mock code. This is not real code. But just to show how easy it is to do this in Rust. And then you just get the text out of those files, chunk them. And then you just spawn a new process for the embedding. So you spawn the process, do the actual embedding logic in this process. And this process, again, sends those embeddings into another channel. And that gets pushed into the vector database. So it's quite simple. But also, it is a Python package. So you don't have to really care about all that is happening. You just call one function in Python. So that would basically take the adapters So we have defined an elastic adapter, but you can have, let's say, a quadrants adapter or a VVH adapter or anything like that. And you just give it into the function, say, adapter equal to this. So if you don't give an adapter, it works like a normal embedding process which just goes synchronously. But as soon as you add that adapter over there, it becomes a vector streaming. So you are essentially streaming vectors into the database as they are made. So it avoids high memory usage because you're not storing those in your RAM or in your memory. So this is what you get at the end. So you have about 25% faster embedding. So the plot that Sonam showed you earlier was just the embedding part. This is the whole pipeline. So from ingestion to up-setting into the database itself. So yeah, it's a big gain that we get out of this. So just to wrap up on the streaming part, why would you use vector streaming? It's to reduce memory requirements. You have very less memory requirements. So you can change the buffer size basically depending on how much RAM you have. So if you have less memory, you keep your buffer size low so that you're pushing to the database more often. Let's say you have enough memory, you can keep it higher so you're pushing less. You collect more embeddings and then you push it. And then you have less time wasted during the embedding process itself. And then you can, you don't have to define a separate up-serting function yourself. That's taken care of by embedding, embed-anything. So the final takeaway is that you can use embed-anything right now. So if you are already having a RAG application, you can just, it's a plug-and-play, you can just plug it into your current embedding process and you can power local applications with it and finally Rust can unlock a lot of performance in Python libraries. So we are a very small team, it's just the two of us working on this library right now. So we are looking for some contributions. So if you have worked with Rust, it's not a very deep library. It's quite basic Rust, so even beginners or even intermediate Rust users can actually start contributing to this. So we are looking for some contributions to Wasm, to ingesting from different sources like S3, Google Drive, those things. And also one big thing is vector quantization, so to just quantize the vectors before they're pushed to the database. So you can scan this, you can look at the repo, and give us a star, contribute. So I'll come back to this slide so I can take a photo. But I just want to show a quick demo, because she did start with saying we were looking to make our own application. So did we make it? Yeah, we made it. So I just took all the talks we had for the past three days, and they're all over here. I just scraped it. And so this is the application. So this is Starlight. You can actually search Starlight search, and you'll get this application, which is live. You can download it. So let's quickly just see how Embed Anything works here. It's completely powered by Embed Anything. So I'll just point it to that folder and say Create. So it will start indexing over here. So this is completely on CPU, which is an ultrabook. So not much power, but it's still quite fast, I would say. And this whole application is about 40 MB.
+
+**Speaker 1** _[22:19]_
+
+So asynchronous task, you can just see it right here.
+
+**Speaker 2** _[22:21]_
+
+Yeah, I can actually already start searching for stuff while the embedding is happening. This wouldn't be possible otherwise, because you're blocking the thread. So I can already search for vector streaming.
+
+**Speaker 1** _[22:36]_
+
+It hasn't come yet.
+
+**Speaker 2** _[22:38]_
+
+Sorry. Yeah, so this is our talk. And you can search for building agent. Yeah, you can. It's very fast. So every keystroke actually does the search, and it's pretty fast.
+
+**Speaker 1** _[22:55]_
+
+So for local thing, we had to take care of, like, running it on different threads plus
+
+**Speaker 2** _[22:55]_
+
+So for local.
+
+**Speaker 1** _[23:01]_
+
+communicating with different threads. So that was, like, practically what we accomplished with Embedding Thing here as a local thing.
+
+**Speaker 2** _[23:09]_
+
+Thank you, that's our talk.
+
+**Speaker 3** _[23:19]_
+
+yeah so thank you for this wonderful talk and we have questions so on Slido and if you just want to make question directly then raise your hands but first we will go through Slido so the first question is how do you handle a back pressure and rust MPC's channel when the embedding model process is slower than chunk production to prevent memory bloat
+
+**Speaker 2** _[23:44]_
+
+So right now at least we are using unbounded MPSC channels, so it just keeps queuing unlimitedly, but that is something we haven't yet looked into, like limiting it to a certain thing and stopping the main thread while if the embedding process is running longer. So that is something definitely we might have to look into.
+
+**Speaker 3** _[24:06]_
+
+Thank you, so the next question is do you have multimodal support in PDFs does it cover images tables? inside a PDF for embeddings
+
+**Speaker 1** _[24:15]_
+
+So I think that could be very well done with Colpally. Colpally can perform search on PDF, on images itself. So that we saw through experimentation that it is possible through Colpally. It's very easy to just choose different models with embedding the things. So you just give a, I want to use Colpally instead of some dense embedding model. Yeah.
+
+**Speaker 3** _[24:42]_
+
+Thank you, and the last question from Slido is is it possible to chunk based on specific conditions such as headers or certain words? Yeah, so
+
+**Speaker 2** _[24:51]_
+
+Yeah, so that is one of the chunks. So we use a semantic chunking, which takes into account the semantics of the... So if you have headers in your markdown file, we stop the chunking there, so you get better chunks which cover a certain heading, let's say.
+
+**Speaker 3** _[25:08]_
+
+Thank you. So is there any questions left? Please raise your hands. Okay, then, yeah, thank you again, and, yeah, that is it.
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -1,0 +1,163 @@
+title: Slack bots 101: An introduction into slack bot-based workflow automation
+---
+description: Most developers work with Slack every day, yet very few of them know about the awesome things you can do when you build your own slack bot. For example,…
+---
+created: 2022-01-16
+---
+code: SFDVVA
+---
+slug: slack-bots-101-an-introduction-into-slack-bot-based-workflow-automation
+---
+speaker_names: Jordi Smit
+---
+speakers:
+
+
+
+### Jordi Smit
+
+_About — in the speaker's own words_
+
+Hi! My name is Jordi Smit. I have a long history of writing software and AI-related products; Even before starting university, I already wrote an AI that learned to play minesweeper by itself and was way better at it than me.
+
+I'm deeply passionate about software engineering, data science, and automation. Nothing makes me happier than creating software that helps humans by automating a tedious and manual-intensive part of their job. Therefore, I love talking about data science since this field has opened the door to many new kinds of automations. However, too often, data science solutions stay stuck at the proof of concept level. To combat this issue, you also need software engineering knowledge. That is why I love the intersection between software engineering, data science, and automation.
+
+Currently, I work as a Machine Learning Engineer at GoDataDriven in Amsterdam. Here I help companies to transform their ML-based models into production-ready applications. I love this job because it allows me to explore the intersection between software engineering and data science daily.
+---
+abstract:
+
+
+Most developers work with Slack every day, yet very few of them know about the awesome things you can do when you build your own slack bot.
+For example, recently, we built a slack bot that automates our hiring assessment sending process. During this talk, we will discuss the lessons we learned during the creation of this slack bot, and we will teach you to build and deploy your first bot.
+---
+full_description:
+
+
+Most people view Slack as only a chat application, but this is only the tip of the iceberg. Many more features are waiting to be discovered underneath the water, such as _slash commands_, _smart UI elements_, etc. These tools can make Slack a powerful process automation tool that can turn repetitive or manual processes, like onboarding or gathering feedback, into automated workflows. 
+
+This talk will introduce you to the wonderful world of building slack bots based on our experience of automating the assignment sending part in our hiring process. After this introduction, we will teach you how to make your first slack bot. We will cover the different aspects of the bot creation process, such as: _how to make your first slack bot using `bolt-python`_ and _deploying your bot in the cloud for only a few cents per month_. After the talk, you should have sufficient information to start automating parts of your workflow using your first slack bot.
+
+This talk is meant for slack users who have never created a bot before. It is totally fine if you are a Python or cloud novice. All you need for this talk is a love for process automation and over-engineered solutions.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: Python & PyData Friends
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 1702
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: some
+---
+domain_expertise: some
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/SFDVVA.png
+---
+youtube_id: jB5LGEjFVvU
+---
+video_link: https://www.youtube.com/watch?v=jB5LGEjFVvU
+---
+video_published_at: 2022-05-06
+---
+video_duration_iso: PT22M51S
+---
+video_thumbnail: https://i.ytimg.com/vi/jB5LGEjFVvU/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+Okay, we're going to talk about Slackbot, but first, a show of hands. Who has worked with Slack before? Yeah, wouldn't expect that. That's why you're here. Okay, Slackbot. Slackbots are very cool plugins you can basically use to make automations in your Slack workspace. So what are we going to talk about? First, I'm going to talk about how I got started with building Slackbots. My first introduction into this beautiful world. Then I'm going to show you a bit on how easy and how you can actually create your own Slack bot using a bit of Python code. Then I'm going to talk about my typical development and deployment workflow for creating a Slack bot so that you can actually use it in your own workspace. And finally, I'm going to show you some cool ideas that we actually built for ourselves to make our own workflow a bit easier within Slack. But first, the typical slide about me. I'm a machine learning engineer at Go Data Driven. We're a consultancy company that's really specialized in helping companies make become more data-driven Where I'm specifically focused on a machine learning ops based solutions for our clients And as we and recently I got really interested in building slack bots The nice intersection here is that it's also about all about automations So now I'm going to show you how it actually do how to do it This recent fascination all got started when I just joined DDD I was fresh out of college, and I couldn't start at my first client for a few more weeks because they needed a bit more time, so I was looking for a cool internal project to do in the meanwhile. So me, here, just out of college, started coding and looking for something cool to do. Eventually, I found out that our assessment sharing process and the interviewing process was a bit outdated. we were still sending zip files around, making it a bit hard to actually share code, make it a bit hard. And actually, it was very hard to see what actually candidates did. So what I wanted to do is make it easy to actually send codes, make it easy to submit, and actually see what could be done. So very eager me, just out of college, went to work, and a few moments later, I had a very cool prototype using the GitHub API script. I could create repos, could invite candidates, set up CI CD pipelines, GitHub UI for diffing, and then I said, cool, guys, I made this cool thing, but then the real world started entering that you don't encounter in college. How do we, for example, use this? How do non-technical peoples that actually send these files around use this? How do we deploy it, bring it into production? How do we make it secure that only people from our own company can work on? So I raised all these issues, and eventually somebody said, hey, why not build a Slack bot around it? So I thought, okay, sounds cool, but this is probably a bit hard, right? So I did some bit of research, but it turns out actually it's surprisingly easy using this very cool library called Bolt Python. It's a very cool framework that makes it very easy to actually build Slack bots. It abstracts away most of the Slack API and all the HTTP requests you need to do, and it makes it very easy to actually listen to specific events that happen on Slack. For example, to demonstrate, these 12 lines of code, including the white spaces, actually are already sufficient to make your very first Slack bot. So what's actually happening here? First, we create our application, our bot. If you ever created a Flask API, this should be very similar to you. Then we actually define what we are interesting, the events we want to listen. In this case, want to listen to the message, hello there. And then we define what we want to do when this specific message ever gets typed. For example, this time if we follow the meme. And then all we have to do is connect to Slack using a web socket in this case. And then you already get a very simple Slack bot that can do this. So it's surprisingly easy to just create Slack bots. Some key concepts you need to know if you want to do this. Almost everything in this library is based on the observer pattern. Whenever there is a state change on Slack, they will send a notification, one you can subscribe to on your bot. Then you have to decide what you want to do based on this event, send a reaction, change some state additional on Slack, and then you have your very first Slack bot. So everything in This observer pattern basically comes down to this very simple syntax. First, we define what we want to do, and we define the event we want to listen to. So that's all we need to do, is just define, add the decorator on top of it, and we already can do quite a lot of stuff with Slack. Everything follows this pattern. And the second most important design pattern in this library is dependency injection. There are a lot of utilities they offer, like, for example, the save function we already saw that makes it very easy to actually send messages back to the specific channel they came from, or the raw information in the body from who actually sent the message, or the client that abstracts the HTTP request in the Slack API. They can all be provided just with dependency injection. And there are a few more if you ever read the documentation. But you just specify them there, and you get them, and you don't need to worry about strange factory methods and complicated things to actually get them to create them. They're basically provided for you. You just specify them and you get them. That's a really nice design pattern. So then the next question we have to ask ourselves, what are the main interaction points for our Slack bots? Now, one we already saw was the event API, and we saw just what happens when you listen to a specific message, but there are quite a few more events. example when somebody joins when a file gets uploaded and a few hundred more are all available for you to to listen to for example here we have a small bit of code we actually listen for some for someone joining a channel and then we respond with a welcome message and with their name and we give this text back with the same method and we already get this additional second very simple slack bots another interaction point are the slash commands these are a bit like cli based commands that you can actually use inside your message composer for example here i implemented a very simple echo command all you need to do is just type slash you get an overview of all the slash commands that are available in your workspace and then you can give additional data that can it react on and it's very nice if you for example want to start a job that takes a bit of time and or add some additional information to a database but you don't want an entire web interface around it you can very easily use this another interaction point are the message shortcuts this is an option you get when you press on more options on a specific message and then you can actually for example here i have defined an additional action called share message and then we listen here we define a decorator with short name for a shortcut named share message then i get this message here and i can acknowledge it and based on this i can do all kinds of cool things with it the final interaction point we have in slack are global shortcuts these are additional actions you can add to your search bar so when i for example here start typing in the search bar you now see that i have an additional action called open form and when i get click on this action it will run this code and decorate i defined over here and open this custom model i defined so next question you might ask yourself okay how do you define this view on here in this code it's just a variable named view now that's also surprisingly easy using the slack block kits builder all these views are basically just large json or python dictionary definitions and this simple ui provided by slack gives an overview of all the different interactive tools that are actually available and you can just select whatever you need edit the messages you want in there and eventually it just gives you a large json file over here that you just need to send back and you can create all kinds of custom views for example here i'm building a very simple pooling tool and just by keep adding all this information we get a nice pool pool overview for where we should go for lunch and our different type of views you actually can define for example here we have a modal but we can also use this same tool to actually define it in a custom message format with interactive interactivity or attachments or the home page the home page is what happens when you click on your slack dots and you get this overview you can define all kinds of different views that it makes it easy for interaction within your workspace with it with your bot so you don't need to build an entire web application you can just build this easily in slack then when you want to interact with these different views you You can actually make them interactive. When you press on a button, you can also listen to that. Here we have the app.action, and then the name of the button we want to listen to. And when that event happens, Slack will notify us, and we can run this additional code to update the view with an updated version of the view, make it entirely interactive. You can also use this to, for example, create a form and do some input validation and only accept the submit when the input is valid, and then some additional process around it. So what is my development workflow when I create these kind of Slack bots? First thing I highly recommend is creating a development Slack workspace. They're free. We are the only few users in there. And it's really recommended because if you ever have a bug, your Slack bot can send quite a lot of messages. It's even possible to have an infinite loop with your Slack bot that keeps reacting to itself, and it would be rather annoying if people that are actually working in the workspace keep getting these messages. The second step is that you need to define what your Slack bot actually does to Slack, and that we can do with these kind of YAML files. You just need to define the name of your bot, the OAuth scopes, for example, does your bot need access to the writing permissions and then some features for example if you want to have shortcuts we need to define them here so that slacks knows about them so to actually show them and if we want slack slash commands we define them in here and all we need to do on the slack website is just upload this yaml file and we can actually you get actually uh get automatically installed into your workspace you only need to uh to copy some of the secrets so that you actually can connect to it, and then it works. But the nice part about this OEMO is that you can easily create a dev and a production version of your Slack bot, one dev version in your private Slack workspace, and one in production in your actual workspace where your colleagues are working that can actually use it. So then the next step is creating a WebSocket connection. This one is really nice because all you need to do to connect to the workspace is just these two lines. It's all abstracted away, the connection with the Slack workspace, Python Bolt does it all for you. But because it's WebSocket-based, you don't need to expose any ports or external IP addresses. You can just connect with WebSockets and you can develop locally on your own laptop and actually see what you do and just rerun it and you can actually see your changes and develop quite fast in your development workspace then when you're ready to actually make a deployment it's also very easy to actually just deploy this on the cloud function for example python bolt also provide this uh this additional class that makes it very easy to create a cloud function or we do everything that bothers just the same we just define the app and the event listeners we're interested in we just add this handler and the cloud function name we're interested in and we can deploy it to the google cloud aws or azure whatever your choice is and the nice thing about this that is will only run when there are actually events you are listening to and all the other times when you have a very quiet channel that not not much is happening in it won't be running so with this approach you can have a slack bot for only like five cents a month and it works just in time. And the nice thing about Python Bolt, if you have a different tech stack, I was not talking about, they have so many examples to get started. Or you want to run on Heroku or AWS or whatever, they have an example over there with the right code to just get to make it into deployment. It's very easy, it's very nicely documented, it's very easy to get started. I highly recommend you check out this GitHub repo. So the final result of what I was actually building when I did this deep dive, remember, we already had a script that was working, but we wanted to make it easy accessible for people with less technical backgrounds, so we actually create a form and make it easy and cheap to deploy while still being able to interact with the GitHub API. Eventually, we decided to use a slash command open form and when this form gets in we can easily fill in the required information then in the background the bot is creating the repo and while it's working it gives updates in slack based on slack messages and it works really really nice and now currently using this and it has made the life of our office manager way way easier she doesn't have to ask anymore about am i using the right repos or write files it's just filling in a form and it takes care of everything else works really nice and the candidates also gets this nice result that has been invited to this do this repo by bot and they can actually start using it and see how should you keep working and it works really well but it's not the only bot we have at godata driven we have quite a quite a few one of my favorite my second favorite is this one we have the parking shaming uh slack Slack channel, when somebody parks his car, terribly, you just upload a photo of the car. Then a Slack bot watches, is there a file uploaded? Yes. Is there a car in it? Yes. Can I read the license plate? Yes. Then we look in an internal database, do we have all the license plates we have, and then you get actually tagged if you're the person that did this. And it's used actually quite a lot and quite handy. And there's some additional information we get from the open data APIs from the Dutch government to actually see how much the car is worth and all kinds of information. Works really, really well. Quite fun. Another cool Slackbot we have is every time you create a, when we have knowledge exchange sessions, they get posted in our special Slack channel, and you can actually press an interactive button to say you want to attend and now works really really nice so some ideas for your very first slackbot trello has a nice api you can actually use if you have a backlog in there you can actually keep an eye and track and track your backlog see what's going way down and hasn't been looked at for a while give a notification about it or all the suggestions based on your backlog drawbox also has an api you can watch for how long ago a specific file has been edited. For example, if someone hasn't been updating his CV, you can give a notification. Or when Confluence also has a nice API, you can see if specific documentation is not up to date and has been updated for the last time. There are quite a lot of ideas. If there's an API, you can build a Slack bot around it. The sky's the limit. So lessons learned. Slack bots are incredibly useful and quite fun to make, and if you know the observer pattern, you can actually make your very own Slack bot using Python Bolt. And deploying Slack bots using this library is extremely surprisingly cheap and surprisingly easy and works really well. I'm a big fan. Are there any questions?
+
+**Speaker 2** _[17:18]_
+
+Thank you very much. So I have one question here. How does deploying a Slack bot look like?
+
+**Speaker 1** _[17:26]_
+
+And the nice part is that we You just need to add this additional class save on. Okay. I want this app deployed in the cloud function. So just add these Few lines I showed here The only change is basically the last two lines in this red scare and then I only need to call the Google The Google see life. Okay deploy disk deploy this Google Cloud function and it works works. So, surprisingly easy.
+
+**Speaker 2** _[17:58]_
+
+Okay, thank you. Next question. How can you create a bot that acts not on events, but for example every Monday at a specific time?
+
+**Speaker 1** _[18:08]_
+
+So it kind of depends on the infrastructure you're using of course, so The nice part is that the app also provides the if you has an attribute called the decline So you can actually use it use it to interact with the slack API Then you can do different things based on a cloud function For example cloud scheduler that calls it on specific times or if you want to keep running it the entire time you can maybe use a cron job depending on what you want to use and what specifically good for your use case but there quite a lot of options
+
+**Speaker 2** _[18:41]_
+
+Thank you. How many bots have you already in use at Go Data Driven?
+
+**Speaker 1** _[18:48]_
+
+But we currently have these three are the most used ones. We have a few more I actually can't talk about but we're currently Planning to use this and create a hackathon in the coming coming weeks create a set up a small Github repo templates and the rights Setup to actually deploy them in the cloud. I'm gonna have a cool hackathon actually create more of these slack bots
+
+**Speaker 2** _[19:15]_
+
+I think this is the last question. Does having too many bots affect the performance of Slack?
+
+**Speaker 1** _[19:24]_
+
+I haven't encountered it yet, but I can imagine they take a lot of precaution about it, because they actually promote it, they take care about, Slack takes care about sending these messages. The only way you can get performance issues is if your Slack bot is too slow. That's an issue in your response time, but not on Slack specifically.
+
+**Speaker 2** _[19:49]_
+
+Thank you very much
+
+**Speaker 1** _[20:18]_
+
+For the first part of your question, Abbas, about can it be integrated with, for example, Teams, this framework is specifically for Slack because Slack has a specific API that is built upon. So we can integrate it with Teams. Maybe, yeah, I'm not sure if Teams has such a plug-in system. So at least this doesn't work there. And for your second question, for listening to specific messages, it offers a RayJax-based listening system. You can actually parse all messages that come in in a specific channel, check if it matches a specific RayJax function, and then do it. But you can also listen to all messages that come in and then do your custom filtering based on natural language. It's a bit more work. Does that answer your question?
+
+**Speaker 2** _[21:10]_
+
+actually there is another question okay I'll just read this one can you get attributes of a third party in slack bot for example github properties can you get attributes of a third party in slack bot for example github properties
+
+**Speaker 1** _[21:35]_
+
+Can I get third-party properties of an other slack, but I'm not really understanding question neither
+
+**Speaker 2** _[21:40]_
+
+me neither. Can you get attributes of a third party in Slackbot? The example is GitHub.
+
+**Speaker 1** _[21:46]_
+
+If you want to do something with GitHub, basically what I did is that you use, for example, the GitHub API, and there are nice other framework or Python libraries that make it very easy to interact with the GitHub API. You can use that, or you can call your own HTTP request to GitHub and do all kinds of cool things. So this Python board is basically just a wrapper around the Slack API. It makes it very easy to listen to specific events that happen on Slack and react based on it and send messages back or do all kinds of interactive things on Slack. But if you want to do things with other third-party services, you just need to use their API. It's just plain Python code you use here. So if you can run a script that interacts with that third-party, you can also wrap a Slack bot around it.
+
+**Speaker 2** _[22:36]_
+
+Okay, thank you. I think there was someone who wanted to ask a question. Thank you very much.
+
+---
+transcript_status: auto
+---
+transcript_language: en

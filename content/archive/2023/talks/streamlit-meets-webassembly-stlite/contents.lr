@@ -1,0 +1,173 @@
+title: Streamlit meets WebAssembly - stlite
+---
+description: Streamlit, a pure-Python data app framework, has been ported to Wasm as "stlite". See its power and convenience with many live examples and explore its…
+---
+created: 2022-12-21
+---
+code: GYEZVW
+---
+slug: streamlit-meets-webassembly-stlite
+---
+speaker_names: Yuichiro Tachibana
+---
+speakers:
+
+
+
+### Yuichiro Tachibana
+
+Yuichiro works as a professional software developer and also loves contributing to OSS projects. As a Pythonista, he has participated in various projects including web development, multimedia streaming, data management, computer vision, and machine learning.
+---
+abstract:
+
+
+Streamlit, a pure-Python data app framework, has been ported to Wasm as "stlite".
+See its power and convenience with many live examples and explore its internals from a technical perspective.
+You will learn to quickly create interactive in-browser apps using only Python.
+---
+full_description:
+
+
+Streamlit lets you create interactive web apps with Python, and its WebAssembly-port "stlite" extends its power to in-browser apps.
+"stlite" offers offline capability, data privacy, scalability, and multi-platform portability while keeping Streamlit’s original features, such as Python productivity and its rich ecosystem.
+
+In this talk, after a short intro of Streamlit, we will review stlite in the context of the recent emergence of various Wasm-based Python frameworks such as PyScript, and show you what's possible with stlite. We will also see its internals from a technical aspect which may inspire you with ideas about how to make use of Pyodide and how to transform Python frameworks for the Pyodide/Wasm runtime.
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2023-04-19
+---
+start_time: 12:25
+---
+end_time: 12:55
+---
+slot_id:
+---
+track: Web
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 2521
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Novice
+---
+supporting_material_url: https://github.com/whitphx/stlite
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/GYEZVW.png
+---
+youtube_id: XivJYZUm1GY
+---
+video_link: https://www.youtube.com/watch?v=XivJYZUm1GY
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT29M59S
+---
+video_thumbnail: https://i.ytimg.com/vi/XivJYZUm1GY/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+I am a software developer who has been using Python as a web development tool or data processing tool, especially for data science, machine learning, and computer vision fields. And I also have been active in several OSS projects or some communities, including Streamlit. That will be the core topic of today's talk. In today's talk, I would like to talk about, you know, introduce STLite. That is WebAssembly port of Streamlit. By the way, there have been several talks about some similar topics like WebAssembly or some Python frameworks based on WebAssembly or Pyodide in this conference. So I believe that this is one of the hottest topics in recent years, especially, of course, in this conference, but also, you know, worldwide Python community. And before we will take a closer look into ST-Lite itself, let me introduce Streamlit first, in short, and discuss about its pros and cons. But first, that will be also the background of the birth of ST-Lite. By the way, how many of you have ever heard about Streamlit? Great, thank you, that's great. And have you ever used, tried it out? Great. So there are many fans of Streamlit already. Let me introduce about it in short. As their website, official website said, it's a faster way to build and share data apps. Actually it's a unique and convenient feature that makes web development super easy. It has become one of the most popular web application or dashboarding framework written in Python. And actually there are many existing web-based demo interesting applications, ML showcasing some or some other, any awesome things are existing in this, are also published in the world. And another thing about, another great thing about Streamlit is it's huge active and welcoming community where many developers have been developing and maintaining many custom components that are kind of extensions of StreamList that cover a wide range of unique use cases from something like molecular biology or some major processing application like this. Although I only picked up two examples in this slide due to the limitation of the surface, but you can find some great custom components from the custom component list in the official website linked from here. After explaining the nice things about Streamlit, let me get back to this introduction slide and focus on this sentence, saying Streamlit turns data scripts into shareable web apps in minutes, all in pure Python, no front-end experience required. So let's see what it means. Assume that we have a single Python script named app.py with content like this, importing package here and calling its functions like st.title here, and in the next line, st.textinput function is called, and its return value is assigned to the variable name, and this variable name is also referred to, used in the next line, the input argument to the st.write function. By the way, in the context of a streamlit, these functions can be called a component. And then when we execute this command, streamlit run command with an argument pointing to the input file name app.py on the command line, the streamlit server side process will be launched and it will start behaving as a web server so that we can access the web application from our web browser. And we can find that the content of this application is based on what we have written in the source code. So here is the title component and here is text input and text output respectively. And what's interesting and unique here is that when user inputs some text data to text input element and hit enter key, the input text data is automatically reflected to the text output field in the next line automatically, even though what we have written in the source file is just a simple Python script that has only unidirectional execution flow, simply top to bottom, whereas it does not have any imperative or reactive parts like callbacks. This is the magic of StreamList that converts such a simple Python script into interactive web application. Of course, it does not require any front-end coding. So due to this convenient and unique feature of Streamlit, it has become so popular, especially for some type of user groups like machine learning practitioners or data scientists, in addition to a more wide variety of general-purpose web developers, of course, because they have some awesome achievement written in Python, and they want to create web applications on top of it, but They do not want to pay so much time or effort to write front-end coding. By the way, let's see what happens under this magical conversion of Python code into interactive application. Of course, when we run streamlit run command on the command line on the server, the Python runtime is loaded, you know, will be launched, and the streamlit component will be loaded onto it that has several components including, of course, the web server and some static files like index.html or main.js that will be loaded soon, and it also has contained a dynamic part named script runner that we will see soon, but at first, when we access to this web server from our web browser, the static files like HTML or JS or CSS will be served from the web server so that the front-end application will be started on the web browser. Then after the front-end application will be launched, the front-end app will establish the bidirectional data connection with the web server so that it will communicate with the script runner, so that whenever user interact with the front-end app, like clicking buttons or inputting text data into a text input field or whatever, the front-end app will send such input data or input events to server side, so that the server side of the script runner will execute app.py with such an input event or input data, and the script runner will also send back the execution result from app.py to the server, sorry, front-end application so that the front-end app will re-render or update the content of the front-end view. This is what's under the hood of the magical generation of interactive application of Streamlit. This is, you know, great, but unique, interesting architecture, but we also can see that this This is kind of an ordinary server client architecture. So that we can easily imagine that there will be some type of drawbacks. For example, you know, it serves web pages or web apps from web server, and it also runs the Python script on the server side to process the input data. We cannot use hosted streamlit application in offline environment, of course. And whenever we want to process some data with hosted Streamlit application, the data must be sent to the remote host, because of course, you know, the logic implemented in Python is running on there. So in that case, there is no data privacy, but this could sometimes be a problem conflicting with some business requirement or security policy. And also from the viewpoint of service developers, scalability is also sometimes a big problem because Streamlit application needs the dynamic Python runtime running on the server side. So here is STLite comes in. STLite is a port of Streamlit to WebAssembly with a concept of client-side execution. In other words, STLite is a fork of Streamlit that runs completely on web browsers with the power of Pyodide. That is a Python distribution for the browser and Node.js based on WebAssembly. By the way, there was a great talk about Pyodide in this conference yesterday, so please watch that if you're interested in the details about it. By the way, using Pyodide, we could convert this server client architecture of Streamlit into the serverless architecture of STLite. You can find that every dynamic part written in Python, even streamlit package itself including script runner that will execute up to pi are now running in the web server, precisely web worker on web browser. And the frontend application is now communicating with the server that is running on the client side and literally the server now is a static file server that will only distribute some initial static files like index.html or some JS or CSS files. With serverless architecture, now we have solved some problems like offline capability and data privacy or scalability problems that we have seen in the previous sections. In addition to them, another benefit has been introduced that is multi-platform portability that we will see in the following slide soon. But at this point, I think some of you are thinking about other WebAssembly ported Python frameworks like, you know, Jupyter Live or Javascript or something like that, so let me talk about them just a bit. At first, the history of WebAssembly-ported Python frameworks has been started with Jupyter Lite or, on its basis, Pyodide. By the way, there was a great talk about Jupyter Lite in the last year, this conference, so please watch the recorded movie if you're interested in it, although we do not have enough time to go through all this topic in this talk. But anyway, after Pyodide has been released, and this was introduced to the Python community, the big ban has occurred, you know, big ban of the client-side Python frameworks, like including PyScript or Shiny, and of course, SDLite. Some are created from scratch to be compatible with browser environment and API like PyScript, And some are forked from existing Python frameworks, like STLite from Streamlit. Actually, there has been an active discussion about something like Pyodide, Jupyter Lite-like Streamlit in the official Streamlit online forum, so this is the reason why I could start the development of STLite with the confidence that there would be some kind of a need for the STLite, that is, you know, JupyterLite-like Streamlit. In that sense, the development of STLite has been hugely driven and motivated by the community. Right, so until now, I have been explaining and introducing about some concepts and history of STLite, so now it's time to show you some actual demos. First thing I'd like to show you is this web page or kind of web platform that is named as SDLite Sharing. As you can see, this is a web platform where we can edit and preview streaming applications online in browser without any explicit setup of Python or installation of Streamlit package. There are some several predefined sample applications, so let us see some of them. This Streamlit hello demo is one of the most famous demo applications of Streamlit. We will normally access this demo when we use normal Streamlit from a Streamlit hello command from the command line, but in the context of STLite, we could see this demo online without installing Streamlit package itself. And in this demo, we can see that some interesting or impressive features of Streamlit that Streamlit provides by default as the part of its unique features, like image frame generation for animation or, of course, a plotting demo with some chart component, and here is 3D map application, and here is kind of a table data with data frame and some dynamic data filtering. Again, all these features are provided by Streamlit by default, but the point here is that on STLite these unique features are still available with 100% coverage. Again, this component gallery example is also showcasing some availability of Streamlit features on STLite environment, serverless environment. That contains all the list of default built-in components provided by Streamlit. It takes a bit of time to boot up. This is kind of a showcase of the various components available in Streamlit environment, like various kind of chart components or some media components, including audio, or here is a 2D map component, and this is a pie plot, and this is embedding video demo, and here is the table of data, and it also provides various kind of input components for various types of input data, like boolean value or colours, right? And as I said earlier, custom components are one of the greatest parts of Streamlit's community, so this example showcasing the availability of custom component, too, in addition to the default component of Streamlit. Let me give it some time, all right? It includes some custom components, like this is an AG Grid component, this is a graph for graph data, and this is more like different types of demo, like image cropping for some multimedia applications, and this is a 3D molecule visualizer. The next demo is kind of a bit different, but still interesting. That is hosted on GitHub pages. This is for, you know, demonstrating some image processing feature on top of SDLite. The point here is that, again, everything is working on client side because, you know, GitHub pages is only for static file serving. So there is no server-side dynamic Python runtime. Please note it again. And let me give some time to write. In this demo, we can input some image data from this local web camera, and we could also apply some image manipulation to this image frame like this, like, you know, my folding or applying some filter. And there's also some result of image analysis is output with matplotlib. Although these image filter or image manipulation are kind of trivial examples, but the point here is that these features are provided by OpenCV. So the point here is that even OpenCV is running on client side. The next example is similar to the previous image processing demo, but the difference is that the target domain is not still image, but a live video stream. Let me see. Let me wait a bit. The interesting point is that this image processing is now working at the client side, and these demos are kind of interesting demos that's showcasing the benefit of the client side execution of SDLite because such kind of image or video data are one typical type of privacy sensitive data. So this kind of media processing demo running on completely in client-side is one typical but appealing demo that's showcasing the benefit of data privacy guarding of the ST-Lite. All right. Let's get back to the slide. So at this point, I would like to introduce some ways, available ways to develop and deploy ST-Lite applications. I mean, now we can run Streamlit applications on WebAssembly, so the target domain, target platform is not only web, but also we can package desktop or mobile apps. The first option is ST-Lite sharing that we have seen in the previous section, but I would like to show you here is this link where we can open up the dedicated view for the application that does not contain editor view by clicking this link or opening this URL in the new tab. The one interesting point here is that every source code and necessary data are encoded and embedded into this URL string, so you can save, restore, and share this entire application just by copying and pasting this URL string, and it also means that these data are never stored on the server side. And we also have an option to self-host STLite application on our own website by creating a single index HTML file and load JS and CSS files for STLite and embed some Python code as a string literal and passed that string literal to STLite API like this. This is the way I used to deploy this OpenCV application demo in the previous section. We also have an option to package the Streamlit application into desktop executable file, and STLite is providing a dedicated way to realize it that is named as STLite Desktop package that is distributed from NPM, not that, this is NPM package, not PyPI package. And you can create a desktop executable file based on your Streamlit source files just by following this instruction on the readme, so please check it out if you're interested in creating a desktop app based on Streamlit. And this is kind of an experimental project, but I recently released a VS Code extension that realized in-editor preview of Streamlit application. One interesting application of it is a combination of VS Code Web and this extension that realizes the Streamlit application development, even on iPad. Sorry, there is not enough time to go through all the remaining slides, but to be fair, I have to say that there are some differences between Streamlit and STLite, all of which are derived from the difference between Pyodide and normal Python environment, so please take care of some of these things if you actually try out development of Streamlit application on STLite. I will upload this slide to the discourse, so please read this slide if you are interested in it. Sorry, we are running out of time. But at last, my message is that Because now you're ready to use the C-Lite, I hope. And thank you for listening to my talk, and thank you.
+
+**Speaker 2** _[22:50]_
+
+Thank you again for your great talk. I said earlier that you have a long way to come to here. Perhaps the conference attendees can just write where they are from. Just use the hashtag PyCon.de or hashtag PyDataBerlin on social media. However, let us just first talk about some questions the listeners write down on Slido. So, first question, how stable is ST-Lite ready to production?
+
+**Speaker 1** _[23:23]_
+
+Oh, good question. Well, I... How should I say? What should I say? The version number is not still 1.0, but I think you can try out this software for your product, near production ready. So you can try it out. I think the coverage of the available Streamlit features or some third-party custom components near 100%, with just a small amount of exception derived from the difference, as I said, between the Pyodide and normal Python environment or something like that.
+
+**Speaker 2** _[24:06]_
+
+How do you compare plotly dash versus streamlit?
+
+**Speaker 1** _[24:12]_
+
+Yeah, that's exactly a big topic. I actually talked about this topic with some developers from Plotly yesterday in the conference. The big difference is execution flow. Streamlit has a unique execution flow, as I presented in the previous slide, from top to bottom, single, in-directional execution flow, and the Streamlit script will be executed every time when the user interacts with the front-end. I think it's a good thing for a small project, a prototyping, and that is a great thing. I really love it, but in some cases, for example, creating some complex and high-frequency updated applications, that such a streamlined architecture could be a downside. In such a huge or complicated or performance-sensitive application, Plotly might be the better choice. It depends on the target domain or target software type.
+
+**Speaker 2** _[25:23]_
+
+What was the decision behind introducing a fork versus moving Streamlit itself to WASM? What is the future of Streamlit in light of ST-Lite?
+
+**Speaker 1** _[25:36]_
+
+Ah, good question, but it was just a technical limitation. There was no other choice, I just forked it to... Because some modification onto the upstream, Streamly source code and upstream was needed. But I am, you know, the developer of STLite, who is me, is continuously contacting with the upstream developer and the core Streamly team to catch up their upstream changes into you know, ST Lite package. So, yeah, I have a positive hope to, you know, to make ST Lite be compatible in the near future.
+
+**Speaker 2** _[26:18]_
+
+Can you still perform requests against remote services like a model or similar?
+
+**Speaker 1** _[26:25]_
+
+That's the story
+
+**Speaker 2** _[26:26]_
+
+Can you still perform requests against remote services like a model or similar?
+
+**Speaker 1** _[26:32]_
+
+Yes, yes, that's exactly what I wanted to talk about in this slide. There were some limitations based on the Pyodide environment, browser environment, but there was, yes, for example, in Pyodide, URL leave or some request does not work. This is not a limitation due to EsteeLite, but this is due to the browser environment of Pyodide, but still there are some available methods to access remote resources that is Pyodide HTTP PyFetch or some libraries wrapping it, so it's possible, it's possible, but there will be some differences.
+
+**Speaker 2** _[27:17]_
+
+May ST-Lite be an easy fronted solution to a database for special use cases of business users?
+
+**Speaker 1** _[27:26]_
+
+I think so, yes. It depends on the situation, but especially, I've heard some business users are using ST-Lite for their internal uses, especially for data privacy or offline use cases, offline requirements, so in that specific case, ST-Lite could be the best choice. That will communicate with some data source in a private environment. But of course, we should be open for any other options that will be best for your situation.
+
+**Speaker 2** _[28:07]_
+
+Could you utilize more advanced features of OpenCV such as face detection or facial gesture recognition?
+
+**Speaker 1** _[28:16]_
+
+Yes, I think so, well, actually in this demo included face detection, although it was based on scikit-image, not OpenCV, but yeah, thanks to the huge contribution by the Pyodide team, OpenCV was ported to Pyodide environment and I think it contains such an advanced feature like face detection or something like that, so I think it works, it will work.
+
+**Speaker 2** _[28:44]_
+
+Okay, the time is up, but because we have a break next, I think we can do the last question I have here. When packaging ST code in an HTML app, how feasible is it to import not native packages and external data?
+
+**Speaker 1** _[29:07]_
+
+Ah, I see. Maybe this question is based on the limitations of Pyodide, probably. Such limitations are the same as the limitations of Pyodide, so there's a difference. Native packages already compiled for Pyodide environments like OpenCV, XGBoost, or something Something that can be imported is the light application, but others are not, unfortunately.
+
+**Speaker 2** _[29:38]_
+
+Okay, thank you for your answers. I think he had a great talk, even if it was a little short out in the end.
+
+**Speaker 1** _[29:47]_
+
+the end
+
+**Speaker 2** _[29:50]_
+
+To all of you, have a great break.
+
+---
+transcript_status: auto
+---
+transcript_language: en

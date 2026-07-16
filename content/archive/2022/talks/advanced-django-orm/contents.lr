@@ -1,0 +1,289 @@
+title: Advanced Django ORM
+---
+description: The Django ORM is one of the most powerful ORM in the Python space. We will look at implementing complex queries and constraints as well as performance…
+---
+created: 2022-01-16
+---
+code: W8KUG3
+---
+slug: advanced-django-orm
+---
+speaker_names: Bas Steins
+---
+speakers:
+
+
+
+### Bas Steins
+
+Sebastian "Bas" Steins is a software developer, consultant and trainer. He holds a bachelor's degree in Scientific Computing and helps diverse teams to leverage technology to deliver complex products that scale. His main focus is on scientific and scalable applications. At the moment he develops Python code for lab devices and trains colleagues from scientific disciplines to turn their knowledge into Python code.
+---
+abstract:
+
+
+The Django ORM is one of the most powerful ORM in the Python space. We will look at implementing complex queries and constraints as well as performance optimisations for queries and models in Django ORM.
+---
+full_description:
+
+
+This talk highlights the Django ORM. This is one of the most powerful ORMs in the Python universe.
+We cover complex queries, optimising joins, building models with rich constraints and more. We also look at the index behaviour of the database and use Q and F objects.
+
+Possible structure:
+- Complex Queries
+   - Joins
+   - Q and F Objects
+   - Aggregations
+- Performance Optimisations
+   - select_related and prefetch_related
+   - Indexing
+- Constraints in Django ORM
+
+By the end of the course, participants should be able to model and query complex data problems with Django ORM.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: Django
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 1702
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: expert
+---
+domain_expertise: expert
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/W8KUG3.png
+---
+youtube_id: F1vaEBDxAig
+---
+video_link: https://www.youtube.com/watch?v=F1vaEBDxAig
+---
+video_published_at: 2022-05-06
+---
+video_duration_iso: PT34M39S
+---
+video_thumbnail: https://i.ytimg.com/vi/F1vaEBDxAig/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+So, absolutely great to be like in a real world event after two years of pandemic craziness. Yeah, I want to talk about advanced topics of the Django Object Relational Manager. But let me first introduce myself. My name is Sebastian Steins. I live close to the German-Dutch border, so my German friends call me Zeb and my Dutch friends call me Buzz and what you call me is completely up to you. I'm a software developer, consultant and trainer. Currently I work for Miltoni Biotech. They produce lab devices in the medical field. I'm doing programming since the age of 14, Python since 2007, and Django since 2008. Which makes actually Django boring technology. Its first release was in 2005, and there was a time when Web 2.0 was a thing, and I was told we are now at Web 3.0, but don't quote me on that, I'm not an expert. So what can we expect from this talk? At first we will have a quick look at the basics of Django ORM. Then we are going to talk about the power of your database engine, including indexes and partitions, constraints, transactions, aggregate functions, and window functions. We will then uncover the secret of Hacker News. And I prepared a short quiz of commonly used anti-patterns when using Django ORM. And we have a short outlook and Q&A session at the end. So here's a quote by Andrew Godwin. The ORM is the majority of Django, which is quite true. It is maybe the most complicated, but also the most sophisticated part of the whole framework. Which for me makes it quite hard to cover the advanced topics in 30 minutes. But let's try. So let me just give you a quick overview of where we come from. In simple terms, when we are defining a model in Django, it looks like this. This should be no surprise to anyone. We defined a couple of models here for user, a tag, and a story, and the built-ins of Django already come with, like, decent helper functions or field types for daytime and for constraint checkings on URLs, emails, and stuff like that. And most importantly, also a very sophisticated management of relations in terms of foreign keys and many-to-many relations. Also, we can query these models quite easily. We can just suffix the field name with modifiers like greater than or equal, less than or equal. We can combine filters and excludes. And we can also apply string functions here. So, key points here is that bear in mind Django of course or the ORM of course is an abstraction layer so you can actually write database applications with pure Python and it's tightly integrated into the whole Django ecosystem and this makes it easy to overlook the actual features of your database engine which is quite powerful. So at the rule of thumb, bear in mind that your database engine is powerful. Don't try to replicate its functionality in Python code. And instead, treat your database engine as your friend rather than something which is abstracted away. Because ORM and database and SQL make a very good team. So, one step further is intermediate jungle ORM. We would just need to introduce two more objects. The first one are Q objects. These work these are query objects. They work basically the same like the native arguments to the filter function, but they support Boolean operations like and, not, and, or, and these query objects can also be nested. Again, this should also nothing new to most of you. The second one, called F objects, these are used to reference the field itself. They are pointer to the field, if you will, and you can put calculation logic, for example, outsource calculations to the database like in this short example. So now that we have covered that, we can move on to the real interesting stuff. So first let's talk about indexes and be aware indexing a database is actually a rabbit hole. That's why I won't cover it too much in detail here. But we had a very good talk by Katharina, I guess it was on Monday morning, about relational databases including their indexes. I just show you a basic example on how to define an index in Django ORM. In this case, we create an index with the headline field, including the publication date field, and this way we can, for example, get a list of headlines by date and use a covering index for that. Another topic, constraints. So, most people think that Django's validators are actually enough. We have something like URL field or e-mail field and others. But these just provide input checking. So, in the forms module or in the admin module. Whereas, constraints are more low-level integrity checks. And these are guaranteed even if you access the database from outside of Django ORM with something completely different, like a shell script or a PHP script or whatever. And they also can be defined in the model's metaclass. examples. One example is a unique index. A unique constraint. In this case, we have a model for a survey where we ask users to rate particular products. And we want to make sure that one user has only one rating for one product. And we can use the unique together keyword in the meta class here. And this expects a list of field names which should be unique linked together. There are a little more complicated unique index types. For example, in this case where you have a web application in which your users can add as many e-mail addresses to their profile as they want. But for apparent reasons, only one of these e-mail addresses should be marked as primary. So what we can use here is a unique constraint, which is only conditionally applied for the email marked as primary. Then there are check constraints, and they illustrate the point about the difference between input validation and database constraints very well. The code you see here is not redundant. So we have a validator which is used again by Django for its forms module and for its admin module and we have additionally database constraints and these database constraints are eventually ensured by the database and not by Django. So again, this code you see here is not redundant. is for input checking and the other one is for keeping, yeah, basically the mess out of your database. So, let's talk about transactions. If you have a look at this code, particularly at the IBAN numbers, and you see a license transaction from Ireland to the Netherlands, ones. This is a transaction which might occur frequently at big tech companies. And I have no idea why. But apparently it has something to do with sandwiches. Anyway. Back to the code. We deduct an amount from one particular account and credit this amount to the other account but what if in between something weird happens you have a power outage your database server is going down or I don't know what you might don't want to end up in this situation so luckily your database has you covered by providing transaction for this and it is very easy to use them as Django provides a context manager for these kind of transactions so if you put this this whole thing into into this context manager you're guaranteed that either none of these updates or both of them are applied to your database that's a guarantee your database gives you. So if you are doing a banking application like that, make sure you use PyTest additionally, which has been covered in great tutorials already on this conference. Make sure you get these recordings. So let's talk about aggregation functions. And just a quick recap of what what this might look like in SQL. So let's say we have a simple table like this consisting of user name, number of orders and total turnover. What a normal select now does is it gives you the records in this table on a row level, so it works kind of horizontally. Aggregate functions, for example, if we are interested in the average total turnover, the other hand work kind in a vertical way so the average function for example takes all the values in the total turnover column and walks all the way down so this is a difference here so when we apply a where to our initial or to a query including an aggregate function this where condition applies like a pre-filter. So all these lines in red where the number of order is greater than one in that case are not taken into account for the average function in that case. What we get instead is a result table and let's say we want to further filter this result table then we have having as a keyword in SQL which acts of of a filter for the result of the aggregate function and in SQL it would look like this. So we have our select, we have our aggregate function, we have our pre-filter in the where condition and we have our post-filter in the having condition. In Django this would look like this and there are a few things to notice about. First of all, there is no distinction between the where clause and the having clause because both of them are here expressed as filters. The second thing we notice is that we don't specify our group by. And this is because it is done implicitly by Django when we call the value method with the value we are interested in. This automatically gets applied to the group by clause. So let's talk about window function. Who of you have heard of window functions? I'd say that's half of you. function are kind of the for loops of modern SQL. And pipeline developers and data analysts use it quite frequently. Web developers, not so much. Although it is quite a handy tool. Here's an example. Let's say you have built a messaging app. And you're interested in displaying one message but let's say you want to display a link to the previous message so what you really want is one query to the database including all information you need and not a list of messages or something like that and what we do here is we use a window function use the lag expression so that the result set is basically shifted by one partitioned by the user ID so that you get really the previous message from the same user and not from another from another person's inbox and we order that obviously by the created date and now we are able to use our messages variable like this we can ask for the first message and on that result say which would just be a record in Django ORM we can ask for the previous message ID So, let's come to a concrete example. Let's uncover the secret of Hacker News. Who of you is aware of this website? Oh, that's almost all of you. But who is aware of this website? No, unfortunately, not so much. This is basically a Hacker News clone I've built in Django. And I want to talk about the ranking algorithm behind that. So what makes a story pop up the first and what makes, what is taken into account for the ranking. So obviously the ranking of a story is a function of the number of upvotes and the freshness of the story. And actually, we end up dividing the number of upvotes by the age of the story in hours to the power of some gravity factor, which defaults to 1.8, but that's just for one of the published versions of Hacker News. So how could we do that in Django ORM? Actually, pretty easy. It's just this. but obviously there is something lacking so we use an annotation we have that formula I showed you on the slide before that's this one annotated to our query set and we can now descendently order by that formula so that we can replicate this ranking so how do we get there so first of all we need a variable containing an expression wrapper for our formula itself and this is quite easy. We just take the pointer to the upvotes field or points field divided by the time float in hours to the power of our gravity factor. And we add this .001 to it just to avoid zero division errors. So, we get to the submission age in hours by actually extracting the time converted to float from seconds to hours by doubly, by dividing it by 60 twice. And we get the submission age in seconds by just using this, yeah, this expression which which automatically will result in a float field. The reason why we, in this case, use time zone dot now instead of the now function on the database is because we want to be able to go back in time and show the front page of Pythonic news at a different date, for example. So when we put all this together, we finally get somewhere. So what we do is we build our expressions in Django OIM. First of all, we have the now value. We convert the date time field to float. We convert this float thing to hours. And we express our formula as an expression wrapper. all of these gets annotated to our story query and can then be sorted by that. So obviously for reasons of brevity, I skipped some parameters to it, but you can find the full source code online. As I promised, I brought a small quiz with simple and innocent-looking pieces of code. But they might bear problems in some cases. And by paying attention to these details, you actually can become the master of ORM pull request rejections. overdo it because you might be perceived by your co-workers as this annoying know-it-all. So let's start. What's wrong with that code?
+
+**Speaker 2** _[20:28]_
+
+you receive a whole list of users in if you check the query set is you receiving if all users from you are database that's
+
+**Speaker 1** _[20:44]_
+
+It's perfectly right, actually this one gives you additionally to the problem you mentioned, it gives you also two queries because the square brackets cause Django to perform another query including a limit condition, so the better variant would be to use the first method. And Django wouldn't be Django if it would have not, besides the first method, also last, and earliest. So what about that one? A bit trickier.
+
+**Speaker 2** _[21:23]_
+
+we can we can use exist instead of count
+
+**Speaker 1** _[21:30]_
+
+Absolutely, because count would go through, would scan the whole database while exists only check for existence.
+
+**Speaker 2** _[21:41]_
+
+also you don't need to check if is null you can set not if not user
+
+**Speaker 1** _[21:50]_
+
+Yeah, you're right.
+
+**Speaker 2** _[21:52]_
+
+But this is not Orem Django. Yeah. Exist is better.
+
+**Speaker 1** _[21:57]_
+
+You're right, so the yeah, you could skip the equals equals zero here obviously So what's the matter here?
+
+**Speaker 2** _[22:15]_
+
+you will you receive their additional objects from database you have their problem and plus ends
+
+**Speaker 1** _[22:23]_
+
+Exactly, so that's the n plus 1 problem, and we can get rid of them by prefetching actually the related table.
+
+**Speaker 2** _[22:40]_
+
+But probably you can choose from author only name. You don't need a table from, you don't need to have whole table from author. You can take only name. It can help you to make your query set in short.
+
+**Speaker 1** _[23:03]_
+
+You can make it even more specific to the fields you just needed, but I wanted to specifically point out the n plus one problem here. But yeah, you are right. You can even do better than that. So then if we have that, this one is trivial.
+
+**Speaker 2** _[23:32]_
+
+Right now you receive 1 plus how many articles requests, how many comments requests in that database, queries in that database. But if you want after that tell us about prefetch related, probably you are wrong, but I don't know.
+
+**Speaker 1** _[24:00]_
+
+I will, but tell me why I'm wrong.
+
+**Speaker 2** _[24:00]_
+
+.
+
+**Speaker 1** _[24:07]_
+
+So what's your take on prefetch-related? After this, please. Okay. So what's here? We have an upload model and we get an HTTP response and we put the file name in it and like the content type, and we actually use the defer method.
+
+**Speaker 2** _[24:50]_
+
+Should I answer?
+
+**Speaker 1** _[24:52]_
+
+You
+
+**Speaker 2** _[24:52]_
+
+I'm not sure...
+
+**Speaker 1** _[24:54]_
+
+i'm not sure because you're right this was a trick question
+
+**Speaker 2** _[24:57]_
+
+Yes, you should use only and not differ, you exclude the large blob.
+
+**Speaker 1** _[25:07]_
+
+blob
+
+**Speaker 2** _[25:08]_
+
+And after that, you want to take a large blob.
+
+**Speaker 1** _[25:12]_
+
+Exactly. It's stupid. Yeah. Sorry. Again, this was a trick question. But you shall not store blobs in your database at all. But if you defer something, don't access it. Because deferring means it won't get queried from the database, but you'll still be able to access it. But if you do, you get another query. So one way to circumvent that is by using values of values list. So that gives you a pure Python list and you will not be able to shoot another query if you for whatever reasons incidentally access that field again. So what about that one?
+
+**Speaker 2** _[26:02]_
+
+I think we already
+
+**Speaker 3** _[26:02]_
+
+I think we already have a winner, so I counted the points.
+
+**Speaker 1** _[26:05]_
+
+But there is another hand. Okay.
+
+**Speaker 3** _[26:07]_
+
+Okay, so yeah, you can get some points, but we're also gonna have some Q&A at the end, so we're gonna, somehow, quickly gonna do questions on.
+
+**Speaker 1** _[26:19]_
+
+You could do article.author underscore ID so that you get it from the article table and not have to go all the way to the author's table. Exactly. That one would give you, again, like a lookup in a foreign table, and since you have integrity checks in your database, you can just use author underscore ID. If you have integrity checks, most of the time. But, okay, let's discuss this on the lunch break. what the problem here if for whatever reasons you need to you need to two four loops what can happen
+
+**Speaker 2** _[27:17]_
+
+In this moment, you receive a report from user.
+
+**Speaker 1** _[27:25]_
+
+I'm sorry you
+
+**Speaker 2** _[27:26]_
+
+You receive a wrapper from user, not string, wrapper from user. Print calls Thunder wrapper from user.
+
+**Speaker 1** _[27:37]_
+
+Yeah, that's perfectly fine. You get the representation here in that case. But I wanted to show you that this one gives you actually two SQL commands again, and you can use a cached result if you introduce a variable first. But if you have two for loops over the same thing, you might have a completely different problem in your code at all. So, what about this one? Looks familiar, right? We import a JSON file, and for each user in that JSON file, we store this user to the database. Yeah, I guess you could use bulk create.
+
+**Speaker 3** _[28:37]_
+
+both create to avoid
+
+**Speaker 1** _[28:38]_
+
+to avoid making multiple
+
+**Speaker 2** _[28:39]_
+
+making multiple
+
+**Speaker 1** _[28:39]_
+
+queries exactly exactly it's by create and of course there's also a bulk update method which works in the same way so what's wrong here so let's say you have a template and this template expects for whatever reason a dictionary with the user IDs as keys and the user object as values and you are building this this dictionary in your in your view and you try to give that to the template so what's what could could we do better here
+
+**Speaker 2** _[29:29]_
+
+probably you should use a generator why you have you have the first loop you create the dictionary and after that this dictionary makes the second loop in template yeah
+
+**Speaker 1** _[29:49]_
+
+Yeah, you could use a generator like a dictionary expression, which would certainly reduce the line count here, but you could go even without a dictionary comprehension. There is a built-in method called inBulk, which exactly does this. It creates your dictionary with the primary key as key and the object itself as a value. and in bulk takes an argument so you can optionally specify which IDs or which primary keys you're going to fetch so but we have a winner obviously so maybe the biggest slide is the one I didn't talk about so what we missed here is we We didn't talk about case when statements. We didn't talk about the recent approaches of the Django team to make Django asynchronously. We didn't talk about custom sequels, stored procedures, custom managers, and migrations. We didn't even talk about the operational impendence mismatch. That's maybe something for the lunch break. Here are other great talks I used as a reference, but I have also linked them. And that's all for it. If you have any questions, I'm happy to answer them, but I'm here around as well. The slides, I've set them online. You can use that link or you can open that link from your command line if you have installed PIVX.
+
+**Speaker 3** _[31:40]_
+
+Okay, so thanks, speaker, again. We extended the time a bit, but I think we could still do some Q&A. So we also got some questions in our app. But if you have some questions here in this room, you also can ask, and I'll just come to you with the mic. And, yeah, but there are at least two or three questions. And the first is, at what point should I just use RAR SQL instead of ORM?
+
+**Speaker 1** _[32:14]_
+
+That's a good question. Because when I showed you the Hacker News example, there was already not database independent. So the code I showed you worked only for Postgres and you would have made some adaptions to SQLite anyway. So when you hit that point, maybe it's a good point to switch to raw SQL since you are losing the vendor independence anyway.
+
+**Speaker 3** _[32:42]_
+
+Maxim asks, constraints with conditions. How can I automate adding to model validation the constraints validation?
+
+**Speaker 1** _[32:54]_
+
+Since the constraints are checked by the database and not by Python you would have to basically replicate the check constraint or the validator for yourself. That's basically the one I had here. So, this code looks redundant, and in a way it is, because you have to replicate the functionality somehow to check your inputs, so there's no at least I don't I'm not aware of any way to automatically extract the constraints from the database and create validators for it, There might be a package for it, but it's not that I'm aware of it
+
+**Speaker 3** _[33:53]_
+
+And the last question, presentation section transactions, why not bulk update?
+
+**Speaker 1** _[34:10]_
+
+This one. Here why not bulk update? Yeah, good point. Because we had talked about bulk update at another point, I just wanted to show you the context manager.
+
+**Speaker 3** _[34:31]_
+
+Okay, thanks to the speaker again, Bas Steins.
+
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -1,0 +1,165 @@
+title: Boosting simulation performance with Python
+---
+description: In this talk I will present the architecture of our simulation (written in Python) which allows us to simulate hours of real-life in only minutes of…
+---
+created: 2019-06-09
+---
+code: CEYMMK
+---
+slug: boosting-simulation-performance-with-python
+---
+speaker_names: Eran Friedman
+---
+speakers:
+
+
+
+### Eran Friedman
+
+_About — in the speaker's own words_
+
+I've finished my M.Sc in Computer Science in the field of Computational Geometry. My first experience with simulations was already back then - part of my thesis involved building a GNSS-Signals simulator. Deploying some novel optimizations, we improved performance dramatically.
+Since then, I've worked as a software engineer in different roles with vast experience in Python. My last one, arrived at early stage to a fast-growing startup named CommonSense Robtics and involved in the system architecture and development, which a simulation is a crucial part of it.
+---
+abstract:
+
+
+In this talk I will present the architecture of our simulation (written in Python) which allows us to simulate hours of real-life in only minutes of simulation. I will describe challenges we encountered and how we handled them.
+---
+full_description:
+
+
+Our product uses a fleet of real (not virtual) robots to perform different tasks in a fulfillment warehouse. Simulation is an essential tool in this kind of product: it allows to perform regression tests and test new features without the need for real and expensive hardware, to compare the impact of different implementations and optimizations, to inject failures, and more.
+
+Tasks performed by physical robots take time (movement over the warehouse, box lifting, etc.), but in simulation, where virtual robots are used, there is no need to wait all that time. I will describe our implementation of the Discrete-Event Simulation approach which allows us to simulate hours of real-life in minutes.
+
+Shortening simulation time improves the development process by providing faster feedback to developers and quicker CI and testing cycles. Another powerful advantage is a more deterministic simulation - using this approach, each component in the system gets equal opportunity (CPU time) in each time tick, which is not affected by the underlying machine or operating system that the simulation is running on. Also, it is possible to simulate any date and hour easily, and by that we wouldn't panic before the "Y2K bug".
+
+I will elaborate on some challenges we encountered: time leak of event-driven components, differences between dev and production environments and running a distributed simulation due to the transition to microservices.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: PyConDE
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 95
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: basic
+---
+domain_expertise: none
+---
+supporting_material_url:
+---
+slides_link: https://github.com/eranfrie/pycon_israel_2019
+---
+social_card_image: /static/media/social/talks/CEYMMK.png
+---
+youtube_id: -0TVMCTnCg4
+---
+video_link: https://www.youtube.com/watch?v=-0TVMCTnCg4
+---
+video_published_at: 2019-12-16
+---
+video_duration_iso: PT24M39S
+---
+video_thumbnail: https://i.ytimg.com/vi/-0TVMCTnCg4/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:02]_
+
+Hi everyone, thank you for coming. So I'm Eran Fridman, I work at Fabric, formerly Gomses Robotics. It is a startup located in Israel. Today I'll talk about our simulation and the benefit of the simulation, especially the time the simulation can run faster than the real time, so we can simulate hours of robot's work in seconds or minutes. So this is the agenda. I'll start with a a short introduction and talk about simulation in general. Then I'll talk about the architecture of our simulation and the benefits of it. I'll talk about the Python library we used to implement this simulation. Then I'll talk about some challenges we encountered and the way we deal with them. And finally I'll talk about distributed or multi-process simulation due to the transition to microservices. So let's start with a short background. So in Fabric we build micro-fulfillment warehouses where online orders are picked and delivered to customers. Most of the work is done by robots. Here in the video you can see two types of robots. The first type is called ground robots. These are the robots that move on the floor. The second type is called lift robots. These are the robots that move on the shaving units. The lift robots take toads from the shaving unit, put them on the ground robots. The ground robots bring the toad into the picking stations, where items are picked and later delivered. Usually the term simulation means a tool that imitates the operation of another system. In our case it's not fully correct. only simulate the hardware, the robots, so we run the rest of the system just as it runs in production, but instead of communicating with real robots, it communicates with virtual or simulated robots. So far I talked about what we do and what we simulate. Now this simulation tool has several usages and benefits. The first one is that it is used as a testing tool for developers, so when developer write new code as long as the code doesn't run on the robot itself this is the way to test the code it also runs as a regulation test as part of our continuous integration center we use the simulation to compare between different algorithms and optimizations in a complex system it's difficult to know how a new code will affect the entire system and the KPIs. So this is the place to test it and to get the feedback before moving it to production. Hardware and robots is expensive and not scalable and this simulation tool decouples the software and the hardware so we can run as many simulations as we need on the cloud. We use the tool to evaluate new warehouses before investing money in construction work. we can run the simulation and get a feedback of whether we can reach a desired kpi or for example how many robots are needed to reach a kpi in simulation it's a very easy to inject failures in the robots and by that to improve the robustness of the entire system we have an integration center in our offices but it's not as big as our product production warehouses. Here you can see a 3D map of our first warehouse which has more than 60 ground robots and 12 lift robots. So this is the only place we can run the system on big setups before we run it in production. So these were the usages and benefits we get from the simulation tool. And now I will talk about how we run the simulation. So the approach we are taking is called discrete event simulation. In this approach continuous operations are modelled by instant event. For example, if we want to simulate an elevator, then the events can be like elevator arrived, button pressed, door is open and so on. So the simulation runs an event, calculates the new state of the component we are simulating, and then it moves to the next event. It also maintains it's on its own clock and doesn't use the real world clock and that's how it can run faster than the real time in our in the in our simulation in the case of the robots we simulate the robot operations which are moving on the warehouse turning passing towards between lift robot to ground robot and so on we do we do it by treating the time as the event so we divide the time into time ticks, and in each time tick we calculate the new state of the robots. Let's see an example. So if we take the move operation, let's say that the robot can move in 2 meters per second, and we choose to have 10 time ticks per second. For the beginning, the robot is located at 0.0. Then the simulation will move to the next event, which is in time 0.1, and calculate the new location of the robot, which is 20 centimeters, because 2 meters per second and 10 time ticks in a second means 20 centimeters in each time tick. Then again, it will move to the next event, which is in time 0.2, calculate the new location, which is 40 centimeters. Notice that there is no intermediate location for the robot. It is never located between 20 to 40. It moves directly from 20 to 40 centimeters. In reality, the robot anyway sends a few telemetries in a second. so from the system point of view it looks the same, it's discrete anyway. To implement this approach we use the SymPy library, it is open source written in Python, it has a lot of code samples and they're well documented and also very easy to use, we'll see it very soon. So to understand SymPy you need to be familiar with the three objects environment, process and events. Now the environment is the main object that maintains the world simulation, maintains the simulation clock, and there is an event queue. The process represents the component we are simulating. So in this example we have two processes, one for robot zero and one is robot one. At the beginning the processes add the initial event in the event queue. So we have the first event for robot zero and the second event for robot one. So when we start the simulation, the environment takes the first event in the queue and it runs it so it calculates the new state of the robot before it ends it adds the next event of that process in the queue so now we have another event of robot 0 of time 0.1 and then it will take again the next event in the queue which belongs to robot 1 at time 0, run it, calculate the new state add the next event and take the next event now the next event belongs to time 0.1 so it updates the simulation clock to 0.01. So this is the basic idea of SimPy. We'll see an example after this slide. So we'll see in the example that the SimPy process is implemented by Python generator and an important thing to be aware of is the world simulation runs in a single thread. and I will mention it again later. The approach I discussed so far is called as fast as possible, it means that the simulation tries to run the fastest it can, it immediately moves from one event to the next event, but we can run SymPy in real-time mode, which tries to follow the real-time, it means that it will run an event and before moving to the next event it will wait until the time of the next event is arrived. The reason we may want to do this is if we are doing some manual tests in our simulation, or if we combine real hardware in our simulation. Also the environment can receive the initial time as a parameter, which is the starting time of the simulation. Okay, now let's see some Python. So in the example I'm going to show you, we are going to conduct a race of robots. So for the example, let's say that in every second, each robot can move somewhere between 2 to 4 meters okay this is not the example so let's go over the code and understand it and then we also run it so we define a three robots in our race and the race is going to take for 30 seconds and and they choose to have two time ticks in each second so we'll have a time tick after every half a second Here we implement the simulated robot. So we support only the move operation of the robot, and as you can see it is a Python generator. Each iteration of the while loop is an event, it is a time tick. So in each iteration it calculates the new location of the robot. I use the randint function to generate the new location. I provide it 1 until 2 meters, because we said a robot can move 2 to 4 meters, and we have two time ticks in seconds, so it is one to two meters in every time tick. Then the robot prints the simulation time, the robot id, and the new location. So at the beginning we initialize the environment object, we register the simpy processes to that environment, the robots in our case, and then we start the simulation for 30 seconds. So let's run and see, don't worry it won't take 30 seconds so okay so i'm going to run it with the time command which shows us the the time it takes the program to run so let's see the output okay so as you see we ran a 30 seconds of race in less than one second and that's what i meant by that we can run faster than real time. Now if you remember I said that together with the simulated robot we run the entire system just as it runs in production. So the simulated robot is the only place where the code is aware of SymPy and whether it is a production or simulation. In this example we couldn't see it because we only ran robots but we'll see it better in the next example also the parameters that affect the duration of the simulation are obviously the number of simulated components the more components then there is more calculations to do in each time tick and the slower simulation and the same for a time tick granularity the bigger granularity then more time ticks in a second and more in the slower simulation so the benefits we get from this approach. The most obvious one is that it makes the development process more efficient. Developers, when they write a new code, they test it using this tool and they wait less time, and also the CI is shorter. But as you can imagine from the previous slide, it is not always the case. If we run the simulation on big setups, then it could be that the simulation will be even slower than the real time, but it's still a benefit, because that way the simulation will still be more realistic, and the time will not run too fast, because in each time tick every robot gets the CPU time, a chance to calculate the new location that it will do in the real world. From the same reason, it also doesn't matter if we run it on our private laptop or on a strong machine in the cloud the duration of the simulation may be affected but the result will be deterministic and realistic also it is agnostic to profiling and debugging so this is a powerful advantage we also calculate the ratio between the time we are simulate the real time we are simulating to the time it takes the simulation um and if this ratio changes then it may mean it doesn't necessarily but it may mean that we added some inefficient stuff in the code like a slower slow database query or anything like that and also since the simulation uses its own clock then it is very easy to set the starting time of this simulation and then by that to simulate the system like it is running on the weekend or any special date or time okay but the simulation is more complex than what i described so far and As I said, we run our entire system together with the simulated robots, and the entire system is more event-driven oriented. So it has some threads, components, that listen to a queue, gets an event, either a telemetry from a robot or an input from the users, and act accordingly. The problem is that if we run the simulated robots together with the event-driven thread, it may be that the simulated robot will run the time too fast, and the event-driven thread will not have enough time to do what they need to do, and the result of the simulation will not be very realistic so SymPy has a support for event-driven processes but as I said, SymPy runs in a single thread and we want our simulation to run just like it runs in the real world in production and we also had a bad experience with a similar solution, we used the gvent1 keypatch, which makes the thread cooperative and runs the system as a single thread it improved the performance a lot but then we found out that we have some bugs that we couldn't see in the single threaded simulation so we so this solution is not so good for us and we choose to solve it in our way so in simulation we run another cmpi process which in every time tick it it holds the simulation time and lets the the event-driven thread do is work. We do it by calling the join function on the queue of the event-driven thread. The join function blocks until the queue gets empty. That's how we stop the time to run too fast. Let's see an example. So here I'm going to show you an example that we are going to have two objects. One is a simulated robot, which in every time tip sends a message to event-driven thread, and the event-driven thread will print it to the screen. Let's go over the code. So for simplicity we'll have a time peak, one time peak in every one second. At first I'll show you the problem, so ignore the event-driven queue, we'll see it later. So here I implement the event-driven thread, and it is very simple. What it does is listening to the queue, getting a message, print it to the screen, marking the task as done, and keep doing it all the time. Here you can clearly see that this thread is not aware of samePy, it doesn't know whether it is a simulation or production, it's the same for both. Now here we implement a simulated robot, which is pretty similar to the previous example. What it does in every time tick inside the while loop, it puts a message in the event-driven thread queue, increments the counter, and test the environment that you will run again after one time tick so here again we initialize the environment to see the problem so i use the native python queue and start the event driven thread register the simple process like before and run the simulation so we are going to run a 50 second simulation and we said we are expecting to see one line per second so we should see about 50 lines so let's run it okay let's see okay so surprisingly we don't see any output and this is exactly the problem i talked about the robot ran the time too fast and the event event thread didn't have the time to to do its work so the result is not so realistic let's now fix the problem so for to fix it as you can see we know it from the python queue and if it is a simulation then we register another SymPy process that performs this function, the SymJoin. And in every time tick, what it does is calling the join on the queue, which as we said, waits until the queue gets empty, and then tells the environment to run again in the next example. So I need to work with this queue this time. Okay, save it. Now let's run the example with our own queue. And as we can see we got 49 logs, 49 lines, almost like we expected. The last one we didn't have time to do it. Two more points to complete the story. So since we run the same code in production and in simulation, then we can use the default time functions of Python. So we wrapped all these functions in our own module, and the entire system calls this module. So this module is also aware whether it is a production or simulation, but the entire system is not. Also in simulation we care more about the simulation time, so we print it to the log for investigation and debugging. Now eventually we also move to micro services like everyone else but as I said SymPy doesn't support multi-threaded simulation so for sure it doesn't support multi-process simulation. So the solution we came up with is this one. In simulation we run another service called the barrier server. The responsibility of the barrier server is this to synchronize the time of the other services and to prevent one service to run faster than the other services. The rest of the services look more or less the same, just like the multi-threaded simulation that I described so far. Each one of them has its own SimPy, its local SimPy, and it works like this. Other services pick a shared time tick, and they add another SimPy process that runs when that shared time tick arrives. So at the beginning they start their simpy they do whatever they need to do when the time of the shared time tick arrives each service sends a ready message to the barrier server the barrier server holds this message until it receives a ready message from all the other services and then it sends approval to all the services that that's how we make sure to synchronize the time of the of the services and notice that once the service sends a ready message until it gets an approval the time for this service holds, it just waits until all the other services will reach this time tick too. So that's it. This is the summary of what I talked about. That's it. Thank you.
+
+**Speaker 2** _[19:44]_
+
+All right. Thanks, Aaron, for this very interesting talk. Are there any questions?
+
+**Speaker 3** _[19:52]_
+
+Thanks for the talk. So using a discrete event simulation framework, you seem to have converted that in a sense by feeding it a stream of consistently timed events, saying to run every 1 or 0.5 or so seconds, where conventionally what discrete event means is that the agents in the system sort of dictate when events happen. And if the search here is for performance, is that a knob that you explored to get more?
+
+**Speaker 1** _[20:28]_
+
+I understand the first part, but can you repeat the question instead, the second part?
+
+**Speaker 3** _[20:32]_
+
+So the question is really, did you try to eliminate the sort of clock and just allow the system agents to generate the events themselves in what is often a very powerful tactic for speeding up these kinds of simulations?
+
+**Speaker 1** _[20:53]_
+
+Okay, this kind of approach, we also thought about it, I think, but I think in this case it will be difficult to synchronize the operation of the entire system together with the events of the simulated robots. So I'm not sure the result will be very liked in the reality, if I understand you.
+
+**Speaker 4** _[21:24]_
+
+I was just wondering about the the way you split it into a distributed service what dimension do you split it on is it each individual robot which is then because that would give you a reason to need to sync and sync sync everything up again or yeah just clarifying
+
+**Speaker 1** _[21:47]_
+
+So we did the speed because we moved to microservices and not because of the robots, the entire system now runs in different services. So we wanted it to be in simulation too, but we also run the robots on different processes now, which we also get the profit of running on more cores. Because in Python, you know, it can't run on multiple cores.
+
+**Speaker 4** _[22:10]_
+
+Yeah, sure. I'm just wondering, is it different simulations of the entire system that you are splitting into individual tasks, or is it each part of the simulation which you then need to sync up again?
+
+**Speaker 1** _[22:24]_
+
+If I understand the question, then now we move to distributed simulation, not a different simulation. This was the question.
+
+**Speaker 4** _[22:34]_
+
+It's more what is your, why do you need to distribute it? What are you distributing?
+
+**Speaker 1** _[22:40]_
+
+Okay, so the entire system was distributed. The backend, not the robot, the part that manages the system, it was anyway distributed to microservices, so we wanted to distribute the simulation itself to run also in distributed metrics.
+
+**Speaker 2** _[23:05]_
+
+A question related to the models for the agents. So how flexible is a SymPy regarding these models for these agents? Can I just put in some kind of a model factory for the agents? Or is this more like a rigid kind of API that supports certain kinds of models?
+
+**Speaker 1** _[23:25]_
+
+Simpa is the infrastructure, it just gives you the API to use the distributed event simulation and you need to implement the entire logic and operation of the simulated component.
+
+**Speaker 5** _[23:46]_
+
+Well, thanks for the talk. What you do in distributed simulation is also commonly called co-simulation, at least in science. Did you check any other co-simulation frameworks of that which suits your needs?
+
+**Speaker 1** _[24:01]_
+
+Okay, thank you for the comment. Actually not, because we already were too deep into SymPy, and the whole infrastructure uses SymPy, so to move from the multi-threaded simulation, which I described first, to the distributed simulation was very very simple. Maybe another approach would be better from scratch, but for us it was very simple to move to the distributed simulation.
+
+**Speaker 2** _[24:30]_
+
+All right, if there are no more questions, let's thank Aaron again for the talk.
+
+---
+transcript_status: auto
+---
+transcript_language: en

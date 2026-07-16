@@ -1,0 +1,333 @@
+title: How Narwhals is silently bringing pandas, Polars, DuckDB, PyArrow, and more together
+---
+description: If you were writing a data science tool in 2015, you'd have ensured it supported pandas and then called it a day. But it's not 2015 anymore, we've fast-…
+---
+created: 2024-12-20
+---
+code: CPCNRZ
+---
+slug: how-narwhals-is-silently-bringing-pandas-polars-duckdb-pyarrow-and-more-together
+---
+speaker_names: Marco Gorelli
+---
+speakers:
+
+
+
+### Marco Gorelli
+---
+abstract:
+
+
+If you were writing a data science tool in 2015, you'd have ensured it supported pandas and then called it a day.
+
+But it's not 2015 anymore, we've fast-forwarded to 2025. If you write a tool which only supports pandas, users will demand support for Polars, PyArrow, DuckDB, and so many other libraries that you'll feel like giving up.
+
+Learn about how Narwhals allows you to write dataframe-agnostic tools which can support all of the above, with zero dependencies, low overhead, static typing, and strong backwards-compatibility promises!
+---
+full_description:
+
+
+Suppose you want to write a data science tool to do feature engineering. Your experience may go like this:
+- Expectation: you can focus on state-of-the art techniques for feature engineering.
+- Reality: you keep having to make you codebase more complex because a new dataframe library has come out and users are demanding support for it.
+
+Or rather, it might have gone like that in the pre-Narwhals era. Because now, you can focus on solving the problems which your tool set out to do, and let Narwhals handle the subtle differences between different kinds of dataframe inputs!
+
+Narwhals is a lightweight and extensible compatibility layer between dataframe libraries. It is already used by several open source libraries including Altair, Marimo, Plotly, Scikit-lego, Vegafusion, and more. You will learn how to use Narwhals to build dataframe-agnostic tools.
+
+This is a technical talk aimed at tool-builders. You'll be expected to be familiar with Python and dataframes. We will cover:
+- 2-3 minutes: motivation. Why are there so many dataframe libraries?
+- 2-3: minutes: life before vs after Narwhals - real-world examples of how the data landscape is changing
+- 7-8 minutes: basics of Narwhals, wrapping native objects, expressions vs Series, lazy vs eager
+- 7-8 minutes: advanced Narwhals concepts: row order, non-elementary group-by aggregations, multi-indices, null values, backwards-compatibility promises
+- 2-3 minutes: what comes next?
+- 5 minutes: engaging Q&A / awkward silence
+
+Tool builders will benefit from the talk by learning how to build tools for modern dataframe libraries without sacrificing support for foundational classic libraries such as pandas.
+---
+room:
+---
+day: Friday
+---
+slot_date: 2025-04-25
+---
+start_time: 10:55
+---
+end_time: 11:25
+---
+slot_id:
+---
+track: PyData & Scientific Libraries Stack
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Advanced
+---
+domain_expertise: Advanced
+---
+supporting_material_url: https://github.com/narwhals-dev/narwhals
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/CPCNRZ.png
+---
+youtube_id: DJk782DWcss
+---
+video_link: https://www.youtube.com/watch?v=DJk782DWcss
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/DJk782DWcss/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+How are we doing? Am I audible at the back? Audio good? All right, seeing some enthusiastic thumbs up, full of energy, amazing. Super excited to be here at PyCon Germany 2025 to tell you about how Narwhals is silently bringing together the data ecosystem. My name is Marco Gorelli, I work at Quonsight Labs. I've come here all the way from Cardiff, Wales to tell you about this. And before we begin, I've got a little service announcement, public service announcement for anyone else who, like me, does not live in Germany. There's something about German culture you absolutely need to know about, and that is Pfand. So, the idea is that in Germany, you can get money back by recycling. So, when you buy a plastic bottle, it often includes a little deposit, and then when you give it back, that deposit, Pfand as they call it, they give it back to you. You can give a bottle back and get eight cents back. Getting money back for recycling is good. Unexpectedly getting money back when you didn't know you'd paid a deposit in the first place is even better. And my impression is that this is very good at incentivizing reduce, recycle, and reuse. It's good to reuse things. Cool, we're about a minute in. Given late, come as a chance to walk in, so let's get the presentation started. Here's how it's gonna work. Gonna start by showing you a before versus after comparison of life before versus after narwhals. Once you're all hyped up about narwhals we'll talk about how to use it, gonna have a little narwhals crash course, gonna talk about how to do things, lazy versus eager, everything you need to know about row ordering and then we'll dive deeper into further narwhals concepts because this is PyCon we cannot just scratch the surface. So gonna talk about perfect backwards compatibility policies, next steps, and what the NowWorlds community is all about, and how you, yes, you and you, all of you, can get involved. And then maybe, hypothetically, perhaps, there's a chance, there's a possibility that I might, if I'm feeling brave enough, do some live coding, maybe. No guarantees, but you seem like a friendly audience, so maybe I'll feel hyped enough to do it. Finally, we've got an engaging Q&A slash awkward silence. You can, if you'd like to contribute to the Q&A, you can submit your questions on Slido somewhere. If you'd like to contribute to the awkward silence, then if the person next to you gets their phone out and submits a question to Slido, you can slap it out of their hand. Let's talk about life before narwhals. So here's a comparison of plotting Polar's data frames with Plotly in 2024 versus in 2025. So Plotly version 6 came out in 2025, and Plotly version 5 was in 2024. So for Pandas users, things stayed about the same, but for Polus users, things got three times faster, ten times faster, and similarly for PyArrow users. What changed? Well, the answer is, narwhals changed. Plotly version 6 started using narwhals as a lightweight compatibility layer between data frame libraries. So you might not have installed Narwhals directly yourselves, but chances are there's at least one data tool you're using which uses Narwhals under the hood to give a seamless experience to different DataFrame libraries. So that's what I mean when I say that Narwhals is silently changing the data landscape. Narwhals is a tool for tool builders, and it provides you with a single unified API to support multiple DataFrame libraries, like Pandas, Polars, DuckDB, and etc. It's used by several major libraries, like Altair, Bokeh, Marimo, Plotly, Shiny, Hierarchical Forecast, and more, and we really care about minimizing the impact on existing Pandas users, so Narwhals comes with zero required dependencies, and we really care about the developer experience, so it also comes with some very strong, perfect backwards compatibility policies, and is fully statically typed. I'll say more about these last two points later, because they merit their own slide. But before that, we need to talk about why this makes such a difference. Because before, data tools would typically only support pandas, which is great if you're a pandas user. And there's nothing wrong with being a pandas user, but the issue is when everyone is forced to squash whatever they're coming from and go into pandas. For some cases, it's fine, but it's a missed opportunity. Like it forces lazy data frames to become eager. It forces GPU data frames to go to CPU. It forces everybody to have an extra heavy dependency of pandas in all their environments. And often it also requires PyARO, not a lightweight dependency. The Narwhals solution, on the other hand, is that users can bring their own data frame. So if a user brings Polars, Narwhals will use Polars. If the user brings QDF, Narwhals will use QDF. If the user brings PyArrow, Narwhal uses PyArrow, and so on, without any of these being required dependencies. Now, it is possible to do all of this manually if you like. You could not use Narwhals and just have a bad time making all of these if-then statements and handle... In fact, even this isn't enough. You would need some extra indented if-then statements to handle Pandas before version 2, and then Polos before version 1, and depending on how far you want to take it, you're going have a very bad time writing all of these if-then statements for all of the different libraries. So instead, we had a bad time for you doing this in narwhals, and you can just use the single unified API, which you can access via narwhals.fromnative. Now I've made a big deal out of dependencies. Now why do I think dependencies are to be avoided if you possibly can when you're making libraries? I think most of us in Python, we've encountered some frustrating error like this at some point. We've tried to install library A, but library A depends on library B, and then library C also depends on library B, but in an incompatible way, and so we end up with a broken environment and we're not really sure what's going on, and nobody can reproduce our errors, and we end up in what's informally known as dependency hell. It's bad. Furthermore, extra dependencies can make it harder to support new versions of Python. If you want to support the new fancy version of Python and one of your dependencies does not support it, then that's enough to block you from supporting the new version of Python with your library. So in Narwhals, from day one, we've been very strict about certain conditions. So zero required dependencies, no ifs, no buts, no typing extensions, no nothing. Extremely lightweight. It's just pure Python files. There's no compiled code. It should be impossible to not be able to install narwhals so long as you've got a functioning Python installation. We also really care about developer experience, so narwhals is fully statically typed, meaning you can run your favorite type checker on it, be it mypy, pywrite, pyafly, redknot. I'm a big fan of redknot there in the front. Was it Luca? Probably Luca. Right. And not only does this give you more safety when you're developing, but also it means that when you're developing code in your editor, your editor can provide you with more helpful suggestions, like writing code when your libraries are fully statically typed is a much better experience than working with untyped libraries. We also care so much about developer experience that we make some perfect backwards compatibility guarantees, but those merit their own slides, so more on those later. Now that we're all hyped up about narwhals, feeling energetic, feeling pumped, let's go on a little narwhals crash course and learn how to use it. So first of all, there are three steps to writing a data frame agnostic function using narwhals. Three steps, one, two, three. So step one is you're going to write from native. So the user passes something into you, you don't know what it is, but you can call from native and this will wrap it in something that narwhals can work with. Step two, you express your logic using the Polar's API. Anyone familiar with Polar's might recognize this as being a subset of the Polar's API, so we use expressions. Here what we're expressing is that we want to keep rows where species is Gen2 and the body mass in grams is less than some given number. And then finally, once we're done expressing our data frame logic using this single unified API, we return it to the user by calling .toNative. Now, as for the Polar's API, some people ask me, why don't we use pandas as the single unified API within narwhals? And the answer, you can find it if you ask any Polar's fan any ever why they use Polars. And that is that they came for the speed, but they stayed for the syntax. And just like Polars and Dr. Dre, narwhals agrees that it's very important for you to express yourself. Let's have a little demo. If we start with a Pandas data frame and you pass it to your function, you get back a Pandas data frame and all the computation happened using Pandas. If you pass in a Polars data frame, you get back Polars and all the computation happened using Polars. If you pass in a DuckDB PyRelation, you get back a DuckDB PyRelation and all the computation happened using DuckDB. All of this happened without any of the other libraries being required dependencies. And you should be able to express any fundamental data frame operation you like. There's also string operations, which, just like in Polars, you can access using the .str namespace. You can, like, convert to upper or lowercase, check if strings contain things or end with things or the first bit of a string, how long they are, replace, slice, split. It should all be there, but we're open to further feature requests if you want more. There's a date-time operations like extracting components, converting time zones, converting strings to dates and dates to strings. And there's also different kinds of joins like left, outer, inner, semi, anti. There's also join as of, very underappreciated join in which you join based on closest matches rather than based on inequality conditions. Did I forget anything? Yeah, I might have forgotten the right join. We should probably add it at some point, but so far nobody has asked us for it, which kind of confirms my prior that write joins are useless. Now, I've made a big deal out of lazy execution, so let's learn what that means. So we can broadly categorize data frames in eager and lazy. So eager ones, for example, we have Panda's data frame, we've got Polar's data frame, there's Pyaro table, QDF data frame. And on the lazy side, we have data frames which defer their execution until the user asks for the results to be materialized, such as Polar's lazy frame, DuckDB PyRelation, PySpark data frame, Dask. These all have different models and different representations and different properties and all, but the main difference that we're interested in in narwhals is row order. So in the eager case, we assume that the data behaves as if it's in memory, and so there exists a physical row order. So it's perfectly well-defined to do a sum based on a physical row order, but in the lazy case, we make no such assumption. No assumption about your data or your compute, and we treat row order as if it's undefined. Just like you can't ask what's the first element of a Python set, because row order is undefined, row order in lazy frames is undefined. If this feels a bit abstract, let's go through a little example. This is the most technical part of the talk, so don't worry, we'll get back to memes very soon if it feels a bit too technical. So let's look at the cumulative sum operation. So in the eager case, if you want to do a cumulative sum, so that is to say, you start by summing values progressively in a certain order, and you accumulate them as you find new values. So 1, 4, 2, 5, the cumulative sum is 1, 5, 7, 12. In the ego case, this is perfectly well defined because we assume that there is some physical row order, so that's the order that we compute the cumulative sum in. But if you try to do this with a lazy frame, narwhals will tell you that no, you can't do this because row order is never assumed in the lazy case. So how do you do a cumulative sum with a narwhal's lazy frame? The answer is you need to explicitly say in which order to do it. Like in this case, we've got a column which orders the data frame date, so we can tell Narwhals, do the cumulative sum over ordered by date, and then, like this, Narwhals is able to do it. So this is perfectly compatible with Polars, but it is an extra restriction on Polars. And I think that's okay. Like this extra restriction enables freedom because it enables you to write portable code, which then you can execute on DuckDB, Daft, Data Fusion, any SQL front end. And, yeah, sometimes restrictions enable freedom. Now, in starting to develop novels, that's exactly what we wanted to accomplish. Like let people just write their code once, focus on the data frame logic, and then get on with their lives. But there is an unexpected feature we ended up encountering. So I'd now like to give a little demonstration of that completely unexpected feature. So here's a little notebook. So I'm starting by just doing some imports and then defining a DataFrame agnostic function. As a reminder, DataFrame agnostic functions in Narwhal's three steps. So from native, Narwhal's API to native. So the user passes something in. We call from native on that. We then express our logic using the Narwhal's API, so we're just going to keep certain rows, we're going to make some rolling means of different window sizes, and then we're going to sort. This is perfectly compatible with the Polar's API. If you're used to Polar's, this should feel familiar. Okay, so we can then verify, okay, if we pass a Pandas data frame in, we get Pandas out. If we pass a Polar's data frame in, we get Polar's out. If we pass a Polar's lazy frame in, we get Polar's lazy out, so we need to call collect to view the results. And if we pass a DuckDB relation in, we get a DuckDB relation out. Now, a quick show of hands. Of the audience that's familiar with Polar's, how many people feel like they could accurately translate this to SQL? Is the mic working? Okay. Okay, so take a look at this. Because we get back a DuckDB relation, we can call SQL query on the result, assign that to a variable, and then going to import SQL pass to make it look pretty, SQL pass dot format, SQL reident equals true, let's print, and voila, we have translated our Polar's code to SQL. Unexpected feature, but I'll take it. Whoops. Let's go back to the presentation. Where's the presentation gone? Here it is. This is why we don't do live demos. This is definitely why we don't do live demos. Slideshow, this will do. Okay. Where did we get to? Okay. need to skip some parts. Okay, yeah, backwards compatibility. Motivation is that deprecation cycles introduce issues, but what we do in narwhals is we've got a main namespace in which we might change things, but we've also got a stable namespace in which the guarantee we make is that code you've written today will keep on working ten years from now and for the future of narwhals. This concept is inspired by Rust editions, and it's a bit of effort, but it's allowed us to make deprecations which have had no effect on the millions of of people using Altair, Plotly, Marimo, and all the other libraries using Narwhals. As for who's behind Narwhals, I started the project in February 2024. I was pleasantly surprised to see people starting using it a few months later, and the project is completely community-driven. There's no Narwhals company behind it. I'm very grateful to my employer for allowing me to spend some unfunded work hours on the project. The community has grown to over 100 unique contributors, And we have bi-weekly community calls and the Discord server, which all of you are welcome to join if you'd like to make the project better. What's next? We'd like to get to narwhals.stable.v2, support extra lazy data frames, and support expressions in more places, and narwhalify more libraries. Now, in confusion, what have we talked about today? We've talked about how narwhals is a tool for tool builders, and it's silently changing the data ecosystem. It's widely adopted by packages such as Altair, Plotly, Marimo, Bokeh, and many others. It allows you to write code which supports Pandas, PyArrow, PySpark, DuckTB, and more, just through a single unified API, which allows you to write reusable functions. Because with Narwhals, you can write reusable functions, and it's very good to reuse things. Especially if you're in Germany and you want to get your Pfand. thank you everybody
+
+**Speaker 2** _[17:49]_
+
+You see, your energy is totally contagious. How do you, where do you get this energy from? What did you eat or drink?
+
+**Speaker 1** _[17:58]_
+
+Is that a question somebody submitted?
+
+**Speaker 2** _[18:00]_
+
+My
+
+**Speaker 1** _[18:02]_
+
+It must have been the coffee. Somebody put something in it.
+
+**Speaker 2** _[18:06]_
+
+Well, lucky you when I was watching you I was also like jumping Wait, I rushed you a bit. Sorry like My math skills are I don't know on the floor But we have more time for questions. All right So the most popular
+
+**Speaker 1** _[18:28]_
+
+Let's see what I've got, hit me. How many can we get through?
+
+**Speaker 2** _[18:35]_
+
+Do you dare? How does narwhals handle performance critical operations across backends without introducing significant overhead or losing back-end specific optimizations?
+
+**Speaker 1** _[18:48]_
+
+Oh, that's a fantastic question. So, Nowells doesn't do any compute. It literally just translates between APIs. So, the overhead is just from doing some extra instance checks and some if-then statements in Python. So, the answer is that. Like, it's just extremely lightweight. We don't do anything clever, and we just let the backends handle all optimizations and all compute. So that's why when Plotly started to use narwhals, maybe you would have naively expected that for polars and pyaro things get faster, but for pandas things get a bit slower because of the extra overhead. But actually things got a bit faster even for pandas because we've been so careful about eliminating all overhead in pandas. and as it turned out, Plotly also had some historic bugs fixed when they started using novels for free because they were using Pandas indexing not quite in the way it was intended to be used.
+
+**Speaker 2** _[19:41]_
+
+When I was watching you, I was thinking, whatever you are selling, I'm going to buy. So someone actually made a comment in the same direction, sounds great, where do I sign?
+
+**Speaker 1** _[19:54]_
+
+Yeah, well, it's a pity there's no company behind narwhals, but you can pip install narwhals and Join the party
+
+**Speaker 2** _[20:02]_
+
+Oh my God, there are so many questions.
+
+**Speaker 1** _[20:04]_
+
+Okay, quick. Let's go. Let's go through.
+
+**Speaker 2** _[20:04]_
+
+Okay, quick. Let's go.
+
+**Speaker 1** _[20:05]_
+
+Let's go.
+
+**Speaker 2** _[20:06]_
+
+Can you compare Narwhals to Ibis?
+
+**Speaker 1** _[20:08]_
+
+Can I compare Narwhals to IBIS? IBIS. Okay, so give me a sec. So, in conclusion, questions, extra slides just in case. How does Narwhals differ from IBIS? So... All right. IBIS provides a Pythonic front-end to SQL engines and polars. We are not in competition. In fact, somebody's opened a pull request to support IBIS within Narwhals, and my hope is that within a month or so we can ship it.
+
+**Speaker 2** _[20:46]_
+
+What happens under the hood? How do the transformations work? Is there an intermediate frame you use?
+
+**Speaker 1** _[20:54]_
+
+Sorry, could you repeat, please?
+
+**Speaker 2** _[20:55]_
+
+Sure. What happens under the hood? How do you do the transformations work?
+
+**Speaker 1** _[20:56]_
+
+Sure. Yeah, so there's three layers within Narwhals, so there's the native layer, so that's what the user passes in. There's then the compliant layer, so that's what we translate everything to. And then there's the Narwhals API, which is what Narwhals developers interact with. So yeah, we're mapping to our kind of intermediate representation and then dispatching and translating things.
+
+**Speaker 2** _[21:21]_
+
+Why is polar syntax better than panda syntax?
+
+**Speaker 1** _[21:24]_
+
+Because expressions are inherently lazy and they allow you to do more optimizations. I'm going to take the chance to plug a talk I gave at PyData Amsterdam last year called Understanding Polar Expressions When You're Used to Pandas. Check it out. It's a good fun one with lots of memes. Which I'm sure will surprise absolutely no one.
+
+**Speaker 2** _[21:44]_
+
+Someone was taking note of a talk from yesterday about data family and Pandera for pollers. So the question was why they use pollers instead of narwhals. How much effort does it require to port it from? Yeah.
+
+**Speaker 1** _[22:04]_
+
+Yeah, so I think at the end of that presentation somebody asked why they didn't use narwhals and it was not me Believe it or not You know you've made it when your project to get so mentioned in other people's questions And I don't know how much effort it would be because unfortunately I wasn't able to attend the presentation because the room was too full I think the reason why they only support polars is that they were only interested in using polars That's how much of a shift there's been within the landscape like they only use polars. They don't even use pandas anymore at their company So, I guess they just had no motivation to keep the bridge with pandas and with other data frame libraries.
+
+**Speaker 2** _[22:41]_
+
+Is there PySpark support? Yes. That's it?
+
+**Speaker 1** _[22:45]_
+
+Easy question.
+
+**Speaker 2** _[22:47]_
+
+How small is novel subset of the Polar's API?
+
+**Speaker 1** _[22:51]_
+
+it's small enough to be lightweight but extensive enough to be useful
+
+**Speaker 2** _[23:04]_
+
+There will be people voting for you if you go for politics.
+
+**Speaker 1** _[23:09]_
+
+All right, so my first policy is going to be to ban cars from city centers
+
+**Speaker 2** _[23:14]_
+
+How good is Narwhal's support for DataFrame, QA libraries via Pandera or others? I want to use Narwhal's, but could not find a solution for that yet.
+
+**Speaker 1** _[23:28]_
+
+So I know that there's a couple of data frame validation libraries that have been written on top of narwhals. So there's whimsy and Validupsi I Think pandera have an issue opening github about using narwhals, but I don't think they're using it at the moment
+
+**Speaker 2** _[23:45]_
+
+Okay, someone also having some hesitations I was planning to start learning duck DBS Well, are you telling me now that I don't have to and just have to learn narwhals instead smiley smiley
+
+**Speaker 1** _[23:58]_
+
+There are things you can do in DuckDB that we can't do in Narwhals, so my recommendation is to learn both. However, if you're interested in just trying DuckDB, then maybe Narwhals is a nice shortcut into it, like just write your Polar syntax, translate it to SQL, and see how far you get.
+
+**Speaker 2** _[24:20]_
+
+And someone is asking about your opinion if Narwhals is going to become part of Non-Focus or other non-profit organizations.
+
+**Speaker 1** _[24:29]_
+
+they've approved us to become part of the affiliated projects but yeah I think most of our contributors are just like doing other things as part of their employment so we've not yet had a chance to apply for any grants to do any funded work but I'm very excited about what we can do in this space and what we can achieve with funding
+
+**Speaker 2** _[24:52]_
+
+Your energy is getting lower.
+
+**Speaker 1** _[24:56]_
+
+High energy question. Let's go.
+
+**Speaker 2** _[25:00]_
+
+must always keep up with the use libraries that are maybe less stable than it is. How would you handle breaking API changes in the use libraries?
+
+**Speaker 1** _[25:10]_
+
+Oh, right, so we do all of this internally, like we keep track of the back-end version for each compliant frame, and then based on that, we choose which API to call. So for Pandas, for Pandas version 3, we remove some copy equals false keywords that are no longer necessary, which we have to keep for lower versions to not do unnecessary copies, which would introduce extra overhead.
+
+**Speaker 2** _[25:36]_
+
+Someone is wondering if it's possible to access Pandas index, for example, date-time index in novels.
+
+**Speaker 1** _[25:42]_
+
+Ah, right. Yeah, a very controversial topic, the Pandas index. So the stance in Narwhals is that we respect your index. So the index you start with is the index you end up with, but it's not part of... So we do have a function which allows you to get the index back out, but we don't do index alignment in the way that Pandas does, because I find it quite unintuitive. But we do preserve the index. So if you really care about the index, the index you start with is the index you end up with.
+
+**Speaker 2** _[26:10]_
+
+Is FireDuck a competition?
+
+**Speaker 1** _[26:13]_
+
+FireDux lets you run like Python-M FireDux.pandas, and then it will swap in FireDux instead of pandas. So if you've written code using novels, then it still works with FireDux. So no, not in competition. Of course. We are bringing everyone together. We are a project about love and community.
+
+**Speaker 2** _[26:34]_
+
+How big is the coverage of the different APIs roughly? Do I have to worry about running into issues because of gaps in the implementation of narwhals?
+
+**Speaker 1** _[26:43]_
+
+I'd say that with every new project that uses Narwhals, we find some gap, and so we add some new features, and so the coverage is becoming more and more extensive, and I'd like to think that it's enough to be dangerous. We can execute all of the TPCH queries, for example. That's very relational-focused, but still the fact that several libraries are using Narwhals to address all of their data frame needs I think is a good sign that we've done enough that it's useful.
+
+**Speaker 2** _[27:11]_
+
+So did you also cover this question how narwhals will handle huge PI spark data frame? Yes
+
+**Speaker 1** _[27:19]_
+
+Is this a record for how many questions we've got through?
+
+**Speaker 2** _[27:23]_
+
+Can Narvos handle cross-library queries?
+
+**Speaker 1** _[27:28]_
+
+To be honest, I think cross-library queries are a bit of an anti-pattern, so no, sorry. As in, like, if you want to pass in a pandas data frame and merge it with a polars data frame, then first it's up to you to make sure they're the same backend. But NowELS does provide you with ways of going two pandas or two polars, so it could make it a bit easier, but yeah, I really don't recommend mixing backends in the same project.
+
+**Speaker 2** _[27:56]_
+
+Okay, I see we covered a lot, so I want to finish with a very important comment and question. About fund, it's more profitable to recycle plastic bottles and aluminium cans than glass bottles and jars. What do you think about that?
+
+**Speaker 1** _[28:15]_
+
+My mind is blown.
+
+**Speaker 2** _[28:19]_
+
+You should have thought carefully when you started and ended with fun in Germany. There are experts here
+
+**Speaker 1** _[28:26]_
+
+Well, I started and ended with Luft and Laff's time, and I didn't get kicked off, so I figured it would be okay.
+
+**Speaker 2** _[28:32]_
+
+Well, I see that we can finish and you can answer the rest of questions offline or people come and approach you before you leave.
+
+**Speaker 1** _[28:44]_
+
+Sure thing. Cool. Thanks, everybody. You're the best. Stay safe.
+---
+transcript_status: auto
+---
+transcript_language: en

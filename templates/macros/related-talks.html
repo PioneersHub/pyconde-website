@@ -1,0 +1,131 @@
+{#-
+  Related-talks panel rendered at the bottom of a talk page.
+
+  Sections (rendered only if non-empty):
+    1. More by this speaker   — other talks by any of this talk's speakers (same edition first, then archive)
+    2. Same track             — other talks in the same edition with the same track
+    3. Also in this edition   — sibling talks (capped, deterministic order)
+-#}
+
+{%- macro related_panel(talk, my_speakers, talks_root, speakers_root, archive_year) -%}
+  {#- `my_code` (Pretalx) is used to compare against `sibling.code`
+      when iterating sibling talks. `my_ref` (slug = folder name) is
+      used to compare against entries in speakers' `talks` lists,
+      because after the slug migration those lists hold slugs, not
+      Pretalx codes. Compare against both for transitional safety so
+      a fresh import (folder still by code) doesn't reintroduce the
+      bug. -#}
+  {%- set my_code = talk.code or talk._id -%}
+  {%- set my_ref = talk._id -%}
+
+  {#- 1. More by this speaker -#}
+  {%- set by_speaker = [] -%}
+  {%- if my_speakers -%}
+    {%- for sp in my_speakers -%}
+      {%- for ref in (sp.talks or []) -%}
+        {%- if ref != my_ref and ref != my_code -%}
+          {%- set sibling = site.get(talks_root ~ '/' ~ ref) -%}
+          {%- if sibling and sibling['_model'] != 'redirect' and (by_speaker|length) < 8 -%}
+            {%- if sibling not in by_speaker -%}
+              {%- set _ = by_speaker.append(sibling) -%}
+            {%- endif -%}
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endfor -%}
+  {%- endif -%}
+
+  {#- 2. Same track this edition -#}
+  {%- set same_track = [] -%}
+  {%- set talks_index = site.get(talks_root) -%}
+  {%- if talk.track and talks_index -%}
+    {%- for sibling in talks_index.children if sibling['_model'] != 'redirect' -%}
+      {%- if sibling.track == talk.track and sibling.code != my_code -%}
+        {%- if (same_track|length) < 6 and sibling not in by_speaker -%}
+          {%- set _ = same_track.append(sibling) -%}
+        {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+
+  {#- 3. Also in this edition (deterministic: alpha by title, take 4) -#}
+  {%- set seen = (by_speaker + same_track) -%}
+  {%- set also_in = [] -%}
+  {%- if talks_index -%}
+    {%- set valid_siblings = [] -%}
+    {%- for sibling in talks_index.children -%}
+      {%- if sibling['_model'] != 'redirect' -%}
+        {%- set _ = valid_siblings.append(sibling) -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {%- for sibling in valid_siblings|sort(attribute='title') -%}
+      {%- if sibling.code != my_code and sibling not in seen and (also_in|length) < 4 -%}
+        {%- set _ = also_in.append(sibling) -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+
+  {%- if by_speaker or same_track or also_in -%}
+  <section class="related-talks" aria-labelledby="related-heading" data-pagefind-ignore>
+    <div class="content">
+      <h2 id="related-heading" class="related-talks__heading">Related talks</h2>
+
+      {%- if by_speaker %}
+      <div class="related-talks__group">
+        <h3 class="related-talks__subheading">More by
+          {%- if my_speakers|length == 1 %} {{ my_speakers[0].name }}
+          {%- else %} these speakers
+          {%- endif -%}
+        </h3>
+        <ul class="related-talks__list">
+          {%- for t in by_speaker[:6] %}
+          <li class="related-talks__item">
+            <a href="{{ t|url }}">
+              <span class="related-talks__title">{{ t.title }}</span>
+              {%- if t.track %}<span class="related-talks__track">{{ t.track }}</span>{% endif -%}
+            </a>
+          </li>
+          {%- endfor %}
+        </ul>
+      </div>
+      {%- endif %}
+
+      {%- if same_track %}
+      <div class="related-talks__group">
+        <h3 class="related-talks__subheading">Same track: {{ talk.track }}</h3>
+        <ul class="related-talks__list">
+          {%- for t in same_track %}
+          <li class="related-talks__item">
+            <a href="{{ t|url }}">
+              <span class="related-talks__title">{{ t.title }}</span>
+              <span class="related-talks__meta">{{ t.speaker_names }}</span>
+            </a>
+          </li>
+          {%- endfor %}
+        </ul>
+      </div>
+      {%- endif %}
+
+      {%- if also_in %}
+      <div class="related-talks__group">
+        <h3 class="related-talks__subheading">
+          {%- if archive_year %}Also in the {{ archive_year }} edition
+          {%- else %}Also in this programme
+          {%- endif -%}
+        </h3>
+        <ul class="related-talks__list">
+          {%- for t in also_in %}
+          <li class="related-talks__item">
+            <a href="{{ t|url }}">
+              <span class="related-talks__title">{{ t.title }}</span>
+              {%- if t.track %}<span class="related-talks__track">{{ t.track }}</span>{% endif -%}
+            </a>
+          </li>
+          {%- endfor %}
+        </ul>
+      </div>
+      {%- endif %}
+    </div>
+  </section>
+  {%- endif %}
+{%- endmacro -%}

@@ -1,0 +1,32 @@
+# Static-site redirect map.
+#
+# Two delivery channels for the same source of truth:
+#
+#  1. Build-time HTML redirect pages. `utils/generate_redirects.py` reads
+#     this file and writes a tiny content/<from>/contents.lr per entry that
+#     renders a meta-refresh + JS-redirect + canonical pointing to `to`.
+#     This works the instant the build deploys — no nginx change required.
+#
+#  2. Nginx 301 snippet. The same generator writes
+#     site/_redirects.nginx.conf (and a Caddyfile) so ops can paste the
+#     proper server-side 301s into the hoster config on the next deploy
+#     window. Once those are live the HTML redirect pages become
+#     redundant (but harmless).
+#
+# Entry shape:
+#   - from: /old/path/         # leading + trailing slash; must be unique
+#     to:   /new/path/         # absolute path or full URL
+#     status: 301              # optional, default 301; use 302 for temporary
+#     note: short rationale    # optional, ignored at render time
+#
+# Conventions:
+#   - Keep entries sorted alphabetically by `from` to spot accidental dupes.
+#   - Never redirect a path that still has live content; remove the source
+#     content first.
+#   - Use `to:` paths that exist in the build, otherwise both channels will
+#     bounce users to a 404.
+
+redirects:
+  - from: /sponsoring-newsletter/
+    to: /sponsoring/
+    note: standalone sponsoring-newsletter signup page retired; sponsoring funnel covered by /sponsoring/

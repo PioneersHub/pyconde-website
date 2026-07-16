@@ -1,0 +1,623 @@
+title: Data Science at Scale with Dask
+---
+description: A Pythonic introduction to methods for scaling your data science and machine learning work to larger datasets and larger models with Dask, all while…
+---
+created: 2021-12-20
+---
+code: RTPEWV
+---
+slug: data-science-at-scale-with-dask
+---
+speaker_names: Richard Pelgrim
+---
+speakers:
+
+
+
+### Richard Pelgrim
+
+Richard Pelgrim is a data scientist with a passion for communicating technical content in creative and compelling ways that increase engagement. Currently he does so as Developer Advocate at Coiled.io, the leading company built around the open-source Dask library for distributed computing in Python. Richard is regularly invited to give Dask tutorials at meet-ups and conferences and has a treasure chest of expert tips to support anyone looking to take their distributed computing to the next level.
+---
+abstract:
+
+
+A Pythonic introduction to methods for scaling your data science and machine learning work to larger datasets and larger models with Dask, all while staying within the comfort of the tools and APIs you know and love from the PyData stack (such as numpy, pandas, and scikit-learn). 
+
+We'll discuss:
+- How to reason about when you need to scale your data and machine learning work and when not to;
+- How to leverage distribute computation on your local workstation (such as your laptop) to analyze larger datasets and build larger, more complex models;
+- How to harness the power of clusters to support larger-than-memory computation, all from the comfort of your own laptop.
+---
+full_description:
+
+
+An introduction to distributed computing:
+- When, why and how should you leverage distributed computing?
+- Introduction to Dask, an OSS Python library for distributed computing
+
+How to parallelise your Python code with Dask:
+- Why parallelise your code?
+- Using dask.delayed() to parallelise custom code
+
+Scaling your NumPy and pandas workflows:
+- How to scale your NumPy and pandas to larger-than-memory datasets?
+- Dask Collections: Bags, Arrays and DataFrames
+
+Distributed Machine Learning with Dask:
+- How to build distributed ML models
+- Bursting to the cloud to transcend local compute resources
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: PyData & Scientific Libraries Stack
+---
+tags:
+---
+submission_type: tutorial
+---
+submission_type_label: Tutorial
+---
+submission_type_id: 1703
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: some
+---
+domain_expertise: none
+---
+supporting_material_url: https://github.com/coiled/coiled-resources/tree/main/dask-tutorial
+---
+slides_link: https://docs.google.com/presentation/d/1BMhxuTuOg1jRYFANDvbb-GNszpyH-JKPKnbGEsO5GtQ/edit#slide=id.gf77e456b38_0_387
+---
+social_card_image: /static/media/social/talks/RTPEWV.png
+---
+youtube_id: xi6Ki23K24g
+---
+video_link: https://www.youtube.com/watch?v=xi6Ki23K24g
+---
+video_published_at: 2022-05-06
+---
+video_duration_iso: PT1H23M17S
+---
+video_thumbnail: https://i.ytimg.com/vi/xi6Ki23K24g/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+Yeah, welcome everyone. Great to see so many people. I'm glad you made it so early in the morning. I had trouble myself, but I'm glad we're all here. This is actually the first time I'm giving this tutorial in person, so I'm very excited. It's also kind of new, so let's see how it goes. Yeah, actually before we get started, I'm curious to get a bit of a sense of the room and adjust this tutorial so you all get the most out of it. Who already knows about Dask? Okay, who has used it? Okay, great. Who uses PyData libraries like Pandas, NumPy, Scikit-learn? Okay, great. Who uses Spark? Great. And who has experience with distributed computing? Excellent. Great. That really helps me. Like Vincent says already, feel free. I would love for this to be a very interactive tutorial, so interrupt me, ask questions. I'm here to hopefully give you 90 minutes that will be worth your time, so feel free to give me feedback and ask questions as we go along. That will only make it better for everyone here. Vincent already said, my name is Richard Pelgrim, I'm a developer advocate at Coiled. Coiled is the company built by Matt Rocklin around Dask. I have a background in design and communication sciences and my specific interests are kind of looking at data tooling, the modern data stack, doing Arabic and natural language processing, and when I'm not doing serious things like that I like to ferment just about anything in my path. So if you're making miso or kimchi kombucha, come talk to me and we can exchange recipes. Cool, in the next 90 minutes we'll start by building some intuition and motivation around what Dask is and what you can use it for. I'll go through this pretty quick, especially given who's in the room, but if you have questions or if I'm going too fast feel free to stop me and we can pause. After that we'll have about an hour maybe a bit more to work through the notebooks that I've prepared to get hands on with using Dask for different use cases and then in the end we'll have about 20 minutes depending on how the coding goes for Q&A but I'm also very happy to do that Q&A as we code so basically the bulk of this section will be interactive coding. So we'll cover what is Dask, then look at how we can use it, and we'll end with any questions that you might have. Cool. What is Dask? Dask is a Python library that scales PyData libraries like Pandas, NumPy, scikit-learn, XGBoost for distributed computing. So who here of you has used Pandas or NumPy and run into memory errors? You're all in the right place. This is great. So Dask allows you to process more data in less time and allows you to process more data than you can fit in your machine's RAM. Interesting. Yeah, so Dask scales Python, but why would we want to scale Python? With that, I'd like to welcome you to this year's Dask car races, a quick little analogy to build some intuition. So this is the Pandas race car, I think a lot of you here in this room are familiar with it, it's great, it does what it, it's popular, it's got good performance for relatively small data sets, right, and small is a subjective term, but I think the rule of thumb is you you need about five times the size of your data set in RAM in order not to run into memory errors. So I've got 16 gigabytes of RAM on this laptop. When I start processing data frames with five or six gigabytes worth of data, I'm likely to run into issues. So we can see that easily here. If we import the New York City taxicab data, we can import one month. It's about one gigabyte of data, no problem. If we try to import all of the data, at least on this machine, I'll get a memory error. And Dask exists to solve this problem. So it was created when the limits of PyData libraries like Pandas and NumPy started to become visible, the size of datasets was increasing, I said, okay, how can we stick to the libraries that people love, pandas, numpy, scikit-learn, same syntax, these work great, we just have to solve for the scaling issue. And that's how Dask was created. Sorry? Yeah, I'll come back later, yeah. Yeah, so pandas is just one of those racecars in these Dask car races, we have numpy, scikit-learn, XGBoost, XRA, Prefect, and really you can think of Dask as the engine that you can sort of put into these race cars to scale them up for larger data sets. So it's the same car, just gets a different engine, it's a familiar feel, the same API, you could use the same Pandas methods that you are used to and familiar with, but you you don't have any more limits on the data size you can process. So then a Pandas race car with a Dask engine becomes a Dask data frame. We'll dig into more detail later what that looks like. But basically, Pandas is limited because it's running on a single core. And Dask will take a large Dask data frame, cut that up into smaller Pandas data frames, and each Pandas data frame will be processed on a separate core in parallel. It's great if you're scaling up to all the cores in your machine. It can be even greater if you scale up to multiple workers in a cluster and scale up potentially infinitely. So Dask does that with Pandas to give you the Pandas dataframe. It also does it with NumPy to give you a Dask array, scikit-learn to give you Dask ML, XGBoost, and so on. That's great if you are using Pandas, NumPy, Scikit-learn. But the great thing about Dask is that it also offers a lower level API called Dask Delayed and Dask Futures, which allows you to scale any arbitrary Python function for distributed computing. So in this sort of hands-on coding part of the tutorial later on, we'll look at how to do this as well. You may have seen some of these visuals on our Coiled booth already. This is the Dask dashboard, which gives you live visual information about computations that are running on your cluster. And we'll see more of that live. And this kind of lower level flexibility is also a great selling point for Dask, as opposed to kind of more traditional MapReduce systems because it gives you a lot more flexibility in building your own task graph and creating custom parallel computations. So very quickly, just a summary for this intuition stage of the tutorial. Dask is an engine for high performance parallel computing. You can step right into sort of pre-built race cars, right? That's the Pandas, NumPy, XGBoost, but then with the desk engine, um, or you can build your own very, uh, your own custom task graphs, uh, for, for custom parallel Python code. All right. So how does it work and why does it matter? Uh, before we get into the hands on, just want to run through kind of a real world case study to demonstrate a use case of desk and the financial services, uh, industry. Uh, So Dask is quite popular for processing time series data at scale. That's one of the many uses of Dask. This is a case study from one of the Coiled clients, Capital One, who have a center for machine learning. You can imagine Capital One, one of the biggest US banks. They have quite a bit of data lying around. They want to make use of it. They're in a competitive environment. And they have a large organization. And so they are quite fragmented in how they are spitting up their resources and crunching the data. And so they have a need for a simple and repeatable way to stand up large infrastructure. They want to leverage GPUs and sort of centralize efforts across the organization. Basically, they want to process more data in less time. They also have sort of a challenge with different programming languages in their organization. So there's a lot of Python programmers who like to code in Python, but then need to use something like PySpark when they want to scale. And then there's other people using other things. And they basically are a big fan of Python and wanted to stay Python native, but needed a flexible and robust way to do that. So they work with lots of data, as I said. This is an example of one of their machine learning pipelines, kind of a schematic. They'll sample some data, do some feature engineering, merge a few tables, train, and then score. They were running this as part of an Airflow-orchestrated model on a 40-gigabyte training data set. It was taking about 2 and 1 half hours training per ensemble and 2 and 1 half weeks for the whole pipeline. But the 40 gigabytes is not all of their data. This is just a subset, I think, something around 5%. And this approach was not very scalable. You can imagine if 5% is taking multiple weeks, then you'll probably never get around to doing 100%, especially in a fast-paced business environment. So they did some initial scaling with Dask using Dask DataFrame. So this is the scaled version of Panda's DataFrames To parallelize at first just the sampling portion of the pipeline. They were using 80 desk workers So a cluster with a total of almost 700 gigabytes of distributed memory And they were able to process this in 15 hours instead of two and a half weeks, which is a significant speed up which They were now able to process the entire one terabyte data set in seven days, which is still a long time, but it's a a good speed up, which meant, at least for the testing, they could do daily iteration instead of weekly, and you can imagine that that speeds up things across the organisation. From there, they were pretty impressed and pleased with what Dask could do, so they used Dask in other parts of the pipeline as well. I'm going to run through this pretty quick so we can just focus on doing some coding, but wanted to give you a sense of kind of applications of Dask in real world scenarios. Dask also works well with Rapids. So if you have access to GPUs, that's another way that Capital One reduced their training cost and time for this specific instance. There's a source here to the full talk if you're interested. I think it's about 30 minutes. that is a great resource. But basically, this is an instance of Dask scaling up the data processing and the company finally being able to use all of their data, which was sitting around. All right, I think with that, yeah, we'll come to that later. I think we're going to dive into the tutorial right now. I mentioned it already for those of you who came in a little early, this is the link that will take you to the GitHub repo for this tutorial. In the GitHub repo, you will find two ways to set up your machine to follow along. One is to launch a binder notebook, and the other is to clone the repository. Is the binder notebook working for everyone who's using it? excellent all right let me pause for questions here before we dive into the code any questions yes sure Yeah. So, so on. Oh, yeah. Is there a situation when not use desk for example, I don't know if you're working with small data sets and the overhead is so large that actually it runs faster on. Yep. Great question. Uh, so for everyone in the back, also the question is, is there a situation when you should not use desk? For example, if the data set is a small enough for pandas to use it, that's exactly right. And that's basically for, well, if you have a data, the use case for Dask is clear, right? If you run into memory issues. If you're not running into memory issues, it's hard to say sort of blanket statement of what will happen. Dask will still let you, if you're working locally, scale out to all of your cores, which could be a performance speed up. There's also an overhead involved. So yeah, basically our advice, and the other thing is working with Dask means you're entering the world of distributed computing, which is complicated. Things get complex. So our advice generally is if Pandas is working for you and you're happy with how quickly it's running, use Pandas. Don't switch over to Dask. But yeah, does that answer your question? Yeah, probably.
+
+**Speaker 2** _[15:28]_
+
+Patricia, a remote attendee, asked, is it possible to use DAX in combination with Solary, which splits DAX across several Solary workers?
+
+**Speaker 1** _[15:39]_
+
+I'm not very familiar with salary myself, but I think so
+
+**Speaker 3** _[15:54]_
+
+Let's say I have a Python package that makes use of pandas dataframes and pandas series. Can I use this also with dusk? Can I say run this pandas code and scale it with dusk?
+
+**Speaker 1** _[16:08]_
+
+Yeah, I mean, so under the hood, Dask is cutting up your data. If you're using Dask DataFrame, it's cutting it up into Pandas DataFrames and then mapping functions over those. So I suppose it will take a little rewrite somewhere, but technically if your library is acting on Pandas DataFrames, there should be a way to map that function using Dask. All right. Let's jump into some code. So in the repo, there are six notebooks. I think we will focus on the first four or five for this session, and let's see how we go. We will cover basically the first notebook is really kind of just a test drive, very quick run through the different functions of Dask, and then the following notebooks are diving into more detail of each section. We'll talk about Dask DataFrames, so that's the scaled-up version of Pandas, Dask Arrays, the scaled-up version of NumPy, we'll talk about machine learning with Dask, which scales up scikit-learn and XGBoost, and then the fifth notebook is talking about Dask Delayed, which is the API for scaling custom or arbitrary Python functions that sort of fall outside those APIs. Let's see. Maybe can everyone in the back read the text on the screen? Yeah, great. Thanks. All right, so this is kind of a quick test drive. First of the Dask DataFrame, so this is the API that scales pandas. Instead of importing pandas, you would import Dask DataFrame as dd. We'll run a little script here to download some flight data. And then we can use dd.readcsv, a very familiar syntax, to import that data set. We can inspect the first five rows with head, you would expect with pandas and we can run a group by computation and who can tell me what's different between this and pandas code does anyone spot the difference yeah yeah the compute at the end so that's a slight different difference with pandas which is quite fundamental in a way to to understand how distributed computing works right the whole thing we're trying to do here is process memory sorry process data sets that are larger than our local memory so we have to find a way to we can't load it all into memory at once that's why we use something called lazy evaluation which means that dask builds a task graph is the technical term you could see it as a root map or a recipe for for how to get to your result, but it will not execute that result until you specifically tell it to. And the command to tell it to get you the result is compute. This means, yeah, so this is a sample data set that's relatively small, so technically we could load it all in. But if this would be a 100 gigabyte data frame and we would just call compute, we would run out of memory. A group by is an aggregation, so the result of that will likely be much smaller, and that's something you could compute and load into memory. This is why if you just call DF in pandas, you would get contents of the data frame here. But Dask does not do that, because usually your data set won't fit into memory, so you would run into a memory error if you just called the data frame. instead what dask provides is some schematic information yeah Just a small question regarding the notebooks. For those of us that have come down and we only have five notebooks, and they are not as good as what you showed us. Okay. Yes, read me on the page. Yeah.
+
+**Speaker 4** _[20:47]_
+
+That's a clone.
+
+**Speaker 1** _[20:48]_
+
+That's the wrong cloning. Sorry about that. Sorry about that. Okay. Um, let me see. You should be cloning Yeah. Sorry about that. So, so this link is incorrect. That's right. That's a, that's my bad so you could clone it from here that's probably the best thing to do all right yeah so what would ask does give you when you call the data frame is some schematic information about the data frame itself which are the column column names, the data types of the columns, Dask does not read all of the data again because it might not fit into memory so it will infer the data types by reading a certain number of first columns. This is something to pay attention to because your data types might change or you might have an issue with data types in a column that hasn't been read. So sort of the fail-safe way to do that is to specify your data types ahead of time when you load the data in. And it will also give you something called number of partitions. So this is the number of chunks or partitions that Dask has cut your big data set into. And each of these partitions is actually a Pandas data frame that is processed in parallel. So we'll dig into this some more in the next notebook, but let's move on to what Dask arrays can do. So here we would import Dask array as DA. We can create an array of 10,000 by 10,000 with random integers. And again, just like with the data frame, we don't get any results or contents. When we call the array, we simply get some schematic information about the number of chunks, the size of the whole array. And then we can, again, we can slice this array, won't get results until you specifically call compute. A quick demonstration of doing machine learning with Dask. There's a separate library called DaskML which mimics the scikit-learn interface. We can make a classification problem with synthetic data. This will produce Dask arrays. And we can then fit a logistic regression model inputting those Dask arrays. So this should all look pretty familiar if you use scikit-learn. Again the main difference here is calling compute when you want results. Yes? How much support do you have of the data and the methods? Is everything inside, or only part of the data and the methods? Of scikit-learn? Yes. Yeah. I would say I mean, I'm hesitant to give an exact percentage, but it's not everything. No, so Dask ML Scales if I'm not mistaken all the algorithms that have an end jobs Keyword argument because not every algorithm can be parallelized and Then for XGBoost, there's a separate integration That's native native to XGBoost, which we'll also look at so but for scikit-learn Out of out of the pandas NumPy scikit-learn scikit-learn is the least supported. I'd say pandas is about 80 85 percent NumPy is the same and then scikit-learn It's just a few algorithms that that can be easily parallelized
+
+**Speaker 2** _[25:16]_
+
+or sklearn, sorry, can you hear me now? Okay. Does the typical SQL learn support the task data frame? So can we simply...
+
+**Speaker 1** _[25:28]_
+
+and we simply pass a dust data.
+
+**Speaker 2** _[25:28]_
+
+pass a dust data frame into.
+
+**Speaker 1** _[25:29]_
+
+a frame into an SK learn? That's a good question. I am not sure. I also don't know why you would want to do that, because that is not parallel. So the reason then you would be incurring overhead by using Dask, but then not getting the parallel gains from processing the algorithm in parallel.
+
+**Speaker 2** _[25:53]_
+
+So I have some online questions. Yeah. I'm so, um, the first one you mentioned rapids, does it act as a sort of backend for ducks or if I remember correctly, does it have his own data frame API or how is it interpretable?
+
+**Speaker 1** _[26:09]_
+
+Sorry.
+
+**Speaker 2** _[26:10]_
+
+The Rapids, does it act as its own back end for the DAX? Or according to the question, if I remember correctly, it has its own data frame API. How does it work together?
+
+**Speaker 1** _[26:23]_
+
+Yeah, I'm going to leave that question for a little later. This is quite advanced. I'd like to keep the level.
+
+**Speaker 2** _[26:28]_
+
+How can it show entries for dataframe.head when it doesn't have the dataframe in memory?
+
+**Speaker 1** _[26:35]_
+
+Yeah, so dataframe.head calls compute under the hood, so it will look at the first five or whatever you tell it rows and load those into memory.
+
+**Speaker 2** _[26:46]_
+
+Does DAX work on copy or view of the Pandas DataFrame? Sorry, what? Does DAX work on a copy or view of the Pandas DataFrame?
+
+**Speaker 1** _[26:59]_
+
+Copy or view of the dance? I'm not sure.
+
+**Speaker 2** _[27:05]_
+
+Oh, and the last one, sorry. What kind of cluster uses DAX in the background for DAX ML? So is DAX ML only usable on a local machine or also on a compute cluster?
+
+**Speaker 1** _[27:19]_
+
+Both, yeah. So that's the great thing about Dask, is that the same code can run on your laptop or on a cloud cluster. You'll just switch out the place where you run the computations, and that's something I'll show in a minute. Yeah. All right. And then this is the lower level API that I talked about briefly already, DAS delayed, which allows you to parallelize any Python function. So here, kind of very simple example, we will define a function increment, which will sleep for one second, then return X plus one. Define a function add, which adds X, Y, and Z, and also takes one second to run. If we run this normally, sequentially, each function takes one second, we're running three This will take three seconds And we will get a result That if we import das delayed we can use it as a function decorator around our functions I've already shown you the secret here, but This will run extremely fast Because it's not doing anything So this is only building the task graph Saying okay if and when I want to get this result. This is how I would get there So it runs extremely fast, but you also don't have a result yet. You only have a delayed object that points To a result that still needs to be computed We can visualize this so a is the result result of the increment function being run once B is the same. And C, this is where we start to build task graphs, is the final result of the add function being applied to the two results of the increment function. Someone take a guess how long this will take to run when we actually run it. Anyone? Two seconds, I hear. seconds. Yeah. 2.01. So the two increments functions are running in parallel. I have eight cores in this laptop, so I could potentially on this laptop scale up to eight increment And and still get to the two seconds beyond that things will have to wait because I only have eight cores You could change this function and then we're running three increment functions that will still take two seconds So this is a very very kind of simple example to showcase what you can do with das delayed But you can imagine for kind of more complex complex situations, you can build your own task graphs, and the great thing about this really is that Pandas, NumPy, Scikit-learn, these are all great, but there are abstractions and your data doesn't always fit neatly into a Dask data frame when you get it, and this is a great way to kind of work around some of those rougher edges. To answer the question about whether Dask works locally or on the cluster, the answer is both, and this is where Coiled comes in, this is the company that I work for. We provide a very smooth way to scale Dask up to clusters in the cloud, so you can import coiled and spin up a you'll need a coiled account to do this but you can spin up a coiled cluster in the cloud in this case specifying 20 workers each with 25 gigabytes of RAM coiled will distribute a software environment to all of your workers in that cluster to make sure they have the right Python dependencies. And then all the code we've just run, no changes. We connect Dask to the cluster with this client object. And then from there, all the code will run in the cloud. So this is really great for doing local development at home on your laptop. And then whenever you need to scale to production or want to work with a full data set and need to speed up, you can scale to the cloud. Let's just demonstrate that quickly. So I've already spun this cluster up ahead of time, but this is where this is the coiled interface. You can see we have a cluster with a name that's running with 20 workers. It's running in AWS. We also support GCP, and Azure is coming as well. We're running spot instances in this case. And we can run a computation on this cluster. We import Das DataFrame, read in this case all of the New York City taxi data. As expected, just calling the Das DataFrame only gives us the schematic. But when we run a group by on this data set, this is now running in the cloud. And Das gives you a nice dashboard to keep track of your computations. So you can see the tasks that are running on all of our 20 workers. You can see the memory stored in each worker, the progress that's going on. And there's a lot more information in this dashboard to look at. We like this dashboard so much that we make t-shirts with it. So it's famous. All right, that's just a very quick run-through of everything that we'll cover in more detail right now. Any questions before we continue? Yeah. So now that you showed this complex graph, I was having my experience with Fire Spark problems with complex lazy evaluation when you have, the graph task is increasing or the evaluation plan increase a lot. Yeah. In iterative process, usually they crash. So that's avoiding because you have, I see that you have only actions like a compute. The rest is transformations, not evaluations. Mm-hmm. Mm-hmm. When you have iterative processes, is Dask anyhow avoiding to have very complex of huge graph that crash at the end? Yeah, so I don't know. My colleague Guido yesterday gave a talk about active memory management in Dask. So the Dask scheduler makes very, is built to make, to optimize these computations and avoid crashes like this. So that's something that's continuously in development. But yeah, the scheduler should take care of that. And if it doesn't, then let us know, and we'll make it better. Yeah. I have noticed when using , which is something different, of course, for parallelizing tasks, that if the data set is too huge, that the runtime improvement due to parallelization I'm not sure the answer there you go question here so the if I understand when When we are in local, like without the cluster, then what we are essentially doing is to avoid the gil, right? We are just using multi-processing to avoid blocking the gil because then Python doesn't do it. Is that the idea, like in local, it's what's happening by just parallelizing across the processes? Yeah, I mean, we're using all the cores in the machine, yeah. OK, got it. Thank you.
+
+**Speaker 5** _[35:59]_
+
+Hi. Does it require fine-tuning to work efficiently? I mean, different data sizes requires different settings like number of repartitions or maybe data could be skewed.
+
+**Speaker 1** _[36:14]_
+
+Yeah, great question. So the Dask scheduler, again, is very smart, and will do a lot of optimizations for you. So definitely running it out of blocks, Dask will do that for you. There is an option to customize, and you can play around and see what that does for sure to try and beat the scheduler. We could have a competition, but the idea is that Dask will optimize that for you. But to give one concrete example, so, for example, when we read in this data set here at the top, let's see, we didn't specify the number of partitions, right? So Dask decided to make it 10. You can play around with this. So you can repartition and say, okay, I want you can repartition based on partition size, The rule of thumb is to do about 100 megabytes. But if you are unhappy with how fast it's running, you can change and see if that has impact.
+
+**Speaker 3** _[37:31]_
+
+In your example, you are showing an array that's read in, so you already have the huge data set somewhere. What usually happens to me is that I have two or even more moderate-sized data sets and then I have to cross-product them and then boom, it trashes my memory. Can I do this with, let's say, two Pandas data frames and cross-product the index and And then get out of it a lazy evaluated dusk data frame that I then can parallelize.
+
+**Speaker 1** _[38:01]_
+
+My go-to would be to turn them into Dask arrays first, so that they are lazy, and then do that cross-product operation on those.
+
+**Speaker 2** _[38:14]_
+
+So, online, someone asked, is there a way to run DAX on an existing MapR or Spark cluster?
+
+**Speaker 1** _[38:22]_
+
+On the spark cluster. Yeah
+
+**Speaker 2** _[38:23]_
+
+cluster. Yeah.
+
+**Speaker 1** _[38:24]_
+
+I know that my colleague Gus is working on a video to run Dask on Databricks, so I assume it's possible. I've never done it myself, and I would avoid it. The great thing about Dask is that it's Python native, so you don't have to deal with the JVM, you don't get weird Scala error messages, so my advice would be to stay in Python.
+
+**Speaker 2** _[38:52]_
+
+Then finally, is there a kind of playground for COID or maybe a demo account?
+
+**Speaker 1** _[38:58]_
+
+Yeah, so we have a free tier. It requires activation because we had issues with crypto miners the last couple of weeks, unfortunately. So we, yeah, you can go to cloud.coil.io. Yeah, I'm already signed in, so that won't be very helpful. but yeah you if you go to yeah yeah so it's it's far from optimal at the moment and we're very aware of that and we're working hard to find a workaround but right now you can sign up for an account and just we we have to confirm that you you are a human using it for a good reason, and we will activate your account, yeah. Thanks. All right. Let's see, how are we doing on time? Let's... The next notebook doesn't have any code. You can open it to follow along, but it's basically just a run-through of some basic Dask concepts now that we've seen what it does. It's also kind of important to have a basic understanding of distributed computing and the architecture of Dask to understand things like how you can optimize performance. So we've already seen, right, Dask follows syntax of the PI data ecosystem and does that on purpose. And basically what we've demonstrated so far is the Dask array and the Dask data frame, which are the kind of higher level collections that mimic Pandas and NumPy, and the lower, we've seen one of the lower-level APIs, Dask Delayed. All of these collections build task graphs, as we've seen, so we saw it specifically with Dask Delayed. Dask DataFrame also does it, it does that under the hood, builds a task graph that is executed by a Dask scheduler. There are technically four Dask schedulers, but the distributed one is really the one you should care about, unless you're doing experimentation on a single machine and want to look at things like the difference between running on threads and processes. But the distributed one is the one that Dask will launch by default, and this is the one that will scale seamlessly from your laptop to a cluster as well. So some Dask concepts that will kind of help you understand what's going on. Mentioned some of these already, but this is the basic architecture of a Dask cluster. And a Dask cluster can exist on your local laptop or in the cloud. So you have a client, which is the user-facing entry where you're writing your Python code, in this case the Jupyter notebook, that communicates to a scheduler, which manages the state and sends tasks to work workers for execution and then the workers if you're working locally will be the cores in your machine and if you're working remotely on the cloud will usually be vms with with yeah that will that will do the actual work send it back to the scheduler and then the scheduler will will send it back to the to the client so when to use dask we talked about this this a little bit already with Joshua's question, but let's see if this fits on the screen like this. Basically, there's two axes that are important here, one is data size, the other is computation time, so if your data size is manageable and your computation time is you're happy with that, then you're in this lower left quadrant, it fits in your RAM, happy with how long it takes, don't use Dask. There's overhead, it gets complex, don't bother. The other PI data libraries will serve you best here. But if your data starts to increase beyond what you can load into RAM, you start running into memory errors, that's one potential use case of Dask. Or if your computations are taking too long and you want to use parallel processing to speed that up that's another use case or of course both then definitely give Dask a try and yeah we say this all the time don't use Dask if you don't need to Panda is not by scikit-learn these are great we work closely with with with the maintainers of these libraries and there's a reason why they're popular so don't don't use Dask because the overhead may be larger than the performance gain that you get. With that, let's jump deeper into the Dask DataFrame API.
+
+**Speaker 2** _[44:00]_
+
+Some questions?
+
+**Speaker 1** _[44:01]_
+
+Can we keep them for a little later? Sure. Sure. Thanks. So this is, we saw it in practice a little already, but let's dive a little deeper in. So we'll download the same flight data, import Dask DataFrame and read it into a Dask DataFrame. You often see ddf when using Dask to distinguish it from df, so ddf stands for Dask data frame. And basically, as I mentioned, Dask will do sort of a pass over the data to give you some schematic information like the column names, the number of partitions, and the data types. So these are things you can inspect without calling compute. These are loaded into memory, small schematic information, and you can get the data types. And as mentioned, you can see the number of partitions. Now, if you wanted to repartition this, you could, oh, let's see, partition size, for example. Male Speaker 3 We are doing that. Perfect. Thanks, David. But I think it won't work from Binder. They're blocking outgoing outreach to certain most ports. And so if you're running a notebook in Binder, I don't think you'll be able to launch the cluster, but not actually do this. OK, thanks. Right, so for the most part, a Dask DataFrame will look and feel like a Pandas DataFrame, And that is because under the hood, it is just a bunch of Pandas data frames. So Pandas works great. We see no reason to kind of reinvent the wheel. But it has a scalability issue. So what Dask does is take your big data set, cut it up into chunks or partitions. Each partition is a Pandas data frame. And Dask will orchestrate applying Pandas methods and operations onto those Pandas data frames in parallel and bringing the results back to the client. So yeah, I would say, yeah, anywhere between 80% and 85% of the Pandas API is supported by Dask. We're continuously working to increase that. I don't think it'll ever be 100% because some things, when running in distributed, just get more complex. But like I said, under the hood, a collection like Dask DataFrame is building task graphs. So these are our 10 partitions. Each partition is the result of reading CSV. This is a relatively simple task graph. This is embarrassingly parallel. If you would have 10 cores, this could all happen at the same time. And we've seen calling head. And yeah, so this calls compute sort of implicitly under the hood. Now, because a DAS DataFrame implements the Pandas API, we can write familiar Pandas code using our DAS DataFrames. So you can call, for example, something like max on a specific column. Again, this won't give you the result. It'll only build the task graph to get to the results. So let's see if this will work. This is starting to get a little bit more interesting. We have our ten partitions. Each one is the result of reading a chunk of the data from CSV, getting the column, applying a max function, getting that result, and then applying a max over all of the ten partitions to give you your final result. This is just kind of... You can use Dask DataFrames without ever looking at these task graphs. I myself, when I use Dask DataFrames, rarely look at them, but it's helpful for this tutorial to kind of understand what's happening and how it's working under the hood, and also to see... Start spotting performance gains, right? So if you, um, yeah, running four cores, then, uh, four of these can run in parallel. Um, but 10 would be faster. Uh, eight or six might not necessarily be faster because you're, you'd still be waiting, uh, in either case. Yeah. Is there a way to catch the intermediate results? Uh, you can use persist, uh, which will persist the results to cluster memory, if so, yeah, and that is basically caching. So this will, if you're working locally, there's not really a difference, because your cluster is local, but if you're working in the cloud, then you can, or another cluster, you can persist them to cluster memory using persist. persist. And this will trigger computation on the cluster, but your notebook can continue working. So there's computations happening in the background. And again, here, all this has done so far is build the task graph, which is why this is so fast. But if we specifically run compute, then it will take a little bit longer and it will give us the result that we're looking for. Cool. Let's see. I see that I left the code in the notebook. Okay. The idea was to turn these into exercises, but I think all the code is still in there. about that. Yeah, this is basically just showing more examples of how we can use Pandas API but just add compute at the end, so this should all be very familiar. And to your point about persisting and computing, so in the examples and the exercises we saw above, we sometimes perform the same operation more than once. Dask DataFrames hashes the arguments, allowing duplicate computations to be shared, and you can use dask.compute to merge task graphs of multiple operations. For example, if we compute the mean and the standard deviation for departure delay of all non-cancelled flights, since Dask operations are lazy, these values aren't the final results until we compute them, they're just the recipe. So if we compute them with two calls to compute, there will be no sharing of intermediate results. This first cell, nothing is happening yet. If we call compute twice, this will take about 3 and 1 half seconds. But if we share results by using dask.compute to compute both of these at the same time, this will be a lot faster. It's about half the time, because the two task graphs are merged, and results can be shared between the two task graphs. And we get even more interesting task graphs here. I'm not going to walk through the whole thing, but you can see that results are shared here and here and then all the way back here. And this is really, I mean, it's kind of, if we take the analogy of Dask as an engine, There's kind of two ways you can approach an engine, right? Some people just want to get in the car and drive. You can do that. You never have to look at a task graph to use Dask. Some people like to get into the engine and say, hey, I know Porsche built this, but I think I'm better. And you can tweak it, and we give you that freedom. And that's really a great thing about the flexibility of Dask. Mentioned already earlier, but there's a few different desk schedulers. But really, the one to know when you get started is the distributed. It offers the most features and diagnostics. So the dashboard that we saw earlier is something that's only available in the distributed scheduler. And this is also the scheduler that allows you to scale seamlessly from local to cluster. You can instantiate a distributed scheduler on your local machine by calling from distributed import client. then creating a client with in this case eight workers is the maximum course that I have on my machine if you don't specify any workers it'll just use all the cores so you can kind of decide what you want and creating that client object will output a Dask dashboard to actually execute so this is this is the Dask dashboard for my local cluster this is something if you're using coiled we provide as part of our interface but if you're just using Dask open source this this dashboard is available to you as well, um, through this client hyperlink. Uh, let me pause here for a second for questions. Yup. that depends a little bit on what you do on a few things are you running them close together in time are they separated far apart Yeah. So if you, if you, um, calculate the median and call compute, then that then dusk is building the task graph until you call compute. It's, it's building a task graph and then it will hash all of your computations and, and calls and, and, and we'll, we'll say, okay, this is that value. i've already calculated it let me bring it over there it will only run once if you call compute it will keep building the task graph Does that answer your question? No, I'm just wondering if I'm in the code I'm, like, let's say I'm computing the median, like, twice in the code, just writing the same value median, and then, like, then I do, I'm continuing to write my code, and then basically, at some point, I press compute, and then the median will be mentioned twice in my code. Yeah. Same value, basically. Will the data be smart enough to understand that actually it doesn't need to compute the data? Absolutely. Yeah. Yes, so geopanda specifically is a good question, I know SpatialPanda is an X-ray, I mean X-ray runs with Dask, and geopandas I'd have to look specifically, but I know that Dask sports polygons as well.
+
+**Speaker 5** _[56:22]_
+
+Hi. What happens if I use a high cardinality column to distribute my algorithm? Let's say I do group by user ID, apply, and there are billions of users. So how does it handle that?
+
+**Speaker 1** _[56:41]_
+
+I didn't hear the first few words of your question, sorry.
+
+**Speaker 5** _[56:44]_
+
+What happens if I choose a high cardinality column to distribute the algorithm or the function like users? So there are billions of users, and if I do DF group by user sum or whatever, there will be billions of parallel tasks, right? So how does Dask handle it?
+
+**Speaker 1** _[57:10]_
+
+Yeah, so it's possible that your question, I think, underneath that is if you call compute on that, that might cause a memory error. Is that your concern?
+
+**Speaker 5** _[57:21]_
+
+No, my concern is I guess the number of tasks produced, so yeah.
+
+**Speaker 1** _[57:29]_
+
+Yeah, yeah, I mean the number of tasks shouldn't be a problem It might take a while Or if the result is really large It won't okay
+
+**Speaker 5** _[57:38]_
+
+okay because in in spark um i cannot do such thing i cannot um group by um users um i cannot do group by on high cardinality columns so but you're saying it's not a problem with desk right so
+
+**Speaker 1** _[57:53]_
+
+No, I don't see why not. No. Okay. Uh, Hey, does task have support for asynchronous computation? Uh, yes. What specifically would you want to use it for? Just in general, the compute function that, uh, computes to find a value. Yeah. Uh, so, um, and with asynchronous you mean you can launch it and keep working. Exactly. Yeah. so that's what something what that persists, uh, does, uh, that persists. And then there's also the desk futures API, uh, which, uh, which is asynchronous. Sorry. Okay.
+
+**Speaker 2** _[58:40]_
+
+The online questions, should I ask it now? Sorry. OK, so the first one is, is DAX root CSV also faster on local machine, or does it require distributed storage, such as S3, to profit from speed up at reading data in?
+
+**Speaker 1** _[58:57]_
+
+no it doesn't require cloud storage to be faster I like we mentioned earlier if your data set fits in a pandas data frame you might be better off
+
+**Speaker 2** _[59:07]_
+
+If I run DAX on my local machine, is it the optimal scheduler chosen automatically, or do I have to set it manually?
+
+**Speaker 1** _[59:17]_
+
+Is the optimal what?
+
+**Speaker 2** _[59:18]_
+
+Is the optimal scheduler chosen automatically or do I have to set it manually?
+
+**Speaker 1** _[59:23]_
+
+Manually yeah, so it will go
+
+**Speaker 2** _[59:23]_
+
+Yes.
+
+**Speaker 1** _[59:26]_
+
+Yeah, I mean you should use the the distributed scheduler when you're starting out which you do with with this code
+
+**Speaker 2** _[59:33]_
+
+So what is the best strategy for data location or access on cluster? All workers should have access to the data.
+
+**Speaker 1** _[59:42]_
+
+What is the best strategy for data location? I'm not sure I understand that question. Yeah.
+
+**Speaker 2** _[59:49]_
+
+Maybe the person that asked it will rephrase. How would you use DAX for many different regress function or assessing the same text column?
+
+**Speaker 1** _[60:02]_
+
+Sorry, one more time.
+
+**Speaker 2** _[60:04]_
+
+How would you use DAX for using many different regex functions or assessing the same text column?
+
+**Speaker 1** _[60:14]_
+
+Interesting, okay. The question is how you would use Dask to apply many different regex functions. So Dask allows you to parallelize any Python function, so that should include regex functions. You can map them across Yeah, it depends if it's in a data frame you can do something called map partitions functions, which will map any function across all of the partitions, and if you remember each partition is a Pandas data frame, so any function that can run on a Pandas data frame can be mapped using the map partitions API.
+
+**Speaker 2** _[60:54]_
+
+Okay, could you briefly go over the difference between DAX data frames and DAX bugs? Are there any specific use cases to use one versus another? Yeah.
+
+**Speaker 1** _[61:04]_
+
+Yeah, so we haven't really looked at DaskBags yet. DaskBags is an API that uses bags as a mathematical concept, unstructured, unordered list, that I've mostly seen used for JSON type data. So things that don't fit neatly in a tabular format, you would use DaskBags.
+
+**Speaker 2** _[61:31]_
+
+Should you repartition after subsetting your data?
+
+**Speaker 1** _[61:37]_
+
+Yeah, it depends. It can be smart to do. Yeah, then we can kind of get into the nitty-gritty of a specific use case. So Dask optimises a lot. If you are subsetting, it is possible that you end up with still, let's say, 100 partitions, but each of these partitions only has two megabytes of data, then it would be smart to repartition, yeah.
+
+**Speaker 2** _[62:04]_
+
+Yeah, sorry. Some more questions.
+
+**Speaker 1** _[62:05]_
+
+more questions yeah a lot more
+
+**Speaker 2** _[62:07]_
+
+Or like.
+
+**Speaker 1** _[62:08]_
+
+Like five more? Okay, let's take a break and do some more later. Okay, sure. Yeah? Thanks. All right. So that was our dive into Dask DataFrames. We'll go to the next notebook, which goes into parallel and distributed machine learning with Dask. Just a hands-up again, people experience with scikit-learn. Okay, so it's quite a big group, So I think I will run through the first part of this quite quickly. So yeah, Dask.ml is the library that scales scikit-learn algorithms using the same syntax. And this is a different version of the, okay, it's not, there we go. The diagram we saw earlier, but specifically for machine learning, again, you might be memory bound or compute bound in your scaling issues with machine learning. So you might have a data set that's too large, or you have a data set that fits into RAM but your model size is too large. For example, because you're running a very heavy grid search and you want to speed that up to meet your project deadline. So this is a quick refresh of scikit-learn, I'm going to run through this very quickly because it seems like most people are familiar. But basically we have the scikit-learn API which accepts samples, matrix, and puts up target values. We can fit a support vector classifier, basically the very familiar fit and train API that scikit-learn is famous for. We can do a grid search CV over a number of parameters, in this case doing eight fits, and get the best parameters and the best score out of that grid search. So if you are compute bound and you want to speed up something like this, so let's actually run these quickly. This will, you'll see each fit coming up sequentially. That's fine if you're doing eight relatively small amount of data, each one takes a bit of time, and it's done in about 17 seconds. Now, imagine this was either a much larger data set or you were doing a grid search over many different parameters. You can speed this up with JobLib using single machine parallelism. So this you don't need to ask for yet. This is a feature that's part of scikit-learn. Any algorithm that has the njobs keyword argument can be run in parallel. So here, we're running the same grid search, but saying njobs equals to minus 1. This will make use of all of the cores in your machine. We no longer get a sequential list of fits, because they're being fitted in parallel. But this runs about 10 seconds faster. Now, if this is still not enough for you, You want this to run in two seconds, or it's actually running for 30 minutes, and you want it to be five minutes. You can scale this up further with Dask. So Dask and JobLib maintainers work together to connect the JobLib parallelism to multi-machine. So you would launch a DaskScheduler like we did before, specify your parameters. Here we're running a lot more. And you would say with job, create a context manager, job-lib-parallel-backend-specify-dask, and then run this in parallel. So this is doing 72 fits. And who can spot where I'm cheating at the moment? Trying to keep you all sharp. I know it's early in the morning still. So this is actually still just running on my machine. So actually, this is no different than JobLib. This would become different if I would spin up a coiled cluster here, which I have running. So we could say, let's see, it'd be fun to test this live. So this just took 28 seconds. If I, let's see, import coiled cluster, cluster should still be running. I can reference it with this name and say, OK, I want to connect from this IPython session, I want to connect to this running cluster. And then instead of saying n workers, which creates a local cluster on my machine, Let's say, OK, Dask, connect to this remote cluster. And again, now with the same code, we'll be running this in the cloud on a cluster with 20 workers. Let's see how long it takes. Speed up. About ten seconds in this case. So the specific speed up, you know, we can talk for a long time about how to optimize this, but basically what I wanted to demonstrate here is the DAS code stays the same. just switch out the cluster object to be to work either locally or in the cloud any questions about this so it was basically pure
+
+**Speaker 4** _[69:02]_
+
+It's basically pure scikit-learn code with just a
+
+**Speaker 1** _[69:04]_
+
+code with just this context manager.
+
+**Speaker 4** _[69:06]_
+
+And that was it.
+
+**Speaker 1** _[69:07]_
+
+Yeah, so this is a collaboration between JobLib and Dask, where you can specify a back-end to JobLib to be Dask, and then your code will know, okay, I need to use Dask, Dask has been connected to this cluster, but in this case, you're not running any Dask syntax. Okay, that's awesome, thanks.
+
+**Speaker 6** _[69:36]_
+
+Hi.
+
+**Speaker 4** _[69:38]_
+
+Just one question, how does it perform with more clients? So if you have in such cluster, how many concurrent clients can you support?
+
+**Speaker 1** _[69:46]_
+
+How many clients at the same time? Yeah, exactly.
+
+**Speaker 4** _[69:50]_
+
+exactly. It's like people running that exact same script at the same time.
+
+**Speaker 1** _[69:54]_
+
+On the same cluster yeah, you know yeah, that should be possible so multiple people can connect to a coiled cluster You'll be competing for resources obviously so
+
+**Speaker 4** _[70:06]_
+
+Is there a way to kind of reserve workers, like available workers, so that you don't use all of them for a single request?
+
+**Speaker 1** _[70:14]_
+
+request that's a good question i personally don't know the answer to that maybe david does
+
+**Speaker 4** _[70:35]_
+
+Okay, thanks.
+
+**Speaker 6** _[70:44]_
+
+So you just showed how to use, for example, Joblib.
+
+**Speaker 1** _[70:50]_
+
+with
+
+**Speaker 6** _[70:51]_
+
+parallelization and then after that you showed the same thing in DASP on the same machine in this case you wouldn't have any speed up compared to pure job blip no
+
+**Speaker 1** _[71:02]_
+
+No, correctly.
+
+**Speaker 6** _[71:03]_
+
+when I have like a really big machine with like a hundred cores and I don't know like hundreds of gigabytes of RAM would a cluster consisting of various nodes would still be faster than this single machine
+
+**Speaker 1** _[71:21]_
+
+depends on your machine depends on the cluster if the cluster is you know has as double the amount of cores then yeah that definitely will be faster if you have access
+
+**Speaker 6** _[71:31]_
+
+I mean, let's say we have the same amount of cores in the cluster and on this single machine, for example.
+
+**Speaker 1** _[71:37]_
+
+then I would recommend staying on the single machine.
+
+**Speaker 6** _[71:40]_
+
+Okay, but still using DOS or?
+
+**Speaker 1** _[71:43]_
+
+less or no need in that case if you can scale so this is specifically for compute bound machine learning problems if you can stay on a single machine and you have access to a large one and you're happy with the results stay on the single machine and you just use job lip yeah all right thanks okay now the second type of problem scaling problem that you might have with machine Machine learning is memory bound, so this is where your data set is too large to process on the machine that you're working on. This is where you would use the Dask ML library, and Dask ML has estimators that work well on Dask arrays and Dask data frames, so if you remember from what we've talked about previously, Dask data frame cuts up your big data into smaller partitions, and Dask ML estimators that that are optimized to work on those partitioned data frames so in this case again you'll see this this mimics the the scikit-learn API so we import make regression and linear regression to create some synthetic data this is just for demonstrative purposes so actually you know seven megabytes shouldn't be using a task array for this but just to to illustrate what it can do instantiate the linear regression model fit it and then predict so and this is again still running on our coiled cluster in the cloud so yeah this should all look very familiar as I mentioned earlier not all algorithms can be run in parallel so something like random forest is great other things are not possible to parallelize so there's there's a limited set of algorithms that are available in in DaskML this section I've already illustrated by by showing how you connect to a coiled cluster but yeah it's a it's a if I'm not mistaken it's a parallel implementation written by the desk ml 10 minutes okay yeah we have 10 minutes left so I'm gonna actually
+
+**Speaker 2** _[74:28]_
+
+Sorry? We have a lot of questions. We have a lot of questions. Sorry?
+
+**Speaker 1** _[74:32]_
+
+let me see yeah I think I illustrated the basics of this notebook here so I think I'll open it
+
+**Speaker 2** _[74:32]_
+
+We have a lot of questions.
+
+**Speaker 1** _[74:45]_
+
+up for questions since we have 10 minutes if there's anything specifically you would like me to dive into deeper we can take some questions online as well for the people at home
+
+**Speaker 2** _[74:57]_
+
+Okay, so maybe the most voted questions. I'll start with the most voted questions. Sure. So the communication backend of DAX seems to be using TCP, CLS. Are you also planning to support InfiniBand as well in the future?
+
+**Speaker 1** _[75:13]_
+
+I can't answer that question. Guido, is that something? Not aware. Okay.
+
+**Speaker 2** _[75:22]_
+
+Where is the training data, which might be huge, is it uploaded to the cluster or could Would that be a bottleneck, like maybe the trainer that I used?
+
+**Speaker 1** _[75:38]_
+
+used uh-huh yeah so the data should not be loaded into the cluster memory at one point unless you specifically tell Dask to do that no so I mean that that's the whole point of Dask right it will cut up your data set into partitions and process those on the fly
+
+**Speaker 2** _[76:00]_
+
+So what if I run DAX DataFrame on a HTC cluster? Will it then uncomfortably take as many calls as possible? Available?
+
+**Speaker 1** _[76:11]_
+
+Yeah, I'm quite certain you can specify that.
+
+**Speaker 2** _[76:12]_
+
+Yeah.
+
+**Speaker 1** _[76:18]_
+
+I mostly run Dask in the cloud. I know we have plenty of people running it on HPC. So there's a bunch of sort of open source libraries like Dask, cloud providers for the cloud, Last Gateway, YARN, that will give you the options you need to use an HPC cluster. That's quite a common use case we see, especially in academia.
+
+**Speaker 2** _[76:46]_
+
+So when I make a DAX distributed scheduler on a compute node on a slum cluster, I cannot use the dashboard link. Are there alternatives for deeper insights?
+
+**Speaker 1** _[76:58]_
+
+Are there, sorry, are there what for deeper insight?
+
+**Speaker 2** _[77:00]_
+
+Alternatives for deeper insights.
+
+**Speaker 1** _[77:01]_
+
+insights you can't use the dashboard interesting yeah I need to know more about the specific setup because there are there are ways to get that dashboard link differently yeah tell them to reach out to me on LinkedIn I'd like to talk to them
+
+**Speaker 2** _[77:23]_
+
+So, would there ever be a situation where number of tags would not match number of partitions? I'm asking because both are mentioned in the output every time.
+
+**Speaker 1** _[77:36]_
+
+The number of tasks will not match the number of partitions. Yeah, I'm not sure what that means
+
+**Speaker 2** _[77:44]_
+
+Okay, so where can I find more extensive documentation or example for DAX, Job Queue, HD, Condor, and SLAM, than on the website documentation?
+
+**Speaker 1** _[77:56]_
+
+The documentation that exists you can find through the Dask.org website and the Dask discourse, so that's maybe a good place to go now. The Dask discourse is a great place to ask a lot of questions that I wasn't able to answer today and any other. So this is where at Coiled we employ quite a few Dask open source engineers, and we're constantly monitoring the Dask discourse channel. So if there's, I mean, you know, working in distributed computing gets complicated quick. So ask your questions and respond very quickly here.
+
+**Speaker 2** _[78:44]_
+
+So does DAX support Delta Lake storage formats?
+
+**Speaker 1** _[78:49]_
+
+Delta Lake store. We highly recommend working with Parquet and Dask works very well with Parquet.
+
+**Speaker 2** _[78:58]_
+
+Yeah, I don't know if anybody have any question here. Yeah
+
+**Speaker 1** _[79:01]_
+
+yeah so maybe I'll wrap it up with a few more slides here so after this tutorial there's a lot more to learn so hopefully this gave you kind of the the basics to try to ask out if you haven't tried it before if you have more questions come find us at the booth opposite the cafeteria area we also have a blog with lots of more resources for specific use cases or best practices for using Dask and some great webinars for practical use cases. Leave a few links up here for specific use cases. So Dask and machine learning, we talked about scikit-learn in the tutorial. What I did not get to right now is the XGBoost integration with Dask. So XGBoost has a native kind of integration just like JobLib where you can say, okay, this on Dask, and without running any Dask code, you can run your XGBoost model in parallel. So there's an example here that trains on 100 gigabytes in four minutes. You can also use it with PyTorch. Dask integrates well with many workflow orchestration tools, and if you are really kind of want to get down to the nitty-gritty of how the engine works and want to tweak that, there's sort of advanced best practices topics here. At Coiled, we provide Dask training, so if this is something you're interested in learning, for example, for your organization, we provide a four-half-day training. It's given by Adam Brindle, highly recommended. The curriculum is here and for PyCon we have a 50% discount coupon so reach out to us if that sounds interesting you can also meet us at the booth we can tell you more about how it works and I showed this already but these are the places where you can find us so desk discourse is the place to ask any desk questions if you're interested in coiled come talk to me David Guido or Gus we're at the coiled stand upstairs and yeah, I hope this was helpful.
+
+**Speaker 2** _[81:19]_
+
+Can you take a few more questions?
+
+**Speaker 1** _[81:21]_
+
+A few more questions. A few more questions, sure. Yeah.
+
+**Speaker 2** _[81:23]_
+
+So, can I use the Jupyter Notebook?
+
+**Speaker 1** _[81:27]_
+
+Yeah, okay, which one
+
+**Speaker 2** _[81:27]_
+
+Yep. No, I like the question.
+
+**Speaker 1** _[81:33]_
+
+Can I share the Jupyter notebooks? Yes, so the notebooks are in the github repo, so if you
+
+**Speaker 2** _[81:33]_
+
+Can I share?
+
+**Speaker 1** _[81:39]_
+
+Go to this link The notebooks are all there
+
+**Speaker 2** _[81:44]_
+
+Who is distributing data to workers? Do they read data, like read CSV, or should they have read access to data, or is it the tax of scheduler?
+
+**Speaker 1** _[81:58]_
+
+so the workers will have access to the data yeah
+
+**Speaker 2** _[82:04]_
+
+OK. So I think the rest of the question. OK.
+
+**Speaker 1** _[82:07]_
+
+Any more questions for the room before we end? You get an applause for your question.
+
+**Speaker 4** _[82:23]_
+
+Thank you very much for that. Why would I want to use Dask with PyTorch?
+
+**Speaker 1** _[82:28]_
+
+Why? Yes. To parallelize?
+
+**Speaker 4** _[82:31]_
+
+But PyTorch already has a parallel CPU and GPU and also has distributed training. I'm not sure why would I want. What would using Dask, what advantages would...
+
+**Speaker 1** _[82:45]_
+
+Can you easily scale to a cloud cluster with PyTorch natively?
+
+**Speaker 4** _[82:45]_
+
+Can you hear? Well, we have distributed training there. Sorry? We have distributed training on multiple machines. We could also use cloud machines for distributed training. Okay.
+
+**Speaker 1** _[83:01]_
+
+Um, yeah, let's, let's talk after, uh, I'm curious.
+
+**Speaker 4** _[83:07]_
+
+Thank you
+
+**Speaker 1** _[83:08]_
+
+from over here.
+
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -1,0 +1,240 @@
+title: Getting started with JAX
+---
+description: Deepminds JAX ecosystem provides deep learning practitioners with an appealing alternative to TensorFlow and PyTorch. Among its strengths are great…
+---
+created: 2023-01-05
+---
+code: TWPBZF
+---
+slug: getting-started-with-jax
+---
+speaker_names: Simon Pressler
+---
+speakers:
+
+
+
+### Simon Pressler
+---
+abstract:
+
+
+Deepminds JAX ecosystem provides deep learning practitioners with an appealing alternative to TensorFlow and PyTorch. Among its strengths are great functionalities such as native TPU support, as well as easy vectorization and parallelization. Nevertheless, making your first steps in JAX can feel complicated given some of its idiosyncrasies. This talk helps new users getting started in this promising ecosystem by sharing practical tips and best practises.
+---
+full_description:
+
+
+Deepminds JAX ecosystem provides deep learning practitioners with an appealing alternative to Tensorflow and Pytorch. Among its strengths are great functionalities such as native TPU support, as well as easy vectorization and parallelization which make JAX and its ecosystem an attractive option for your deep learning projects. Nevertheless, making your first steps can feel complicated. From pure functions and the resulting differences in coding style, to avoiding recompilation, JAX comes with its own set of restrictions and design decisions to be taken by the user. 
+
+This talk wants to help new and prospective users in their JAX learning journey, by providing guidance regarding practical problems they are likely to encounter when transitioning into the JAX ecosystem. Having recently switched to using Jax and Flax for my daily work this talk shares some of the insights I gained and wants to help them to avoid some of the mistakes I made early on. The talk will have a systematic look at selected situations in which JAX provides users with choices, seeing how they differ, and which is the best option given different circumstances. 
+
+The talk covers: 
+- Why bother switching to JAX? 
+- A brief introduction to JAX including a list of JAX’s idiosyncrasies 
+- Pure functions and the resulting architectural decisions 
+- To  JIT and or not to JIT 
+- A speed and memory comparison of the different iteration options 
+- Memory management and profiling
+---
+room:
+---
+day: Tuesday
+---
+slot_date: 2023-04-18
+---
+start_time: 14:10
+---
+end_time: 14:40
+---
+slot_id:
+---
+track: Deep Learning
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 2521
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Novice
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/TWPBZF.png
+---
+youtube_id: yDYiiVVkBXY
+---
+video_link: https://www.youtube.com/watch?v=yDYiiVVkBXY
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT29M49S
+---
+video_thumbnail: https://i.ytimg.com/vi/yDYiiVVkBXY/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Yes, well, hello also from my side, yes, I'm Simon, I'm working at Königsweg, and I would like to use the opportunity to heartily invite all of you to our amazing quiz, you can win a PlayStation 5. And in case you want to know anything about me or about Königsweg or about me at Königsweg, you can usually find me at our booth. End of advertisement block. What do I want to talk about today? I want to share with you the experiences I had when I moved into JAX. I've been using PyTorch before and in my experience with JAX there were a few stumbling blocks which I thought might be interesting for you to hear about. So you can make an informed decision if JAX is the right thing for your use case and in In case I bore you overly much, you can start artifact hunting in my presentation. Example here. To give you a little bit of context about how I came to use JAX, I had the opportunity to work on a bit of a research project on a graph neural network, and I only had a very limited time frame. I needed to train multiple models, so I Googled around, how can I speed things up, and then I came across JAX, and if you have ever encountered any JAX-related material, you will know that one of the key advantages of JAX is speed. Quick side note here, a lot of the examples you find online are, I would argue, not ideal insofar as a lot of the comparisons compare tiny functions, and that's not really representative of a deep learning use case, actually, if you think about it. Therefore, I'm very grateful for the speed comparison by Hugging Face, and they benchmarked a Jaxx, I think actually 10 Jaxx-based models, again, 10 PyTorch-based models, and they reported speedups and training time between 20 and 40 percent. I've given you the link down here. If you're interested, You can check that out. So that's about the level of speedup I was expecting as well. Furthermore, JAX is a rapidly growing ecosystem which is currently getting a lot of attention, which makes it very interesting to have a look at it at least. It has a familiar NumPy-like interface, which I thought makes usage actually quite easy, so what can go wrong? And if you have access to TPUs, you can run your code without further transformation on TPU, which also sounded very handy to me. So I got started on my journey, and I encountered some difficulties. But in order to understand these difficulties, we need to have a look at a just-in-time compiler in JAX. Can you give me a brief show of hands who has some form of understanding how to just-in-time compiler in JAX works? Okay. Good. Yeah. Then let's discuss this very briefly. In JAX, making your function just in time compilable is actually very easy from your side. You have to just add a decorator. If one of these decorated functions is called for the first time with a new object it hasn't seen before, so with a new signature, the function will be compiled. The signature is the shape and data type of the input. What happens during compilation is that your input will be replaced with an abstract tracer value and this tracer value will be used to translate your Python code into a Jacksper expression. I have an example in a moment. This Jacksper expression is then, by the way, we're now talking about the stage out, now we have a jack spur, this is then lowered, which means it's converted into a valid input for the XLA compiler. The XLA compiler performs its magic and makes your code run on the accelerator of choice, so CPU, GPU, or TPU, and then your code is finally executed after compilation with your original input. Less abstract. I apologize for the stupidity of the example, I had to fit it on a slide, you can see a very easy function on the left-hand side here. We have an input, we print the input, we add plus one to the input three times, and then we're done. We return the input. On the right-hand side, you see the resulting Jacksper expression, and I would like to draw your attention to three things here. First, you can see that all of the data objects we have here, A, B, C, D, are annotated with a fixed shape and data type. This means that this Jacksper is actually only valid for this specific combination of shape and data type. In practice, this means we need to recompile our code whenever we hit a new combination of input shape and data type. The second thing I would like to draw your attention to is the print statement, because it's gone. This is the fact because JAX doesn't allow you for side effects. If you have a JAX function which you want to adjust in time compile, you're moving yourself into the beautiful world of functional Python. Last, here, for loop, and you can see that the for loop is completely unpacked. Jax wants to concretize your input as much as possible for easy compilation. Now imagine you have a for loop and the number of loops is dependent on your input. And this will not work because Jax wouldn't know how to unpack this. How many statements should there be here? And these are the main caveats you need to keep in mind when you're working with Jax. So I've given you the overview here. Please only for pure functions during just-in-time compilation, no stateful functions. Avoid recompilation whenever possible, and the structure of functions passed through the just-in-time compiler shouldn't depend on the input value. So these are the challenges. And I want to address the later two now. What do you do if you have something in your function that actually needs to depend on the input value. And here you have three basic choices. First, I would recommend checking out the JAX-LAX control flow primitives. LAX is basically underlying the handy NumPy interface, so we're moving one layer down in terms of abstraction. If you can't find anything there, It's in my opinion a valid choice to also say we just move this logic outside of the just in time compiled part of the function and only just in time compile the specific thing we need. So remove the logic. Or my preferred solution is working with static arguments. This means that we declare one of our inputs to not only be defined by shape and data type but also by value. But keep in mind, if we make this more specific, we also need to recompile more often because now we need to recompile whenever we hit a different input value as well. Talking about recompilation, another thing I want to make you aware of or I experienced as really, really useful and I wish I would have kept in mind earlier is padding. If you're working with JAX, it's highly likely that you sooner or later find yourself in a situation where one of your model inputs just has a different shape every time. In my instance, I was working with graph neural networks. I needed to dynamically remove edges from the graph depending on the training batch. And you can imagine how many different graph shapes were a result of that. And I tried to run this, and I was so disappointed in Jacks because where's all the performance? Nothing there, everything is horribly slow. And padding is I think the most elegant solution to this. Just bring everything to one shape if possible. I'm bringing this up, I mean it's kind of self-evident, but I wish I would have known it beforehand because fixing this post-hoc can be a bit of a pain. Enough with complaining about JAX I also want to make you aware of another great feature that in my opinion flies a little bit under the radar in the marketing materials which is JAX performs some JAX offers you a great option to vectorize your code. I've a little running example in the next couple of slides we have two vectors vector A and B each is itself composed of two other vectors and we want to compute the element advice vector product. Easiest solution to this problem, vectorization with a for loop. So you can see this relatively simple problem produces this much of a Jacksper. That's also the reason why we're looking at this specific problem, because anything more interesting would have exploded on the slide. So advantages, this is very straightforward, but compile time is long, performance is not really as efficient as it could be, and therefore I want to make you aware of VMAP doing the same thing in basically one line of code. And what is awesome and feels a little bit like magic about VMAP is that it doesn't happen sequentially anymore. VMAP maps your function in a way that all of the vectorization steps are executed at the same time, which massively increases your accelerator utilization, which is really cool, and thereby massively reduces runtime. So I think this is an awesome feature that should get more attention, actually. The only downside is doing everything at once kind of consumes a lot of memory. And I ran into this problem multiple times, so do I need to go back to a for loop? Answer is no, I don't. Lex offers you also a map operator which is again hidden a little bit in the Lex package which produces this and it might look also a little bit complicated but if you have a look it's in fact only one large scan function. So this reduces memory consumption by being strictly sequential again and has a way better compile time than actually having this for loop which needs to be unpacked in multiple different functions. Only problem with this solution is it only takes one input argument, so I had to package my two vectors into a tuple, so the usage is a little bit cumbersome, and talking about packaging brings me to one of the other things I realized when working with JAX. I guess that's more of a functional programming thing than a JAX thing, but given Given that you don't have any state in your functions, everything needs to be passed around. Don't worry, your model parameters don't need to be passed around individually, there's still a container for that, but you might be wondering about your random numbers. For example, in JAX, random number generation is handled by passing around a key. The random number generator, in contrast to PyTorch, doesn't keep track of the numbers it has already produced, so you need to pass around a key whenever you need new values. This can be quite cumbersome and generally speaking every other thing you want in your model to be kind of behaving like a state needs to be manually handled. So it's very easy to get lost in stuff you hand around, lost in parameters. Or data classes, the solution to most of mankind's problems. I highly recommend thinking about also this before getting started, what are the parameters I want to hand around, and then package them into data classes, which also makes refactoring way easier. you're in the fifth layer of a stack trace and you realize oh yeah I need information that was present in the context of the first function that called another function called another function that called another function so you would need to add the parameter to each of the functions in between so this can be very conveniently solved with using data classes only thing is you need to register data classes. Again, I recommend checking out this very helpful flex utility here that very much simplifies this process. This slide is a bit of a general collection of memory issues I encountered. I tried to fit all of this a little bit more neatly together, But I couldn't, so here's the laundry list, I'm sorry. You need to know that JAX allocates 90% of GPU memory whenever you initialize the first JAX object. And when I got started, I found this behavior a little bit annoying, so I turned that off so I can see what's actually taking up all my GPU space. And then I realized, oh, I can't fit my model on my GPU. And then I turned it back on again and I realized that there's a huge difference in terms of efficiency in memory usage if you pre-allocate. By extension, if your model only narrowly doesn't fit on a GPU, it makes sense to increase this share of 90%. Maybe it fits. I would give this a try. Also just in time compiled functions, take up way less space in memory so when you find yourself debugging, that's something to keep in mind. Don't despair if your function suddenly breaks your GPU. If it's just compiled, it might very well fit. And a little bit random, but I spent so much time on this, I want to at least mention it. If you save an array to disk, it will try, when you load it back in, it will try to go to the same GPU from where you saved it, which is a little bit of an annoying behavior. Just so you don't spend two hours on trying to figure out why stuff that fit before doesn't fit anymore. That's it from the technical side of things. Another thing I want to address is general project maturity. How does that feel when you're using JAX for the first time? X is rapidly growing, which also means that not everything is already there yet that you might be needing. I also learned that the hard way. You really need to make sure that if you have a very specific use case in mind where efficiency is paramount, that what's there is actually implemented to the same degree of efficiency. In my case, I needed to have an optimized message passing algorithm. I only checked and giraffe provides some form of message passing. And then I wanted to scale up for my toy example and I realized it just doesn't fit, it's not there. Okay, I guess I need to do this myself, let's get started with sparse matrices. Well sparse matrices are kind of there, but not entirely yet, not every feature that I would have needed. So, if you consider making the transition to JAX, I would really advise you to make sure that everything is there that you need. Generally, though, the development is quite rapid. In the six-month project I've been working on, I could basically watch the sparse matrix capabilities of JAX grow. So, if something isn't there yet, doesn't mean that it will never be there. Give it two weeks, it might very well have appeared. Last thing I want to address is my experience with support and examples when using JAX. Because that's one of the key advantages if you're using one of the two big players in deep learning. Everything has been done before, it's easy to get examples. And with JAX, my experience was that everything can be found. should just take more time finding it. It can take a little bit longer, can be a little bit more hidden, generally speaking. I also made quite good experiences with the Stack Overflow and Flex, so there seems to be a sufficient support there. I can only recommend that. In summary, JEX offers some great features such as very efficient just-in-time compilation and vectorization, but using JAX introduces a set of restrictions which you need to keep in mind and which might very well force you to implement things differently that your intuition would have been to implement them. Also anticipate to spend more time when you're Googling for a problem. And that's it. I think I might have been too early.
+
+**Speaker 2** _[18:58]_
+
+Thank you so much Simon for sharing your insights on working with JAX. So we received a couple of questions and I will start with the first one. Can JAX work with distributed computing, for example distributed model training?
+
+**Speaker 1** _[19:14]_
+
+yes, it can. Do I have sound? Yes, it can. I personally haven't used it. But I know that the functionality is there. If you check out the padding functionality, the link is in the slides that's also meant to work on distributed data sets
+
+**Speaker 2** _[19:39]_
+
+Thank you so much. Another one. Can you please explain what exactly you mean with padding?
+
+**Speaker 1** _[19:49]_
+
+By padding, I meant that you might be running into a situation where something is not as big as another thing, one area not the same size as another area, smaller usually, and you just add stuff to fill that area up to the same size. In my instance, talking about edges in a network, I added self edges to an artificial garbage node which was not connected to the remainder of the network, so that the network has a fixed number of edges. I hope this makes it clearer.
+
+**Speaker 2** _[20:32]_
+
+Thank you for clarifying I will actually move another question up because we're already talking about padding So how did you do the input?
+
+**Speaker 1** _[20:42]_
+
+I think that's what I just explained. In my instance, it was about a graph, so it was relatively easy to just add artificial edges which were only connected to one node which I introduced, but not connected to the remainder of the network, and then these were self-edges only connecting the node to itself, so that information from this fake node wouldn't diffuse into my real network.
+
+**Speaker 2** _[21:13]_
+
+Thank you. Any thoughts on JAX versus Pytorch for model prototyping? Why use JAX for graph neural nets?
+
+**Speaker 1** _[21:22]_
+
+I think that's a little bit of a hard question, because most people are already experienced in using PyTorch, and as I said, the switch to JAX necessitates some adjustment period, so you're probably faster prototyping in something that you already know. So I guess that's user dependence. And the remainder of that question was?
+
+**Speaker 2** _[21:54]_
+
+So why use JAX for graph neural net?
+
+**Speaker 1** _[21:59]_
+
+I used it because I really wanted to run as many experiments as possible and I thought everything is there that I need, so why not use that sweet, sweet speedup?
+
+**Speaker 2** _[22:14]_
+
+Very nice. Is JAX compatible with ONNX conversion?
+
+**Speaker 1** _[22:20]_
+
+I'm really sorry. I don't know
+
+**Speaker 2** _[22:23]_
+
+Okay, so we will see and then also question maybe it's about elaborating this a little bit further How is the Jack's development experience? Is there an eager mode?
+
+**Speaker 1** _[22:37]_
+
+development experience.
+
+**Speaker 2** _[22:40]_
+
+It's like how you work as a developer.
+
+**Speaker 1** _[22:44]_
+
+Maybe that's a misunderstanding. I'm not a Jaxx developer. I'm a user. I'm talking from strictly from a user's perspective But with all the I've been in contact with developers
+
+**Speaker 2** _[22:57]_
+
+the package like how it was like you mentioned that you
+
+**Speaker 1** _[23:00]_
+
+Um.
+
+**Speaker 2** _[23:01]_
+
+that uh like very uh quickly support on stack overflow and that you like features were flying in within like two weeks so maybe uh the question is a little bit it feels
+
+**Speaker 1** _[23:14]_
+
+that? It feels very responsive still. Maybe it's because it's still growing very much and you can definitely feel that DeepMind is putting quite some resources into JAX. So that feels very responsive. If you ask for something, you might get it.
+
+**Speaker 2** _[23:31]_
+
+That's very nice to hear very responsive community So this question is what was your use case using JAX?
+
+**Speaker 1** _[23:45]_
+
+I wanted to, I found a very interesting graph neural network model, and I wanted to reimplement that and then run multiple experiments with it. In case you're interested in the model itself, I recommend Googling for neural Bellman-Ford networks for link prediction and knowledge graphs. Hope that answers that.
+
+**Speaker 2** _[24:10]_
+
+Thank you so much. I hope it does. If not, I guess you're still around. Yes.
+
+**Speaker 1** _[24:13]_
+
+People can always you can find me close to a playstation
+
+**Speaker 2** _[24:20]_
+
+All right, perfect. So another question, how much of the performance advantages comes from the JIT compilation?
+
+**Speaker 1** _[24:30]_
+
+No, seriously, if you run the functions without the JIT compilation, I think they're actually slower than PyTorch. Oh, sorry, there seems to be someone objecting.
+
+**Speaker 2** _[24:47]_
+
+give you the mic and then you can
+
+**Speaker 1** _[24:50]_
+
+Hi, I wanted to ask about how does JAX compare to, like, Numba and its JIT compiler? Because both tools kind of do JIT compilations, so I wanted to know if you had any experience comparing those two. Unfortunately, no. I have played around with Numba, but never to the same degree that I use JAX, so I don't feel qualified to give you a definite answer on that. But when I looked up numbers for this talk, I stumbled across a comparison where somebody achieved comparable results on CPU with Numba and JAX. I mean, with JAX you can then go on to move to GPU or TPU, which I'm not sure if Numba actually supports that. GPU, yes. GPU, yes? Yeah, so Numba supports compiling to GPU, NVIDIA GPUs actually only, so no problem. I mean I wasn't aware yeah, but no TPUs so that's kind of Google proprietary, I think
+
+**Speaker 2** _[25:58]_
+
+All the questions are gone now, interesting, back again, okay. So I think we have time to actually answer all those nice questions and there is another one on debugging. How is the model debugging experience in JAX?
+
+**Speaker 1** _[26:22]_
+
+I would say that very much depends. If you already have put a nice JIT compile around everything and then you start to get errors with only one specific batch, it can feel a little bit opaque because what is, if the function is already just in time compiled, you can't debug in it with the usual IDEs. So then you find yourself in a situation where you try to decipher the error message you're getting which can feel a little bit frustrating at times. I would definitely recommend A, having kind of a hard test data set to play around with, maybe introduce some of the errors yourself that you want to debug into your test data set and B, I found it very helpful to use very specific shapes for things. For example, limit the input to let's say be an array with only 13 rows and then the linear layer has 27, so definitely numbers that you can't get by accident, so that helps it to better find where you are in the trace because there are shapes printed out in the error messages.
+
+**Speaker 2** _[27:44]_
+
+Thank you So maybe less on to prototyping But where do you see in general the benefits of using JAX versus the big player?
+
+**Speaker 1** _[27:53]_
+
+players? In general, I find the offering very attractive that you can also run it on TPU. Just gives you another option if you want to move away from Nvidia, which I think is something worth considering. Speed is really there. To my knowledge, you can also just in time compile in PyTorch, but it's more meant for deployment. In JAX, you can already get these speedups during training, which is really nice. And in case you didn't notice, I'm kind of in love with the vectorization option. Makes development very easy and the result is super efficient.
+
+**Speaker 2** _[28:44]_
+
+Very nice. So last question, so we stay on time. Is the person that answers the JAX stack overflow question you?
+
+**Speaker 1** _[28:55]_
+
+No, it's not me. I wish it was me. If I ever make it to that level of knowledge about JAX, I will heavily pat myself on the shoulder. No, that's... Can I call out names? I'm sorry if I butcher his name now. Jake Funderplass or someone. To my knowledge, he's living in Washington, also working for Google. And he seems to single-handedly take care of all Jack's related questions on Stack Overflow, which is very impressive in my opinion.
+
+**Speaker 2** _[29:32]_
+
+big shout out to Washington then so Simon thank you so much for your interesting talk and for sharing your knowledge about JAX with us
+
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -1,0 +1,160 @@
+title: vtext: text processing in Rust with Python bindings
+---
+description: In this we talk present how to write Python extensions in Rust, and discusse advantages and limitation of such approach. We then illustrate this approach…
+---
+created: 2019-06-09
+---
+code: ALRGXS
+---
+slug: vtext-text-processing-in-rust-with-python-bindings
+---
+speaker_names: Roman Yurchak
+---
+speakers:
+
+
+
+### Roman Yurchak
+
+Roman Yurchak has a background in computational physics, and is currently working
+as an independent consultant for data science related projects. He is also a  scikit-learn core developer.
+---
+abstract:
+
+
+In this  we talk present how to write Python extensions in Rust, and discusse advantages and limitation of such approach.  We then illustrate this approach on the vtext project, that aims to be a high-performance library for text processing.
+---
+full_description:
+
+
+Scientific Python has historically relied on compiled extensions for performance critical parts of the code. In this talk, we outline how to write Rust extensions for Python using [rust-numpy](https://github.com/rust-numpy/rust-numpy),
+project. Advantages and limitations of this approach as compared to Cython or wrapping Fortran, C or C++ are also discussed.
+
+In the second part, we introduce the [vtext](https://github.com/rth/vtext) project that allows fast text processing in Python using Rust. In particular, we consider the problems of text tokenization, and (parallel) token counting resulting in a sparse vector representation of documents. These can then be used as input in machine learning or information retrieval applications. We outline the approach used in vtext and compare to existing solutions of these problems in the Python ecosystem.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: PyData
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 95
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: basic
+---
+domain_expertise: some
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/ALRGXS.png
+---
+youtube_id: G_43eu6Ascs
+---
+video_link: https://www.youtube.com/watch?v=G_43eu6Ascs
+---
+video_published_at: 2019-12-08
+---
+video_duration_iso: PT26M50S
+---
+video_thumbnail: https://i.ytimg.com/vi/G_43eu6Ascs/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Roman, the floor is yours.
+
+**Speaker 2** _[00:04]_
+
+Thank you. So today I will talk about how we can do fast text processing in Python using Rust extensions, but also more broadly how we can build Rust extensions for high-performance Python. A few words about myself. So my background is physics. I was doing computational plasma physics before. And now I'm working as an independent consultant on data science. And I'm also an active open source contributor, in particular, to Scikit-learn and to PyDyte projects, which I will mention later. So let's look at how the scientific Python ecosystem has been traditionally built to be high performance. Essentially, we have, let's look at SciPy, for instance. So SciPy has like around half in the lines of code of Python. It has 24% of Fortran, 19% of C, and a bit of C++. And essentially, the performance parts are due to those compiled languages, in particular, Fortran and C. And interestingly, if you look at how often those files change, we will see that Python files change much more often than C or Fortran. For instance, Fortran, on average, it was contributed maybe six years ago, and nobody actually touched it since. I mean, it works. It's very stable. It's very robust. But it also means that we are missing some of the performance improvements we could get just because maybe the algorithms could be written better or things could be done better. And so it applies to SciPy, but I'm sure it also applies to a set of other libraries. So what are the alternatives? Well, there is a number of alternatives that you can use. For instance, a popular one is Cytron, so we will write a pseudo-Python code that will be compiled to C and then build as a C extension. Petron, Numba is just a type compiler. And essentially, all of those work really well. However, they're very interlinked with Python. What I mean by that is that you're part of the Python ecosystem, and it means that you cannot use actual libraries built outside of this ecosystem. or make use of other libraries. Unlike if you go, for instance, into C or C++, of course, there you can use libraries developed by other people. You don't have to do everything from scratch. I mean, it also applies to Cyton, but just a broad idea. And more recently, you can actually also build extensions using Rust. And this is the subject of this talk. So just a quick show of hands. Who has used Rust before here? Great. who has heard of Rust? Okay. So, Rust is a high-performance system programming language, which focuses on memory safety and, in particular, safe concurrency, which is important if you want to do high-performance computing. So, one prominent feature of Rust is it has a package manager, meaning that you can, when you want to use some functionality, you can just, you know, You don't have to manually compile or build something as you would do in C or C++. It uses automatic memory management at compilation time, so it means that you don't have a garbage collector, but memory is going to be allocated and deallocated depending on its use in the code at the compilation time. So this is useful if you want to link it with another language, such as Python, because Python has its own garbage collector. And it means that because Rust doesn't have one, it's easier to make them communicate, essentially. And also another nice feature is that you can detect vectorized instructions at runtime. So it means that you can make a single binary. And depending on the CPU you're going to run it, it's going to use the right CPU instructions to be faster. And this is more or less transparent to you. So if you use just some dependencies that do this, you will automatically get the benefit of it. So now let's talk about writing extensions for Python in Rust. So essentially, the main project we're going to use is Py3, which provides those bindings to the CPython interpreter. It also works for PyPy, by the way. And then we have the Rust NumPy project, which provides bindings to the NumPy CEP. so there is also a young but growing ecosystem of scientific packages around this one small issue is that for now PIO3 requires Rust unstable so you cannot use it on the stable branch of Rust which is not that great for production systems but yeah so let's do a simple example we want to say sum a vector so we will just take a view into this array of float 64 here, and we'll apply the sum operator from the ndarray library. So ndarray is like an equivalent of numpy for us. And actually people who wrote it, they also have this convenient mapping of different functions. So for instance, you want to do array creation, so then in numpy you would do this, and in darray you would do that. So it also gives you some idea of the syntax of how you can map your computations in one or another. So, I don't know, there's, like, all this standard NumPy operations and then slicing and then, like, basic mathematical operations. So, we have now this function in Rust, right? So, I mean, here it's a very simple piece of code, but you can imagine, like, building a more complete computational pipeline. and we want to use it in Python. So we'll just write a wrapper for it in Python 3. The wrapper in this case would look something like this. So there is a bit of boilerplate code here. But I mean, if you have written wrappers in C, you'll know that it's not necessarily very pretty. But the point is that it will allow you to create a Python module and sorry, a Python module that you can then import in Python and just pass it in a pyarray and it's going to return the result. So this is the basic idea. And then the question is, so the project I'm going to present is how we can apply this on a particular example of text vectorization. So what is text vectorization? It's essentially how we take a document and convert it to a sparse matrix that can do actually machine learning on later on. So the basic pipeline is we take this document, we apply some pre-processing, some tokenization to convert the documents to tokens, then potentially we concatenate tokens together to get n-grams, and then finally we count these tokens into a sparse matrix. So it's like the very basic thing in NLP. And for instance, if you look in the Python an ecosystem, this, for instance, can be done with scikit-learn with the classes called countVectorizer and hashInvectorizer. So the hashInvectorizer, what it does, it additionally applies hash functions on tokens so we can reduce the size of the vocabulary. And I have been essentially looking for some time into how we can make those two classes faster. Because this is often a bottleneck in terms of you have a large document collection, you want to just apply some basic linear model on it, and just extracting tokens can take a while. So if you look at the history of contributions in scikit-learn, there have been a lot of small contributions, incremental things to tune out the performance there over the last several years. But however, it was never like the performance kind of reached the maximum, the optimum at the the moment, and unless there are major changes, it's not going to get improved. So what you could do, you could also, for instance, rewrite token counting in Cyton. So this is already done for hashing vectorizer, and unfortunately, we can see that in this particular case, it doesn't actually improve the performance that much, because part of the pipeline is still in pure Python. Then also the problem is, if you want to rewrite it in Cyton, it means that you have to handle Unicode. And basically, you have to handle Unicode in C, which is not something, at least personally, that I would like to do in my free time. And also another thing is tokenization is a bottleneck. So the tokenization just uses the Regex site and library. And so basically, this is one of the bottlenecks that is a bit hard to address. So another approach could be to use parallelization with Dusk. So this works well, for instance, in the case of hashingVectorizer, which is stateless. It means that it doesn't have a state, and you can apply it basically to chunks of the dataset independently. So here with this mapPartition function, and then concatenate the result, and you'll get essentially the result on your full dataset. So this works, but it's still a workaround around the fact that our basic transformation function is a bit slow. So, the question I was wondering about, can we actually make it a bit faster by writing a Rust extension? So, first nice comment, like observation, was that if we just use the... So, the basic tokenization is just you call regExp with some expression and you apply the final function. So, this directly calls to the CPython implementation of vModule, right? And actually, if you do the same thing in Rust, including the Python wrapper, just this is going to be twice faster because Rust has a bit more, a newer implementation of RegExp and it's a bit better at the moment. And also there's nice packages such as, for instance, Unicode segmentation. So Unicode segmentation is a spec on how we basically tokenize sentences into words. and if you apply this just like the basic package in Rust with a few additional rules in the sense that there are a few NLP specific rules of how you should tokenize text. For instance if you look at this sentence the can't, it usually tokenizes C-A-N-T to denote the negation. But anyway, so this you have to add it additionally because Unicode segmentation doesn't handle it but in the end you get something which is essentially reasonably fast. So if you compare it, for instance, to the Python regex version just above, it's twice faster if you just use the regex in Rust. If you use this more complicated Unicode segmentation thing, you'll get equivalent performance. However, if you then look at the accuracy, so here we measure the accuracy on the Universal Dependencies Treebank. Sorry. You'll see that the regex get an F1 score of 0.8 on English or in French, for instance. For instance, if you compare it to spaCy, spaCy is really good. It has a lot of more advanced rules. It gets a pretty good F1 score here, but in terms of performance, you get a bit lower because you have a lot of manual rules that need to be checked. And actually, we taxed this package, so you'll get pretty good F1 scores while the performance is actually also significantly higher. Of course, I mean, this benchmark is a bit preliminary, so here, essentially, the rules have been tuned to get the score high, so spaCy does a lot more things than vText, but it's just an illustration of how you can tokenize text. So, let's look a bit into detail what we need to do to do token counting. so for instance one of the things that's nice in terms of workflow is that imagine you're in you know you write your function in Cyton and then you need a hash function so a hash function is like a hashing algorithm say so for instance you have the common ones are for instance murmur hash xx hash etc so for each one you want to use you'll have to well either install a Python package but then you can't use it in Cyton because it's going to be too high level and it's not going to be fast enough. Or you can actually take the source code, compile it locally, and then try to build it and see if it works and iterate like that. But actually that's a bit like takes time. Well, if you do it in Rust, you can just like import a given module. It'll be built fine and then you can just use it directly. So this is a nice, well, it makes experimentation much faster. Another thing is if you want to make this token counting parallel, for instance, all you had to do here is that... So, for instance, here, this is our data set of documents. Normally, what we would do, we map for each document, we apply some pipeline. So, for instance, here, we tokenize and we hash. And then, if you want to do this parallel, essentially, here, we just had to use a parallel iterator, and basically, it's going to multitraded without much effort on my side. So, here, for instance, the comparison of the scikit-learn version of so this is the speed in megabytes per second of text, and then the vText is just single-threaded, it's already significantly faster, and then you can also essentially use multiple cores. So to summarize, we have a simple so basically it's a package for simple NLP in REST with Python bindings. We have some of the features I talked about such as tokenization, token counting, there's also say stemming and some string edit distances. So you can actually install it with pip. There are binary wheels for four different platforms so you will not when you use it you will not actually know that it's done in Rust because it's just a binary package. Well it's still in alpha so the API is still going to move a bit but so this is just like an experiment of how you can write Python bindings for Rust. A few more ideas of where to go from here. So for instance, what you can do is you can build WebAssembly binaries from the Rust package. Who knows, who heard about WebAssembly? So WebAssembly is essentially a binary format that you can run inside a browser. So for instance, you can call it from JavaScript. So this would allow, for instance, to use the core of this package from JavaScript. And more interestingly, there was a project that aim to build, actually, CPython and NumPy and all these basic core scientific packages into WebAssembly so it can run inside the browser. So this project is called Pyodide. And the question is, can we actually use the binaries we built previously there as well? So that would mean that you can actually, say, you have a web page, you can apply tokenization on some text you see on the web page inside your browser. and so this is all essential experimental ideas it hasn't been done yet but it's just like ideas of nice things we can try to do and also there is another project called wasmr.io and essentially what it allows you to do is from Python to run this WebAssembly binary the nice thing about it is that it means that basically your code is going to run on any platform so for instance you build the binary once And it should essentially run Linux, Mac, Windows, etc., but also, say, on some non-standard architecture such as ARM or etc. Well, less standard, let's say. So this could be an interesting, like, in the future, this could be an interesting way of actually building a platform-independent Python world. Another interesting project that's a bit in the same ecosystem are, for instance, Rust Pythons. So, this is an implementation of a Python interpreter in Rust. So, it aims to be exactly the same as CPython, but in Rust. And personally, I'm also attached to a project called Argmin. So, this essentially does numerical optimization in Rust with Python bindings. So, for instance, in my application, if you look at machine learning libraries, like the classical machine learning libraries, they often use the LBFGS optimizer. So, this optimizer comes from SciPy and it's essentially, I don't know, maybe a thousand lines of Fortran code that nobody has really touched in a while. And in particular, for instance, you cannot use it with floats 32. And so, it's a bit difficult to iterate there. And one of the goals could be to expose this optimizer written in Rust from Python and use it, for instance, in machine learning libraries. So I have been developing Python for a long time before I went to experimenting with Rust, and just a few observations I made while just changing languages. So automatic formatter tools are really good. So in Rust, you have this cargo format. In Python, the equivalent is black. And it's actually interesting to see what happens if everybody uses it. So in Rustic system, everybody uses their formatter. I think in Python, if everybody started to use Black, that would be a significant improvement. So the way versions are pinned in packages is interesting as well. So for instance, in Rust, you take one package. It will have fixed dependencies, right? So, for instance, you can, I don't know, you take your package, it depends on a version of NumPy, and it's only this version. And then a different package, if you install at the same time, it can depend on a different version of NumPy. So that potentially means that you will have to install twice the same thing. So in Python, it's obviously not going to work, but there is some interesting ideas there, and I guess some of them maybe are solved by tools like Poetry or PIP, etc. So, I mean, just some thoughts. I guess my tendency was to use actually Dix for everything because like in Python this is the basic structure and you know it's just you use it everywhere well essentially if you think about it more as a mapping between one type and another type then you think that maybe in some cases Dix is not the best thing and actually you start to realize that when you for instance type your Python code and finally a better type inference with PyPy or Cyton would be nice. That would in particular involve having types in the core scientific Python libraries, such as NumPy and SciPy, which are currently missing. But if you build your third party, like your user code on that, you cannot, I mean, types are not going to be that useful unless all your dependencies are typed. well, have type annotations well, in conclusions essentially using Rustic extensions for core algorithms can make scientific Python better so, I guess the same applies to the talk about Julia previously beyond the actual performance you get from just using a different like compiled language, well, in this case, you also have access to this whole new ecosystem. And it's interesting to just be aware of that and to know, okay, well, we need to solve this problem. How did people in this ecosystem solve it previously or already? And of course, because Python has a history of wrapping different codes for Fortran C, et cetera, if you have some feedback on the Rust NumPy package in terms of API, that would be very welcome. And, of course, there's another different interesting project that could be made where writing Rust extensions could be useful, for instance, for parsers. So, for instance, there is the OpenML project, which collects data sets that can be used for machine learning. So this is, for instance, used in Scikit-learn currently. And so this project uses the ARF format to include the data and the metadata. And the parsers we have right now in PurePython are really slow, which means that when you actually try to load the dataset in Sacred Learner, it's going to be slow. So in that case, for instance, writing parsers, again, writing parsers in Cyton is not something that's like very, how do you say it? Well, very nice. So in that case, using a different language could be interesting. As I mentioned previously, Argmin, for instance, Apache Arrow has also Rust implementation, etc. So I think I'll stop here. Any questions?
+
+**Speaker 1** _[22:08]_
+
+Great audience. Applause without cue. Thank you so much for this. I think I was the only person who had never heard of Rust. But I felt that even though this talk was at least very useful to me, I saw a lot of engaged faces. So we have, since you were so kind to finish early, we have more time for Q&A. I already see a first hand. Anyone else?
+
+**Speaker 2** _[22:34]_
+
+Okay.
+
+**Speaker 1** _[22:36]_
+
+Sorry, I need to run to give you the mic.
+
+**Speaker 2** _[22:38]_
+
+Yeah.
+
+**Speaker 3** _[22:40]_
+
+thanks for the talk just curious if you have tried a similar approach with C++ no, so
+
+**Speaker 2** _[22:46]_
+
+And if you have any...
+
+**Speaker 3** _[22:47]_
+
+If you have any performance measurements and stuff. I mean, because I really like Rust, but leaving aside all the web assembly, I don't see the gain of using Rust. I mean, it says, for me, at least, maybe naively, C++ will be closer to what C offers in CPython. So that's why I'm always curious why going to the Rust direction to bind yet another language to improve Python. Just curious. I mean, I know that it's better for us if we have more languages and stuff, But just curious, what is your stand of doing the same thing with C++ and why not, or these kind of things?
+
+**Speaker 2** _[23:23]_
+
+Thank you for the question. So indeed, I haven't talked about C++ too much because in particular, I don't have any experience with C++. So I think a lot of what I said also actually applies to C++. And I think, I mean, modern C++ is also very nice and has a lot of like good things. So it's not like, you know, let's say there are some nice things in Rust. There are some nice things in C++. So for instance, Rust has this, in terms of safety, it's a bit better because you have this memory management which avoids a certain number of errors or segfaults, etc. On the other side, maybe the learning curve is a bit more difficult. I think there is no one solution to everything so it's good to have a choice. In my case, I was a bit also attracted by the WebAssembly side. I was wondering if you have any knowledge how the Rust compiler deals with GPU architectures or does it? So I mean Rust is based on LLVM so I guess you I mean to be honest that's not really something I know a lot about but I mean I know people are writing things in Rust for TVM and I think it has some GPU backends but yeah
+
+**Speaker 1** _[24:56]_
+
+More questions? Oh, come on.
+
+**Speaker 2** _[25:02]_
+
+Ha, ha, ha.
+
+**Speaker 4** _[25:08]_
+
+Thanks for the talk. In combining Rust and Python, what did you find to be kind of the hard part of getting the play together, particularly the two different memory models where there are particular sticking points where they either couldn't or didn't seem to want to play nice?
+
+**Speaker 2** _[25:25]_
+
+Well, let's say, so far, this project is kind of a side project for me, so I haven't spent that much time on it, and I think if I spent more time on it, I would have encountered more and more issues that you mentioned. So far, the experiences have been more or less smooth, but it's also, like, this whole thing of doing Rust extensions for Python is fairly new, so things are a bit still experimental, and I think if more people used it and tried to build things with it, it will be in better shape overall. but but yeah but the fact that uh at least you don't have to handle memory uh handle the memory management on the rust side is a nice thing because like it means that there is no garbage collector but at the same time you don't have to allocate the allocate things manually which is always a problem for me when i like do c python uh like in c you would to to remember to increment decrement like reference counting but yeah I think I think you really need a project that where you work work on it full-time to actually understand the limitations
+
+**Speaker 1** _[26:32]_
+
+hands no hands no more questions you don't have to ask questions but he's from paris so this is you know like your last chance no okay very good
+
+**Speaker 2** _[26:44]_
+
+Very good.
+
+**Speaker 1** _[26:45]_
+
+Thank you so much.
+
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -1,0 +1,332 @@
+title: Building an ORM from scratch
+---
+description: Have you ever wondered how Django, SQLAlchemy, and PonyORM can translate Python objects into database rows? How complicated can this really be? In this…
+---
+created: 2022-01-16
+---
+code: LKHQ9J
+---
+slug: building-an-orm-from-scratch
+---
+speaker_names: Jonathan Oberländer, Patrick Schemitz
+---
+speakers:
+
+
+
+### Jonathan Oberländer
+
+Jonathan studied Computational Linguistics, Cognitive Science and Computer Science, and works as a software developer since finishing his various degrees. He fell in love with Python during university, and for the most part has been faithful to it. Outside of work, he either works on esoteric programming languages, or writes esoteric (read: terrible) Python code.
+
+### Patrick Schemitz
+---
+abstract:
+
+
+Have you ever wondered how Django, SQLAlchemy, and PonyORM can translate Python objects into database rows? How complicated can this really be? In this talk we will be creating our own (limited) ORM from scratch, starting from almost nothing and finishing with a library that can define relational models, translate simple and (somewhat) complex queries into a database query, and create and apply migrations, all while hiding the details behind a Python interface.
+---
+full_description:
+
+
+ORMs are powerful tools that map Python objects and their relations with one another to database structures.
+
+Using an ORM has its limits: in many cases it helps to actually understand what is going on behind the scenes, for example to avoid performance problems, and occasionally even the best ORMs won't be able to represent your complex SQL query, forcing you to write SQL by hand again. Then again, ORMs automatically and trivially protect you against one of the most frequent, easy to exploit, and dangerous attack vectors: SQL injections.
+
+How does this all work? How can an ORM perform these translations?
+Starting from a database connector, we will write a small ORM with the following features:
+
+- defining database tables through model definitions as Python classes
+- linking these models through foreign-key relations
+- a query engine that can do all the common operations while feeling (at least somewhat) Pythonic
+
+```py
+Animal.select(where=Animal.type == "snake")
+Animal.select().order_by(Animal.name.asc).limit(10).filter((Animal.age > 1) & (Animal.age < 5))
+```
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: Libraries
+---
+tags:
+---
+submission_type: talk_long
+---
+submission_type_label: Talk (Long)
+---
+submission_type_id: 1701
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: expert
+---
+domain_expertise: none
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/LKHQ9J.png
+---
+youtube_id: 1NN__kmMtAQ
+---
+video_link: https://www.youtube.com/watch?v=1NN__kmMtAQ
+---
+video_published_at: 2022-05-06
+---
+video_duration_iso: PT34M44S
+---
+video_thumbnail: https://i.ytimg.com/vi/1NN__kmMtAQ/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+Hi, my name is Jonathan, this is Patrick, and we're going to build an object-relational mapper in 45 minutes, hopefully. I'm going to be doing the coding, he's going to be doing most of the talking. And so a word of warning, this is a live coding talk, so things can go wrong. Let's hope they don't. And with that, I'll hand it over to you.
+
+**Speaker 2** _[00:31]_
+
+So we work for Salud GmbH in Karlsruhe. We are an e-commerce company that basically provides traffic for online shops. That's basically our business model. And for that, we have our price comparison website, which some of you might know, billiger.de. We also have a syndication partner API, which allows partners to build their own price comparison or similar website. We are a full-stack Python company, so not just data science. So if you're looking for a new job as a Python developer, you should definitely check out our booth just outside. Okay, remember, this is live coding, as Jonathan said, so things may go wrong. And since we're a bit off on the clock, and the chair already said, please postpone questions until after the talk. And that's all we got for slides, so let's go right into it. So what does an object relational mapper do? An object relational mapper will map an object, like the talk class Jonathan is just typing onto an SQL relation, a table basically, as we know from the last talk. So, first thing we got to do is we have to create that table. Now, how can we do that? that. What we do is all the stuff that is in common for the talk and any other stuff we want to put in the database will be in a class model, which is then inherited by talk and any other models. And the create method will create the table, so a bit of SQL, even though we were encouraged to think more about the internals in the last talk, which was very interesting. For the create table, we need a table name, and a couple of columns with their respective data types, which we can derive from the class capital T talk. And for that, we use a magic method called dunder init subclass, which is invoked whenever someone inherits from our model. So at the end of the class talk indentation block, this will be invoked with the new class talk as the param. And we can use the class Dunder name in lowercase as the table name. And we append a plural S because we are not a bunch of reprobates. So also the columns can be found. And for that we use the type annotations. Type annotations are in a thunder annotations dict over which Yonatan is just iterating. So there is the names and the Python type. So now we've got a couple of columns with their names, and we can build the SQL stuff for that. For that, we have to translate the Python types into SQL, into their respective SQL type. A little helper function here, SQL type of a Python type will give us that. It's going to be pretty straightforward. And now the helper function, pretty straightforward, just map like int to integer and stru to text, do float or Boolean or whatever, but let's just keep it simple. All right. Now look at this. We already have some usable SQL. Now we have to execute it. So for this talk, we're just going to use SQLite as a backend and a little helper that will run the SQL statement on some SQLite database. Always print the statement we're going to run, get a cursor and then execute it on the cursor. All right. Now the table already exists, so apparently we have to clean up before we run the script, so we create a delete table, a delete method, class method, which will just drop the table if it exists. All right. And now it works. We can now peek into the SQLite database file and see if the table looks as we expect. Aha, this looks good. Schema is all right. Okay. So next step would be to create some talk instances and then later on save them. So we've got to build a suitable Dunder init, and Dunder init will just copy over the quarks so we can reuse it for any model, not just the talk. And put them into the instance as attributes. Okay. And while we're at it, we also write a little wrapper so we can actually make sense of the output. We print the class name and all the attributes we just got from the Dunder annotations from our columns. Okay. Now, this should be much more pretty. Ah, it is. Okay. The talk, the title, the duration. Nice. So, now we have some instances, and And the next thing will be, of course, to put it into the database. And for that, we need to write some insert statements, a method called save, insert into table name, got the table name already, then in parents, the list of columns, then the keyword values, and then the list of actual values, or in our case, because we don't want to run into sql injection attacks we will use placeholders instead but we get there in a minute first the column names and then the placeholders in sqlite the placeholder is just a colon and then the name of the actual placeholder and sqlite will then try to to get this from um from a parameters dict we have to pass onto the execute method we will do this in in a second So we now run the statement and pass along the magic Dunder dict, which already contains all the values we need with the correct keys. We have to extend SQL run for values, if we have any, and values or an empty dict because none doesn't fly with SQLite. Now this looks pretty good. see what the database itself says. Browse it. Oh, fine. Okay. Okay. Is this kind of readable? Yeah. Okay. Good. So, now we can update our talk. Maybe 45 minutes is not long enough. Not wanting to scare anyone, but who knows. So, 60 minutes it is. Let's save this. And let's check the database again, reload, oops, we got two talks now. Why is that? It's of course because we insert it again. We need to update. So in order to update, we will have to introduce an ID, a primary key for the table, on several places. If we already have an ID, then apparently it's an update, otherwise it would be the insert case, and the SQL run should return the ID of the new column. This is what cursor.lastRowID is, right, in SQLite, okay? And furthermore, we can do this later, wrapper and create. And now this is key equals value set for all our columns, and we will have to introduce a where clause which will then fix only update only the column where the id matches and all right and then in the create table we need to to need to insert it as primary key id column Okay, and we could also fix the wrapper so we will always see what ID we have so we can follow the ID around. Okay, so now let's see if the update actually works. The SQL looks right. Let's check the database browser. Okay, 60 minutes. Well, no more duplicates. Okay, that was a major milestone. We can now create the table, save talks into the table, and we can update them, of course. And the next milestone will be retrieval. We now have to retrieve stuff from the database. Okay. Simplest form of retrieval, we just get all the talks. So we can write a class method select, which will yield a couple of instances of class. So we will run some select star from table name statement. And SQL select, we will need a different method that will return all those rows and see what And it returns. Execute the statement. also print the values. All right. So, selecting select star from talks. And we get the talk. That's fine. But we get it as a tuple. We don't like it as a tuple. We would rather I have something dict-ish, so we can feed it into our Dunder init as this magic sqlite3.row param and now we get a row object which feels like a dict or is convertible into a dict. And this we can feed into the class constructor and now it actually returns proper talks. Neat. Okay. Now, always retrieving all the talks is, of course, not what we want. So we want to restrict it somehow. We need conditions. Something like where talk.duration equals 45. And before we can get to this, the talk.duration syntax isn't going to fly the way we implemented right now. So we have to do some refactoring. Live coding refactoring. What could possibly go wrong? Okay, what we need here is descriptors. The descriptor protocol allows us to use both mytalk.duration equals 45 or 60, possibly, and capital T talk.duration equals equals 45 as we want to use in our query syntax. So the descriptor has, we call this class field, which will just take the name and the Python type. And the descriptor has two magic methods which are relevant to us. There's actually a couple more, but for us relevant is dunder get and dunder set. Because the access to a class and an instance's attributes is funneled through a descriptor if it has those metric methods. So, dundaset is pretty straightforward. It always gets an instance that is a talk object and a value, and we just copy it over to some under values dict which we have to then introduce to the model. And dundaget is a bit more complicated because dundaget may or may not get an instance. If it's got an instance, then we use the my talk.duration thingy. And we will just return the value from the under instance dict. But in other case, if you don't have an instance, it's actually like the capital T talk.duration. And in this case, we will return safe for reasons self. Not safe. Unsafe, actually. For reasons that will become clear momentarily. So, okay. Now, let's see the SQL type now has a quite natural home we can put it there because we already have the python type just prefix it with self all right field dot and get rid of the pi type all right okay now we have to remember to to give it the under value thing with an id and empty okay
+
+**Speaker 1** _[16:15]_
+
+I feel for the ideas well
+
+**Speaker 2** _[16:19]_
+
+the ID field It's an int, like primary key Okay, and now we can't use dunder, dunder dict of course, but dunder and but single under values in both Safe statements and now we refactor this, whoo Okay, now Now we can actually use conditions. Now we can get to writing these conditions. Now if you don't have a condition, we can just make one up. One equals one would come to mind, but this where condition will have to return more than just some SQL which we can then put in a where statement. It will also have to provide all the necessary values and placeholder to value mappings so we can pass it along. So far, we now write Dunder equals in the field. The field has Dunder equals where we can, in this case, just use SQL equals sign comparison with some value. And this will intercept this capital T talk dot duration equals equals 60 in the select statement, okay. As sql it just returns the field name and the operator equals in this case and placeholder which is again the field name and the value is just the value we put it in a dict. All right. And that would be the return type. Now, in select, we have to evaluate the where clause if we have one. So SQL statement, the where statement and the values are whatever this thing returns. And if we don't have one, as I said, we make one up. One equals one and an empty dict. We don't need any values here. So let's see what happens. We have to extend the select statement, of course. And we have to pass the values. And let's see what happens now. Okay. Now we don't find anything because the talk has in fact 60 minutes. So let's change it. Aha. Now we can actually select by the fields of our talk. Fine. Now Now that is a rather simple solution, maybe I am not that fixated on 60 minutes talks and I'm fine with 45 minutes as well, so some more logic there. The pipe, the OR symbol, we can extend the condition to have a Dunder OR method which will allow us to logically combine this condition with another condition and this Boolean condition which is itself a condition so we can nest it under in it with will have an operation and two conditions and again we'll have a two sql in which both conditions are evaluated and then concatenated with the operator so we have nice sql syntax All right. Now we return the SQL. Combine SQL statements with the operator in between. And we have to merge the two dictionaries, the values one and two. Okay. Okay. Let's see what happens. Oops, we don't find anything. Why is that? Look very carefully. The dictionary, the values dictionary is the cue why this doesn't work. In the values dictionary, we only have one value, the 45. The 60 is gone. Now, why is that? Because the placeholders are named identically. We have a placeholder collision. So, we need unique placeholder names. Conveniently enough, Python is totally batteries included, so we can just use something from itertools. It's always itertools, isn't it? In this instance, the counter, and we can just use the next counter, so we have var0, var1, var2, and so on. Okay. And now Now the dict is all right, it's got var 0 and var 1 in the conditions and the values dict is correct as well, neat. So now that's pretty great and in 21 minutes too. So that is almost usable I guess, but with one more treat and that is nested models. Now the speaker being just a string is a bit plain, let's be honest. So let's tune it up a bit, and the speaker is now a model itself with a name and a company. Let's make sure the table exists, and let's create a speaker, a speaker instance, and save it right and okay now it doesn't work anymore why because we're trying to save an object this this won't work how would we model this in sql in sql we model this with a foreign key this is a classical foreign key constraint so the python type of as model subclass is in fact an integer and that is the foreign key that will be used as the foreign key and now that we change this we can also no longer um we can also no longer um just use the value the under value dict in the query because now in the under values there's still the speaker object this won't fly we have to intercept this as well and if um the python type or is um underscore if the python type again is a subtype of model, we will have to use the ID of the value instead of the value itself. And now in storing in the save method, we will have to build a custom values sticked which transforms the stuff from under values of value I'll get utter I I think it was getUtter, all right, and again, for the insert, okay. Special case for ID, in the update case, we have to provide extra ID. We can't provide an ID in the insert case because it then would always create stuff with an ID primary key zero, and that of course won't fly either. Okay, so that's it. We basically done. Almost done. One last thing. One last thing. That's the last thing. What's a bit ugly here is that the speaker is in fact just a one. Now that's boring. We want the speaker object, of course. And we already wrote something that will select this particular speaker. And, again, we can plug into this fantastic descriptor protocol into the dundaset method. If someone wants to set a value for a Python type that is a model, we can intercept that, and we can actually because we know then it's an ID. If it's an ID, we can resolve the ID by using self.pytype is our speaker in this line of code. And we can use speaker.select with speaker.id equals the value we got. And we can use this to resolve the ID. And now we get what we want. Now we get a speaker that is actually an instance of class speaker. Whew. Okay. So that's basically it for today. It was quite a ride. It wasn't without glitches either. So we got from type annotations, Dunder init subclass, creating tables, inserting rows, then introducing the IDs, which make up this quite annoying impotence mismatch with ORMs. We got to the descriptor protocol. With Dunder set and get, we wrote a Dunder equals, we wrote a Dunder or, and we were referencing other models by using is subclass so and and we actually do have some time for questions
+
+**Speaker 3** _[26:12]_
+
+thank you thank you your life code session ahead of time that's neat
+
+**Speaker 2** _[26:18]_
+
+Nobody's more surprised than us, I think.
+
+**Speaker 3** _[26:23]_
+
+Uh, we actually have one question from a slider, but I, okay, there's another one, but actually I think you answered with this slide because they are asking if you can share the code afterwards.
+
+**Speaker 1** _[26:36]_
+
+There are two repositories there. The first one is the initial experiment from which this
+
+**Speaker 3** _[26:36]_
+
+Yeah.
+
+**Speaker 1** _[26:41]_
+
+was born. Cuneiform was the result of a learning day at our company, which has more features that can actually do joining and so on. I will upload this exact state in a few minutes That's on the lower link there on the second repository.
+
+**Speaker 2** _[27:00]_
+
+The second repo doesn't exist yet, yeah.
+
+**Speaker 3** _[27:02]_
+
+The second question is, how many times did you practice this?
+
+**Speaker 1** _[27:13]_
+
+quite often i think twice once twice together and um okay separately yeah i don't know times
+
+**Speaker 2** _[27:20]_
+
+Yeah, something like that.
+
+**Speaker 3** _[27:23]_
+
+And all right another question is to make this production already. Would you need to add any improvements for example? performance improvement for example
+
+**Speaker 1** _[27:33]_
+
+I think you would need to add a few hundred developers.
+
+**Speaker 3** _[27:36]_
+
+200, you said 200, right?
+
+**Speaker 1** _[27:36]_
+
+200. No, this is obviously not something you would actually want to use in real life This has like actual real ORMs have lots of optimization and many more features But yeah, it's it's interesting to see how far you can get in not so much time Getting like yeah a basic one working
+
+**Speaker 3** _[28:00]_
+
+All right, so we have another question. It's kind of personal, I believe. How often do you pair programming together?
+
+**Speaker 1** _[28:09]_
+
+Yeah, most of the time actually.
+
+**Speaker 3** _[28:12]_
+
+Actually, yeah. Okay.
+
+**Speaker 2** _[28:12]_
+
+Basically every day and a couple of hours.
+
+**Speaker 3** _[28:16]_
+
+for new projects would you advise to be the custom or or arm or you use something I mean already existing and if the ladder do you have any suggestions about existing ones
+
+**Speaker 1** _[28:31]_
+
+I mean the first question is very easy to answer. Don't use this, don't use your own.
+
+**Speaker 2** _[28:37]_
+
+Except for like a talk, that's fine.
+
+**Speaker 1** _[28:41]_
+
+We have a bit of experience with Django and SQL alchemy. I've also looked into pony ORM. I find that very cute, like the parsing of the generator syntax to do selects. But the only ORM I've worked with for an extended amount of time is Django, so I don't really know if I have an informed opinion there.
+
+**Speaker 2** _[29:03]_
+
+At the company, we mostly use SQLAlchemy, but frankly, I prefer to not use it. What's wrong with SQL anyway?
+
+**Speaker 3** _[29:18]_
+
+Ha, ha, ha, ha, ha.
+
+**Speaker 2** _[29:18]_
+
+Yes.
+
+**Speaker 3** _[29:20]_
+
+I don't know, actually we have another question, have you tried building anything else from scratch?
+
+**Speaker 2** _[29:28]_
+
+or or
+
+**Speaker 3** _[29:29]_
+
+YORM specifically.
+
+**Speaker 2** _[29:32]_
+
+We once built a blockchain from scratch.
+
+**Speaker 1** _[29:34]_
+
+Yes.
+
+**Speaker 2** _[29:36]_
+
+We built all the stuff we don't actually like that much
+
+**Speaker 1** _[29:48]_
+
+What was the second part of the question, Alfred?
+
+**Speaker 3** _[29:53]_
+
+YORAM specifically.
+
+**Speaker 2** _[29:54]_
+
+Ah, yeah.
+
+**Speaker 1** _[29:55]_
+
+Okay, so we were working in the company on a project with a certain customer relations management tool, which brings its own ORM, and we felt it was so clunky that we thought, isn't this possible to do this better?
+
+**Speaker 3** _[30:09]_
+
+I actually have a question. Can I ask you a question? Sure. So I don't use ORM very often. It's just for personal projects. But have you ever facing some complicated query that you cannot run through an ORM and you have to run row SQL instead of using dot notation with your class objects, Python objects?
+
+**Speaker 2** _[30:38]_
+
+No, really no. Usually we don't have very complicated queries.
+
+**Speaker 1** _[30:45]_
+
+I heard in a previous company once that Django's OEM wasn't powerful enough, basically, that you had. But most of the things, I think, will work with an OEM, with a sufficiently powerful one, not this one.
+
+**Speaker 2** _[30:55]_
+
+No, not this. Certainly not this one.
+
+**Speaker 3** _[30:57]_
+
+thank you okay so let's switch in the old way
+
+**Speaker 2** _[30:57]_
+
+Thank you. thanks for good talks and a small question if you start to wrote this with async await syntaxes how you from each part of this code you start to do it
+
+**Speaker 1** _[31:27]_
+
+If you would write this with async await, I mean, I don't know, I guess everything would have to be async await. The color of all the functions would have to be red. I guess we can only use async await if we have a database driver that is capable of doing that. Otherwise it doesn't really make sense. And then I think you would just make all functions async await, but I don't even know if I assume this exists, the database driver, but I have no experience with it.
+
+**Speaker 3** _[32:05]_
+
+we do have it's second time we have plenty of time for other questions
+
+**Speaker 1** _[32:17]_
+
+or lunch.
+
+**Speaker 3** _[32:21]_
+
+There are no questions, I suppose.
+
+**Speaker 1** _[32:25]_
+
+Maybe maybe
+
+**Speaker 2** _[32:26]_
+
+Maybe one last question, is your talk about ORMs, is it just an ingenious way to advertise learn your Dunder methods?
+
+**Speaker 1** _[32:36]_
+
+It's actually an ingenious way of advertising work at our company because you get to experiment for a day every month
+
+**Speaker 2** _[32:47]_
+
+But Dunder methods are really magic. It's those protocols down there in Python. This is quite amazing You learn something new every day with the with the descriptor protocol the Dunder set name We couldn't use it because we really wanted to stick with the type annotation syntax but if we had switched to something like a duration equals field Blah blah blah, then we we wouldn't even have to pass the name name into the constructor of the field because Dundaset name would have taken care of that. It's really quite amazing and we haven't used like half of it.
+
+**Speaker 4** _[33:30]_
+
+Thanks a lot. One of the deciding issues or aspects of ORM is that the objects are represented as individual rows but when you're doing bulk operations on the database usually you want to bulk operate on the whole column or insert multiple values and then the ORM doesn't fit so well like for example if you have an umpire array or something. Do you know of any ORM or ORM-like that approaches the problem from a columnar perspective instead of from a row-based perspective?
+
+**Speaker 1** _[34:01]_
+
+I can't tell you what to honestly say.
+
+**Speaker 2** _[34:03]_
+
+I'm not sure either. I'm pretty sure the ORM that triggered that experiment doesn't You have to touch all the rows Yeah, all the rows in order to update a single column. Yeah For that one. I can't say for SQL alchemy really
+
+**Speaker 3** _[34:32]_
+
+So no questions? Thank you.
+
+---
+transcript_status: auto
+---
+transcript_language: en

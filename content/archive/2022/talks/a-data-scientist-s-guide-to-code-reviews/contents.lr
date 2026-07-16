@@ -1,0 +1,225 @@
+title: A data scientist's guide to code reviews
+---
+description: A crucial aspect of software engineering teams' working agreements are code reviews. By applying the four-eyes principle on code, teams can reduce the…
+---
+created: 2022-01-16
+---
+code: YT7WM7
+---
+slug: a-data-scientist-s-guide-to-code-reviews
+---
+speaker_names: Alexandra Wörner
+---
+speakers:
+
+
+
+### Alexandra Wörner
+
+Alexandra Wörner is a data scientist at scieneers GmbH, where she supports project teams in industry and the non-profit sector in implementing their visions around data and machine learning. Past and current projects cover a wide range of topics, including recommender systems, time series modeling, customer analytics and engagement, and topic modeling. Given her strong computer science background, Alexandra's natural interest in data, algorithms, and tools is accompanied by a curiosity about how software engineering practices can be applied to data science tasks with the intent to improve and facilitate the process from experimentation to production.
+---
+abstract:
+
+
+A crucial aspect of software engineering teams' working agreements are code reviews. By applying the four-eyes principle on code, teams can reduce the number of bugs and errors, uncover misunderstandings early and ensure a certain level of quality across their common code base. 
+In essence, the relevance of code reviews does not change for data teams, including data scientists. However, due to the often experimental nature of data science tasks, standard code reviews do not always work well and therefore need some tweaks. 
+
+This talk will give a data scientist's view on code reviews, focussing on which aspects data scientists can pull from the general process and what needs to be adjusted in order to have effective and satisfying code reviews. Building on that, you will get recommendations for the following questions:
+* When and what should I review?
+* What feedback should I give?
+* What tools support me in executing this task?
+---
+full_description:
+
+
+The standard code review process known from traditional software engineering does also apply to data tasks when these also follow traditional software engineering practices in large parts. Examples for such tasks are data extraction or transformation pipelines and machine learning (ML) services which run in production(-like) systems. Yet, a significant amount of data science work is experimental, e.g. analysing data, preparing data for use with ML algorithms or training and evaluating ML models.
+From experience, code reviews are often skipped during these experimental tasks although they are still highly important in order to detect issues or errors early. Part of the reasons for skipping checks is that the focus of this work is not to produce production-grade code and rather to try out and verify a certain concept which can be put into production lateron, if successful. Code reviews need to be adjusted to the changed requirements of data science work for them to still be effective. A lesser focus on code quality and more on the technical correctness and logic of the concept instead are key in these adjusted reviews. Thus, _code_ reviews develop to some form of _peer_ review, as they are known from the process of paper review.
+
+The talk will give an introduction to tradtional code reviews as well as the updated form of code reviews for data scientist. After showing why standard code reviews are not always applicable, the changes to the process will be described and explained. Furthermore, listeners will hear practical recommendations for what feedback they should give to make a code review effective. Using two of the most common software version control systems, GitLab and GitHub, supporting functionalities, which make the strenuous process more pleasant and efficient, will be shown. The aim of this talk is to give data scientists a reason as well as some guidance to do code reviews.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: Python & PyData Friends
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 1702
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: none
+---
+domain_expertise: some
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/YT7WM7.png
+---
+youtube_id: h8oI24i9dPk
+---
+video_link: https://www.youtube.com/watch?v=h8oI24i9dPk
+---
+video_published_at: 2022-05-06
+---
+video_duration_iso: PT30M7S
+---
+video_thumbnail: https://i.ytimg.com/vi/h8oI24i9dPk/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+Hi everyone, I'm very excited to see so many of you who are interested in code reviews Which is kind of a boring topic you would assume. So let's make it this a bit interactive by show of hands Who of you is a data scientist? Yeah, well great. Thanks for being here Who of you has some experience with code reviews? Also good and who of you who is a data scientist does regularly do code reviews so regularly means like once or twice a month at least. Okay, yeah, well, there's room for more, so let's see how it looks after the talk. Anyway, let's get into it. And what I want to start with is a look at some pros and cons of reviewing a piece of software. Why would I do code reviews? For one, they improve the code clarity. So if I, as a reviewer, understand the code that the author has produced, then it's more likely that someone else is able to understand what's happening there in a month or half a year or even a year. Next thing, they might uncover errors. So getting a bug or finding a bug in production is, yeah, well, not so good. It's costly. and sometimes, or I think many of you who did code reviews have found some error doing that code review and this is always a good thing. Next thing is that I as a reviewer probably learn something while doing the code review. So I learn what is happening in the piece of software. I might learn something that the author is doing, so learning about a new function, a tool, some design pattern that the author is using and last thing well literally everyone says that I should do code reviews on the con side is yeah well I don't want to I have meetings I have other tasks to do I want to work on a very cool thing do some research so yeah well code reviews are tedious and I don't want to spend my time on that and so with all these advantages and yeah one point against it of course conclusion is I won't do code reviews but what about actually what about code reviews for data science work so meaning exploratory data analysis prototyping a model wrangling the data for that model visualisations and so on. Well, I think the pros don't really change. The only difference, and you see that maybe on the bottom that we don't have that point here anymore, I would say that it's rather a con. So I have hardly heard anyone say that I should do a code review as a data scientist, and you can see that as a con. But actually, in seriousness, the that we produce as data scientists often is some prototype and will never end up in the production system as it is. It will get updated, some data engineer, machine learning engineer maybe takes a look at it, refactors it a bit, makes it more robust and so on, and so why would I spend time on something that changes eventually? Moreover, when we're talking about analyses, the work is often a one-off thing. You produce some results, you report these results to your stakeholders, and then this code gets put into the desk, basically, and forgotten, and no one sees it anymore. So why should I spend my time on that? So could argue that reviewing data science work is some kind of waste of time and that keeps us from doing some other cool stuff like working on the newest model. Therefore, the conclusion again is that I will not do code reviews. Yet I think that having someone else review your work is as important in data science as it is in software engineering. Let me show you why I think that is by starting with why they're important in software development. This kind of takes up the points that we had previously. First of all, and this is kind of an implicit thing, I don't think that we are really aware of it when doing code reviews, but we want to check that the goal that we defined in some ticket, some task, a story, actually fulfilled by the piece of software, by the artifact that the author has produced. Next, we probably all agree that detecting bugs is not really great in a production system. We had that before. One way to mitigate this is apart from rigorous testing, also having code reviews and of course you'll never catch anything and this should also but not be the aspiration and aside from that misunderstandings also can happen maybe the goal hasn't been specified clear enough in the story or you have a new team member and he doesn't or they don't really know everything about how it works in a team and then misunderstandings can just happen but code reviews are also an option or a possibility to detect these misunderstandings, to uncover those. Next point is a knowledge transfer. I, as a reviewer, I learn to understand what is actually happening in that code, and then the author is not the only one who knows what's happening, and someone else can work with it in a later stage maybe even when the author is not around anymore an ultimate point is feedback for architectural or design decisions code could for example fit better in another place or it may be reasonable to use a class instead of just collecting um yeah your function some helper script or whatever or you have some maybe an API endpoint and it's more convenient to use when you would add an optional argument to that endpoint and so on and so forth. These discussions are really essential when doing code reviews. Finally, we also have the option or the possibility to improve our code and our coding practice one eye as a reviewer can do that by learning from the author or the author can benefit from my knowledge by maybe hinting at some function that they implemented yeah on their own and if we think about these points or these aspects i think we could say that these are also essential in large parts to the kind of work we do as data scientists. So these exploratory analyses, the prototypical tasks and so on. However, in my opinion and from my experience, the traditional code review practice is not applicable to this typical data science work. And the reason for this conclusion lies, and And that's from what I experienced and what I learned is the different focus areas that we put or that we have between writing proper software that ends up in production on the one side and prototyping or doing analyses on the other side. And here on this slide, I want to give you a sense of what these differences are by giving you some questions that you can maybe think when doing code reviews. For software engineering or data engineering, machine learning engineering, we have, is the artifact functional? Is it doing what it's supposed to do? Is it working smoothly within the system that we put it in? Are there bugs? I think we had that before. Another important one is, are coding guidelines and quality standards met? Is this tested rigorously enough? And the last question that you could ask is, can someone else than the author work on the artefact? It should never be the case that only one person knows what's happening there. For data science, the questions are a bit different in my opinion. we have is a chosen approach comprehensible and clear and that's the algorithm that has been chosen makes sense in this specific use case that it has been chosen for are the evaluation criteria the correct ones in that context and so on does the data have any specifics to it so yeah we're in real real life and real life data never is clean, never is perfect and there are some things that you need to take into account when working with the data and that, yeah, review is kind of a check or a possibility to check whether these peculiarities have been taken into account. Next one are the results that a model produces plausible or that you find out during your analysis and reporting to stakeholders because that can be kind of dangerous when your results are not plausible or even incorrect and stakeholders make their decisions based on these decisions that can become expensive and last one can someone else then the author explain the concept and here it's not so much about all the technical details but more about the model the evaluation criteria baselines and so on so more on a higher higher level so i would still say that we have for software engineering code reviews and but I would call it on the other side for data scientists of offer data science peer reviews because I think that kind of works kind of similar like we are reviewing scientific work or like the paper reviewing process that you know from many academic or also industrial conferences and so yeah I I think we can transfer these changes in the focus also on the aspects for code reviews, what code reviews are for, to data science. And firstly, we have again the check on whether the defined task has been completed. And I suppose that you would agree here that it's still being relevant and important. We can also keep the second point with a little adjustment, and that is to look into logical errors. And what I mean by logical errors is to focus more on the correct usage of algorithms or evaluation metrics, meaning to choose the right methods for the right use case and not so much the technical implementation of that. Of course, if you find some errors in the implementation, that's always a good thing, but that's not the focus here. The next point, knowledge transfer, is also something that we can keep as it is. As I said earlier, we want to make sure that someone else apart from the author really understands the concept. a penultimate point, so the second to last point, needs a bit more tweaking. Done. We don't need to focus so much on why technology A has been chosen over technology B, why we designed the API in that way, and if it needs some more endpoints or arguments. Instead, we should rather focus on whether the approach is fulfilling the task it is supposed to fulfill. So, meaning why has algorithm X been chosen for this model, to set up the model, why did we choose this subset of, this specific subset of the data for training the model or for doing that analysis and so on. Is the baseline the right one for the use case or are there even better ones? I think that these questions are much more important than having feedback on the design. Lastly, although I think that it's always important to improve your code and your coding practice, I would say that for these kind of task is much more important to reproduce the results. So you should check whether you can run as a reviewer the code and get to the same results, because works on my machine is just not enough. So I hope that I convinced you now that code reviews or peer reviews in that sense are also a good thing for data science tasks and that you want to really get into it, but you might ask, how do I do this even? I put together something that might help you out with that. I put together a code review checklist, and you can find that on my GitHub repo, which, yeah, and this checklist tries to put the points that I just talked about into, yeah, some concrete steps. So, for example, the reproducibility part is here as a second point, you run the code, you see if that even, yeah, gets to result, and you check the result. For example, the part about understanding everything, ask questions, ask the author to be clearer about things, to document more, and so on. If you want to get a bit more into code reviews, I can recommend you the blog by Michael Lynch, who is a software developer and who wrote some really nice articles about code reviews. And I don't agree with everything that he wrote about, but I personally took a lot from these blog posts for my own code reviewing practice. In summary, you could say that we should be more empathetic when doing code reviews and also always be mindful of the fact that there is a human being sitting on the other side of the screen. Just a note, the first two links are actually for reviewers, whereas the third article is more for the author. I think the title is very cool. Now as a last thing, I want to give you some tools that you can maybe work with that make this still kind of tedious task a bit less tedious. I'm assuming that you're working with some kind of versioning system, and in that case it is Git. Git has some very nice functionality which is the pre-commit hooks, and these give you the possibility to run a predefined set of tools with every commit. And some of the tools that I would recommend for data science work is, for one, the nbconvert, since in Jupyter notebooks you normally have this IPython notebook format, and this is really not easy to review. So GitLab and also GitHub cannot really show the diffs for this format, and with mbconvert, you can convert these IPython notebooks to the percent format, so that means the .py suffix is what you get out, and this is much more easy to review. So you're doing your reviewer actually a big favour here. Another thing are code formatters, so in the best case, you and your team agreed on some style guides, and Black and iSort as well as a linterflake 8 are some tools that ensure that these style guides are kept. Another thing is for actually the GitLab and GitHub interfaces, and this is now assuming that you are kind of familiar with these or at least with the merge request interface. If not, there is a link on the bottom where you can read up on the merge requests in GitLab at least. So there is the comment field in merge requests and some tools that I find very useful I can show you here. the code suggestion, and this is my personal favourite to be honest. If you click that, the lines of code that you selected are actually pasted into that field, and you can edit them and then add this to the review, add this as a comment, and the author only needs to apply this suggestion and spares you to copy the code. Another one which is relatively new is that you can actually mark multiple lines when doing code reviews and this is also quite neat because you can then give the reviewer the context or the scope of what you're actually commenting. And the last one here is this at the bottom. Also more or less new is the possibility to add comments to a review, so that means that you can comment in a batch and don't spam your author, because actually when you're getting notified, you would get notified about each individual comment, and that can be a bit annoying and is mostly also not necessary. So I heavily recommend to use that add to review option. GitHub also has these functionalities. Sometimes they look a bit different. The code suggestion is actually not an icon there, but as you see in the brackets, you can also use that here. And the very last thing I want to show you is the Mark Viewed option here, which is especially helpful when you have very big reviews, and this is actually a real review that I did. If you have so many files, you can easily get lost what you actually have already looked at, and this little checkbox then collapses just the file, and helps you in keeping an overview. And with that, I would like to thank you for your attention. And I'm available on LinkedIn, on Twitter. You have my email there. And I look forward to your questions.
+
+**Speaker 2** _[21:28]_
+
+already have the first question so which tool would you use for peer reviewing the elements that are not version controlled like the data and the trained models
+
+**Speaker 1** _[21:40]_
+
+So train models is something I wouldn't really review directly, but more about the metrics that I get, or the code. So yeah, if you're tracking metrics, maybe MLflow is something helpful. And the data, well, that's also in the code. So normally we have different kind of filters, maybe as SQL code or SQL queries, maybe as Python code and then you also see from that what the data is about.
+
+**Speaker 2** _[22:19]_
+
+What would you say is a reasonable team size for which code reviews make sense? Are standardized code review processes feasible in small teams of two or three people?
+
+**Speaker 1** _[22:29]_
+
+Yes, it's a short answer, so I think starting from two people, it's sensible to do code reviews. I mean, it slows you down, of course, it keeps you from other tasks, but in the end you only benefit from it.
+
+**Speaker 2** _[22:49]_
+
+How to deal with colleagues that don't care for having their outputs peer-reviewed without using authority?
+
+**Speaker 1** _[22:56]_
+
+Well, honestly, have a talk with your manager is, I think, the only tip that I can give. Or if you're working in an agile environment, maybe there's a scrum master or some agile coach, but, yeah, that's a tricky one and a situation that you don't want to get into.
+
+**Speaker 2** _[23:26]_
+
+Different focus. Doesn't the data scientist list extend the software engineer list? Are there bugs? Seems to be very relevant for data scientists.
+
+**Speaker 1** _[23:38]_
+
+Of course, yeah, you could also see it as an extension. I would say Bugs are well They are not so common in in these data science tasks and more relevant in the In the production environment. So yeah Depends on how you how you look at it. I would say
+
+**Speaker 2** _[24:03]_
+
+Shall the peer review be done by a data scientist as well or a data engineer or even a software engineer?
+
+**Speaker 1** _[24:09]_
+
+It's clearly a data scientist because mostly data scientists are in the best position to do these kind of reviews since they're also more or less deep in the stuff, in the models and so on.
+
+**Speaker 2** _[24:30]_
+
+How do you prioritize ongoing tasks and code review? How deep should a review go? A.k.a. how much time do you recommend to invest per week for review?
+
+**Speaker 1** _[24:40]_
+
+It depends. Normally, when I have a review, it takes more or less a day, I would say, in the week. Luckily, I don't have a review every week, but more or less every second week, so in the end, it's okay. But it really depends on the size of the review. But I can maybe recommend is to split it up into several chunks. I personally can only concentrate or focus for maybe an hour, one and a half at a time on code reviews because they take quite some energy. I think that's all I can say to that.
+
+**Speaker 2** _[25:32]_
+
+Yeah, that's like we have a similar question here. What are you usually what do you usually define as the response? Responsibility of the peer reviewer how to wait responsibilities on reviews and reviews review is taking too long
+
+**Speaker 1** _[25:47]_
+
+I don't get the question, really.
+
+**Speaker 2** _[25:52]_
+
+Maybe that is
+
+**Speaker 1** _[25:53]_
+
+Is there a person in the... Ah, okay. Can you give me the microphone? Very difficult to understand you with a mask.
+
+**Speaker 3** _[26:12]_
+
+So, for example, in the presentation that you mentioned, you said that one responsibility
+
+**Speaker 1** _[26:13]_
+
+So, for example...
+
+**Speaker 3** _[26:19]_
+
+of the reviewer is ensuring that the logic is indeed implemented as wanted, right? Is the responsibility of the reviewer then getting the test, running the, like, everything by themselves, or should the responsibility of providing these numbers and the notebooks showing the test be on the writer themselves.
+
+**Speaker 1** _[26:43]_
+
+Definitely on the writer, so they should make sure that everything runs correctly. Of course, we're not perfect and sometimes there are just errors, so you as a reviewer need to rerun that stuff, but in the first place it needs to be provided by the author. Does it answer your question?
+
+**Speaker 2** _[27:10]_
+
+At which state of the project would you propose to do a peer review at the end of the merge request might be very large
+
+**Speaker 1** _[27:19]_
+
+And tip here, split it up, if possible, if you see a good point in between to have someone look at it, then try that out, but from my experience, we do that at the end when the merge request is open and the task is completed.
+
+**Speaker 2** _[27:43]_
+
+What is the usual format of code files that you imagine doing a code review on When keeping it in mind some of the guidelines you offer Jupyter notebook Yeah, what is the usual format of code files that you imagine doing a code review When keeping in mind some of the guidelines you offer
+
+**Speaker 1** _[28:05]_
+
+If I get the question correctly, then I would answer with try to keep as little or as few IPython notebooks as possible. I'm a Python coder, and we're all Python coders. We're here at the conference. Use Python files. This would be my recommendation. I'm not sure if I got that question really.
+
+**Speaker 2** _[28:36]_
+
+It was anonymous offer maybe
+
+**Speaker 1** _[28:39]_
+
+If there was someone online, please reach out and maybe we can discuss that later on.
+
+**Speaker 2** _[28:48]_
+
+A lot of data scientists also write great code. How do you categorize developers?
+
+**Speaker 1** _[28:59]_
+
+How do I categorize developers?
+
+**Speaker 2** _[29:08]_
+
+Okay, maybe Reimer? No? Maybe he's gone. Okay. In data science, should there be supplementary document that explain the method, data results to help the review?
+
+**Speaker 1** _[29:26]_
+
+Yeah, of course, so what we are doing often in the project is to write some documentation apart from the code, so some markdown files, some conference page, whatever you're using, which documents the process and the results and the parameters you have, and that helps for one the reviewer and also everyone else who is later referring to what you're producing there.
+
+**Speaker 2** _[30:00]_
+
+Okay, that's the end of it. Thank you very much.
+
+---
+transcript_status: auto
+---
+transcript_language: en

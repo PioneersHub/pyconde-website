@@ -1,0 +1,233 @@
+title: Machine Learning Lifecycle for NLP Classification in E-Commerce
+---
+description: Running machine learning models in a production environment brings its own challenges. In this talk we would like to present our solution of a machine…
+---
+created: 2023-01-05
+---
+code: 8VYHKG
+---
+slug: machine-learning-lifecycle-for-nlp-classification-in-e-commerce
+---
+speaker_names: Gunar Maiwald, Tobias Senst
+---
+speakers:
+
+
+
+### Gunar Maiwald
+
+Gunar Maiwald has a background in Computer Science. For the last 3 years he worked as an ML engineer at idealo.de. His professional programming path led him from Perl via TypeScript to Python.
+
+### Tobias Senst
+
+Tobias Senst is a Senior Machine Learning Engineer at idealo internet GmbH. Tobias Senst received his PhD in 2019 from the Technische Universität Berlin under the supervision of Prof. Thomas Sikora. He has more than 10 years of experience in Computer Vision and Video Analytics research. 
+
+At idealo, he switched from the world of images and videos to Natural Language Processing and is responsible for the operation and development of machine learning models in a productive environment.
+
+* LinkedIn: https://linkedin.com/in/tobias-senst-08090b192
+* Github: https://github.com/tsenst
+---
+abstract:
+
+
+Running machine learning models in a production environment brings its own challenges. In this talk we would like to present our solution of a machine learning lifecycle for the text-based cataloging classification system from idealo.de. We will share lessons learned and talk about our experiences during the lifecycle migration from a hosted cluster to a cloud solution within the last 3 years. In addition, we will outline how we embedded our ML components as part of the overall idealo.de processing architecture.
+---
+full_description:
+
+
+idealo.de offers a price comparison service for millions of products from a wide variety of categories. The automated classification of the offers is carried out using both traditional and deep learning-based approaches. Our machine learning components are part of a fully automated life cycle and process up to 500 million offers daily at peak times. 
+
+In addition to the enormous amount of data that we process, we particularly face the challenges of being online 24/7 while adapting to an ever-changing catalog structure. This requires a high level of reliability from our inference service and continuous automated retraining and model deployment. 
+
+In this talk we would like to share and present our view on MLOps: 
+- How we integrate our CI/CD and continuous training pipelines with Github and AWS Sagemaker 
+- How we migrate the lifecycle from a hosted cluster (running Kubernetes, Argo Workflows and ArgoCD) to the cloud (running AWS Sagemaker and Datalake). 
+- How we monitor our models as well as data and performance indicators up to date and alert in case of disruptions 
+- How we embed the classifiers in an event-driven heterogeneous software architecture (based on Kotlin and Python). 
+
+And share lessons learned on: 
+- How we keep reliability high while deploying, updating, and scaling our classification inference services 
+- How we meet a valid compromise between performance and cost requirements.
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2023-04-19
+---
+start_time: 14:00
+---
+end_time: 14:30
+---
+slot_id:
+---
+track: DevOps & MLOps
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 2521
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/8VYHKG.png
+---
+youtube_id: 4mGvH3ms6B8
+---
+video_link: https://www.youtube.com/watch?v=4mGvH3ms6B8
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT30M32S
+---
+video_thumbnail: https://i.ytimg.com/vi/4mGvH3ms6B8/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:02]_
+
+Cool, thank you. So, hello and welcome to our talk about a machine learning lifecycle for NLP classification in e-commerce. Okay, before we give you our agenda, let's introduce ourselves. Tobias is standing next to me. He's been working for Idealu now since three years. As senior ML engineer, my name is Gunnar, I've been with Idealo for eight years now and also work as an ML engineer. That's our agenda. First, we give you a brief overview of Idealo as a company and some key facts, but only for short. And then we introduce our machine learning classification background, that you know in In which context we are working, continuing with our machine learning lifecycle, how we think it is, which steps we implement from data to model and deployment. Then we continue with some MLOps. So we implemented our solution to a self-contained cluster and migrated the solution to the cloud. how we did it, which things we learned, we give you some takeaways and hopefully have enough time for your question and give you an answer here on site or from remote. Okay, short, some key facts about Idealo, we are a company about 20 years now, experience in e-commerce, we are quite international, so over 1,000 employees working, we are based in Berlin so yeah people from over 40 countries the data we do our price comparison from 50,000 online shops so quite a big set and we generate over 500 million online offers for 2 million online products so that's some benchmarks about Idealus data and the classification background that we want to talk about is you can imagine like this so on the one side you have the shops here on the left there are big shops and small shops medium-sized shops and from a big bunch of e-commerce segments yeah nearly all e-commerce segments deliver us their data their show at their office that's on the one side. And on the other side, there's the EDR low category structure. It's like a category tree with about 2,000 product categories, so a full segment. And each product category has a list of or a set of product types. It's something like a subcategory. Imagine it's a tech, and the system has over 25,000 product types, so 25,000 techs. And the task is to the assignment of all the offers from the shop, the import continuously through our idealo category system, and this is done via classification. Next slide. If you look at a single offer, for instance, a sneaker like this, so an individual offer, the task looks like this. The offer has a well-defined set of metadata, an image, a title, a short description text, a longer description text, it has a price, manufacturer, category given by the shop, and of course a bunch of text data. And we generate out of this text data some relevant text features and we use a support vector machine applying on this text feature to do our product category classification and for the product types we use deep learning model multi-layer pods. But that's only to have an idea of what in which context we are talking. And that's just a brief overview of our classification task. And one step higher, on a conceptual view, this classification task is embedded in our machine learning life cycle. And the machine learning life cycle, I guess most of you know, it's like a theoretical concept that describes the continuous sequence of repetitive steps that brings the data to a productive model. And how we think the life cycle and which steps are important and how we implemented it will be part of the next sections. So in short, life cycle consists of these four steps, starting with data collection, model building, model training, then model evaluation, and last but not least the classifier deployment. And I would like now to introduce you what's behind each individual step. So first data collection. It's clear every machine learning model is based on data. The data that we use is based on manually maintained product of us so really manually created data and out of this we generate our data for the next steps and the data is in our data lake, we use Athena queries to generate the data sets and we store each data set on external storage device with a version number and to ensure that we can repeat experiments at any time on the same data set. Next step is training or model building here and as already mentioned we only use text data for our classifiers. This means that the preprocessing and filtering on the text data must be equal between training time and inference when the model is in deployment. So this has to be ensured and has to be also keep in mind. And we also generate each model that we generate has a version and for us it was good practice that version of the data we use and the model version they match together with the same identifiers. After model building, we do a model evaluation. So this is based on the test data that we get from the data collection step in step one. That's also pulled from the data lake, the test data, and for the validation of a model, so every model that is built goes through a validation process, but this we keep quite simple, just a simple indicator on model F1 score and if the F1 score of the model is above a certain threshold then we say okay that's a valid model and if not then we keep the model back. But however if the in our case we have a 2000 class classification problem or 25,000 class classification problem there are a lot of opportunities where how to evaluate the model and we store all the data that we generate during evaluation, so F1 score, precision recall, accuracy for every single class, for every single product type, and even for different levels of thresholds of confidence. And so there's a real big amount of data that we generate through evaluation, and we store all the data as JSON on external storage, but also on our data lake. Last but not least, classified deployment. As already mentioned, when validate check was valid, the model is ready for deployment. But there are a few boundary conditions that have to be kept in mind. So the model must be sure for or must guarantee scalability. In case of different fluctuations in traffic, a model can outscale the incident that analyze it and so scalability is quite important during deployment. Also, sometimes occurs something unexpected. The doesn't run for some cases. In this case immediately you have to roll back or we have to roll back in our case to a stable version and last but not least cost efficiency during deployment, something that is quite important if you go to the cloud. Last but not least, monitoring. This is quite an essential point during lifecycle to ensure stability of every process step. And monitoring can be done during different periods, monthly monitoring, weekly, hourly, even minutely monitoring. And on the other side, every single step can be monitored. There are data matrix during data collection, number samples, number classes, model matrix already mentioned, but last but not least, of course, also the operational metrics during classifier deployment, very important if you went online with your model. And especially after deployment it's quite important to ensure that the model can stand the incoming traffic. In our case, where does this traffic, I mentioned, where does it come from? So you can see here the structure of kind of structure of our components. In the middle there's our team space, we are mixed team of Kotlin developers, we are machine engineering engineers. So we are responsible for declassifiers but also for Kotlin components. And there's outer space, so there's event architecture and there comes traffic in, there goes traffic out but the traffic goes through our system and the responsibility of our team is to ensure that the traffic goes smooth and stable through our system and that's why it's necessary to monitor all the traffic during or after deployment and the time on. And the traffic in our case means, so just to mention a number, up to 2 billion offers per week. And from lifecycle to operations Tobias will tell you something about this.
+
+**Speaker 2** _[11:53]_
+
+So, when we started our journey, we used a hybrid solution. That means we did our training and our continuous training on a cloud and the service deployment and CICD was done on a self-contained Kubernetes service from Idealo. As you see here, just at the beginning, we split our lifecycle in different components and there we were able to develop each complement independently. The services were deployed via CDK, the SageMaker pipelines, and the service itself was deployed by using our workflow and hand packages. And so when we change something in the code, then we run our automatic deployment pipeline. We do unit testing, integration testing, and use our workflow for the pipeline. So, in that case, we trained each two week a new model. That means this is triggered, then the pipelines are triggered, the model is training. When the training was finished, we store everything, the data and the model on S3 bucket, which are corresponding to timestamps and use these timestamps as identifier. And then on the Kubernetes side, we implement an Argo con job, which looks each morning or text each morning if there is a new model. And if there is a new model, then we write this identifier in a configuration file, which is in the service repo. We push it to the service repo, and this triggers the Argo workflow. And then the service knows which model it should deploy, and we use hand packaging for the deployment, and Argo CDs does the rollout for us. That means it does a safe deployment, lifeless probes, and so on and so on. And the Kubernetes services, they are connected to our monitoring. We use Grafana and Kibana for the logs and for the metrics. And we also tracked the experiments performance with MFLow. But we quite early found out that MFLow does not fulfill all our needs. So as Gunnar said, we have to store more detailed evaluation matrix and JSON files and also the version folders. So with this early solution, we had very good experiences, especially Argo CD provided us a very intuitive user interface, but the drawback of Argo was that it takes some time to get used to the workflow and to Argo CD because of all the YAML files and all the YAML configuration. But we were very lucky that we had a team member, which was from the Kotlin part, which were very used to Argo CD, and we learned a lot from him. And we had also a very supportive operations team, which run the Kubernetes cluster and helped us with the initial initializations. When we run our services then, we have seen that the memory demand of classifier can increase drastically during the operation. That's in our case because we allow different kinds of batch sizes. And then the traffic increase, it can be that the batches get really high. And since we use support vector machine, which has a huge sparse feature, and this somehow has to unfold to a dense feature, we frequently run out of memory. And this was after the safe deployment. So in production, this can be really a mess. So we learned that we have to test our memory beforehand and the memory demand of our services under different operations mode, under the full load, and also under normal operation mode. We also found out that doing the versioning of our data in the simplistic way is, for us, easier than handle large databases, feature stores, or MLflow, especially when afterwards we had to take a look at the JSON files or if we did some experiments. This easy solution for us gave us the best flexibility to accessing the data and to play around with the data. When our company decided that we want to move into the cloud, we had only changed our model deployment from Kubernetes to SageMaker. We benefited from the fact that we had separated all the components of the lifecycle. And we were also thinking and doing a shift of the deployment to EKS cluster from Amazon because the other half of our team has to go to the EKS cluster with their Kotlin services, but decided to stay in the same ecosystem. Since also SageMaker provides us safe deployment and auto-scaling, this was, for us, a good solution. And we moved to CI-CD from our workflow to GitHub Actions, where the pipelines can be deployed via CDK and all the rows and stuff, but the classifier has to be deployed We have the SageMaker API, and this can be done from the model training when a new model arrives or is trained, and if we change something in the service implementations. So experiment tracking was then changed from MLflow to SageMaker Experience, and we attached the model registry from AWS, but we still have to store these JSON files because we didn't find a solution where we can really have an overview of fine-grained evaluation metrics. And finally, monitoring, we use the Grafana integration of CloudWatch metrics. And we also use CloudWatch and CloudWatch dashboards. So in this slide, I would like to provide you a deeper look into the model deployment because this was, for us, an interesting case. So from our experience, we found that it's a good idea to separate the deployment of a new model from the deployment of a new service. For that reason, we have to ask the model registry, which was the last deployment of the, which was the last model, or which was the last service. And then you can start a session market deployment by defining a model package. You can then configure the endpoint if you had the model package, choose the instance, choose the deployment strategy. And we decided that we need another test of this endpoint because we have to test against this massive load we observed before and that the models will not crash when we have large batch sizes. Another positive way is to do additional tests of the endpoint. If it fails, then we can remove all the entries from the model registry. We have seen that if we do not do that, then the model registry can be very cluttered and we want to keep the model registry clean.
+
+**Speaker 1** _[18:51]_
+
+Okay, one quite important point when moving into cloud is cost and this almost is related to the instant types that you use and to found our optimal solution we did some experiments to estimate runtime on cost for processing 2 billion offers and as you can see there is quite a wide variety of instant types, and some of them do not fit in time and others do not fit in code. But there's a variety of instant types that fit in time and code, and this are some benchmarks we did, some benchmark tests we did on different instant types, and here are three examples. And as you can see, the MLR524X large processor has the best performance with 2.3 days processing 2 billion offers, but it's by far the most expensive out of this, with 534 US dollars in our case.
+
+**Speaker 2** _[20:02]_
+
+Uh,
+
+**Speaker 1** _[20:03]_
+
+Less performance with 2.27 days is the M5-24XL, but you can spend or save one third of the money when using this instance. And in our case, we have a limit of seven days. So our product owner says, okay, seven days should be your benchmark. And in our case, we decided to take the M5 for xlarge, that process the data in seven days, but only one third of the amount of the best performing instance. So to keep it short, it's up to your requirements, up to your limits, which instance fits your needs best. Here are some lessons learned from our migration to the cloud. There's a small learning curve in setting up basic SageMaker pipeline endpoints. Using infrastructure as code, CDK, or for instance, in our case, this helped really to automate our deployment. We are a friend of GitHub Actions. This allowed us painless CI, CD integration. But we also think test classifier performances for different instant types make sense to keep your cost in the cloud as low as possible. And Tobias continues with monitoring.
+
+**Speaker 2** _[21:31]_
+
+In the last minutes, I would like to talk about monitoring of our training data and service components. From our point of view, monitoring is essential and you cannot start early enough to monitor your services. And it's also important to check the boards on a regular base. That means in our team, we check each morning on our dailies, the Grafana and Gibana boards, but I think that's nothing new for you. So let's move on. So when we are moving to the cloud, we use the Grafana integration of the Cloud.matrix that makes it really easy. And we have different boards of different degree of complexity. For example, this is an example board which is simple and interpretable for our team lead and for our PO. It shows how much instances we are using. It shows the throughput. And it also shows if errors are arising. But for us developers, the operational matrix are a little more helpful to understand if our services are working efficiently. For example, here we see this is like a 16 core CPU service. And on the lower left, nearly half of the service is used for computation. In an ideal case, we would increase the number of workers to run more processes in parallel. But you see also that we are restricted in memory. So 80% of the memory is used. This is every time a trade-off you have to deal when you use big models. And also interesting is, for example, the prediction score, where you can see model drift, which gives a clue of how your model is performing. Finally, CloudWatch also allows you to integrate SageMaker pipeline status metrics, which gives you the top nice overview of the status of your pipeline And you see, at first place, when something went wrong, here you see our trading generator had some problems a week ago. And we also track the training data metrics, the distributions of the classes, distributions of the offers for each language, and also something like a final scores. So we've come to an end. But I wouldn't let you go without sharing some takeaways. Of course, these are very personal, and these reflect very how we work as a team. But maybe you can find yourself and your experience there. Yep, first thing is start monitoring as fast as possible. Especially in machine learning, you have cycles which are quite long. So you have a long training. And if you want to observe a matrix, you need some measurements to see a trend or to see if something behaves wrong or bad. And if you wait until everything is ready, then you have to wait like a month to see if your process is really working. And finally, it was good to split our lifecycle into a different kind of components, which helps us in the development, in the testing phase, and also by moving through different platforms. And it's very essential that you know the performance requirements of your services. It helps you that they do not crash. And as we see, even if you have a nice safe deployment, it can crash afterwards if something happens, the batch is getting too big. And finally, in our case, it's like we try to keep it simple as possible. So there are lots of framework there, a lot of solutions you can attach. But if you keep it simple, it helps you on testing. It helps you on issues with dependencies. And the last point is start monitoring as fast as possible. That's really the most important thing for us. Thank you very much. Thank you for your time. Thank you for spending time with us in this talk.
+
+**Speaker 3** _[25:34]_
+
+All right on to questions we're using slider of course I forgot to mention that There's already a bunch of questions in here, so I'll go through these first, and then if there's more time Tend to the room did you consider changing multiple classifiers in a row to reduce the number of possible classes for example clothing classifier clothing type classifier
+
+**Speaker 1** _[25:52]_
+
+We decided but decided against it
+
+**Speaker 2** _[25:54]_
+
+Yeah.
+
+**Speaker 3** _[25:55]_
+
+You want to elaborate?
+
+**Speaker 1** _[25:57]_
+
+Um, it's,
+
+**Speaker 2** _[25:58]_
+
+It's about propagating error during the classifier. At first, when we moved from a German model to a multi-language model, we made some experiments where we want to find out which is the best solution. And we can also have different classifiers for different classes. But especially with the deep learning, we see that although there are different kinds of languages, in our case, there are some words like brands, which are in different languages. And we increase, thus, the number of offers to train for the classifier. And if you split everything in small classifiers, then each classifier will be trained with less amount of data. And it reduce accuracy in our perspective here.
+
+**Speaker 3** _[26:43]_
+
+Nice, thanks. What kind of textual features are you using for the SVM? Bag of words?
+
+**Speaker 2** _[26:49]_
+
+TF-IDF, so it's a classical bag of words with a little bit of writing, yeah.
+
+**Speaker 3** _[26:55]_
+
+Can you tell us more about how you load the data from so many different shops which possibly differ very much in data quality and structure etc
+
+**Speaker 1** _[27:02]_
+
+There's a well-defined import structure and there's something like normalization. So of course there's predefined fields where the shops put in their data but that's not in the scope of our team. So we take what the import team gives us and I think we do the best with it.
+
+**Speaker 3** _[27:24]_
+
+How many persons work in your MA teams?
+
+**Speaker 2** _[27:28]_
+
+Well, at Idealo, we have a core machine learning team, which is about eight persons. And our team is two machine learners, and then we have six Java developers. So we found it a good practice that the team which owns the product, which uses machine learning, has also capability of persons who are dealing with machine learning. So we had the proof of concept from our internal machine learning team, which I gave to us, and we are here to deploy it and to also improve it. Cool. Hope that answers the question.
+
+**Speaker 3** _[28:03]_
+
+Why do you need to retrain every two weeks? How do you decide whether the new model is better?
+
+**Speaker 1** _[28:08]_
+
+Okay, we do need retraining because new categories arise, others are mixed together, so all this what happens with categories and it was a good practice to have a new model every two weeks to keep it actual.
+
+**Speaker 2** _[28:29]_
+
+Yeah, we made experience with making this adaptive, but then you add complexity in your code Something can get wrong and two weeks was a good trade-off
+
+**Speaker 3** _[28:39]_
+
+All right, this question is from me, actually. What was the motivation for moving to cloud-native? Did you, well, you have answered that. Did you achieve a cost reduction?
+
+**Speaker 2** _[28:47]_
+
+main motivation is scaling so if you have an own cluster and you want to scale it's easier on a cloud and for us it's also easier because then we know we have access to GPUs for training and we don't need them for this inference but it's scaling
+
+**Speaker 3** _[29:04]_
+
+When looking at cost versus processing time did you also look into changing code optimizations or other languages?
+
+**Speaker 2** _[29:12]_
+
+Not really because we have a Python stack and if we add like C++, I came from the C++ area, but if there's no one else in the company who doesn't know your language, then it doesn't make sense to have very efficient code. It's better to share code and make it accessible.
+
+**Speaker 3** _[29:34]_
+
+All right, final questions. How do you get your labels for training?
+
+**Speaker 1** _[29:38]_
+
+The labels for training, so we got this manually created products and the offers match to to the products via identifier and so the product is assigned to a category and so we got the category for offer and same with 50 tags. So, but manually curated.
+
+**Speaker 2** _[29:59]_
+
+That's maybe what we really like. We have all these content employees which create products, which make this association for important stuff and we can take our data from there and they really helped us and all they really work out. All right. Thanks.
+
+**Speaker 3** _[30:16]_
+
+Thanks very much. Sorry, we're running out of time. These two gentlemen will be around, so maybe you can just talk in person. Sorry for all the questions we didn't get to answer. One more round of warm applause, please.
+
+**Speaker 2** _[30:26]_
+
+applause please
+
+**Speaker 1** _[30:27]_
+
+for coming to the end.
+
+---
+transcript_status: auto
+---
+transcript_language: en

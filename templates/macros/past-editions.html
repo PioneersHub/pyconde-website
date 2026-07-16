@@ -1,0 +1,62 @@
+{#
+  Past Editions — homepage promo block
+  ────────────────────────────────────
+  Compact table of "year | place" rows — two columns on wide screens,
+  one on mobile. Data lives in databags/frontpage/sections/past_editions.yaml
+  so curators don't need to touch templates to update.
+
+  Link target depends on `archive_ready` in the databag:
+    true  — rows link to the in-site archive (`path`), and the
+            "Browse the full archive" button shows.
+    false — the archive is not migrated/deployed yet: rows link to the
+            edition's original conference site (`site`) in a new window,
+            the archive button is hidden, and editions without a `site`
+            render unlinked.
+
+  Usage:
+    {% from "macros/past-editions.html" import render_past_editions %}
+    {{ render_past_editions(bag('frontpage/sections/past_editions')) }}
+#}
+
+{% macro render_past_editions(data, section_label='Past editions') %}
+
+{% if data and data.editions %}
+{% set archive_ready = data.archive_ready != false %}
+<section class="past-editions content-block--white" aria-label="{{ data.section_label or section_label }}">
+  <div class="content">
+    {% if data.heading %}
+    <h2 class="past-editions__heading">{{ data.heading }}</h2>
+    {% endif %}
+    {% if data.subheading %}
+    <p class="past-editions__subheading">{{ data.subheading }}</p>
+    {% endif %}
+
+    <ul class="past-editions__grid">
+      {%- for edition in data.editions -%}
+      {%- set href = edition.path if archive_ready else edition.site -%}
+      <li class="past-editions__item">
+        {% if href %}
+        <a href="{{ href }}" class="past-editions__row"{% if not archive_ready %} target="_blank" rel="noopener"{% endif %}>
+          <span class="past-editions__year">{{ edition.year }}</span>
+          <span class="past-editions__location">{{ edition.location }}</span>
+        </a>
+        {% else %}
+        <span class="past-editions__row">
+          <span class="past-editions__year">{{ edition.year }}</span>
+          <span class="past-editions__location">{{ edition.location }}</span>
+        </span>
+        {% endif %}
+      </li>
+      {%- endfor -%}
+    </ul>
+
+    {% if archive_ready %}
+    <p class="past-editions__cta">
+      <a href="/archive/" class="past-editions__cta-link">Browse the full archive →</a>
+    </p>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% endmacro %}

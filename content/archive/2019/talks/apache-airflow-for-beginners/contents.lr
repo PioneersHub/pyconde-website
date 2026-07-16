@@ -1,0 +1,212 @@
+title: 🌈Apache Airflow for beginners
+---
+description: This talk gives an introduction to *Apache Airflow*, that facilitates workflow automation and scheduling. You will learn about the core concepts in…
+---
+created: 2019-05-23
+---
+code: 93C7TF
+---
+slug: apache-airflow-for-beginners
+---
+speaker_names: Deleted User
+---
+speakers:
+
+
+
+### Deleted User
+---
+abstract:
+
+
+This talk gives an introduction to *Apache Airflow*, that facilitates workflow automation and scheduling.  You will learn about the core concepts in Airflow and how they fit together to form a data pipeline.
+---
+full_description:
+
+
+Apache Airflow is an open source project that allows you programmatically create, schedule and monitor sequences of tasks. It earned its good reputation over the past years and became the industry standard for building data pipelines. However, for a beginner, it may be tricky to understand whether Airflow can solve some of their problems. In this talk, I will show you what problems can be solved using Airflow, what are the key components and how to use it on a simple example.
+
+We will go over the basic concepts and the building blocks in Airflow, such as `DAGs`, `Operators`, `Tasks`, `Hooks`, `Variables`, and `XComs`.
+
+To demonstrate how those elements are working together, I will show you the process of building a workflow that takes the following steps:
+
+- Extract the data from an API and transform it into the format suitable for the analysis.
+- Save the results in a database.
+- Run some transformation and rearrangement of the stored data. 
+- Save the results in an S3 bucket.
+- Send you an email notification that the pipeline has finished successfully (or not).
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: PyConDE
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 95
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: basic
+---
+domain_expertise: some
+---
+supporting_material_url: [ will come later ]
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/93C7TF.png
+---
+youtube_id: YWtfU0MQZ_4
+---
+video_link: https://www.youtube.com/watch?v=YWtfU0MQZ_4
+---
+video_published_at: 2020-01-04
+---
+video_duration_iso: PT29M6S
+---
+video_thumbnail: https://i.ytimg.com/vi/YWtfU0MQZ_4/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Hi, everyone. Oh, this is a bit very loud, maybe. So my name is Varya. And today I want to make an introduction to Apache Airflow. I want to say that this presentation is aimed for beginners, somebody who maybe heard about Airflow, but never used that. So let's start. what is the what what's airflow airflow you can think of it as a tool to build schedule and monitor data pipelines build means to create schedule means to set specific time when the workflow should start and monitor means to be able to check how your workflow is going which task failed, which succeeded, why they failed, for example. Let's also define what's the data pipeline. Data pipeline is a set of data processing elements connected in series where the output of one element is the input to the next one. Imagine you have some data, you put it into the data processing element, simply put function, and you get transformed output that you can put into the next function and so on. So today we're going to build a very simple data pipeline. So it's going to be a toy example, but I believe it will help us to understand and to learn main concepts of Airflow. And so the project for today is the following. So imagine you are very interested in some Python library, let's say Pandas. For those who don't know, Pandas is a data analysis and modeling library. So you're very interested in that. You want to stay up to date. And you think, oh, maybe if I know what people with good reputation on Stack Overflow ask about Pandas, then it will give me a good overview. So you decide to automate this process and get fresh questions from Stack Overflow every day to your mailbox. So let's see how we might make a data pipeline of this project. So the first task would be to create a table, just Postgres table where we will store raw questions. The next step will be to actually get data from Stack Overflow and in a raw format for one day, store it in this table. Then we will filter this data to select only good questions, only interesting one, and store them as JSON in S3. Okay, the fourth Our task will be to take data from S3 and render in HTML template with this data that eventually we're going to send this email. And it's supposed to run every day without us touching it. Okay, so now we know what we want to build. Let's see what tools do we have in our disposal, like what Airflow can offer us. It's called main concepts of Airflow. some people say it's building blocks of Airflow. And there are seven of them that we're going to learn today and use in our code. So the first one, the very first concept is operator. You can think of it just like a worker, something that knows how to perform a task and has all the tools to make it, right? For example, specific for Airflow, you can have Python operator. It knows how to run Python code. Postgres operator knows how to connect to Postgres database and run SQL queries there. Bash operator knows how to run bash commands, et cetera, right? So the second main important concept is DAG. It states for directed a cyclic graph, but it's just protocol. It's just like set of instructions where you define which task should follow which one, what to do if one task failing, how many times you want to retry, things like that, right? Next concept is task itself. It's job performed by the operator. The fourth one is important. It's connection. Connection, it's secrets or credentials to external systems. For example, Postgres connection would consist of ports, a host, user passwords, right? And it all can be stored in the Airflow database securely, right? So you don't need to worry about how to securely get it there. Next, it's hooks. Hooks are very, very useful, I think, because they give us a common interface for these external services, right? Because if you need to connect to Postgres, you would normally use some external library like PsychoPG or something. But here you can just use a hook, provide connection that you stored in the Airflow and run your queries. And for example, S3 hook should look very similar to Postgres hook, just with different connection and parameters. Fine. So one more concept is variables. Super simple. It's just like environmental variables, any arbitrary chunks of data that you might need to store. And the very last one is XCOM. XCOM stays for cross communication between tasks and if you follow the best practices of building workflows, your tasks should be independent or idempotent. They should not share any state, but sometimes you need to share a little bit of data between tasks. And XCOM is the tool to do that. And you will see today how one might use it. Okay, so now we have our goal, right? The pipeline we want to build, and we have the tools that Airflow provides. Let's just go and we can go start building the pipeline. and the first thing like that you need usually is to install everything and have it deployed somewhere but all this is out of scope of this presentation but in the git repository that i provided in the beginning you can find some links that can help you get started but let's just imagine we have everything installed and the first thing i do before building the pipeline is usually store those connections and variables that I already know in Airflow UI. I have a small demo for you to show how it might look like. Hopefully internet's working fine. So here is just like I'm starting the web server locally. So since it's local I can go to my localhost and this is how the UI looks like in the admin tab you have connections and variables let's check the variables I already created them you see a S3 bucket, stack overflow ID, secret, and the tag. So let's change it to pandas. This is how, so remember all these variables, we will need them. And also connections. For this project, we need two connections, Postgres connection and S3 connection. Here you can see how it looks, which parameter it takes. and yeah we saved cool so this is all we need for now so let's go and step by step implement a pipeline okay remember the first task is to create questions table for that we will need a postgres connection because we need to create table in this database and postgres operator it This operator knows how to work with this database. And here I prepared some code. I hope you can see it. So all the all important imports are done. And this is how we usually instantiate a DAG, our instructions. You need to give it an ID and also default arguments. So maybe the most interesting argument is like the schedule interval. How often do you want to run it? Here I say daily, you can say weekly, hourly or use cron syntax. So let's go and implement our first task. As you see it's using a Postgres operator. It should have an ID and I just use a Postgres connection here. Remember we created this in the UI and since it knows how to run SQL we need to provide SQL query here. Just create a table. Very nice. Our first task is ready. So the second task is to take data from Stack Overflow API and we will store it in this table. For this we will again need Postgres connection, variables and Python operator because we will write a Python function that we will ask our Airflow to run. I prepared here some functions for you and what I want to show here is how to to get variables from Airflow. It's very simple syntax. You just say variable get and refer it by name, right? There are other variables that I'm using here, like tag and Stack Overflow credentials. So this is the first function. And the second function is inserting questions into database. Here, I want to show you how to use Postgres hook. Again, super simple, just Postgres hook, give it a connection ID, and it has a very nice method, just run, and I give it a query that I want to run, insert questions query, and parameters of this query. Cool. So, yeah, this is the function that we want. Just also notice how it's easy to use Postgres hook. You don't need to use psychopg worry about the logic now we just take this function that we created and go and create one more task in our deck it's using python operator because we need to write python function and i just provide python callable here super easy nice done second task the third one Now we're taking data from the table, filtering it, and storing as JSON in S3. So here we will need Postgres connection, Postgres hook, and two new things, S3 connection and S3 hook. And of course, Python operator to run it all for us. let's look at the so the first function is actually not very important what's here you can see I'm again using Postgres hook and the one that we actually gonna use in the DAG is write questions to S3 here I wanna show you how to use S3 hook excuse me so also notice how similar it is to Postgres hook I just need to provide connection and use specific method for this hook nice let's go and write our third task which is writing questions to a stream I just provide call a Python variable by the callable and it's done the force one it's when we're gonna take data from s3 and render HTML template with this data for again we will need s reconnection and hook we need Python operator in the new thing that we're going to use now is XCOM because I'm well after rendering template is just a string I don't want to store it anywhere I'm just gonna pass it to the next task using XCOM and let me show you how it's done so there's the last function render template please notice how that we use this additional context here this context you give us access to the air flow internal database right so we can push something into this database let's see so first we need get the task instance from the context and then we need to push this rendered template which is just a value of the template and give it a key some identifier so that the next task knows how to what to look for so nice let's add this to our instructions Python operator provides callable and additional parameter which is provide context true very exciting last last step is to send emails take this HTML send emails and here we just need XCOM to get data from the previous task and email operator that knows how to send emails let's look so here here I'm using email operator it takes parameters like email whom you want to send it here I created some temporary email for the purposes of this demo and I need context so provide context yes please and it takes one more parameter which is subject let's write some subject here look I can use ginger template in here airflow knows how to handle that so DC stays for it's just like data so my email on each date will have slightly different subject with different email and HTML content again I'm using ginger templates to get task instance this time XCOM pull and I need to say from which task I want to pull data from the previous one render template the name and the key HTML content nice so this is this is our task that we wrote here in you can see how I define the pipeline where I say like it's all should run in in a series there are many other options you can split and branch but right now it just just just like that so you can see our doc is actually ready our pipeline is ready it's very simple very readable and I have also a small demo to show you how it might look like to run it. Let's see, just a second, maybe I can make it a bit slower. No, I can't make it slower, so it will be probably fast. So this is how you can see your pipeline in the Airflow UI. So you can see how many times it's run, what's the schedule interval, what's the name, and you can also trigger it from here, which I'm gonna do now. Okay, our pipeline is running. Green means it's running, it was successful. The next task is inserting questions. So it's scheduled, it's running, and it failed. So we can check why it failed. Logs are very helpful here. So I can see that I actually misspelled the variable name. I can quickly go and fix that. And try to resume this task. cool so this task is cute now it was successful the next task is writing questions to s3 I actually have s3 bucket open here so I can show you that Actually, on the day when I made the demo, it added additional JSON. And it looks like just metadata of questions. Very nice. Now we're going to use this to render template. Let's check how other tasks are doing. Render template and send email. Done. Awesome. So, I also want to show you that email actually arrived to my temporary mailbox from me. Questions. On that day, there were only three interesting questions based on my parameters. Yeah. And it would be nice to get it every day. Nice. So, this is it. And let's sum up what we learned today. So first we learned what's Apache Airflow. That is the tool to build, schedule, and monitor data pipelines. We learned what's the data pipeline. It's a set of data processing elements or functions where the output of one element is the input to the next one. Also, we learned main concepts of Airflow, like DAG, task, operator, XCOMs, et cetera. And we wrote our first data pipeline. so yeah thank you very much I also want to say that usually in real world data pipelines are much more complex and much more useful and also the Airflow itself developing every day so there are many more operators hooks other tools in Airflow that you might use you also might write your own ones also you can set complex triggering rules you even can trigger your DAG from your code so there are many many things you can do with it I just encourage you to try it once maybe several times yeah and thank you very much for being a very nice audience if you want to get in touch with me here's my email bye
+
+**Speaker 2** _[20:42]_
+
+Right. Now I have a microphone. So my butchered introduction wasn't quite recorded, which I'm happy about. Thank you very much for the talk. It was very interesting for me to see it. And I'll be certainly looking into it in the future. Now we're up to questions. We're actually five minutes early, so there's much more time for questions. Please raise your hand. I'll just come over to you for the question.
+
+**Speaker 1** _[21:14]_
+
+Thank you for your talk. I have a question. How can you debug the stuff?
+
+**Speaker 3** _[21:16]_
+
+debug the stuff. It's
+
+**Speaker 1** _[21:17]_
+
+Is it only possible to go over the logging or is there any possibility?
+
+**Speaker 3** _[21:21]_
+
+any possibilities.
+
+**Speaker 1** _[21:22]_
+
+possibilities? Yeah, yeah. I think like login is very helpful. Like this is usually how I do that. I debug with login or you can, of course, run it locally, right? All your pipelines, you can write like run locally or using. So, yeah, I just usually try to have some unit tests on my tasks right or on my functions as well you can run your functions independently from the DAG but depends what you want to debug if it's like failing then logs are probably the best place to go any other questions? I do have a question if some of the steps in this pipeline are
+
+**Speaker 2** _[22:12]_
+
+Pipeline R.
+
+**Speaker 1** _[22:13]_
+
+computationally heavy and the result can be cached is there a way to do that um i'm actually don't really know about like the caching but uh computationally so all the your pipeline can be distributed right and you also can run the tasks in parallel so on many machines so it's like very computationally heavy you might need to distribute that it's good to after each task is succeeded or finished to store the data that was outputted to somewhere so this is what I can offer here
+
+**Speaker 2** _[22:59]_
+
+Right. Anyone else up for questions?
+
+**Speaker 1** _[23:10]_
+
+Hi. In your example, imagine if you had two colleagues and one of them, so both are interested in those overflow questions, but one of them would only be interested in having one message per day or one HTML page per day and another colleague in one per hour. In your example, could you adapt that to have the same graph, but with a different scheduling or would you end up in multiple graphs? I think you will end up with multiple pipelines, or maybe you can have this pipeline running and splitting, and it would stop for one person if there is an email operator, and for the next one, it will continue running every hour. so but I think like I would do like two pipelines maybe there's a better way to do that so I would suggest to have to
+
+**Speaker 3** _[24:16]_
+
+Previously, you talked about distribution of tasks. Let's assume that I don't want to go into just a single cloud scenario. What would you suggest to use? Is there the SSH operator, I guess? Do you have any experience with that one?
+
+**Speaker 1** _[24:36]_
+
+No, unfortunately, I don't have experience with SSH operator, and I don't really know if I understood your question. What do you mean, like different clouds?
+
+**Speaker 3** _[24:49]_
+
+Yeah, so for example, if I want to distribute the tasks, which are computation heavy among different cloud scenarios.
+
+**Speaker 1** _[24:50]_
+
+Yes.
+
+**Speaker 3** _[24:58]_
+
+So for example, if I want to exploit AWS, Azure, Google Cloud Platform, I've seen that different implementations to address particular cloud platforms. But if I want to be independent of that, so to avoid vendor login, for example, do you have any suggestion for that?
+
+**Speaker 1** _[25:16]_
+
+for that? Well, you can write your
+
+**Speaker 3** _[25:16]_
+
+Okay.
+
+**Speaker 1** _[25:18]_
+
+own operator that will handle all that and go to all the vendors that you would like. So, it's very extensible. So, you can just write your own operator. Thanks.
+
+**Speaker 2** _[25:36]_
+
+So, yeah, I was just about to ask the other side of the room, do you maybe have any questions? We still have five minutes. We have time for everybody, so I'll just go.
+
+**Speaker 1** _[25:56]_
+
+Thank you. Actually, I don't have a question, but I wanted to ask you just to scroll to the beginning so that we can note again the GitHub link. Thank you very much for your presentation, it was very very interesting and I have a question that if you would like to have something that now is not implemented, is not in Airflow, what you would like to have? What I would like to have? Yeah, something that is not there. Well, that's a tricky question because I haven't thought about that. So right now I also see that people are writing like this, for example, Postgres to Postgres operator, I don't know, S3 to Postgres operator or some other like that, that combine this. so you don't need to write extra Python functions and just use them. So maybe just more like that. But I don't have a use case for it at this moment, so I don't have ideas, actually. Okay, thank you very much. And tomorrow there will be a workshop, and if you are interested, you can join. Are you doing the workshop? Yes, yes. Oh, cool. Very nice.
+
+**Speaker 2** _[27:28]_
+
+Guys and girls, two more minutes, and we have just one more question.
+
+**Speaker 1** _[27:38]_
+
+Hi, first of all, thanks a ton. I was wondering how the architecture is working. As I understand it, basically you have some server running that is executing the pipelines and the Python code is kind of a CLI that you use to add new pipelines. Maybe you can expand a bit on that. As far as I know. So, yes, you need to have several things deployed somewhere on the server, database, scheduler and web server for the Airflow and your code also so I'm not sure there are many different ways you can build that and set up but I've never done that so I can't give you the definitive answer perfect, thanks Thank you.
+
+**Speaker 2** _[28:37]_
+
+Is it the short one?
+
+**Speaker 3** _[28:43]_
+
+It depends on the answer, if it's a short one or not. Does it integrate with Kubernetes?
+
+**Speaker 1** _[28:49]_
+
+Yes, it is.
+
+**Speaker 3** _[28:52]_
+
+That was a short one. Thank you.
+
+**Speaker 1** _[28:54]_
+
+Thank you.
+
+**Speaker 2** _[28:58]_
+
+I think Mario deserves a round of applause for answering the question so quickly.
+
+---
+transcript_status: auto
+---
+transcript_language: en

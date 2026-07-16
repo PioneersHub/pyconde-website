@@ -1,0 +1,152 @@
+title: Stretchy - NoSQL Database behind REST API
+---
+description: A dynamic REST API database. Think of "elasticsearch", but brutally simple.
+---
+created: 2018-05-23
+---
+code: GFFGSG
+---
+slug: stretchy-nosql-database-behind-rest-api
+---
+speaker_names: Artur Scholz
+---
+speakers:
+
+
+
+### Artur Scholz
+
+My interest is in Space, Programming, CubeSats, Open Source, and Standardization. My mission is to combine those to enable truly open space exploration to all humanity.
+---
+abstract:
+
+
+A dynamic REST API database. Think of "elasticsearch", but brutally simple.
+---
+full_description:
+
+
+Stretchy is built as a microservice that provides a simple and intuitive REST API with a NoSQL database as backend. No need for database migrations or upfront schema design. The basic CRUD (create, read, update, delete) operations are available for getting data in and out from the database.
+
+Stretchy is free and open source software built with Python 3, using Flask web framework. It currently uses MongoDB as its backend database. Since it is interfaced through the REST API however, Stretchy is technology agnostic and developers can create bindings to other databases, including SQL databases.
+
+This presentation reviews the reasons for creating Stretchy, its current applications, an short tutorial on how to use it, and tips on how to deploy it.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track:
+---
+tags:
+---
+submission_type: lightning
+---
+submission_type_label: Lightning Talk
+---
+submission_type_id: 9
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: basic
+---
+domain_expertise: not required
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/GFFGSG.png
+---
+youtube_id: FzXejIzMQ30
+---
+video_link: https://www.youtube.com/watch?v=FzXejIzMQ30
+---
+video_published_at: 2018-11-05
+---
+video_duration_iso: PT16M10S
+---
+video_thumbnail: https://i.ytimg.com/vi/FzXejIzMQ30/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:02]_
+
+Yeah. So my name is Artur, and I'm going to present you now basically a NoSQL database onto which I put a REST API on top of this. And I think I have about 13 minutes for this talk. And I would like to ask all of you who is or has been working with databases. Please raise your So almost everyone, I guess that's the reason why you're here. And I would like to, so after 13 minutes, I would like to give one, the first minute to you. And I would like you to discuss within a minute with your neighbor, maximum of four people, what is the most annoying thing that you experience when working with database? So please share your opinion with your neighbors. Got one minute. Maybe move closer together. Thank you. Okay, so I hope you, I mean, probably you, hopefully you didn't have any problem with the database. That's great, but I think there are some problems, And hopefully, during this talk, maybe some of the problems that you just discussed now, maybe some of this can be answered with this database, which is strangely called Stretchy. And I also have to say that it's my first time at a PyConference, and today is also my first day. And it's really great to be here and meet all of you and to get to know each other. And I'm really looking forward for the social event tonight and to get to know each other even better. And what I think is very important is to stay in contact, stay in touch. I also don't like Facebook, obviously, but we're all programmers. Probably some of you have some web programming knowledge in Python. So I think we can just set up a small web application on our own. What we need is just a web application in Django or Flask and then some database to store our contact details. And the table of this database would probably look something like this. So you put in your name and your email and your address. Hold on, something is missing. Of course, your phone number, very important. So hold on a second. I just have to stop the server, do a database migration, and then restart the server. This just takes a minute or so. okay here we are so now we have a column for your phone that's really good uh but hey did we not get this t-shirts right uh for this for the next conference i would like to we would need your shirt size t-shirt size um hold on a second i just uh add this information um yeah here it is so now you can put in your shirt size and hey it's not your birthday coming up soon right 40 years yeah so um i really think it's good to to know each other birthday we can send cards and cakes um so we should also add a column for your for your birthday um yeah this just takes a couple of minutes uh okay so we're there back and then there was this other thing that we would like to add okay i think you are know where i'm heading to so um database migration is really a painful thing if you've worked with django or flask you're familiar with this and um so unless you really know up front what you want to put in a database in your sql database um um if you know this from the very beginning and it doesn't change that's all fine but if you you know want to add some more stuff you have to do migrations and imagine there's a scenario where you uh your user or you want to put data into your database during the runtime so dynamically create uh yeah uh to put this data into your database um can you create dynamically uh database models in django i don't think so i have not found out how to do it um but actually um so this is the problem with no scale is very with sql it's very uh restrictive or prescriptive um and this is where no sql comes into in um into the game because no sql is um yeah it's there's no scheme there's no schema um you just put your data in it's basically imagine it as a as a store of python dictionaries and um since we want to have this database technology agnostic of course I'm using MongoDB because it's almost a synonym for NoSQL databases but we don't want to tie this too much to a technology so let's use a REST API to make it technology agnostic and then NoSQL database and REST API there should be something available on the market or on the open source community for this So anyone knows Elasticsearch? Please raise your hand. Yeah, I see a couple of people, almost everyone. And so I'm not so familiar with that experience with Elasticsearch, but I gave it a try. I did a tutorial. And what I learned is when you do a put request or put your data in, what you get back is your data, of course. Then you get metadata about your data. then you get metadata about your search and you get metadata about your machine deployment i find this a bit verbose um yeah and on top of it i really struggle to set this up i find it very complex and it's a heavy monster um and i don't like this complicated and heavy things because i like to keep it simple i'm a simple mind so i thought uh well how complicated could it be let's make a simple version uh out of this and that's where yeah stretchy was born and so um if you want to to start it on your laptop it's very easy if you use docker uh you just clone the repository go into it and then do a docker compose up so it loads a bit of data takes a while but uh then it's running if you want to install it bare metal make sure you have mongodb installed clone the repository install the python requirements and run the flask application and then the first thing you should do is to go to your local host port 7979 that's configurable and to see if it's up and you will already see some stuff here but that's from the mongodb database it's just some artifacts you can delete them or just leave it there and so the first thing is we have this database now running we want to put data in so um in strategy i use this concept of domain and models um well in sql you would use database and tables in no sql use i think database and collections um but i'm i like more this domain model concept because the domain is your domain of interest could be your project or your company um And then the models belong to this domain, and these models, they store documents. And a document basically looks like a Python dictionary. It's a JSON dictionary, so you have your key values, entries. And so we are going to make a database of the best movies of all times in the cinema domain. We'll start with number one. This is from IDBM or some other source. You can also insert more than one dictionary, a list of dictionaries with a bulk insert. And you can also insert, and this is the nice thing about NoSQL, the data documents must not be homogeneous. You can, in this case, leave out a field and edit another field. And this gets all into the database. Then you have to replace and modify. um so all these uh crude so create read update delete operations are provided and i'm just i just want to highlight that um right now it's on on document basis so if you do a replacement for example you have to supply this unique id which i will explain in the next two slides and then the new content that you want to store there. Okay, so we have now put a lot of data in, or some data in the database and also modified it. So let's look, let's do a read request. First, you can see the domain is here now, the cinema domain. And if you go in the domain, you would see there's one model, the best movies, and I go directly now to this best movies. I'm not sure how readable this is, but you get back all your entries without any of the metadata. The only thing that is added is a unique ID, underscore ID. And this data is actually auto-generated by MongoDB, but it doesn't matter. The important thing is that there's a unique ID attached to your document that makes it identifiable. You can also see that numbers are stored as numbers and everything else is basically a string that actually also includes datetime objects because it must be JSON serializable. But so far I didn't see any limitation in this approach. And so, okay, if you do a get request or a read, you get back everything, but you don't always want to have everything, of course. you want to do a filter and for the filtering syntax to get a filtered view you just um you supply a query string and i try to be uh the syntax is very much like this pi mongo library syntax and i try to be to make it as intuitive as possible so in this case we're filtering for years greater or equal to 1940 and lower or equal to 1950 and these are the two entries that you then get back so okay um so far i didn't show have shown you any code i just showed you the rest client and the rest client uh this actually how the the that's the code for the code for the post request so that's all yeah very short very neat and in fact the whole thing is just 300 lines of code so i'm a bit embarrassed actually to present this project here because it's really so small But maybe this is the beauty of it, that it's so simple, but at the same time quite powerful. And the thing is then that you can basically put any kind of data that you can imagine as Python dictionaries into this database and read it out. However, since it's not like with SQL, where everything is enforced, the data types, and the things that you can put in, and the relations. So here, there's the complete freedom. And complete freedom can also sometimes lead to a complete mess. So you, as a developer, are then responsible to make sure that you're consistent with how you put the data in, that you also read them out in that way. And, yeah. So, basically, that concludes already the presentation. And I really would like to hear your feedback, especially from those people that were using or are using Elasticsearch. Thank you.
+
+**Speaker 2** _[12:52]_
+
+Thank you very much for the talk. I see the first question already.
+
+**Speaker 3** _[12:59]_
+
+Yes, thank you for this nice talk that you gave on your great Linux laptop, of course. My question would be, you said it works with Mongo internally. So have you looked at TinyDB at all? Because that would be a suggestion if you want to go even smaller. So for those who don't know, it's also a NoSQL database, but it's more lightweight than Mongo.
+
+**Speaker 1** _[13:26]_
+
+Mongo. What is the name again?
+
+**Speaker 3** _[13:28]_
+
+Again, tiny DB.
+
+**Speaker 1** _[13:28]_
+
+TinyD. I haven't looked into it, but I mean, this is the idea of using this REST API that you can replace this MongoDB by anything else that then complies to the REST API syntax. You could even do this with an SQL database. There are some approaches, but it would be a bit complex. But maybe this is something that you could look into and submit a pull request.
+
+**Speaker 3** _[14:00]_
+
+If I may have a second question, do you have any actual use cases of this? Because it's technically a cool concept to have a REST API with a database, but are there any real-world examples?
+
+**Speaker 1** _[14:12]_
+
+So let's say the marketing slogan of this would be, it's like Elasticsearch, but brutally simple.
+
+**Speaker 3** _[14:12]_
+
+Sort of.
+
+**Speaker 1** _[14:20]_
+
+And I'm actually using this also at work. I work for ESA, and we get a lot of telemetry from the satellites, and also mostly actually for the planning, so the ground station contact times. And so we are actually, I mean, we are using this also to visualize, yeah, to store this data and then do some calculations on the data. So we use this as a backend data store for some of our internal calculations.
+
+**Speaker 4** _[15:00]_
+
+Hi. Thanks for the presentation. It was very interesting. I was wondering, are you familiar with Python Eve, with this project? And I was wondering how it compares to your project.
+
+**Speaker 1** _[15:11]_
+
+There are two big projects, Python Eve and Sandman.
+
+**Speaker 4** _[15:12]_
+
+Yeah.
+
+**Speaker 1** _[15:18]_
+
+Both of them did not fulfill. So I think it's the Sandman one, which is kind of introspective. So you connect it to your existing database, and then it finds out what's in there, and then you provide the interfaces to it. But that's for the Sandman. And for Eve, there was another thing that really kept me from using it. I can't recall right now exactly why, but I looked into it and I found it. It's a nice project, but for my purpose, it was a bit too overhead, too much.
+
+**Speaker 2** _[15:53]_
+
+Okay, thank you again. Now it's time for another break. And I guess for further questions, you can just come forward and ask them yourself. So another round of applause. Thank you very much.
+
+---
+transcript_status: auto
+---
+transcript_language: en

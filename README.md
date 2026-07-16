@@ -1,75 +1,60 @@
-# PyCon DE Website
+# PyCon DE & PyData Website
 
 [![Fetch submissions](https://github.com/PioneersHub/pyconde-website/actions/workflows/fetch_submissions.yml/badge.svg)](https://github.com/PioneersHub/pyconde-website/actions/workflows/fetch_submissions.yml)
 [![Upload website](https://github.com/PioneersHub/pyconde-website/actions/workflows/main.yml/badge.svg)](https://github.com/PioneersHub/pyconde-website/actions/workflows/main.yml)
 [![Upload staging website](https://github.com/PioneersHub/pyconde-website/actions/workflows/development.yml/badge.svg)](https://github.com/PioneersHub/pyconde-website/actions/workflows/development.yml)
 
-PyCon DE &amp; PyData conference website.
+Static site for the PyCon DE & PyData conference, built with Lektor. Serves the current edition plus an archive of every previous edition with talks, speakers, recordings, transcripts, and full-text search.
 
-> **Important Note for Speakers**  
-> All speaker and session information is sourced from Pretalx.  
-**To update your bio or session description, please make the changes directly in Pretalx.**  
-> The website updates periodically, at least once per day, to reflect changes from Pretalx.
+> **Speakers:** session and bio data come from Pretalx. Update your information there; the website picks up changes on the next scheduled sync. Direct edits to talk or speaker files in this repo are overwritten by the next import.
 
-## Workflows
+## Pick your task
 
-1. Add a blog post [details](./docs/blog_post.md)
-2. Add a sponsor [details](./docs/sponsors_partners.md)
-3. Add a community partner [details](./docs/sponsors_partners.md)
-4. Manage pre-conference and post-conference landing pages [details](./docs/landing_pages.md)
-5. Add a subsite [details](./docs/subsites.md)
-6. Manage sessions (talks, tutorials,…) [details](./docs/pretalx.md)
-7. Manage speaker-information [details](./docs/pretalx.md)
-8. Manage contact form [details](./docs/contact_form.md)
-9. Update the coding [details](./docs/coding.md)
-10. Deploy the website [details](./docs/deployment.md)
+The site has three operating modes. Find yours, follow the link.
+
+- **[Running the current edition](docs/live.md)** — daily ops while the upcoming or in-flight conference is live: blog posts, sponsors, landing pages, Pretalx sync, deploys, contact form.
+- **[After the conference](docs/post-conference.md)** — once the event is over: link YouTube recordings, import transcripts, switch the landing page to recap mode, cut the edition over to the archive.
+- **[Archive](docs/archive.md)** — how prior editions are stored and served: slug URLs, Pretalx-code redirects, per-track index pages, cross-edition speakers, search.
+
+Cross-cutting topics referenced from every phase:
+
+- [Local development setup](#development-setup) (this file, below)
+- [Template components and macros](docs/components.md)
+- [SEO machinery — sitemaps, breadcrumbs, JSON-LD, social-link normalisation](docs/seo.md)
+- [Site search (Pagefind)](docs/search.md)
+- [Redirects — manual entries plus generated nginx / Caddy snippets](docs/redirects.md)
+- [Deployment](docs/deployment.md)
 
 ---
 
-## Development Setup
+## Development setup
 
-Following steps are required to develop and run the website locally:
+Requires Python 3.12+, `make`, and either `uv` (preferred) or `pip` with `venv`.
 
-### Setup
-
-There are two options for local development. Both option are valid.
-
-#### Conventional Setup
-
-1. Select the right Python version, the one used and tested is stored in `./.python-version`, however, most relatively current versions
-   should work. Use whatever Python version manager you prefer, for example `pyenv`.
-2. Create a virtual environment and activate it, so that the dependencies for this project won't clash with other, locally installed
-   libraries:`python -m venv ./venv && source venv/bin/activate`.
-3. Install the dependencies: `pip install -r requirements.txt`.
-
-#### Setup with uv
-
-```shell
+```bash
 uv venv
+source .venv/bin/activate
+uv pip install -e .
 ```
 
-#### Devcontainer Setup
+Run the build pipeline once to materialise generated content (tracks, redirects, Pagefind index):
 
-After having cloned this repository:
+```bash
+make build
+```
 
-1. Make sure to have a local installation of Docker and VS Code running.
-2. Open VS Code and make sure to have the Dev Containers Extension from Microsoft installed.
-3. Open the cloned project in VS Code and from the bottom right corner confirm to open the project to be opened within the Devcontainer.
+For interactive editing, the Lektor dev server reloads on file changes but does **not** run the post-build steps (Pagefind index, redirect generation). When testing search or redirects, run `make build` and serve the `site/` directory with a static HTTP server instead — see [docs/search.md](docs/search.md) for the launch profile.
 
-If you miss any dependencies check out the devcontainer.json within the .devcontainer folder. The correct python version and all python
-dependencies are already installed.
+```bash
+make run             # Lektor dev server on :5001
+make build           # Full production build into site/
+```
 
-### Run locally
-
-Lektor requires local plugins to be installed. This will take care of all of it.
-
-``bash
-make run
-``
+The optional `[backend]` extra pulls in dependencies for the contact-form FastAPI service. See [docs/contact_form.md](docs/contact_form.md).
 
 ---
 
 ## License & Notice
 
-- **[MIT License](LICENSE)**
-- **[Notice - Logos & Trademarks Excluded](NOTICE.md)**
+- [MIT License](LICENSE)
+- [Notice — Logos & Trademarks Excluded](NOTICE.md)

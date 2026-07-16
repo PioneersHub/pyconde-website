@@ -1,0 +1,167 @@
+title: Marketing Media Mix Models with Python & PyMC: a Case Study
+---
+description: In today's digital landscape, traditional analytics struggle with understanding marketing ROI, especially with evolving privacy norms. But Python and its…
+---
+created: 2023-12-22
+---
+code: D7AEQY
+---
+slug: marketing-media-mix-models-with-python-pymc-a-case-study
+---
+speaker_names: Emanuele Fabbiani
+---
+speakers:
+
+
+
+### Emanuele Fabbiani
+
+Engineer by education, Data Scientist by choice, researcher and lecturer by passion. Emanuele earned his PhD in AI by researching time series forecasting in the energy field. He was a guest researcher at EPFL Lausanne, and he's now the Head of AI at xtream, where he solves business problems with AI. He published 8 papers in international journals, presented and organized tracks and workshops at international conferences, including AMLD, ODSC, WeAreDevelopers, PyCon, and ERUM, and lectured in Italy, Switzerland, and Poland.
+---
+abstract:
+
+
+In today's digital landscape, traditional analytics struggle with understanding marketing ROI, especially with evolving privacy norms. But Python and its ecosystem come to the rescue. 
+In this talk, we will discuss how we leveraged Python and PyMC to build a Bayesian Marketing Media Mix model for the fastest-growing Italian tour operator. We'll cover the challenges we faced, the valuable insights we gained, and the results achieved. This will offer you a clear and practical roadmap for developing a similar model for your business.
+---
+full_description:
+
+
+Understanding the effectiveness of various marketing channels is crucial to maximise the return on investment (ROI). However, the limitation of third-party cookies and an ever-growing focus on privacy make it difficult to rely on basic analytics. This talk discusses a pioneering project where a Bayesian model was employed to assess the marketing media mix effectiveness of WeRoad, the fastest-growing Italian tour operator.
+
+The Bayesian approach allows for the incorporation of prior knowledge, seamlessly updating it with new data to provide robust, actionable insights. This project leveraged a Bayesian model to unravel the complex interactions between marketing channels such as online ads, social media, and promotions. We'll dive deep into how the Bayesian model was designed, discussing how we provided the AI system with expert knowledge, and presenting how delays and saturation were modelled. 
+
+We will also tackle aspects of the technical implementation, discussing how Python, PyMC, and Streamlit provided us with the all the tools we needed to develop an effective, efficient, and user-friendly system.
+
+Attendees will walk away with:
+
+- A simple understanding of the Bayesian approach and why it matters.
+- Concrete examples of the transformative impact on WeRoad's marketing strategy.
+- A blueprint to harness predictive models in their business strategies.
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2024-04-24
+---
+start_time: 15:20
+---
+end_time: 15:50
+---
+slot_id:
+---
+track: Industry & Academia Use-Cases
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 3578
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link: https://speakerdeck.com/donlelef/is-your-marketing-effective-let-bayes-decide
+---
+social_card_image: /static/media/social/talks/D7AEQY.png
+---
+youtube_id: k2LDWMLZQ8k
+---
+video_link: https://www.youtube.com/watch?v=k2LDWMLZQ8k
+---
+video_published_at: 2024-06-23
+---
+video_duration_iso: PT29M3S
+---
+video_thumbnail: https://i.ytimg.com/vi/k2LDWMLZQ8k/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:05]_
+
+So it's the last talk of the day, and what can I offer you? Lots of charts, some equations, actually lots of them, and some good old statistics. I mean, the title is Head of AI, but that's only marketing. Actually, what we do is good old machine learning on tabular data. And today we're talking about marketing, which is a very complex topic, as you may know. Today, marketing is a mess because the customer journey is very long and very complex. So people get in touch with your brand through a brand awareness campaign, maybe on a social network. Then they click a link and you pay for that click. Then they go to your web page and then they click some other button and then they do not convert. But fortunately, they have left their emails, so you can spam them a lot. they receive a lot of emails and finally they click the button they click the button they did not they do not finalize the purchase so they get a phone call and so on so forth well that's difficult uh but it gets even worse because this is online marketing and online you can track everything but what about fucking this good luck um this is a real picture it's not like the beaver that is dully generated. This is the underground in London. And WeRoad is a tour operator in Italy. We will talk about them later. But it gets even worse because even in online marketing, sooner rather than later, you will not be able to track everything as we did up until this year because third-party cookies are going to be phased out from all the major browsers. Yes, of course, alternative data providers, but I'm not sure if you want to rely on them. What does it mean? Does it mean that we shall not perform any data analysis on marketing anymore? No, the answer is no, otherwise I wouldn't be here. It means that we need to shift the focus from attribution to contribution. And here is where things get serious. Because attribution means that you follow the path of every single customer click by click. As we saw, this was possible online. It was already impossible offline. And it will become more and more difficult online as well. Contribution is a different stuff. It means that you reason, you think about the average, about how each channel contributes to your sales, not how every customer gets in touch with your brand. It's a completely different framework. And I mentioned a word that is very interesting to every data scientist in this room, that is on average. Because when you start thinking about average behavior, you start thinking about something that you can model quite easily. So the problem is not following every action of the customer, but the problem becomes finding a function that links your investment in media channels, in basically every channel you can reach your customer with, to your sales KPI. This is an example, this is a pretty easy one, where we have only online channels, Google, Instagram, Facebook, and investment in promotional activities, that means discount. And we have as a target the number of new customers that we can acquire. this will be our setting for the case study we will be discussing in the next 20 minutes the case study we will be discussing is real is a solution that we really developed for we rode the company that you saw before their tour operator in italy they raised 17 millions in series a this year at the end of sorry at the end of last year in november 2023 and they aim to become the coolest tour operator in Europe. They invest a lot in marketing, like millions every year. And by the way, they are active in Germany. That's advertisement. And we shall model this. It's kind of hard. So they want to know if they're investing their millions well. Of course, there are privacy concerns and trade secrets. So all the charts and all the numbers will be based on synthetic data. So do not take messages from the charts. Take messages from the method that we are going to be discussing. Second disclaimer, I'm here talking because Marta could not make it, but she's a data scientist in our team, and what I will be discussing is really her work. So give a round of applause to Marta. Thank you. Marta, if you are there. Hi. So let's refine a little bit the problem statement. What does it mean, is your marketing effective? Basically, it means answering three questions. When is the right time to invest? Shall we invest in advance? Shall we invest exactly in the time where we know that our customers are more likely to convert? Why? because we are talking about tour operators and we know that people travel more during summer and we know that they plan their trips free two months in advance so we know that basically May and June are the most interesting months to convert our customers so we know that we want the maximum marketing pressure there the question is when should we start to invest in each channel to get the maximum pressure exactly in that time range. There will be other two questions, but let's solve one problem at a time. This problem can be easily solved without any kind of machine learning or fancy AI, just good old exploratory analysis and time series statistics. So this is cross-correlation. Cross-correlation is a statistical function, statistical indicator that gives an idea about the strength of the relationship of two time series at different lugs. So you can imagine that one time series is the sales KPI, so the number of new customers that you acquired in every week, for example, and the other series is the investment in a specific channel. If you plot the class correlation as a function of the lug, where the class correlation is highest, then there is the maximum impact of an investment with respect to the sales KPI. So what this chart is telling you is that if you want to invest on Instagram, you have better starting investing very early, like six to eight weeks before the time where you know your customers are most likely to convert. Well, if you want to invest on Google AdWords, you should really invest in the same week that your customers have expected to convert in. Good. These are already valuable insights. If they were true, of course they aren't, because this is synthetic data. But we can do better. Because why should we use linear correlation? Is there a specific reason why there should be a linear relationship between investment and sales? No. The relationship is not linear. We can see it with scatterplots. So we have better use a nonlinear correlation function. For example, the Spearman correlation is great because it's a rank correlation, so it measures the relationship between rankings in variables, not between the values of the variable themselves, so it can capture nonlinear patterns as long as they are monotonic. And in reality, they are. with some good approximation. So we can use cross-correlation function where the correlation function itself is the Spearman correlation. But we can also compute something else about time. We can compute the ad stock. The ad stock answers a different question. And the question is, how persistent is the effect of your investment? As you can see from the transformation, ad stock is basically kind of a repeated sum of a certain quantity. So the ad stock measures the accumulated effect of a marketing investment on a specific channel. If you have a look to the charts in the slide, you can see the normalized ad stock for different channels. And what you want to look at is the similarity of patterns between ad stock and the sales KPI that is new customer is the blue line. Why? Because you want the maximum accumulated marketing pressure where the propensity to acquire is the highest. So you want the peaks of every line, every trace, yeah, to be in the same position as the peaks of the blue line. That's not true. This company is not doing a great job because it doesn't exist. Two more questions. And here is where we start need modeling. Where and how much to invest? That is, fine. I know that on some channels I must start investing sooner rather than later. I know that in some channels I need to wait until the specific time where I want the maximum pressure. But what is the mix that I want to use? And how much money do I want to put on every channel? To answer these questions, we need the function I talked about before. We need this little green line linking investments to the sales KPI. How can we get it? At the very beginning, what we want to do is start simple. So what's wrong with linear regression? Nothing. It's great. Sometimes it works. Sometimes it doesn't. But sure enough, it is easy to interpret, and it's easy to gain insights from this kind of a simple model. This model is additive, so we can think about it as a series of modules that are connected by a sum. And these modules are the contribution of the promotion, the contribution of the investment in each marketing channel with its specific delay. We have a linear trend and we have yearly seasonality. linear trend and yearly seasonality is the baseline that is it tries to model the customer that the brand would acquire anyway if it did not perform any marketing action why should this happen because a brand has its own power so people know we're old because they invested a lot of millions in the past so it's quite likely that they have some returning customer it's quite likely that refellows happens so it's quite likely that people book travels even though there is no direct marketing action very good um that's a great model to start with um i forgot one detail why should we use that super weird uh term with uh sums on of sines and cosine uh this is kind of Fourier decomposition. The data we have have weakly granularity, so we want this sine and cosine with a period of 52 weeks, that is one year. Very good. So what What does it happen when we use such a model? We get a specific model KPI. We use the mean absolute error as our model metric, and let's say that the mean absolute error with this model is 1,000, which is a number that has absolutely no meaning, but it serves as a reference point for what we will say in a few minutes. This model has three main problems. we got very high with high levels of promotion we got a negative baseline which really freaked out the marketing team and we got very high instability of coefficients so basically statistics told us that we were very unsure about the coefficients of the model which is very bad because those coefficients are what we really want to estimate in the model itself, because, I mean, look at the formula. The coefficients here are how many new customers can I get for one euro of additional investment in each of these channels. Hmm. How can we solve this? Again, one problem at a time. Start with the simplest. Let's say that we have a very high error with IPromotion, let's look at the scatterplot of promotion against a new customer. So these are synthetic data, but they are built so that their statistical properties are somehow similar to the real ones. The value on the axis are not really meaningful. So we see that saturation happens. So in specific parts of the year, you can go with huge amounts of discounts, but it doesn't really matter because the additional customers that you're acquiring would have booked the trips anyway, so you're basically losing money. How can we model this phenomenon? Well, we have a little bit of feature engineering. We do not... I mean, we still want a model that is linear in its parameters, so what we do is to transform the variable with this exponential saturation. Visually, this is what happens. So a relationship that was highly unlinear becomes more or less linear. Much better for the linear regression. What about our model KPI? So we improve the error by 65%. Again, the absolute number is completely meaningless, but the relationship with the previous metric is somehow realistic. Good. Second problem. We have very high instability in coefficients, and we have a negative baseline. Okay, let's have a look to the correlation metrics, because we know that when we have very high instability on coefficients in a linear regression, most likely we have a multicollinearity in our data and actually this is not a problem of the data itself it's a problem of the physical phenomenon because if you know that your customer are more likely to book a trip in a specific period of the year then you increase all the marketing investments at the same time to acquire more customers now big tech companies like Amazon perform A-B testing and, I mean, controlled experiments to alleviate this correlation problem, but we could not really tell the marketing team, can we manage your budget for you, because our model can become better. So what we had to do was to come up with another method to go around this problem. Again, there is no way of solving this, because the problem is not in the data, it's in the physical phenomenon that we are trying to model, and you just can't change reality. Unless you're Amazon, then you can. So now it's time for a little bit of a lesson about frequentist regression and Bayesian regression. So in a frequentist regression, what you have is that your underlying model is something like the first line. So you have a target variable that is some kind of coefficient, time, an independent variable, plus some noise, right? The important thing is that the real model that is underlying the phenomenon is made of deterministic coefficients. So M and Q in that formula are not random variables, they are deterministic numbers. Good, the only random variable is epsilon, that is the noise, and as y is something deterministic plus epsilon, also y is a random variable. Frequency segregation is great. It's very easy to explain. It's very easy to train. It's extremely efficient. It's like solving a system of linear equations. The problem is that when you start trying to estimate uncertainty with this kind of model, you are going to have a very hard time. And when you want to inject domain knowledge in this kind of model, you're also going to be a little bit in trouble. Let's explain the first claim I made. So how can you estimate the uncertainty on parameters in this kind of settings? The usual answer is confidence intervals. What are confidence intervals? Well, the canonical explanation goes like this. Imagine that your data set, the only one you have, is one of many data sets that could be produced in an imaginary universe that does not exist. So if you train a model on each of these data sets, what you get is a different estimation of M and Q. a confidence interval is an interval such that alpha percent of the times the coefficients that you get are inside that interval and you say that's great that's nice that's all fun but i have only one dust so and how can i inject domain knowledge in this kind of model the solution is you don't do a least-square regression. What you do is you solve a convex constrained optimization problem. Again, that's fine, but it starts becoming quite kind of hard. Bayesian regression is kind of different. It's a completely different approach. They say, look, everything is a random variable. So the data is deterministic, but the coefficients of the parameters are themselves random variable. You start with a certain belief, and the data are only useful to update your belief. So it goes something like this. You have an initial belief, and as you see more and more data, your estimation of the parameters becomes more and more precise, hopefully. That's great for two reasons. your beliefs become your domain knowledge that you can inject into the model so if you know that the baseline cannot be negative you can set priors such that the baseline cannot be negative and it's easier than setting constraints to achieve the same goal moreover, everything is a random variable so if you can estimate the probability distribution of your parameters given the data and oh, no, no, wait, come on, and it turns out you can, then you're done. Basically the probability distribution tells you everything. Good. So how can we do it in Python? There is a wonderful library called PyMC that lets you build and solve Bayesian models. So with PyMC, it goes like this. You create a model as a context manager, then you create random variables for the coefficient and from the noise, and then you use deterministic features from the data. What you get out of the model is something like this. That is, you get prior, you can get, they're not here, but you can get the prior distribution of the variables, but after sampling the posterior distribution of the variable, you get the probability distribution of the parameters. With the probability distribution of the parameters, you get all the estimation of uncertainty that you want to have. Now, the challenge becomes, how do you set the priors? So, when you have no information, normal distributions worked out fine for us. There is a whole field of research about how to set priors, but I'm running out of time. When you have information, you can use other distributions. For example, if you know that your customer acquisition costs that are related to the model coefficients must stay within a certain interval, you can use truncated normal so that you make it impossible for the coefficient to stay outside of the interval because no matter what the data tells you, if there is zero probability at the beginning, there is going to be zero probability at the end. And if you want some coefficients, in particular the ones from linear trend, to be strictly positive, you can use the half normal because the probability of them to be negative is zero. And with that, we got another 14% out of our error and the marketing team was much more happy with this chart. where the baseline is very positive. And in the real world, it's also increasing, not here. I would like to conclude with a very quick video showing what we did in Slimlit to make it easy to use our model. So people could simply go there and insert some number that was the projected investment in each channel, and then the model computes the projected sales KPI so they know, like, if they raise 20 million and they want to invest everything in marketing with a very specific allocation, how many customers, how many new customers they can get. That being said, this is it. I'm Emanuele Fabiani. I'm the head of AI at Xtreme. And if you have any questions, that's the right time to do it.
+
+**Speaker 2** _[24:38]_
+
+So do we have questions?
+
+**Speaker 1** _[24:51]_
+
+Sorry, I just saw there were a lot of questions that you hadn't said yes to, so I was just putting them up. Sorry, how do I get into them? There they are. Okay, so I don't think anyone saw them yet, so I'm just going to go from the beginning. How do you validate the model to ensure this is not an overfit, minimizing in sample metric? So, of course, these metrics... Oh, come on. Do you want to? Yeah, yeah. Of course, all of these metrics are computed out of sample with a test set. So it's a standard way of checking the generalization of the model.
+
+**Speaker 2** _[25:47]_
+
+Okay, there's also a question on if you invest in your channels, when you expect the customer to convert anyways? As per observed correlation, did you really impact this decision to convert?
+
+**Speaker 1** _[26:06]_
+
+Sorry, didn't get it.
+
+**Speaker 2** _[26:07]_
+
+I really don't understand the question, so I think the question is more about you are going to get conversions from customers anyways, so what is the impact in the decision, something like that. So it's more about the number of customers you are going to get.
+
+**Speaker 1** _[26:23]_
+
+So, it's all about this chart. So, part of the conversions that you get come from marketing. Part of the conversions that you get come from the strength of the brand. And most of them come from marketing actions, actually. So, the point is that which marketing actions are optimal to get the maximum number of conversions. and with the what-if tool that I showed before in the video you can exactly simulate that in the future we hope that we can optimize the whole flow but as of now it's domain knowledge you try with the model and you see what works best
+
+**Speaker 2** _[27:06]_
+
+Another question, how do you handle co-founding from competitors' ad spend?
+
+**Speaker 1** _[27:12]_
+
+Second. Third.
+
+**Speaker 2** _[27:13]_
+
+co-funded from competitors art spends
+
+**Speaker 1** _[27:15]_
+
+ad spend so okay uh that's a good one and uh we didn't it's how do you say in the literature it's outside the scope of this work um no really uh the point is that we didn't have this data we had no idea how many how much money the competitors are spending so we are not modeling these variables. Actually there is a worse mistake if you want that is
+
+**Speaker 2** _[27:46]_
+
+Maybe I can also add some we are not
+
+**Speaker 1** _[27:47]_
+
+we are not modeling this so we only have variables for online marketing so we are missing all the effect of offline channels we have no television no radio but we have the out of home campaigns
+
+**Speaker 2** _[28:02]_
+
+And maybe the last question is, how often do you find the marketing contribution negative? So negative contribution, how often do you get that?
+
+**Speaker 1** _[28:10]_
+
+I don't know, because in this project, the answer was never. And in all the other projects about marketing media mix that we performed, the answer was also never. I mean, you expect every investment you put into marketing channels to have at least a positive return. it may be negligible it may be not worth it but the return is expected to be positive so we kind of force it to be that way when we set priors
+
+**Speaker 2** _[28:50]_
+
+Okay, I think the time is up, so thanks so much, Manuel.
+
+**Speaker 1** _[28:54]_
+
+Thank you.
+
+---
+transcript_status: auto
+---
+transcript_language: en

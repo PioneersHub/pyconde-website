@@ -1,0 +1,110 @@
+title: Beyond Kafka and S3: Python Data Pipelines with HTTP-Native Bytestreams
+---
+description: Real-time bytestreams between systems in different organizations or secured environments, whether for batch dataset delivery or continuous streaming, are…
+---
+created: 2026-01-11
+---
+code: HP7DLX
+---
+slug: beyond-kafka-and-s3-python-data-pipelines-with-http-native-bytestreams
+---
+speaker_names: Johannes Dröge
+---
+speakers:
+
+
+### Johannes Dröge
+
+Johannes holds a PhD in computer science, has developed open-source software, algorithms and statistic methods for genome data analysis, worked as a data scientist, and led a group of data engineers in a mid-size startup. He is currently bootstrapping SaaS infrastructure software projects with a focus on cross-organizational data sharing.
+---
+abstract:
+
+Real-time bytestreams between systems in different organizations or secured environments, whether for batch dataset delivery or continuous streaming, are surprisingly hard. Traditional solutions fall short: message brokers like Kafka use discrete messages, file storage like S3 works for batch exchange but lacks streaming and coordination, while HTTP client-server approaches require one side to host and expose server endpoints, introducing security and operational overhead.
+
+This talk introduces the ZebraStream Protocol: an open, HTTP-based bytestream protocol with coordination mechanisms that let you stream data — Parquet files, compressed archives, encrypted content—directly between decoupled systems using Python's file-like interface. No message framing, no server hosting, no exposed endpoints.
+
+We'll explore the design of a bytestream protocol for data sharing and integration that crosses the file-stream boundary, enabling seamless integration with pandas and any Python library expecting file-like objects, supporting use cases from ETL pipelines to IoT data delivery, cross-org collaboration to home network automation.
+---
+full_description:
+
+**TL;DR** *Streaming data between systems — whether across organizations, from secured environments, isolated networks, or even home setups — remains a common challenge in modern data engineering and data sharing workflows. This talk introduces the ZebraStream Protocol: an open, HTTP-based bytestream protocol designed specifically for decoupled systems, where both sides act as clients — no server hosting, no exposed endpoints.*
+
+### Talk Outline (45 minutes)
+
+**Opening — The Shape of the Solution (3 min)**
+
+The talk opens with a UNIX pipe: opaque, minimal, composable. Any program that reads from stdin and writes to stdout already fits — no negotiation, no shared infrastructure. Two real-world use cases introduce the challenge: a supplier pushing inventory to a buyer's pipeline, and a hospital sharing trial data with a contract research organization. The question the talk sets out to answer: can the pipe's properties work across organizational boundaries, over HTTP?
+
+**Part 1 — Why the Problem Is Hard (8 min)**
+
+Sharing data across organizational boundaries requires sharing infrastructure, trust, protocol, and format. Every crossing is a negotiation, and the cost is ongoing. The coupling spectrum — from function calls to cross-org transfers — sets up a precise vocabulary for what "strong decoupling" actually means. A well-composed protocol owns only transport and access, leaving structure and format to the caller.
+
+**Part 2 — What Already Exists (4 min)**
+
+Kafka, S3, and HTTP APIs each fail at strong decoupling in a specific and diagnosable way. Kafka requires the other side to adopt a platform. S3 is a storage abstraction, not a transfer abstraction — no presence signal, no cleanup. An HTTP API permanently makes one side a server. Reading each failure as a requirement, a named pipe already satisfies all three — within a machine. The open question: can this work over HTTP?
+
+**Part 3 — The ZebraStream Protocol (5 min)**
+
+The basic protocol and its Data API are revealed: a bytestream channel over HTTP where both sides are clients. A stateless relay sits in the middle — exclusive channel, HTTPS outbound only, separate read and write tokens. The difference between a message and a bytestream is made precise: no opinions on size, structure, or format. A raw HTTP example using `requests` shows the Data API in full — producer streams a generator over PUT, consumer reads a streaming GET response.
+
+**Part 4 — Presence and Coordination (5 min)**
+
+HTTP connects immediately, without knowing whether the other side is there. Two failure modes show the consequence: a consumer holding a silent GET with no way to tell if the producer is slow or absent; a producer writing into a PUT with no signal that nobody is reading. The Connect API resolves this with an explicit waiting room — the first client waits, the second triggers the transfer. Push and pull are runtime choices, not architectural ones: whoever arrives first waits.
+
+**Demo 1 — Push and Pull** (3 min): the supplier/buyer inventory use case, both modes shown live; the rendezvous is the point.
+
+**Part 5 — Python Integration (8 min)**
+
+`zebrastream-io` implements `io.IOBase`. Any library that accepts a file — pandas, loguru, tarfile, csv, pickle — works immediately, with no changes to existing code. Because there is no intermediate file, the producer's write and the consumer's read are the same operation: an early disconnect on either side raises immediately. No silent failures, no orphaned files, no copy cascades.
+
+**Demo 2 — Log Streaming** (5 min, notebook): two lines added to a loguru producer; the consumer is the ZebraStream CLI. The application logs normally — transport is invisible.
+
+**Part 6 — Design Decisions and Security (5 min)**
+
+Three deliberate choices — HTTP, bytestream, stateless relay — are named alongside what each costs. The security model follows from the relay design: TLS and scoped tokens require trusting the relay; end-to-end encryption does not. The relay moves ciphertext and has no key. Per-chunk encryption keeps live streams encrypted without buffering the full payload. The hospital/CRO use case from the opening gets its resolution: pull mode, on-demand EHR query, one extra argument — the relay operator sees nothing.
+
+**Closing — Open Protocol (1 min)**
+
+The protocol specification is open and community-focused. The Python client is open source. ZebraStream.io is the managed relay and protocol sponsor. The talk closes where it opened: opaque, minimal, composable — across organizational boundaries.
+
+**Q&A (5–10 min)**
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2026-04-15
+---
+start_time: 15:00
+---
+end_time: 15:45
+---
+slot_id:
+---
+track: Data Handling & Data Engineering
+---
+tags:
+---
+submission_type: talk_long
+---
+submission_type_label: Talk (Long)
+---
+submission_type_id: 6781
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url: https://help.zebrastream.io
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/HP7DLX.png

@@ -1,0 +1,136 @@
+title: deepdoctection - An open source package for document intelligence
+---
+description: Extracting information from business documents is difficult. They often have a complex visual structure and the information they contain is not tagged.…
+---
+created: 2022-01-16
+---
+code: HP9KVN
+---
+slug: deepdoctection-an-open-source-package-for-document-intelligence
+---
+speaker_names: Janis Meyer
+---
+speakers:
+
+
+
+### Janis Meyer
+
+Janis has a PhD in mathematics from TU Berlin and has been consulting in financial services for more than 13 years now. There, he focused on Data Warehousing, Risk Control, Regulatory and Financial Reporting as well as Internal Audit.
+
+Recently he shifted towards machine learning and especially deep learning solutions driven by the prospect of solving back office problems that could not be tackled with ordinary methods before. This includes information extraction from complex documents let it be business reports, forms, filings or other types of complex structured documents.
+---
+abstract:
+
+
+Extracting information from business documents is difficult. They often have a complex visual structure and the information they contain is not tagged.  Let me introduce deepdoctection: A tool box that is intended to facilitate entry into this topic.
+---
+full_description:
+
+
+Document Intelligence refers to the task of understanding and extracting information from visual rich business documents, let it be noisy scans, images, PDFs etc. 
+
+While there has been a lot of improvement using deep learning with CNN architectures or Transformer based multimodal approaches, open source projects that offer a framework for using these powerful tools as components of a pipeline are very sparse to non-existent. Moreover, when starting a project with digitalized documents, every step involved, like loading a multi page document, processing an OCR task, cropping ROIs must be written from scratch.  
+
+This talk aims to bring deepdoctection on the radar, a new package that offers building document analysis pipelines.
+ 
+Deepdoctection is being developed from the original problem of extracting and normalizing table contents from investments documents. It therefore offers pre-trained models for document layout analysis, table recognition as well as wrappers for OCR tools. The goal is to further include solutions for key figure extractions and entity recognition on visual rich structures and to provide a framework for solving information extraction tasks on visual rich documents.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: Natural Language Processing
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 1702
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: some
+---
+domain_expertise: some
+---
+supporting_material_url: https://github.com/deepdoctection/deepdoctection
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/HP9KVN.png
+---
+youtube_id: EXmJjpEQxrM
+---
+video_link: https://www.youtube.com/watch?v=EXmJjpEQxrM
+---
+video_published_at: 2022-05-06
+---
+video_duration_iso: PT29M10S
+---
+video_thumbnail: https://i.ytimg.com/vi/EXmJjpEQxrM/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+Today I would like to talk about a package that I've been working on for quite a while now and of which I decided to publish it. And this package is called Deep Doctection and as the subtitle already says, it is an An open source package for document intelligence or a different subtitle might be a toolbox for getting text out of complex structured documents. And before we get started, let me introduce myself a little bit further. So my name is Yannis, I've got a background in mathematics. And I've been consulting for financial services for more than 13 years now. And during my consultant work, I'm more involved in the business area of, in the business units of controlling, accounting, risk control, but also regulatory reporting. So these are all business units where you don't really expect a lot of machine learning and of deep learning as well. However, you will encounter a lot of use cases where you might think of how you can apply these kind of new techniques in order to simplify or to optimize work. And this was actually the trigger why I started working on this package, because during a project a couple of years ago in a bank, I find out that a lot of people were involved in extracting key figures out of financial reports. To be a little bit more concrete, the business case was that for regulatory reporting, banks need to report their investments in mutual funds for the central bank not on a fund level but on the underlying asset level. And this requires a lot of work in order to gather all these different information. sometimes the banks need to collect, they need to ask the fund manager themselves. In some other cases, the only way to get these information will require going through semi-annual or annual reports of these documents and extract, so that means copy-paste these information of these documents, out of these documents, to normalize these data, and finally to get it ready in order to load it to a database. So quite a tedious work. And I was thinking about how can you automate this? How can you automate this thing? And the actual step was, at the first NAIF approach, quite straightforward. The first thing is that you somehow need to parse the document. And on the second thing, you need to do something with NLP whatsoever. And when I tried to work on this problem, I got already stuck at the very first place. I had the problem, how do I get all these information which are often trapped in PDF documents or maybe even scanned documents, how can you get this information out of these documents in order to process them even further? And if you think about what do you have to do when having this complex structure document, there are several things you need to take care of. So the first one is maybe covering the rough layout structure, which also includes detecting the table structure. But you also need to get the text out in a way that it actually makes sense. So if you've got a complex structured document with several columns, it is not trivial to get the reading order of the text out in a sensible way. In some other cases, you have to link some types of tables with the surrounding text in order to identify the content of the table correctly. So these were the actual problem I faced. And nevertheless, I started working on exploring some tools. I started working with just open source PDF parting documents. They tried to reconstruct the layout structure based on the text they find. However, if you want to process them further, these results were quite mediocre and certainly not enough in order to get your work done. So the next step was to go much deeper into the subject and try to find out what's going on on the research side. And when I started, it was around 2019, there were actually quite a few papers out there who suggested to use deep learning. So, for example, it was already common case that object detectors work quite well with detecting layout structures. However, there was another problem. It was really difficult to get annotated data. And the other thing, the other problem, was simply that you had to implement a lot by yourself. There were some repos with some open research code out there, but if you try to use some research code in order to try something out, you will end up with a lot of frustration because research code is not really useful for applying it to some real-world problems. So this is why I started developing this package, Deep Doctection, and yes. So let me just say some words about the basic features. So when you want to tackle this type of problems of decomposing this document into a structure that you can process further. So you want somehow to parse this document, and the easiest way to do this is by decomposing the problem into several small pieces, and this ends up by setting up a pipeline. So one of the main features of this package is the fact or is the idea to build pipelines depending on your personal needs in order to decompose this document. So let's start with one example, I think that's the easiest way to understand what you need to do. Suppose you have this type of document which has ordinary document structure with headers, with titles, text, and so forth. The very first thing that you need to do, in case you have an image, in case you have a PDF, you need to load it and you need to convert it into a tensor. And at the very first thing, you try to recover the document structure, the rough document structure by identifying the course layout structure, namely title, text blocks and tables. And you can do this by applying a deep learning model, a detection model, which works quite well, provided that it has been properly trained, and you get all these results back, the bounding boxes back, and on the next thing, you maybe want to investigate further on the table structure, So you need to crop the table out of the document and apply maybe second model which is an expert model for determining the table structure, namely determining the cell structure of the table, the rows as well as the columns. And these results, which are calculated based on the relative coordinates of the crop document, of the crop page, needs to be reconverted in terms of absolute coordinates of the document. And after that, you need to infer the row number to each cell, the column number to each cell, the row span, the column span. And you can do this, for example, by looking at how much does the cell intersect with the detected row and the detected column in order to get a segmentation of the table. So what's next? The next step is actually something which involves extracting text. So this can be an ordinary OCR approach, or in case of PDF documents, you don't really need OCR very often, so you can just rely on some PDF miners, for example. So the next step requires extracting the text. And once you've got all these information together, you need somehow to create some sensible stretch out of it. You remember at the end you need to get some proper floating text out of it. And right at this point you only have some text bounding boxes. So next step, you need to perform some matching in order to match the text bounding boxes with the underlying layout structure you recovered earlier. And after that, you need to group these text information, the word information. You need to order them in order to get some proper text out of this. And at the final step, you need to create an output structure which you can load maybe in your favorite NLP library. So this is one of the main features that you can actually combine different steps of different parsing steps according to your needs, according to your document you want to recover. And at the next step, which is the second feature, is how do you get all these models which are on the right side, which are part of the pipeline as well. And this is the second feature, actually, that this package comes equipped with some external packages which you can load according to your needs, and that contains some models, pre-trained models on some specific task like layout detection or table segmentation. There are also some light wrappers for very popular OCR libraries like TASA act. I've also discovered a less known OCR library which gives actually some very decent results. You can also use, instead of an OCR library, if you have some native PDF documents, PDF Plumber for example, which is also contained as a library wrapper, and you can load these external packages by yourself. And just use them straight away. And the idea is that you pick one model for a specific task, you plug it into the backbone of the pipeline, and the backbone of the pipeline is just there for the orchestration for gathering all these information, recalculating the necessary values, and grouping the results. So when I started, I said that collecting data is actually very difficult. And I already said that I have prepared some pre-trained models which are there for retrieving the layout as well as for retrieving the table structure of a document. And fortunately there were two data sets available a couple of years ago which are quite large and which give a good baseline for actually detecting these document structures. So regarding these two datasets, they're coming from the same source, which is the PMC, which is public medical center open access subset, and the type of documents they contain are only research articles from medical reports. So if you want to apply this to your specific use case, so say for evaluating the layout of business reports, you cannot expect that these pre-trained models will work well on your specific, on your custom data set. So this is the next feature that you somehow need to fine-tune these pre-trained models according to your need. And for that I have also provided some training script that allows you to, provided you have data set at hand to fine-tune these pre-trained models on your specific use case. And to give you a number of how well do these models perform, when you start evaluating these detection models on the layout detection task. And you will get on the PubLayNet data set, so provided you do the test evaluation of the layout detection on the PubLayNet test set, a quite good result. So it is around 0.9 mean average precision, which is quite high and which is already enough in order to get some results correctly processed. However, if you apply this to a specific business use case, as I applied to, namely to my business reports, you get a significant drop of the layout detection. So when I set up a test data set composed of about 500 manually hand-labeled documents from business report, the original performance dropped from 0.9 to 0.5%. On the other hand, you have some techniques on which you might, again, increase the performance just by putting a bias on the model. That is, you can just fine-tune the model on a training set of business documents. and if you do this in a somehow clever way that is that you select a wide range of business documents and you don't only choose one specific corporate layout documents but actually select from a wide range and you even improve this by setting up an active learning strategy you can actually leverage the performance and again to give you a number after 600 pages I got an average precision of 0.85 percent again just by manually labeling with an active label strategy of 600 pages. So, another use case you can use, you can think of, the first one included the whole business process, parsing the whole document, would be to filter out some specific parts of a business document. And in order to show you at least a few lines of Python code, let me just show you how to compose a pipeline with this framework. So at the very beginning, you need to set up a config and some model parts, some weights, which you can download, for example, the pre-trained models are available on Hugging Face. And on the second step, you need to set up your specific layout detection model. And you plug this into the backbone of a pipeline. At the second step, if you work on PDF documents, you use just a PDF plumber and a text extraction tool which gives you the text based on words and bounding boxes. And as already said, by showing you the first pipeline, you need to set up a matching service which tries to combine the word structures with the detected layout structure from the very beginning. And at the last step, you need to determine the reading order. And for that, there is a special pipeline, backbone pipeline available as well. And after that, you just plug them, all these backbones into a pipeline. And if you want to run this pipeline, so you just need to set a path to your document. And this can be a document containing several pages. And you just need to call the analyze method. And this returns a generator from which you can iterate. And for convenience, there is also an output parsing structure available which gives you some handy features like getting some text based on some filter condition. So in this particular use case you can see on the right hand side that it contains actually only the text without the table structure and this was intended from the beginning that I wanted to exclude the table structure. So this is just an overview of the architecture of the package. I don't want to go into the details, just want to let you know if you're interested in using it, I try to add as much help as possible. So there are a few Jupyter notebooks as tutorials available. And also read the docs has been set up. So finally, some ideas because this is an open source project and there are definitely a lot of features you can think of. For example, you can work on training table detector only model because the ordinary, The currently available layout framework detects other features which are only involved in documents which contain several pages. So if you have text and titles in there, this might be something that you are not really looking for because tables can be contained also in invoices, for example. Another thing that I would like to add, because this would fit quite well in this framework, is adding these layout models, which you might have heard of, that are a combination of visual models and NLP models, and that leverage the visual structure in order to determine classification of documents or even classification of tokens. So for these there are some pre-trained models available and it would be quite nice to add them into this framework. Yeah so ideas and pull requests are welcome of course and yeah I hope you enjoyed the talk and thank you very much.
+
+**Speaker 2** _[25:02]_
+
+So I have a couple of questions here. So I have more than what we have time. So for the people that we didn't answer, you can go and see Yannis in the breaks and then ask yourself the questions. So in the one that I have here, so the first one is quite interesting. So what is the main motivations? I'm pretty already mentioned at the beginning, but just to record, what is the main motivation of open sourcing, basically, the package.
+
+**Speaker 1** _[25:27]_
+
+Well, the main motivation is that, well, it's quite difficult. I started this project when I was working on a very particular problem, namely these business reports. And when I started working on that, I also met some potential customers and asked if they would be, especially the bank where I was looking, where I detected this frame, this problem, this use case, and they came back to me and said, oh, yes, this problem is quite interesting, but why wouldn't you do this kind of document extraction task? This is actually a problem which hurts a lot more, and that made me think that it would be much better to generate a general framework that several people could use because there are just so many use cases out there which require retrieving information from structure, and so maybe people might profit it. And because this area is so huge, it wouldn't be able for just a few people to create a framework which works actually quite well to solve business problems. Thank you.
+
+**Speaker 2** _[26:53]_
+
+So second one What's the difference between for instance this package and something that I have no idea what it is, but maybe you know Apache Tikka Did you come over? Oh?
+
+**Speaker 1** _[27:06]_
+
+Don't know anything about Apache Tika. Okay
+
+**Speaker 2** _[27:12]_
+
+Can have further discussion there. Yeah, so let me see So yeah, you spoke about active learning and someone is asking like which tool do you involve in that actions I mean in that process basically
+
+**Speaker 1** _[27:29]_
+
+This requires not only the active learning but also the labeling tool because these features are quite integrated heavily. So regarding a tool, I haven't found unfortunately a proper open source tool which I found very useful for. So I use a proprietary tool for which I also developed some active learning strategy based on some research paper which is available, which is so-called OLALA paper, based on that one. But yes, regarding labeling, I use a proprietary tool. I don't want to make any adverts for that now.
+
+**Speaker 2** _[28:21]_
+
+Last question, you mentioned that you test the library on PDF, is there a way that you can for instance have different input like PowerPoint, PDF, images that all come together and have a single thing for everything?
+
+**Speaker 1** _[28:43]_
+
+Well, as long as you can convert your original structure into an image, that means as long as you can convert it into a NumPy array, everything is possible.
+
+**Speaker 2** _[28:56]_
+
+Okay. So thanks again. So for all the question that I couldn't ask, feel free to contact Yanis in the conference.
+
+---
+transcript_status: auto
+---
+transcript_language: en

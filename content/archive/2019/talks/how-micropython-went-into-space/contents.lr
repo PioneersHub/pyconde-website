@@ -1,0 +1,1117 @@
+title: How MicroPython went into space
+---
+description: MicroPython is a lean and efficient implementation of the Python 3 programming language, optimised to run on microcontrollers and in constrained…
+---
+created: 2019-05-26
+---
+code: 7QRAWK
+---
+slug: how-micropython-went-into-space
+---
+speaker_names: Christine Spindler
+---
+speakers:
+
+
+
+### Christine Spindler
+
+Christine has been with the MicroPython team since the beginning of 2016. She is responsible for production and logistics at George Robotics Ltd. – the company behind MicroPython. She is also involved in Project Management for ongoing Product Development that uses MicroPython for the Systems Architecture. Besides a degree in economics she holds a B. Sc. in Electrical Engineering. Her final thesis focused on Ultra-Low-Power applications for the Internet of Things.
+Besides giving talks about MicroPython Christine teamed up with the amazing pyladies Berlin and held workshops for Python on hardware beginners and code curious people.
+---
+abstract:
+
+
+MicroPython is a lean and efficient implementation of the Python 3 programming language, optimised to run on microcontrollers and in constrained environments. One of these environments is on a spacecraft.
+---
+full_description:
+
+
+On Board Control Procedures – OBCPs are procedures, or scripts, that can be dynamically uploaded and executed on board a spacecraft even after it has been launched. They can be used to change or extend the functionality of a spacecraft during its mission. Using MicroPython as an OBCP engine would give operators the ability to write such control scripts in Python, allowing them to write expressive and concise code using a familiar language.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: PyConDE
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 95
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: none
+---
+domain_expertise: none
+---
+supporting_material_url: https://micropython.org/resources/publish/Spacebel_MicroPythonOBCP_Dasia2018_Paper.pdf
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/7QRAWK.png
+---
+youtube_id: Vh_5Lz1mLq8
+---
+video_link: https://www.youtube.com/watch?v=Vh_5Lz1mLq8
+---
+video_published_at: 2019-12-16
+---
+video_duration_iso: PT22M43S
+---
+video_thumbnail: https://i.ytimg.com/vi/Vh_5Lz1mLq8/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Yeah, thanks for the introduction. My name is Christine. I'm with the MicroPy.
+
+**Speaker 2** _[00:08]_
+
+with the MicroPython team.
+
+**Speaker 1** _[00:09]_
+
+team and I would like to tell you a little bit about how MicroPython is getting ready
+
+**Speaker 2** _[00:14]_
+
+and is getting ready for space at the minute.
+
+**Speaker 1** _[00:16]_
+
+at the minute. But first of all, what is MicroPython? MicroPython is about six
+
+**Speaker 2** _[00:21]_
+
+and is about six years old now.
+
+**Speaker 1** _[00:21]_
+
+years old now. It has been funded originally through a Kickstarter back in 2013.
+
+**Speaker 2** _[00:26]_
+
+2013.
+
+**Speaker 1** _[00:27]_
+
+And there was some hardware developed, the PyWarp. So the aim of MicroPython is to run Python bare metal on a microcontroller so you don't have an operation.
+
+**Speaker 2** _[00:41]_
+
+operation system.
+
+**Speaker 1** _[00:42]_
+
+system like an RTOS, a real-time operation system on the microcontroller.
+
+**Speaker 2** _[00:46]_
+
+microcontroller in between. So you can use your
+
+**Speaker 1** _[00:47]_
+
+So you can use your Python knowledge directly on the microcontroller. So it's an open-source project.
+
+**Speaker 2** _[00:54]_
+
+open source project run on
+
+**Speaker 1** _[00:55]_
+
+run on GitHub, and has the open source MIT license.
+
+**Speaker 2** _[00:59]_
+
+MIT license, which is very liberal, so you can use it for teaching.
+
+**Speaker 1** _[01:01]_
+
+You can use it for teaching for your personal projects or even in industrial use cases.
+
+**Speaker 2** _[01:05]_
+
+use cases.
+
+**Speaker 1** _[01:07]_
+
+There has been the BBC microbeads in the UK.
+
+**Speaker 2** _[01:10]_
+
+introduced to children.
+
+**Speaker 1** _[01:11]_
+
+to children, and they have been giving out one million and supporting the teachers.
+
+**Speaker 2** _[01:14]_
+
+the teachers there to
+
+**Speaker 1** _[01:15]_
+
+there to teach Python in school.
+
+**Speaker 2** _[01:18]_
+
+And these little devices run MicroPython as well.
+
+**Speaker 1** _[01:22]_
+
+So, how does it work?
+
+**Speaker 2** _[01:24]_
+
+Does this all work?
+
+**Speaker 1** _[01:26]_
+
+So you can see on the left side, there's the real evaluation print looped, the red box, the read evaluation print loop prompt, which is familiar to a Python programmer, which makes...
+
+**Speaker 2** _[01:45]_
+
+which goes into the Alexa and produces tokens.
+
+**Speaker 1** _[01:48]_
+
+tokens, which goes into a parser and produces a parser tree, which goes into a compiler and then
+
+**Speaker 2** _[01:55]_
+
+produces the bytecode.
+
+**Speaker 1** _[01:56]_
+
+bytecode, which is then executed in a virtual machine. So this is just a
+
+**Speaker 2** _[02:00]_
+
+So this is just a little overview.
+
+**Speaker 1** _[02:01]_
+
+a little overview to how to get you on board, how this is going to work. But how is this going to be able for space here? So how does...
+
+**Speaker 2** _[02:10]_
+
+Can this be used in space somehow?
+
+**Speaker 1** _[02:11]_
+
+in space, so how does even somebody get the idea that there's going to be a potential for this? And the European Space Agency
+
+**Speaker 2** _[02:18]_
+
+and Space Agency quite early.
+
+**Speaker 1** _[02:20]_
+
+quite early, showed some interest after the Kickstarter campaign and was thinking this could be a thing that we could put on the Leon.
+
+**Speaker 2** _[02:31]_
+
+smart processors, which are on our space targets. So I'm not programming them in C.
+
+**Speaker 1** _[02:37]_
+
+see anymore. We could use a Python environment on ground and dynamically upload our code to the spacecraft. And there is also now just
+
+**Speaker 2** _[02:50]_
+
+just more recently
+
+**Speaker 1** _[02:51]_
+
+more recent, a company named SpaceBell, who is developing these onboard...
+
+**Speaker 2** _[02:59]_
+
+board control procedures.
+
+**Speaker 1** _[03:01]_
+
+Originally, MicroPython was not intended for use in
+
+**Speaker 2** _[03:05]_
+
+for use into space, so the challenge here
+
+**Speaker 1** _[03:06]_
+
+The challenge here was, of course, there's the interest for MicroPython because the creator, Damien Schultz, thought, of course I want to have MicroPython in space. That's amazing.
+
+**Speaker 2** _[03:15]_
+
+Um, and.
+
+**Speaker 1** _[03:17]_
+
+if we get it running
+
+**Speaker 2** _[03:18]_
+
+get it running in space, we have it so robust for
+
+**Speaker 1** _[03:22]_
+
+any other kind of industrial products, and we get more of the embedded developers on board to try new things so that they see there is not only
+
+**Speaker 2** _[03:32]_
+
+There is not only sea at the minute.
+
+**Speaker 1** _[03:33]_
+
+see at the minute anymore, so you can use MicroPython, for example, for programming a microcontroller. But what is really important is
+
+**Speaker 2** _[03:42]_
+
+Important is it needs to be isolated.
+
+**Speaker 1** _[03:43]_
+
+it It needs to be isolated from the onboard software that's running on a spacecraft, for example. There's no chance this virtual machine causes some threat or risk to the software that's running on the spacecraft, so it's not going to be.
+
+**Speaker 2** _[03:59]_
+
+Well, yeah, worst case coming.
+
+**Speaker 1** _[04:00]_
+
+Worst case, coming down.
+
+**Speaker 2** _[04:03]_
+
+So this needs to be...
+
+**Speaker 1** _[04:06]_
+
+Um,
+
+**Speaker 2** _[04:07]_
+
+It's very important that this certification
+
+**Speaker 1** _[04:09]_
+
+certification gets ready. So the idea was porting to Leon 2 and Leon 3.
+
+**Speaker 2** _[04:18]_
+
+And it helped to improve the microcosm.
+
+**Speaker 1** _[04:19]_
+
+to prove the micropython core. The aims of the European Space Agency at this point in time was
+
+**Speaker 2** _[04:28]_
+
+They wanted to have a low use of the CPU.
+
+**Speaker 1** _[04:30]_
+
+of the CPU and RAM, and also they wanted an interface.
+
+**Speaker 2** _[04:35]_
+
+to the native C code and
+
+**Speaker 1** _[04:36]_
+
+C code and other code that's running there. And it's on top of the real-time operating system that's on these microcontrollers implemented at the minute. There have been also some benchmarks performed with PyStone, which is a tool that compares different Python implementation regarding their speed and space so that low footprint and increased and low and high speed. And so again, the whole idea of getting MicroPython into space
+
+**Speaker 2** _[05:11]_
+
+Python into space.
+
+**Speaker 1** _[05:13]_
+
+what is the virtual machine and the compiler getting
+
+**Speaker 2** _[05:18]_
+
+and the compiler gets separated, so only the virtual machine needs to be the certification.
+
+**Speaker 1** _[05:21]_
+
+to be the certification, because it's quite hard when you have complex.
+
+**Speaker 2** _[05:27]_
+
+programs to programs
+
+**Speaker 1** _[05:28]_
+
+programs and you
+
+**Speaker 2** _[05:29]_
+
+you need to ensure
+
+**Speaker 1** _[05:30]_
+
+ensure that they never fail so getting a valid certification for it so looking more into this
+
+**Speaker 2** _[05:38]_
+
+looking more into this?
+
+**Speaker 1** _[05:39]_
+
+was the idea of what is coming next after this ESA project.
+
+**Speaker 2** _[05:42]_
+
+project there. There's been a lot of potential
+
+**Speaker 1** _[05:42]_
+
+a lot of potential there has been a lot of development going on regarding the robustness of micropython at that point in time so the space bell the company the belgian company decided to qualify an onboard control procedure engine which is on top of the micropython virtual machine um so it's a product that's going to be sold by space space bell obviously so there has It's been a contract in place with George Robotics, the company behind MicroPython. And it's going to be used in 2022.
+
+**Speaker 2** _[06:21]_
+
+In the Euclid mission, which
+
+**Speaker 1** _[06:22]_
+
+Mission, which is a telescope, a space
+
+**Speaker 2** _[06:25]_
+
+a space in space.
+
+**Speaker 1** _[06:26]_
+
+telescope. So SpaceBell was thinking...
+
+**Speaker 2** _[06:32]_
+
+what are the most used
+
+**Speaker 1** _[06:34]_
+
+scripting languages at the minute. So obviously Java, Lua, Ruby, or Python would be possible in general. Because when they were thinking about it, MicroPython, so this was two and a half, three years ago, MicroPython was not mature enough. So there has to be much more work put into. So they said even though Python is the most popular and widely used language, Let's see.
+
+**Speaker 2** _[07:02]_
+
+Let's make the first steps in Lua.
+
+**Speaker 1** _[07:04]_
+
+steps in Lua and see if we can use this for our
+
+**Speaker 2** _[07:10]_
+
+virtual machine on board.
+
+**Speaker 1** _[07:15]_
+
+There was successful testing, but along the line, MicroPython, so they decided, let's continue the work what ESA has started, and we're going to put more funding into MicroPython to make this a certified onboard control procedure engine. There are different...
+
+**Speaker 2** _[07:32]_
+
+Waze.
+
+**Speaker 1** _[07:33]_
+
+to program these onboard systems. So, for example, there's dynamic linking, which means there's a compiled library which allows the onboard software that runs on the spacecraft that it gets to be extended. But the problem with it is that it runs on the same level. So if there's something uploaded and it's going to cause...
+
+**Speaker 2** _[07:56]_
+
+problems. It might interfere with the onboard software. So this is not
+
+**Speaker 1** _[08:00]_
+
+recommended, or there is
+
+**Speaker 2** _[08:04]_
+
+the time and space partitioning.
+
+**Speaker 1** _[08:05]_
+
+partitioning, which would give additional security.
+
+**Speaker 2** _[08:08]_
+
+additional security because you separate
+
+**Speaker 1** _[08:10]_
+
+separate this
+
+**Speaker 2** _[08:11]_
+
+these These things from each other
+
+**Speaker 1** _[08:11]_
+
+this
+
+**Speaker 2** _[08:15]_
+
+And then this would mean...
+
+**Speaker 1** _[08:16]_
+
+then this would mean that under specific
+
+**Speaker 2** _[08:17]_
+
+spacecraft there is already time
+
+**Speaker 1** _[08:19]_
+
+There's already time and space partitioning implemented at the minute.
+
+**Speaker 2** _[08:23]_
+
+So this is not always the case.
+
+**Speaker 1** _[08:26]_
+
+This leaves a lot of possibility to use.
+
+**Speaker 2** _[08:31]_
+
+interpreted procedures, which means
+
+**Speaker 1** _[08:36]_
+
+They are uploaded, interpreted, and executed on the spacecraft. So on demand, on board, at any time when there's a change or a problem.
+
+**Speaker 2** _[08:45]_
+
+a problem that needs to be fixed.
+
+**Speaker 1** _[08:48]_
+
+But usually scripting languages are compiled and executed on the same platform.
+
+**Speaker 2** _[08:55]_
+
+on the same platform, but that wouldn't be possible because...
+
+**Speaker 1** _[08:58]_
+
+This needs to be separated, so technical and safety reasons make basically
+
+**Speaker 2** _[09:01]_
+
+make basically impossible to do this on board so the code is executed
+
+**Speaker 1** _[09:05]_
+
+Executed so the code is generated on ground so must be first compiled on ground then uploaded So
+
+**Speaker 2** _[09:15]_
+
+These, so again,
+
+**Speaker 1** _[09:16]_
+
+So, again, what's an onboard control?
+
+**Speaker 2** _[09:18]_
+
+board control procedure so it's a flight procedure to provide a
+
+**Speaker 1** _[09:20]_
+
+feature to provide a flexible way to operate a spacecraft. It can extend the onboard software and modify the behavior of the applications up there.
+
+**Speaker 2** _[09:33]_
+
+It's prepared on ground and dynamic.
+
+**Speaker 1** _[09:34]_
+
+ground and dynamically uploaded even after launch and it's written in a scripting language and compiled as bytecode and executed.
+
+**Speaker 2** _[09:43]_
+
+executed up there. So the whole procedure...
+
+**Speaker 1** _[09:48]_
+
+whole procedure chain is, so you see in the blue button, it's the blue.
+
+**Speaker 2** _[09:52]_
+
+It's a ground developed
+
+**Speaker 1** _[09:53]_
+
+ground development environment and the red one is the onboard
+
+**Speaker 2** _[09:56]_
+
+is the onboard execution, so you have
+
+**Speaker 1** _[09:57]_
+
+So you have your user language.
+
+**Speaker 2** _[10:00]_
+
+And it goes to the ground development environment.
+
+**Speaker 1** _[10:02]_
+
+environment and produces a target bytecode and of course you can have a ground debug environment because there is no way you are going to debug it on the spacecraft. So when you write your Python code it can be done in any
+
+**Speaker 2** _[10:17]_
+
+done in any standard Python
+
+**Speaker 1** _[10:18]_
+
+standard Python development environment and it's so there is no dynamic importing so the import expender allows to building a single on-board control
+
+**Speaker 2** _[10:36]_
+
+Board Control Procedure file.
+
+**Speaker 1** _[10:36]_
+
+position. each a file and it can import multiple files from each other and as I said you can you should be having your
+
+**Speaker 2** _[10:52]_
+
+or debug environment on-ground.
+
+**Speaker 1** _[10:53]_
+
+and on ground because your code needs to be highly tested and debugged before it's going to go up there. So on board of the spacecraft, it looks like this. You usually have your target bytecode coming in.
+
+**Speaker 2** _[11:08]_
+
+And your virtual machine is a C library, which is purely passive.
+
+**Speaker 1** _[11:11]_
+
+passive. There's only one access point. It executes your bytecode and it's optimized for speed.
+
+**Speaker 2** _[11:17]_
+
+speed. So you have the telemetric
+
+**Speaker 1** _[11:18]_
+
+telemetric and
+
+**Speaker 2** _[11:19]_
+
+and
+
+**Speaker 1** _[11:19]_
+
+telecommand interface and these are standard space to ground interaction with an additional that you can upload from
+
+**Speaker 2** _[11:33]_
+
+from a script as well.
+
+**Speaker 1** _[11:34]_
+
+as well. The storage handles the access of the memory and your onboard control procedure engine. So it's like this.
+
+**Speaker 2** _[11:43]_
+
+It's like this, the virtual machine can have several instances.
+
+**Speaker 1** _[11:46]_
+
+So you can start, stop, resume.
+
+**Speaker 2** _[11:47]_
+
+resume abort any
+
+**Speaker 1** _[11:49]_
+
+any kind of code you're going to put up there as required from the ground. So this makes this all more flexible and interactive. So here I tried to make this come a little as an overview if you want to go into more depth. so again going back so why would MicroPython be an ideal machine virtual machine to run on board so there's dedicated buffer for your Python stack and dedicated buffer for your heap there's a garbage collector and your heap can be locked
+
+**Speaker 2** _[12:35]_
+
+So it gives them the whole
+
+**Speaker 1** _[12:35]_
+
+Thank you for watching. the whole situation
+
+**Speaker 2** _[12:37]_
+
+more security,
+
+**Speaker 1** _[12:38]_
+
+more security.
+
+**Speaker 2** _[12:39]_
+
+The virtual machine is in Python.
+
+**Speaker 1** _[12:40]_
+
+is in Python 3.4.
+
+**Speaker 2** _[12:42]_
+
+It's object-oriented.
+
+**Speaker 1** _[12:44]_
+
+It has exception handling, math function, list, dictionary, binary.
+
+**Speaker 2** _[12:53]_
+
+Used to, so there's...
+
+**Speaker 1** _[12:54]_
+
+built-in imports.
+
+**Speaker 2** _[12:56]_
+
+and lots of built-in function.
+
+**Speaker 1** _[12:58]_
+
+but external imports and most of the standard modules are not supported.
+
+**Speaker 2** _[13:01]_
+
+are not supported because...
+
+**Speaker 1** _[13:02]_
+
+because
+
+**Speaker 2** _[13:04]_
+
+it needs to focus on
+
+**Speaker 1** _[13:06]_
+
+to focus on
+
+**Speaker 2** _[13:07]_
+
+the things that has to be
+
+**Speaker 1** _[13:08]_
+
+that has to be then there has been intensive testing obviously is this really reliable and robust so
+
+**Speaker 2** _[13:20]_
+
+They are all relevant.
+
+**Speaker 1** _[13:21]_
+
+relevant tests defined in the MicroPython Virtual Machine Master branch.
+
+**Speaker 2** _[13:25]_
+
+the branch.
+
+**Speaker 1** _[13:26]_
+
+the CPython standard test suite for core Python language, and there has been end-to-end testing, so MicroPython script is produced and compiled. It's uploaded for execution in the MicroPython virtual machine, and the output is compared with the accepted result. Certification is oriented in the classical onboard software development process. it follows all these
+
+**Speaker 2** _[13:53]_
+
+follows all these alignments, space standards.
+
+**Speaker 1** _[13:56]_
+
+standards for category B software and documentation has been made and qualification status and I put in the
+
+**Speaker 2** _[14:12]_
+
+The ESA.
+
+**Speaker 1** _[14:13]_
+
+standards so the conclusion of this is the new generation of onboard control procedure has been developed based on the Python scripting language which you
+
+**Speaker 2** _[14:23]_
+
+language, which you can use on ground.
+
+**Speaker 1** _[14:25]_
+
+to generate your script and it's executed by the virtual machine on board in MicroPython and well, we're very excited when in 2022 the
+
+**Speaker 2** _[14:36]_
+
+the first spacecraft.
+
+**Speaker 1** _[14:37]_
+
+spacecraft will have MicroPython on board.
+
+**Speaker 2** _[14:43]_
+
+So that's my talk.
+
+**Speaker 1** _[14:44]_
+
+but I would like to invite you
+
+**Speaker 2** _[14:46]_
+
+invite you to the sprints on Saturday.
+
+**Speaker 1** _[14:48]_
+
+on Saturday because I brought some hardware with me to test out if you want to learn more about MicroPython.
+
+**Speaker 2** _[14:55]_
+
+getting started or
+
+**Speaker 1** _[14:56]_
+
+or see what we are doing next. So it would be great to see you there. And if you have more questions or you send me an email or contact us on Twitter or join the development on GitHub.
+
+**Speaker 2** _[15:15]_
+
+Thank you.
+
+**Speaker 3** _[15:21]_
+
+Very interesting. I thought that my weather station will be on the balcony, but in space it would be even more awesome. Yeah. I think there are questions.
+
+**Speaker 2** _[15:34]_
+
+Running
+
+**Speaker 1** _[15:40]_
+
+Thank you.
+
+**Speaker 4** _[15:42]_
+
+Hi. I was a bit curious. Since this is compiled beforehand and run, I guess it doesn't really support metaprogramming then?
+
+**Speaker 2** _[15:55]_
+
+Not to my knowledge.
+
+**Speaker 1** _[15:57]_
+
+my knowledge, no.
+
+**Speaker 5** _[16:01]_
+
+Okay
+
+**Speaker 3** _[16:04]_
+
+More questions here?
+
+**Speaker 1** _[16:05]_
+
+here.
+
+**Speaker 4** _[16:11]_
+
+know perhaps a few details what do you control can you talk a bit about this what it's connected to
+
+**Speaker 1** _[16:19]_
+
+two. You mean on the spacecraft? Yeah, on the
+
+**Speaker 4** _[16:20]_
+
+Yeah, on the spacecraft.
+
+**Speaker 1** _[16:21]_
+
+spacecraft okay um as i have to like it's not in space yet so i what's going to be right so um the oiklete mission will be um a telescope so just imagine you want to adjust a mirror and it seems to be easier to do this in a python like easy on ground and then upload it and it's going to be executed in a like sandbox save environment and cannot hurt anything else that's going to go in this...
+
+**Speaker 2** _[16:50]_
+
+Up there, yeah.
+
+**Speaker 3** _[16:55]_
+
+Yes, sir.
+
+**Speaker 5** _[16:59]_
+
+Thanks for the talk and congratulations. Thank you. Could you explain a bit more of the safety considerations that force you to do compilation on the ground? Does that just mean outside of the microcontroller or sort of necessarily offside of the spaceship altogether?
+
+**Speaker 2** _[17:18]_
+
+Yeah, so generally any code can interfere
+
+**Speaker 1** _[17:19]_
+
+because you can't be really 100% sure you have.
+
+**Speaker 2** _[17:25]_
+
+no failure in your code.
+
+**Speaker 1** _[17:27]_
+
+So that's like the safety, so you want to avoid...
+
+**Speaker 2** _[17:27]_
+
+So that's... doing the compilation on the
+
+**Speaker 1** _[17:33]_
+
+on the machine because you want to avoid and debug it on ground before something happens. But I'm not sure if this answers your question. Or if you have, like, you mean the standards or what's going to be following? So there will be, there's a white paper about this, so if you really want to dig into it.
+
+**Speaker 6** _[17:54]_
+
+Hello. Hello. Thanks for the talk. I'm really curious about the interaction with other C libraries. You mentioned something about maybe loading or interfacing other stuff that was already running. How easy or how complicated is it at the moment with MicroPython to interact with other shared libraries that are already in the microcontroller?
+
+**Speaker 1** _[18:15]_
+
+They are already in the microcontroller.
+
+**Speaker 2** _[18:16]_
+
+or that you can share.
+
+**Speaker 6** _[18:17]_
+
+Or that you can ship with MicroPython itself.
+
+**Speaker 1** _[18:21]_
+
+Yeah, so in MicroPython in general, you can...
+
+**Speaker 2** _[18:24]_
+
+So there's C modules.
+
+**Speaker 1** _[18:25]_
+
+C modules, so you can look, so MicroPython, you can interact with C language or assembler, there's even an inline assembler, something like this, so when you ask how complicated, well, the more experience you have, obviously, the easier it gets, but yeah, yeah, but that's the idea, that's why you like to have MicroPython, so you can use Python for all the easier or more obvious stuff.
+
+**Speaker 2** _[18:50]_
+
+more obvious stuff
+
+**Speaker 1** _[18:50]_
+
+and then you go into the deep where you need a C library or Assembler.
+
+**Speaker 2** _[18:50]_
+
+and then you go into
+
+**Speaker 4** _[18:55]_
+
+Hello, thanks for the great talk. One question, it's a bit stupid, but will the day come that MicroPython will replace C and C++ for embedded programming or not? And if it will come, when?
+
+**Speaker 1** _[19:12]_
+
+Of course it will. No, that's an interesting question. I think maybe more like a coexistence for...
+
+**Speaker 2** _[19:22]_
+
+existence for a while.
+
+**Speaker 1** _[19:24]_
+
+because with MicroPython, for example, it's so much more easier to get people in from the Python area or from high-level scripting languages in general.
+
+**Speaker 2** _[19:33]_
+
+But still, you have some where you really need the speed or where you really need something special.
+
+**Speaker 1** _[19:39]_
+
+special which is your well yeah the special target you're gonna you might not be able to do this
+
+**Speaker 2** _[19:47]_
+
+But as more powerful as the microcontroller is,
+
+**Speaker 1** _[19:48]_
+
+as the microcontroller is going to get. Maybe there will be one time. A lot of people have said this when C came up.
+
+**Speaker 2** _[19:54]_
+
+That's never gonna happen
+
+**Speaker 1** _[19:55]_
+
+going to happen, that assembler's going to be gone, but that's the case, isn't it?
+
+**Speaker 2** _[20:01]_
+
+facing up
+
+**Speaker 1** _[20:02]_
+
+Muslims, not everywhere.
+
+**Speaker 2** _[20:02]_
+
+well
+
+**Speaker 7** _[20:07]_
+
+Okay, so I'm interested regarding the boards that you will be using in order to send it to the space. What kind of boards? So I think like the ones that I use is the ESP8266. Yeah. But I don't know if it is like Dust3. So I'm more interested into what kind of boards that you can use reliably in the industry. And if it is reliable for a space, it should be reliable for the industry.
+
+**Speaker 1** _[20:35]_
+
+Yes, of course, yes, of course, of course.
+
+**Speaker 7** _[20:35]_
+
+Yes, of course. My next question is, I saw that there's CircuitPython.
+
+**Speaker 1** _[20:44]_
+
+Yeah.
+
+**Speaker 7** _[20:44]_
+
+Yeah. how it is related to MicroPython. So there's CircuitPython and there's MicroPython. How are they related?
+
+**Speaker 1** _[20:56]_
+
+later. Yeah.
+
+**Speaker 2** _[20:58]_
+
+So, Python is...
+
+**Speaker 1** _[20:59]_
+
+a fork, but a very close fork from other food.
+
+**Speaker 2** _[21:04]_
+
+And Adafruit is manufacturing that.
+
+**Speaker 1** _[21:05]_
+
+manufacturing their own hardware.
+
+**Speaker 2** _[21:09]_
+
+using a fork of
+
+**Speaker 1** _[21:11]_
+
+fork of micropython too so it's not really like they are not separate they are very close friends
+
+**Speaker 2** _[21:17]_
+
+friends and we work together to achieve common
+
+**Speaker 1** _[21:20]_
+
+to achieve common goals, but they are a little bit more oriented.
+
+**Speaker 2** _[21:21]_
+
+little bit more orientated in
+
+**Speaker 1** _[21:22]_
+
+orientated in, I would say, teaching and
+
+**Speaker 2** _[21:25]_
+
+and getting new people in.
+
+**Speaker 1** _[21:28]_
+
+which we would want to, but we try also a little bit.
+
+**Speaker 2** _[21:31]_
+
+also a little bit with
+
+**Speaker 1** _[21:32]_
+
+bit with our new hardware line for example as well getting really pushing this into industry development if you have seen our new pie board so or come on Saturday we're gonna can you can play around with them a little bit so they are so small that you can embed the embed this already
+
+**Speaker 2** _[21:50]_
+
+this already in your industrial application, which is already
+
+**Speaker 1** _[21:52]_
+
+which is already in use.
+
+**Speaker 2** _[21:53]_
+
+already in use with a few companies.
+
+**Speaker 1** _[21:55]_
+
+So this board is ready for industry because it's used.
+
+**Speaker 2** _[21:57]_
+
+industry because it's used in industry
+
+**Speaker 1** _[21:58]_
+
+in industry.
+
+**Speaker 3** _[22:01]_
+
+And there was the first question about the boards. It's okay? Okay. Any more questions? Then I have a question. My girlfriend is a teacher. Where can we buy these tiny nice things? Is there a shop?
+
+**Speaker 1** _[22:18]_
+
+Yes, we have an online store on micropython.org, you can buy them there, or we have the discount
+
+**Speaker 2** _[22:22]_
+
+there, or we have the distributors? How much is it?
+
+**Speaker 3** _[22:27]_
+
+abort this one
+
+**Speaker 1** _[22:29]_
+
+Yes. 35.
+
+**Speaker 3** _[22:30]_
+
+pounds 35 okay any more questions okay then let's thank Christina again
+
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -1,0 +1,312 @@
+title: Improving Machine Learning from Human Feedback
+---
+description: Large generative models rely upon massive data sets that are collected automatically. For example, GPT-3 was trained with data from “Common Crawl” and…
+---
+created: 2023-01-05
+---
+code: AUJYP7
+---
+slug: improving-machine-learning-from-human-feedback
+---
+speaker_names: Erin Mikail Staples, Nikolai
+---
+speakers:
+
+
+
+### Erin Mikail Staples
+
+Erin Mikail Staples is a very online individual passionate about facilitating better connections online and off. She’s forever thinking about how we can communicate, educate and elevate others through collaborative experiences.
+
+Currently, Erin is a Senior Developer Community Advocate at Label Studio. At Label Studio — she empowers the open-source community through education and advocacy efforts.  Outside of her day job, Erin is a comedian, graduate technical advisor, content creator, triathlete, avid reader, and dog parent.
+
+Most importantly, she believes in the power of being unabashedly "into things" and works to help friends, strangers, colleagues, community builders, students, and whoever else might cross her path find their thing.
+
+### Nikolai
+
+_About — in the speaker's own words_
+
+As CTO of Heartex / Label Studio, I specialize in machine learning, data-centric AI, and innovative data labeling techniques. My expertise spans weak supervision, zero-shot and few-shot learning, and reinforcement learning to drive cutting-edge AI solutions.
+---
+abstract:
+
+
+Large generative models rely upon massive data sets that are collected automatically. For example, GPT-3 was trained with data from “Common Crawl” and “Web Text”, among other sources. As the saying goes — bigger isn’t always better. While powerful, these data sets (and the models that they create) often come at a cost, bringing their “internet-scale biases” along with their “internet-trained models.” While powerful, these models beg the question — is unsupervised learning the best future for machine learning?  
+
+ML researchers have developed new model-tuning techniques to address the known biases within existing models and improve their performance (as measured by response preference, truthfulness, toxicity, and result generalization). All of this at a fraction of the initial training cost. In this talk, we will explore these techniques, known as Reinforcement Learning from Human Feedback (RLHF), and how open-source machine learning tools like PyTorch and Label Studio can be used to tune off-the-shelf models using direct human feedback.
+---
+full_description:
+
+
+Large generative models rely upon massive data sets that are collected automatically. For example, GPT-3 was trained with data from “Common Crawl” and “Web Text”, among other sources. As the saying goes — bigger isn’t always better. While powerful, these data sets (and the models that they create) often come at a cost, bringing their “internet-scale biases” along with their “internet-trained models.” While powerful, these models beg the question — is unsupervised learning the best future for machine learning?
+
+ML researchers have developed new model-tuning techniques to address the known biases within existing models and improve the model’s performance (as measured by response preference, truthfulness, toxicity, and result generalization). All of this at a fraction of the training cost is very low compared to the initial training cost. This talk will explore these Reinforcement Learning from Human Feedback (RLHF) techniques and how open-source machine learning tools like PyTorch and Label Studio can tune off-the-shelf models using direct human feedback.
+
+We’ll start by covering traditional RLHF, in which a model is given a set of prompts to generate outputs. These prompt/output pairs are then graded by human annotators who rank pairs according to a desired metric, which are then used as a reinforcement learning data set to optimize the model to produce results closer to the metric criteria.
+
+Next, we’ll discuss recent advances within this field and the advantages they provide. One advance we’ll dive into is the use of Human Language Feedback, in which ranks are replaced with human-language summaries that take full advantage of the “full expressiveness of language that humans use.”  This contextual feedback, along with the original prompt and output of the model, is used to generate a new set of model refinements. The model is then tuned with these refinements to match the new output to the human feedback. In a 2022 study, researchers at NYU reported that “using only 100 samples of human-written feedback finetunes a GPT-3 model to roughly human-level summarization ability.” It’s advances like these that are providing advantages in terms of accuracy and bias reduction.
+
+Finally, we’ll leave you with examples and resources on implementing these training methods using publicly available models and open-source tools like PyTorch and Label Studio to help retrain models for targeted applications. As this industry continues to grow, evolve, and develop into more widespread applications, we must approach this space with ethics and sustainability in mind.  By combining the power and expansiveness of these widely-popular “internet-scale models” with specific, targeted, human approaches, we can avoid the “internet-scale biases” that threaten the legitimacy and trustworthiness of the industry as a whole.
+---
+room:
+---
+day: Tuesday
+---
+slot_date: 2023-04-18
+---
+start_time: 10:30
+---
+end_time: 11:00
+---
+slot_id:
+---
+track: Machine Learning & Stats
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 2521
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/AUJYP7.png
+---
+youtube_id: IbuNQsM9uAA
+---
+video_link: https://www.youtube.com/watch?v=IbuNQsM9uAA
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT29M5S
+---
+video_thumbnail: https://i.ytimg.com/vi/IbuNQsM9uAA/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Good morning, everyone. How are we feeling this morning? Woo! I like some excitement for some machine learning today. Today we're here to talk to you about how to improve machine learning from human feedback. Now, before we begin, a little bit about us. We're part of the team behind Label Studio. It's an open source tool for data labeling created by hard techs. I'm Erin. I'm the senior developer community advocate. And this is Nikolai. He's the CTO and one of the co-founders behind Label Studio. We're really excited today to be here to explore reinforcement learning from human feedback and other ways to improve your large language models or other large foundational models. But if you've never wrote in a model in a day in your life or you've never even typed a single line of Python, do not be scared. This talk does dive into it from a theoretical perspective, but for those of you wanting to get your hands dirty, we'll be providing a notebook for you and a live demonstration of how this is possible. All within 30 minutes. Think we're up to it? Yeah, I see some excitement here. All right. Without further ado, let's begin. Nothing if you don't have a minor technical error. All right. As many of you may have known or noticed, large foundational models have hit the cultural zeitgeist. We've all heard it, we are all participating and climbing to get into that room talking about chat GPT yesterday, and we've all played around with DALI or BERT or many of the other large foundational models that exist. However, they come at a cost. We've all probably heard it, especially if you work in the world of machine learning. My parents ask me every day, are you building the next Terminator? Mom, I'm not. You're welcome. I know, major lame. AI isn't taking over the world. This talk is actually the opposite of that. We're going to be talking today about making the technology that powers much of our machine learning world just a little bit more human. Because we believe that these large generative models are better with a little human signal. So why does this matter? But if you've been on the internet, product hunt, or across the web, you likely have noticed a trend happening. Slap a shiny front end on the top of chat GPT API, bam, that's a new startup innovation. I think I've seen it on product hunt more than plenty of times. And I'm no shade there if that's what you're into. But we need to recognize that these large foundational models, bigger isn't always better. At its core, because these models are trained on such a wide data set and create such a wide variety of content in it, these internet-trained models bring with them internet-scale biases. And for those of you who have been online, we've got some problems. These biases can include gender bias, racial bias, sexual bias, poor data quality, and even limited applications. That's not my cup of tea. If we're here to make these large foundational models actually useful for your day of work, we should harness the power of reinforcement learning. And in order to harness the power of reinforcement learning, we need to know exactly what it is. We've probably seen it or joked around about it. The hottest new programming language out there is actually English. Now, all jokes aside, there is some truth to that statement. We need to be better at communicators and understanding the social problems that go into these large generation models. Reinforcement learning with human feedback helps to adjust for the problems that tend to come with large-scale foundational models through understanding the social things that go into it and harnessing the power of human feedback. So what exactly does that mean? At its core, reinforcement learning is a goal-oriented model that seeks to identify similar actions or a sequence of actions that maximises future of rewards. These are able to success the best output among a series of outputs. So where you're targeting the best goal for your situation. You're able to target for specificity, individual use case, and so on and so forth. In comparison to unsupervised learning or prompt engineering as we've seen which relates on an existing model and rather adapts your prompts to the model's known limitations, what we do know is reinforcement learning changes the model itself. These known limitations that come with these existing models include harmful speech, over generalised data, out-of-date data, racial, gender and religious biases, and on top of everything else, require large computational resources, and let's be honest, I have not convinced my employer to get me that really fancy new MacBook yet, so we need to come up with a better solution. Reinforcement learning continues to focus on optimising for the end goal by adapting the model itself. This also provides us an advantage when dealing with new or uncertain information. Reinforcement learning allows you to adapt based on existing trends, all depending on that early human signal. With RLHF, one can align model output directly with one's specific needs, all at a fraction of that original cost. So what exactly does that mean? This means that we can align with our specific use case. Take, for example, Bloomberg GBT. That's a specific use case on a specific set of data. And don't fret, this all can be done in a pretty accessible way thanks to our open source landscape. There are plenty of open source tools out there, and we've provided a list at the end of this talk for you to get your hands dirty as well as a complete awesome list of all the resources that we have found. We're already seeing this used in the wild. In one case, we've seen Bloomberg GPT. We've also seen Find, which has been another way that we've been training it. And even this morning, I found someone who was training it to reinforce and identify and speak like Shakespeare. Pretty freaking cool. So, practically, how did this work? As we discussed, our large language models train off of almost everything on the internet. Pikachu face memes, Nyan Cat, you get the picture. What the difference is, when we start working on our prompts, we'll have the first prompt say, what is a dog? And begin ranking, put it through our large language model, and then begin ranking the outputs from this prompt. In this example, our model generated the answer pair, a furry animal and a furry animal with four legs and a tail. We then put this output through a human feedback loop, typically done through data labelling. In our case, this is when you would apply Label Studio to better identify and label the data, which is the better prompt. In this case, we want to gamify for detail, so our second output, a furry animal with four legs and a tail is the more accurate option at this point. Our human annotators gave this a better score. We'll then combine the results from our human feedback back with the original large language model to create a reward or a preference model. What this does is it makes sure that we're still aligned and we're still in touch with what our end goal is to be. In this case, we're targeting detail and specificity. There are some underlying things that that model understood, like how human language works, how to structure a sentence, but we also want to make sure that it's aligned with the end goal. In many ways, this reward or preference model is one of the key innovations that has allowed for large-scale foundational models to innovate at such a rapid pace. As this industry grows, we can only expect that this reward model will have further innovations. In fact, Anthropic AI has identified this as part of their iterative online RLHF paper as an area for further research and discoveries to be made. Pretty cool. On top of this, we have what's called an error metric or an update rule. In order to ensure that we just don't start outputting and spitting out whatever to gamify this model, or to best fit our reward metric, the error metric makes sure that it actually makes sense, and it is independently calculated based off of your original large foundational model. In the final stages of model development, as your model is continuing to move through this loop and improving the base model itself, we'll run the data through another additional copy of that large language model to make sure everything's aligned, and then leave with our new tuned language model that delivers better results based on our original goal. At this point, your model is ready for production. You can remove your model from the training process to start receiving better outputs and models all from that initial stats and internal training data. We all tracking theoretically? I've got some nods, I'm seeing some thoughts. ready to play in real time? Let's see it in action and I'll be passing it to Nikolai.
+
+**Speaker 2** _[10:13]_
+
+Hey guys, thanks for a very nice presentation so I can quickly walk you through the notebook that allows you to put your hands dirty on all these steps including the reward model training and putting this reward model training into the final production. So there is a repo where we collect the tools and best practices here, and you can find the notebook example, Jupyter Notebook, so we go here. The best way is to open this notebook in Google Colab, so let's do this. When you open the Google Colab environment, a quick recap of what we're going to do here is we train the reward model that would mimic our labellers' preferences, so that by showing them two examples here, they're going to opt for one example, and collecting this human signal would train our reward function, the reward function will replace the real humans, and then we plug this reward function into our reinforcement learning training procedure. So maybe you're asking why not just directing humans to the reinforcement learning. So train reward function is just cost you a few bucks rather than getting the human labellers consistently labelling signals is too costly and reward function will not complain about working schedules and so on. So it's kind of like good practice to incorporate all the human signal into the actual reinforcement loop. So, here we're going to install all the necessary libraries. One of the very good frameworks to start iterating and experimenting with reinforcement learning with human feedback is TRLX, which gives you the ability to inject this reward model once it's trained. So the end plus, you can start from the baseline models collective, the Hagen phase, so in case we're going to, for example, training some analog of chat GPD, you can collect DPGD, which is simpler to example here, GPD2, which is smaller, but you can actually get any type of the model to bootstrap your initial training pipeline. So once it's get done, then we create the generation step, so generation step aims at creating the pairs of the examples that you're going to provide to your human labellers, so there is initial prompt, and the initial prompt fed into the baseline model, and it It gives you out the generated examples, so let's try generated, hope that environment already set up.
+
+**Speaker 1** _[13:27]_
+
+Nothing like a live code demo during a 25-minute talk, right?
+
+**Speaker 2** _[13:30]_
+
+Yeah.
+
+**Speaker 1** _[13:30]_
+
+Yeah. Can we get a little excitement for that in the morning?
+
+**Speaker 2** _[13:34]_
+
+That's just a test of luckiness. Good, so we start generating the real examples, so here we see the initial prompt, and there are model outputs that we're going to compare with the human labellers. So instead of waiting that, I'm going to go to the data we already collected, so these are the same, you see there's just JSON payload, initial prompt, plus two outputs, so let's get this link, and the next step is we're going to label that within our labeling pipeline, so just give me a quick second, can't find it.
+
+**Speaker 1** _[14:22]_
+
+Give me a minute.
+
+**Speaker 2** _[14:29]_
+
+Really hard to see that
+
+**Speaker 1** _[14:31]_
+
+You're good. Your local host, 8080.
+
+**Speaker 2** _[14:34]_
+
+Great, so here the Label Studio is a tool where you can create the projects for your labeling needs, for example, we create a project, then we go and import our data, let's put that here, great, we import the data, we see all our data collected previously on the screen, and the final thing is that Label Studio comes with all tools that enables you to label the the generative thing. We go here, we find the template that provides you with comparing to models, and here we go. We start comparing, you can invite your friends and hang out together by clicking on and collecting the preference of everything you need. Once the data is collected, The final step is to get this data back to our pipeline, and in the pipeline, we prepare the data collater that allows you to set the data annotations into PyTorch model, and then we start the training. once the training is done, so the training actually fits your initial model to produce just one single score, then this score is going to be used to populate reinforcement learning framework powered by TRLX. So we can inspect here the convergence, again, this is just the toy example here, but in the real-world practice, you can get more robust and more long pipeline and wait more. You can also inspect the convergence in if you have that collected. And once your checkpoint is done, once your reward model is training, here's the way how to get this model into the reinforcement learning, powered by the library, it's going to take a while unless you have very big computing power, or you can use the library from the hiding phase that gives you the ability to connect to your two computational resources very quick. And here we go. The final output is the model that allows you to by incorporating your feedback allows you to chat with and get your particular task and your preferences established. So here is like very quick walkthrough end-to-end from the beginning, from the initial model baseline, collecting your data until the final model results that allows you to train your model from scratch until the final end. So then I pass.
+
+**Speaker 1** _[17:26]_
+
+I bet you didn't think you'd be training a model in ten minutes in this talk, did you? That all being said, if this was a little too quick, don't panic, we will be sharing all of this on this repo as well as a QR code at the end of the slide, so don't panic, we've got you. And of course, we're always here if you've got any questions. But like many systems, technology isn't perfect, so we would be remiss if we didn't discuss some of the problems with RLHF. As with many things, darn humans, we ruin everything. This lack of programmatic reward rewards bad actors. You can't control perfect people. Human judgments of behavior are, at the end of the day, a key role in reinforcement learning. Our LHF relies on poor annotator training or relies on social engineering and data integrity just as much as it does technical skill. Poor annotator training or onboarding can lead to models that optimize for the wrong things. Making sure that your human annotators are well informed on the goal that you're trying to achieve, looking at how annotation scores rank among two different annotators, and keeping people motivated and creating a positive environment for your annotators can go a long way in building a more positive and improved model set, and a better model, and a better, more holistic integrity in the world of machine learning as a whole. If you really enjoyed this talk, I'd love to see you try it out for yourself. If you have any questions, feel free to reach out to us online, reach out to us via email. We'd love to take it, and we'll answer audience questions now, but thank you.
+
+**Speaker 3** _[19:21]_
+
+Thank you for this great presentation. I think my teacher just just said I mustn't do like slides like this Okay, I have read many of your questions on Slido Feel free to vote Questions up you really like but we can start with the first one How much human feedback is needed to get good results?
+
+**Speaker 2** _[19:48]_
+
+Yeah, that's a great question, and it's the same as how much data they needed to build a good model. Of course, the answer is it really depends, and experiment, try, depending on what type of the task you are trying to solve and how complicated this task is. So there are reports that for making the instruct GPT-like models, you don't need a huge amount of data, especially if your instructions are in narrow domain, but for broader tasks, for allowing like to mitigating some biases, harm or whatever you want to get rid of from your model that may involve more data to be labelled to ensure that it is robust.
+
+**Speaker 1** _[20:34]_
+
+And a lot of that also comes into the training of the annotators itself. When you're annotators and you've done the work to properly prepare your annotators by having a diverse set of people looking and reviewing the data set, as well as them being well informed, you can actually reduce the amount of time it takes to train the model or the number of human annotations needed. However, if your annotators are all over the place and can't come to agreement, again, we've got a social engineering problem on our hands, not necessarily a technological one.
+
+**Speaker 3** _[21:06]_
+
+Okay, your next question is, what are the trade-offs of using a trend reward function instead of more labeled data? How to quantify that?
+
+**Speaker 1** _[21:15]_
+
+quantify it.
+
+**Speaker 2** _[21:19]_
+
+Quantifiable is like the...
+
+**Speaker 1** _[21:20]_
+
+like the hard part.
+
+**Speaker 2** _[21:21]_
+
+Yeah, the hardest problem. So when you actually use the direct signal, like direct supervision signal, you enforce your model to follow specific targets, and these targets can be well-defined or not well-defined, and eventually if you find your initial problem ill-defined, you need to re-establish your training pipeline and training procedure. Whereas with human feedback concept, you can continuously learn and continuously incorporate human signals into the model and re-establishing the guidelines for human annotators. But in a nutshell, they both work similarly. The way they differ is how you structure your annotation pipeline, how you structure guidance and basically the framework, how you're capturing human knowledge into the models.
+
+**Speaker 3** _[22:24]_
+
+Next question, which 11 people liked. How is the reward model trained? How many layers are frozen from the ground?
+
+**Speaker 1** _[22:33]_
+
+So if you repeat the question, oh
+
+**Speaker 3** _[22:34]_
+
+How is the reward model trained? How many layers are frozen from the original?
+
+**Speaker 1** _[22:41]_
+
+So the reward model is really based off of that original large language model itself So usually they come in a pair set and they kind of are paired in tandem So we are always building through the same loop at the same time. You want to kind of continue? Yeah
+
+**Speaker 2** _[22:56]_
+
+Yeah, the good question is how we are practising, of course it should not be used, the entire backbone model to train from scratch. Most of the layers are used for doing extraction of the feature and kind of allowing this model to behave in a similar space as the model you are going to train with reward model. So it's kind of like the head of the model can be unfrozen, then you retrain it, but which is the most important, that your target should consist of just the reward score that you're going to plug in. And as soon as you see that the convergence is well enough with the human labourers, that means a good sign that you can start utilizing this model in an RL framework, in an RL pipeline.
+
+**Speaker 3** _[23:44]_
+
+How to keep labellers motivated.
+
+**Speaker 1** _[23:48]_
+
+Remember they're not robots. I think that's a good one. This is where their whole quality of life and ethics comes in, is understanding the core problem. I think we've seen this when we outsource labeling without clear intentions and getting them understanding why they're labeling in the core process is something we witness a lot. Keeping people motivated with intentions.
+
+**Speaker 2** _[24:14]_
+
+Yeah, and actually, like, incorporating the feedback to the humans, not only the feedback to the machines from humans, but humans also love feedback, so the more feedback you put into the labelling procedure, like, you can do this for sort of communication, like, the more they see the progress of what they are doing, the more motivated they become.
+
+**Speaker 1** _[24:32]_
+
+come. You know positive reinforcement doesn't only just work for models. I like being told I'm doing a good job too.
+
+**Speaker 3** _[24:40]_
+
+Is there a rule of thumb how much samples in context of the overall data the human have to rank until it is good shape?
+
+**Speaker 1** _[24:49]_
+
+I think, again, this is one of those really tricky contextual ones, and I hate to give the cop-out answer of, it depends, but like many things in development and machine learning, it depends. If your models are well, if your annotators are well-trained and they're well-targeted, you can kind of speed up that process, but you're really looking for when the annotations and that reward function starts to align, and you can start to see that positive reinforcement there.
+
+**Speaker 3** _[25:16]_
+
+Next question. Do you think it makes sense to also utilize weak supervision, for example, snorkel AI, combined with RL instead of human feedback to improve the models?
+
+**Speaker 2** _[25:28]_
+
+Yeah, there is also, like, the early experiments where, like, sentiment models can be also used to drive up the rewards for producing positive feedback, but, again, the core idea here is, like, humans are very flexible in changing the goals, and you can always sit down with the friends and say, okay, guys, let's do this stuff right now, and let's follow this particular rule, which is not available with the model, so you always need to get the model first trained, and annotators can pick up very quickly what exactly the goal of this aligning is. And yeah, that means that whatever you come up with the actual goal, you can quickly get this goal into this target into their model, which is good.
+
+**Speaker 1** _[26:12]_
+
+Yeah in comparison when you're actually retraining the model the cool thing is is it's a more long-lasting and a more iterative approach Rather than gamifying like your prompt to best fit an existing model. You do have you have adjusted that core data
+
+**Speaker 3** _[26:29]_
+
+Could it be could it be applied to regress regression model for example price prediction?
+
+**Speaker 1** _[26:36]_
+
+Trust protection
+
+**Speaker 2** _[26:38]_
+
+You mean when you had the regression which means like it's not just the categorical predictions. Is that what it pointed out? Yeah
+
+**Speaker 3** _[26:47]_
+
+Is it useful to let multiple annotators label the same question and hopefully have agreeing judgments for more robust human signal?
+
+**Speaker 2** _[26:55]_
+
+Oh, yeah.
+
+**Speaker 1** _[26:57]_
+
+I was going to say, the more humans, the better. How many people like pineapple on pizza? That's always a controversial one. I see not everybody raise your hands. If we're labelling and building a model for the best pizza type, we might have a serious debate on our hands here. And that's why having more annotators and actually also being explicit with what your prompts are is really important. So say we were building a new pizza restaurant that we wanted to get data labelling in for. This is a very extreme example. But that only wanted pineapple on pizza. And we picked only people who like pineapple on pizza. We might have a pretty screwed up data set. But by inviting a diverse set of models, or diverse set of annotators, we help can align to see what is the best actual solution, not just the best of a limited subset.
+
+**Speaker 3** _[27:47]_
+
+Question by Ilyas. Could it apply to imagined generations? If so, would it be better than Dreambooth or similar? Dreambooth.
+
+**Speaker 1** _[28:00]_
+
+Stream booth and somewhere
+
+**Speaker 2** _[28:01]_
+
+I also didn't get clearly the question.
+
+**Speaker 1** _[28:03]_
+
+I get clearly the question. The question clearly, can we read it?
+
+**Speaker 2** _[28:05]_
+
+And it sounds very intriguing.
+
+**Speaker 3** _[28:06]_
+
+Could it apply to imagine generations?
+
+**Speaker 1** _[28:08]_
+
+Yeah. To image generation.
+
+**Speaker 2** _[28:10]_
+
+Yeah, actually, we are aiming at, since the multimodality here is the key, so right now
+
+**Speaker 1** _[28:10]_
+
+Yeah. Oh, okay.
+
+**Speaker 2** _[28:17]_
+
+there are a lot of experiments with natural language processing and steering models to the natural language task, but the same concept of steering model towards the human signal, towards the human feedback for any modality, for the images, apply it here. You can pick whatever image you like, or you can pick whatever the audio generated. So it's absolutely open for any data domains, which means I think, I believe that very soon we're going to see a lot of models come to the plate that are chaffed by humans from different domains.
+
+**Speaker 3** _[28:53]_
+
+Okay, thank you for your great presentation and for answering all these questions.
+
+**Speaker 2** _[29:01]_
+
+Thank you for all being here.
+
+---
+transcript_status: auto
+---
+transcript_language: en

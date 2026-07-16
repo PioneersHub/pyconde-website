@@ -1,0 +1,146 @@
+title: Forget Mono vs. Multi-Repo - Building Centralized Git Workflows with Python
+---
+description: The mono vs. multi-repo is an age-old debate in the DevOpsphere, and one that can still cause flame wars. What if I were to tell you that you don't have…
+---
+created: 2022-01-04
+---
+code: 9ZVQE7
+---
+slug: forget-mono-vs-multi-repo-building-centralized-git-workflows-with-python
+---
+speaker_names: David Melamed
+---
+speakers:
+
+
+
+### David Melamed
+
+Currently CTO and Co-Founder of Jit, the Continuous Security platform for Developers. David has a PhD in Bioinformatics and for the past 20 years has been a full-stack developer, CTO & technical evangelist, mostly in the cloud, and specifically in cloud security, working for leading organizations such as MyHeritage, CloudLock (acquired by Cisco) and leading the 'advanced development team' for the CTO of Cisco's cloud security (a $500M ARR BU).
+---
+abstract:
+
+
+The mono vs. multi-repo is an age-old debate in the DevOpsphere, and one that can still cause flame wars.  What if I were to tell you that you don't have to choose?
+
+In this talk we will dive into how we built a centralized Git workflow that can work with any kind of repo architecture, delivered with Python.
+---
+full_description:
+
+
+One of the greatest recurring pains in CI/CD is the need to reinvent the wheel and define your CI workflow for each and every repository or (micro)service, when eventually 99% of the config is the same.  What if we could hard reset this paradigm and create a single, unified workflow that is shared by all of our repos and microservices?  In this talk, we will showcase how a simple solution implemented in Python, demoed on Github as the SCM, and Github Actions for our CI, enabled us to unify this process for all of our services, and improve our CI/CD velocity by orders of magnitude.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: DevOps
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 1702
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: some
+---
+domain_expertise: some
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/9ZVQE7.png
+---
+youtube_id: Q-H5plbl-zU
+---
+video_link: https://www.youtube.com/watch?v=Q-H5plbl-zU
+---
+video_published_at: 2022-05-06
+---
+video_duration_iso: PT29M2S
+---
+video_thumbnail: https://i.ytimg.com/vi/Q-H5plbl-zU/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+Hello everyone! About a year and a half ago, together with four friends, I started a new company called JIT. I'm sure you all remember the excitement of starting a new project from scratch. Well, I wanted to ensure we would do things right from the start. So, when we decided we wanted to build our app using microservices and when we started to build the first service, I said to myself well let's make sure we add CI CD pipeline for the service today and we did but then guess what happened when we added the second service well of course we did not do it and it got me thinking why do we need to think about adding CI CD every time for every repo we create and then it hit me centralized CI and this is what I want to talk about with you today I'm David Melamed co-founder and CTO at JIT, born in France but living in Israel with my wife and my four kids for the last decade. A few days ago I tested positive for COVID when I got back from a talk that I gave in Oslo and therefore I'm currently still in isolation at home with the inability to be there with you in person which I regret very much. I'm passionate about technology, cloud and security and JIT is a little mix of all of that we provide an automated security plan as code in order to continuously monitor the security of your app in order to do so we integrate we configure we orchestrate all sorts of security tools and processes some being open source and in the future also commercial ones but let's go back to the beginning before even writing the first line of code, I had to pick an architecture. Monorepo or multirepo? Putting all my code in one place or using microservices and following the single responsibility principle? I'm sure that as a developer you all ask yourself the same question over and over when you were about to start your new project, right? Should I manage all my codebase in a single repository, allowing me to refactor easily if needed and having a common culture among my teams? Or should I rather favor the ability to have independent deployments and versioning and more autonomous work in each team who can decide in which language they want to code or which web frameworks they are more comfortable with? The monorepo versus multirepo really at least seems like a never-ending debate with its pros and its cons. And what about CI? On one hand, I have a single CI file for my whole application. And on the other, I have one file per repository that I need to remember to add every time I create a new one. And then I need to manage with obviously a lot of duplicated code. This seems like a headache and I wanted to decide whether I want to go with monorepo or multirepo without having to consider this headache. So what if there was another way? Of course you could create a template for new repos which would include a predefined CI pipeline but I don't think it would be a really sustainable solution since I would still need to update all my existing repos every time I decide to change my pipeline. And so I thought what if I could have a central place where I can keep my CI pipeline configuration and find a way to trigger it from every repository. What would it look like? Well, basically, what I would need is the ability to listen to every PR using some backend service, which would trigger the CI pipeline automatically with the relevant context in order to clone the branch and run my tests on it. Simple enough, right? Well, let's take a look at a more complete example then. Here, let's pick Github as our SEM, the way we want to store our code, and Github Action as a CI system. But of course, it can work with other setups, like using GitLab or using Bitbucket and Jenkins, for example. But for the sake of this demo and this talk, let's pick up GitHub and GitHub Actions. So let's say I have a GitHub organization with a repository called A. When I open the PR, GitHub automatically sends me some event, let's call it PR opened, and it sends this to my webhook listener. This listener leverages a feature in GitHub called dispatch workflow which can trigger a GitHub action remotely and well this workflow was stored in my central CI repository in my GitHub organization and that should run all the tests that I need on my PR. So this seems like a quite simple setup right let's see what i need to implement this in real life so what do i need basically first i need to create a github application of course and this will give me access to the github api and then i will be able to register and receive all the events about open prs and i will be able also to trigger remotely my ci workflow For the webhook listener, I will implement it in Python. And I decided to have a server with async calls to GitHub, so I picked IOHTP as a web server and GidgetHub as a GitHub API wrapper. And finally, for local development, I need the ability to have some public URL, since GitHub needs to send me the open PR events. And for that, I will use ngrok, which can create some tunnel and provide me with some unique public URL. So let's create the GitHub application. What do I need to do that? Well, first, the webhook URL, which will point to my ngrok public URL, followed by slash webhook, the path that will route to the function, will handle the events. I also need to define some webhook secret in order to verify that the call to this endpoint is genuine. Next, I need to define which permission this application will need. So, what do I need there? Action is the scope is required to dispatch the workflow. The scope of contents will be required to clone the code in my CI pipeline. Pull request will be required in order to receive the events together with subscribing to the pull request events. Checks will be required later when we'll have to deal about checks in the PR. And finally, I need to define a couple of environment variables for my webhook listener to work, just like the GitHub app ID or the webhook secret and the certificate the private key that is used by github to verify my token okay now let's see what do i how do i build this centralized ci and how we can put in practice everything we saw so far so let's start with the IDE okay here in the IDE I have my project and I have a simple file main.py where as you can see I have my web application and I have one unique endpoint slash webhook if I'm checking what's happening inside slash webhook as you can see I'm receiving, I'm listening for events and here I'm dispatching it internally and if you're looking at which event I'm currently listening on, I'm listening to pull request open and pull request reopened. And they're both going to the same handlePR function. What does this handlePR do? Well it's quite simple. Basically, I'm using the installation ID that I receive as part of the event. And from that, I'm generating some installation access token that will help me talk with the GitHub API. And then I'm building some payload that will include the metadata, the config, the context on which I want to trigger my centralized workflow. So for that, I need basically the original repo, which is based on the owner and the repo, and the headshot that is part of the PR that I'm currently listening on. the event is currently received from and of course also needs to send token that will help me in the centralized ci workflow to clone the original repo okay um this is uh the place where i want to trigger my centralized uh workflow so uh it's uh it's in centralized ci organization this is a Test organization that I created for the matter of this repo and as you can see I just need to post Some requests to this to to get up in order to trigger decentralized CI so What happens inside the CI itself? Let's see the github action workflow Basically, if you don't know github action is a very simple YAML file to define a workflow. You need, first of all, to define what is the event that will trigger your workflow. So here, as you can see, it's basically defined. It's triggered every time there is a workflow dispatch event that is sent to GitHub. And this is the input, so this is the payload that I'm sending to this workflow. These are the jobs. Right now there's only one job and this job is doing the following. First of all, I'm setting up Python and then I'm checking out the original repo based on the payload. So this is the exact path of the repository that I want to clone. and this is the SHA that I want to clone so that I'll be able to clone the repo with the current branch that the PR is based on. And I'm also sending the token in order to be able to clone the repo. And finally, I'm cloning the repo in slash code and then I'm running flake8 that I'm installing with pip install and I'm running it against this slash code repository. Now that I have this, here you can see in the project, I also have these requirements.txt, so something very, very simple. And now if you're going to the terminal, here you can see that I started ngrok, and so I have a public URL, or this one with HTTPS, that is redirecting to localhost 8000. And then let me start the server. Okay, now the server also started. And now let's go to the browser. So in the browser, this is the repo that I just showed. So if you want to be able to clone or fork this repo, you definitely can, you can play with that. And this is the test organization that we'll use for the demo as you can see in this organization there are only two repository the first one is the centralized CI one with this workflow that we just show we just showed so this is the CI 0 and this is a test repository that we'll use right now to demonstrate how it works so I will just actually we'll just change an existing file just to show that it works so I'm creating a new branch and I'm creating a pull request and then what I will do is go to the CI and go to actions and And what you can see is that there is a new action that is currently triggered and if I check in the details, I can see that the repo that was checked out is my test repo and here it ran flake8 okay and uh actually it worked there was nothing there so it's uh it's green right now just to show you that it really works if now i'm changing something else let's say in the main file and i will just add some line here okay creating a new PR going to action in CI you'll see here it is the new this new work for this triggered and actually linked is failing because I added extra lines right so it works but as you can see there is an issue here because if i'm coming back to the original uh repo and if i'm checking the pr that's the last one i have actually no indication in the PR itself, that something happened. No status update, nothing. Okay, so what should I do now? Basically what I would like to do, what I would like to see is something like that. Some check that will tell me that something happened, there was some PR, there were some tests that were performed and whether or not the test was successful, right? This is what I would like to see. So how can I make it work? Well, basically what I'm missing is the feedback loop, right? Something from the CI that will trigger back some kind of reporting inside the PR itself. Let's see how we can make it work. Basically, the flow should look like that. The job is checking out the code, telling the backend to create the check, running the linter, telling the backend to update the check. And for that we can leverage the feature of GitHub around checks. So the updated or the updated the diagram looks like that. Basically what we want to do is to start checking out the code and then we want to create a check to immediately inform that there are some check that is running then we once we create a check we want to be able to run the linter and then once the linter finishes we want to be able to update the check so the linter should be able to return some status code so that I can know in my backend how to update the check whether or not the check should be pass or fail. So this is basically what we want to see now. Let's see that in action. Let's go back to the IDE and this time I will open another main.py with a more advanced version. So in this version, I also want to take care of the checks. So in addition to what we had before, which was the slash webhook route, I have now new routes. The first route I have is a route to create a check with the post method. And the second is a put method where I can update the with this specific check run ID. So let's see how the check is actually created. Basically, it's very simple. I'm getting from the payload all the information about the target repo, the name of the check, and the token that I need to use in order to create the check on this target repo. What is important here is that I also need this check run ID, and this is what I'm returning to the DSA API. The second endpoint, I'm updating the check. And here, the code is quite similar. But as you can see here, first of all, I want to read all the properties of the check. And then I want to update the check with the status of completed and a conclusion that comes from the payload itself. Okay, so that was the changes here, everything else is the same, and now I want to show you exactly what is changing in the CI itself. So in the CI, the first step after I start up Python is actually to create the check. And for that, what I want is to do some kind of curl command to my backend, slash check. So here, in this case, it will be my public URL. And the data I will send is basically the installation ID that I get from my workflow. I have the owner, the repo, the headshot, everything else is part of the same context, the name of my check. And what is important here is that I want to save the check run ID as part of the GitHub environment variables so that I can use it later on. Then I'm doing the same thing that I did before, so I'm checking out my code, I'm running the linter, and as you can see here there are two different uh steps if failure so if the previous step failed then i want to save into environment viable that the result is failure and if success i want to save that it was excess and then always in both in in any case what i want to do is to curl and uh to to send a request to my backend with this specific run id that i need to update with the conclusion which is based on the value of the result environment variable right so this is the code now let's see that in practice the only difference here that i will do in my terminal is that instead of starting here i will start with the updated version okay and now let's go to the browser so i will actually do the same thing that i did before i will add a few lines here that should make my uh pr fail right they test on my pr later on ipr let's create a new branch for that and let's create a pull request now let's see what happened first of all in my terminal I can see that I got the first the first request on the slash webhook so github returned to me that is webhook and then I get this post to check now what happens in the browser at the same time the check got created it's now in progress and as you can see now it's failing now right now if I want to check why it's failing if I'm getting to details I don't have the results here so this is something that I will still need to fix for example here I need to fix that view more details and centralizer and need to go to the log the log is right now in another repo and that's why it's not working automatically so if I'm going here into the action here I can see the last the last job and here I can see actually log but right now it's not connected something I will need to fix all right so what you saw until now was how to create the centralized linter with some feedback loop that updates the pr status of the original repo and the main advantage of this is that as you can see developers don't need to think about adding it every time it works behind the scenes transparently which is pretty cool right but as you can imagine we're not done yet and there are still a couple of things that i did not have time to touch but first where you can find the code just so, well, the URL is just there. Feel free to fork and submit your improvements. Second point is that the way developers... Well, the most dev-friendly way to show the results is actually to show them as comments in the PR, as you can see here in the screenshot. So I have a few more minutes for questions. if you have some. But before that, thank you a lot for attending this talk and hope you enjoyed it as much as I did. Talk to you live in a minute.
+
+**Speaker 2** _[24:28]_
+
+please submit your questions via slido and ideally not in the room to keep also the remote attendees happy um yeah thanks for the great talk david um the first question i think it received quite a few upvotes what is the benefit over the reusable workflows which is a github built-in feature
+
+**Speaker 1** _[24:57]_
+
+So basically, the advantage is that you have one central place where you can define everything and all your settings are centralized in one place. Using the reusable workflow, you can define the workflow once and you still need to define it in every repo and you still need to copy the same file over and over. The other advantage is that if you want it, you can make things that are more advanced. For example, if you have some differences between the workflows, you just need to override some specific settings by adding some file in one of the repo. And in your central repo, you can just read the specific file and have a different behavior, which is something that you cannot do easily with reasonable workflows.
+
+**Speaker 2** _[25:54]_
+
+Okay, now...
+
+**Speaker 1** _[25:59]_
+
+Sorry, I cannot hear you anymore.
+
+**Speaker 2** _[26:01]_
+
+anymore yes okay now for the next question um what are you thinking about dagger which is the
+
+**Speaker 1** _[26:01]_
+
+Yes.
+
+**Speaker 2** _[26:08]_
+
+new project of the docker creator which solves exactly this problem and more like testing and usage in different cicd tools
+
+**Speaker 1** _[26:18]_
+
+I think it's a great project. I just started to test it. Actually, I thought about it about the Central Asia about a year ago, so Dagger didn't exist yet at the time. I think I'll definitely give it a try.
+
+**Speaker 2** _[26:37]_
+
+If your GitHub workflow is unique to the updated dev repo, do you still put the workflow in the centralized CI repository, or do you enforce centralization of all workflows?
+
+**Speaker 1** _[26:58]_
+
+So the major advantage of enforcing centralization is that you can enforce some security checks, for example, that you want every repo to be part of. So you don't want the developers to decide whether or not they want to, for example, enforce even linter. And so even if you have some unique features in your pipeline, I would still use centralized workflow, but I would rather use the fact that you can override some of the settings or some of the jobs inside your specific repo.
+
+**Speaker 2** _[27:43]_
+
+Yes, thank you. I think we have time for one last question. And this would be, can you disable merging without running checks? It seems like when you created a PR in the demo, you could just merge it quickly without checks.
+
+**Speaker 1** _[28:00]_
+
+So, basically, that's because in the demo, I actually used a backend that is local. And so, first of all, it took some time to create a check. But if you add a branch protection to all your repos, and you actually enforce the fact that you need a specific check, for example, let's say you have a global check, then you can prevent merging before all the pipeline is running.
+
+**Speaker 2** _[28:30]_
+
+Yes. Thank you. We are out of time now. Once again, thanks for your talk. Thanks for still joining in Zoom, even though, like, the situation didn't allow it. And, yeah, we will continue in ten minutes with the next talk here. And thank you, everybody, for coming.
+
+---
+transcript_status: auto
+---
+transcript_language: en

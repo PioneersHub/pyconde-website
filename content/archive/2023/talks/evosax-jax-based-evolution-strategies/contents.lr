@@ -1,0 +1,150 @@
+title: evosax: JAX-Based Evolution Strategies
+---
+description: Tired of having to handle asynchronous processes for neuroevolution? Do you want to leverage massive vectorization and high-throughput accelerators for…
+---
+created: 2023-01-05
+---
+code: WMWZQC
+---
+slug: evosax-jax-based-evolution-strategies
+---
+speaker_names: Robert Lange
+---
+speakers:
+
+
+
+### Robert Lange
+
+_About — in the speaker's own words_
+
+I am a 3rd year PhD student working on Evolutionary Meta-Learning at the Technical University Berlin. My work is funded by the Science of Intelligence Excellence Cluster and supervised by Henning Sprekeler. Previously, I completed a MSc in Computing at Imperial College London, a Data Science MSc at Universitat Pompeu Fabra and an Economics undergraduate at University of Cologne. I also interned at DeepMind (Discovery team) & Accenture and maintain a set of open source tools.
+---
+abstract:
+
+
+Tired of having to handle asynchronous processes for neuroevolution? Do you want to leverage massive vectorization and high-throughput accelerators for evolution strategies (ES)? [evosax](https://github.com/RobertTLange/evosax) allows you to leverage JAX, XLA compilation and auto-vectorization/parallelization to scale ES to your favorite accelerators. In this talk we will get to know the core API and how to solve distributed black-box optimization problems with evolution strategies.
+---
+full_description:
+
+
+The deep learning revolution has greatly been accelerated by the 'hardware lottery': Recent advances in modern hardware accelerators and compilers paved the way for large-scale batch gradient optimization. Evolutionary optimization, on the other hand, has mainly relied on CPU-parallelism, e.g. using Dask scheduling and distributed multi-host infrastructure. Here we argue that also modern evolutionary computation can significantly benefit from the massive computational throughput provided by GPUs and TPUs. In order to better harness these resources and to enable the next generation of black-box optimization algorithms, we release [evosax](https://github.com/RobertTLange/evosax): A JAX-based library of evolution strategies which allows researchers to leverage powerful function transformations such as just-in-time compilation, automatic vectorization and hardware parallelization. [evosax](https://github.com/RobertTLange/evosax) implements 30 evolutionary optimization algorithms including finite-difference-based, estimation-of-distribution evolution strategies and various genetic algorithms. Every single algorithm can directly be executed on hardware accelerators and automatically vectorized or parallelized across devices using a single line of code. It is designed in a modular fashion and allows for flexible usage via a simple ask-evaluate-tell API. We thereby hope to facilitate a new wave of scalable evolutionary optimization algorithms.
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2023-04-19
+---
+start_time: 14:35
+---
+end_time: 15:05
+---
+slot_id:
+---
+track: Machine Learning & Stats
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 2521
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: None
+---
+supporting_material_url: https://github.com/RobertTLange/evosax
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/WMWZQC.png
+---
+youtube_id: OZgnAApYltU
+---
+video_link: https://www.youtube.com/watch?v=OZgnAApYltU
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT28M23S
+---
+video_thumbnail: https://i.ytimg.com/vi/OZgnAApYltU/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Thank you very much. Hello everyone. As already said, I'm Robert. I'm a PhD student at TU Berlin. And today I'm going to talk to you about two of my absolute favorite topics. One being evolutionary computation and the other one being accelerated computation and JAX. But before we're going to get started, I quickly want to give you my philosophy on the current take of machine learning. So many of you might know this classic painting by Michelangelo called The Creation of Adam. And in this painting, we see this magical moment in which God, an old white man, is about to instill life into Adam, a young white man. And sort of the beauty of this painting comes from basically the silence and this magical moment that is about to be happening. And in the machine learning community, we're right now arguably at a similar inflection point where there are many people in large companies who are of the opinion that just scaling gradient descent together with large transformer-based models and the internet scale data, we're going to get to a point where we're going to get to AGI. And many of them use the brain and our own central nervous system as a motivation, for example, in the form of dopamine and reward prediction errors or metacognition in the prefrontal cortex. And this is all nice. But what if this is only a local optimum and what if this is actually not going to lead to the moment where the fingers actually touch each other and we're going to get to AGI? And in nature, basically, there's only one single process of which we know that it has led to general intelligence in diverse forms, and this is basically biological evolution. So what I want to do here is not bash grey and descent-based learning, but simply raise awareness that we need diversity of ideas and diversity of sort of approaches for how to tackle this problem. Okay. So, this is not supposed to be a history lesson. Instead, I want to sort of motivate large-scale black box optimisation and how JAX and this package that I developed, EvoSax, can support this. So, hopefully, we have now sort of reached some excitement in terms of this topic, and going forward, there's going to be a small dip where we're quickly going to get some background knowledge on black box optimisation and what an evolutionary optimiser is, and basically from there on I'm going to tell you why EvoSax tackled some of the challenges that modern black box optimisation is facing right now, and basically afterwards we're going to go to the moon and I'm going to give you some examples for what kind of cool research you can do and sort of what the future of evolutionary optimisation might be. And for anyone who's interested in the slides or sort of the code or all the accompanying information, there's like a tiny URL link that you can visit and yeah. So let's get started. So basically at the start of this talk is the definition of what black box optimisation actually encompasses. And most of you are probably familiar with white box optimisation where we assume to have access to the underlying function f which we are trying to minimise with respect to the input x, and that means that we can basically calculate well-behaved gradients through this. This might be, for example, a neural network forward pass where we try to optimise some form of loss with respect to the parameters of that neural network. In black box optimisation, we are essentially assuming, or we are not assuming that we have access to this gradient, and this might come due to different reasons. This could for example be that the function that we're trying to optimise is inherently non-differentiable, like for example a spiking neural network or some form of hard thresholding operation that we use, or that the gradients that we're trying to compute are actually not well behaved, for example exploding or vanishing. And there are many different ways how one can go about black box optimisation, including for example, random search or Bayesian optimisation, successive halving or hyperband, which use some form of smart early stopping criterion. And what I'm trying to argue today in this talk is that evolutionary optimisation sort of is one alternative that sort of fulfils a sweet spot. We cannot only use it for doing hyperparameter optimisation of like 10 parameters, but we can actually also optimise small neural networks up to a million parameters, which allows us to discover new algorithm components, and I'm going to come back to that. Good. So here are a couple of examples where you might want to do black box optimisation. Some of them I've already talked about, including hyper-pyramid optimisation, non-differentiable operations like spiking or hard tension, architecture search, but it's also useful in the context of sparse reinforcement learning where basically we're not doing exploration in the state space of the agent, but we are doing it in parameter space. And finally, this is something I'm again going to come back to, using evolution to do essentially meta-learning and computing gradients through long, unrolled computation graphs. Okay. So let's rewind or go forward one step. What is an evolution strategy and how does it work? So basically, at the core of an evolution strategy lies a search distribution, which could, for example, be a multivariate Gaussian with sufficient statistics m and covariance sigma, which is here assumed to be diagonal, for example. And then based off of that search distribution, we sample solution candidates, so axis, for example, which we use to minimize, and we go ahead and we evaluate some function that we're interested in minimizing and compute so-called fitness scores. And we do so for a population, one to n, different candidates, and based off of these fitness evaluations, we then update our search distribution. And intuitively, this update is going to try to increase the likelihood of sampling good or well-performing solution candidates from that search distribution. And then we can continue to iterate this process until we find a good solution or a suitable solution, or until our AWS or GCP credits run out. Good. So what are challenges of modern evolutionary optimisation? In principle, this sounds like something you could implement in plain Python. Two challenges. One is one related to scaling this to large search spaces, and this is sort of simply due to the inherent sort of nature of doing random search in high dimensions and the curse of dimensionality. But another one which I'm going to focus on today is one which is related to the engineering aspects of running these evolutionary optimisation processes. And oftentimes in these settings, we're interested in taking these population members and evaluating them on tasks which might not be super quick to run. Like, for example, this could be in the hyper-pyramid optimisation case training an entire network, or rolling out an agent in an environment and trying to optimise the parameters of its policy, and oftentimes we want to do this multiple times to get a good Monte Carlo estimate of their fitness. And usually what people then do is either use some form of simple multiprocessing to sort of parallelise this fitness evaluation, or use some form of task manager like Ray or or Dask. But this ultimately requires some form of engineering overhead where you have to write sort of a worker node, and you have to make sure that this all runs smoothly, but maybe we can do something which is a bit more smooth. But before we go there, this kind of limitation of the engineering side and also the curse of dimensionality have made one of the grandfathers of deep learning sort of question or highly criticise the role of random search, or more specifically gradient-free estimation or gradient-free optimisation. And what I'm trying to claim or show you today is that JAX, this new library developed by or somewhat new library developed by Google, might actually make our lives a lot easier and also might help us in finding and discovering new evolutionary optimisers in the first place. So what do I mean by that, or what is JAX? JAX is on the top surface or when you probably first encounter it in automatic differentiation library, but to me it is much more since it allows us to essentially be much more flexible in terms of doing GPU programming or TPU programming or doing accelerated computing in the first place. So what do I mean by that? JAX comes with a set of function transformations at the core being GRAT, JIT, VMAP, and PMAP, And these can be composed to either train a large transformer model on multiple devices or to do other cool things, and evolution being one of them. So let me show you what I mean by that. We already spoke about sort of this problem of evaluating multiple population members for multiple times to get good fitness estimates, and now in sort of an embarrassingly parallel way, and this would look like it follows. You would have an evaluation function which takes a seat as an input and the parameters and returns some form of fitness score, and then we would loop over the different population members, these different red points, if you remember in this cartoonish search picture that I showed, and we would evaluate each one of them for the different seat. And then we would take the mean of that as the fitness estimate and sort of update our search distribution with these candidates. And this would take long and you could do multi-processing or array or a DAS, but these would all introduce some form of communication latency. And what JAX allows us to do is essentially take two of these primitives or function transformations that I showed before, VMAP and PMAP, and vectorize the evaluation across random seeds, and then device parallelize this seed or multi-seed evaluation across the different population members. Okay? So, here, what you've done with two lines of code is get rid of these two nasty loops and use as many accelerators as you have access on your host machine. Okay? Awesome. Great. So, this gets rid of this entire engineering hassle and allows for high throughput fitness evaluations with large populations. And now enters Evosex, which is the library I'm presenting to you about today, which is essentially a JAX-based library of many different evolutionary optimisation algorithms. So here I'm only showing the subset, and all of these evolution strategies can be themselves jitted, VMapped, and PMapped, which means that you can run multiple instantiations of them basically in parallel, but I'm going to get to that. Basically, the set of algorithms that are implemented in EvoSachs can be divided into three main classes, one being finite difference-based gradient estimators, the other being estimation of distribution evolution strategies, and then we have genetic algorithms and many more ESGA and black box algorithms. And they sort of differ in the way how they update the search distribution, and they differ sort of, yeah, the nature of the search distribution. Is it a unimodal distribution or do you have an archive of solutions? Okay. So, now, let's take a step and look a bit deeper under the hood. How does EvoSax work? Basically, you would import from EvoSax a strategy which you would want to use, for example, CMAES, and then you would instantiate that strategy with a given population size, number of dimensions, so this is the search space that you're looking at, and then you would initialise the strategy state which contains the mean or the covariance matrix of your search state. And then based off of that initialisation, you would run then this for loop in which you would first ask and sample different candidates, like these points here, and you would evaluate these points on the task, and then based off of these solutions and their evaluations, you would update the search distribution and iterate this process. And all of the strategies or optimisers that I showed you before follow this simple API where you initialise the strategy, you ask for candidates, you evaluate your population, so this dot, dot, dot here would be where your VMAP and PMAP magic come into place, you would update the search distribution. Then there are some utilities for achieving the best member or the best fitness score obtained so far. Next to the standard evolutionary optimisers that EvoSax is providing in JAX, we are also providing utilities for standard things you would want to do in evolutionary optimisation. For example, some of these evolutionary optimisers might not want to use the raw fitness score, but they might want to use some transformation to reduce the variance of sort of your updates that you do during your search. And another utility EvoSax provides is a tool for essentially taking pie trees or some representation of neural network weights and then flattening them into a vector to do evolutionary optimisation on that vector, and then reshaping again. This is maybe one detail I haven't spoken about, but most of these evolutionary optimisers I spoke about before, they actually sort of discord to a certain degree the network topology that you would like to optimise in sort of deep learning-like settings. Okay, so let's come to a set of three examples or things you could try to do with EvoSachs, one being sort of simple parallelised accelerated evaluations and then doing evolutionary optimisation in the outer loop where you're just optimising, for example, the parameters of the neural network policies of these agents or of these robots shown up here. And here under the hood, we're using Brax, which is another Google library, and Gymnax, which is another library of mine, to do sort of accelerated rollouts. And importantly, basically, EvoSax implements these 30 different optimisers, and you can use them to benchmark against or come up with your own new evolutionary method. And yeah, we're planning on releasing a separate benchmark based on top fairly soon, so watch out for that. Okay. So this is basically what I've shown you so far is like the standard thing where you would just use JAX to do parallel evaluation of fitness. thing which you could try to do is take a single function which runs black box optimisation or evolutionary optimisation, and then go ahead and ask yourself, hey, can I actually run the same optimisation loop just multiple times across different random seeds or across different hyper-pyramiders? And with JAX, similar to how I showed you how to parallelise single evaluations of a function, you could also parallelise this entire training loop. So basically you would take this function, run ES loop, and you would simply wrap it with a VMAP that sort of batches across different sigma-inits, which is a hyper-pyramider. And then if you run this function now, it would basically run the same loop across three different sigma-inits. And this would all be parallelized automatically or automatically vectorized on your accelerator. So you basically don't have to do anything except for wrap it with this VMAP and supplying sort of an array or some batched shape to map over. And for example, what I'm showing you here is an animation where this is done. For one evolutionary optimiser, differential evolution across different differential weights and crossover races are hyper-pyramiders, and you can literally see how this optimisation is done in parallel for hundreds of evolution strategy runs. And one thing you could then also imagine is sort of hooking up a meta-evolution strategy to optimise these parallel running evolution strategies. And then finally, one application I'm very excited about is sort of using evolutionary optimisation to discover new algorithms. And what we're doing here is we have some form of base algorithm with parameters theta which we can run in the inner loop, and then use evolution in the outer loop to discover essentially new algorithms in the inner loop. So you define some form of meta-fitness score, and then use evolution in the outer loop to optimise the matter parameters without having to compute gradients through essentially the unroll of the algorithm in the inner loop. And there are already a bunch of applications of this, for example, Google has used this to discover new gradient-based optimisers, there's been work on discovering new plasticity rules, or reinforcement learning objective functions, And what I'm going to quickly highlight today is two of my own works that I've done, one being on learning evolution strategies and the other one being on learning genetic algorithms. Okay. So this was a project I did last summer during an internship at DeepMind where we used sort of the EvoSax utilities to do meta black box optimisation, so to parameterise a learned evolution strategy or an evolution strategy as a small self-attention layer and then to optimise these weights of the self-attention layer to essentially perform better black box optimisation. And again here we can use a simple PMAP across different evolution strategy parameters and a VMAP across multiple evaluations of that specific evolution strategy. And it turns out that self-attention is a really good and nice inductive bias for parameterising evolutionary optimisation algorithms, because without a positional encoding, self-attention essentially gives us a set operation that if you change the ordering of the inputs, also the ordering of the outputs is going to change accordingly, and this is a useful property for evolutionary optimisation. And we have some results showing that this discovered or meta-optimised evolution strategy beats many, or exhaustively, the baselines on these Bragg's continuous control tasks I showed you before. The second application is to use the same sort of framework of using evolution in the outer loop to do meta-optimisation in the context of genetic algorithms, which use some form of selection and mutation rate operation, and again, parameterise them with attention and obtain better or learned, discovered genetic algorithms. Okay. And, again, we outperform baselines, and I'm happy about that. Good. So, now, let me come back or somewhat close out what I wanted to talk to you about today. So, some of you might know this sort of survivorship bias fallacy, or I think Nazim Taleb and many of these popular science people have written about this, which is literally about the question what to reinforce in science or what direction or what to reinforce in engineering. And the The basic example is this airplane from the Second World War, which basically returned after war home, and had all these different sort of bullet holes through it, and the engineers afterwards wondered what part of this plane to reinforce going forward. And one thing to keep in mind is this plane has returned home, right? So basically all the people who sat in that plane have survived, okay? So this is a successful airplane. But oftentimes, we then would intuitively go ahead and reinforce sort of the things where the bullet holes were in, and what I'm trying to argue is that this is basically sort of similar to how many of our sort of heuristics or empirically well-served tools in deep learning come about, right? So things like skip connections or pre- versus post-layer norm, using layer norm at all, using gated cells in recurrent neural networks, using the famous McCarthy constant, these are all things where we're trying to duct tape things that don't work about gradient descent, while potentially evolution might allow us to discover new components which can circumvent this and to really drive home what's actually working about the gradient-based paradigm. Okay, and this sort of relates to a recent paper or a paper from 2021 by Sarah hooker, which was termed that hardware lottery where she basically highlights how many of the tools that we use right now came into fruition because At the point of in time the hardware stack as well as the software stack sort of really enabled them Okay, so if you think about the the ImageNet moment in that ImageNet moment when Krzyzewski and Hinton and Sutzkeva sort of came up with AlexNet, there was basically two things came together. We had deep neural networks sort of somewhat in place, ConfNets, and in the other setting we had NVIDIA GPUs and CUDA and could really bring these two things together. And to me JAX is somewhat giving us a similar opportunity in the context of evolutionary optimization and sort of discovering or looking at what other paradigms might support or help gradient-based optimization going forward. Okay. So, we're now here. I hope you're as excited as I am. If you want to check out the code, it lives in my GitHub. There's a paper now on EvoSnacks, accepted at Gecko this year. With this, I want to end, and thank you all for your attention.
+
+**Speaker 2** _[22:54]_
+
+Thank you so much for this fascinating talk. I personally learned a lot of things. Thank you. And there are many, many, many questions. We might not be able to answer all of them. So I guess you have to stick around for a moment longer.
+
+**Speaker 1** _[23:06]_
+
+a moment longer. I can do that.
+
+**Speaker 2** _[23:07]_
+
+But nevertheless, let's try. What are the best resources to get started with JAX using EvoSax?
+
+**Speaker 1** _[23:14]_
+
+There are amazing blog posts for pure JAX. I believe there was a previous talk at this conference by our own moderator who spoke about how to get started with JAX. In general, I would say even though Google, a big corporate company, is maintaining it mainly, there are a lot of very helpful people who are trying to scale this or have it be the future of automatic differentiation and distributed computing. So I've written a blog post as well. There are many notebooks to get started, and for EvoSachs, basically there is, in the repo, there are many example notebooks, for example here, which run through the core API, running this on some continuous control tasks and showing you how to use the API.
+
+**Speaker 2** _[24:08]_
+
+Currently, most upvoted question is relating to the limitation you pointed out, up until one million parameters, but what happens after one million plus?
+
+**Speaker 1** _[24:17]_
+
+That's a really good question. So, it's just no longer competitive with gradient descent-based tasks, right? But this is also something, or gradient descent-based optimisers, something where there might not, or it might not be the best setting to compare against gradient descent-based optimisation, because evolutionary optimisation allows you to do a lot more and is more general, but might not be best targeted at trying to optimise large language models. If you try to fit in 1,024 ChatGPT-sized models into memory, good luck. This is basically what I would say. You run out of memory, and you might no longer be as efficient in terms of doing the optimisation that you're trying to do.
+
+**Speaker 2** _[25:02]_
+
+So regarding your package development, what is the roadmap for Evosex and how can somebody help contribute to the library?
+
+**Speaker 1** _[25:10]_
+
+Thank you very much. That's a great question. First of all, like everyone who is working with EvoSax or has tried working with it, it would be great just to get more feedback and to see what kind of problems might arise in certain settings. Going forward, I'm going to try to add more features to make it scale better. For example, right now, most of these strategies themselves as a single strategy, they run on a single accelerator, but you could for example also try to parallelise the evolutionary optimisation similar to how Optax allows you to do data parallel or model parallelism across different devices. So that's something I'm currently working on and making Evostax maybe a bit closer to how Optax works in the setting of.
+
+**Speaker 2** _[26:05]_
+
+Regarding your choice of JAX, are there any fundamental limitations of PyTorch that prevent you from implementing the algorithms in a similar way? Or is it just that VMAP is an awesome feature?
+
+**Speaker 1** _[26:19]_
+
+Also a good question. I'm not here in the role of an evangelist. I'm not here to try to convert everyone to use JAX. JAX and PyTorch have converged to similar capabilities, especially with Torch 2.0. You have just-in-time compilation and some of the features which JAX provides, but basically when I started working on this, Torch didn't have them. If you wanted to batch certain things up or vectorise them, you had to do sort of all of the math with the dimensions in your head, and that was something I wasn't really happy about. Furthermore, JAX allows you to more naturally sort of run things on TPU, and, yeah, I think it's just like a really well-clean, functionally designed programming language, while with PyTorch it can sometimes feel a bit like it was more added on top. But this is my personal sort of perspective on this.
+
+**Speaker 2** _[27:22]_
+
+What about stopping criteria? Are there any ways to estimate convergence?
+
+**Speaker 1** _[27:27]_
+
+Yeah, so actually there are a couple of things implemented, like for example, we have some strategies like BipopCMES and iPopCMES, which adapt the population size on the go based on stopping criteria and looking at how fitnesses improve or do not improve across time, and there are a couple of these implemented. I would have to dig out where they are right now in the strategy, but most of the times they are either related to how the fitness changes over generations or how the standard deviation of the search distribution has converged.
+
+**Speaker 2** _[28:05]_
+
+Then I would like to thank you once more for a fascinating talk and I'm afraid we have to come to an end soon, but
+
+**Speaker 1** _[28:12]_
+
+You'll be I'm gonna be right and yeah, okay. Thanks. Thank you very much
+
+---
+transcript_status: auto
+---
+transcript_language: en

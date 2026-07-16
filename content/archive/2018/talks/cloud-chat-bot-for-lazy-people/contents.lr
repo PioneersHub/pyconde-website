@@ -1,0 +1,96 @@
+title: Cloud chat bot for lazy people
+---
+description: These days with chat applications everywhere people tend to ask other people about things there although a direct answer would not be far on a website or…
+---
+created: 2018-06-03
+---
+code: HW3RYU
+---
+slug: cloud-chat-bot-for-lazy-people
+---
+speaker_names: Björn Meier
+---
+speakers:
+
+
+
+### Björn Meier
+
+Bjoern is a software engineer at Blue Yonder GmbH since 2016 where he is developing and operating - among other things - the services for the external data interfaces, preprocessing and data storage to enable the data scientists to run their prediction models. He loves the versatility and ecosystem of python to write e.g. production web apps, data analysis tools or operational scripts. If there was more free time he would like to spent it to dive deeper into functional programming languages like elixir to have a different view on things.
+---
+abstract:
+
+
+These days with chat applications everywhere people tend to ask other people about things there although a direct answer would not be far on a website or it would be the first Google search result. It is understandable because mankind is lazy, so I am. Therefore, I want to let bots answer the easy questions for me.
+In my situation as a DevOps person these questions can be about the health of a service I am responsible for. I will show you how you can run a Python bot with [Azure bot service]( https://azure.microsoft.com/en-us/services/bot-service/), reachable by [Slack]( https://slack.com/) which gives you a service health status based on information from a [Prometheus](https://prometheus.io/) monitoring system.
+---
+full_description:
+
+
+At work we established Slack years ago as our chat application and by now quite a percentage of communication goes through it. As a result it got much easier to contact one person or a group simultaneously. And this is good as we can share our knowledge save each other time. But it also introduced a category of questions in the chat which only require simple tedious tasks to get the answer and then post it as a response.
+One possibility is to educate and point others to the place where they can find the answer or what tasks they have to do. The other one is use a chat bot for this. Both ways have advantages and for the bot it is that you can import a specific type of response more easily into a conversation without first gathering the information and copy and paste it.
+I am a developer and service operator and one category of questions which fits this is the category of service health questions, like "Does service X has a problem right now?". Hence, I will use a bot to answer them.
+First I will show you how you can create a python bot for the Azure bot service. With it the questioner then can either directly use the bot to answer his question or you can just create the response for him without going to the service health monitoring. In this case the service health information has to be obtained from a Prometheus monitoring service and then transformed into a chat message.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track:
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 10
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: basic
+---
+domain_expertise: some
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/HW3RYU.png
+---
+youtube_id: oLCy7UrD-gU
+---
+video_link: https://www.youtube.com/watch?v=oLCy7UrD-gU
+---
+video_published_at: 2018-11-05
+---
+video_duration_iso: PT15M25S
+---
+video_thumbnail: https://i.ytimg.com/vi/oLCy7UrD-gU/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Welcome. So I have to admit, I'm one of those lazy people as well, and the organizers didn't know it, so I only have a very short 15-minute slot. So it will be a very brief introduction into chatbots with Azure and Python. So just something about me, I'm a software engineer at Blue Yonder. I work there with the infrastructure and services running in Azure, and I wanted to see some more about the services Azure provided, So I was looking into the chatbots, which were released a few months ago in previous versions. But what are chats really? So sometimes I have these users. Chats are just something like Googling for lazy people and internal information. So if you cannot find it in Google because your colleagues just know it, you nowadays just send a message in a chat room or something else, and I hope they will answer it instead that you're looking maybe for the code or Wikipedia page or something else. So I think we can automate this and we can use their chatbots. And I think, yeah, this could make life easier. I don't think this is real, but I just needed some topics where I can work on this. So, but I'm one of those chatbots and I will do it nonetheless. And if you did not realize until now, what I tell you is that I will enable you to build those annoying web bots on every homepage now, and you can do it afterwards for yourself, and they can ask stupid questions, and you can talk to them. So if you listen carefully, your homepage will be something like this in the next time. So to explore those features, I needed a topic, a problem. And sometimes we have those questions in our Slack channel if there was an issue, a service problem, or something like this. And as I operate them and I build them, I usually have to answer them. And so I think this might be a quite good problem I can work on because usually I want to post this for every question. It's just that, Jim. But I think it's not the best answer to when your colleagues ask you something because a customer has problem sending data or it does not have any retries because he's still in the 80s or something like this. So usually I look up if there are any problems or alerts in our Prometheus service or something like this. So just for exploring, I use the Prometheus service. They have alerts. I can query them if I know the instance and maybe the time. So this is something I get from every question. Usually they say there's a problem with the service on Monday. and now I just have to understand what he wants and I can query my permissive service and I can answer directly in Slack or not me, the lazy bot. So this is just an example. I build a very, very basic bot who does this. So here's a Slack example. I just send a message. Was there any problem with the Euler system one on Monday? So I just have a random name in there and the bot recognized, oh, he's asking about a problem. He is asking about a service or instance name I know or it's similar to something I know and I can recognize which time so and it said since Monday You can see here. He used the since Monday. It's In the morning on Monday and until then so I took this picture on the 24th So it recognized the time frame since Monday and I can't show them. Oh, there were some slow answer times So it took some time this service will overload or something like this. So So this is my solution to the maybe problem, but how you can build this. So Azure now has some new features, and it's quite easy. You just need maybe three building blocks to build such a chatbot. You just need your Python logic. So there's an Azure bot SDK for Python, but there's already a lot of the logic in there. You don't have to do so much. This is mainly what I show you later. And then, of course, you just need a simple Python application. In this case, it will be an AO HTTP web service, and this will be running in an Azure app. This is the second building block. You need an app service plan, and in this case, you use an Azure Linux web service plan because there you can run Python 3.7 at the moment. And other service plans, this is a little bit tricky, so I would advise you to use the Linux environment at the moment. And, of course, I want to connect multiple, maybe multiple chatbots, chat services like Slack, Skype, or anything else. And there's the chat channels registration, and this handles all the stuff. I just say, okay, here's my Slack application, and I want to register this bot. And then everything goes to my bot, which is running as an Azure app service. Just an example. Let's go on page. Maybe a stupid idea. Okay. Switching here is ugly. So this is just the Azure portal, and you see everything I need is here. I have a sampling bot. This is the bot registration I have. The bot app is running there. I have a Prometheus fake service because I'm pumping in fake data, and a Prometheus service is tricky, so I just fake the service as well. And this is my service plan, and this is everything I need. This is fake data and all the bot logic is in there and I show you now how this works How you can build such and bot? So here's a picture from the Microsoft documentation So I would just want to answer to a question. So basically your bot needs two parts. This is the first part This is basically just a bot can connect you can react to Changes like joining or anything else and this is very basic and you don't have to do anything there because this is more or less What you need for it, so you have here and all the code you need except the imports I cut off the impulse sorry But you see there I just create a bot framework adaptive settings I put them in in the adapter and this is the adapter. This is just a local setup there You don't need an app ID or password But it's working with the emulator Microsoft provides you and it's fine So and then you see I and the bottom I just start an a or HTTP web application And it has an endpoint and this handles messages at this endpoint and the in this message handling I just say adapter and to the adapter trust Here's my my handler and this is a good for nothing handler just replies within this a four four But this works because you can still, the bot can connect already to my channel or where I want to talk. I cannot respond, okay? So the adapter is more or less the conductor. Everything that's happening there is going through this. You can add some middleware, and it will add some conversation information. Like if you know this is an ongoing conversation, you can store multiple information in there, which is the user who's talking to you or to the bot and all this will be added by the adapter and you can now handle messages like this. So, someone sends a message and you want to respond. So, what you need there is just, we need to replace our code for nothing handler and just add some logic there. So, we see here the activity, so we have a turn context. This is something the adapter inserts. So if you handle a message, you get this context, and this context says, okay, there's a message, I want to handle a message, and this is just an echo bot, so I just send back, you said, and that's it. I just had to add the response, status response, and this is everything you need. So on top, just the activity, the bot needs to really respond, but this is also the code, what you need for this. I say something to bot, hello, bot, and the bot responds, you said hello. Now we have a complete bot, and this is working. So, quite easy. So this handles more or less the key component, and the turn context holds all the information usually you need. Okay, now we have the bot, but the bot is stupid. He needs to understand a bit more what the people are saying. So, I told you about the problem. People are saying something like this. Oh, I have a problem with this system today. I had a problem on Sunday. Some customer has problems since nine o'clock, And you see the picture, so they're talking about problems, about services, and maybe some time or no time. And now we have to understand this. And as well, for this, you can build something on, or you can be lazy as well, and just use the Azure language understanding. So this is a standalone Azure service, where you can just train an understanding model, or messaging model, and he will detect the intent on your message, or you train it to detect special intents, like, oh, he's talking about a problem, so I can train it with sentence like this, so those six sentence are already enough to train it for problems. Then we can also get some extra information out of it, like data about words like the service names, or we can say, okay, give me dates or location or anything like this. So I will show you an example. So the customer has a problem with Euler P2 since nine. It detected, oh, it's a problem, because I trained it for it, and it says the score's very high, so okay, problem, message is a problem. Good, next one, ah, okay, we want to see where has your problem. He's training for Euler, so my service name is detected. He also detects it's a service identifier P2, and we also said, okay, this is a composite entity, my service is called Euler P2. I get the information now. Okay, we have now, it's a problem, and we know about what. And we just want to know when was the problem. And now here again, they provide directly a date v2 entity, and this detects, I think it's mostly a ugly regex, but it's working, so it detects stuff like since, today, yesterday, and the stuff, and sends, gives you information about it. Here you can see dates can be tricky, because when you say Monday, which Monday? next Monday, last Monday, so you get two dates, and you had to input data and more information from your own, what you're doing. So if I want to get alerts about a system, the future's probably not right, so I can't get rid of the future and just take the past, and now I have all information for this chatbot I showed you. So I know problem, I know the instance, and now I can just use this to query my premises instance. It has an API which directly needs this, and now I can send this message back I showed you earlier. And so as this is a very short slot, I could not put in all the information I gathered together when I was working with the bots. So I put it on a GitHub page. So when you go to GitHub, Leander, and sampling, it's a name for it. And here you find all the requirements you need, you need which configuration you can do, how you can deploy it. Because just clicking the portal is ugly, it's problematic, it's not easy. So you can do this all with the Azure client. it's all in the documentation, the app code is there, and how you deploy it was good and can do some development with it. And so go to the page, if you have any questions, just send me a message there, open an issue, send me a message on Twitter. Just some short notes about the current state in Azure. The SDK for bot development in version four was just, or just left preview, is now in general availability since September, but the Python SDK is still in preview. I don't think that will change much there. It's working so far, but be advised it's still in preview state, as well as the Python 3.7 service in Linux. So it's working for me, but don't expect it to, at the moment, to run it perfectly or fully in production or scaling with it. So it's preview. And as well as I said, in the portal, you can create a bot, but it will not a Linux, and it will not be a Python 3.7 bot, and it will be ugly. So I really, if you want to do something with this, just use the Azure command line interface to deploy it, and it will be much easier for you, and you don't have so much pain as I had when I tried it with the portal and all this stuff. So that's mostly it. Again, here's the GitHub page. I hope I can help you with the information there and with this talk. And if you have more questions, I will be in the social event. I will be here tomorrow, maybe at the booth at our company, or just send me a message. Thank you very much. Thank you, we have one question So Bjorn, actually all the time I talked to you in the last months in the company I was already talking to a bot Yeah Okay Are there more questions? So they just say, for this, five or six, because it's very easy to detect problems. It's just problem issues and this and it always, when you have those similar sentences, it's quite easy. I did not try it with more sophisticated sentences like this, but if you have very easy to detect, it's just I put in the six and it was enough for my example bot. So if you just don't want to do a bot, but you want to do some sentences and recognition, just check out LUIS. Maybe it's something for you. Is it the recognition, just a regular expression? Or if I change, for example, let's say the grammar, send it the Monday at the beginning of the phrase? It doesn't care about grammar or anything like this, I think. So it can just say, okay, I know it's a bot. I can be stupid and say problem Monday on the instance. It will detect it. But I can totally turn it around, use different wording, so it will detect all this different ordering or grammar usually because it's not, I think, I don't know exactly because it's a black box from Microsoft, but I think it's quite good to find those stuff. Okay. So I think the lightning talk starts in a few minutes. Yes, definitely. I'm very excited to see Miro. Maybe he's now telling about lines of codes of, I don't know, packages or what he's doing today. No, it's me. It's the phone. Oh, okay, cool. Even worse. Even worse? Okay, okay, cool. Thank you very much.
+
+---
+transcript_status: auto
+---
+transcript_language: en

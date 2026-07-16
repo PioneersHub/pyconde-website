@@ -1,0 +1,65 @@
+# Ticket pricing for the current edition.
+#
+# Single source of truth for BOTH:
+#  - the schema.org AggregateOffer JSON-LD (read by
+#    templates/landing-page-active.html), and
+#  - the UI tickets CTA (databags/tickets_cta.yaml, kept in sync by
+#    `make flip-pricing` via utils/flip_pricing.py).
+#
+# `make flip-pricing` flips `active_period` (early -> late) and
+# rewrites `aggregate` + `price_valid_until` + the UI CTA copy from
+# the tier list below, so schema and UI never drift. Roll back with
+# `make flip-pricing PERIOD=early`.
+#
+# Prices are the public conference passes only. Update the tier
+# prices for each cycle; the aggregate is derived by the flip helper.
+
+currency: EUR
+
+# Public sale window close — Offer.validThrough for the late period.
+valid_through: "2027-04-16"
+
+# Switch point Early -> Late (informational + drives the early-period
+# price_valid_until = this date minus one day).
+late_bird_from: "2027-02-11"
+
+# Which tier set is on sale now. flip_pricing.py toggles this and
+# rewrites `aggregate` + `price_valid_until` to match.
+active_period: early
+
+# priceValidUntil for the currently-on-sale period:
+#  - early: late_bird_from - 1 day
+#  - late:  valid_through
+price_valid_until: "2027-02-10"
+
+# Tier list — order preserved in rendered output. `kind: public`
+# counts toward the public-retail AggregateOffer bracket.
+tiers:
+  - id: 3day-standard-early
+    kind: public
+    name: "Conference Pass (3-day, Standard)"
+    period: "Early Bird"
+    price: 690
+  - id: 3day-standard-late
+    kind: public
+    name: "Conference Pass (3-day, Standard)"
+    period: "Late Bird"
+    price: 890
+  - id: 1day-individual-early
+    kind: public
+    name: "Conference Pass (1-day, Individual)"
+    period: "Early Bird"
+    price: 400
+  - id: 1day-individual-late
+    kind: public
+    name: "Conference Pass (1-day, Individual)"
+    period: "Late Bird"
+    price: 550
+
+# AggregateOffer hints for the CURRENTLY on-sale period only.
+# Derived by flip_pricing.py from the tiers whose `period` matches
+# active_period — do not hand-edit; run `make flip-pricing`.
+aggregate:
+  low_price: 400
+  high_price: 690
+  offer_count: 2

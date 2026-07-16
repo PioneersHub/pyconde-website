@@ -1,0 +1,43 @@
+{#
+  Programme status band
+  ────────────────────
+  The live, milestone-driven band on the active homepage: CFP-open,
+  voting, accepted-talks, schedule-coming, live. Replaces the dead
+  section_4 slot. Each staggered reveal is a databag edit + rebuild.
+
+  Usage:
+    {% from "macros/programme-status.html" import render_programme_status %}
+    {{ render_programme_status(bag('programme_status')) }}
+
+  Databag schema (programme_status.yaml):
+    status: cfp-open | voting | accepted | schedule | live | (empty)
+    headline, sub, count_label, count_value, cta_label, cta_url
+
+  Self-hides when `status` is empty or headline is missing.
+#}
+
+{% macro render_programme_status(data, section_label='Programme status') %}
+
+{% if data and data.status and data.headline %}
+
+<section class="programme-status programme-status--{{ data.status }}" aria-label="{{ section_label }}">
+  <div class="content programme-status__inner">
+    <p class="programme-status__headline">{{ data.headline }}</p>
+    {% if data.sub %}
+    <p class="programme-status__sub">{{ data.sub }}</p>
+    {% endif %}
+    {% if data.count_value and data.count_label %}
+    <p class="programme-status__count">
+      <span class="programme-status__count-value">{{ data.count_value }}</span>
+      <span class="programme-status__count-label">{{ data.count_label }}</span>
+    </p>
+    {% endif %}
+    {% if data.cta_label and data.cta_url %}
+    <a href="{{ data.cta_url }}" class="programme-status__cta">{{ data.cta_label }}</a>
+    {% endif %}
+  </div>
+</section>
+
+{% endif %}
+
+{% endmacro %}

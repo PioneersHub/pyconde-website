@@ -1,0 +1,165 @@
+title: Guardians of the Code: Safeguarding Machine Learning Models in a Climate Tech World
+---
+description: LLMs, Machine learning and AI are everywhere, yet their security is often overlooked, leaving your systems vulnerable to serious attacks. What happens…
+---
+created: 2024-12-03
+---
+code: CVMPVG
+---
+slug: guardians-of-the-code-safeguarding-machine-learning-models-in-a-climate-tech-world
+---
+speaker_names: Doreen Sacker
+---
+speakers:
+
+
+
+### Doreen Sacker
+
+_About — in the speaker's own words_
+
+I'm an MLOps Engineer from Berlin working at the start-up 1KOMMA5°, and I'm part of the women's tech podcast Unmute IT. I aim to empower underrepresented groups to have a say in shaping the algorithms that impact our world today. Also, I’m always on the lookout for the best coffee shop in town ☕️
+---
+abstract:
+
+
+LLMs, Machine learning and AI are everywhere, yet their security is often overlooked, leaving your systems vulnerable to serious attacks. What happens when someone tampers with your model’s input, poisons your training data, or steals your model?
+
+In this talk, I’ll explore these risks through the lens of the OWASP Machine Learning Security Top 10 using relatable, real-world examples from the climate tech world. I’ll explain how these attacks happen, their impact, and why they matter to you as a Python developer, data scientist, or data engineer.
+
+You’ll learn practical ways to defend your models and pipelines, ensuring they’re robust against adversarial forces. Bridging theory and practice, you'll leave equipped with insights and strategies to secure your machine learning systems, whether you’re training models or deploying them in production. By the end, you’ll have a solid understanding of the risks, a toolkit of best practices, and maybe even a new perspective on how important security is everywhere.
+---
+full_description:
+
+
+Machine learning is applied to a variety of challenges in climate tech, from optimising renewable energy to forecasting energy demands or predicting solar production. We rely more on these models, but we often forget a critical piece: their security. What happens if someone tampers with your model’s inputs, poisons your training data, or sneaks malicious code into an open-source package you’re using? These attacks can throw off predictions and disrupt energy systems or even the grid itself.
+
+In this talk, I’ll walk you through the OWASP Machine Learning Security Top 10, using real-world examples from climate tech to show how these attacks can happen. I'll show you cases like manipulating energy consumption forecasts, poisoning datasets, or sneaking malware into open-source libraries used for climate modelling. It’s not just a hypothetical threat, these risks are real and the consequences can be serious.
+
+I’ll also share practical solutions you can use as a Python developer, data scientist, or data engineer to protect your models and systems. I’ll talk about securing your ML supply chain, validating data, and monitoring your pipelines for suspicious activity. You'll leave with strategies to defend your work so you can build systems that are not only smart but also safe and reliable.
+
+Why does this matter? Because in climate tech, the stakes are incredibly high. The predictions we make and the systems we build influence the grid, energy policies, resource allocation, and consumers trust.
+
+During the talk, we'll cover:
+
+- How attacks on machine learning models can disrupt climate tech applications.
+- Examples of adversarial attacks, poisoned datasets, and supply chain vulnerabilities in renewable energy systems.
+- Practical steps to protect your machine learning pipelines.
+- Why security should be at the core of any ML project, especially in mission-critical fields like climate tech.
+
+Outline of the Talk:
+
+1. Why Security in Climate Tech Machine Learning Matters
+    - How machine learning is powering renewable energy and climate solutions.
+    - What can go wrong when systems are vulnerable.
+2. Breaking Down the OWASP ML Security Top 10
+    - Input manipulation: How attackers trick models with tampered data.
+    - Data poisoning: Real-life example of skewing optimization models with bad data.
+    - Supply chain attacks: How a hacked library could disrupt energy demand predictions.
+3. Real-World Impact of Attacks
+    - Manipulated energy consumption forecasts causing grid instability.
+    - Corrupted solar panel efficiency datasets leading to poor resource allocation.
+4. How to Protect Your Models
+    - How to spot tampered inputs.
+    - Data validation, cleaning and checking datasets.
+    - Best practices for safe use of open-source libraries.
+    - Monitoring and auditing: Setting up checks for unusual activity in your pipelines.
+
+Key Takeaways
+
+- Recap of risks and defences.
+- Practical steps you can take today to secure your ML systems.
+- A call to prioritize security as a core part of building trustworthy ML.
+
+Climate tech is one of the most exciting and meaningful areas to work in. The systems we’re building have the potential to shape a more sustainable future. But if we don’t make security a priority, we risk undermining the customer's trust. This talk will give you the tools and confidence to keep your machine learning models safe and ensure they’re as reliable and impactful as they need to be.
+#ThereIsNoPlanetB
+---
+room:
+---
+day: Friday
+---
+slot_date: 2025-04-25
+---
+start_time: 11:35
+---
+end_time: 12:05
+---
+slot_id:
+---
+track: MLOps & DevOps
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/CVMPVG.png
+---
+youtube_id: FXBqn_bBDf0
+---
+video_link: https://www.youtube.com/watch?v=FXBqn_bBDf0
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/FXBqn_bBDf0/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:08]_
+
+I already had a lovely introduction, 1.5 for the people who don't know it, does that work? We do all sorts of energy stuff, and they're like a one-stop shop for energy things. Today's short agenda, first I want to tell you why security in climate tech, specifically machine learning matters, then I'll break down some machine learning security risks, real-world attacks that actually happened and then I'll tell you more about how to protect models in your whole life cycle. First, why climate tech? Why do we do this at all? The main reason currently is that we have a 4% expected annual increase in electricity consumption throughout the next years, mainly driven by a growing use in the industry. We need air conditioning because the planet is getting more and more hot, we have more electrification, we have electric vehicles, and we have really hungry LLMs that need huge data centers that also need a lot of energy. But we also have more and more solar panels and also more smart home energy management systems. I'll come to them in a little bit. And they can also significantly help reduce CO2 emissions. So the Tier Berlin, Tier Munich, and other research institutes did simulations to see what would happen if most of the rooftops that we have, or just 0.1% of the landmass, would be covered with photovoltaics. And that would not only reduce CO2 emissions, it would actually reduce the temperature of the planet by 2050. So something we could strive for to actually have a little bit more. What are real-world examples? of climate tech. The first one is called eGridGPT. It's a GenAI model to assist control room operators. It's one prominent example from the US National Renewable Energy Laboratory. And this model supports the control room operators with decision-making, interprets and enables the data that it sees. and the main goal is to enhance the grid stability by kind of like supporting proactive decisions that can be taken that are a lot harder for like without AI to see and Gartner did a research that by 2027 40% of all control rooms will be somehow driven AI related and the next one is something that also my company does is home energy management systems. So these are systems that connect your solar panels, your batteries, your EVs, your heat pumps, and then optimizes the energy flows around the house. So you can then optimize to kind of like have your self-sufficiency, so you need as little as possible from the grid, but you can also optimize to have the cheapest kind of like energy. So most of you probably have a static tariff, but you can also have a fluctuating tariff because the energy market kind of like trades energy depending on supply and demand. So at night, for example, when most of us are asleep and the supply is a lot, no, the demand is a lot lower, supply can be high, for example, towards wind, energy can be a lot cheaper, and if you have a dynamic tariff, then you can have cheaper energy, for example, by charging your car at night. I'll take this off. One second. Can I take this off? one second, help, better, thank you. However, so this is in your house. But you cannot be expected to have the same level of security as large power plants, for example. So this is why we need security in climate tech. We established increased demand for electricity means, we also need more efficient production and consumption, and AI can help with us. But we also have escalated cyber threats, and we have new vulnerabilities at the heart of our energy infrastructure, specifically if you have more and more connected devices and more and more connected homes, the more you connect stuff, the more you can also influence the grid on a larger and larger scale. I brought you the report, and it highlighted the alarming trend in the last three years that 80 per cent of the new vulnerabilities they found had a high or critical severity, and 32 per cent had a 9.8 or 10 CVSS score, which means the attacker can take full control of your system, and this is your house, right? in your house, someone can fully go in and take control over everything. What is most at risk? So, solar monitors and cloud backends, which is something that a lot of us probably also work on. And if you have access to these, specifically if you have access like full control over it, and full control over a lot of systems in close proximity, you can destabilise the grid, but you can also get access to a lot of really, really sensitive data. So, machine learning security risks. You might know OWASPs. They have security top tens, but they also have machine learning security tens. They're an open worldwide application security project, a non-profit foundation. This is the full list of ten things. I will not present all 10 today. I will focus on three. The input manipulation attack, the data poisoning attack, and AI supply chain attack. First, input manipulation attack. So, you have carefully crafted inputs to kind of like trick the model to make wrong decisions and misclassify. So, for example, in our example, we said, okay, prices can vary throughout the day. And you can say, okay, if you get access to the system, you can also say, maybe the price is now something else. I want you to behave differently. And then if you say that to a lot of homes, maybe they think it's a good time to discharge their battery all at once. Which would then, depending on kind of like your emergency infrastructure, you could destabilize the grid, but you could also have a lot of loss on the customer side and the company side, and especially for coordinate attacks, this can be quite dangerous. And something that I learned from you, actually, is this toaster, where you have this lovely sticker, and if you want, as an example, to put it next to a banana, it will then classify it as a toaster instead of a banana, and I thought it was a very good example, so I stole Thank you very much. Then data poisoning. So in the first one, we had a kind of fine working model and said, okay, but we manipulate you in the kind of like running infrastructure with some examples. Here we actually want to manipulate during the training process. So we're injecting or attackers injecting false or misleading data during the training to lead the model to learn wrong patterns. And you can have malicious actors, but obviously you can also kind of like poison data if it's not so good anymore. So if you get access to the system and then continuously kind of like change the sensor data, then it's not super useful for the training anymore. So what could happen? Models often estimate load to kind of like see how much energy should be bought on the energy market. And if you have poison training data, it could lead to overestimating the load that you need to buy, and you buy unnecessarily large amounts of energy. The next attack is summarized by this picture. Most of you have probably seen this. It's a random person in Nebraska that maintains a library, thanklessly, and kind of like all of your machine learning models probably built upon it. What I'm talking about is a supply chain attack, so how a hack library from this one Nebraska person which probably doesn't have too much time could actually lead to widespread kind of like exploit. So a lot of machine learning models do rely on open source, and a lot of us also rely on open source, but attackers can also tamper with libraries and pre-trained models. So poison packages could lead to wrong predictions, could lead to data breaches, you could have models that have back doors that gain access to your system or manipulate outputs. And then again, wrong predictions on the energy demands, you can have all kinds of outcomes here. now towards kind of like real-world attacks. The first one I want to show you is how to hijack an inverter. This is also from the ForceGuard report, which was an actual vulnerability they found in one of the inverters. So an inverter, if you don't know, it's a power inverter that converts DC into AC current, Which means that kind of like your PV produces one current and then you transfer it so you can use it in your house. So an attacker could guess usernames through like an exposed API, for example, or obtain them otherwise. And then by exploiting some vulnerabilities, the attacker can reset the password. In one example, the reset of password was then 12456. Or they could inject some JavaScript and seal some credentials. That also worked. Once you have access to the accounts, full access, by the way, because you have all of everything you need to log in, you can tamper with the power output settings, switch them on and off, and because these vulnerabilities are on a provider level, so these are usually built in in several homes, then you can also do this in a coordinated way if you know where they are. And depending on the grid emergency capacity, also you can see how much damage you can do. The next one, also a real one, is called Poison GPT. It was done by the mithril security researchers, so not actually bad actors, but nice people wanting to highlight this. What happens if you manipulate a pre-trained LLM and then kind of like say, I want you to generate false or misleading information. And then I reupload this to Hugging Face and see what happens. And nothing happened. It was not detected. It was not deleted. was done, so anyone can use it, anyone can kind of like play with this, and this is also, this was made publicly by researchers, but other people might be able to do this too. And the next attack was a compromised PyTorch dependency, so malicious malware was submitted to the Python package index and compromised the Linux package PyTorch nightly, which is the pre-release version of PyTorch on Linux. And it used something called dependency confusion, where you install a fake package, which has the same name as the real kind of like dependency, and that worked. And then PyTorch was like, I'll take this package instead. Seems fairly the same. Wasn't. And it was live for five days until PyTorch disclosed the issue and actually removed the dependency. And urged users to uninstall it because you can't get it out of the version. So how to protect your models. First before you train. Validate and clean your data. So I think that's good practice in general. Filter out the noise, outliers, implausible values. If a heat pump says it's running for 24-7, it's probably not the case, so you might want to look into it. Then least privileged access, give access only to people who really need it, configure role-based control, role-based access controls, which also helps with this. And then containerised care only, package machine learning models with minimal dependencies you need, the smaller it is, the safer and easier to audit. you train. Also, monitor for anomalies. Also, I think just these are good practices, I think in general. If you have sudden spikes in load forecasts, maybe it's an exploit, maybe not. Maybe it's fine. But also update your models regularly. It's annoying to have model drift, That's also a security risk. Then perform adversarial or red team, if you know this, testing of your models, so actually have internal teams or external teams test your models. So identify where your model is the most vulnerable. So we had, in this case, malicious inputs. We had poison training data. We could have a hacked library. Can you identify any of those? But you also had the other list of like 10 things. So go through them, see if you can play around with your model, see if you can trick it, and then also see how you can build it in a more robust way. Have more edge cases, for example, in your training data set. Build stuff in that you've seen, say how it should respond, just generally make sure your model can be a bit more robust. And AI can also contribute to a stronger cybersecurity. It is also a risk, but we can't have our eyes everywhere. And sometimes for anomalies, for example, it's better to have an AI look at it than to have like a very basic monitor that can only scan for certain things. So key takeaways. Secure machine learning models. It's not optional. Then security should be by design. You should build it in. Do not kind of like bolt it on in the end somehow. Also have machine learning specific risk assessments. Go beyond the generic audits, analyze and test your data flows, your model behavior, see where you can have attack surfaces. And really important, also kind of like skill your teams across. So have your machine learning teams kind of like look into security threats, but also train your security teams. What are you doing with machine learning? And then not just train people, also work together and collaborate, because together we're all a little bit smarter. That was it. Thank you very much. I have a podcast, it's called Unmuted. We talk about all things in tech. If you're interested, you can follow us. And you can also follow me on LinkedIn if you want. And thank you very much. Do you have any questions?
+
+**Speaker 2** _[17:14]_
+
+uh yeah we have okay so we have two questions at the slido at the moment so you guys can register your questions right now because we have some time left so i'll read out some questions to address uh so how do energy companies can identify potential cyber threats or vulnerabilities
+
+**Speaker 1** _[17:38]_
+
+So energy companies specifically. So I think the largest or the biggest thing is to actually have people look into it. So for example, we have a security team that tests it and then also goes around to see kind of like where they can poke holes into other teams' systems. But also then, so we work quite closely with them and then also say, okay, they say, look into this. You should be careful of that. And then everybody kind of like has an eye on it. So I think it's a culture thing to everybody actually say, okay, this is something we need, this is important, but then also have specifically people going around and say, like, what can I break?
+
+**Speaker 2** _[18:16]_
+
+The risk seems not only AI related, right? If the smart home control system without AI is hacked, we have the same risk.
+
+**Speaker 1** _[18:25]_
+
+It's true. It can be a security risk from AI, but it can also be a security risk without AI. However, the home energy management system, without AI, it works without AI, but it makes it more useful to have AI in the system in general.
+
+**Speaker 2** _[18:45]_
+
+How do you keep updated and informed on vulnerabilities and security incidents?
+
+**Speaker 1** _[18:50]_
+
+I have a lot of newsletters, and I try to read them. Sometimes it works and sometimes it doesn't, but I kind of like it to just scan it.
+
+**Speaker 2** _[19:01]_
+
+think that's it so so we want to thank you during so that was a wonderful talk so please give her a round of applause
+---
+transcript_status: auto
+---
+transcript_language: en

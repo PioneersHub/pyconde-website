@@ -1,0 +1,176 @@
+title: Streamlining Python Development: A Practical Approach to CI/CD with GitHub Actions
+---
+description: Crafting code for minimal dependencies and maximum portability is an art. This talk focuses on how continuous integration and delivery ensure project…
+---
+created: 2024-01-03
+---
+code: YHMUCL
+---
+slug: streamlining-python-development-a-practical-approach-to-ci-cd-with-github-actions
+---
+speaker_names: Artem Kislovskiy
+---
+speakers:
+
+
+
+### Artem Kislovskiy
+
+_About — in the speaker's own words_
+
+I am a software engineer who codes for fun and profit. Proudly affiliated with the EuroPython Society, I am committed to share my knowledge at conference and actively contibute to Python community events. As a Pythonista I love crafting elegant and maintainable software. Beyond coding, I find joy in long-distance running and the thrill of speeding down ski slopes.
+---
+abstract:
+
+
+Crafting code for minimal dependencies and maximum portability is an art. This talk focuses on how continuous integration and delivery ensure project resilience to Python updates and changes in the packaging ecosystem. Setting up automation around your project enhances peace of mind, improves code maintainability, and facilitates collaboration.
+---
+full_description:
+
+
+The worst thing I dislike when dealing with code is encountering an error message indicating that well-crafted code, written a while ago in a language other than Bash, fails to run on the new system, new laptop, or some other operating system. It's an art to write code with minimal dependencies and maximum portability.
+
+The complexity increases in larger projects. This is where Continuous Integration and Continuous Delivery (CI/CD) pipelines prove useful. CI/CD can help you keep the project alive even without you being around. Dependencies could be automatically updated, the code could be automatically tested, and delivered to the end-user, be it you or someone else.
+
+This talk is about "YAML programming", which will help you write better Python code. The goal of the talk is to equip you with a set of building blocks to construct a CI/CD pipeline with GitHub Actions for your projects. Automating tasks as much as possible is highly beneficial.
+
+We'll cover best practices and helpful tools for writing and debugging CI/CD pipelines. Writing YAMLs is time-consuming and error-prone; my goal is to help you spend less time on it and benefit faster from automation.
+---
+room:
+---
+day: Tuesday
+---
+slot_date: 2024-04-23
+---
+start_time: 11:05
+---
+end_time: 11:35
+---
+slot_id:
+---
+track: MLOps & DevOps
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 3578
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/YHMUCL.png
+---
+youtube_id: eNi8ALNKc54
+---
+video_link: https://www.youtube.com/watch?v=eNi8ALNKc54
+---
+video_published_at: 2024-10-28
+---
+video_duration_iso: PT24M30S
+---
+video_thumbnail: https://i.ytimg.com/vi/eNi8ALNKc54/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:05]_
+
+Today I will actually try to distill this huge topic of continuous integration and fit it into 25 minutes, so it would be a challenge, but my goal is really to give you some insights on what is this field, and also if you have never applied the practice of continuous integration on your projects, I want to inspire you to do so, and if you are an experienced person and you already use something of this, so to give you some, well, insights on how I debug the workflows and how I write them in an elegant way. However, I will talk about Python development most of the time, but I just want to highlight that this practice is universally adoptable, whatever language you use. And also I will highlight that I will focus mostly on CI part of this CI CD, and you will know this in a minute what I'm talking about, because I think this is like the most misunderstood concept around the continuous integration. And what I want you to really understand is that when we actually create some code, we move this artifact, which is our code, from one stage to another. And in literature, you commonly could see that after your code is written, it's like the first block, you go to something which is called built and compiled languages, but after the build is done, you test it, then you iterate in this blue setup like many times, You have a feature that you want to release. You prepare it. You take a snapshot, and you distribute it to your users. And then as soon as it's ready for the runtime, it goes and appears on some, well, runtime system. But the thing is that that's how it's usually explained. And the picture that you have in your head is usually like, yeah, you have to deploy, and this deployment probably would be an API, and you have to have a server, and those kind of things. My argument and my main thesis of this talk is actually it's not something that I have in my mind. So, for me, the continuous integration is more about, like, a speed efficiency and reproducibility. It's not about, like, shipping your code to production. And actually, maybe to better illustrate what I mean by the CI, it's better to tell you the story. And the story begins actually last year at the same conference. I was talking about the data visualization project in one of the rooms. And at that time, well, the workflow for this Python project was kind of the same as always when you have a pet project. You have a very active burst of activity when you commit like almost daily. You know your code very well. You write your test. You add the new features. And for this specific case, I was talking about visualization and about graphs. So I was like it was very easy to me to add something new to the code base. But after the code is written, the conference is gone. So usually, this is the way for the project to come down and to go on the shelf. And I was lucky enough because at that time, I actually had someone else doing some jobs. And actually, this is this blue guy which is on the bottom. And even today, if I go to the repository for the talk, I see that this robot is still working to me. And I know that the environment changed since last year. So we have new versions of Python coming out. have new versions of any dependencies that I used. But I still know that even today, I can go to my talks repository, I can navigate to this 2023, and I still see that my PDF file with beautiful graphs that I showed you last year, it's still working. And if you inspect carefully the Git commit, you will see that actually this Git commit corresponds to some Pandas updates. And basically what this automation does for me, it ensures that my project is still in a runnable state, even after a year, I completed it, and if I need to reuse it, it would be as easy as just go and repeat the same comments. And yeah, you could ask the question, like, okay, that's very cool. What do you need to start doing this? Usually the first advice if you're just starting with Python is to use Git, but you could ask the question, like, is it Git enough? And my answer is probably not, because that's how my commit history usually looks like, So I always break the things and then I have a very weird message saying, like, please work. And, yeah, it's never worked from the first try because I always forget things. And the problem with this approach is that, yeah, usually we don't do it in production environment. And why? Because if you have a client, so you don't want the client to, well, to break the functionality. And the thing is, like, it's very psychological thing. Why would you treat someone else better than yourself? So you don't want to be in a situation when you interrupt it, you stop working, you're caught in the red state, it's not functioning, then you go to do something else, and you got contacted like, hey, I need your beautiful PDF, but I am in this red state. So this is a very dangerous situation to be in, and likely there is another practice that I'm really advocating, which is the trunk-based development. So you basically put this redness and move it to the branch. And you see that there are two important aspects in this diagram. Is that first there are two colors, the green color and the red color. And there are some tests and then some artifacts. And this is actually something that quite simple, but it gives you lots of power as soon as you understand how to do this. And that's what usually I hear a lot when people start to share the code. So they basically say that, hey, you know, this is a Python file. You just copy this Python file to some directory. You update the config. Then you set the config point to some directory, and you see how long it takes to explain, and then, yeah, it's just like it's over for them. Don't write your Python projects like this. And the secret for the good project is to follow maybe the packaging standards. And if you have some simple CLI, you could basically package it in a very simple way. You have your script here. force to write some tests, you put all your dependencies in pyproject.tomo and if you have something more complex, that simple CLI, so you put everything under SRC, but again you have all flexibility of having the tests and then all the dependencies and specific goals to the pyproject.tomo. And this is like one of the main thesis of the talk, like for efficient and for the sustainable Python development, it's actually good to follow some packaging practices. And why? because they force you to follow the good practices. And here you can add actually the Lego block that I'm talking about today is the workflows. And you see that if you have the structure in place, it takes like a matter of a few clicks on the keyboard and then you can introduce this ci.yetanother.yaml file with the syntax that I will talk about. What is an inaction? So, the action is something that is triggered on some events that happens on your repository. And then, as soon as the event is triggered, so you have a bunch of virtual servers somewhere in the cloud that are called runner. Each runner is supposed to run the jobs. And inside one job, you could run multiple steps or actions. And I like this high-level diagram because it makes the comprehension of these YAML files way easier. If you go inside and actually look into the specific workflow file, you see, again, the same encapsulated picture. So you see the workflow definition, which is like a very top, it has a name, and it also has this on argument, basically tells when it needs to be triggered. Then you have another block which specifies the jobs, and inside the jobs, you have steps and actions. That's how it looks like on the GitHub UI. And as soon as you have Ubuntu machine in the cloud, so for me, it's like the first thing you try is to understand what does it mean to run an action. And you see here that, okay, action is actually something that will by default pass to the bin bash thing. So it's a bash script. And that's where the internal hacker appears when I see something that I have access to some cloud machine. It's because, yeah, usually if you ever try to hack any server, then you go, and the first thing you do, you try to explore what is there. And since it's a GitHub, it gives you a virtual server. So let's go and see what is in this Ubuntu latest exposed to you. And usually you do it with a print environment. And actually I advocate to do this because this is important. You just play with GitHub Actions, and the first time you play is exactly this. So you try to see what is available. And you can do it safely, so you can just print environment and see actually that there are a bunch of things already coming with Ubuntu latest. And yeah. But be very careful. That's why I put this symbol here, because the printenv could also expose the secret, and it's better not to trust GitHub on mask them, so that's why the command is just more complex than simple printenv, because it cuts all the values out there. But you see the structure, and you see how we can play. But after we play, actually, it's better to think, like, okay, I have those building blocks. What I can build from them? I was trying to come up with some example that would be easy to comprehend, but it would be very useful for you to write more elegant workflows. And in that case, let's take a look into the random number generator. And the random number generator job will have two children jobs. And what I want in the end is to trigger only one of them, based on the value of the random number generator. That's how it looks like in practice. So you could have multiple jobs inside your workflow. The first job would output the random number, and the goal is to trigger either the odd job or the event job. And you have the syntax of saying that, yeah, this job needs the first to be completed, And it would be executed on this condition. And the same for the event. And you see it in action. So basically, outside of the three jobs inside my workflow, only two was triggered. And this is based on the number that was generated in the first step. So for example, it was number 25,009. And it's an odd number. So it was executed. After you played it, so you see that you can change the actions. There are some tips for structuring the workflow. So it's better to keep your workflow atomic. So each of the bits of the job has to do one specific thing. And usually in programming it could be like linting, testing, deploying, or notifying. And another very important thing is that usually the GitHub UI is very messy. So GitHub gives you the opportunity to set the run name. And you can put the build prefix for something that is triggered automatically. For example, pull request event is something that triggered in an automatic way by another workflow and manual for the jobs that you run manually. And this is why. Because as soon as you start to accumulate the YAML files, so you start seeing more and more jobs like this, and it becomes very challenging to navigate through that. But as soon as you have the very descriptive prefix name, you could deduce that, okay, this was the branch. This was the pull request, and this is the build. So you can browse the logs quite nicely. This is actually the part that I think GitHub could do a better job. And I think, well, sometimes it hides many things, and those things are quite interesting. I'm a big fan of observability. Unfortunately, GitHub, yeah, it's not very feature-rich, so I had to use some third-party integration things. But I think it's very important to look what's going on inside your GitHub actions. In this example, I picked up the Datadog, but they are not unique. There are other solutions. It's just like it's very easy to set up. And for example, as soon as you have your workflow running, you could ask the question, like, what's going on really in this workflow? And with this flame diagram, you can really see that, okay, my workflow runs in a green state, but it takes quite a bit of time. And this half of the time is actually spent on the checkout stage. Then you go and navigate to the workflow file. You immediately see, like, where it's going. And then you start to read the documentation, and then you actually realize that this is coming because, yeah, you for, like, the action that you run downstream, you don't need to run it always. So you add something to your repository with the hope that, okay, it will actually improve things. And, indeed, it does improve things. But if you do it in the GitHub UI, you could notice that I have two workflows that I updated. And the one actually runs a bit faster than another. You start questioning, like, why it's the same commit. Then you start to explore the flame diagram, and it makes very obvious that, yeah, one does more than another. So you start thinking, okay, I will fix it. You push the commit, and then, as always, I'm in this red state because, yeah, you thought that you fixed it, but you have now another issue because your code became not faster, but slower. Yeah, welcome to my development style. So you have to go and see, again, into the documentation. Indeed, I was missing it. It was a typo. But plotting it makes it very obvious what needs to be done. And the observability really matters because here I pushed final fix and I see the result I want to see. So it's down to a very small time. It also helps you to think like if you have a monorepo, as in case of this talks repository, you have lots of workflows. So you don't need to run each of the workflow if you change something for this specific talk. I don't need to trigger all the CIs that were specified for the previous talk I gave. So that's how the idea of the filter appears. And why do I care? Because in the GitHub, you're actually paying per minute. And as soon as you start accumulating repositories, you're starting applying those changes. So you start to, well, the time counts. So you start paying more. And that's why I really like this path filter sections. So basically it allows you to execute the actions only on changes in specific paths. So you see that here, any time I change something inside my old project, it's either Python file or notebook file, or I change the dependencies, the workflow will run, and actually it allows me to save some, like, to cut unnecessary workflows. Observability really makes things easier. So you could see what is the slowest workflow. And I think it's also very nice because you have a virtual server in the cloud that runs your code. You can even test some regressions. And yeah, I would be really happy if GitHub can add some features like this. But I'm not advocating for the Datadog. Originally, I'm a big fan of Grafana. And last year, they published a very nice article about the CI observability. And to be honest, this article was inspiring me to give the talk today. So go check it out. So this is like the internal trigger for me to start this exploration process. And yeah. Grafana is cool. I like it. Another thing that comes that came actually after I started preparing the talk is that it's actually quite powerful to draw your workflows in the form of diagram. Because you could immediately spot some anti-patterns. And for example, in this case, you have a PR that triggers multiple jobs. But do you really need this filter and have this filter step on each of your workflows? Probably not. And that's how you come naturally with the idea that, hey, you actually need maybe some orchestrator pipeline that stays in front of you. And then it detects the changes and it directs which workflow needs to be run. And this is important because Deversam talks about templating. And I think it's quite a dangerous situation to be because as soon as you start, like, Using templates with CI, you end up with lots of CI files that you need to maintain. And this is an anti-pattern. And better to, well, don't repeat yourself. So in GitHub Actions, you can use the reusable workflows. And what you can do, you can actually extract your CI to a separate repository or have some master repository and then trigger the downstreams pointing to this master one. That way, if you need to change something, for example, you stop using black and you move to RAV formatter, you change it in one place instead of 10 places. And that's how it's done. So basically the only one thing that you need to change is the on definition. So it's not a pull request, it's a workflow call. It instructs the GitHub actions that it could be called from another action. And in the another action, you call it like your GitHub organization, and then you give a full path to your workflow and specify the branch or Git commit or SHA. And actually, yeah, you see here it's independent, so I put this sign, so it's like, yeah, it points to the master one. Some tips and tricks. So since you're paying for the minute, it's always good to set up some default timeouts because you know that your linting should not take one minute. So it's better to set this up. And I'm a big fan of having some summaries in the GitHub UI because I think it makes the pipelines more parsable. We just put the output, and you see it immediately out there. Pipelines are not different from your code. They also got outdated. And I think the best way to actually reduce the vector of attack is put to the SHA. And then there is a pattern when you put a SHA and then you put a tag. And that's where the Renovate, and Renovate is the competitor of Dependapod, wins, in In my opinion, because actually outside of the box, you can update your GitHub actions and Renovate, except of the Dependabot, can update the SHA as well. Dependabot cannot. And the problem with the tags is that tags are mutable, SHA are immutable. So with SHA, you always know that you execute the code that is in the repository. As always, I'm a big fan of security. If you have your CI running, you have to be very careful. And the hackers are as lazy as we are. So it's better to be prepared. And there is a very nice framework called OWASP. You probably know it by web development, but they also published the top 10 CI CD security risks. As soon as you have the CI running, go and check it out. Because as soon as you fix the common problems, maybe you disappear from the radar of the hackers, and you would be safe. I hope you don't have sensitive information in your repository, but it's better to always be protected. If you would ask me what I want you to remember from this talk, I just want you to know that if you have a Python project, it's better to follow the Python structure, because that way it's very modular, it makes testing easier, it makes plugging in the CI way easier, and Then you end up in a situation when you have a very complete thing, and even if you stop actively maintaining your project, the CI keeps your project alive. Because on each thing that changes outside of your control, you're prepared. I collected some information on the right that I used while preparing the talks. You can always reach me out, and I think, well, if you follow this, it will be a better alternative to this Python script that you copy to some directory and then explain to people what needs to be done, it will make the world a better place, and I really hope that you'll start doing this and stop contacting me with this run this Python script with tons of configurations.
+
+**Speaker 2** _[20:26]_
+
+We have a couple of questions. Actually, the first question that came in quite early on and something we discussed before your talk is just a question of what the reference on your shirt is.
+
+**Speaker 1** _[20:39]_
+
+Oh, OK. The reference is like for the?
+
+**Speaker 2** _[20:42]_
+
+No, I mean like your t-shirt.
+
+**Speaker 1** _[20:44]_
+
+Well, I'm used to being a physicist, so I still consider myself a physicist who does software engineering. And yeah, this is a standard model, like, yeah. I live in Lausanne, which is close to Geneva. And Geneva is the center of, yeah, you know CERN, Center of Nuclear Research. So yeah, physics is something that inspires me to do things.
+
+**Speaker 2** _[21:08]_
+
+Thank you.
+
+**Speaker 1** _[21:09]_
+
+Thanks.
+
+**Speaker 2** _[21:09]_
+
+Okay, now the rest of the questions actually have to do more with your talk. So there's a question on how do GitHub actions compare to GitLab's? And then there's another question, how do GitHub actions compare to Azure DevOps pipelines? And then the first question is, with GitHub and GitLab, any pros and cons you could mention between the two?
+
+**Speaker 1** _[21:29]_
+
+Well, I cannot tell about the GitLab, but I can tell, compare it with, yeah, I have rich experience with Jenkins as well. But I would say that, yeah, I can compare, like, GitHub actions with Jenkins. That's probably the best I'm competent in. They all follow the same concepts. So, at the end of the day, what matters is that in those diagrams, nothing will change between the tools. So, it's basically the different frameworks that automate stuff. Yes, in Jenkins, you will end up writing lots of groovy, and it gives some functionality because the groovy is the language. So it's not a markup language, it's a real programming language, so it gives you more flexibility. With CI.yaml, you have less flexibility from the programming point of view, but at the same time, do you really need this for your automation tasks? So yeah, it's a question of balance. But we can talk more, like, I don't know what I prefer the most. It's a hard question, depends on your project. If you have some pet project that you host on the GitHub, go with GitHub Actions. If you have something custom on premise, and you have a team who can maintain the CI infrastructure, then of course solutions like Jenkins will work out.
+
+**Speaker 2** _[22:49]_
+
+So we have one minute left and we have a couple of yes or no questions so you can elaborate a little bit more than yes or no. So one is, can the workflow be executed or tested locally before pushing to GitHub?
+
+**Speaker 1** _[23:00]_
+
+to GitHub?
+
+**Speaker 2** _[23:01]_
+
+Yes.
+
+**Speaker 1** _[23:01]_
+
+Yes, yes. And actually, there is a very nice project, and I didn't put it, oh, no, I put it, it's the third line from the bottom. You see that there is a GitHub.com Nectos slash act, and the project is awesome because it emulates the GitHub environment on your local machine. The only one dependency you need is the Docker. So it tries to do the best to help you debugging it locally, yeah. And common YAML syntax could be fixed by introducing the pre-commit, so those are two things that I use quite often for the speed cycle.
+
+**Speaker 2** _[23:37]_
+
+The next question is, can filters be set based on imports or other in-code dependencies?
+
+**Speaker 1** _[23:43]_
+
+imports or other in code I'm not sure what do you mean by the question but I guess imports or
+
+**Speaker 2** _[23:50]_
+
+Perhaps because we're running out of time, perhaps the asker can just find you.
+
+**Speaker 1** _[23:54]_
+
+Yeah, but I think, well, you saw probably that I also, yeah, I have a huge monorepo. And in monorepo, I actually included the requirements.txt file and pyproject.toml. So as soon as those gets updated, the CI is also triggered. So yeah, you could detect the changes in those things, but I'm not sure if this is the question.
+
+**Speaker 2** _[24:15]_
+
+Let's go and then the last question we got is did you hand wrote the nice drawings yourself? Yes
+
+**Speaker 1** _[24:19]_
+
+Yes.
+
+**Speaker 2** _[24:21]_
+
+Thank you all.
+
+---
+transcript_status: auto
+---
+transcript_language: en

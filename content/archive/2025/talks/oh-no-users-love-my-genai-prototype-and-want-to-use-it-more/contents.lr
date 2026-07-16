@@ -1,0 +1,220 @@
+title: Oh, no! Users love my GenAI-Prototype and want to use it more.
+---
+description: Demos and prototypes for generative AI (GenAI) projects can be quickly created with tools like Streamlit, offering impressive results for users within…
+---
+created: 2025-01-02
+---
+code: UXTCZC
+---
+slug: oh-no-users-love-my-genai-prototype-and-want-to-use-it-more
+---
+speaker_names: Thomas Prexl, Frank Rust
+---
+speakers:
+
+
+
+### Thomas Prexl
+
+Thomas is an expert in tech transfer and startup development, with a career focused on fostering innovation and bridging the gap between research and industry. He has led initiatives like accelerator programs, innovation networks, and hackathons. A Generative AI enthusiast and co-founder of neunzehn innovations, Thomas helps companies leverage AI technologies. He holds a doctorate from the University of Basel and is a dedicated advisor, educator, and speaker in the startup ecosystem.
+
+### Frank Rust
+
+Frank is deeply passionate about technological advancements and a co-founder of neunzehn innovations, a company specializing in AI solutions. His professional background combines entrepreneurial experience—having established an innovation and strategy consultancy focused on strategy and deep tech—with several years at a major software corporation. Throughout his tenure in the software industry, he contributed to multiple product and service launches, working across various teams to bring new offerings to market.
+Outside the office, he enjoys discovering new horizons in the camper van.
+---
+abstract:
+
+
+Demos and prototypes for generative AI (GenAI) projects can be quickly created with tools like Streamlit, offering impressive results for users within hours. However, scaling these solutions from prototypes to robust systems introduces significant challenges. As user demand grows, hacks and workarounds in tools like Streamlit lead to unreliability and debugging frustrations. This talk explores the journey of overcoming these obstacles, evolving to a stable tech stack with Qdrant, Postgres, Litellm, FastAPI, and Streamlit. Aimed at beginners in GenAI, it highlights key lessons.
+---
+full_description:
+
+
+Demos and prototypes for projects with generative AI can be quickly put together: an API key from the preferred model provider, some source code from the online tutorial and a few small adjustments suffice. Thanks to Streamlit and the like, even beginners can achieve impressive results that can be used by users within a few hours.
+
+But what happens when users actually like the solution? When demos and prototypes need to be expanded and connected to other systems? What if the number of users continues to rise?
+
+It is quite impressive how far you can bend Streamlit to achieve things it was probably never meant for. But at a certain point, you pay for the hacks and workarounds with unreliability and frustrating debugging.
+
+The speakers repeatedly reached this point in various projects and delayed the necessary architecture discussion for too long. So the path was longer and more painful than it should have been – but in the end, thanks to the wide range of open-source (Python) projects, a flexible and stable system was created. Our current tech stack includes Qdrant, Postgress, Litellm and FastAPI – as well as OpenWebUI, and of course Streamlit. 
+
+Thanks to modularization, we now have a stable system that we can easily run locally but also deploy in an enterprise environment. Nevertheless, we have retained a great deal of flexibility.
+
+In our talk, we report on the trials and tribulations along the way. We report on the challenges that led to decisions for various components. We disclose which problems we were able to solve and which new problems arose.
+
+The talk is aimed primarily at those who are taking their first steps with generative AI or have already developed their first demonstrators or prototypes. 
+
+Structure:
+
+(1) GenAI applications in Streamlit are cool
+(2) The challenges on the way from prototype to productive deployment
+(3) Ramming heads through walls
+(4) The path to a flexible but stable stack
+(5) What still plagues us
+---
+room:
+---
+day: Thursday
+---
+slot_date: 2025-04-24
+---
+start_time: 10:55
+---
+end_time: 11:25
+---
+slot_id:
+---
+track: MLOps & DevOps
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Novice
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/UXTCZC.png
+---
+youtube_id: BR_zakAFO0c
+---
+video_link: https://www.youtube.com/watch?v=BR_zakAFO0c
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/BR_zakAFO0c/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:11]_
+
+is us. June 2023, so more or less two years ago. As you can see, we were in front of a group of business leaders, and we were rather early in the LLM API game, and we were very eager to show them endless possibilities to a room, you know, in 2023 that was rarely acquainted to CheckGPT. And of course what we did was we showed them stuff like that. Many of you will probably recognize that. Neat little streamlet apps with neat little prototypes. And as it seems, we were quite convincing, because as it turns out, we found our first customer there. To be perfectly blunt, our first customer actually found us, because he convinced us to bring something to production, which then led to us creating a company to do more of that. And well, that's when we started producing prototypes. And this is what we want to talk to you today. How we went from prototypes to production. And the ups and downs that we had on our journey there. Just to manage some expectations, this talk is great for you if you are just in the face of maybe copying some Medium articles and trying your first steps in LLM applications. It is when you are where we found ourselves, in the middle of, we now need to bring this into production and company-wide rollout, and well, of course, it's also there for you if you're already a gen.ai maven who has done that a lot and we're happy to you know compare notes or to learn from you. It is probably not for you if you are a streamlit
+
+**Speaker 2** _[02:37]_
+
+Super power.
+
+**Speaker 1** _[02:38]_
+
+Power user, you know, if you believe that everything can be achieved with streamlit Then we don't want to argue with you because we know you can we've been there, right? We've done it all the CSS hacks the monkey patches You know The singer turns to keep everything on track We've done it all We know it's great. We still use it today but for us there was more and that's what we want to talk about. Now to give you a brief foundation here's what we actually do at Neuntze in the company that we started. We do AI sprints. That is we identify generative AI use cases, we We build prototypes together with customers and evaluate them, and if they have value, we then roll them out company-wide. It's somewhat similar to what some of you probably do in some LLM lab of larger corporations, just for those who either don't want to have their own LLM lab, smaller companies, or would You prefer to work with someone on the outside who might in some cases be able to do things faster or whatever. Now so this is where we need to excel, building prototypes out of use cases, right? And what we want to show you today is three major walls that we quite heavily ran our heads towards and the first one is the user experience and mostly mixing the front end and the back end. To those of you who have maybe never used streamlet here's just a quick example I stole that from their documentation which is also really awesome and you take something like that so really just a couple of lines of code and you get something like that. If you create a prototype that's just awesome. Now you sparkle some additional elements here, some length chain, some llama index, whatever you want and you get a really awesome convincing application for your users and sooner or later our demos and apps looked like that you know you can achieve a lot and in many cases the customers loved it Because it could make stuff for them much easier. It basically automated a lot of the boring stuff. You know, we are talking about German Mittelstand, and you have to think about the shop floor downstairs with all the machinery, everything is kind of automated, otherwise you don't produce in Germany. And then you have the administrative floor, and there many people are really, really doing, you know, rather boring, repetitive stuff. Copying and pasting info from one piece of software into another. Stuff like that. So they loved it. Now let's start from there. And of course, once you roll something out like that, you know, you have changes. Meet customer expectations. Add some more pages. you know we've done plenty of that that's easy add a logo that's easy as well you know maybe change some of the user interface you can do that as I said we've done it all add more functionality in the middle of somewhere at layout instruments and then at the end you know can you just change the whole structure and we could and we did and you know it's really awesome because you just mix and match UI elements with your code and at the end our code looked somewhat like that and as I said we've tried it all but we always ended up you know hurting our heads trying to run through this war so what did we need our objective we needed a clear separation from front end to back end and what we've done to do that is we used fast API it's a really great match because it does asynchronous tasks very well which kind of makes streaming less of a pain than it is but we also wanted it to be front-end independent you know without too much effort so what we've done there is our default nowadays for chat operations is open web UI and we basically created an API that just behaves somewhat like open API, which is kind of the de facto standard. So if it talks to OpenAI, and most frontends available in this realm do, it can talk to our backend. We basically pose as a model to use our functionality. Well, and then of course we needed a lot of flexibility because not everything is chat and we also needed backward compatibility and sometimes just user specific or customer specific front ends. So we can always add another route to FastAPI with another API and use Streamlet, as I said, we still use that heavily and adapt to whatever our customer needs us to be. So far regarding the first challenge, the front end, and with that I'm happy to hand over to Frank to dig a bit deeper into our stack.
+
+**Speaker 2** _[09:19]_
+
+thank you thomas all right so our next challenge and i think every one of you might be familiar with this um so it's it works on my machine as thomas showed you earlier this is our starting point this is how we started we showed this application and everyone in the audience was surprised that this is working and basically all we did is we showed some streamed code at that time we used a link chain and streamlit and we showed this application running on our laptops so basically everything you needed was on laptops except for the api calls for the large language models so just simply enough but as thomas said people liked it and they asked us okay great but how can we use it so how can we access it if a user in my company wants to test it or wants to use it and i think the answer to that at least it was the obvious answer in our case was okay just use containers i mean build up in a container put in everything you need and then spin it up and make it run for your clients so what we did is we rented the server at hetzner we set up potman we created the compose file we created the systemd files or service files we we created some shell scripts to optimize the deployment process, to make this as easy as possible and in the end people were able to access our infrastructure, our applications and we were successful, right? Yeah, unfortunately not, because what we learned at that point in time is that especially the German Mittelstand. They are not so much willing to provide you data which is not running in their systems. So, what we needed to figure out is, okay, how can we make sure that our applications will run on-premise in this specific customer infrastructure? And what we also needed to do is, we needed to scale up. So, we needed to learn about specific infrastructures, especially when they are several years old, like the network setup, the firewall setups and so on. And we started with creating Linux machines at customer side and then made sure that our containers are running there. We set up a private repository for the containers. So everything was working great, but then the requirements got even higher. And the highest requirement we had so far is that our customers wanted us to use Azure. And I'm not sure who worked with Azure before, but let me tell you that it's quite complicated. And it was quite a challenge for us to get to know the specifics, how to set up an environment which was capable of running the container infrastructure we had in place. But we managed somehow. And what we saw is that, I mean, this on-premise hosting is challenging, but there are also techniques like infrastructure as code, like Terraform and Ansible or the Kubernetes topics, which is something which at least this is our hope. Help us to to make this a little bit more easy for us to make this on-premise hosting Yeah, more declarative and more reusable But we are not there yet, but this is our path right now But I think the good thing about this it works on my machine is you can start very small I mean set up a container on your machine and you can easily scale up depending on the requirements you have on on premise at your customers so the next challenge challenge number three and I think this is the biggest biggest challenge for us because our value proposition was always okay you can use AI with your own data and as Thomas showed you before this chat with your PDF was something which really blew people's mind so what you were able to do is you were able to upload a specific complex document like the European AI Act and then you ask a specific question and you get an easy to understand answer and maybe for the first time in history people were able to understand what's written in those specific regulatory documents so I mean people loved it and we were successfully prototyping applications like this but then they started to provide us more documents and more documents and more documents so for us it was not so easy okay how to figure out what document do we need to answer the specific question luckily for us there was something which was developed quite early its retrieval augmented generation and the basic idea is just that you have a specific preparation process now let's see if this works okay you have a specific preparation process and there you take your documents you use the specific embedding model and then you create so called semantic vectors for specific text blocks and whenever a user is asking a question you again use the same embedding model create semantic vectors and then you use you look for the similar vectors in your vector database retrieve the specific text blocks and then send it both to the large language model to answer the question so it works great and we also use this quite a lot but then people were sending us again more documents and more documents and more documents and the worst thing about this is that our companies are manufacturing companies in Germany and what they do is they provide or they produce a lot of products which are very similar but there are specifics which are different. So for us the biggest problem was whenever someone is asking a question and wanted to have a specific answer like how much power has A and B 3x has then you need to find an answer which is specific for this product not something which is similar but the specific answer for this specific product and that was not so easy to be achieved with the standard rack approach so it got worse worse and worse until it was not good enough and we needed to figure out okay how to deal with this now and what we did is we now have a more advanced rack strategy and it looks a little bit complicated but I I think the most important thing for us, which really leveled up our quality in regards to specific answers, is that we introduced, let me try this again, that we introduced this context information database. So what we are doing is when we are doing the preparation of the documents, we try to get out as many metadata or classification information as we can. For example, what is the specific product which is covered by this document and then stored in an additional database where we also can add additional information, which then can be used to filter out the specific semantic vectors in the vector database and so achieve a higher quality and a more precise search for embeddings which are relevant for the queries. For example, if I take a product question like the SMB3X, I know, okay, please only look for the semantic vectors which are for this product. So, it's working quite well, but this also led to a little bit more complex architecture. So, remember, we started with a simple Python script. This Python script was running on our machines and now we have an infrastructure which looks like that. So what we do is we have Move it more. Oh Yeah, there we are. Okay. Now I'm pointing in that direction So we have front-end container and we talked about this earlier We have open web UI and we have front ends like stream it and maybe other things Then we have our back-end container, which is running most of the logic. So we use right now, it's the new kit on the block and we like it. It's Bidentic AI for the agent framework. We already mentioned first API. We use Lama Index for the rack operations. And then in addition, we have Postgres for the contextual data, which is also running in the specific container. And we have Qtrent for the embeddings, Because Qt Lens has a very powerful filter mechanism, which we use in combination with the context data we stored in the Postgres database. What we have in addition is the Light LLM proxy, which is a simple proxy, which takes your large language calls and then moves it to whatever model you are using. And the main benefit for us is not that you're taking with the same interface, but that you have also something like budgets you can assign to specific products. So you can generate specific keys for specific projects and you also have something like a calculation. Okay, this is how much money was used in this project for that model. And you get an understanding, okay, what operations are costly and what operations are not. And then, and that's the last part, the hosted models, I mean, can be hosted on Anthropic, Meta or OpenAI, but also maybe in your seller if you like, if you have enough money to spend and use an open source model. So, an overview for our architecture. For sure, there are some other aspects, but I think those are the main blocks. What are the next steps for us? I think everyone right now is talking about the model context protocol for sure. That's also a topic for us, especially thinking about creating a server which is capable of providing us specific functionalities. Then we need to figure out how to better test our applications, because as you saw, this infrastructure is quite complex and also this whole advanced rack process is quite complex. If you change something there, something else might fail and we need to have a better testing mechanism in place to make this much more easy to test. But last but not least, and I think this is the most important one, this area we're working in is so fast moving, you don't know what hits you next. And this is also what we learned, that whatever plan we have is not the plan we follow. we are also a little bit guided by whatever technology breakthrough will be there. So that's it for now. Thanks a lot. And we are happy to answer questions.
+
+**Speaker 3** _[21:20]_
+
+thank you so much for your enlightening talk we already have a few questions if you would like to ask a question go to Slido, you can find the link in the Discord channel of the Helium 3 room and if you want to push a question you can like it the first question is why did you decide against storing embeddings also in Postgres with the PG vector extension.
+
+**Speaker 2** _[21:53]_
+
+Good question. We started quite early and at that time we used Chroma and then we moved on to Qtrent because Qtrent has much more powerful filter mechanisms. To be honest, we had a look at Posca's vector, but we are not sure if this really helps us at this point in time.
+
+**Speaker 3** _[22:20]_
+
+All right, thanks a lot Then the next question is how are you experiences with radio? It claims to be production ready
+
+**Speaker 2** _[22:31]_
+
+I mean, we had a look, but to be honest, we didn't have time to look into this in more detail. And what we had so far worked quite well.
+
+**Speaker 3** _[22:41]_
+
+All right, then the next question is Do your customers chat with internal documents? How do you deal with company data being fed to a public LLM?
+
+**Speaker 1** _[22:53]_
+
+That's a question we get every time and every, you know, even in demos we do with leads that we have. And, well, one of the reasons why we do what we do is that you can run it on-premise. At the end, you know, when you do a trade-off between what's the cost of having everything, including GPUs on-premise, And doing some cloud stuff, the typical path that we see in our customer base is that they have some connection to Microsoft already, right? And there's a lot of data already somewhere in Microsoft services. And then using endpoints in Azure that are quite readily available for, you know, the most important models is typically the tradeoff. But there are cases, you know, medical data, for example, where you want to have stuff on-premise all the time. At the end, it's a cost-benefit decision that companies have to take.
+
+**Speaker 3** _[23:54]_
+
+All right, thanks a lot We have a couple more questions, but keep on asking we have a lot more time How do you how do you learn about the how do you learn about your future clients problems? How do you find potential clients?
+
+**Speaker 1** _[24:12]_
+
+Well, maybe let me connect it with the question that we have been asked on the aisle, you know, how do we make sure that customers love or users love the Gen AI application? An answer to that is that we are both from the innovation field and we have a very user-centric approach. That is, whenever we start a project, you know, obviously we talk to some sort of project team, But very, very early, we insist on bringing in people that actually need to use the application and work with them and understand their problems and create prototypes that ideally from day one, even in testing phase, can already save them some time. Because that's all about in our space, basically, we need quick ROEs, right? We're not talking with large companies that do something just to learn it. Our customers typically want to have some benefit out of it very, very quickly. How do we find them or get to know them? By exposing ourselves, not only here, where it's about Python, but at conferences that it is targeted towards our potential customers, to talking with chambers of commerce, stuff like that, and then talking to them, understanding what their problems are. And of course, you know, we are pretty sure that two years from now we will do something somewhat similar, but very different as well. So it's a fast-moving field.
+
+**Speaker 3** _[25:43]_
+
+All right, thanks a lot what tool or program are you using for the pointer?
+
+**Speaker 1** _[25:51]_
+
+That one that's that's a weird Logitech thing and It's yeah, not working It's Logitech it's basically the reason why they produced it I think or why I bought it at least is the chances are that you are there if you're flying That they take away your laser pointer because you're not allowed to bring it into a cabin is quite high and that's an alternative
+
+**Speaker 3** _[26:18]_
+
+How do you use light LLM to check query costs?
+
+**Speaker 2** _[26:22]_
+
+If you use a light LLM, I mean there are two points of light LLM, you can use it as a library inside your code but you can also install light LLM as a proxy and then there's an easy way to assign for every model you integrate, you can assign how much specific tokens will cost and then you have a nice overview, okay, what are the costs for this model or for that project.
+
+**Speaker 3** _[26:51]_
+
+Alright, thanks a lot. What does your pre-processing and context enrichment look like for embeddings?
+
+**Speaker 2** _[27:03]_
+
+For embeddings, let me go back, it's quite straightforward. I mean, I think the most magic happens here with the metadata and classification part. Right now, we are experimenting using LLMs for that, also for analyzing what kind of document is it like. Is it a brochure? Is it a technical document? And then we use the embedding models, and I think most of the time we just use text embedding small, the newest model from OpenAI, and use it as it is, and then enrich it with the metadata which we find relevant.
+
+**Speaker 3** _[27:43]_
+
+Thanks a lot. Do you ever get hired for a use case and then realize this can be done easily without AI? If so, how do you handle this?
+
+**Speaker 1** _[27:57]_
+
+Well, there's a common pattern, you know, we get in the room and then typically, of course, you know, there's some decider in the room, etc. And in quite a few cases, the decider, you know, kind of also falls in love with potential AI applications and the technology. And one of our main tasks and in this early phases is, again, then to really break it down to what helps, right? So what really can generate benefits for users to get the perspective of the employees in the company. And yes, we had cases where it was not useful to use any LLMs or it was an unnecessary overhead. And then, you know, either hand it over to someone else or we do it without LLMs.
+
+**Speaker 2** _[28:45]_
+
+And maybe to just add something, this chat interface and this RAC, this retrieval augmented generation, I think the biggest benefit customers have is to find their own documents. So it's not so much about AI, it's just, ah, okay, we had a document about this, okay, just find me this document. So it's not so complicated from an AI perspective, it's more search and find information, but it's still very valuable.
+
+**Speaker 3** _[29:15]_
+
+All right, thanks a lot. Maybe one more question. Can you say a bit more about the experience with FastAPI?
+
+**Speaker 1** _[29:25]_
+
+It works.
+
+**Speaker 2** _[29:26]_
+
+Thank you.
+
+**Speaker 3** _[29:29]_
+
+That's said perfectly
+
+**Speaker 1** _[29:32]_
+
+Feel free to approach us later to ask about our experience more specifically, but we are quite happy with it.
+
+**Speaker 3** _[29:43]_
+
+Thanks a lot for answering all those questions, the Fragenhage we say in German, the hail of questions. One more thing, before you leave the room, please take all of your stuff, especially the glasses and the cups, with you. And with that, let's thank our speakers one more time.
+---
+transcript_status: auto
+---
+transcript_language: en

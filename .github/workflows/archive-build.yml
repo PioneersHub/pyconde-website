@@ -1,0 +1,71 @@
+name: Build archive & certificates (on demand)
+
+# Archive editions and attendee certificates are static after their initial
+# generation — production deploys (main.yml) build only the current edition.
+# Dispatch this workflow to rebuild and deploy them. See
+# plans/selective-builds.md.
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: >-
+          archive: full render, deploy only archive/certificate/cross-edition
+          pages. full: full render + Pagefind search index, deploy everything.
+        type: choice
+        options:
+          - archive
+          - full
+        default: archive
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setting up python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: '.python-version'
+          cache: 'pip'
+      # pagefind lives in pyproject's dev dependency group, which the
+      # compiled requirements.txt does not include — full mode needs it.
+      - run: pip install -r requirements.txt pagefind pagefind-bin
+
+      - name: Build sponsor pages
+        run: make sponsor-pages
+
+      - name: Build static page (${{ inputs.mode }})
+        run: make build BUILD_MODE=${{ inputs.mode }}
+
+      - name: Sync archive scope to S3
+        if: inputs.mode == 'archive'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-central-1
+        # Deploy scope derives from databags/selective_build.yaml — the same
+        # list the selective-build plugin excludes from current builds, so
+        # build scope and deploy scope cannot drift apart. The include args
+        # are captured in a variable first: a failing command substitution in
+        # argument position is swallowed by bash -e, but a failing assignment
+        # aborts the step (no silent zero-file deploys). set -f keeps the
+        # shell from glob-expanding the include patterns.
+        run: |
+          set -f
+          INCLUDES=$(python utils/selective_build_sync_args.py)
+          aws s3 sync site "s3://pyconde-26" --no-progress \
+            --exclude '*' $INCLUDES
+
+      - name: Sync full site to S3
+        if: inputs.mode == 'full'
+        uses: jakejarvis/s3-sync-action@master
+        env:
+          SOURCE_DIR: site
+          AWS_S3_BUCKET: 'pyconde-26'
+          AWS_REGION: 'eu-central-1'
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

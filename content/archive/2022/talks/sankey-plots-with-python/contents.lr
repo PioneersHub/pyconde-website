@@ -1,0 +1,132 @@
+title: Sankey Plots with Python
+---
+description: This talk provides an introduction to Sankey plots with a focus on creating them with various Python libraries. We will talk about the pros and cons of…
+---
+created: 2021-12-21
+---
+code: 7SFQNW
+---
+slug: sankey-plots-with-python
+---
+speaker_names: Daniel Ringler
+---
+speakers:
+
+
+
+### Daniel Ringler
+
+_About — in the speaker's own words_
+
+I studied Business Informatics and Data and Web Science in Mannheim before working as a Data Science Consultant for a few years. Now, I'm a Data Scientist at DB Systel in Berlin and mainly work with Python. My passions are visualization and music. I am part of PyData Berlin since 2018.
+---
+abstract:
+
+
+This talk provides an introduction to Sankey plots with a focus on creating them with various Python libraries. We will talk about the pros and cons of the libraries, give practical advice on how and when to use them, and what you should regard when creating Sankey plots yourself.
+---
+full_description:
+
+
+Sankey plots can be seen more and more in newspapers, magazines, and dashboards (e.g. visualizing election voter flow). This talk will give an introduction about the origin of Sankey plots, how they are used and when they should be used (or should not be used!).
+We will examine different Python libraries that can be used to create Sankey plots and give practical examples, show common pitfalls and compare the pros and cons of the different libraries.
+In the end, we will see some good and bad examples of Sankey plots that you can use in practice.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: Visualization
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 1702
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: some
+---
+domain_expertise: some
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/7SFQNW.png
+---
+youtube_id: rgwr3wDQ3uQ
+---
+video_link: https://www.youtube.com/watch?v=rgwr3wDQ3uQ
+---
+video_published_at: 2022-05-06
+---
+video_duration_iso: PT26M22S
+---
+video_thumbnail: https://i.ytimg.com/vi/rgwr3wDQ3uQ/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Thank you. I'm one of the organizers of PyData Berlin, so thank you for showing up. I hope you all have a great time. And we will start the meetups again every third Wednesday, probably starting from next month, so maybe see you around there. My name is Daniel. I work for DB Systel. And for the first time, we are one of the sponsors. So if you are interested in jobs, you can go upstairs and talk to us. Yeah. So I'm a data scientist, and a couple of years ago I had to do some Sankey plots and I was like maybe I should talk about it because you don't find that much stuff on the internet. So maybe just start really from scratch, like what are Sankey plots? And basically Sankey plots are just flow charts where the flow has a certain width which stands for the amount or the volume of the data. They are named after Matthew Sankey who was an engineer and did paper on steam engines And he made this like Sankey plot that you can like see an extract here where he basically Yeah, you see the distribution of heat in such a chart So he compared the current model to some some idealized version of it So he did that in like late 19th century Actually, the first Sankey plot is like yeah almost 100 years earlier here, from Charles Minard who visualised this, Napoleon's route to Russia, probably many of you have seen this before, it's one of the most famous graphics, and in this 2D graphic you see many, many data types, you have location, you have the amount, the width of the flow, you have temperature and time, so you have a lot of data types here, but this is kind of like a thank you chart in its most original way. Nowadays, you see it much more often with energy flows, so I have two examples here. The International Energy Agency shows this energy flow of the entire planet, and when we zoom in, you can see some different energy sources, and you have some steps here with production, and import, and export, and you can filter that by year, so it's kind of interesting to see how that changed over the years. Also with Eurostat, like a European website, you can see kind of the same stuff as before. So it's like an interactive energy balance from all the countries of the European Union or the whole European Union. So you can filter that as well between different years and different countries. So if you look a little bit closer, you can see imports and exports, and you see those different distributions like each color stands for like one of the energy sources so you see different steps along the process from like production import they have some transformation here and in the end you have consumption exports and some like waste in the process so I guess that's quite like important to see you have different steps you have different categories and like with those flows you can see the distribution of those categories at a certain moment in that in that process. So how are they used today? I guess many of you see maybe those like voter flow charts in elections now. I found that for a German election from last year and five years ago. So you see the different parties color-coded with different colors and then I guess like with the thank you chart like what do you really want to show or highlight is the flow so the question is like where does something go to like in that case you know you see one party on the left side which is highlighted in red and then you see the flow of voters you know who voted again for the same party or who voted for different parties at the same time you can just like reverse it you know and you can ask the question where does something come from so if you see now the green party on the you can see how many voters stayed the same and how many voters from different parties voted now for another party. So I guess the main focus on those charts is basically to show you where does something come from and where does something go. You can also extend it. So here you see a thank you plot from The Economist for the British election for a couple of years. So you can extend the y-axis for multiple years as you can see here and yeah make it much more yeah interesting for more than like just one year so yeah just just to get like an idea like what you yeah what thank you plots are about so basically you have a flow of different categories at two or more steps you know with the German election we had two years that we compare and with the British one we had four for the energy charts also we have different steps on the on the process and The important part is like the the flow of the data So you have like a redistribution of those categories usually going from the left side to the right side Yeah, and those distributions you can basically just calculate like they are kind of implied because you can just sum up all the flows of one category at the step Yeah, and then kind of important to highlight like the width of the line should always represent some volume or amount like if you see some really bad examples that doesn't really match up then it's kind of difficult to understand and maybe yeah Maybe like misleading in in some way So the idea of my talk was just like how to do that with Python, right? Like I had a customer we had some data and I wanted to do some thank you plots So I just tried some some libraries and for this talk now I just you know started from scratch see how easy is it is it with different libraries to get started to to make such a a Sankey plot. So first I wanted to get some data from the Deutsche Bahn like how you know which energy do they use but I could only find the distribution of the data but not the flow so it was like yeah too bad. So I looked further and I found the like some census data from Berlin where you can see you know different years here you see some kind of you know beginning of the year how many people live in Berlin, how many people are born, how many people died, you see many people are immigrating and emigrating and then you have like a total of the year and then like a total number of people living in Berlin at the end of the year. What's kind of interesting what maybe you don't see in the beginning the numbers don't match up. So I was kind of confused because you know you I recalculated the lines and was like that does look kind of weird so there is some kind of error in here which is not that small and I was trying to find out where this happens and i guess it's just different like governmental agencies calculate the numbers differently so you just have like an error in here which is um yeah seems like people are disappearing in berlin so um yeah i i tried to yeah just took those numbers here you can see this error of like almost like four and a half thousand people which were just like disappearing um but i just took those numbers from the sheet um gave them some names and um yeah This is kind of like how to get started. So first library, obvious choice, Matplotlib, I guess everybody knows, like from NumFocus, like sponsored project, and they have like just a Sankey class which you can import and many examples. So I started, you know, importing the class, initializing the class, and adding a flow, and that was the result. It was like, yeah, what happened here, you know? So you go through the documentation, and I found this like magic scale keyword, so because the numbers are quite high, Matplotlibs kind of expect numbers around like 1 to 10, I guess, so larger numbers, small scale, like it looks better, but still it's kind of not what I'm supposed to like want it to show. So you know, just going further in documentation, orientations is kind of the keyword, so with orientations you can tell matplotlib where does something come from and where does something go. So the zero here stands for it comes from the left goes to the right so I took that for the beginning and the start and the end of the numbers and then with minus one and one you can kind of tell it does it go to the top or does it go to the bottom. So you know with like just a few steps it looks kind of okay. But yeah, I guess it could be better, right? So I found this path length attribute where you can just say, you know, with the error, it goes a little bit longer, so it's easier to read, you know. So finally getting somewhere which looks kind of close to the original Sankey plots. Yeah, like seeing those numbers, right, like the scientific notation doesn't really help me here too much so I just wrote it like in like a small method for adding just like thousand separator and getting rid of just like scientific notation so you know kind of kind of getting somewhere and then in the end I was just like yeah just removing the color because I don't need it like blue doesn't show me anything here and adding a title so I guess you know kind of what I wanted to do easy but like you have to do all the steps explicitly on your own so yeah thank you plots I guess get kind of interesting when you add more steps it was like how easy is it to like add another year so I edited like 2019 data as well so you can see here like almost 3,000 people disappeared in Berlin wherever they went so just like doing the same as before, and I guess the most important part here is you have one object, you just use this add method for adding data from different years, and then the second flow, you can see you have a prior and you have a connect, so you kind of tell it where do you want to connect the second flow to the first. So that was kind of easy and straightforward, a little bit surprised how easy that was, But yeah, that was kind of like getting started with Matplotlib. So it is quite original to the original flowchart and the Minard chart that you have seen before. You on the other hand have to do all the stuff explicitly. So you really have to tell Matplotlib what you want to do. But at the positive side, you really can tell it what to do, right? Documentation is good, but it's a lot. So you don't know where to start. just a lot, but at the other side, there is a lot of documentation. I had some pitfalls with the scale and the format arguments, but I guess Matplotlib is so well used that you can find all the stuff on Stack Overflow and really can do something. But tooltips or something like that, it will just take a lot of programming and you know what I'm talking about. So I looked at GitLab for some small projects, how to get started, and I found PySankey, which is I guess just like a single girl doing that. So I imported it, and you can see now here Pandas. So you know, that's great. Just get data into a data frame. So that's much, much easier to handle. So I created a data frame from the 2020 data, just with the actual flows. Where's the start? target, what's the amount of people. And then it's just like magic, you know, you tell it where's left, where's right, what's the value, and that's basically it. So that was quite cool to get started. At the other side, documentation was not that good. Some stuff didn't really work, and you can't really add more than one step. So I guess it's good if, like, the chart that you just saw is what you want to have. But you can't really go further than that. So it's a lot of trial and error. You don't really have documentation. Some stuff is, like, missing. But I guess it's good to get started. Like simple plot and a data frame. So I found another one, quite similar, a p-sanky. So I installed that, imported it, used it, just used the same data frame as before, works in a way, right? At the same time, you can't really change a lot, but I think it looks a little bit better at the other side. I don't know why they have the lines coming from down left to top right. I guess it could be better, but it's all magically calculated somehow. So just doing the same stuff as before, adding the 2019 data, just have the data frame. So like with that library, you can add multiple steps, which makes it, I guess, like much more usable, easy to get started, like not that easy to like really use, right? It's a little bit crowded on top, hard to read. But at the other side, not a lot of code, right? It's just give it a data frame and the rest is like magic. So it also works with data frames, you can have multiple steps now. It is a short but helpful documentation. There are some really smart ideas here, like there's one argument where you can highlight some notes. So I guess when you really want to say, you know, that's what I care about, that's kind of easy. But I haven't found an easy way to customize where the notes are positioned, you know, and then it's kind of crowded on top and difficult to read. So getting more like in sponsored projects and like much more, you know, bigger libraries. So HoloViews is sponsored by Anaconda. And it uses the back end which, you know, many people probably know immediately makes it more interactive. So it's just part of the main HoloView library. So just trying to get the example running. Just a few lines of code works immediately. So that was kind of fine. So I used the 2020 data that we used before, just to data frame with 2020 data, put it in, works. And it's kind of interactive, so you see stuff here, which is really nice. So I would say that's much better, much easier than the stuff before. And the nodes are kind of, yeah, make sense. So let's add another level. We have the two-step data, like the data frame with 2019 and 2020, just putting it in. Just works. That makes it kind of easy. Coloring the flows and the nodes, it's not that easy. You could tell it which attribute to use, and then you have to give it a color map, which is like, yeah, I don't want to spend an hour now just doing a color map. Maybe there's some easy part, but I guess like HoloView also on Stack Overflow or something, you probably can find some hacks to do that. So like HoloView, with DataFrame, super easy to get started. You have all the interactivity with the bookie backend, like your tooltips and that stuff. You have a really short user guide with only a few examples. So I guess it would be nice if there would be just more to get you started and makes it easier to, you know, see how it's done, and I could really find a way to change the node position, so I guess that's also, like, something, you know, when you have all those nodes, you know, on top, could be better, I guess, in a way, but maybe it's possible, you know, like, probably some people hacked it in a smart way, so, yeah. Last library that I checked was Plotly, which I use at work right now, so I don't know how free it is. I guess you can use it free, but then for companies you have to pay for it. But I guess Plotly also has a lot of stuff, so just import it Plotly. You see code gets a little bit more, so I was just trying to get the example running. So you import this Sankey class here, and here we define nodes first, and then we define the flows. just the example data with some random labels and random links and values, so this is basically how the plotly example looks like, and with the open source libraries before you install something, you try to get the example running, it doesn't work, I was like, yeah, just start simple in the beginning. So yeah, I changed the data a little bit now, so it is basically the same as before, I just edit colors here so you see this data frame now and we have to select C like the C value here which is just colors of the different flows so was like yeah let's make it more like readable and then like yeah prettier so it's basically the same data frame as before two years with the color column so yeah I found this like hack for Plotly to use data frames for Sankey charts so it's just like making a unique series of all the nodes in source or target, so we can use those like indices for all the other attributes that we need. So what do you see now? We define like the nodes, you know, just the list as you see before. We have like the node indices, and then we have links, you know, we add the source to the target with the value, and looks like that. So I like that way more. You also have tooltips again, it's easy to add a title. You have all the stuff and it looks kind of pretty without changing too much, it was kind of surprising. At the same time, it's not perfect, it's all crowded here, you can't really spot the difference and where does something come from, where does something go, so it was like, how can we improve that? So what's kind of cool but difficult is you can really change a node position now in an easy way, but it's kind of complicated. So you can define like X and Y values for all the nodes. So it took me like a lot of trial and error to like get it where I wanted it to be. So this is how it looks. You just like give it kind of a position X and Y. I also gave the node some color. So yeah, it took me probably half an hour to just like, you know, change like a 0.3 to a 0.2 and see how it looks like. But yeah, that's what I did. I found this padding, or like pad attribute as well, which is just like giving some space between the nodes. I give the link the color, and yeah. This is basically how it looks like, which is like, yeah, we have simple colors, we kind of know, yeah, we have tool tips, and the nodes are kind of where they are supposed to be. is kind of what a thank you should look like. And with Plotly, in that case, it was the easiest. At the same time, it's a lot of lines of code just for like a simple thank you chart, right? But I guess it's not that easy to automate all that. Yeah. So yeah, Plotly was very adjustable, interactive. You can move the notes. So that was the only library that I found easy to really change it. Even though it's kind of like tricky to do. You have many examples, which is great. Yeah, and yeah, difficult to arrange, but you have all the power, which is great. So just some takeaways in regards to thank you plots. So I guess it's quite important to know what do you want to show, right? Like are you interested in distributions? Then you should probably take a bar chart or maybe a pie chart if you don't have too many categories. But if you're interested in flows, you have to fit, is your data right for flows? If you only have the distribution data, that's not enough to create a thank you. You really need the data for it, which can be tricky to get. And in my experience, it only looks good if you don't have too many categories. Like I will show you some good and bad examples now, so you can, I guess you see quite quickly what I mean. At the same time, make sure it's worth the effort. It takes time. It's not that easy to do. So getting your data in the correct format and then customising the plot over and over until you are at a point where you're like, this looks great, yeah, is tricky. And then in the end, as well, think about colours, right? All the default colours are quite heavy. So if you find some good examples, it's easy to guide you. So just some examples, you know, we've seen it before. This is something I kind of like, it's easy. I also like Economist, they have really good color codes as well, all the stuff in good newspapers, they usually have good people with data visualization skills, and yeah, always good to see those examples. I found this example which I really like, which is petroleum and where something comes from, what imports. I think that's kind of easy, not too many colors, just one scale and kind of easy to read. So I really like that example. And then maybe just some I found which are kind of like bad, which is like, yeah, kind of, you know what I mean, too many categories, weird colors, you don't really see anything apart from a few countries that stand out. And then I found that one, which is probably the worst I've seen in a really long time. And somebody completely, yeah, used it incorrectly. So I guess like the colorful arrows like just here on the bottom are kind of the ones going out of the blue arrow. So they're even like on the wrong position. And yeah, the width just doesn't make any sense at all. Yeah. So yeah, I just like put the links here. On the bottom you see the libraries. On top you see some further reading, and you can get the slides here, that's maybe the easiest to get started, get the links, and I hope you learned something, and I'm open for your questions.
+
+**Speaker 2** _[23:26]_
+
+Thanks a lot, Daniel, for this presentation on Sankey Plots. I think I already went through, and it has been quite painful for me, a painful experience for the Sankey Plots. We have some questions. Yeah, one question about how do you present the Sankey Plots, can you present the Sankey Plots from right to left for some language we are reading from right to left?
+
+**Speaker 1** _[23:52]_
+
+What was the middle part?
+
+**Speaker 2** _[23:53]_
+
+Can you present some Sankey plots, like does the option exist to present from right to left for the language you are reading from right to left?
+
+**Speaker 1** _[24:02]_
+
+to left i guess with oh good question uh i guess you could just change it around right like i guess mud pot lip the error like i guess it should be hackable in that way um and i guess like for all the other ones we saw in the in the end you just change around the you know the order and then it should should work
+
+**Speaker 2** _[24:24]_
+
+Just a hint from Mike who says that on Matplotlib it can be usually start with the Matplotlib website and can be more complex and key diagram too on the Matplotlib website. And another from Pierre-Olivier who is saying that you can reorder the nodes in a Sankey with the whole of this by using dot redeem, but yeah, just a remark.
+
+**Speaker 1** _[24:50]_
+
+Okay, yeah, thank you
+
+**Speaker 2** _[24:55]_
+
+If you have any questions in the audience? Yeah.
+
+**Speaker 1** _[25:02]_
+
+Thank you for these votings looked great because they were like a lot of change like some parties just like lost a lot of voters and Berlin population kind of hovered around 3.6, 3.5 million and like the differences we were interested in were just like a couple of thousands. Do you think it's, like, or is there some option to kind of break, like, these 3.5 million of Berlin inhabitants we're not that interested in to see, like, these little errors, like, better? Is there some visualization tool? Do you know? You can just, like, you know, divide it, you know, by a few hundred or something. Just make it, you know, steady or just remove it completely, you know. If you're not really interested in the total population but just to change, I guess it makes sense to just remove it. because you know you're just interested in like how many people come and how many people go so yeah i guess on on that regard like if if it's difficult to read if you have like one really large numbers and the others are kind of small so maybe just removing it if you're not interested in it makes it easier okay thanks
+
+**Speaker 2** _[26:08]_
+
+We still have time for another question? Okay, then. Thanks a lot, Daniel.
+
+---
+transcript_status: auto
+---
+transcript_language: en

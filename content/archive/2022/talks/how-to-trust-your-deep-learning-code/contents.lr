@@ -1,0 +1,140 @@
+title: How to Trust Your Deep Learning Code
+---
+description: Errors in Deep Learning are hard to catch as training often fails silently s. Unit testing can catch those errors early and lets you make changes to your…
+---
+created: 2022-01-04
+---
+code: YQK7UU
+---
+slug: how-to-trust-your-deep-learning-code
+---
+speaker_names: Tilman Krokotsch
+---
+speakers:
+
+
+
+### Tilman Krokotsch
+
+_About — in the speaker's own words_
+
+Deep Learning Engineer by day. PhD candidate by night. My research focus is predictive maintenance but I care most about maintainable code.
+---
+abstract:
+
+
+Errors in Deep Learning are hard to catch as training often fails silently s. Unit testing can catch those errors early and lets you make changes to your code base with confidence. Learn about the unique challenges of testing Deep Learning systems and how to trust your code again with hands-on examples explained on a realistic Deep Learning repository.
+---
+full_description:
+
+
+Unit testing is a bread and butter technique in software engineering that does not get enough attention in the space of Deep Learning. Even though testing Deep Learning code comes with challenges like non-determinism and huge amounts of data to process, it is even more important here than in classical software engineering. Because training a Deep Learning system fails quietly, many errors may hide for a long time.
+
+In this talk we will analyze a realistic codebase that implements a Variational Autoencoder and see how each of its components can be tested. Additionally, we will develop some DL-specific insights for writing maintainable tests and running them in a CI pipeline.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: Deep Learning
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 1702
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: some
+---
+domain_expertise: some
+---
+supporting_material_url: https://github.com/tilman151/unittest_dl
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/YQK7UU.png
+---
+youtube_id: ICKATFuYQTE
+---
+video_link: https://www.youtube.com/watch?v=ICKATFuYQTE
+---
+video_published_at: 2022-05-06
+---
+video_duration_iso: PT29M38S
+---
+video_thumbnail: https://i.ytimg.com/vi/ICKATFuYQTE/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Welcome then to couples counseling. It's nice to see of all of you here that late in the conference. I know it's really difficult to be honest to yourself to go to therapy but I heard that you and your deep learning code you had some trust issues and today we are going to work on that and see how we can resolve them. But jokes aside today will be about you writing reusable tests for your deep learning code. Quick questions. Who knows about unit tests? Who knows about integration tests? Who cares about the difference? Okay, then that is not the right talk for you. No, this talk won't be making any difference between integration tests and unit tests. It's all just testing. If I say unit testing, I mean testing. So keep that in mind. Why am I interested in deep learning unit tests. This is really simple. I'm a part-time PhD student, and some time ago I wrote some code for a project of mine, and the results were extremely good. Should have been suspicious at this point. But anyway, I wrote the paper, and when I was nearly finished, I had a last look into the code, and there was a bug. And the results without this bug, we're pretty shit. So, I fell into a deep, deep hole. I know it's called deep learning, but not that way. Yeah, and when I climbed out again, I thought, okay, this will never happen to me again. And then I had a look in how to write unit tests for my deep learning stuff. And this is why I'm here today. So, TLDR, this talk is about that you stop doing this. This is a code snippet that appeared a lot of times in my modules where I defined my network architecture because I wrote down some PyTorch code and then I wanted to see, okay, does it work? Okay, I just call the file directly and execute this code at the bottom of the script and see if it works. Nice. Afterwards, I deleted this again because I didn't want some random code to clutter my module, obviously. Then I changed something on the module, and then I wrote it down again. And then I deleted it again. And I did this for an embarrassingly long time. And what I want you to do is start doing this instead. This is an example of a unit test with the unit test package, which is built in in Python. And it does exactly the same thing as the code snippet before, but in a more sustainable way. Okay. Today I will show you how to write tests like these. I will be using the unit test package. There are other packages out there, most notably pytest. This should not be an endorsement for the unit test package, but it's the one that is built in and I thought it's the most easy to use, no additional dependencies, you can just get started if you have Python installed. We will use this on a little project as an example. The project directory looks like this. And what this is, this is a variation autoencoder that will be trained on the MNIST dataset and it is implemented PyTorch. What And you can see here we have a data directory, we have a source directory with all your code, we have a test directory, which is currently empty. We have a readme where we have the requirements. And the first question we should ask now is what should we test? And the answer is everything in the source folder, obviously. Maybe not the run script, but because this is really boring, it doesn't do anything just calling trainer.fit. But everything else we should test, probably. And in this talk, we will go over the different aspects of our code, the data set, the model, the trainer, and see which kind of tests we can implement for these aspects. And we will learn on the way what is important about writing unit tests for deep learning. each section we will have some concluding thoughts just as a reminder what we have learned so far okay let's get started first of all what are good tests good tests are first of all fast because you will be running them a lot and if they're slow you will skip them and that's not good you will run these tests a million times during development and if they run longer than even a second you will just not use them second these tests should be independent which means it should not matter if you run a single test if you run all of the tests or the order of the tests either of these should be completely independent from each other and the last one is your test should be readable i consider tests to be part of the documentation of your code And if your documentation is not readable, you can just skip it. So these are the three things we should keep in mind when we're looking at our tests. And we will start with the dataset. So I saw already that there were talks about data testing. We are a step further. We assume that our data is okay. And we're concerned about the process of loading the data from disk and getting it right at the gate of our model. And the most obvious thing you should test is if the data that we get out of our data set has the right shape. So what we see here is a simple test function, which first instantiates our data set. This is a really simple class that just wraps the TorchVision MNIST data set and provides the training and the test split as attributes. And what we do here is we simply pull the first sample out of our training data set and see if it has a blight shape that's it nothing more and So this is really simple because it's the first example You can see here that we're testing for 32 by 32 pixels, which is because Inside the data set we're applying a padding so that we get to a power of 3 in terms of size of the image Okay, we only have to test one sample here because we already know that our data set has only images that are of the same size. So keep in mind, don't do superfluous stuff. Test only the things that you know you have to test. So if every image is the same size, you only have to see if one image has the size you're expecting. second we have to scale the data because what we get here is a uint image between 0 and 255 and we have to convert this our autoencoder expects the images to be pixel values to be between minus one and plus one and to test this we have to go over the whole data set because there could be a fluke sample which is corrupted or I don't know and we have to find this sample. This is why here a single sample is not enough. We have to go over the whole data set. If your data set is too big, maybe you want to sample it a bit. But in this case, we can go over the whole data set because it's tiny. Okay. What we're just doing is for each sample, we are checking if the max and the min are inside of our boundaries and what we're checking too is that there are samples that are greater or lower than zero because a common error that we could do is just scaling our data between zero and one or i don't know between minus one and zero and to check for this we have the second two asserts in there okay the next part is a little bit more complicated we want to use data augmentation for our training and data augmentation means in this case we have random augmentations so if i pull the same sample two times from the data set it should be different but only on the training data we don't want to augment our test data so the most important thing we are testing here is does our augmentation return random deviations of our samples and if it's activated on the training set and if it's activated on the test set deactivated on the test set so we have two functions here which do basically the same thing to check if the two if i take two samples sample two times if they are different and the first one just checks if they are all different and the second one for the test set checks if they are all the same and as you can see here this is pretty redundant and the third rule of tests comes in it should be readable and redundancy is probably not that readable so we can just extract a helper function here which we will call check augmentation and this one just is just here to see to do exactly the same stuff but you can check if it's if the augmentation is either active or if it's not active and with this helper function, we can then just merge our two test functions into one and just check both of our splits. When this test fails, we will not know where it fails, because as you can see here, we merge two tests, two different aspects we want to test, into one function. But if the first one fails, the second one will not run, and then we fix the first one and then we run it again, the second one will fail. We don't want to do that. We want this function to run both tests and then only tell us which of them failed. To do that, we can use the subtest context manager for this. So here we just wrap our calls in the subtest context manager so that they will both run even though one fails and then the test runner will just tell us that test augmentation in the subtest train failed the important thing here is to remember you should test both of your splits because or at least think about are there differences in behavior from my data set for the training set the test set or the validation set and you should always test both forth. Okay. And here comes the last thing about the data set, which is if it plays nicely with the PyTorch data loader. You may think this is not an issue. I mean, it's a data set. How much can go wrong? A lot. Because one time, for example, I wrapped the function that read the data from the disk into a cache because I was reading a lot of data frames and I didn't want the same data frame to be read again if I had two consecutive calls to the same data frame. So just LRU cache, which worked nicely on doing it in the same process, but when I wanted to use multiple workers, it crashed because the LRU cache cannot be transferred to another worker. that and it failed in production because I only tested it locally with a single worker or no workers at all. So the lesson learned here is just check if your data set is able to be used by the data loader and especially test if it can be used in multi-processing. To do this, we just use subtests again, a little helper function, which is called CheckDataLoader. CheckDataLoader just iterates one time over the whole dataset to see if it works. We have four subtests here, one for each split and one for single and multiple workers. What have we learned so far? For datasets, it's important to think about testing each split. If you have multiple splits, please think about what are the differences in behavior and what do we expect from each split. Second, test as few samples as possible. If you know something about your data set, for example that it's all the same image size, you only have to test one sample. For other use cases, you may have to test more data, even the whole data set. Sometimes it's prohibitive, but yeah. Try to minimize the compute power you need here, because this is the most data-intensive part of the unit tests. And third, stick to public interfaces. If you have paid attention, you may have noticed that I did not call any other methods on our data set than the getItem method with the brackets. This is because the unit tests should only test the public interface of whatever you are testing. Otherwise, when your internals change, your tests have to change, too. So this kind of test could be reused over and over again for each data set, because the data set API is fixed in PyTorch. I don't know when was the last time it changed. I think in 2011 it changed. It changed recently, but before that, it didn't change. When you start testing the internals, some private functions of your dataset, when you maybe delete this private function because you don't know it or you want to split the function even further, you have to change your unit tests again and this is just a lot of overhead you're producing here. So stick to public interfaces if you can. Next one, testing your model. I talked about public interfaces. This is the most reusable part of this talk because the public interface for PyTorch models is pretty fixed, this time really. So the first thing we want to test is what was in our intro, we want to see if the output shape of our model is the right one given a specific input. So here we instantiate our variation autoencoder, it expects an input shape, and because it's an autoencoder, it should output a tensor of exactly the same shape. So what we do is random input, put it through our net, and see if the shape matches. Pretty easy. The thing to notice here is the decorator above the function. This is the torch no-grad decorator, which just disables the gradient accumulation for PyTorch. We don't need this for this test. And it just makes it much faster because then PyTorch is just disabling all the tape stuff in the background and runs it just with a forward pass. As I said, keep the computational overhead for your tests low, and this is one thing you should do for all your model stuff. We didn't have to do it for the other, for the dataset stuff, because we didn't have any tensors that require the gradient there. And here we have the weights of our model, which require a gradient, so PyTorch would start accumulating them. Next thing is moving to devices. So most of you probably want to train on a GPU. And the most basic thing to do here is just call model.png.cuta and be done with it. This can fail, actually. So here is one function of our variational autoencoder, the bottleneck function. And who of you can see the problem here when moving this to the GPU? Actually it's the first line of the function where we generate the noise tensor. Because when we are working on the GPU, the mu and the log sigma tensors will be on the GPU, but by default, Torch instantiates all the tensors on the CPU, which it will do with rand n here. So the noise tensor will be on the CPU, but the other tensors will be on the GPU. And then when you try to multiply them, it will fail. So the fix is quite quick. just call randlike and this is done. But again if you test only on your laptop maybe it doesn't have a GPU and you then deploy it into production and it fails this is not good so you should test it beforehand. And the test is pretty simple. First we instantiate the model then we move it to the GPU then we move it back. This gives us three copies of a model, the first one on the CPU, the second one on the GPU, and a third one that is back on the CPU. And then we just pipe a random input through it and see if all the inputs and outputs are the same. Again, we have the TorchNogret decorator here, which helps us because we don't need radians and makes it faster and the second decorator here is a little cautionary step because as i said maybe the machine you're running on doesn't have a gpu and then this test will fail but you don't want to tell the test to fail because of some external configuration thingy so this test is skipped by the test runner unless torch knows that a gpu is available otherwise it will just say a test was skipped because no GPU was detected yeah this is extremely important if you later want to do something like a CI where you may not have a CPU and which will just fail directly if you don't wrap it in this decorator okay the second thing you should notice here is that before each call to the network we set a manual seed a manual random seed for a torch This is because our network is a probabilistic model and it is non-deterministic because of this noise tensor that I've shown before. So we just set the manual seed here to a nice value each time before we evaluate to make sure that the output of our networks can be the same, otherwise it will just fail. But the random seed of Torch is not the only one you should be aware of. The other one is the one of NumPy and the Python random seed. So this is a little helper function that I've wrote for my tests. It's just called make deterministic. And first of all, it sets the manual seed in PyTorch. Then it sets the QDNN backend to deterministic because otherwise QDNN will try to find the best algorithm for your stuff. And this may lead to problems later on. It sets the NumByRandomSeed and the PythonRandomSeed too. Okay, I have to speed up a bit here. Next thing is sample independence, which is basically if you put a batch of samples through your network, these samples should not interfere with each other on the backward pass. Otherwise your model may do something stupid. So each of these samples in the batch should produce the same output if they are in the batch or if they are just piped through on their own. To do that, we are just going to do a small backward pass and we are going to mask the loss for one of our samples and then check if the gradient is zero for the masked one and if they are non-zero for all the other ones. you should see here is that we do not have the no gradient decorator because this time we need the gradients and the other thing is that we put our network into evil mode because there's one interaction between the batch stuff in the training mode and this is the running mean of our batch norm so be aware of that there can be interactions between the samples in your model that you want and for this test to succeed you have to deactivate them okay next thing is parameter updates which is all the parameters in your network should be updated when you do an optimization step if they are not this is weird because then the parameters are either not used or you did something wrong which is basically just again do a backwards pass do an optimizer step and see if the gradients are there so if they are not one none and if there is if the gradient norm is bigger than is greater than zero which they should be in this case because we did a really dumb loss okay these four tests are the same for each model in my opinion so every model you do you will need these four tests so you should reuse them but you are you should not just copy the code what you should do is do a test template to do that in the unit test framework, you just move some of the code that you're using in all of your unit tests, namely defining an input and defining the network to the setup method. This method is automatically called before each of your test functions. And what you then do is just lift the setup method up to a template class where you just define all of your unit tests and then have child classes for each of your different models that inherit from this template class and you if you are then adding a new model for example this cnn variational autoencoder here you just have to instantiate a new child class and then you have all the tests that you already have for your for your previous model low overhead the last thing you should do test your trainer first of all you should test your losses this is a kl divergence loss which is used in the variational autoencoder normally i would have asked if anyone sees the error the joke is that there is no error but nobody would have guessed that but still every time i code this down i make an error and i just get it afterwards what you should do in these cases is try to find an implementation of this function or this loss in some other package luckily scipy has a kl divergence function that we can use here to test if our version which can produce gradients is the same so what we do here is we generate two distributions take samples from them put them in the scipy kl divergence function and see if the output of this gold standard function is the same as an hour function, which it is in this case. Be aware you're comparing floats here, so even though they should be the same, they most of the time are not. So we add a little delta here, so the difference, there can be a difference between them, but they should be in the same ballpark. Okay, next thing, logging. Because when your training succeeds and you didn't log anything you don't know if it did. Test the logging. I have to speed up again. This is pretty straightforward. One thing you should keep in mind, use the mock package, look it up because I don't have any more time. Next thing, this is a really simple test but it's really important. Check if your whole setup is able to overfit on a single batch. If it it is, it's most probable that it will be able to fit your whole dataset. What this does is it just trains on a single batch for a long time and sees if the loss is really small. Okay, next thing. When should you run the tests? All the time, but you will forget it. I forget it all the time, and then you have outdated tests and buggy code. you should do is use continuous integration. You will say, okay, continuous integration is hard to set up. It's not. GitHub Actions makes it easy. This is the code you use. You just put it in your repository, GitHub Actions stores all the other stuff. It works. If you want to see this talk again, because I was just too quick, you can check out my blog. talk is there as an article and some other stuff and then thank you for your time
+
+**Speaker 2** _[26:29]_
+
+Yeah, thanks Timon for the quite getting more and more fast talk
+
+**Speaker 1** _[26:34]_
+
+Ha, ha, ha.
+
+**Speaker 2** _[26:36]_
+
+with a lot of information. I think we are interesting guys who will go more into detail and look into your blog post. We have also some questions. I have two. Okay. Two questions. Maybe we can also find several questions here in the audience, but we start with the two questions. How fast is a test that needs to go over the whole data set, like the one you showed, with a scaling? Is this manageable with huge data sets?
+
+**Speaker 1** _[27:18]_
+
+Okay, obviously, if your data set is big, you don't want to do that. Here you have a trade-off between precision and speed, so you could just sample a smaller version of your data set and go over that and live with the probability that there is an error. But as we have seen in previous talks, there are also these data unit tests which can help with this problem. Just move stuff like this where you want to see if your data is even worth anything, your data quality, to another step in your pipeline.
+
+**Speaker 2** _[27:54]_
+
+Okay, and then we have a second question. The first was from Lucia, and the second one is from Martin. Where do you store your test data? If it's too big for storing it in the same Git repository as a code? I don't understand the question. I have to think about it.
+
+**Speaker 1** _[28:17]_
+
+to think about i think the question is um and let's answer it that way you should not commit your test your data yes um so what this example does it just uses the torch vision version of mnist and downloads it when the test runs the first time so for a small data set you can do that please don't not commit them otherwise you should have like a hosted version of it maybe an S3 bucket or something like that where your tests can download it. Otherwise, sometimes it's maybe okay to, like if you have an image data set, and you have one single image that you can try some stuff on, you can commit that. But please do not commit code to your GitHub repository, it would just be too big.
+
+**Speaker 2** _[29:06]_
+
+Code is okay. You said code
+
+**Speaker 1** _[29:07]_
+
+Yeah, data. Code is okay, data is not. Sorry.
+
+**Speaker 2** _[29:12]_
+
+Okay, several questions in the audience to the talk.
+
+**Speaker 1** _[29:18]_
+
+hopefully
+
+**Speaker 2** _[29:20]_
+
+For some other question No, so but we are also done now with the time actually so thanks again tillman
+
+---
+transcript_status: auto
+---
+transcript_language: en

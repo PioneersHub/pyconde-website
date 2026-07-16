@@ -1,0 +1,169 @@
+title: Introducing the Dask Active Memory Manager
+---
+description: The Active Memory Manager is a new experimental feature of Dask which aims to reduce the memory footprint of the cluster, prevent hard to debug out-of-…
+---
+created: 2022-01-04
+---
+code: MZUDYP
+---
+slug: introducing-the-dask-active-memory-manager
+---
+speaker_names: Guido Imperiale
+---
+speakers:
+
+
+
+### Guido Imperiale
+
+_About — in the speaker's own words_
+
+I worked 10 years on the technical infrastructure underlying Monte Carlo simulations for finance.
+I'm currently busy full time improving the dask and dask.distributed open source packages.
+---
+abstract:
+
+
+The Active Memory Manager is a new experimental feature of Dask which aims to reduce the memory footprint of the cluster, prevent hard to debug out-of-memory issues, and make worker retirement more robust.
+---
+full_description:
+
+
+Historically, the Dask scheduler did not implement any particular logic to manage distributed data after it's been created. This can lead to imbalances in memory allocation throughout the cluster, excessive memory consumption, and counter-intuitive out-of-memory issues.
+
+This talk introduces a new feature of Dask, the Active Memory Manager daemon, which aims to resolve all these long-standing issues by removing unnecessary replicas and moving around the rest to even out the memory load among workers. The same system also allows for more robust worker retirement, adaptive downscaling in the middle of a computation, and a redesign of the OOM worker pause.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: PyData & Scientific Libraries Stack
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 1702
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: some
+---
+domain_expertise: expert
+---
+supporting_material_url: https://coiled.io/blog/introducing-the-dask-active-memory-manager/
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/MZUDYP.png
+---
+youtube_id: pYtjhhVLqFQ
+---
+video_link: https://www.youtube.com/watch?v=pYtjhhVLqFQ
+---
+video_published_at: 2022-05-06
+---
+video_duration_iso: PT29M29S
+---
+video_thumbnail: https://i.ytimg.com/vi/pYtjhhVLqFQ/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+Historically, Dask has been laser-focused on delivering the fastest performance possible end-to-end runtime of a problem. This sometimes has come at the cost of less than optimal memory usage, which on occasion was a libress, an afterthought. First, before I start, how many people in the room are already familiar with Dask? Raise your hands. Okay. Not so bad. Those that aren't, you may find yourself a bit disoriented here, as this is quite a bit into the internals of Dask. But tomorrow morning at 9 a.m., there will be a tutorial from one of my colleagues that starts from scratch and it's highly recommended. So those that already run DAS distributed may have already found issues with a lot of memory usage. This is stemming from different reasons, but the chief one is that whenever you have a task that finishes on a worker, it will leave its output on that worker. When another task on a different worker needs the same data as an input, the task, the data, is copied over. Let's look at it. So here I'm creating a cluster with two workers, and I am submitting a task, simply a function that returns one. In this case, I'm artificially saying I want this task to run on worker zero, normally I wouldn't have that specification, I would just say run this task on whatever worker is free and the task would choose it. I wait for the task to finish, the result is 1, and then I query the cluster and ask okay, where is the data of this task? And I see that I have the output on worker 0, and worker 1 doesn't have it, it didn't run the task, it doesn't have no reason to contain a copy, so it doesn't have it. Now I'm going to run a second task, y equals x plus one. Now, if I didn't put these workers one specific task would notice that the cluster has two workers. Both of them are free. Worker Worker 0 already has all the input data, worker 1 doesn't, so it would choose worker 0, therefore avoiding a copy of the data. However, let's say that worker 0 is fairly busy and worker 1 isn't. At that point, Dask will choose worker 1 because it will privilege CPU allocation over the cost of memory transfers and data duplication. Using this artificial example, I'm forcing the copy from worker 0 to worker 1. So I'm running Y on worker 1, and that forces an automatic copy of X. I didn't ask Das to do the copy, it just happens, because Das realizes that Y requires X. So now I'm going to query again the cluster to see what the data situation looks like. What do you think the output will be? We have Y on worker 1 where it just finished. We have the original copy of X on worker 0 and we have a new copy or replica of X on worker 1. Now I have two copies of x, and x in this case is a tiny integer, but in real life it may be hundreds of megabytes worth of numpy. This is actually something desirable as long as you have infinite amount of memory. Why? Well, because if in the future I have another task that also requires x, I won't need to transfer it again. I already have it on both workers, so all workers are already hot and they can fire off the new task straight away. If X was a transitory task, meaning a task that is not referenced by any client, but is just an input to something else, then the scheduler would delete it as soon as possible. But in this case, X is referenced by a client, so it will stay there indefinitely. Other issues in memory management that people may find is that if you have a task that has, let's say, 16 inputs, and those 16 inputs were computed on 16 different workers, Dask will have no option but to get those 16 outputs and copy them over onto a single worker. And that will cause a memory spike on one of the workers of the cluster. DaskArray and DaskDataFrame already mitigate this by having recursive aggregation in all of the reductions. If you take da.sum, for example, to reduce the data frame at an array on the columns or on the rows or whatever, under the hood you're actually having chunks of four and then four and then four recursively, so exactly to avoid this kind of coagulation of memory onto a single worker. Another problem that a lot of people may have been stumbled upon already is that when a worker hits 60% memory usage, it will start spilling data to disk. If that is not sufficient and the worker hits 80% memory usage, it will pause and refuse to accept new tasks. If that is not sufficient and it hits 95% usage, it will be killed by the nanny. The idea being that that is preferable for to have 100% at which point theoretically the Kubernetes watchdog or whatever else you're using will kick in and just do the killing. Now when the process is killed, all the data that you have on that worker is lost. Good news, you are not going to experience a crash in your computation because the scheduler will notice that it lost a worker and all the data on it and will just reschedule it somewhere else. Bad news, you just lost a lot of time because you have to rebuild whatever was on that worker. Worst news, if this is a systematic problem, now you may have another worker that ends up exactly in the same condition. To solve all of this kind of problem, we came up with the Active Memory Manager. AMM, for short, is a daemon that runs every couple of seconds in the scheduler. It analyses all the tasks in the cluster that are in memory and asks its policies, which is a plug-in system for suggestions. Every policy goes through the task that it cares about and issues two kinds of suggestions to the NMM. Replicate a task that is already in memory on one more worker, so if the task exists on only one worker, say, create a copy somewhere else. If it exists on 2, create 3, et cetera. It can ask to just create a copy somewhere, the AMM will choose whatever the worker with the lowest memory usage is, or it may ask for a specific worker or a specific short list of workers. Another, The opposite suggestion that a policy could do is to drop a replica. This can only happen if you have at least two replicas of a task. The AMM will flat out refuse to delete the last replica of a task. It will also flat out refuse to generate more replicas than you have workers. There are a lot of other more subtle things that the AMM will notice and will use to reject a suggestion when it is unwise. The whole idea being that a policy can be as sophisticated as you want in terms of decision-making progress, whereas the AMM doesn't know about decision-making, doesn't know why the policy decided to drop or replicate but it guarantees the stability and robustness of the whole thing and one of the key features of AMM is that you can run it while the computation is running you don't need to push a button like for example client.replicate which is something that exists today it just runs on its own every two seconds and it's guaranteed to be performant and stable For the same sake of simplicity, there is no move suggestion. You have replicate, or copy if you prefer, and drop. If you want to do a move, first you do a replicate, second iteration, two seconds later, you do a drop. The condition may have changed two seconds later, so your same policy may realise, actually, I don't want to drop that key anymore, I want to drop another. I want to do something else entirely. The cluster evolves over time and the policies over time will take different decisions. AMM is at the moment an experimental feature which is off by default. If you want to play with it, all you need to do is flick the switch. You can do it through the Dask config by simply setting the flag here, as shown, or on the fly even from the client, client.amm.start, that's it. You need a fairly recent version of Dask, what I am demoing is 2022.2 onwards. Alternatively, you can set the config from the command line, or if you're using Coiled, as I will in the demo in a few minutes, you can pass the environment variable through the coiled cluster creation. So as I said, the AMM in and by itself is very dumb in terms of decision making. It actually doesn't do any decisions. It just asks the policies for decisions and then enacts them. What policies do we have? Well, at the moment, we have two policies available in the package, which are Remove Replicas and Retire Walker. And we have plans in the future for two more, Rebalance and Replicate. On top of that, this is a plugin system, and it is designed to let the users add their own policies. For example, you may have a hybrid cluster where some hosts are GPU enabled and have not so great memory, and other workers don't have a GPU and have a much larger memory capacity or something like that. And you may say, well, I want to replicate this task that contains GPU-specific data on a short list of workers, which is only those that have a GPU. Or you may say, yes, I want to replicate this CPU-generic data, but please avoid the GPU-specific workers, because on those, memory comes at a premium, or whatever else may come to mind. Or you may have some data that you know is very, very expensive to pickle and unpickle, and you say, actually, skip this one, just shuffle around the NumPy data that is quick to serialise. policy that we have right now is AMM remove replicas and it is on by default, all you need to do is activate the active memory manager and you will just have it running every two seconds. What does it do? Whenever you have two plus copies of a task in memory, it drops extra one if it deems them not useful in the immediate future. This drastically reduces the memory consumption in the cluster and that's something I will show in a second. RetireWorker is something that you may actually have already used even if without realizing. It is the backend of client.retireworkers and it is used also by the adaptive scaler whenever you scaled down a cluster. It is at the core of what we call graceful worker retirement, meaning unlike when you kill a worker and you lose everything, when you decide to retire a worker and you have some time and the worker is still working, you can flush out all the data to the rest of the cluster and then shut it down without losing anything. In the future, we want to add rebalance, which is complete overhaul of what currently is the client.rebalance command. We want to get rid of the command entirely and instead have this thing that runs every two seconds and continuously moves data from the workers that have the highest memory usage to the workers that have the lowest, so that the problem with spikes in single workers of memory should be a lot less visible. And finally, replicate is going to reimplement the current client of replicate command. So you have some very precious data that took you a lot of time to complete, but you have some stability issues in your cluster, you can say, okay, have four copies at all times of this piece of data. And unlike the current replicate command, whenever you lose a copy, AMM replicate will regenerate the copy continuously until you have four or whatever many you ask for. For example, how will these policies work together. You have something that leaks memory and leaks memory very severely and you end up over time with 80 per cent of your memory in leaks. It's no longer usable, it just sits there. So the worker is paused, you get stuck there in pause state because there is nothing to spill, it's a memory leak. After 30 seconds or so, it transitions into graceful retirement. This is something that we hope to deliver in Q3. And retired worker takes all the data, all that valuable data that was sitting on that worker, and shuffles it out to the rest of the cluster. Then that worker is shut down. Replicate will recreate whatever data that was there that now has less than the desired number of replicas. In the meantime, the worker goes back online, and it goes back online, brand new worker, and it's completely empty. AMM Rebalance will see that there is the rest of the cluster with a substantial amount of memory and a completely empty worker. We'll take some data from the rest of the cluster and put it on the new worker. All right. Now, I will show you the reduced replicas policy. I am going to use a cold cluster here. I'm actually going to use two parallel cold clusters that are 16 workers, two threads per worker, six gigabytes per worker, perfectly identical except for this one weird trick which is enabling the AMM for all other purposes they are perfectly identical I have started them ahead of time to save two or five three minutes okay and now I'm gonna test okay client 1 AMM is not running client 2 it is running now I'm gonna define a square matrix of a bit less than 6 gigabits with DaskArray and now I'm gonna put it in tensor dot with itself. This is a particularly brutal exercise because tensor dot is n-squared computation where every chunk needs to be put together with every other chunk so all all the nice ideas behind the ask of a worker contains only a little bit of the whole data set fly out of the window. Every worker eventually will need the whole data set. But we need to be careful not to have it at the same time because we simply don't have the space to store it. And now I'm going to send them to the two clusters in parallel. On the left, I have the memory usage on the cluster without AMM. On the right, the exact same computation the cluster with AMM and bar goes orange when it goes beyond 50% if it reaches 60% it starts spilling if it reaches 80% it pauses if it reaches 95% it dies and we can see how it is less memory-intensive on the right and once it is finished we will be able to see the differences on top of each other I use a small example so just wouldn't take the entirely entirety of the presentation it's on the started to dwindle down And we can see how more or less at all times, the one with AMM is somewhat less memory hungry, but now we will see them on top of each other. And here you go. In the initial part, there is not much difference, but once you get to the core of the computation, you see the difference. This is the total memory usage, the sum of the memory across all workers, and you see how the one with AMM caps out at 46, 47 gigabytes, whereas the one without goes fairly higher. Are there questions? Maybe somebody wants to, sorry, microphone.
+
+**Speaker 2** _[22:27]_
+
+So then, you mentioned that rebalance will basically try and take workers that have high memory usage and distribute the keys amongst other workers, but I'm assuming this only works for workers that have completed their task, or how would it work if the keys are necessary for actually doing the computation?
+
+**Speaker 1** _[22:50]_
+
+So, the AMM avoids tasks that are just being copied over to a worker to serve as an input to other tasks. We're talking about tasks that individually are at rest. The cluster itself is not at rest. You have a computation going on, but if you have a task that is a dependency of another task that is queued, it is completely ignored by the AMM and it reverts to the traditional algorithms of plain and thus distributed.
+
+**Speaker 2** _[23:27]_
+
+All right, thank you
+
+**Speaker 1** _[23:41]_
+
+Thank you. How do you define a custom policy or register one? You need to follow a duck API, duck type API, and you have access to the list of the tasks on the scheduler, and you can define a policy, you can define, you can go through them, well, I would not recommend to go through all of the tasks on the scheduler sequentially, but you can track, for example, a subset of tasks that you're interested in, or you can have your own memory structures to keep them in check. We have additional memory structures, for example, specifically for tasks that have more than one replica running, and you can tap on those. And once you go to your decisions, you just yield them back to the AMM. All of those are thoroughly documented in the dust distributed page of the AMM with plenty of examples.
+
+**Speaker 3** _[24:54]_
+
+So we have a few from Slido. What is the best reduction in peak memory consumption that you have seen in practice using AMM?
+
+**Speaker 1** _[25:07]_
+
+First and foremost, in practice is a hard question because this is disabled by default for obvious concerns in terms of stability. And every time I see a crowd like this, I try to push, please, play with it and come back to me and tell me if it breaks. producer dot is probably one of the biggest examples. As a general rule, if you have an embarrassingly parallel computation, AMM will make no difference whatsoever, because if it's embarrassingly parallel, most times you will not have data transfers at all. You have the beginning of a bunch of siloed computations, and every worker can just take one. If you you have something which any any kind of n squared problem will benefit the most because those are the ones that need to copy around most data
+
+**Speaker 3** _[26:16]_
+
+One more. What do you mean by the worker will keep valuable data? What is valuable data?
+
+**Speaker 1** _[26:26]_
+
+That is entirely up to you to define, but say, for example, you have a first stage of a computation that took you five hours to complete, and you have a second stage of a computation which is performed by a C extension which has a habit of segfaulting once in a while. You don't want to lose those five hours just because a segfault killed the worker with the one and only copy of the data on it. What you said you want to do is say, okay, four copies at this point, and oh, you have a segfault, fine, just restart the worker, copy the data over somewhere else, and now you have three copies, back to four AMM replicate.
+
+**Speaker 3** _[27:19]_
+
+And one more from Slido. Will AMM be affected by storage backend being used? For example, ZAR.
+
+**Speaker 1** _[27:32]_
+
+Not really. As long as your data is in RAM, AMM will not really notice. AMM does handle a special logic for data that is spilled to disk. So if you spill something to disk, there will be decisions that change. Namely, you will not have data that is moved around if it's built to disk unless absolutely necessary because you will not get any any RAM back it's already on disk
+
+**Speaker 3** _[28:13]_
+
+Okay.
+
+**Speaker 1** _[28:14]_
+
+We
+
+**Speaker 3** _[28:16]_
+
+time for one more question from the audience, if there is one.
+
+**Speaker 4** _[28:25]_
+
+I was wondering where the policies that you use were coming from and if you take any inspiration from other distributed framework. I'm coming more from the Spark world and I'm wondering if you took some of them from there or from other ones.
+
+**Speaker 1** _[28:43]_
+
+No, not really. In previous jobs, Monte Carlo is very, very heavily. Monte Carlo computations tend to be very, very heavily embarrassingly parallel. Most calculations, 95% of the calculation is embarrassingly parallel there, so not really. This is specific when you start having matrix dot products or such.
+
+**Speaker 3** _[29:16]_
+
+Um
+
+**Speaker 1** _[29:17]_
+
+I would...
+
+**Speaker 3** _[29:18]_
+
+Maybe you can ask it later because we have another talk in 10 minutes. Let's thank Guido for his excellent talk, excellent presentation.
+
+---
+transcript_status: auto
+---
+transcript_language: en

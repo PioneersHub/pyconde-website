@@ -1,0 +1,174 @@
+title: Boost your app to Flash speed by mastering performance tricks
+---
+description: In this talk, we discuss computational operations and memory utilization in Python and what is the connection between them. Additionally, we will provide…
+---
+created: 2023-12-22
+---
+code: C9F9CC
+---
+slug: boost-your-app-to-flash-speed-by-mastering-performance-tricks
+---
+speaker_names: Laysa Uchoa, Yuliia Barabash
+---
+speakers:
+
+
+
+### Laysa Uchoa
+
+Laysa is a digital architect who constructs scalable structures using the magic of the cloud and Python. She is a certified cloud engineer and an enthusiastic advocate of the Python language and its environments. In addition to this, she serves as the leader of the PyLadies Munich chapter—a community where individuals gather to learn, share, and nurture their growth.
+
+### Yuliia Barabash
+
+_About — in the speaker's own words_
+
+I have lived in Germany for the past five years, during which I have gained a diverse range of experiences in the tech industry. My expertise spans from developing web applications in Python to constructing AWS cloud solutions. I have a good understanding of design patterns, Object-Oriented Programming (OOP), event-driven architecture, and microservices architectures. Additionally, I have hands-on experience with REST API design and database technologies. I am continuously committed to enhancing my skills and ensuring that I utilize tools in the best practices.
+---
+abstract:
+
+
+In this talk, we discuss computational operations and memory utilization in Python and what is the connection between them. Additionally, we will provide you with visual aids for helping to build a mental picture of these concepts. Moreover, we will dive into how Python interpreter works and how the understanding of bytecode instructions can help you write better code. In the end, we will demonstrate the advantages of best practices by comparing both performance metrics and bytecode instructions.
+---
+full_description:
+
+
+Nowadays, more and more companies are looking for different strategies to gain more users for their products by using different approaches starting from introducing unique features to optimizing application performance. Additionally, python is one of the widely used programming languages where the community continuously introduces new libraries for enhancing performance and optimizing memory usage. However, can we also accelerate app performance not only by relying on libraries but also by understanding how Python works under the hood?
+
+In this talk, we discuss computational operations and memory utilization in Python and what is the connection between them. Additionally, we will provide you with visual aids for helping to build a mental picture of these concepts. Moreover, we will dive into how Python interpreter works and how the understanding of bytecode instructions can help you write better code. In the end, we will demonstrate the advantages of best practices by comparing both performance metrics and bytecode instructions.
+
+If you're keen to move beyond basic optimizations and truly understand what happens under Python's hood during application execution, this session is for you. Join us to learn how Python works under the hood and also have an imagination of what is going on in Python during the application execution.
+---
+room:
+---
+day: Tuesday
+---
+slot_date: 2024-04-23
+---
+start_time: 11:40
+---
+end_time: 12:10
+---
+slot_id:
+---
+track: Python Language & Ecosystem
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 3578
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Novice
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/C9F9CC.png
+---
+youtube_id: q4WICGF7pL0
+---
+video_link: https://www.youtube.com/watch?v=q4WICGF7pL0
+---
+video_published_at: 2024-10-28
+---
+video_duration_iso: PT28M51S
+---
+video_thumbnail: https://i.ytimg.com/vi/q4WICGF7pL0/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:06]_
+
+Short correction, my name is Laisa, but I do have a cousin called Laila. So our talk had a very fancy title, Boost Your App to Flash Speed by Mastering Performance Tricks. But even that we already optimized. So what actually it's about? We're going to show you how Python tricks us with performance. And therefore, maybe you will understand how Python actually works and how you can improve your code. so about us my name is laisa and like liza in german but i will try to be not so liza and here is yulia barabas
+
+**Speaker 2** _[00:48]_
+
+Hi, everyone.
+
+**Speaker 1** _[00:51]_
+
+And we both work at a company called Nord Cloud. We provide cloud solutions. We are cloud engineers. We do work a lot with Python. And we are involved in some of the Python community. Where do we live? Maybe you recognize this symbol. We live in the beautiful city of Munich. And we have a very nice, lovely Python community there. So people come to us normally with problems. Sometimes with solutions, but mostly likely with problems. And some of the problems they have, it's like they want to optimize how they use resources. They don't want to pay so much for resources. They want to make the application lighter. Because if you have a heavy application, you end up losing users. By the end of the day, what actually you want is to make your users happy. And every time you are in a meeting, people bring also solution. and one of the solutions, I say, it's optimization. When you talk, you cannot just go to a meeting and say optimization and run away. You have to explain what optimization actually means in this context. And there are many ways that you can optimize code. Some of the ways you may be aware, you can do refactoring, you can profile to actually understand if your code should be optimized or not, or if there was some optimization after process, You can do cache and so on and so forth. One of the ways that normally people don't, they neglect, is code execution. And you may wonder why. Of course, we are not machine and we are not always looking at machine code, how machine executes code. But code execution is actually sometimes important. And this talk today will be about this. I was outside, and people asked me, what are you going to talk about? And I say Python internals. Wow. They made a face like, wow, this is hard. And yeah, it's a complex topic. And if there is any Python core developer here, raise your hand. Few. There is none. But yeah, but we had saw a lot of things related to this, and it's a complex topic. But what we want to bring to you today is something that anyone here could start to use this in a practical way and understand how that works. Because yeah, that's what we believe. So we're going to be focused on what is essential. Of course, we're going to do some abstractions so everyone can understand. We do have to talk how Python executes code. And the first thing you have is the build phase. So in this phase, you type your code, you write, you have your Python code. And then there is compiler. So, what the compiler will do is actually generate a bytecode. What is actually bytecode is a set of instructions that the machine understands. So, you can try to understand like this. Python is a very high-level language. So, you can read. If you understand English, you can understand so-so what things are happening. So, it's not a very low-level language. You're not talking to the machine directly. So the compiler will actually generate bytecode, and bytecode is that. After that, this is a set of instructions that you're going to give to the interpreter. So it can execute your code. Great. These are normally terms you heard. You heard compiler, you heard interpreter, Python virtual machine, very great stuff. But what is if I would explain to anyone what actually would that be in simple terms? So I took this Volkswagen photo, and because I live in Munich, we have a lot of auto engineers, and we are all working somehow to the auto industry. So maybe if you are talking about auto engineer, maybe they will know how to build a car with these pieces. Maybe. I guess not me. But yes, what the compiler would do actually is it would try to get all this information. If a compiler was an auto engineer, he would try to get this information and create a set of instructions. Okay. Maybe they know by head. They can tell Python, okay, type it like this, do it like this, do it like this. But in the end of the day, what they actually want to give this information is to a robot. Or if you are interested, like, cook a robot is very used on that. And the robot would build the car. Great. Now we have an imaginary car like I do. So we have the set of instructions. Interpreter would build the car, and in the end, the car would be associated with your code being executed and doing something. That's what the Pyto interpreter actually does behind the scenes. One component that we have here is the bytecode. So your bytecode became your C Python bytecode. And bytecode is the machine code for virtual machine. Because it's not really the machine, because Python has Python virtual machine, so bytecode is actually what you're giving to the virtual machine. You may tell me, no, I never saw bytecode. I don't know what you're talking about. I only have my Python code. But if you ever had the curiosity of looking into the cache files, you saw something like this. Maybe you can open and you can try to see. It's something like, oh, well, I cannot read that, to be honest. But this is how the cache files work. But if I show you something like this, you can read. Because if you understand load, constant, some programming concepts, and you can understand And return value, okay, there are some numbers here. They may make some sense. So we are looking for something that can give us from that to this. So we can understand how a code is executed. And there is a model in Python called these. They're actually these model, and there is the these from disassemble. They are two different things. So this one, these, it will help you to disassemble your code so, like, make it in a way that that you can read and understand. So here is a simple example for us to get started. So let's get started. Import this. You have a function. You can either give a file or you can give a function. Here I'm giving the function. And you have this information. Okay. A constant was load. This constant, there is a value 3 here where I'm summing 1 plus 2. So probably is the tree of the constant, and there is a return value. This already gives you some insights. Let's go to the next example. You have here A and B. Now we are giving arguments, we are not using constant, and we are adding. Load fast, so A is load fast, B is loaded fast, okay, there is a binary add, I understand that is a binary add, and there is a return value. That's very good. So what does instructions actually mean? So you have line here. This line is associated to your Python source code, not to the bytecode. So in one line of Python source code, you can have several instructions. So that's why you only have one line here. You have the offset, which is the starting index of bytecode instruction. These two are okay. You can understand. Not so important. The important ones here are like operation name. So there is a lot of operation names that tells you how this works in the machine. How your code is executed. And you have it here and so on. And you have here argument index, which pretty much a way that you can access these arguments. The access is arguments A and B. And the argument value, which was given to the function. This already gives you better insight. But this was just like intro. Now you're going to get deeper into the code with Yulia Barabas. So let's give a big applause to her.
+
+**Speaker 2** _[09:18]_
+
+So thank you very much for the practical part, and let's dive into the theoretical part. Thank you for the theoretical part, and let's dive into the practical part. But before going to some complicated one, I will just show you a small example of what actually is happening inside the Python. Because when you're debugging, you think, OK, it's happening line by line. But actually what is going is going line by line by bytecode instruction. And here we have a small example where we have two values, and we want to add two values. And what is actually happening inside the Python, during compilation phase, it parses all your variables, constants, functions, and so on, and somehow plays. Right now, it simplifies. It's just placing the memory. During execution, it will retrieve the value, sum it, do an operation, again, save inside the memory. In this case, it will load constants for form. And after that, we'll start to the memory with variable A. Again, we will have a similar operation for B. We load our constants 5 and save it with variable B. And during execution, and again, retrieves from the memory, it loads the name. Loads the name, it usually retrieves the variables from the memory, and also push to the stack where this is happening executions. There are specific stacks where you push all operation. And in these stacks, it will happen execution. For example, in our case, it will be binary operation. And we will load all variables there, load A and B. And after that, we sum up, and we start our C value. Great. will just very small example to show you what's actually happening but now it's getting very interesting because right now we want to also challenge you if you really understand some performance tricks and after that we will explain you why these tricks actually happening by showing some by code so let's start with the first hour round of questions and basically is the easiest one and also very common to use is basically how you create your strings inside your python code and right now we have three options we will have three teams one three one team will be for s for uh c style formatting another will be for f strings another will be for coordination operator And now we will log in to the Kahoot, where you can log in and you can vote. Let's take your time. Get ready. Get ready. Get your phones. And let's see how well you know Python, how you know some performance tricks, and if you understand them. There's also price in there. But it will be secret price. but it will be some kind of the crisis, okay we have 8 people great, we have 40 people, let's get more, I see more people here it's not 30 people I need more people, is it somebody, let's get inside okay, it's getting 64, 60 70, yeah we're getting great and also we can see like we will have different teams and we will fight, maybe it will resolve some of your PR comments, usually there's a lot of them, so a lot of questions and people not always have answers 178 ok 150, ok 160, yeah it's getting harder, 170 nice 170 more we need more people Can we have 2,000? Okay, great. I think this is all, right? No, it's still not all? So let's start. We need, unfortunately, we need to start. Okay, let's go to, unfortunately, we need to start. okay let's start so the first again you need to select what's the fastest operation is it by creating f strings is by using c formatting style or c style formatting or by using operator plus for creation of the string and after that you can have answer also it's good to check what you use in your code because for some people performance is very important even some companies just fight for every microsecond. They show their best one and the stronger ones. And let's see our answers. So actually the fastest one is operator using plus. Everyone, a lot of people vote like F, strings, but actually it's operator using plus. And here we will show you Why? Because operator using class doesn't care about formatting of your string. And also he doesn't have execution another function of build string. He just will call another function binary operation add to strings in terms of your results. He doesn't care about format. And because f strings cares about formatting, it takes some time additionally. If we compare f strings to the C style strings, that's very similar in a by-code. So we have the similar number of instructions with a format value. We had build strings. We have additional instruction load constants. But at the end of the day, f-strings was also optimized. So execute faster internally in build strings with also formatting values. It happens faster. That's why they have better performance and C-style strings, but the fastest ones was continuation operator plus. Okay, next round. It's getting hotter. Yesterday we had a very heated discussion about this, so here is also very interesting questions. What is the fastest? If you just, without function, without class, execute to your code some like operations inside for loop, Or, you create the function, pass all arguments, and we'll execute your operations there, and after that calls the function and retrieves the value. So what do you think was the faster ones? Also we didn't discuss our winner after this question. Let's have our winner, okay, Nick, very interesting. But let's have the next one. And what was the run, who runs the faster, is it calling the function, or is it execution directly in the code? What do you think? It's very tricky, yeah, sometimes people fight during PR, they thought about, okay, should Should we use function, should we use directly somebody just want to write like scripts in one file and execute it? But actually, okay, a lot of people knew the answer, so 80 it was by calling the function, but by calling if you pass all arguments to the function, it will be faster. But now let's check our winners. So it was meek, now it's test one, test one. you maybe get price, but let's see. After this one, you're really not a lot. It's another, like, second in a row. Good. And it's also Janice and Cha. Okay, but let's go, and let's check our bytecode. More or less, bytecode looks the same. What's the only difference? How we load our variables. Because in the execution inside the function, we have load fast. In the execution directly in the code, we have load name. Load fast already gives you a hint because it's fast. But it's a bit also more. It's more of what is happening behind Python because when you parse your code, you also save all your variables inside tuple for methods. So inside load fast, it will just access your local variables via index. But load name will also check your local variables, check global variables, built-ins, And usually data structure, if I understand, it's dictionaries, that's why it's more time-consuming. It's more time-consuming, so it's very sometimes like functions have better time performance that basically directly in the code. Great. Next, the round three, and here is also the trick. We don't have one question, we have two questions. And the idea of this round to check about the list in the element and also check the element in the set. What's faster, if you use list or if you use set? And the thing here, the number of elements and elements for list and set are the same. Are totally the same. So, let's go and see. What's faster, to check element in the list or to check element in the set? What do you think? It's a very common operation, a lot of people are using it, so for some people it will be interesting.
+
+**Speaker 1** _[19:33]_
+
+Often,
+
+**Speaker 2** _[19:36]_
+
+also on the interview, I hear it's also in the interview questions, this kind of depression, but in our case, it was the least. Yeah, only 53 people know. Okay, let's go. And who is the winner? Chu. Chu is really getting good. Benny as well. Okay, let's go. Next question. Again, we need to check element in the list and also in the set. What is the faster? Is it check the element in the list or check in the set? It's the same. This also can be a bit suspicious because it's like the same questions, but somehow it can be maybe there's hidden trick here. Okay, in our case it was set. So it's very two questions. Similar questions, but different answers. Why? And also bytecode looks the same. It's also very complicated and very confusing, so we're getting scared. But I also wanted to trick you, and I wanted to trick you and hide some implementation. It's basically bytecode understands what kind of object of it, so in the first case it understands that it is, or it understands that. Even later it calls the same operation, contains all, but it will execute differently for list and set. In case of the list, it's also a very important factor how it checks if the element inside the list is going through all elements from the beginning till the end. In case of first questions, we were searching for the first element in the list. It was very fast operation. You check the first element and return. In case of second questions, we look for another element a bit deeper in the set in the list. That's why set was the answer, the correct answer, because in case of the set, it doesn't go through all elements because if you know sets contains unique elements and these elements are hashable. That's why Python core developers decided, not decided, I'm not sure, somehow they did it. They're using hash values. They calculate hash value of the elements that you search and after that check if this element exists. So it's always like similar price of the operation. Great. And now round three, but we didn't check our winners. Maybe we should check our winners first. Ben. Ben is really smart. Like three, Matt as well ignores. Good. Round four is also very common. It's basically how you import your module. We have here two options. The first one, you import the whole module. After that, you call the function, or you import the function directly from the module and just reuse the function, entire code base. So let's go and vote. Next. And the last question. After this, we will have our winner. So let's do it. Let's do it. Let's see what's the fastest. It's also very interesting question because some people neglect it, but for some developers who fight for every performance, microseconds of performance can be useful and also very interesting to go, but yeah. Actually it was the second option is to get value, import the whole function from the module and later use, but somebody knows why, why exactly. And by code, no, it's secret who is winner, but by code knows it, why it's, because first of all when we, it's the first case, if we import the whole module, we will store the whole module in our namespace, after that we always use get attribute, it's also operation to retrieve our function, so it's additional operations that can give you some overhead, sometimes small, but for some people it can be important. Another one is to get the whole function, the whole module, after that store the function in your namespace and just reuse this function, entire your code base, and it will just, it will cause a small overhead. So let's time check our winners, and we know Ignacio is the first one. Who is that, can you, can you show, yeah? Maybe he is online, Ignacio, are you here? Raise your hand. Ah, you're here, great. We will ask you later. After that, we have A, doze is we have, okay, great. You will give the next talk on Python, ladies. It's your prize. And after that, we have Matt. Matt, are you here? Great. So if we conclude, thank you, our winners. If you conclude, sometimes small snips give you great examples. If you just start to explore your code base, small example, one by one, you may learn something useful stuff. And also bytecode doesn't bite you, so you should not be scared. Maybe at the beginning it looks very scary, but if you just like example like this, you started to explore you will learn some interesting facts and also I would like to be thankful to all the sources that give me these insights basically we use like documentation for this and also high-performance Python I check this book I really like it and maybe for some people will be useful and thank you very much and follow us in Twitter and LinkedIn
+
+**Speaker 3** _[26:18]_
+
+So, thank you for the great insights into Python. I think we don't have a lot of time for the questions, but I think we can answer the most voted one. This is, you haven't demonstrated the actual performance difference in the questions. Do you maybe have any actual values?
+
+**Speaker 2** _[26:36]_
+
+Yeah, I have my factual values, but unfortunately we didn't have time to put in our slides,
+
+**Speaker 3** _[26:37]_
+
+Yes.
+
+**Speaker 2** _[26:43]_
+
+that's why, but you can just repeat at home, if you remember your commands, we use the library. Yes, it's available slides, and you can just, we will also post like GitHub, and you can run it, explore it, so keep it posted, we will update it on Twitter.
+
+**Speaker 3** _[27:04]_
+
+Okay, so we have time for a second question. How to figure out what types of execution steps run faster or slower?
+
+**Speaker 2** _[27:12]_
+
+So I tried to use a similar setup, and also I use a library time it. I every line of code run a few times with a few times of runs, and after that I a lot of computation, a lot of times of operation, a few big runs, and after that I did comparison, but it was by using library time it.
+
+**Speaker 3** _[27:44]_
+
+Last question, which embedding model did you use?
+
+**Speaker 2** _[27:48]_
+
+It's not, I think it's wrong questions here, we don't have Embedding models here, maybe it's like from another, we don't have LLMs or machine learnings here.
+
+**Speaker 3** _[28:02]_
+
+Oh, we're changing the...
+
+**Speaker 2** _[28:03]_
+
+But thank you for the question, maybe next time we'll use an embedding model.
+
+**Speaker 3** _[28:09]_
+
+So then we change the last question. What's the overhead for external function calls? Example, Rust.
+
+**Speaker 2** _[28:16]_
+
+It's also, unfortunately I don't have your data here, but unfortunately for this one we don't have, we did not compare us or others external functions, because it was not in our scope, but maybe you can just have a look at home, because it's very easy setup and you just like, can you do.
+
+**Speaker 3** _[28:40]_
+
+So thank you for the great talk and give them a warm applause.
+
+---
+transcript_status: auto
+---
+transcript_language: en

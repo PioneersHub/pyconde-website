@@ -1,5 +1,101 @@
 {% extends "layout.html" %}
+{% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
+
+{% block title %}{{ this.title }}{% endblock %}
+
+{%- set branding = bag('branding') -%}
+{%- set host = branding['canonical_host'] -%}
+{%- set is_archive = this.url_path.startswith('/archive/') -%}
+{%- set archive_year = (this.url_path.split('/')[2] if is_archive else site.config.PROJECT.year|string) -%}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "@id": "{{ host }}{{ this.url_path }}#speakers",
+  "url": "{{ host }}{{ this.url_path }}",
+  "name": {{ this.title|tojson }},
+  "numberOfItems": {{ this.children|list|length }},
+  "itemListOrder": "https://schema.org/ItemListOrderAscending",
+  "itemListElement": [
+    {%- for speaker in this.children|sort(attribute='name') -%}
+    {
+      "@type": "ListItem",
+      "position": {{ loop.index }},
+      "url": "{{ host }}{{ speaker|url }}",
+      "name": {{ speaker.name|tojson }}
+    }{{ "," if not loop.last }}
+    {%- endfor -%}
+  ]
+}
+</script>
+{%- set crumb_trail = [] -%}
+{%- if is_archive -%}
+  {%- set _ = crumb_trail.append(('/archive/', 'Archive')) -%}
+  {%- set _ = crumb_trail.append(('/archive/' ~ archive_year ~ '/', archive_year)) -%}
+  {%- set _ = crumb_trail.append((this.url_path, 'Speakers')) -%}
+{%- else -%}
+  {%- set _ = crumb_trail.append((this.url_path, 'Speakers')) -%}
+{%- endif -%}
+{{ breadcrumb_jsonld(crumb_trail) }}
+{% endblock %}
 
 {% block body %}
-  {{ this.body }}
+{%- set visible_trail = [] -%}
+{%- if is_archive -%}
+  {%- set _ = visible_trail.append(('/archive/', 'Archive')) -%}
+  {%- set _ = visible_trail.append(('/archive/' ~ archive_year ~ '/', archive_year)) -%}
+  {%- set _ = visible_trail.append((none, 'Speakers')) -%}
+{%- else -%}
+  {%- set _ = visible_trail.append((none, 'Speakers')) -%}
+{%- endif -%}
+{{ breadcrumb(visible_trail) }}
+{% if is_archive %}
+<aside class="archive-banner" role="note" aria-label="Archived edition">
+  <div class="content">
+    <strong>Archive</strong> — speakers of the
+    <a href="/archive/{{ archive_year }}/">{{ archive_year }} edition</a>.
+  </div>
+</aside>
+{% endif %}
+
+{%- set is_current_speakers = this.url_path == '/speakers/' -%}
+
+<div class="subsite">
+  <div class="subsite-title">
+    <section class="content">
+      <h1>{{ this.title }}</h1>
+      <p class="speakers-count">{{ this.children|list|length }} speakers</p>
+      {% if is_current_speakers %}
+      <p class="archive-pointer">
+        Looking for speakers from previous editions?
+        <a href="/archive/">Browse the speaker archive (2016–2026)</a>.
+      </p>
+      {% endif %}
+    </section>
+  </div>
+</div>
+
+<section class="subsite speakers-grid-wrap">
+  <div class="content">
+    {% if this.body %}{{ this.body|shift_headings }}{% endif %}
+
+    <ul class="speakers-grid">
+      {%- for speaker in this.children|sort(attribute='name') -%}
+      <li class="speakers-grid__item">
+        <a href="{{ speaker|url }}" class="speaker-card">
+          {% if speaker.avatar %}
+          <img src="{{ speaker.avatar }}" alt="Portrait of {{ speaker.name }}" loading="lazy" class="speaker-card__avatar" width="160" height="160">
+          {% else %}
+          <span class="speaker-card__avatar speaker-card__avatar--placeholder" aria-hidden="true">{{ speaker.name[0]|upper }}</span>
+          {% endif %}
+          <span class="speaker-card__name">{{ speaker.name }}</span>
+          {% if speaker.company %}<span class="speaker-card__company">{{ speaker.company }}</span>{% endif %}
+        </a>
+      </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
 {% endblock %}

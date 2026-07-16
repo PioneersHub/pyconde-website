@@ -37,31 +37,42 @@
   {% if has_slideshow %}
   <div class="intro__slideshow" aria-hidden="true">
     {% for image in intro_data.hero_images %}
-    <img src="{{ image_dir }}/{{ image }}"
-         alt=""
-         class="intro__slide"
-         loading="{{ 'eager' if loop.first else 'lazy' }}"
-         decoding="async" />
+    {% set base_name = image.rsplit('.', 1)[0] %}
+    <picture class="intro__slide">
+      <source srcset="{{ image_dir }}/{{ base_name }}.webp" type="image/webp" />
+      <img src="{{ image_dir }}/{{ image }}"
+           alt=""
+           loading="{{ 'eager' if loop.first else 'lazy' }}"
+           decoding="async" />
+    </picture>
     {% endfor %}
   </div>
   {% endif %}
 
   <div class="content intro__content">
     {% if intro_data.logo_path %}
-    <img src="{{ intro_data.logo_path }}"
-         alt="{{ intro_data.logo_alt }}"
-         class="intro__logo"
-         width="{{ intro_data.logo_width }}"
-         height="{{ intro_data.logo_height }}" />
+    <h1 class="intro__heading">
+      <img src="{{ intro_data.logo_path }}"
+           alt="{{ intro_data.logo_alt }}"
+           class="intro__logo"
+           width="{{ intro_data.logo_width }}"
+           height="{{ intro_data.logo_height }}" />
+    </h1>
+    {% endif %}
+    {% if intro_data.headline %}
+    <p class="intro__headline">{{ intro_data.headline }}</p>
     {% endif %}
     <div class="intro__details">
       {% if intro_data.location %}
       <p class="intro__location">{{ intro_data.location }}</p>
       {% endif %}
-      <p class="intro__date"><strong>{{ site.config.PROJECT.sprint_days }}</strong> &middot; Sprints &amp; Community Day</p>
-      <p class="intro__date"><strong>{{ site.config.PROJECT.conference_days }}</strong> &middot; Conference</p>
-      <p class="intro__date"><strong>{{ site.config.PROJECT.master_classes_days }}</strong> &middot; Masterclasses</p>
+      <p class="intro__date"><strong>{{ site.config.PROJECT.master_classes_days }}</strong> &middot; {{ site.config.PROJECT.master_classes_text }}</p>
+      <p class="intro__date"><strong>{{ site.config.PROJECT.conference_days }}</strong> &middot; {{ site.config.PROJECT.conference_text }}</p>
+      <p class="intro__date"><strong>{{ site.config.PROJECT.sprint_days }}</strong> &middot; {{ site.config.PROJECT.sprint_text }}</p>
     </div>
+    {% if intro_data.cta_text and intro_data.cta_url %}
+    <a href="{{ intro_data.cta_url }}" class="intro__cta">{{ intro_data.cta_text }} &rarr;</a>
+    {% endif %}
   </div>
   {% if intro_data.show_scroll_hint %}
   <span class="intro__scroll-hint" aria-hidden="true">&darr;</span>

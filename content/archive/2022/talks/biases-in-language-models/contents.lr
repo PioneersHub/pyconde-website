@@ -1,0 +1,153 @@
+title: Biases in Language Models
+---
+description: The talk is an attempt to measure biases in most popular language models and we propose a solution to reduce the bias, and promote social inclusion and…
+---
+created: 2022-01-08
+---
+code: HXCMKR
+---
+slug: biases-in-language-models
+---
+speaker_names: Sonam Pankaj
+---
+speakers:
+
+
+
+### Sonam Pankaj
+
+Sonam is currently working as an AI Researcher at saama technologies mostly in the area of natural language processing and deep learning. 
+
+She have also been tech Speaker at PyData Global 2020 , Pycon India 2019 and 2020. Previously, She has worked as a visiting faculty for robotics and computer vision, and also have experience in entrepreneurship and startups, worked as a Lead software engineer in an IIT Madras incubated company for pipeline inspection and robotics solution where she implemented corrosion detection using ML.  Have also built and released an App for movies and series recommendation using ML. 
+
+These days mostly interested in AI Fairness, Responsible AI in Language Models like Bert and GPT.
+---
+abstract:
+
+
+The talk is an attempt to measure biases in most popular language models and we propose a solution to reduce the bias, and promote social inclusion and diversity based on gender. We have covered both methods on contextual and non contextual word em- bedding debiasing techniques. We have also tried to compare the biases in different models, like Flair, Bert and glove. The dataset used is Winograd-schema style sentences with entities corresponding to people referred by their occupation (e.g. the nurse, the doctor, the carpenter).
+The use of AI in sensitive areas including for hiring, criminal justice and health- care makes it more important to look under the hood for bias and fairness. AI being shaped by flawed and societal biases.
+Underlying data rather than the algorithm itself are most often the main source of the issue. and how can we use finetuning and projection methods to overcome those biases in models
+There have been several cases where google translator or any other language models have given racial or gender biased results. 
+When a gender neutral language like finnish is translated to English it gives male biased results.
+Due to word embeddings trained on news articles may exhibit the gender stereotypes found in society.
+We have finetuned model and have tried debiasing non contextual embeddings.
+---
+full_description:
+
+
+Biases in popular models like flair, bert and bytepairs and debising techniques:
+
+--why debiasing is important?
+The use of AI in sensitive areas including for hiring, criminal justice and health-
+care has stirred a debate about bias and fairness. AI being shaped by flawed
+and societal biases data, where muslims are considered more violent, females are considered less smart for a job and blacks 
+-- word embeddings
+-- contextual and non contextual
+-- non contextual word embeddings, types
+--debiasing
+--contextual
+--bert examples
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: Ethics
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 1702
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: expert
+---
+domain_expertise: some
+---
+supporting_material_url: https://github.com/sonam-pankaj95/gender_bias
+---
+slides_link: https://docs.google.com/presentation/d/1Y0W8VISohSbaqQmCyOpyzBGS8uyGQTsaT4qQ_MyW1CI/edit?usp=sharing
+---
+social_card_image: /static/media/social/talks/HXCMKR.png
+---
+youtube_id: SdjmhbFNR_Q
+---
+video_link: https://www.youtube.com/watch?v=SdjmhbFNR_Q
+---
+video_published_at: 2022-05-06
+---
+video_duration_iso: PT29M43S
+---
+video_thumbnail: https://i.ytimg.com/vi/SdjmhbFNR_Q/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Hello Berlin, I'm Sona Pankesh and my talk deals with biases in language model and data and its interpretability. So a little bit of background about myself. I work as an AI researcher at Sama Technologies. Previously, I have worked as a software lead in an IT Madras incubated startup. And before that, I also served as a visiting faculty in robotics and computer vision. These days I am mostly working in the field of NLP and its application in Biodomain, Model Compression, and Fairness in AI. And I'm so grateful for the organizers like PyCon DE and PyData Berlin to give me the opportunity to share some of the insights. So let's get started. So the topics we will be covering today are language model. What is language model? What are the different kinds of language model? Transformers, the building block of a new NLP, the building block of Word, etc. Why is it important to check for biases in language model? Examples with OpenAI and Google Translate. Contextual and non-contextual language model, non-contextual language de-biasing. We will also see contextual language model with a sample of BERT. We will see BERT visualization, de-biasing of BERT. We will see importance of interpretability tools, interpretability visualization, and open source library like AIX360. So the first question arises. What is language model? So a language model learns to predict the probability of sequences of words. So example, there's a sentence, Tom is a bad cat. And that, the language model is trying to predict the probability distribution of each word given the whole other words in the sentence. There are two typical kind of language models, statistical language model and neutral language models. So statistical language models are traditional, uses traditional statistical techniques like n-grams, hidden Markov model and certain language linguistic rules to learn the probability of the word distribution in the sentence. Whereas in Neural Language Model, and these are the new players in NLP Town that have set past statistical model ineffectiveness and they use different kinds of neural networks to learn, you know, model language like your ELMO, your BERT, et cetera. Then there comes pre-trained language models. So a lot of many tasks, NLP tasks are very GPU intensive, GPU intensive very you know training intensive so a good way to go through is to train it first on a GPU and then do the transfer learning and use it in different cases like for example Hugging Face has a lot of different kind of more pre-trained models and you can just take it off the shelf and use it according to your like suppose if you have to do document classification You can use one of the models trained, pre-trained on the language and then, you know, use it in your downstream task. So in the language model, there are two kinds of language models. One is autoregressive, that's predicting based on the past words, predicting new words based on the past words. So, for example, Tom is a bad blank. So, autoregressive will use all the words used before and then try to generate a new word. Whereas, if we see autoencoding, it will try to predict the probability of the masked word. So, for example, Tom is a masked cab. So it will try to predict, is it good, bad, dirty, et cetera, et cetera, based on its previous words and past words. So it's future words and past words. So it's both, it's bidirectional. So if you see different examples of pre-trained models, there's BERT, there's OpenAI, there's ELMO. So BERT uses bi-directional transformer, OpenAI uses a left-to-right transformer, ELMO uses the concatenation of independently trained left-to-right or right-to-left LSTM to generate feature for downstreaming tasks. Now, if you see downstreaming tasks, these are the ultimate tasks that you have to perform, like name, entity, recognition, sequence labeling, documentation, classification, et cetera. If you want to visualize how the POS looks, you can easily visualize their embeddings using the train models, using T-SNE library. Now, let's come to an important point. Why is it important to study language models? why are we so focused on mitigating biases or de-biasing? So the use of AI in sensitive areas, including hiring like criminal justice, healthcare provisioning or resource allocation has stirred a huge debate in the community about biases and fairness, Because if you can imagine, our own world is so biased, our data is so biased. So, models will try to predict the same kind of biases that we have now because our data is biased. So, AI has been shaped by flawed data and full of societal biased data. Feminists are considered more violent and females are considered less smart for a job. So these biases in data will not only be baked in the models, but it could actually enhance, increase the intensity of biases as well. And the issues algorithmic fairness is one with the massive societal employee creation, the allocation of welfare schemes, welfare resources to prioritize the life savings to surgeries, and all these things, and job application, all these things are going to be based on AI. and if we let the data dirt the model so be able to mitigate it so one of the example is Google translation so if we see there was a tweet by there was a tweet where someone tried to translate Finnish which is a gender neutral language which is a gender neutral language to English and the results was he is a journalist, he is a leader, she is exhausted, she has a grandchild, he works, she has headache, he has a great car, she is taking care of the child, he takes care of things. So we already see that he is being related to journalists, being a leader and owning something where she is related mostly to caregiving and to having a headache or you know taking care of the child. So we use these things in everyday life recommendation system and you know for chatbots etc. One more example would be in open air playground so if you give a gender neutral name like Taylor loves her job she is a great so it feels like she's a great teacher she loves her job whereas if you give it like Henry is a great at his profession and he is a great so it comes out he's a great doctor so we already see the model are associating a female character more with a teacher and a male character more with a doctor now after seeing all these examples you will see what kind of language models are there? So the first and basic language model comes as non-contextual language models which includes methods like skipgram and cbouw. And so what is the meaning of non-contextual models? So non-contextual models, the meaning of a word does not depend on what context it is being used. So Apple and Apple products, maybe it could be used in different ways but their embedding will be same. So let's buy Apple products. Apple is healthy. They both will have same embeddings and the context will not depend, the embedding will not depend on the context. So as we can see it will create a lot because there are so many examples like, like run away from bear and bear grills. I like bear grills. Both bear will be seen and read it. So it creates kind of non context scenarios. On the other words present. Like, let's see de-biasing technique and how we how we can do it in contextual methods, how we can remove biases using projection method. So first important method is the projection technique in which original embedding is projected onto a common gender axis. The results look something like this, where you can see that teacher editor has been reduced. So what's happening is we are trying to check both your conformance, like your preserved gender roles, like king, queen, brother, sister, whereas also taking into consider stereotypical gender roles like teacher, editor, doctor, nurse. So if we try to check the teacher neutrinos has been faded away the correlation has faded away and Whereas in your king and queen there is there is still a correlation so it removes the correlated the heart association with preservation of the gender roles If you want to calculate the embedding and calculate the gender direction, project all the embedding away from this axis and plot the results. So the results will look like something like this. So we can include the past great works that have been done for removal of biases. The first work, the first work done was like Manus to Computer Programmer as Woman is to Homemaker by Jolka Bulbisky, where he created two kind of embeddings and tried to see if they are like equal distance or study of gender stereotypes word embedding also deals with the de-biasing with soft bias correction. It provides a method for modifying an embedding to remove gender stereotypes such as association between the word deceptionist and female while maintaining desired associations. Now there was another paper published which says that the projection method actually doesn't work. It's by lipstick on a pig which says you are actually hiding the gender biases instead of removing the gender biases by projection method. Then a paper came called measuring stereotypical biases and pre-trained language model that deals with measuring the stereotypical biases with the different kind of scores like CMS score LS score then came as a null projection method which was removing information from neural representation and the method is based on repeated training of linear classifier that predicts a certain property we aim to remove that followed by projection of representation on their null spaces. So there is just a projection of all these undesired characters of displayed on gender and they are nulled out by biometrics. Now let's discuss the contextual language models. The word embeddings in which the context has been used like here the apple product and apple will have different embeddings example bird and flare in 2017 a paper called all you attention is all you need and that led to the transformer that led to the uh like use of transformers and that changed everything and the reasons to change everything, it was easier to train, pre-trained model can be fine-tuned, can be trained on unsupervised text. So you can easily parallelize the text, it is the transfer learn, you can train the model, you use the pre-trained model in your downstream task. How is it able to do that? So here is the transformer model architecture. you could see different encoder and decoder stack that I can, you can now segment it out easily, which one is the encoder, which one is decoder, and there's different kinds of input-output processes. But the main attention is happening over here, like there's a query key and then there's a value. So encoder-decoder attention between input sequence and output sequence, then there's self-attention, there's multi-head attention. Okay, but basically what we want is to take query and find a more similar key, a K, by doing dot product for Q and K. And the closest query key product will have the highest value followed by a softmax that will drive Q dot K with the smaller closest values. So with the softmax, it will look something like this. and then we find the most attention over there. So we saw the architecture of transformer and how it tries to calculate attention to each of the world, like multi-headed attention models with the help of multi-headed attention model and self-attention models. And now Bert is the biggest example that makes use of this transformer and attention mechanism that learn contextual relations between the words. Like suppose Tom is a bad cat. So cat is really, it's kind of has attention to both Tom and to bad. Because previously there was no mechanism by which one can know that cat is related to Tom because it was mostly related to being bad, but now it can have multi-headed attention. So cat can be both Tom and cat can be bad as well. Here the position and coding, sentence embedding, token embedding you give, you mask one of the words and at the end you will get the probability of that masked word or your next prediction models And so there are two kinds of bird models. There is both a mass language model and there's next prediction model. If we see the visualization of attention in bird, we can see the designer is associating itself more with he's than her. And this is the biggest, this is what bias means, right? That you're giving more weightage or some gender is giving more contribution to the designer than the other gender. So in that case, you can use fine-tune model. How do we fine-tune the model? So these codes are available. I will make them available on my repo. And this is how you first try to mask one of the words, of the tokens and then you kind of provide the predictions of this output and then soft masters prediction find the weightage and you get top five weightage of that you know the top five maximum weightage of the predicted tokens okay so the end results if you want to see it will look something like this the lawyer wanted to help the designer but that could she refused so she will be masked and then the masked token will be predicted so here we can see it is trying to predict he with the weightage of 0.4 and she with the weightage of 0.16 right but when you fine-tune that when you fine-tune your model that is like you know making new kind of association based on data so if you provide it with a general neutral data if the data set is gender neutral it tries to kind of decrease that now if we can see the mass prediction of him is reduced to 0.01 which is which is a lot of uh a lot of progress so if you want to visualize everything i had I had this so bird is in red and green is the fine-tuned bird so each of the word is representing each of the point is on the X axis is representing different kind of profession and on the Y axis the the distance between his prediction to the profession I mean his to the profession prediction so we can see the the distance has reduced a lot. It's kind of like settling down. So at last if we investigate the calculator bias model, we find out that the underlying data is responsible for bias models and you know there there should be ways to find out what kind of biases we lie within the data. And then there are many tools in our explainability and interpretability tools available like AIF360. So biases in data can occur because of sampling, omission of certain groups and exclusion and under-representation of certain groups. So prejudice bias, exclusion, omission, inside we get from data of the model we have to be very careful about how conservative that bias is. For example if we see here in the probability grid y-axis is the age group and x-axis is the gender group. We see females are much less in as a default age of loan as compared to male, only 19% as compared to male, which is like 23%. So there could be numerous reasons for that. Maybe females are better at managing the credits or that men have more burdens or maybe that females are not getting as much as credit as male groups. So there could be numerous reasons which could not be inferred from here. So visualization of dataset is based on privileged and underprivileged group. Biases will impact protected feature that is privileged and underprivileged group. Representation, there can be a lack of representation or an overrepresentation of underprivileged group. The model will learn either too much or too little about the group. So the distribution is centered around, and it could be centered around underprivileged group or could be far away from underprivileged group. As an example, we can see in recidivism, what happens, there are two features of confusion matrix, the two feature of risk prediction made by COMPASS, is recid and the ground truth. So we see that people who were, you know, seen that they will they will again do the crime are much more in African-American confusion matrix than Caucasian confusion matrix. It's actually totally opposite. So we how do we quantify the data set? So we quantify the data set based on your statistical parity difference and disparate impact. They both have formulas according to the which one of them is the favorable group. Now, pre-processing of biases. Pre-processing based on feature engineering sometimes continuous features capture bias because there are so many sparse areas where the model can fill the void with assumptions. Balancing or resampling of the representation problem can be fixed by balancing the dataset, which is done by XAI library. XAI library has a balanced function that does this by downsampling and upsampling of group representations some tools called smooth or synthetic minority oversampling technique or reweighing. Initialize it by specifying grouped and fit the transform the data as you would with any of the cyclical encoder or scalar. So there are in-processing, post-processing all focused on a balanced classification and equalized odds for privileged and misclassification treatment for misclassification. So at last AI is going to be a big reset in our society and it's on us and now if we want to carry our current biases from the day with the data to the future or we want to make the future a better place. I'm available at Twitter, all the materials will be available on GitHub under ikigai groups which is which I'm going to I'm planning to open source where you can all also contribute about the data set you can contribute unbiased data set you can contribute visualization tools you can actually we are trying to make an augmentation model based on these unbiased data. So, Ikigai is going to be open sourced. You can avail it from Sonam Pankaj 95. You can any day connect with me on LinkedIn and I will make everything public on Twitter, LinkedIn, GitHub, etc. So, thank you so much. Thank you so much for your Thanks for your time.
+
+**Speaker 2** _[26:20]_
+
+all right okay I think we have some questions online can you hear us
+
+**Speaker 1** _[26:30]_
+
+Hey, everyone. Yes.
+
+**Speaker 2** _[26:31]_
+
+Perfect. Okay. The first question comes from James. What do you think of the role the size of the model plays in perpetuating bias? Any thoughts on the Stochastic Parrots paper?
+
+**Speaker 1** _[26:48]_
+
+Oh, if you could repeat the question, I didn't get the question.
+
+**Speaker 2** _[26:51]_
+
+what do you think of the role the size of the model plays in perpetuating bias and do you have any thoughts on the stochastic parrots paper
+
+**Speaker 1** _[27:03]_
+
+So, the size of the model like depends on the data set and the more data set is like bias. So, it all, it's a round circle like the more data is biased, the more data, even heavier models like BERT are highly contributing towards, you know, biases in models. So it's all a round circle. The less unbiased data set we have, like Vino bias data set, you can search it online. It's called VinoGrade, which I have used for fine tuning. So that would be better, just making data set better instead of making the models heavier. It's better.
+
+**Speaker 2** _[27:48]_
+
+Okay, second question. Is it better to use the projection technique to remove bias or to mask pronouns and retrain the model?
+
+**Speaker 1** _[27:58]_
+
+So they were totally different use like one was the de-biasing was for non-contextual uses like GloVe, GloVe is an embedding, whereas masking was for contextual language models like BERT. So, yeah, so they have totally different use. Non-contextual has a lot more examples like, you know, FastText, GloVe. I could give you byte pair or different you can search it like non-contextual versus contextual so I have covered both and how you can be biased in both situations
+
+**Speaker 2** _[28:36]_
+
+All right. I think that's all the question we have online. Let me check again. Yes. So we can open it up to the audience here in the room. Does anyone here have questions for our speaker? I don't see any raised hands if you're raising your hand please shout okay so that was a short Q&A I think the second talk should begin in 10 minutes here and thank you again for your great talk your great presentation and thank you for answering these questions yeah we would love to have you here in Berlin but this was also great
+
+**Speaker 1** _[29:36]_
+
+Yeah, thank you. Bye bye.
+
+---
+transcript_status: auto
+---
+transcript_language: en

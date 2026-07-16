@@ -1,0 +1,184 @@
+title: Is Prompt Engineering Dead? How Auto-Optimization is Changing the Game
+---
+description: The rise of LLMs has elevated prompt engineering as a critical skill in the AI industry, but manual prompt tuning is often inefficient and model-specific.…
+---
+created: 2024-12-20
+---
+code: GURXPK
+---
+slug: is-prompt-engineering-dead-how-auto-optimization-is-changing-the-game
+---
+speaker_names: Iryna Kondrashchenko, Oleh Kostromin
+---
+speakers:
+
+
+
+### Iryna Kondrashchenko
+
+Iryna is a data scientist and co-founder of DataForce Solutions, a company specialized in delivering end-to-end data science and AI services. She contributes to several open-source libraries, and strongly believes that open-source products foster a more inclusive tech industry, equipping individuals and organizations with the necessary tools to innovate and compete.
+
+### Oleh Kostromin
+
+_About — in the speaker's own words_
+
+I am a Data Scientist primarily focused on Deep Learning and MLOps. In my spare time I contribute to several open-source python libraries.
+---
+abstract:
+
+
+The rise of LLMs has elevated prompt engineering as a critical skill in the AI industry, but manual prompt tuning is often inefficient and model-specific. This talk explores various automatic prompt optimization approaches, ranging from simple ones like bootstrapped few-shot to more complex techniques such as MIPRO and TextGrad, and showcases their practical applications through frameworks like DSPy and AdalFlow. By exploring the benefits, challenges, and trade-offs of these approaches, the attendees will be able to answer the question: is prompt engineering dead, or has it just evolved?
+---
+full_description:
+
+
+With the rise of LLMs, prompt engineering has become a highly impactful skill in the AI industry. However, manual prompt tuning is challenging, time-consuming, and not always generalizable across different models. This raises a reasonable question: can prompts be automatically learned from data? The answer is yes, and in this talk, we will explore how.
+
+First, we will provide a high-level overview of various prompt optimization approaches, starting with a simple technique like bootstrapped few-shot, which automatically generates and selects an optimal set of demonstrations for each step in the LLM chain. Then, we will discuss more complex approaches, such as MIPRO and TextGrad, which directly optimize the instructions.
+
+Afterwards, we will move on to a more practical part by showcasing how these techniques can be used via popular frameworks such as DSPy and AdalFlow.
+
+Finally, we will discuss the benefits and trade-offs of these approaches and frameworks in terms of costs, complexity and performance, so the audience can decide whether prompt engineering is truly dead.
+
+**Outline:**
+* Introduction (2 min)
+* Discussion of problems with manual prompt engineering (2 min)
+* Overview of existing prompt optimization approaches (10 min):
+    * Bootstrapped few-shot (3 min)
+    * MIPRO (3 min)
+    * TextGrad (4 min)
+* Showcasing the prompt optimization frameworks (8 min):
+    * DSPy (4 min)
+    * AdalFlow (4 min)
+* Comparison of methods and concluding remarks (3 min)
+* Q&A (5 min)
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2025-04-23
+---
+start_time: 17:50
+---
+end_time: 18:20
+---
+slot_id:
+---
+track: Natural Language Processing & Audio (incl. Generative AI NLP)
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/GURXPK.png
+---
+youtube_id: 3meErI1Qlag
+---
+video_link: https://www.youtube.com/watch?v=3meErI1Qlag
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/3meErI1Qlag/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+Thanks a lot for the introduction. As I said, today we are going to be talking about the automatic prompting optimization and if you want to follow the slides you can scan this QR code from your devices. Yeah, so let's begin. Why do we even care about automatic prompting? I guess If you've been following the Python community for the last couple of years, it was difficult not to notice that LMs were a rather big thing. Just by looking at the post-representations at NeuroIPS 2024 grouped by the topic, we can see that LMs take up a substantial portion. But obviously, LMs are popular not only among the researchers, and recently we've been seeing the emergence of many great tools and frameworks. Even major tech companies are stepping in with their LM-powered offerings. I guess you've at least heard about Apple Intelligence, which provides native AI capabilities for iPhones and Macs. But when we look at how the systems work under the hood, we see something like this. Long, manually constructed prompts with lots of directives like do not hallucinate, do not make up factual information, present your output in a certain way, etc. The overall idea is that complex systems require complex prompts, and crafting those prompts manually is not always trivial. They need to be precise, well-structured, and non-ambiguous. This naturally raises the question, can prompts be optimized automatically by being provided with some training data? And the very short answer is yes, and with that I hand it over to Irina, who will explain how exactly it's possible to do that.
+
+**Speaker 2** _[02:14]_
+
+Okay, so before we proceed further, we need to make a distinction between simple or single component and compound or multi-component systems. In single component systems, we typically deal with just one prompt. Think of a summarizer or a translator. There is one input, one output, and the prompt is pretty straightforward. Tuning the prompt manually is actually a manageable task. You write the initial prompt, test it, tweak a word or two, and can already see satisfactory results. In contrast to simple systems, compound systems are made up of multiple components that are connected together in a pipeline. As an arbitrary example, imagine a retrieval augmented QA system. Here, our program first retrieves some text from a corpus of documents, then generates an answer grounded to these extracted passages, then summarizes and rewrites the answer. such multi-component systems are becoming increasingly more popular and there are a few reasons for that first of all they often outperform analytic models especially when designed thoughtfully in addition because each module is isolated you can inspect each step independently also as you may know different tasks don't require the same horsepower with With compound systems, you can use different LLMs for different tasks. For example, you could use a smaller and cheaper model for extraction and a more capable one for reasoning tasks. This lets you optimize cost-performance trade-offs more intelligently. Finally, such systems give you more ways to ground the model's output, for example, with external data sources or external tools. But here's the catch. This added structure comes at a cost. We're no longer dealing with just one model or one prompt. Instead, we have a chain of graph of components or modules, each with its own role and, more importantly, its own prompt. These prompts are no longer independent. For example, a small change in the first component can alter the output a bit, which would result in unintended, a huge side effect in the later steps of a pipeline. Because of this cross-prompt dependencies, manual prompt optimization becomes infeasible. So while compound systems offer important benefits, they also introduce serious challenges in terms of prompt optimization. We already established that there must be a way to approach prompt optimization almost like a machine learning program, where we treat the prompt itself like a trainable parameter and optimize it based on some training data. But how exactly can we do that? It turns out that the simplest technique we can apply is few-shot and context learning. The idea is very simple. We just put several labeled examples directly into the prompt. For instance, to improve text classification, we can supply several text label examples alongside a very generic prompt. This way, we obtained a better prompt without much hand crafting. However, here we have a single component system. Applying the same techniques in compound systems is not that straightforward. And why is it the case? Because in multi-step pipeline, we usually only have access to the initial input and to the final output that pipeline produces. However, we don't have any intermediate input-output pairs between the modules. However, we can use the training data and a teacher model to construct, trace, and save the intermediate results. These results can afterwards be used as few short demonstrations. This approach is used by a technique called Bootstrap Few-Shot. The idea is as follows. First, we run training inputs through our program. If the output is a high-scoring prediction as assessed by a specific metric, then we save this trace, otherwise this trace is discarded. This process repeats until a maximum number of good or high-performing demonstrations is selected. Before we proceed with other methods, let us zoom into an important component of this process – the metric. The metric is what tells us whether a model's output is good enough to be saved as a demonstration. In simple cases, we can use traditional metrics, for example, exact match, F1 score accuracy, etc. However, most real-world applications don't produce simple outputs. Instead, they usually produce long-form text. For example, summaries, answers, explanations, and so on. For these cases, we can use another language model to judge the outputs based on some desired qualities. For example, correctness or even some domain-specific requirements such as adherence to a brand voice. Let's now look at another method for prompt optimization, which is called Bootstrap Viewshot with Random Search. It's based on the idea of Bootstrap Viewshot, but it takes it one step further by actively searching for the best performing combinations of demonstrations. Let's go through how it works. First, we generate a set of good input-output traces. Then instead of just inserting these traces into the prompt, we randomly sample different subsets of these traces. Next each sampled combination is evaluated and finally we select the demonstration set that leads to the highest validation performance. You might have noticed that so far the primary approach for prompt optimization was simply adding labeled demonstrations directly into the prompt without doing anything with the instruction. And it turns out that this method is quite powerful. In fact, some studies show that optimizing just the demonstrations can lead to better performance than optimizing the instruction alone. However, the instructions become more important for tasks with complex conditional logic. Moreover, joint optimization of instructions and demos generally yield the best results. So how can we achieve that? One of the most well-known methods is called Multiprompt Instruction Proposal Optimizer or MIPRO. This method is able to optimize both instructions and demonstrations at the same time. First, as in Bootstrap for your shot, we generate a set of good input-output traces. Then, to propose instructions, MIPRO doesn't just rely on language model's internal knowledge, but instead it grounds it with some meaningful context. For example, summary of the data set, overview of how the program flows from module to module, some bootstrap demonstrations and historical information of prompts and their validation scores. Finally the best combination of instructions and demonstrations is selected using Bayesian optimization strategy. This is a powerful method because it allows to explore a huge space of prompts and instructions and pick the combination that works best together however me pro might still be limited in one key way it uses a single feedback signal to optimize all modules that makes it difficult to improve prompts precisely the optimizer doesn't know which module is responsible for a poor performance Making an analogy with deep learning, it's like training a neural networks without gradients. You just try different things and see what sticks. The concept that might solve this problem is textual gradients. Just like a neural networks, we could back propagate those gradients to quantify how each parameter contributes to the overall loss and provide direction for optimization. Protogy mimics this idea by using natural language explanations of what went wrong as textual gradients. It starts by running the initial prompt on a mini-batch of inputs. Then it uses the first prompt plate, which instructs the language model to describe the problems which could have led to these mistakes. That response is our semantic gradient. It points in the direction of what is wrong. Then the second language model takes this feedback and edits the original prompt to correct these mistakes. This loop continues recursively until the most highly performing prompt is found. TextGrad builds on the core idea of Protogy, but it allows for systems of arbitrary depth and multiple parameters, variables per prompt. According to some benchmarks, TextGrad can be on par or even better than Bootstrap Viewshot with eight demonstrations. Now that we covered some essential theory I would like to hand it over back to Oleg who will walk you through some available prompt optimization frameworks and provide more practical code examples.
+
+**Speaker 1** _[13:03]_
+
+When it comes to prompt optimization frameworks, without any doubts, the most popular one is DSPy by Stanford NLP. And as their own motto says, it's used for programming, not prompting language models. And indeed, in DSPy, prompts are completely abstracted away from the users through a concept known as signatures. A simple signature might look like this, which is just a string. Intuitively, just by looking at it, we can realize that here we want our input to be a question, we want an answer as an output, and our answer needs to be a floating point number. To test that it works, we can construct a very simple DSP program and initialize a predict module with our demonstration. and we will talk about modules a little bit later but for now we can pass the question what is an average weight of a cat as an input to this module and we will obtain the prediction as answer equal 4.5 this is floating point number so everything works as expected however in many cases such simple string-based prompts and string-based signatures are not enough for example what if the variables within the signature are not self-explanatory or we want to explicitly set the initial instruction. And fortunately in DSPy this can be achieved with class-based signatures. Here we are constructing a signature for making the prediction about the faithfulness of the text given some factual context. in addition to the answer itself, the LLM should also provide the list of supporting evidence. So here we provide our initial instruction as a docstring and the specifications of the inputs and outputs as the properties. Also, as you can see here, the fields can have optional descriptions. But now you might be wondering how or where exactly those signatures are being used. And in order to answer this question, we can actually inspect the raw text history that is being passed to the LLM itself. And from here, we can see that our signature got automatically converted into a rather long system message. It starts with field specs, then a rather long description of the input-output formats, and finally our instruction itself. So now that it's more or less clear how the signatures are used, we can talk a bit more about modules. And in DSPy, modules are basic building blocks. If you are familiar with PyTorch or other similar frameworks, you will actually see a lot of similarities. Out of the box, DSPy provides several pre-built modules. However, we won't have enough time to go through all of them, so let's have a look at just two. We are already somewhat familiar with the predict block that we used earlier, and it's the simplest module in DSPy. It just takes a row instruction and executes it without any modifications. A chain of thought to comparison is a slightly more difficult module because it modifies the initial signature and inserts an additional reasoning output field. Therefore, here the model would be forced to produce its reasoning before the final answer. And exactly like in PyTorch, we can create our own custom modules. For example, here we are creating a simple chain that first translates the text and then summarizes it. When we have our custom module, we want a way to optimize it. And for that, we need final two components, teleprompters and metrics. Again, making an analogy with PyTorch, teleprompter is something like an optimizer. we just supply the teleprompter with a metric and call teleprompter.compile which is an equivalent of the fit or train so to sum up in DSPy you would usually create custom modules using the basic ones as the building blocks and you optimize those modules using the teleprompters and metrics Also, you usually don't write prompt templates, but you use signatures. And now let's have a look at another framework, which is called TextGrad, and it is also an official reference implementation for the TextGrad method explained earlier. And unlike DSPy, TextGrad is a rather small framework that provides only several low-level primitives out of the box. And the first important concept we need to be familiar with is the variable. A variable in TextGrad is either a complete or partial prompt template that can be optionally optimized by setting the respective value of the requiresGrad argument. To use the variables, TextGrad provides a built-in Blackbox LL module that takes one variable for the system message in an init, and another variable for the user message as an input in the call method. Now, in order to optimize the instruction, we use the same syntax as we would in PyTorch. First, we calculate the loss, where the loss in this case is just a feedback generated by the judge LLM. Then we call backward on the loss, and then step on the optimizer, so exactly like in PyTorch. and basically this is more or less everything that you need to know in order to work with TextGrad. It's very simple and easy to use, however some things cannot be easily implemented out of the box. For example what if you wanted to hard code a certain part of the instruction while optimizing another one or provide the future demonstrations and this brings us to the last framework for today called Adolf Flow. Overall Adolf Flow can be viewed as an extension of TextGrad, but with some things taken from DSPy. Given that we don't have that much time left, we will go through only the most notable differences between Adolfo and TextGrad. So in TextGrad, we had variables. And in Adolfo, we have parameters, which are more or less the same things. However, now we have two different types of parameters. Prompts for holding textual instructions, and demos for holding future demonstrations. These parameters can be used in explicit prompt templates. Hence, the prompt template can have both the static hard-coded part and the optimizable dynamic one. The functionality related to a certain pipeline can be encapsulated in a component, which is an equivalent of a module. Finally, in order to optimize our component, we first need to wrap it into another adder component. This adder component is a special case of the component, which expects the component that needs to be optimized, the evaluation function, and the loss function. Finally, when we have our adder component, we can pass it to the trainer and call fit on the trainer. This might look a little bit too verbose, however, it's actually not that different from what we've seen with other frameworks earlier. So, to sum up, IdleFlow is a very feature-rich framework, which combines the ideas of text-grat and automatic few-shot optimization. But, in my opinion, it's a little bit too verbose, which is not necessarily a bad thing, however, might cause a steeper learning curve. So, now let's get back to our original question, is manual prompting that? And as always, the answer is not that obvious. Without any doubts, automatic prompt optimization brings many benefits. It is fast, simple, and in many cases still cheaper than manual effort. Additionally, the optimization procedure can be repeated easily in case if the target LLM changes. However, there are also some potential limitations. First of all, the underlying optimization procedure still depends on hard-coded, manually constructed metaprompts. And those metaprompts are not necessarily optimal for your specific use case. In addition, when using automatic optimization, you are still bound by the reason power of the LLM, which might be limited. Therefore, it is probably too early to declare the death of manual prompt optimization for now. However, automatic prompting is for sure a viable alternative, and we encourage you to try it yourself for your specific use case. And from our side, that was it. Thank you for your attention, and if you'd like, you can add us on LinkedIn to chat about automatic prompt optimization. Thank you.
+
+**Speaker 3** _[23:08]_
+
+Thank you, Irina, Oleg. So let's have a quick question and answering session. So first of all, can you provide some examples of how the prompts are improved? And it would be great to have these examples with the different frameworks you demonstrated.
+
+**Speaker 1** _[23:30]_
+
+Okay, so maybe it won't be that easy to explain it, but basically if you're talking only about the few-shot optimization, then your instruction is not being changed at all, and I'm trying to find the slide. Okay, so imagine that classify the text into the neutral, negative, or positive is your original instruction, and that was your original thing. when you provide future demonstrations, your instruction is just being extended. But when you're also using any of the frameworks for the actual instruction tuning, then the instruction itself will be changed. The way it is being changed depends on your use case, but generally there is another LLM that is generating new instructions and a certain technique to select the best one out of those.
+
+**Speaker 3** _[24:25]_
+
+Okay, then let's move to the next one. Does MIPRO add a lot of latency during an inference?
+
+**Speaker 1** _[24:35]_
+
+Well, it depends, because during the inference, you might use Mipro either to tune the instruction itself or instruction plus the demonstration. Obviously, your prompt might be much, much bigger than the original one. And if you're using a local LLM, for example, and you have rather slow hardware, then yes, it might at latency. However, if we're using cloud inference providers, for example, like ChatGPT, I wouldn't say that it adds that much more to the latency, however, it increases your token consumption.
+
+**Speaker 3** _[25:16]_
+
+Okay, thank you. The next one would be regarding what are your best practices advice for approaching LLM evaluations in a very small ground truth data environment, so some niche industrial problem.
+
+**Speaker 1** _[25:32]_
+
+Well, again, that depends really on the problem you're using, and in some cases it's necessary to even use the exact matching to make sure that LMS produces exactly what you need. But it's really difficult to answer this question without knowing the underlying problem.
+
+**Speaker 3** _[25:51]_
+
+So, in this case, the author of this question, I recommend to reach out to Irina and Oleg to ask it in person and get more details. So, the next one would be, prompt optimization seems like a possible use case for reinforcement learning. Is there any work or literature using reinforcement learning instead of gradient descent?
+
+**Speaker 1** _[26:21]_
+
+Okay, again, here we're not using the gradient descent per se. When we're talking about the textual gradients, it's not the same as just backpropagation. Therefore, also we are not changing the underlying weights of the model itself. Could we use reinforcement learning for that? Yeah, in some way I'm pretty sure we could. For example, we could have a teacher model that generates the new instructions. The teacher model could be tuned using the preference model based on reinforcement learning. But again, I would say it's a bit too vague of a question, so I'm not sure how to answer that.
+
+**Speaker 3** _[27:06]_
+
+Okay. Do you find value in generating traces of varying the temperature when optimizing prompts with, for example, MIPRO?
+
+**Speaker 1** _[27:19]_
+
+Okay, can you repeat it, please?
+
+**Speaker 3** _[27:22]_
+
+Do you find value in generating traces varying the temperature when optimizing prompts?
+
+**Speaker 1** _[27:30]_
+
+I mean, it also depends, but I would say yes, if you want to, if you don't have that much data and you simply run it several times with a non-zero temperature and to generate several traces and then you try to figure out which one was the best, then yeah, the answer is yes.
+
+**Speaker 3** _[27:50]_
+
+Okay, thank you. And the last one here is for someone coming from Langchain. Could DSPy act as a replacement framework for Langchain?
+
+**Speaker 1** _[28:04]_
+
+Okay, so long chain is a very, very general framework, whereas DSPy is really about prompt optimization. I don't personally use long chain that often, but a while ago there was a DSPy module for long chain. I'm not sure, to be honest, whether it's still maintained or not, but at least in the past you could use DSPy within long chain, and I wouldn't say that DSPy is a replacement for long chain.
+
+**Speaker 3** _[28:34]_
+
+Okay, good. And the last one. Oh, it was the last one. Okay, so once again, let's thank our today's presenters, Irina and Oleg.
+---
+transcript_status: auto
+---
+transcript_language: en

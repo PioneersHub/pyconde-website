@@ -1,0 +1,276 @@
+title: Delivering AI at Scale
+---
+description: Everybody knows our yellow vans, trucks and planes around the world. But do you know how data drives our business and how we leverage algorithms and…
+---
+created: 2023-02-28
+---
+code: DTBTVF
+---
+slug: delivering-ai-at-scale
+---
+speaker_names: Severin Schmitt, Anna Achenbach, Thorsten Kranz
+---
+speakers:
+
+
+
+### Severin Schmitt
+
+Severin is a Senior Data Scientist at Deutsche Post DHL Group, leading the forecasting tech team, main
+developer of DPDHL’s forecasting library and holds a PhD in mechanical engineering. He is passionate
+about combining Data Science and Software Engineering for long lasting and maintainable machine
+learning projects; he loves guiding the scoping of new projects as well as the change management
+processes necessary to bring small and big solutions to life; he is curious about timeseries forecasting
+and constantly looking for interesting discussions.
+
+### Anna Achenbach
+
+After pursuing her PhD in Data Science Anna started her work at DPDHL back in 2018. With a background in Logistics from her Bachelor's and Master's studies Data Science at DPDHL combines what she enjoys most: Work with a group of talented
+Machine Learning Experts and Analytics enthusiasts and develop projects to embed data (science)-
+driven decision making deeply into our business processes. Besides regular project work Anna focuses on developing trainings for Non-Data Scientists ranging from data literacy to management trainings.
+
+### Thorsten Kranz
+
+With a background in Physics and Neuroscience Research Thorsten has been working as a Data Scientist
+for many industries. He is driving DPDHL’s efforts of increasing the efficiency for building productionquality, large scale Data Science solutions for the business together with his team. While working as a
+Manager for many years now he has remained a nerd at heart – with a passion for data, algorithms and
+Software Development in Python.
+---
+abstract:
+
+
+Everybody knows our yellow vans, trucks and planes around the world. But do you know how data
+drives our business and how we leverage algorithms and technology in our core operations? We will
+share some “behind the scenes” insights on Deutsche Post DHL Group’s journey towards a Data-Driven
+Company.
+• Large-Scale Use Cases: Challenging and high impact Use Cases in all major areas of logistics,
+including Computer Vision and NLP
+• Fancy Algorithms: Deep-Neural Networks, TSP Solvers and the standard toolkit of a Data
+Scientist
+• Modern Tooling: Cloud Platforms, Kubernetes , Kubeflow, Auto ML
+• No rusty working mode: small, self-organized, agile project teams, combining state of the art
+Machine Learning with MLOps best practices
+• A young, motivated and international team – German skills are only “nice to have”
+But we have more to offer than slides filled with buzzwords. We will demonstrate our passion for our
+work, deep dive into our largest use cases that impact your everyday life and share our approach for a
+timeseries forecasting library - combining data science, software engineering and technology for
+efficient and easy to maintain machine learning projects..
+---
+full_description:
+
+
+Everybody knows our yellow vans, trucks and planes around the world. But do you know how data
+drives our business and how we leverage algorithms and technology in our core operations? We will
+share some “behind the scenes” insights on Deutsche Post DHL Group’s journey towards a Data-Driven
+Company.
+• Large-Scale Use Cases: Challenging and high impact Use Cases in all major areas of logistics,
+including Computer Vision and NLP
+• Fancy Algorithms: Deep-Neural Networks, TSP Solvers and the standard toolkit of a Data
+Scientist
+• Modern Tooling: Cloud Platforms, Kubernetes , Kubeflow, Auto ML
+• No rusty working mode: small, self-organized, agile project teams, combining state of the art
+Machine Learning with MLOps best practices
+• A young, motivated and international team – German skills are only “nice to have”
+But we have more to offer than slides filled with buzzwords. We will demonstrate our passion for our
+work, deep dive into our largest use cases that impact your everyday life and share our approach for a
+timeseries forecasting library - combining data science, software engineering and technology for
+efficient and easy to maintain machine learning projects..
+---
+room:
+---
+day: Tuesday
+---
+slot_date: 2023-04-18
+---
+start_time: 14:45
+---
+end_time: 15:30
+---
+slot_id:
+---
+track: Sponsor
+---
+tags:
+---
+submission_type: sponsored_long
+---
+submission_type_label: Sponsored Talk (Long)
+---
+submission_type_id: 2530
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: None
+---
+domain_expertise: None
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/DTBTVF.png
+---
+youtube_id: 0F1cE8L-neE
+---
+video_link: https://www.youtube.com/watch?v=0F1cE8L-neE
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT43M36S
+---
+video_thumbnail: https://i.ytimg.com/vi/0F1cE8L-neE/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:02]_
+
+Thanks a lot, thanks a lot for being here, even though we are a sponsor, but you can be safe, we won't sell you anything, this is not why we are here, but instead we want to share with you a bit of our journey, share a bit of what we are doing using Python, especially in the area of data, of data science, machine learning and stuff like that. So this is what we want to be talking about today, but before we get into it, of course, we want to have a short round of introductions and ladies first, Anna.
+
+**Speaker 2** _[00:30]_
+
+Yeah, thank you Torsten. So I come from a logistics background and during my PhD I got into data science and then started working for the central data science team in 2018. Yeah, back then I didn't have any grey hair and now in the past years I worked on different projects for different business units and got more and more grey hair, so I don't know if it's correlation or causality, but yeah.
+
+**Speaker 3** _[00:58]_
+
+Hello, everyone. My name is Severin. I have a background in material science. I joined the DGL data and analytics team about six years ago now, and I'm the expert for time-series forecasting, and I'm personally very passionate about bringing together data science and software engineering.
+
+**Speaker 1** _[01:19]_
+
+Yes, and finally myself, Torsten. Yeah, so my name is Torsten. I have a background in physics, very long time ago. And now I have the pleasure to be managing this great team around data and analytics as part of an awesome management team of this department. But in my heart, I'm still a Pythonista. I started using Python back in 2006. I do not remember which version it was, 2.5 or 2.6 or something. and I still write at least some lines of code of Python every week, even though it's sometimes hard to do so. All right, so let's get started. I hope this works now. Yeah, as you can see, we are very yellow. We are a big yellow company. I guess many of you have used our services before, but especially if you're Germany-based, maybe you're not fully aware how globally distributed our business is and how large it actually is. These numbers are already a bit outdated. We don't have the latest numbers at the moment, But in total, we have more than 600,000 colleagues around the world. We have five business units who are doing all kinds of logistics. And this is just a huge company. Definitely, yes. And the topic that we want to address today is how do you deliver data science? How do you deliver AI to a company of that scale? What do you have to do as a data science department to be able to fulfill this journey? and yeah you might know this aspect of our company you might know our planes flying around if you ever have the chance to visit our hub in Leipzig I can highly recommend to do that you might know our vans driving through the cities or trucks or whatever you have seen before this is the site that is usually quite well known but what many persons around the world do not yet know is how much we are using data already now. So whenever a plane is taking off, if it transports some stuff around the world, a lot of things have been happening before already. We are applying optimizations, we are applying operations research in order to optimize the flight networks. We are maximizing the utilization of our plans through forecasting, Severin will be talking about this later today, and all ways of using our assets as good as possible. You might know this situation quite well when one of our couriers delivers the parcel to you, usually it's quite a nice experience, both for you, but also for our couriers. This is kind of the destiny of what we are doing. And long before you receive your parcel, our algorithms written in Python have already been active in supporting this and making this possible. And Anna will be sharing some details around that, what we are doing in that area, in the digitalization of the last mile delivery, which is our most cost-intensive block that we have. Last mile delivery is hell. And when you come across the German autobahn or anywhere else in the world, you see maybe those big distribution centers, those parcel centers that we have all around the world. And also here, we apply state-of-the-art algorithms. For example, we are applying computer a vision in those parcel sorting systems. Of course, yes, we scan addresses and stuff like that. This is old school. But we apply in deep neural networks to identify not just the size and the weight of a parcel, but also what is the shape? Is it like crunchy? Is it rigid or whatever? And based on that, we can do different forms of delivery. We can implement a lot of different use cases. And this has to be done in a kind of edge computing way because sending it to the cloud and waiting for the response is not fast enough for what we are doing there. And also in all supporting functions, be it HR, finance, whatever there is, also in our headquarters and around the world, we are applying advanced algorithms, machine learning, mostly written in Python, to automate all kinds of processes and become more efficient, have really high impact on our business, and deliver value in that area. To summarize this a bit, yes, we have a large team already now. Recent stocktake is about 130 data scientists around the world, not all in the central team, but also in this kind of hybrid organizational setup. I could spend hours talking about this, but this is not what we are here for today. And we have already implemented hundreds of use cases. We have a lot of them in production. There's a whole governance around it, blah, blah. Not a topic for today, as I said. But they are spread in a wide variety of areas of applications. Forecasting, we'll be talking about this today. Optimization, routing network. We have a dedicated operations research team. And you can meet some of them. They are here. Hi, Martin. And customer analytics, general predictions, finance topics. Carsten is here if you want to talk to him about that. So this is definitely a wide variety of use cases that we are doing. And I won't go into this bottom lines that we have here. But it's not academic interest why we are doing this. It's delivering real business value. You also quantify this, what we are achieving through our projects. And it's definitely in the order of hundreds of millions of euros of value, which we bring to the company. This is officially confirmed. and this is also why we are significantly investing in that area. So this is now just as a kind of brief introduction that you know what we are talking about today and with this I would like to hand over to Anna to give you some more insights of two examples of use cases that we have implemented.
+
+**Speaker 2** _[07:12]_
+
+Thanks, Thorsten, for the nice intro, and I have now the pleasure to introduce you to two big use cases we have been working on for quite some time now, and that are really and well-developed. So I will share a video as a short introduction about... Okay, so, and this video is about our last mile delivery that Thorsten just touched up on, where we deliver a lot of, yeah, where we deliver the parcels and we also provide the forecast when the parcel will arrive. So if you have been in touch with it, you get information on your phone saying, oh, your parcel will be delivered today between 12 o'clock and 1.30. Let's see how it works.
+
+**Speaker 4** _[08:41]_
+
+and data science are improving our private and professional life not only in the future but already today let's take a look at sarah sarah is waiting for her long-awaited delivery that will arrive around 1 pm but how does sarah know that short answer on track on track is generating real business impact by digitalizing the last mile delivery at post and parcel germany leveraging AI to provide pre-notifications and live tracking for parcel recipients. By feeding billions of historical delivery data into our algorithms, we can predict future deliveries. Using operations research, we can find the best and most convenient route tailored to each courier's preference and provide accurate estimations for the time of delivery for millions of parcels throughout the day. At the end of the day, Sarah is happy about her long-awaited whatever that is, and we're happy that Sarah's happy. This is just one of many examples how data science can drive our business and solve our challenges. Do you want to start your own journey? Then get in touch with the Data Analytics Center of Excellence or your divisional data science experts.
+
+**Speaker 2** _[10:12]_
+
+So, yeah, we have been working on this topic for quite some time. And I think at the beginning, it doesn't seem like a very complicated topic. We work together in two teams. So we had an operations research team that focused on the route optimization. And then we had the data science team working on the delivery time window prediction. And when you look at it, you start out with your deliveries that are spread out across the city. And the first thing you think about, okay, it's an easy traveling salesman problem. I just optimise for the shortest path, and I'm done. But the problem here is to actually have the time window prediction when your parcel will arrive. You need to be sure that your courier actually drives the route that you expect. And in our case, it's not that the time is really spent on driving because the routes that they are taking to deliver the parcels are not that long, but the time is actually spent on delivering the parcels. So it's really critical that you meet the person you want to deliver the parcel to. And the courier, with his experience or her experience, they have a lot of information that is not seen in the data. And therefore, we optimize the routes to actually be accepted by the courier. So to be able to assign a time window to the route that we give the courier, we need to ensure that we have a very high tour loyalty. And to create these efficient routes where you are able to deliver the parcels in a short time we need to ensure that we account for the individual preferences that the courier has. And therefore we did not only do route optimization but combined it with a machine learning algorithm that takes all the historic tour information and optimizes in a way that we give out routes that the courier accepts. And if the tour is accepted, we have a high tour loyalty, and then we can also easily predict when the parcel will be delivered. While we were working on tour optimisation, we were also working on the delivery time window prediction, and we really started out in a small team analysing the data, and the nice thing is in the big company, we have a lot of data. So we relied on all the historical tools and shipment data that we had to train a machine learning algorithm, and then we looked for local specialties to make sure that, yeah, we get all the information and expectable delays, for example, that are in the data, and we optimise, for example, seasonal patterns to ensure that we have a very accurate prediction. And with this solution, we are live now, you probably know from your personal experience, and we are continuously working on it to ensure that we still have high quality and that everything is running. And just to give like an example, so the most of it is done in Python and C sharp, and in the peak season, like a day in the beginning of December, we deliver about 10 million parcels, and therefore we need to really generate a lot of these time window predictions, and with our hosting in the Azure cloud, we are able to generate 2,000 delivery time window predictions within a second to ensure that everything is sent out at the right time, and that's about this use case. And the next use case we have is about customs clearance. So we have a lot of cross-border shipments, and when you ship cross-border, you need to give an HS code that describes what kind of product you are shipping. And here we also have a short video to introduce you to the topic.
+
+**Speaker 4** _[14:21]_
+
+and data science are improving our private and professional life not only in the future but already today. Do you know that we are moving billions of shipments between countries every year within the DP DHL group? Crossing so many borders can cause major impediments. In most cases a customs code is required to identify the product for customs clearance. The solution product classification tool, also called PCT, is a ready-to-implement, data-driven solution that improves customs processes by predicting and automating customs code classification for cross-border shipments. The basis of this solution is historical shipment data which is processed and consolidated into one large database that contains only unique products with valid customs codes. A machine learning model uses this information to learn how to predict customs codes. As a result, PCT can be used to automate the product classification process in our operations and for customer facing services. In customs operations, the tool can provide multiple recommendations for customs codes to accelerate customs clearance or determine the customs codes automatically. And for customers, the customs codes can be automatically enhanced to provide transparency about fully landed costs during the ordering process this is just one of many examples how data science can drive our business and solve our challenges
+
+**Speaker 2** _[16:03]_
+
+So, that's also something that we have a big need of because we have different business units and a lot of cross-border shipments, and as I said in the video, so the basis for this machine learning model that we are training is actually the product description as a core. Here we use deep learning and NLP to transform this human readable format to an HS code and then learn on this data for further predictions. I brought a little example of the training data, so it's really like written information on the product, and then you have the six-digit HS code. I think this example is not so common, so you don't know it as a normal user, but it is applied for like when you do online shopping to see how your total cost will actually end up. And if we have the option, we also add data, for example, the airport code, so we know from where to where the product is shipped, or we have shipper details because only some shippers are only associated with certain HS codes, or you have the SKU as more information on the product. And here also we relied on the available data, we have a lot of historical shipment data in this case as well, and we also integrated the data from different business units to to have one big data source, and now we provide an API service into the different operations systems of our business units to either automate the customs clearance process or to really accelerate it. And here also we look for the scalability because it is really needed, and it needs to be scalable in large numbers, and we have now implemented it across different countries, across different business units and also host the whole API in a way that it has a low latency by being hosted in three regions in the world. And especially in our big company, it often occurs that you have just these cases of reinvention of the VIA. So we as a central team can look for the different needs of the business units and avoid that every business unit is developing the same product, only looking at their needs and ensure that also stuff that we can do in-house is not given out to external vendors and we end up with a certain vendor lock-in. So this is it from our big use case side and now I would like to hand over to Severin for various other topics.
+
+**Speaker 3** _[18:46]_
+
+Thank you very much. I would like to talk today about time-aware forecasting, right? We've just heard about some very big solutions that we are running, but of course we are also running a lot of, let's say, standard forecasting topics in smaller and bigger varieties. But what do I mean by time-aware forecasting? By time-aware forecasting, I mean projects which are either built on multivariate time series data, or data which have some kind of time-dependent nature, right? So one example, the Parcel Germany line-haul predictions use case we did. So line-haul in this case refers to the transportation of parcels between parcel centres, which happens every night in our networks between all the parcel centres. And this is a classical time-series forecasting project, right? With a half-an-hour granularity, we predict the volume of parcels that are shipped between any two parcel centres. But on the other hand, with time-aware forecasting, I also mean projects like the invoice overdue predictions, where we actually do classification and try to classify invoices which are going to be paid late by the customer, right? This is very helpful in steering our collecting process such that we can collect the money from all the customers. Now here, in that sense, the time-dependent nature is described by kind of the customer behavior over time, right? And if you think about you're doing a classical train-validation test split as you would do in classical machine learning, you might, if you have, for example, a customer which runs out of business and by chance a data point which reflects this is already in your training set, of course, it won't be very hard to predict this kind of behavior in your validation, your test set as well, right? But this is information leakage in that sense that we need to prevent, and therefore time-aware forecasting actually plays quite an important role in almost any of our projects because you will most likely find always some time dependence that you need to reflect. Now, to fully understand our perspective and our solution, just some background, what we typically do is that we train global regression models or classification models on custom engineered features, right, which allows us to especially also encode business specific drivers and experience. We found that this is really key ingredient to successful projects that we're running because first of all, the prediction quality really can benefit from the input of the business So, in terms of process knowledge and other information, besides of course EDA phases. But mostly it's also very important in the integration of such models into the business processes, right? We need, essentially, you need a lot of high user acceptance that people start trusting your models, and if they are in the loop of developing it, they know what kind of data flows in there, there's much higher chances that you can succeed with this, right? just on the side, but I think that's very important to rename here. Now, if you have such an overarching theme or recurring theme in all your projects, at some point, of course, you ask yourself, okay, what can we do to scale this? What can we do to improve things? And then, yeah, what you come up with is a forecasting library. And I just want to briefly take you on the journey that we went through. So in the middle of 2019, we kicked off our forecasting lab with the aim of collecting common code from all the projects, improving code quality and increasing the prototyping speed by reducing the testing and implementation efforts for each and every project. So you do it once properly, and then all the projects can use this. The aim was to provide an end-to-end library for time series forecasting, such that very experienced people can work with it, but also people not having done time series forecasting before can do it. And it would cover things like time series cross-validation, which is an important topic which I will follow up, but also things like wavelet decomposition, which then you could use as features or also for outlier detection. And as I think all time series forecasting projects, of course, you want to be scikit-learn compatible. As all time series libraries, you want to be scikit-learn compatible. At the end of 2019, we did our first release, and with the nine-hole forecasting project that I just talked about, this was actually the first one which was used, where the time series forecasting library was used in putting it in production, and pretty much since then all of our forecasting projects used as a standard our time series forecasting library. In the course of last year, we came to realise that there's things that we can further improve on. The landscape of time series forecasting libraries and available models has really grown, and it is quite an effort if you claim to have an internal end-to-end library where you somehow want to support all the good practices. So what we decided to do is to modularise our library, break it up into smaller parts in order to reduce dependencies and then essentially maintenance effort. So for projects which only focus on parts of it, specifically if you talk about time aware forecasting with non-time series forecasts, then this is a very important point. Our tech stack has developed further and we've seen a lot of opportunities to integrate this further into the library, and I think an overarching theme in any aspect of the projects we're doing is really production-ready development, trying from the start on being as close as possible to production, because this will save you a lot of things. Okay, now I want to deep dive a little bit on our library which now will be factored for the time series cross-validation or time aware cross-validation. Let's start with the structural difference between time series and time aware forecasting. So first of all, we need historic data to generate features and make predictions. I think that's quite an obvious one, but we'll get to that in a second. Second point is we want to do time-aware cross-validation, right? I motivated this in the beginning with the invoice overdue predictions, but there is good reasons to do time-aware cross-validation, right? Might not be necessary for your project, but if you do, you're certainly on the safe side. Now for me, this also means that you include the entire pipeline, right? That's the entire preprocessing and feature generation pipeline that you should put into this cross-validation, because if you think about what do we do in preprocessing, we often rescale the data, we detect outliers, we impute missing values, but this might lead to very different results depending on what point in time you actually apply this to your data. And specific for time series data, often the data points don't even exist yet once you put it in production, right, because you know you want to predict the next day, you have all the data from the history, so you can puzzle it together, just to keep this in mind. Now having the need for historical data to make predictions, of course, is kind of a breaking requirements to classical scikit-learn pipeline, right. Now I see two approaches how to tackle this, right, so one is you could store the history during the fit call, right, you just remember the history, the advantage is you don't need any further, provide any further history during predict, which might be beneficial if you for example put this in an API, right, you don't need to pass the history along with the API call. But on the other hand, the drawback is that you add time-dependent state to your machine learning model. For statistical model, this is quite natural. But for machine learning model, it's not. The second approach is that you provide sufficient history during predict and then basically on your pipeline for the transform, you do it on the full history and then you filter down to whatever portion of data you want to actually do the predictions The advantage here is you don't end up with a time-dependent state. Of course, the drawback is that the transform and the predict, you will actually call on different data. So the transform of the transformers and predict of the estimator. Now let's look at how we realise this. Now here you see classical scikit-learn pipeline. Let's assume you put together an amazing pipeline, lots of transformers, estimator, and you now want to, and let's assume you have kind of the split interface, right, which provides this fit data and predict data method which just filters down your data from the full data to your training data set and your test data. You fit the pipeline on the fit data and you predict on the test data, right? So far so good. Now what the forecasting library offers is this TS pipeline, and the TS pipeline is simply a wrapper around the scikit-learn pipeline, and it adds another argument to fit and predict, right? You see this split object that we pass along. Now why do we do this? We do this such that we can now internally do the splitting, right? Here for example, this is what the scikit-learn fit call will do internally. You iterate over all transformers, you fit them, you transform the data, and then you fit the estimator. The difference is here that we switch back and forth between the full data set and the trained data set. I'll come to in a second why this is the case. Similar with the predict, you basically take the entire data frame that you got, or data set that you got, you run it through all your transformers, transform methods, and only then you filter down to the data points you want to predict, and then you call estimated or predict. Now, the reason is why, the reason for why I added this before is we can further make this a little more efficient, we can add a fit predict function, which only does the loop over the transformers once, right. Now, what you've seen so far is we have defined an abstract interface for the split logic, we inject the split logic to the call of the transform and the predict methods to be able to call them on different parts of the data, and essentially what we've achieved is a generalisation of the scikit-learn pipeline. We haven't done any assumption of any time-dependent nature of this split interface, but if you think about for the fit data and the transform data, you just put in the identity, then you will recover the scikit-learn pipeline behaviour, right? Now since we haven't defined any detail of split interface, we can now easily inject any logic, any split logic, which we, for example, need to implement time-aware cross-validation. And while we are at it, we might as well also add a couple of more features, right? Like we're now able to subset data within our scikit-learn pipeline, which you cannot do in the scikit-learn pipeline itself. Yeah, let me briefly talk about the split interfaces, that's the next thing we need. As I mentioned before, if we look at the implementation of the non-time-aware splits, right, we have the identity methods for all three cases. I will leave out why we have this transform data here as well. And with this we will recover the standard scikit-learn pipeline behaviour. And then we can introduce time-aware splits, and actually our library has a generator for these time-aware splits, where you can specify all the details, your data frequency, retraining frequency forecasting horizons and you'll get an iterator for those splits and each of them is defined by train end date and prediction range and with this we have we we turn our data into a multi-index where we have the daytime index and an index indicating time series ids and with this we can simply filter by date time to cut data into our fit data predict data. This works both for time series as well as non-time series data. Now, one thing I want to mention here as well, we also have a production split specifically for time series because now this transform data interface adds the future data points if they don't exist yet. The first time you call it, it checks, are they there? If not, recreate them and you will automatically create the features for this. You can take your pipeline, give it to production split and you couldn't immediately put it into production. There's a couple of more features that I can talk about, let me maybe focus on one which is quite important for us, I told you about that we also want to improve our integration with our tech stack. So first of all, there's also a persistent version of the TS pipeline where you can persist part of the pipeline which is computationally expensive, and this will give large benefits if you do cross-validation, because you don't need to recompute those steps, but they will be persisted and you can simply reuse it from there. And yeah, we've also implemented the ability that we can use Kubeflow as a back-end for our parallelisation. Let me quickly wrap up. So, yeah, what have we achieved with our library? We have generalised the scikit-learn interface for the pipeline and the splits with the goals to improve maintainability and usability, so the core functionality is roughly 700 lines of code with really high test coverage, so it's a really small and neat package with close integration with our tech stack, which allows essentially rapid prototyping with the high code quality. And on the other hand, we've improved usability, right, we preserve clear scikit-learn workflow, you can use any scikit-learn transformers estimator out of the box, and we've really customised it to our needs and our way of approaching time series and time-aware forecasting. So with this, I would like to hand over back to Torsten, and he will tell you more about our tech stacks. Thank you very much.
+
+**Speaker 1** _[34:37]_
+
+working again. Just four minutes we have left, I think, very quickly. So I have to rush a bit, but it's not that bad because we have a booth over there and you can come over to learn more, right? So we have a hybrid infrastructure on-premise and in two different cloud environments. And on top of this, we have data platforms. We have Kubeflow, as David already mentioned, as our dedicated environment for data scientists. And we are deploying this in all three IT environments that we have selected. We are providing, therefore, a consistent experience for data scientists on different infrastructures, just as we need it. And we also rely on a tool for automated machine learning. If you want to know more about this, what we're doing with that, and why we are having that, happy to talk to you after the talk, or at our booth afterwards, right? With the lack of time, I won't go into more details here, but it's definitely a super interesting topic if you want to learn more about it, absolutely, yes. But tools is not everything. This is something I really want to highlight. Yes, we are providing toolings, not just for our team, but for the whole company, for all data science teams which we have in our company. But very important for our aspect of scaling is also the dedicated support that we are providing for data science projects. We have set up an MLOps department, MLOps team, because this is so crucial. If you don't have proper MLOps, you will get stuck in the existing projects. You will then have data scientists who just maintain older projects but don't have time to do a new project anymore. And therefore, we are investing here heavily. We are investing in the talents, in the best practices, in the templates, and all of that, right? And also here, our head of MLOps is also here, Christian. I guess you can meet him at our booth afterwards, right? And an active community is the third pillar, I would say, which we are fostering. We are providing trainings here. We have a clean code club. There has been a lot of talking about good code quality for data science at this conference and we are investing there a lot and this is a very active community where we learn from each other and improve over time. And with this, I invite you to talk to all of us. We are a team of 40 persons here at this conference, so you can meet all the experts that you need if you want to talk about those topics. and yeah this was just a very brief summary of things we are doing there's so much more we would like to talk to you about what we are doing but we don't have time in this talk for now because we also want to have some questions that we can answer for you and again as I said we have a booth it's straight if you leave the room on the left-hand side come and visit us two colleagues of us are always there but for many of our experts are visiting by all the time
+
+**Speaker 3** _[37:23]_
+
+um,
+
+**Speaker 1** _[37:24]_
+
+Meet us there learn about what we're doing discuss without the use cases that you have seen or additional ones that we have done
+
+**Speaker 3** _[37:25]_
+
+me.
+
+**Speaker 1** _[37:30]_
+
+And by the way, we are hiring Thank you
+
+**Speaker 2** _[37:40]_
+
+Thank you so much. We have a lot of questions on Slido, so let's try to get in as much as we can. So, what are the main challenges you're facing that are due to your specific scale, and how do you cope with them? Which approaches, tools, or infrastructure?
+
+**Speaker 1** _[37:57]_
+
+This one I can answer my experience is that the biggest challenges are always on the human side of things Of course, there are challenges in the technology in the infrastructure in bring scaling it But really having the buy-in from all stakeholders having the buy-in from the end users who will have to adopt the solution Afterwards and have no objections around. This is the biggest challenge for scaling in my opinion Of course, you have to do your homework's we are doing that but then this remains
+
+**Speaker 2** _[38:24]_
+
+OK, next question. What tech stack do you use for training machine learning workloads?
+
+**Speaker 3** _[38:33]_
+
+Well, yeah, so we use the Kubeflow platform, right? And then we have used the standard tech stack, right? Pandas, we're now looking a lot of into Polar, so a lot of interesting talks. I've just started to implement this on one of our first, on one of my current projects. And, yeah, turns out that in many cases, we're using LightGBM, for example, but we have just mentioned the data robot platform, right? So it's also an AutoML solution which we use for benchmarking or as baseline for the projects and also for scaling because the kind of idea is a little bit that skilled data analysts can also use this to make forecasts, right? Because the key, and that's also what we see in our work, is the key in getting good forecasts is in the pre-processing of the data and the feature generation.
+
+**Speaker 2** _[39:30]_
+
+So a lot of people want to know, as DHL is also an international company by the looks of it, are there any international people in your data teams?
+
+**Speaker 3** _[39:39]_
+
+Yeah, sure.
+
+**Speaker 2** _[39:43]_
+
+Yeah, our team is very international, actually. I think if we do a world map of our data science team, we covered every continent except for Australia, I think. But it's a very international team. Everything is in English. So, of course, we have a lot of German native speakers, but generally it's no problem to everything in English.
+
+**Speaker 3** _[40:03]_
+
+in English. And also in most divisions, it's fine if you speak English. It's a bit different with the German side of things, but especially with the wording, but yeah.
+
+**Speaker 2** _[40:15]_
+
+so there's a question here how do you scale and what are your deployment best practices
+
+**Speaker 3** _[40:29]_
+
+Yeah, this is a huge topic, right? I mean, if you just look at the forecasting projects we're talking about, right, we're really trying to standardize our CICD workflows, right? That's what we're using Kubeflow for, right? Scheduling via recurrent runs. Trying to, you know, get similar structures also to ease support for those, right? As Thorsten mentioned, we have an MLOps team which at least covers technical things of support. here but of course you need to be able to support all the projects that you generate and that's I think key and then of course we have the bigger solutions maybe you want to comment on those
+
+**Speaker 1** _[41:09]_
+
+on those yeah no i work my most important aspects really standardization and observability of the solutions and automation wherever you can do automation if we have a small team of like we have support clusters like three persons who then can support a larger number of projects if one person always has to support one project you can forget about scaling so standardization observability and automation these are core aspects independent of tools
+
+**Speaker 2** _[41:37]_
+
+So is route optimization done on the level of the individual courier? If so, how do you account for new couriers without established preferences and retraining models?
+
+**Speaker 3** _[41:47]_
+
+We all work on this program.
+
+**Speaker 1** _[41:48]_
+
+We'll work on this project.
+
+**Speaker 3** _[41:50]_
+
+Yes, very interesting question. So actually, this is a highly non-trivial project because, first of all, you look up the courier, but it also has to match kind of the region he's looking for. It doesn't help if you're looking at a different district where he's typically not delivering. So there's some fallback mechanisms. If there's a new courier being onboarded, and we kind of also see this, that this enables to kind of transfer knowledge from a very experienced driver to a new driver and is also the onboarding process. Currently, there's a machine learning model behind which actually selects the best clusters that we created based on historical tools that the query has done and it basically votes for which one is the most likely to be picked for today, right?
+
+**Speaker 2** _[42:46]_
+
+So we only have time for one more question is your forecasting library open source if not have you thought about doing so
+
+**Speaker 3** _[42:53]_
+
+Yes, unfortunately it's not yet open source and it's been on the table for quite a while and the goal is still to have it open source this year.
+
+**Speaker 1** _[43:03]_
+
+And we have to okay from our CEO to do so
+
+**Speaker 3** _[43:05]_
+
+Yeah, I mean there's some some official things there was a question before a drawback in such a big company There's a lot of a lot of rules you sometimes have to follow and you first have to find out that you need to follow them But yeah, this is this is something we will make up manage
+
+**Speaker 2** _[43:24]_
+
+Great. Thank you so much. Thank you, and thank you, everybody, for your questions.
+
+---
+transcript_status: auto
+---
+transcript_language: en
