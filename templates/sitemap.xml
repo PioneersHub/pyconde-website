@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  {%- for page in [site.root] if page != this recursive %}
-  <url>
-      <loc>{{ page|url(external=true) }}</loc>
-  <xhtml:link
-    rel="alternate"
-    hreflang="de"
-    href="{{ page|url(external=true) }}" />
-  <xhtml:link
-    rel="alternate"
-    hreflang="en"
-    href="{{ page|url(external=true, alt="en") }}" />
-  </url>
-  {{- loop(page.children|sort(attribute='path')) }}
-  {%- endfor %}
-</urlset>
+{#-
+  /sitemap.xml is now an INDEX of segment sitemaps. Each segment file
+  lists URLs of a single content kind. Easier to spot indexing problems
+  per segment in Search Console, and each sub-sitemap stays under the
+  50k-URL limit indefinitely.
+
+  The /sitemaps/{kind}.xml files are real content nodes — see
+  content/sitemaps/.
+-#}
+{%- set base = site.config.PROJECT.url -%}
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap><loc>{{ base }}/sitemaps/pages.xml</loc></sitemap>
+  <sitemap><loc>{{ base }}/sitemaps/talks-current.xml</loc></sitemap>
+  <sitemap><loc>{{ base }}/sitemaps/talks-archive.xml</loc></sitemap>
+  <sitemap><loc>{{ base }}/sitemaps/speakers-current.xml</loc></sitemap>
+  <sitemap><loc>{{ base }}/sitemaps/speakers-archive.xml</loc></sitemap>
+  <sitemap><loc>{{ base }}/sitemaps/tracks.xml</loc></sitemap>
+  <sitemap><loc>{{ base }}/sitemaps/blog.xml</loc></sitemap>
+</sitemapindex>

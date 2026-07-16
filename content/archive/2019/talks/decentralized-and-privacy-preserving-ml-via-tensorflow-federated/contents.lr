@@ -1,0 +1,2032 @@
+title: Decentralized and Privacy-Preserving ML via TensorFlow Federated
+---
+description: Federated Learning is a technology to train machine learning models and run data analytics on decentralized data. This tutorial will demonstrate step-by-…
+---
+created: 2019-06-08
+---
+code: WRPFUC
+---
+slug: decentralized-and-privacy-preserving-ml-via-tensorflow-federated
+---
+speaker_names: Peter Kairouz, Amlan Chakraborty
+---
+speakers:
+
+
+
+### Peter Kairouz
+
+Peter Kairouz is a researcher interested in machine learning, security, and privacy. At Google, he is a Research Scientist working on decentralized and privacy-preserving machine learning algorithms. Prior to Google, his doctoral and postdoctoral research have largely focused on building decentralized technologies for anonymous broadcasting over complex networks, understanding the fundamental trade-off between data privacy and utility, and leveraging state-of-the-art deep generative models for data-driven privacy.
+
+### Amlan Chakraborty
+---
+abstract:
+
+
+Federated Learning is a technology to train machine learning models and run data analytics on decentralized data. This tutorial will demonstrate step-by-step how to train largescale TensorFlow models and custom computations in federated environments.
+---
+full_description:
+
+
+In this tutorial, authors of TensorFlow Federated will introduce the key concepts behind federated learning, an approach to machine learning that allows a shared global model to be trained across many participating clients that keep their training data locally. By eliminating the need to collect data at a central location, yet still enabling each participant to benefit from the collective knowledge of all participants in the network, it lets you build intelligent applications that leverage insights from data that might be too costly, sensitive, or impractical to collect.
+
+We’ll demonstrate how you can develop hands-on familiarity with federated learning using TensorFlow Federated (TFF), a new open-source framework in the TensorFlow ecosystem. We will introduce the key concepts behind TensorFlow and TFF, we’ll demonstrate by example how to setup a federated learning experiment and run it in a simulator, what the code looks like under the hood and how to extend it, and we’ll briefly discuss options for future deployment to real devices.
+
+The talk caters to audiences with different types of backgrounds:
+
+Machine learning developers and practitioners, who would like to experiment with running their existing machine learning models and data in a federated setting, will learn how to do so using Federated Learning API, the included simulation runtime and sample federated data sets.
+
+Researchers, who would like to experiment with new types of federated learning algorithms or extend those that come included with the framework, or who might wish to develop custom types of federated computations such as statistical analysis over sensitive data, will learn how to do so using Federated Core API, a strongly-typed functional programming environment that allows for easy mixing of TensorFlow code with federated communication abstractions.
+
+Systems engineers and researchers, who would like to adapt TensorFlow Federated to target new types of environments, will learn how they can benefit from the abstract platform-independent representation used to represent all computations expressed in TFF - at its core, TFF is designed to facilitate a smooth migration path for all TFF code from a simulation environment to a possible future deployment on real devices in production.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: PyData
+---
+tags:
+---
+submission_type: tutorial
+---
+submission_type_label: Tutorial
+---
+submission_type_id: 126
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: basic
+---
+domain_expertise: some
+---
+supporting_material_url: https://www.tensorflow.org/federated
+---
+slides_link: https://www.tensorflow.org/federated
+---
+social_card_image: /static/media/social/talks/WRPFUC.png
+---
+youtube_id: PP209iFnnH8
+---
+video_link: https://www.youtube.com/watch?v=PP209iFnnH8
+---
+video_published_at: 2019-12-08
+---
+video_duration_iso: PT1H25M27S
+---
+video_thumbnail: https://i.ytimg.com/vi/PP209iFnnH8/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+All right, so today we're talking about decentralized data.
+
+**Speaker 2** _[00:09]_
+
+and
+
+**Speaker 1** _[00:10]_
+
+and how we take decentralized data and apply machine learning, but also apply other such computations, right? Think analytics, think any kind of computation that can benefit from.
+
+**Speaker 2** _[00:23]_
+
+from
+
+**Speaker 1** _[00:24]_
+
+from decentralized data.
+
+**Speaker 2** _[00:28]_
+
+Right, so, so.
+
+**Speaker 1** _[00:34]_
+
+So for the talk today, so it's a tutorial.
+
+**Speaker 2** _[00:39]_
+
+tutorial.
+
+**Speaker 1** _[00:41]_
+
+So just to start off, we have on the TensorFlow Federated website, I'll show you the link in a second, we have these tutorials. And this is basically a dive into that same tutorial. Those tutorials use Google Colab notebooks, so you should be able to run them yourself.
+
+**Speaker 2** _[00:59]_
+
+um
+
+**Speaker 1** _[01:01]_
+
+What I'm going to do is I'm going to run to the motivation of decentralized data. Then we're going to federated learning. Then we're going to talk about the more general topic of federated computations, which is an intuition that we came up with as we started working with federated learning. And then finally, the key part here is to talk about TensorFlow Federated, which is an open source effort that we want everyone to participate. We want to build this as a community.
+
+**Speaker 2** _[01:31]_
+
+and you know
+
+**Speaker 1** _[01:32]_
+
+and enable more and more use cases for privacy-preserving computations. And the general aspiration is like, it's for, you know,
+
+**Speaker 2** _[01:43]_
+
+Um, you know, uh...
+
+**Speaker 1** _[01:45]_
+
+Privacy being central to competitions, right? So, like, today the world is, like, privacy has become a key deliverable for any app developer or any software, right?
+
+**Speaker 2** _[01:59]_
+
+And.
+
+**Speaker 1** _[02:01]_
+
+for data learning is one of those techniques that can offer utility of a software without compromising on privacy so like the existing existing model of app like existing model used as centralized servers where models learn in a centralized server we want to break away from the pattern and come up with this new way of computation. So like I said, let's start talking about decentralized data.
+
+**Speaker 2** _[02:35]_
+
+Thank you.
+
+**Speaker 1** _[02:43]_
+
+So does it actually even make sense to have decentralized data?
+
+**Speaker 2** _[02:48]_
+
+Um...
+
+**Speaker 1** _[02:51]_
+
+Can data actually live at the edge?
+
+**Speaker 2** _[02:54]_
+
+Um.
+
+**Speaker 1** _[02:55]_
+
+So most of the data, so today like smartphones are ubiquitous, sensors are pretty ubiquitous, right? So IoT is taking off or already has taken off maybe, right? So there is like this plethora of data that is out there. that are resident on devices at rest. And so we can leverage devices that are on the edge and learn from them pretty easily, right? So if you think about models or, you know, just general concept of learning, you can actually learn a lot on devices themselves. You will get much improved latency If you run learning on a device, you don't have to go back and forth to some centralized location. It works offline because there are data caps and whatnot. So it can work offline. Definitely saves battery because one of the most battery draining activities is actually connecting off and onto networks. Privacy advantages, which is our key central point here, like to keep, to not send data off my device. The device is something that I own, And that's my domain, right? The moment it leaves my device, the owner's device, the owner has lost control of the data, right? So if that's the premise, then this is huge. So great. So you actually have the tooling to learn on device. And you have all these advantages that I outlined of learning on a device. So that's fantastic, right? But is it really fantastic?
+
+**Speaker 2** _[04:38]_
+
+Uh, no.
+
+**Speaker 1** _[04:38]_
+
+No, right? So basically because how do you know how you're doing, right? If you're on a device, I mean, how do you analyze? How do you learn about your learning, right? If learning is a problem that you're trying to solve.
+
+**Speaker 2** _[04:50]_
+
+Um,
+
+**Speaker 1** _[04:52]_
+
+And there is definitely patterns that you could learn if person A and person B use the same application. There is probably some learning to be shared between their two experiences, right? And so there's fundamental things that are missing here, right? So you just create a lot of different silos if you're just learning on a device, which can be bridged if there was some way to kind of collaborate across devices.
+
+**Speaker 2** _[05:17]_
+
+Right.
+
+**Speaker 1** _[05:20]_
+
+So in comes
+
+**Speaker 2** _[05:23]_
+
+Um.
+
+**Speaker 1** _[05:25]_
+
+basically the idea of centralized learning right I'm going going back a step and going into centralized learning
+
+**Speaker 2** _[05:37]_
+
+Um...
+
+**Speaker 1** _[05:39]_
+
+So think about this particular model, right? So there's data on the client The client makes a request the model learning is happening at the server. The model is at the server So basically the data is on the client. The model is the server and the request comes into the server the learning happens on the on the server itself to centralized learning and Then basically the data asks a question the prediction goes back and and the client gives feedback back. So this is, again, this is back to that model where the data is on the client. But there is some amount of data that is leaking to the server, so learning is on the server. So you're going back and forth. But one thing that we can get out of this centralized learning is if data is in one place, then it's easy to learn. That much we can infer, right?
+
+**Speaker 2** _[06:29]_
+
+Um...
+
+**Speaker 1** _[06:32]_
+
+Let's see if we can make this better
+
+**Speaker 2** _[07:02]_
+
+So
+
+**Speaker 1** _[07:05]_
+
+centralization has its clear disadvantages right I think we talked about this briefly
+
+**Speaker 2** _[07:10]_
+
+Um.
+
+**Speaker 1** _[07:11]_
+
+We now introduce latency.
+
+**Speaker 2** _[07:13]_
+
+Um...
+
+**Speaker 1** _[07:15]_
+
+If you're offline then just becomes impossible to learn and then actual there is actually cost involved not just You know privacy concerns, but there's actual costs involved in learning on the on the on the server the data caps There's battery life. I talked about all these things. It's just a recap of the same thing So now the key question can you learn about collecting data? And And so basically, in comes predated learning. So we sort of established this point that, yeah, there is decentralized data on devices. Learning on the server, like in a centralized location, is something that we have explored that has clear disadvantages. Learning on the device itself has advantages, but then you don't share learning. So we have to come up with some model that where data never leaves the device, the data stays on the device, privacy is protected, and you learn collaboratively. So in comes federated learning, which is essentially machine learning on decentralized data. That's roughly what federated learning is. So if I read from the slide, so it basically says, enable edge devices to do state of the art machine learning without centralizing data. And obviously, if you centralize data, it's already one step in the direction of privacy. It's not everything, but it's one step in the direction of privacy. So privacy is by design in this technology. Privacy is by default, because data never leaves the device. Right? So we can do all the training on the device, which is established. It's something we can do. I think let's skip over this. already talked about these two little data client other clients and contributing
+
+**Speaker 2** _[09:09]_
+
+Um, um.
+
+**Speaker 1** _[09:18]_
+
+So this is one alternative that people have tried, right? So you pre-train a model on the server, right, with some proxy data that you farm off of. Either you generate that data or you farm it off devices, which is also sort of a gray area, right? How do you get that proxy data, right? You have to have some intuition about real data, and there is privacy compromise right there. But let's say if I hand wave on that, Let's say if you have access to some proxy data, then you can train the model in the cloud or in some remote location in a server. And then once you have trained that model, then you can push that pre-trained model and now
+
+**Speaker 2** _[09:59]_
+
+uh...
+
+**Speaker 1** _[10:00]_
+
+The device can take from there, but still there is no collaboration, right? So it's basically one centralized model Pre-trained model then that the devices improve on but there is no feedback mechanism. There is no collaboration So, let's just see how federated learning works, right so So the initial model is decided by the model engineer. So they decide what the initial model is.
+
+**Speaker 2** _[10:33]_
+
+and
+
+**Speaker 1** _[10:35]_
+
+basically for the initial model it can be very simple right so I mean even random in the initialization is sufficient is what we found out
+
+**Speaker 2** _[10:43]_
+
+and
+
+**Speaker 1** _[10:45]_
+
+If you have proxy data like in the previous slide you can train on the proxy data and that becomes your initial model So that that technique doesn't change Then the client also once once it goes to the client the client trains on on that data So and then you get the locally trained model And Then the locally trained model and just the model rate the model update not the data itself the locally trained model makes it back to the the server right so and here is basically the thing that i've been alluding to all this while is keep the raw data local right and
+
+**Speaker 2** _[11:28]_
+
+and
+
+**Speaker 1** _[11:31]_
+
+So the data never leaves the device, it stays on the device, the cloud learns nothing about the data, the raw data itself, right? The onus of now maintaining that data or, you know, making privacy, making the data secure is definitely on the app itself, right? It has to expire the data on a timely fashion, and it has to encrypt it at rest so that it doesn't leak, right? But the learning protocol is completely agnostic to what data there was. it doesn't need the data and so it's completely out of the picture so that's that's sort of the privacy technology that is enabled with this so now think about like a whole cohort of clients right it's a bunch of clients out there they're all doing the same thing and you are basically all these devices are learning and they're all sitting the updates back roughly at the same time Here is the key thing, here is the key sort of magic, which is all these models come in and then we do federated model averaging. So essentially, jumping into machine learning here a little bit, if the learning
+
+**Speaker 2** _[12:43]_
+
+Um, on this.
+
+**Speaker 1** _[12:44]_
+
+On these devices, they did some gradient descent, assuming that's the optimizer they used. So basically, those many steps are average. So we call this federated model averaging. And then basically, we get a combined model. It's provable that this combined model actually is a result of all the different model updates that came from the clients.
+
+**Speaker 2** _[13:12]_
+
+Um, so.
+
+**Speaker 1** _[13:12]_
+
+So, in this combined model,
+
+**Speaker 2** _[13:15]_
+
+is, um...
+
+**Speaker 1** _[13:17]_
+
+It's something that comes to the server
+
+**Speaker 2** _[13:20]_
+
+Um.
+
+**Speaker 1** _[13:22]_
+
+There are some additional things that I have not mentioned here. This can actually be, so like I mentioned in the beginning, that the data...
+
+**Speaker 2** _[13:33]_
+
+Um
+
+**Speaker 1** _[13:35]_
+
+Obviously, they'll never leave the device, but it's model updates that the only thing comes. So a question that you may ask is, now you see the model updates, if you see model updates over time, can you make some sense of the data? That will be leaking privacy.
+
+**Speaker 2** _[13:50]_
+
+Um...
+
+**Speaker 1** _[13:52]_
+
+The question is yeah, maybe right So two things there one is these devices are presumably selected at random, right? There is no way to identify which update came from which device. That's that's a key point here, right? So and even if there was a curious, but not malicious
+
+**Speaker 2** _[14:14]_
+
+Um...
+
+**Speaker 1** _[14:16]_
+
+entity that were looking at these updates and trying to make sense of them. There are other technologies which I'm not going to go into today.
+
+**Speaker 2** _[14:25]_
+
+uh as well
+
+**Speaker 1** _[14:26]_
+
+There's one thing called secure aggregation that we have published a paper on, which can potentially even ward off that. So we introduce some noise. That noise cancels out. But basically, there are technologies that we can use.
+
+**Speaker 2** _[14:42]_
+
+to
+
+**Speaker 1** _[14:44]_
+
+Reduce the probability that that you can infer something about the raw data from the models themselves model updates themselves
+
+**Speaker 2** _[14:55]_
+
+Um...
+
+**Speaker 1** _[14:58]_
+
+Yeah, so one, so federated model averaging is, I don't have the time to, there's a paper, you're welcome to, I really encourage people to read the paper.
+
+**Speaker 2** _[15:09]_
+
+that
+
+**Speaker 1** _[15:10]_
+
+That was published a few years back But as just an intuition basically the way it works is it's a data weighted average of the model update so all these model of this comes and so it's a data weighted average of that updated models and That sort of gives you the combine combine model Yeah Or just theoretically, is it possible if someone would team up, some people would team up to spoil the combined model or infect the combined model with some malicious injections, data and stuff like that? Good question. So the question is, can you have a cohort of malicious clients that collaborate amongst themselves?
+
+**Speaker 2** _[16:06]_
+
+And, um...
+
+**Speaker 1** _[16:08]_
+
+and basically poison the learning, right?
+
+**Speaker 2** _[16:11]_
+
+potentially
+
+**Speaker 1** _[16:12]_
+
+Potentially yes, but the main thing is that the number needs to be very high, the size of the population has to be significantly high because
+
+**Speaker 2** _[16:24]_
+
+Um...
+
+**Speaker 1** _[16:26]_
+
+maybe I didn't mention this but the server is the one that's selecting which clients participate in this right so if the if the so so basically what are the odds that if you have a small pop if you have a population of a million devices then you have a smaller size of you know some hundreds of devices that are interest that are selected by server then the probability that you will select one from that cohort of collaborating clients is fairly low but theoretically, yeah, it's possible.
+
+**Speaker 2** _[16:57]_
+
+Um, so
+
+**Speaker 1** _[16:58]_
+
+So, yeah, so the model comes in, and then the combined model goes back out to, again, back up. So it's an iterative process. It goes back out to a set of clients. And like I say, this client has selected a random based on some heuristics. And so basically the chances that the same client gets picked up over and over again is significantly low, unless the population, it's dependent on the population size. if the number of clients is closer to the number of clients you need to compute, then clients will get repeated often. But essentially, this happens in a repetitive fashion now. So the combined model comes in, it goes back out to a set of devices, the devices learn, and it sends back in, and so on and so forth. So that goes on, and basically...
+
+**Speaker 2** _[17:43]_
+
+Um...
+
+**Speaker 1** _[17:45]_
+
+like any other machine learning you can also you'll also evaluate your your learning over time and essentially at some point you will find that your convergence is what you what you need and at that point you have a proper model that you can now work with
+
+**Speaker 2** _[18:02]_
+
+um right
+
+**Speaker 1** _[18:05]_
+
+Is that idea kind of clear? Let me just finish this and I'll come back. Yeah, go ahead. Yeah, so when we're talking about models, are we restricting ourselves to a certain class of machine learning models, like deep learning or neural networks? Yeah, so. With random forests or anything else? So typically, this is for Keras models, but there is, I think this can be extended to any kind of model, per se. I mean, the technology itself is not specific to the kind of models, right?
+
+**Speaker 2** _[18:45]_
+
+um
+
+**Speaker 1** _[18:48]_
+
+When I talk about in civil federated you will see that I'll mention
+
+**Speaker 2** _[18:51]_
+
+that
+
+**Speaker 1** _[18:52]_
+
+You know the code will be catered towards chaos models, but it can be easily easily adjusted to other kinds of models Sorry Yes, yes Yes, yes if it's a dishes and if the decision doesn't even make sense right
+
+**Speaker 2** _[19:19]_
+
+Um, so this
+
+**Speaker 1** _[19:20]_
+
+So this is a quick shout out to the Google mobile keyboard effort, where essentially this has been, I can't say proven, but this says this has worked. So this is the next word, completion, is the paper out there, which actually works without any collection of data, as does keyboard query suggestions. Yes yeah so you can
+
+**Speaker 2** _[20:06]_
+
+you can't
+
+**Speaker 1** _[20:07]_
+
+You can start with pre-trained data or you can
+
+**Speaker 2** _[20:10]_
+
+basically
+
+**Speaker 1** _[20:11]_
+
+basically start with very bare initial state right like even a random thing would work because since the the initial model really is it'll take you longer to to converge, potentially, right, if you choose the random ways. But you would probably want, if you start such a thing, you would want the client already to have, without a lot of iteration .. Yes, right, that's a good point. So that's the more sort of, yeah. So the client resources are precious. So you would want clients to do less. And I'll mention that briefly in the next few slides.
+
+**Speaker 2** _[20:52]_
+
+um
+
+**Speaker 1** _[20:53]_
+
+So typically what what people do is they run simulations So you can you can take your model and like I said, you can take proxy data and you can actually have
+
+**Speaker 2** _[21:02]_
+
+have
+
+**Speaker 1** _[21:04]_
+
+potentially machines in a cloud or something that pretends to be clients, right? So you can think of a machine and you spin up multiple threads and each thread becomes a client or something of that sort, some setup like that, and you run training. And so before you go out in the wild, you already have a pre-trained model. That's typically the flow. But I'm just saying, theoretically, you should be able to do even with random. Oops, sorry. Yeah, so now the intuition is, Now, once people started working with predator learning a bit,
+
+**Speaker 2** _[21:36]_
+
+Um...
+
+**Speaker 1** _[21:37]_
+
+The thing is, fundamentally, the protocol itself is not specifically
+
+**Speaker 2** _[21:43]_
+
+Um, in
+
+**Speaker 1** _[21:44]_
+
+You know connected to learning right? It's it's it's a it's a it's a general possible technology that can be used for Analytics, for example, right? So if you have do you want to do privacy preserving analytics you could I think, okay? Right so cool, so let's think about federated computation then
+
+**Speaker 2** _[22:03]_
+
+then, which is just
+
+**Speaker 1** _[22:04]_
+
+which is just extension, like you mentioned, from federated learning. And you can think of its analogy. It's like privacy preserving. It's like MapReduce, but built on top of decentralized data and privacy. So as you go along, so if you remember, so we talked about federated model averaging. That was one thing. As you go along talking about federated computation, It's a more broader non-machine learning subject when you talk about this. Then, basically, we'll see how privacy is addressed at a very ground level. So this is repetition of what I already talked about. So let's say you have a
+
+**Speaker 2** _[22:48]_
+
+Um, but.
+
+**Speaker 1** _[22:49]_
+
+a bunch of clients, but this is more simple at this point. There's no models, nothing. And let's say each device has its own data. So in this particular case, let's say these are sensors or devices that keeps track of temperatures of a day.
+
+**Speaker 2** _[23:03]_
+
+Um.
+
+**Speaker 1** _[23:05]_
+
+So they all have this data on the devices.
+
+**Speaker 2** _[23:11]_
+
+And, um, and.
+
+**Speaker 1** _[23:14]_
+
+The data is local obviously the same privacy preserving technology
+
+**Speaker 2** _[23:18]_
+
+Um,
+
+**Speaker 1** _[23:22]_
+
+So now our job is to find what's the average maximum temperature experienced by the fleet of devices, right? So that's the problem, right? So we're going to find out on the server, I mean, obviously server.
+
+**Speaker 2** _[23:34]_
+
+Um...
+
+**Speaker 1** _[23:35]_
+
+And by the way, one thing I want to mention is when I keep on saying server, it's just an entity, right? It doesn't have to be really a server in the cloud per se. It potentially could be a connected device that's connected all the time, right? So it's just the notion of an entity, right? So how do you get the average maximum temperature, right?
+
+**Speaker 2** _[23:57]_
+
+Um, so.
+
+**Speaker 1** _[23:58]_
+
+So okay, this is a kind of busy slide bunch of things came in right so let's say So scenario is let's say we want to find out
+
+**Speaker 2** _[24:08]_
+
+Um.
+
+**Speaker 1** _[24:11]_
+
+Not just the average but a little bit more right let's say we want to find out How much sorry how what's the fraction of devices? with the reading that is Larger than a threshold temperature right let's say it's a more realistic example rates instead of just computing average across random devices We're gonna find out what fraction of devices explain the temperature more than 75 or something like that, right? So So the way it works is so the if you remember the persona of the model engineer in this case it's not a model anymore but it's the person of an engineer who actually controls this experiment they are they're determining the in one of the inputs to the to the whole federation computation which is that input of the threshold which is 70 Fahrenheit and we are interested in the output which is the fraction of sensors that readings greater than the threshold right so what happens first so first thing that will happen is that threshold much like the model in the in the federated learning case will get broadcast.
+
+**Speaker 2** _[25:12]_
+
+to all
+
+**Speaker 1** _[25:12]_
+
+To all the devices right so you're interested in notion of the input that comes from the engineer So that's the input we obviously have the output and now there's one this fan out of information to all the devices There's also the act of actually selecting those devices that I glossed over But I did mention that devices are selected at random right so there's these so some devices get selected and then
+
+**Speaker 2** _[25:36]_
+
+There's
+
+**Speaker 1** _[25:37]_
+
+this threshold goes out to those devices.
+
+**Speaker 2** _[25:45]_
+
+All right.
+
+**Speaker 1** _[25:49]_
+
+So now, so each device computes, so it has the readings, like I mentioned, so in the first slide, right? So each device has its own readings, the data never leaves. So it basically just computes that one simple calculation, which is, is my temperature larger, so my max temperature, rather. Is my max temperature more or less than the threshold that I got from the server, right? so that's the simple calculation right and it let's say returns a boolean or 1 or 0 back okay these values then come back
+
+**Speaker 2** _[26:32]_
+
+And.
+
+**Speaker 1** _[26:34]_
+
+They can be aggregated using an aggregation operator. So we talked about federated model averaging more general-purpose thing of federated mean right so Basically This is a simple Aggregation technique here, but think of the federated mean as the whole process of of multiple devices sending this one number back, or one result back, one data type back, one value back, and then the server actually running these aggregations.
+
+**Speaker 2** _[27:09]_
+
+uh
+
+**Speaker 1** _[27:11]_
+
+wearing this predated bean, which is
+
+**Speaker 2** _[27:13]_
+
+um
+
+**Speaker 1** _[27:14]_
+
+on all the different outputs that came from the devices and then coming up with a number, right? So that whole computation, that whole operation is what we're calling federated mean. So an important thing I mention is these things are, these green arrows are potentially happening over a, so basically it's not happening instantly, right? So there is a time window, a sliding window where these things are coming in and then the server is aggregating this, right? So the whole operation is federated mean. yeah so this is i'm calling it technology number three but it's essentially an extension of the federated model averaging thing we talked about because it's still an aggregation that is happening at a federated scale and basically combining reports from these multiple devices Thanks for watching.
+
+**Speaker 2** _[28:08]_
+
+Um...
+
+**Speaker 1** _[28:09]_
+
+and coming up with an answer.
+
+**Speaker 2** _[28:13]_
+
+Um,
+
+**Speaker 1** _[28:21]_
+
+So, this is kind of important here. So, we're trying to see if we can extract some privacy principles that we have come up with, with what we learned about federated learning and federated computation. Can we establish some privacy principles? So, the... And we're also looking at it from personas, right? So, there is a server, there's a device, there is potentially the man in the middle, and there's an engineer who has access to this data, right? so one first privacy principle that we're establishing here is that you can only access the combined device reports right you cannot see individual device reports even if you cannot identify the device if you if you cannot connect the device to the device reports what you have access to is just the combined device reports because because that is the only thing that that the server is interested in so all the reports comes in you have merged them and then you get one value and one value is the is the thing that you are that you're persisting right so so anyone from the outside who has access to the to the server or server storage has only access to that all that aggregate and nothing else none of the raw data this is the other thing right so this is a privacy principle number two is the per device reports are not useful right because we once you compute the average or federated mean we can just throw that away so we should never persist any of the per device reports they're not necessary and so that's the privacy principle number two we can what we need to what you collect is just it's just ephemeral we just need it for the duration of the computation of the favorite to me and not longer yeah there is a third privacy principle which is focused collection right we just return that one value, which is the one or zero,
+
+**Speaker 2** _[30:15]_
+
+Um...
+
+**Speaker 1** _[30:16]_
+
+Indicate whether the max temperatures were higher than the threshold or not and that's the only thing so it's focused collection devices only report The very minimum that is needed right, so that's the other privacy piece will be establishing that Devices only report what the very minimum of what is needed we don't store anything on the server the like you know what comes from the the reports of the device are never stored and Finally the only thing we stored is the aggregate All right, and finally, like I mentioned in federated learning, this is repetitive, right? So it's an iterative process. You can improve this. Pardon my arrows. You can improve this.
+
+**Speaker 2** _[31:01]_
+
+this um uh
+
+**Speaker 1** _[31:04]_
+
+what you know about your computation by repeating it, because the key thing here is you are selecting different devices every term. The same thing will apply for more federated learning as well, because the fact that you are selecting potentially different set of devices every single time gets you to learn more. In this case, you will compute a more accurate fraction of sensors with readings as you pick more and more devices. Just a quick question on these first two principles. This means that me, as a device owner, I need to trust you that you're not storing it, essentially, right? Or is that somehow... It is... It should be guaranteed, right? Yes, so...
+
+**Speaker 2** _[31:47]_
+
+Yes, so...
+
+**Speaker 1** _[31:52]_
+
+I think it'll be more clear when I talk about TensorFlow Federated, but so it's a principle, right? It's a design principle, right? So if somebody builds a malicious solution where they don't adhere to the principle,
+
+**Speaker 2** _[32:05]_
+
+then
+
+**Speaker 1** _[32:08]_
+
+Then sure, yeah, so in that aspect it's a matter of trust, right? What we're suggesting is if somebody builds a framework, TensorFlow Federated will internalize these principles, right? And it's provable, right? I mean, so you can see the code and that this device reports are not persisted anywhere, right? So if it's ephemeral, I mean, it's easy to check that it's ephemeral, right? These privacy principles are easy to inspect and find out, right? If it's a closed source project, then you have less visibility into what really is happening, right? So it's a principle, right? So the design principle is either adhered to or not adhered to, right? The only way to prove that it's adhered to is by allowing code inspection.
+
+**Speaker 2** _[32:50]_
+
+inspection.
+
+**Speaker 1** _[32:51]_
+
+and binary attestation, I guess.
+
+**Speaker 2** _[33:02]_
+
+Um.
+
+**Speaker 1** _[33:05]_
+
+So now I think it What's important here is
+
+**Speaker 2** _[33:12]_
+
+um
+
+**Speaker 1** _[33:14]_
+
+These are, both this learning and federated computations are areas of active research. We are in, so privacy is...
+
+**Speaker 2** _[33:21]_
+
+is central
+
+**Speaker 1** _[33:22]_
+
+central to this things and like I mentioned right some of the questions you asked right I mean everyone asked the same questions right we privacy is something that you can never sort of check box and say like oh this is this is completely full proof
+
+**Speaker 2** _[33:37]_
+
+Um...
+
+**Speaker 1** _[33:38]_
+
+there are exploits that we need to be aware of and keep on iterating to make these things better.
+
+**Speaker 2** _[33:43]_
+
+and
+
+**Speaker 1** _[33:46]_
+
+And so this extension that, if you look at the extension, the first one is differential privacy, which is another sort of pillar
+
+**Speaker 2** _[33:52]_
+
+that
+
+**Speaker 1** _[34:01]_
+
+Yeah, so that's another pillar that we want to internalize and build into TensorFlow Federated, which I'm going to talk about in a second.
+
+**Speaker 2** _[34:11]_
+
+and and
+
+**Speaker 1** _[34:13]_
+
+And then there is additional things like compression and quantization that we will not cover today. So TensorFlow Federated. This is the key part of the talk today. So with the introductions laid, so let's jump into TensorFlow Federated. The thing to mention here is I put a QR code there.
+
+**Speaker 2** _[34:41]_
+
+Um, and-
+
+**Speaker 1** _[34:42]_
+
+And that's a link.
+
+**Speaker 2** _[34:43]_
+
+Um, you.
+
+**Speaker 1** _[34:44]_
+
+If you want, now you can potentially jump into, because I'm going to go pretty fast over the code that we're going to show. You're welcome to go there and start the tutorials.
+
+**Speaker 2** _[34:55]_
+
+um, and, uh,
+
+**Speaker 1** _[34:56]_
+
+And there's a CoLab, which is, I would suggest, the best way to run the tutorials. And there's also a link to the GitHub repo for the TensorFlow federated code. I really encourage everyone to go take a look.
+
+**Speaker 2** _[35:13]_
+
+you know
+
+**Speaker 1** _[35:14]_
+
+read the code, file bugs, and contribute, right? Because so we pretty strongly feel that there are a myriad of use cases that we do not know of and we maybe never know of, right? So this project can be best built as a community effort because we just have scratch the surface. We have some building blocks that we've identified and we have tried to put those building blocks together and we're continually doing that. But I think this project will definitely, it stands to benefit immensely from being open source. And that's why, so yeah, so TensorFlow.org slash federated. And there's a link to the GitHub repo and tutorials and introduction and the APIs and everything. All right, so as we run through TensorFlow federated, I'm going to quickly give an introduction. And then we're going to look at first the FL API, which is a federated learning API, and see some code examples. And then I'm going to talk about the FC API. I'm going to talk about some core concepts of the federated computation API, and I'm going to look back at the example that we just saw and look at the code examples. And maybe I'll mention a tip. Actually, I think I'm mentioning one tip, but a tip or two. I can talk about stuff. So like I mentioned, TensorFlow Federated It is an open source framework for machine learning and other competitions on decentralized data.
+
+**Speaker 2** _[36:42]_
+
+um
+
+**Speaker 1** _[36:43]_
+
+Pretty straightforward at this point. I think hopefully I've been able to communicate that part
+
+**Speaker 2** _[36:48]_
+
+that it's
+
+**Speaker 1** _[36:49]_
+
+Yeah, you should be able to do other computations as well.
+
+**Speaker 2** _[36:58]_
+
+Um.
+
+**Speaker 1** _[37:00]_
+
+So that's a GitHub link if somebody wants to go look at the code while I'm explaining these things. Like I mentioned, it's being developed in the public. It's absolutely open to contributions.
+
+**Speaker 2** _[37:11]_
+
+Um, with...
+
+**Speaker 1** _[37:12]_
+
+Things are changing really fast. I mean, we are adding features to TensorFlow Federated really, really quickly.
+
+**Speaker 2** _[37:20]_
+
+So, yeah.
+
+**Speaker 1** _[37:22]_
+
+Yeah, please join us in any way. I'd really encourage you to read the code, read some of the design principles, and definitely run the tutorials. So what's a value prop for TFF, right? So TFF as an open framework. Sorry, I'm going to use TFF as a...
+
+**Speaker 2** _[37:45]_
+
+Um...
+
+**Speaker 1** _[37:47]_
+
+placeholder for TensorFlow Federated, it's a long name.
+
+**Speaker 2** _[37:49]_
+
+Um Um
+
+**Speaker 1** _[37:54]_
+
+The first thing that we want to enable is basically enable this for researchers. So this should be something easy.
+
+**Speaker 2** _[38:03]_
+
+you know,
+
+**Speaker 1** _[38:05]_
+
+To get a good idea about a technique that is a let's say you made a model or in case of competition a competition Does it really make sense? Right? So if you have some proxy data, so You can quickly run this Using TensorFlow federated you can put something together real quickly and then run it and see if it works so You can focus on the actual problem and the infrastructure to run things in a federated fashion is something that that TFF can do for you So essentially separation of concerns
+
+**Speaker 2** _[38:35]_
+
+Um.
+
+**Speaker 1** _[38:38]_
+
+The second thing is, yeah, develop together. So you can reuse components. So essentially, you can combine whether it's something part of the framework that you're combining or if you're collaborating in research, you're combining your own code. But basically, you can develop faster, and eventually, you probably create an ecosystem.
+
+**Speaker 2** _[39:02]_
+
+and
+
+**Speaker 1** _[39:03]_
+
+We definitely hope that we can we can as a community can create an ecosystem which enables new applications New patterns and definitely new deployment environments So this is a Very important a point. I wanted to call out is it's absolutely architecture agnostic It does not care what machine is running on. It actually does not care what device it's running on it's what TFF compiles into is a representation of what that federated computation looks in case of edited computation if it's federated learning which is a special case of edited computation then then that
+
+**Speaker 2** _[39:45]_
+
+uh
+
+**Speaker 1** _[39:47]_
+
+But, since it's essentially a serialized representation of what that competition looks like, technically you should be able to expand it to any sort of deployment environment, right? So the devices could be any kind of devices, right? So you have to probably write, like, you know, we have to probably write adapters or whatnot to make it run on a specific kind of platform. But tensorflow doesn't restrict it from doing that.
+
+**Speaker 2** _[40:23]_
+
+Uh...
+
+**Speaker 1** _[40:30]_
+
+Like I mentioned so right now we support a local simulation runtime so you can basically whether if you use a code lab or even if you You know write the code on your own machine
+
+**Speaker 2** _[40:41]_
+
+um
+
+**Speaker 1** _[40:43]_
+
+We support a local simulation runtime
+
+**Speaker 2** _[40:45]_
+
+but
+
+**Speaker 1** _[40:46]_
+
+but yeah, we can support other, uh,
+
+**Speaker 2** _[40:48]_
+
+um the
+
+**Speaker 1** _[40:49]_
+
+deployment environments as time comes and there is the link to the tutorials I think this link takes you to the tensor profile or federated and then there's option for tutorials where you can go and look at the tutorials yeah so you can focus I think the main key point here is that
+
+**Speaker 2** _[41:14]_
+
+here is that
+
+**Speaker 1** _[41:16]_
+
+There is, since it's an open source project, there is advantage of having shared learning. And so, you know, pain points would get mitigated. As, you know, we build federated learning systems, we will address this. And as, like TensorFlow would be this one effort where we address this and hopefully,
+
+**Speaker 2** _[41:36]_
+
+Um...
+
+**Speaker 1** _[41:37]_
+
+TensorFlow federated with one effort where you address those and mitigate those pain points. Yeah, so here the important point I want to mention is
+
+**Speaker 2** _[41:49]_
+
+um
+
+**Speaker 1** _[41:51]_
+
+that there's tension between order of construction and execution. So typically,
+
+**Speaker 2** _[41:57]_
+
+Um, you know.
+
+**Speaker 1** _[42:00]_
+
+When you build your computation and when you execute it, there is...
+
+**Speaker 2** _[42:07]_
+
+Um, they,
+
+**Speaker 1** _[42:08]_
+
+There is a certain order you want to There's a certain order that you have to follow And that's or there is a there's not a prescribed order, but there's a typical order That you follow through these things
+
+**Speaker 2** _[42:22]_
+
+and they
+
+**Speaker 1** _[42:23]_
+
+there is a bit of tension there right so that pain point is is addressed by tff because since it's kind of pluggable so essentially you you do your your
+
+**Speaker 2** _[42:33]_
+
+your, when you
+
+**Speaker 1** _[42:34]_
+
+when you write your TensorFlow plan,
+
+**Speaker 2** _[42:36]_
+
+um
+
+**Speaker 1** _[42:38]_
+
+or essentially the TensorFlow computation, you basically, what you're doing, like I said, is a serialized representation of what your computation looks like. What happens on a device? What happens on a server? How do they communicate the protocol between the server and clients? So you basically represent that in some serialized format. And basically, you're doing it using Python code. So you're writing a block of Python code. And what it does, it gives you the serialized representation. Now, what happens actually in your computation, or if in case of a data learning, what are the actual model parameters and everything, is outside the TFF framework. So that tension is addressed. And I think that the first point is also a similar thing. So you're interleaving different types of logic. And we'll see that in a second. So what's in the box? So when you get tensile perforated, what do you get? So you get
+
+**Speaker 2** _[43:36]_
+
+Um...
+
+**Speaker 1** _[43:38]_
+
+For the FL part, you get implementation of federated training and evaluation. I may not talk about evaluation, but I mean, I think evaluation is an important step in learning, which is essentially when you run your models on test data and see how you're doing. So we get implementations of federated training and evaluation. It's out of the box.
+
+**Speaker 2** _[44:00]_
+
+Um...
+
+**Speaker 1** _[44:02]_
+
+And obviously, you can use, like I mentioned,
+
+**Speaker 2** _[44:04]_
+
+any
+
+**Speaker 1** _[44:05]_
+
+existing TensorFlow models or TensorFlow data it can be can be used to run can you can basically federate
+
+**Speaker 2** _[44:14]_
+
+you know
+
+**Speaker 1** _[44:14]_
+
+you know, existing TensorFlow model or data and run an FL on them using TFF.
+
+**Speaker 2** _[44:20]_
+
+Um.
+
+**Speaker 1** _[44:21]_
+
+for federated core
+
+**Speaker 2** _[44:23]_
+
+um
+
+**Speaker 1** _[44:25]_
+
+So it allows for expressing new federated algorithms, right? So we saw an example of a simple averaging across devices. You can do more complex ones, I guess, right? And it offers a local runtime for simulations, which is what I mentioned.
+
+**Speaker 2** _[44:43]_
+
+Um...
+
+**Speaker 1** _[44:45]_
+
+And again, this is a community project. There are multiple ways to get involved.
+
+**Speaker 2** _[44:50]_
+
+Um,
+
+**Speaker 1** _[44:51]_
+
+You can apply FL and TF to existing models, which is what I was talking about a second back. For ML dev, you can very easily federate your model and see if that makes it better, right? If you're FL researchers, right, you can try new federated algorithms. If there are extensions that you think are not existent, and there'll be lots of those, you can actually go contribute. You can add those and then enable those. If you're a system researcher, then you would be more focused on FC APIs and essentially you can do better.
+
+**Speaker 2** _[45:36]_
+
+Um...
+
+**Speaker 1** _[45:38]_
+
+So, yeah, so you can target newer platforms.
+
+**Speaker 2** _[45:42]_
+
+are, and I'm
+
+**Speaker 1** _[45:44]_
+
+build new federated computation structures but give me one second connect power all right sorry about that interruption And that's the link to the, so if you hit that QR code, I think you'll go to the tutorial, to the federated learning API.
+
+**Speaker 2** _[46:26]_
+
+so
+
+**Speaker 1** _[46:28]_
+
+yeah so this so we're gonna follow the the first tutorial which is an image classification tutorial for FL we if you are if you are familiar with the MNIST data set that's a lot of experimentation is based on so that's what that's the data that we use it's a data set that's provided by TensorFlow as well as TensorFlow federated
+
+**Speaker 2** _[46:53]_
+
+Um, and
+
+**Speaker 1** _[46:54]_
+
+and and that's the tutorial we're gonna run parts of the tutorial today
+
+**Speaker 2** _[47:01]_
+
+Um.
+
+**Speaker 1** _[47:02]_
+
+So if you go to that link that I just gave you You should be able to There'll be they'll be linked to See the source on github if you want to read the code or you can run that tutorial on colab All right, so first things first so if you learn Federated learning on using TFF the first thing you would want to do is going to prepare your federated data sets for training So we, so TFF, like I mentioned, supplies some of these data sets.
+
+**Speaker 2** _[47:35]_
+
+um um
+
+**Speaker 1** _[47:38]_
+
+So the MNIST database, that data set that is there, that is supplied by TensorFlow,
+
+**Speaker 2** _[47:45]_
+
+Um, but.
+
+**Speaker 1** _[47:46]_
+
+Bear-tensive flow TFF actually
+
+**Speaker 2** _[47:49]_
+
+um
+
+**Speaker 1** _[47:51]_
+
+Supplies that same data sets in a federated format, right? So it's ready to sort of use and I'll show you in a second right and There's a project a leaf
+
+**Speaker 2** _[47:59]_
+
+a leaf
+
+**Speaker 1** _[48:01]_
+
+that actually took some of the data sets and made them palatable for federated learning.
+
+**Speaker 2** _[48:15]_
+
+All right.
+
+**Speaker 1** _[48:17]_
+
+So here is a simple block of code that shows how you can load data sets, TFF data sets, and you can try to play around with it a little bit. So essentially that... TFF simulation data set MNIST is the MNIST data set that is supplied by TFF. And essentially, you call load data on this.
+
+**Speaker 2** _[48:48]_
+
+And, um...
+
+**Speaker 1** _[48:49]_
+
+That gives you a pair of train data and test data, right?
+
+**Speaker 2** _[48:54]_
+
+and if you look
+
+**Speaker 1** _[48:55]_
+
+If you look at the following lines, you'd see that the training data actually has something called client ID, so it's already sharded.
+
+**Speaker 2** _[49:03]_
+
+started.
+
+**Speaker 1** _[49:04]_
+
+In a certain number of clients right and you can then think you can actually move these things around right so it's it's a standard
+
+**Speaker 2** _[49:11]_
+
+Um, um,
+
+**Speaker 1** _[49:12]_
+
+TensorFlow data set, that you can actually move around. So I'm making some assumptions about general awareness of TensorFlow. If there's something that doesn't make sense, please stop me and ask me the question.
+
+**Speaker 2** _[49:26]_
+
+So, um,
+
+**Speaker 1** _[49:29]_
+
+OK, so yeah, so we have loaded that example data set. And then essentially, we
+
+**Speaker 2** _[49:33]_
+
+We, um...
+
+**Speaker 1** _[49:35]_
+
+We are basically creating a data set for a specific client right and the idea here is to show that you know It's like if you if we access a particular shard and get a data set for a particular shard then What I'm doing is since this is a this is the MNIST database, so I'm using the PyPlot library here to essentially See you know you can you can potentially run this code and it will show you the actual digit, the picture of the pixel that is in the data set.
+
+**Speaker 2** _[50:07]_
+
+Right. So, um,
+
+**Speaker 1** _[50:08]_
+
+The dataset itself has two features. One is the label, which is basically the name of the digit, and the other is the, I think it's a 28 by 28 image of the digit, handwritten digit. Oh, sorry, yeah. I think the MNIST database is essentially that. It's a set of handwritten digits that are labeled. That's the training data.
+
+**Speaker 2** _[50:31]_
+
+Um...
+
+**Speaker 1** _[50:32]_
+
+so so yeah, one part that pixels is essentially the pick the the image of the hand-written digit And then this other one is I think it's called label which is then which is actually the digit itself And by the way this all this code is from the tutorial itself
+
+**Speaker 2** _[50:46]_
+
+Um, so.
+
+**Speaker 1** _[50:54]_
+
+Yeah, so I already mentioned this. So this ready-made helper function create tf.dataset for client, and once you pass the client ID, creates an example dataset for the specific client.
+
+**Speaker 2** _[51:07]_
+
+Um, here.
+
+**Speaker 1** _[51:08]_
+
+Here is what something is something interesting right? Once we have that data set
+
+**Speaker 2** _[51:13]_
+
+Um...
+
+**Speaker 1** _[51:14]_
+
+you can use normal Python functions to actually enhance the dataset and make it a little bit more palatable for using it for your experimentation. This is just an example from the tutorial. This is not the canonical way to do this. I'm just trying to highlight that you can take the dataset, you can repeat that, and you can actually map it. In this particular case, if you see, roughly what the mapping is doing is it takes that pixels and calls it x and
+
+**Speaker 2** _[51:48]_
+
+and I think it
+
+**Speaker 1** _[51:49]_
+
+I think it takes the label and calls it y. And I think that's to make it acceptable for Keras models. But roughly, that's what it's doing.
+
+**Speaker 2** _[51:58]_
+
+And then...
+
+**Speaker 1** _[52:00]_
+
+We just shuffle it around, and then we create batch sizes, because this is something in training you typically want many batches of data. And so essentially, I just wanted to highlight that you can pre-process your data.
+
+**Speaker 2** _[52:13]_
+
+um
+
+**Speaker 1** _[52:15]_
+
+with standard Python code, right? You don't have to do anything special.
+
+**Speaker 2** _[52:21]_
+
+Yeah.
+
+**Speaker 1** _[52:33]_
+
+Right. So once you have written a pre-processing of data, then essentially what you can do is you can run the same pre-processing for every single client, right? So what you're doing here is just taking the initial client data and we get the client IDs. These both things come from the trained data. And we essentially run this through that pre-process that we had in the previous slide. and that gives us federated data that we can now use.
+
+**Speaker 2** _[53:04]_
+
+for
+
+**Speaker 1** _[53:06]_
+
+for for training one obvious thing here is the data set comes with a certain number of class shards I do not exactly remember how many shots but some number of client IDs but you can if you want to use more clients you can shuffle and repeat and you know distribute the data in
+
+**Speaker 2** _[53:27]_
+
+And, you know.
+
+**Speaker 1** _[53:28]_
+
+you know, in any way you want. The whole idea is basically it comes to the data set, and you can use standard Python functions to redistribute the data, to change the data, transform it, whatever you want to do, including like tf. You can use TensorFlow transforms on those. All right, so once we have the data, now we want to run.
+
+**Speaker 2** _[53:50]_
+
+um
+
+**Speaker 1** _[53:51]_
+
+model. I'm using a Keras model and we suggest you use Keras models because that's emerging as a standard.
+
+**Speaker 2** _[53:57]_
+
+and
+
+**Speaker 1** _[53:58]_
+
+But fundamentally,
+
+**Speaker 2** _[54:00]_
+
+um
+
+**Speaker 1** _[54:02]_
+
+Yeah, I mean, other models can also be used, but we suggest that we use Keras. All right, so we take the train data. That's in the, that's really just.
+
+**Speaker 2** _[54:22]_
+
+uh
+
+**Speaker 1** _[54:23]_
+
+created in the previous step and here we use a standard helper function from Keras model
+
+**Speaker 2** _[54:35]_
+
+Um.
+
+**Speaker 1** _[54:37]_
+
+that's becomes a model function and then we basically our training process is is basically take the model function
+
+**Speaker 2** _[54:53]_
+
+Um...
+
+**Speaker 1** _[54:54]_
+
+which is, the ellipsis up there, right, model function is something that is beyond TensorFlow federated. The idea to show the previous slide was that, you know, the model itself is something that TensorFlow doesn't care about. It's just wrapping federated learning around existing model, right? So you can use the helper function that essentially builds the training process. And then there's these two important steps that happen. So this is, I think it's called the iterative process. Essentially it has two properties, basically two methods that you can call. One is initialize, which is the start. So if you remember the federated learning slide, I talked about the first time when the model goes out to all the clients and the clients are ready to train. So that is essentially that step. So that state goes out and then...
+
+**Speaker 2** _[55:49]_
+
+And, and, um,
+
+**Speaker 1** _[55:50]_
+
+So the first time, so it gets initialized and then we saw the iterative process where
+
+**Speaker 2** _[55:56]_
+
+where, um, you know, um,
+
+**Speaker 1** _[55:59]_
+
+so we let's say in this particular case we are running it five times and and basically the training is happening five times the the whole notion of clients and and how many clients there are this has already been taking so here we don't talk we're running this as if it's it's a single process right there is the whole thing about data going out to clients clients running training reporting back aggregating and then the next thing that's all abstracted out at this point right so so when you call train that the that the train
+
+**Speaker 2** _[56:33]_
+
+I mean, um...
+
+**Speaker 1** _[56:34]_
+
+implementation actually encompasses all that right so when you do train next a whole set of competition happens all that happens so when you call next
+
+**Speaker 2** _[56:43]_
+
+uh
+
+**Speaker 1** _[56:45]_
+
+The most recent updated model, combined model, goes out to clients. Clients run with their data on those models, report back, and the new combined model is generated, which is state.
+
+**Speaker 2** _[56:58]_
+
+Yeah.
+
+**Speaker 1** _[56:59]_
+
+So that whole thing happens, and train.next simply takes care of that, right? And the intuition here is, like, you have a server model. That one step is doing a server model. It takes federated data, so all the data distributed across clients, and it generates a server state, and it generates metrics. So I think I didn't mention metrics until now. So metrics are important, right? So you want to see how your training is progressing, right? So for every round, you generate metrics. But these metrics are not per client, but these metrics are combined metrics.
+
+**Speaker 2** _[57:41]_
+
+Um.
+
+**Speaker 1** _[57:42]_
+
+Yeah, so this is the other important point is like we're running it like this iterative process that I mentioned earlier in the slides. So this iteration, this is happening, this five iteration is happening. We call this as rounds. So every time a server pushes a combined model out to the clients, the clients runs it on local data, reports those models back, updated models back to the model updates. to the server, the server combines and gets a new combined model along with metrics. This whole process is a round and that is essentially that train.next and we are running through it five times here, so that iterative process.
+
+**Speaker 2** _[58:28]_
+
+Yeah.
+
+**Speaker 1** _[58:31]_
+
+This is how evaluations are done.
+
+**Speaker 2** _[58:33]_
+
+All right.
+
+**Speaker 1** _[58:35]_
+
+You can do it after every round or you can do it after certain number of rounds that There's no control tensor doesn't dictate anything
+
+**Speaker 2** _[58:45]_
+
+Um, that's, um,
+
+**Speaker 1** _[58:46]_
+
+but essentially when you evaluate basically what you're doing is you're running it on
+
+**Speaker 2** _[58:53]_
+
+on
+
+**Speaker 1** _[58:55]_
+
+the test data right there yeah and basically you're taking that model
+
+**Speaker 2** _[59:00]_
+
+So,
+
+**Speaker 1** _[59:00]_
+
+So evaluation models are not the same as train models. I'm not going to go into detail about that, but basically it doesn't need all that a trainable model needs. A trainable model is the way it's represented in TensorFlow federated internally. So evaluation functions, this helper function builds federated evaluation.
+
+**Speaker 2** _[59:27]_
+
+uh
+
+**Speaker 1** _[59:28]_
+
+You can say it returns a simpler model that you can use for evaluations. That you run on test data, get the metrics, and that process goes on. And so essentially, at some point, those metrics will determine what you want to do next. Does that make sense so far?
+
+**Speaker 2** _[59:49]_
+
+Um.
+
+**Speaker 1** _[59:50]_
+
+Moving on to federated core
+
+**Speaker 2** _[59:52]_
+
+Um
+
+**Speaker 1** _[59:53]_
+
+So that's the QR code for federated core, but if you're already there, it should be pretty obvious there are tutorials in this continuation
+
+**Speaker 2** _[60:02]_
+
+Um,
+
+**Speaker 1** _[60:04]_
+
+Yeah, so we're just going to go there two tutorials on the on the site the first one is a basic FC API Tutorial and and the next one has a little bit more where you actually go to federated averaging In detail, I'm not going to go through that today, but All right same same stuff the links to run it in collab you can go look at the source
+
+**Speaker 2** _[60:33]_
+
+Um,
+
+**Speaker 1** _[60:36]_
+
+So, quickly go through what FCAPI is.
+
+**Speaker 2** _[60:39]_
+
+Um, um.
+
+**Speaker 1** _[60:42]_
+
+Yeah, so it's a it's a language like I mentioned for defining federated computations
+
+**Speaker 2** _[60:47]_
+
+um
+
+**Speaker 1** _[60:49]_
+
+It's strongly tied that's that's really important. We'll see how
+
+**Speaker 2** _[60:52]_
+
+and
+
+**Speaker 1** _[60:53]_
+
+It's functional
+
+**Speaker 2** _[60:54]_
+
+And, um...
+
+**Speaker 1** _[60:59]_
+
+It has TF concepts and it also
+
+**Speaker 2** _[61:02]_
+
+So, uh...
+
+**Speaker 1** _[61:03]_
+
+builds on distributed communications is the first class concept right so essentially that is the fact of the the act of sorry sending out
+
+**Speaker 2** _[61:13]_
+
+um
+
+**Speaker 1** _[61:14]_
+
+Data like you know in the example that you saw about the temperature one There was the threshold temperature that was getting sent from the server out to all the devices and that
+
+**Speaker 2** _[61:23]_
+
+that
+
+**Speaker 1** _[61:24]_
+
+that communication, that broadcast.
+
+**Speaker 2** _[61:27]_
+
+Um...
+
+**Speaker 1** _[61:28]_
+
+As an example of distributed communication, that's a first class concept.
+
+**Speaker 2** _[61:31]_
+
+It's about the
+
+**Speaker 1** _[61:31]_
+
+It's a Python API.
+
+**Speaker 2** _[61:33]_
+
+Um
+
+**Speaker 1** _[61:34]_
+
+And, once again, so right now the only runtime that we support is simulation environment in a local machine, but fundamentally the architecture is such that
+
+**Speaker 2** _[61:44]_
+
+um
+
+**Speaker 1** _[61:45]_
+
+extending it to other deployment environments is very feasible. All right, so kind of a recap. So this notion of federated values. So if you remember from the FC slides, we talked about temperatures in clients. So if you take the same
+
+**Speaker 2** _[62:07]_
+
+I'm
+
+**Speaker 1** _[62:08]_
+
+example then basically we introduce this first class concept of federated values now
+
+**Speaker 2** _[62:13]_
+
+in that
+
+**Speaker 1** _[62:13]_
+
+in the NTFS right so it's a local item of data type flow 32 let's say it's a sensor reading could be a model weight too but in this case is the sensor reading let's say so that's the notion of a federated value so you know basically it's representative of of this that flow 32 value being in all the different all clients so it's a multi set
+
+**Speaker 2** _[62:46]_
+
+Um...
+
+**Speaker 1** _[62:50]_
+
+The key thing here is there's a value, which is like the multi-set of values, and this also has this other thing called placement. I'm going to talk about that in a bit, but this is the kind of canonical TFI representation. So those braces mean it's a multi-set, so it's number of values, not the same values, different kind of values, and it's at something called clients.
+
+**Speaker 2** _[63:13]_
+
+uh
+
+**Speaker 1** _[63:16]_
+
+Client is a literal.
+
+**Speaker 2** _[63:18]_
+
+Uh.
+
+**Speaker 1** _[63:19]_
+
+placement, but when I talk about placement, I'm going to explain what clients really is.
+
+**Speaker 2** _[63:28]_
+
+Um.
+
+**Speaker 1** _[63:29]_
+
+Let's not throw the server in the mix right Now if you remember the example we try to find out so basically the server has
+
+**Speaker 2** _[63:41]_
+
+Um...
+
+**Speaker 1** _[63:43]_
+
+The problem was to find the fraction of
+
+**Speaker 2** _[63:47]_
+
+uh,
+
+**Speaker 1** _[63:48]_
+
+devices that had a temperature higher than a particular threshold rate so yeah
+
+**Speaker 2** _[63:48]_
+
+uh,
+
+**Speaker 1** _[63:58]_
+
+so whether it's whether it is that problem threshold or if you want to find the average of temperature across clients the key thing here is that there is one value at the server that that we aren't so when you're building this computation we know that you have to represent that value in the server right and that's written as that you know float32 at server now the server becomes another placement literal right so we talked about placement so so what we have here is two federated types one is a type that is um you know a multi-set of floats at clients clients being this thing called placements and um and then another value singular value float32 at the server server being this other the placement
+
+**Speaker 2** _[64:48]_
+
+Um,
+
+**Speaker 1** _[64:50]_
+
+What are placements? Placements are essentially groups of participants or cohorts. In federated learning, the term that is often used is called population. I've used it a couple of times. A population is essentially a set of devices that can participate in learning or in competition.
+
+**Speaker 2** _[65:15]_
+
+so
+
+**Speaker 1** _[65:17]_
+
+So so essentially clients doesn't necessarily mean client server doesn't necessarily mean the real server. These are
+
+**Speaker 2** _[65:25]_
+
+Um,
+
+**Speaker 1** _[65:28]_
+
+names that most of the time you'll use clients to actually mean clients and and server to actually mean server but these are just literals
+
+**Speaker 2** _[65:36]_
+
+you
+
+**Speaker 1** _[65:37]_
+
+You could use them in any way you want right and you can define your own placements as well
+
+**Speaker 2** _[65:45]_
+
+Um.
+
+**Speaker 1** _[65:47]_
+
+Slightly more advanced federated type is you can actually have a name tuple, right? So let's say the server actually did not have one value but had two values, right, that go in together. So you could do something like that.
+
+**Speaker 2** _[66:03]_
+
+you know
+
+**Speaker 1** _[66:03]_
+
+you know, it could have a float 32 which has a level a and float under float which is B and that's That's a named named tuple in general
+
+**Speaker 2** _[66:14]_
+
+um
+
+**Speaker 1** _[66:15]_
+
+this is called a federated tuple. The float example that we saw are called federated floats. So we tend to use federated x, y, z if the underlying type is x, y, z, right? So if it's like, you know, so like this is a federated tuple.
+
+**Speaker 2** _[66:34]_
+
+that
+
+**Speaker 1** _[66:35]_
+
+That's a federated float, and so on and so forth. So now that we've talked about the federated data types, we'll look at the federated computation. And just to recap, this was the scenario that we tried to do.
+
+**Speaker 2** _[66:52]_
+
+So, you know, we.
+
+**Speaker 1** _[66:52]_
+
+You know, we sent a threshold to all the bunch of devices. Not every device is selected, right? You see there's one device that's not selected. So you send a bunch of devices.
+
+**Speaker 2** _[67:00]_
+
+And then we.
+
+**Speaker 1** _[67:01]_
+
+we got
+
+**Speaker 2** _[67:03]_
+
+Um, response.
+
+**Speaker 1** _[67:03]_
+
+responses back about, you know, whether their maximum temperature is higher than the threshold or not back from and then we computed an average, right? So that's the scenario you're gonna build on using.
+
+**Speaker 2** _[67:14]_
+
+using.
+
+**Speaker 1** _[67:15]_
+
+federated learning all right sorry federated competition Right. So the other thing that was involved here was this distributed aggregation, right? So if you use the federated types that we established, clients has all these temperatures, and you want to compute a distributed aggregation that gives you one federated float that's at the server, then that distributed aggregation is something that we want to represent as an operator, right? because remember what I mentioned that you know so even in learning you saw like you know you do train dot next and essentially everything that happens in one round of training happened with that one function call apparently right
+
+**Speaker 2** _[68:02]_
+
+Um.
+
+**Speaker 1** _[68:09]_
+
+So yeah, so federated op is essentially it's a function
+
+**Speaker 2** _[68:15]_
+
+That you know
+
+**Speaker 1** _[68:19]_
+
+one function call that sort of represents the
+
+**Speaker 2** _[68:23]_
+
+the
+
+**Speaker 1** _[68:25]_
+
+It represents whatever happens in a fair data computation where the inputs are distributed across multiple clients and the output is on our server, right?
+
+**Speaker 2** _[68:35]_
+
+Um,
+
+**Speaker 1** _[68:37]_
+
+One thing that is important to remember here is that this function calls don't execute.
+
+**Speaker 2** _[68:37]_
+
+well,
+
+**Speaker 1** _[68:44]_
+
+This is actually, when you write it in TFF, what you're generating is basically a computation plan, right? So it's a representation, it's a serialized representation of what really should happen. It's really not, it doesn't execute right then.
+
+**Speaker 2** _[69:09]_
+
+Right.
+
+**Speaker 1** _[69:17]_
+
+Right, so that's why I say so it's it's an abstract specification of the of the communication protocol and not really actual Execution right so if you if you jump in the github code I suggest take a look at the protocol buffers defined and you'll see how a competition is defined the competition has These aspects. I mean this feels in the message body, which is what this thing generates essentially So the output is essentially one of those messages that determine how a federated competition is to be run.
+
+**Speaker 2** _[69:53]_
+
+Um, so.
+
+**Speaker 1** _[69:54]_
+
+So right, so now that we have established what so we need federated types and we need federated operators, right? That should give us very good computation. So the first thing in this particular case is we we create this federated type called readings type and it's the placement is clients and it's a type of float 32, right? So it specifically means that it's a multi set of clients and and and it's a float 32 time. so now this is your client-side competition that what happens on a device right so you want to find this particular average temperature let's say so you would you'd say that that my operation is so my so that I take a federated type and this is what I want to compute so that annotation at EFF federated computation indicates that this is a specification of of what will happen at at multiple clients right so so this is the same thing this is the presentation of the fact that every client would compute this average temperature on the settings right and sorry yeah so
+
+**Speaker 2** _[71:18]_
+
+So...
+
+**Speaker 1** _[71:21]_
+
+So you take a multi set of of that value the float 32 that is distributed across clients and that TF of average
+
+**Speaker 2** _[71:30]_
+
+would then
+
+**Speaker 1** _[71:31]_
+
+take all those values from these clients and compute an federated average, which is a standard federated computation method, and generate one value on the server. So this whole representation about the protocol about the clients communicating those temperatures and the server actually computing an average is
+
+**Speaker 2** _[71:55]_
+
+um
+
+**Speaker 1** _[71:58]_
+
+Expressed in that in that in those three lines of code essentially, right? So the first line of code indicates that it operates on the federated type. That's reading style that we established And then it's a normal Python function declaration and then basically And the last one is actually a TFF TFF code that that says that is you want to compute a federated average?
+
+**Speaker 2** _[72:26]_
+
+Um, let's.
+
+**Speaker 1** _[72:27]_
+
+Let's look at the second second example that we that we saw right which is average Sorry, which is the thresholding finding out a fraction of sensors with readings more than the threshold
+
+**Speaker 2** _[72:39]_
+
+Um, so...
+
+**Speaker 1** _[72:40]_
+
+So here, the things change a little bit, right? Because we have to send this threshold out to the. So in the first example, the only operation was the clients had these temperatures. They sent it back to the server. The server computed a federated average. That was it, right? In this particular case, there's a little more interaction, right? So the threshold needs to go from the server to the client. The client needs to do this computation, send it back to the server, right? So the first thing is the broadcast.
+
+**Speaker 2** _[73:10]_
+
+Then, um,
+
+**Speaker 1** _[73:16]_
+
+Yeah, so now the server computes that, you know, whether it is greater than the threshold or not, and then reports back to the server, right? And then the server does the federated averaging, right, so some more steps involved, right? So we already had the readings type, right, so we already have that, which is essentially a multi-set of, float multi-set on client, with the client placement, so essentially It's the sensor values on different clients. Now we have a threshold that we need to pass from the server to the clients, right? So we declare that as...
+
+**Speaker 2** _[73:53]_
+
+as as
+
+**Speaker 1** _[73:54]_
+
+a float32 value as a federated type and it's with the placement of server
+
+**Speaker 2** _[74:01]_
+
+um what
+
+**Speaker 1** _[74:02]_
+
+Once you're done, we basically say, so we declare this as, this is the federated computation. It now needs a reading type and a threshold type, and then basically, and you basically get fraction of a threshold.
+
+**Speaker 2** _[74:18]_
+
+Um...
+
+**Speaker 1** _[74:24]_
+
+Yeah, so is overflowed is the local computation that's happening on the device itself right here, which is the threshold. So basically, if you look at how this is structured, so there is the federated computation, which is the get fraction over threshold. That is the overall function.
+
+**Speaker 2** _[74:49]_
+
+Um
+
+**Speaker 1** _[74:51]_
+
+Or representation rather and then there is the TFF TF computation, which is which is a straight-up
+
+**Speaker 2** _[74:57]_
+
+Yep.
+
+**Speaker 1** _[74:58]_
+
+Which which which is basically which indicates that if this is this is a local operation that's happening on the clients themselves and which is basically it's just computing whether that values over the threshold or not and then once you have that essentially you are Basically, you can now do the TFF operation of federated averaging. So that's it. That is the FC API call which is in the standard federated average
+
+**Speaker 2** _[75:25]_
+
+Um, uh,
+
+**Speaker 1** _[75:26]_
+
+which is implemented and
+
+**Speaker 2** _[75:28]_
+
+and
+
+**Speaker 1** _[75:29]_
+
+And then you also have this other thing called federated map.
+
+**Speaker 2** _[75:33]_
+
+um
+
+**Speaker 1** _[75:35]_
+
+which is essentially, which essentially takes, it's a function that
+
+**Speaker 2** _[75:42]_
+
+But...
+
+**Speaker 1** _[75:43]_
+
+that gets the values from the different clients, right? And basically computes whatever gets reported back from the clients. And basically, you express that on every client you want to compute isOverAsFloat, and that's what you return, right? So the data comes in. So you broadcast the data, the threshold, and then basically you compute the isOverAsFloat function, right? so the key thing here is there is a separate declaration that tff tf computation which is which basically defines what is the function that you want to run on the clients
+
+**Speaker 2** _[76:22]_
+
+and
+
+**Speaker 1** _[76:23]_
+
+And then there is the overall function, which is essentially, you know,
+
+**Speaker 2** _[76:28]_
+
+you know
+
+**Speaker 1** _[76:30]_
+
+There's a broadcast to the threshold you run a federated map which is basically saying okay get the data so you have the readings and you have the threshold use these two things and then essentially compute run that function and then Once you get all this the federated map means once you get all this data back from the clients and on federated average yeah so this highlights the the fact that each device will will perform on its own temperature reading right and it's not not this is a this is a local computation like I mentioned
+
+**Speaker 2** _[77:11]_
+
+Um...
+
+**Speaker 1** _[77:12]_
+
+It's surely a bunch of code, but how do I run this?
+
+**Speaker 2** _[77:15]_
+
+um
+
+**Speaker 1** _[77:22]_
+
+If I want to run just this example that we show, we could do something like this, right? What I'm doing here is I'm passing, if you see, I'm passing ordinary list of lists. And each list indicates, the outer lists indicate inputs from a specific client. And the inner list is settings for that client, right?
+
+**Speaker 2** _[77:42]_
+
+Um, and, and
+
+**Speaker 1** _[77:44]_
+
+And that's how I can run this, right?
+
+**Speaker 2** _[77:46]_
+
+Right.
+
+**Speaker 1** _[77:47]_
+
+Now obvious question is like this is not really you did all this work to represent a federated thing and then you're driving this Locally right kind of right so So like I mentioned so we we only support simulation in local on local machines now, so that Indicates that you know you can basically if you wanted to if you wrote an algorithm And you wanted to really see how it works, then you can drive this with test data data. But basically, this doesn't really run on clients yet or devices yet. But the thing is
+
+**Speaker 2** _[78:26]_
+
+um
+
+**Speaker 1** _[78:26]_
+
+um all the TFF code, the annotated code generates
+
+**Speaker 2** _[78:30]_
+
+generates
+
+**Speaker 1** _[78:33]_
+
+a serialized presentation of the distributed communication protocol and what needs to happen in the client, what needs to happen in the server, how they communicate, how does initial data go from the server to the client, how does competition happen in the client, what comes back. That whole plan is essentially what's representing the code above. So if we can plug a different runtime environment, this code should be able to run on clients, on real devices as well. But currently, this is the way to run this.
+
+**Speaker 2** _[79:04]_
+
+um and um you know um yeah
+
+**Speaker 1** _[79:16]_
+
+Yeah, so yeah, I mean real devices you cannot run this on real devices
+
+**Speaker 2** _[79:21]_
+
+but
+
+**Speaker 1** _[79:23]_
+
+But the general concepts of federated computations are proven. So yeah, I think I've mentioned this a few times. So currently the only runtime environment is the local simulation mode. But TFF code is a serialized representation of the computation, right? So extending it to production-like environment should not be that hard, right? I mean conceptually I'm not saying implementation I should not be that hard right it's it's obviously going to be we have to write quite a bit of code when I say we I mean the community TensorFlow federated community has to enable this but architecturally it's cogent right so it should work yeah and
+
+**Speaker 2** _[80:15]_
+
+Um.
+
+**Speaker 1** _[80:16]_
+
+Yeah, like I said so It's something that we really want to enable for at least some production leg environments
+
+**Speaker 2** _[80:25]_
+
+um
+
+**Speaker 1** _[80:27]_
+
+Otherwise, I mean, the proof of the cake is in the eating, right? So, I mean, not being able to run with actual devices and actual production-link environments is a blocker. It can be a blocker for some people. But, yeah, we also would like to hear from you if it's really something that you think blocks adoption or it's if this is something that you you think that we absolutely need right I would like to hear from you like your contributions
+
+**Speaker 2** _[81:00]_
+
+And yeah.
+
+**Speaker 1** _[81:01]_
+
+Yeah, we think that like I mentioned architecturally it's aligned with adding production like environments support, but yeah, I mean
+
+**Speaker 2** _[81:19]_
+
+So I
+
+**Speaker 1** _[81:20]_
+
+So I did mention that I would talk about
+
+**Speaker 2** _[81:23]_
+
+Uh...
+
+**Speaker 1** _[81:25]_
+
+A best practice.
+
+**Speaker 2** _[81:26]_
+
+I guess.
+
+**Speaker 1** _[81:28]_
+
+So here it is TFF Code is layered as I showed there is Primarily I think of it as I think of it as three layers You could have probably figure if you think of more, but there is a TFF code there is the TensorFlow computation or any computation that happens on a device
+
+**Speaker 2** _[81:52]_
+
+Um.
+
+**Speaker 1** _[81:53]_
+
+And then there's orchestration.
+
+**Speaker 2** _[81:56]_
+
+um
+
+**Speaker 1** _[81:57]_
+
+which is the repeated rounds, which is, in case of federated computation, we saw that we are passing in
+
+**Speaker 2** _[82:03]_
+
+in um
+
+**Speaker 1** _[82:04]_
+
+an array but that's essentially orchestration right how often so in the case of edited learning
+
+**Speaker 2** _[82:04]_
+
+let's see
+
+**Speaker 1** _[82:10]_
+
+we saw that we are running five rounds and we are calling eval how often you want to eval that kind of code that's orchestration right and suggestion here is that you know TensorFlow really makes it easy for you TensorFlow federated really makes it easy for you to keep that code modular and and separate and that makes it your code better readable and testable so so best practice tip there is to keep it modular uh such that you know separate those layers out because there's really separation of uh concerns the the uh the the bottom three should be able you should be able to write them separately and put them all together and test them independently.
+
+**Speaker 2** _[82:54]_
+
+Yeah.
+
+**Speaker 1** _[82:55]_
+
+Yeah, just highlighting that, you know, there is the orchestration, there's a TensorFlow computation that happens on device, and then there is a TensorFlow federated computation, and these things can be independently tested. And this is the same thing from the federated learning example, where, you know, you're getting it from the Keras model. That's the TensorFlow model, and then this averaging process, and then this, the bottom two blobs, essentially your orchestration and yeah we welcome your contributions
+
+**Speaker 2** _[83:34]_
+
+patience.
+
+**Speaker 1** _[83:35]_
+
+Everything that you've seen so far is completely open sourced. The code is in GitHub, like I mentioned.
+
+**Speaker 2** _[83:42]_
+
+Please.
+
+**Speaker 1** _[83:42]_
+
+Please go check out the TensorFlow.org federated link. There are tutorials there. There is API documentation there. There is also a link to the GitHub, I think, above. Yeah, please, please, please go check out the code. Read code. Try the tutorials. Try other scenarios. And most importantly, please contribute to the repo.
+
+**Speaker 2** _[84:08]_
+
+yeah and
+
+**Speaker 1** _[84:12]_
+
+And yes, and please let us know if the fact that we run on a local simulation environment, how much of that is really impeding your adoption. And with that, yeah, so one last point. There is a comic book that we published a while back. Not a while back, a few months back, which is federated with Google.com. It's a very interesting, simple way of understanding what federated learning really is. But it's just not a comic book. If you go there and if you click on Learn More on there, you will get a link to the key papers published across the board, not just by us, which sort of help shape federated learning and federated competitions. And with that, thank you very much. Please once again, go to TensorFlow.org slash federated or the GitHub link and try out the tutorial, check out the code.
+
+---
+transcript_status: auto
+---
+transcript_language: en

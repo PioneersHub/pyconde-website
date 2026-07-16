@@ -1,0 +1,264 @@
+title: The Beauty of Zarr
+---
+description: In this talk, I’d be talking about [Zarr](https://zarr.dev/), an open-source data format for storing chunked, compressed N-dimensional arrays. This talk…
+---
+created: 2023-01-04
+---
+code: JY3R3Z
+---
+slug: the-beauty-of-zarr
+---
+speaker_names: Sanket Verma
+---
+speakers:
+
+
+
+### Sanket Verma
+
+Sanket is a data scientist based out of New Delhi, India. He likes to build data science tools and products and has worked with startups, government and organisations. He loves building community and bringing everyone together and is Chair of PyData Delhi and PyData Global.  Currently, he's taking care of the community and OSS at Zarr as their Community Manager.
+When he’s not working, he likes to play the violin and computer games and sometimes thinks of saving the world!
+---
+abstract:
+
+
+In this talk, I’d be talking about [Zarr](https://zarr.dev/), an open-source data format for storing chunked, compressed N-dimensional arrays. This talk presents a systematic approach to understanding and implementing Zarr by showing how it works, the need for using it, and a hands-on session at the end. Zarr is based on an open [technical specification](https://zarr.readthedocs.io/en/stable/spec/v2.html), making implementations across several languages possible. I’d mainly talk about [Zarr’s Python](https://github.com/zarr-developers/zarr-python) implementation and show how it beautifully interoperates with the existing libraries in the PyData stack.
+---
+full_description:
+
+
+[Zarr](https://zarr.dev/) is a data format for storing chunked, compressed N-dimensional arrays. Zarr is based on open-source [technical specification](https://zarr.readthedocs.io/en/stable/spec/v2.html) and has [implementations](https://github.com/zarr-developers/zarr_implementations) in several languages, with [Zarr-Python](https://github.com/zarr-developers/zarr-python) being the most used. Zarr is [NumFOCUS’s sponsored project](https://numfocus.org/sponsored-projects) and is under their umbrella.
+
+### Outline:
+
+
+First, I’d be talking about:
+
+### What’s, Why’s, and How’s of Zarr (15 mins.)
+
+- How does Zarr work?
+    - Talking about the motivation and functionality of Zarr
+- What’s the need for using Zarr?
+    - When, where and why to use it?
+- Pluggable compressors and file-storage
+    - Talking about several compressors and file-storage systems available in Zarr
+- Managing(selection, resizing, writing, reading) chunked arrays using Zarr functions
+    - Using inbuilt functions to manage compressed chunks
+- How is Zarr different when compared to other storage formats?
+    - Talking briefly about technical specification, which allows Zarr to have implementations in several languages
+    - Pros and cons when compared to other storage formats
+- Zarr community
+    - What is the Zarr community, and how do we do things?
+
+
+Then, I’d be doing a hands-on session, which would cover the following:
+
+### Hands-on (10 mins.)
+
+- Creating and using Zarr arrays
+    - Using inbuilt functions to create Zarr arrays and reading and writing data to it
+- Looking under the hood
+    - Use store functions to explain how your Zarr data is stored
+- Consolidating metadata
+    - Consolidating the metadata for an entire group into a single object
+- Writing and reading from Cloud object storage
+    - Using S3/GCS/Azure to create Zarr arrays and write data to it
+- Showing how Zarr interoperates with the PyData stack
+    - How Zarr interoperates with the PyData stack(NumPy, Dask and Xarray) and how you can write data to your Zarr chunks at incredibly high speed in parallel using Dask
+
+
+I’d be closing the talk by: 
+
+### Conclusion(5 mins.)
+
+- Key takeaway
+- How can you contribute to Zarr?
+- QnA
+
+This talk aims to address the audience who works with large amounts of data and are in search of a data format which is transparent, easy to use and friendly to the environment. Zarr is also reasonably used in bioimaging, geospatial and research communities. So, Zarr is your one-stop solution if you’re from a community or an organisation dealing with high-volume data. Also, anyone curious and wants to learn about Zarr and how to use it is most welcome.
+
+The tone of the talk is set to be informative, along with a hands-on session. Also, I’m happy to adjust the style according to the audience in the room.
+
+Intermediate knowledge of Python and NumPy arrays is required for the attendees to attend this talk.
+
+### After this talk, you’d learn:
+
+- Basic use cases for Zarr and how to use it
+- Understand the basics of data storage in Zarr
+- Understand the basics of compressors and file-storage systems in Zarr
+- Take a better and more informed decision on what data format to use for your data
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2023-04-19
+---
+start_time: 14:35
+---
+end_time: 15:05
+---
+slot_id:
+---
+track: PyData & Scientific Libraries Stack
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 2521
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Novice
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/JY3R3Z.png
+---
+youtube_id: OYaMi9WnQpA
+---
+video_link: https://www.youtube.com/watch?v=OYaMi9WnQpA
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT29M39S
+---
+video_thumbnail: https://i.ytimg.com/vi/OYaMi9WnQpA/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Awesome. So how many of you have heard about this format known as ZAR? One, two, three, four, five, six. Oh, nice. Okay. So this is going to be an introductory talk about how ZAR works using some neat illustrations and a bit of a code to show how ZAR works. And I'm going to try to convert the ZAR logo, it's a PNG, into ZAR format. So we're going to see a lot of things today. So this is today's 19th of April. We are at PyCon Germany and PyData Berlin 2023. It's 2.35, 2.36. A little bit about me. I take care of the community and the open source software of ZAR as their community manager. I have been working with them since one and a half year. Before that, I have chaired six or seven Pardita conferences. These are mostly Pardita daily and Pardita global conferences. And apart from my volunteer time, I've worked with forensics, startups, organizations, and government of India. And when I'm not working, I like to play violin. Any of the violin players here? String instruments? Oh, nice. And if you like this talk, you can go to my Twitter handle. I know it looks scary looking. Not as scary as this guy. Yeah, this is me. This is my photo in a pixelated version. So yeah. If you want to look at the slides and the code, this is the link. You can just go ahead and take a screenshot. I'm sorry there's no QR code. Yeah, cool. So what I'm about to show you, what is SAR and how it works, and then there's a few lines of code, and obviously why you should use it. There are so many data formats out there, and why you should use SAR, and how it is different. And then we'll come to the specification part, which is more of a technical thing. I mean, yeah, obviously, because it's a PyCon, yeah. And then we can talk about implementations and community. So Zawa was basically created by this person known as Alistair Miles. He is a scientist at Oxford. So basically, he was working with genomic data of mosquitoes. And their data sets were in large size, like hundreds of GBs and petabytes. So he needed a way to how to handle and manipulate the data efficiently and without losing any information. So this was created in 2015. And if you go to this link, this basically, in 2015, that's the link of the first commit in the project. And as you can see on the bottom, there's the Twitter handle, the GitHub link, and the website. It has a rapidly growing user and industry base. People have been using it like, I mean, NASA, if I have to start with, then Microsoft, Google, and Amazon, and all these companies. And ZAR has implementation in several languages, like Python, Julia, C, C++, JavaScript. But this is PyCon, so I'm going to talk about only the Python implementation of ZAR, which is our Python. And currently, it has 21 core devs. It is sponsored by Numfocus, so Numfocus is over here. And it's funded under CZI. CZI is like the nonprofit arm of Facebook. And EOS stands for Essential Open Source Software. So yeah, enough of that. So yeah, before working, before, yeah, before, Zal, let's have a look at what Arian Tensor is. I'm sure everybody know what Arian Tensor is here, right? OK, so we can just, I can just skip through these illustrations which I made. Not made, like, this is why this person is clever. So array is like a container of items, like how you contain your data. You have like 1D, 2D, and ND. And it could be like 8-bits, 16-bits, 32-bits, or 64-bits. And we have these dimensions, like 1D, 2D, and 3D. So ZAR is actually a specification, which is actually a technical document of how the array should be organized, your hierarchy should be grouped, how your metadata should look like. And based on the specification, we have implementations in different languages. And the specification basically lays out how you can store your data in chunks, which is basically divided, compressed. You can compress those chunks in n-dimensional manners. So a lot of technical terms, but I'm going to simplify it in the next couple of slides. So let's just say you have a small data set to work with. You have 1 GB of data. You can easily load it into a laptop and work with it, because you have that much memory your computer. But let's just say, what if your data is too big to fit in your memory? Like let's just say it's like 100 GBs. You can't just load it and work on it. So you need something which a data format which could work out of the memory. So that's where basically XAR kicks in. And what it does is basically divides your array into equal chunks. As you can see, the equal chunks have been divided over here. And it compresses all of these individual chunks using compressors in the NumCodex library. NumCodex is like a dependency of ZAR, which is under the ZAR Developers Organization. And the compressors like BLOSK, ZSTD, ZLIB, and LZMN, all the compressors that you can think of. And so all these chunks are compressed. And these compressed chunks are basically stored in your hard disk, not in your main memory. And you can retrieve those chunks that you want to work with into your main memory. And then you can make some addition, make some subtraction, manage those chunks, and store them back into your main memory. And the reads and the writes are basically concurrent, so if you want to work on multiple chunks at the same time, you can do that as well. So this is what a group, like ZAR group, looks like. This is actually a container. As you can see, this part over here is the actual data, which is the binary blob. And on the top of it, we have this metadata. So Z-array stands for the Z-array has basically all the important essential information about your ZAR array, what compressor did you use, how many chunks you have, along which dimension did you chunk your data, and other information. And Z-attr is actually the custom attributes that you can add to your data set, which could be something like the time of the data was taken, like who created this data, and how it should be accessed, and what's the, I don't know, like password or something. And the Z group is actually when you have to store like multiple arrays into hierarchies, the Z group attribute will store how all these different arrays are organized in the hierarchies. So yeah, so this is a simple, what do you call it, illustration of how the chunking works and how this decompression works. So we have this n-dimensional big area, and we have divided it into four chunks. And each chunk would be assigned a key using mutable mapping fashion in Python. And every chunk would have key, and this chunk would be compressed using that numcodex library, which I showed earlier. And if you want to work with any of the chunks, you can just enter the key, and that chunk will be retrieved, not the whole data. So let's just say if you're working with 100 GB of data and you want to just load the last chunk, you don't need to load the whole data set into your memory. You can just retrieve that chunk and work on it. So this is how the whole cycle of compression and how does the allotment of key and values work. So as I told earlier, there are different type of compressors available over here. And the next thing is the file storage system. So there are different type of storage mechanisms for your data on your disk. So you can use zip store, which is the zip file. You can use memory store in the memory store, directory store, which is like simple fashion directory how you store files in your laptop or in your system. And then we have cloud enabled storage like AWS, S3FS, sorry, AWS, GCS, and Azure. So you can basically directly talk to the cloud using XOR interface as well. So this is basically the link of the code, Google Collab Notebook. If you want to have a look at it, I'm going to switch to my notebook, my Jupyter notebook. Is it visible? Is it visible to everyone? Okay. How about now? Okay, cool. So I assume everyone is familiar with NumPy. so I'm going to just skip the introduction to NumPy, like how to create an array in NumPy and how to slice it and everything. So this is how you can basically create arrays in XOR using the create function. So here I have identified the shape of the array, which is like 1,000 by 1,000, and I have identified the chunks, like how many chunks I want to basically split that whole big array into it. And the D type is actually the data type, which is the float, and this is the store I want to use, like the location of my data set. If I run it, now I can see the Mazar is stored, and it has 10,000 chunks because 1,000 by 1,000, when you divide 1,000 by 1,000 into 10, you get 10,000 chunks. As you can see, there is no chunks initialized because you have not written anything on it. There is like your memory is entirely free right now. It is not utilizing any of your memory. I have not mentioned any compressor over here because I do not want to, because I have to finish in a limited time. But as you can see, if you do not mention any Compressor, it defaults, goes to BLOSC. And this is the total size of 7.6 MB, how much data it is storing. And I just use this as fill values, actually. I want to see what is the value written in it. And when I try to access the first chunk, it shows 0.0, the address is 0.0. And now I want to basically write 2, like the scalar value 2, into half of the chunks. And when I do it, you can see the half of the chunks are initialized, and it's now taking bytes storing. So now it's storing 210 KB into a memory. And the above number of bytes is the actual size of the whole chunk. And yeah, all the other information that you can see. And in the next we go, I try to attach some custom attributes to my data set, like if I want to add something. So here I added like unit per second, units like meter per second and standard name like win. So this is what basically I have. So for what I've done so far is I created an array. I wrote some data to it. I added some attribute to it. But what does it look like under the hood? So this is what the hierarchy would look like. So you have these small binary blobs with the key from 0.0 to 50.0, and then you have the z-array, which is actually this one, and z-atters is actually the attributes which I just wrote it to my XOR array. And if I try to open the z-array, you can see everything which was created when you created your XOR array. And if I try to open the z-atters, you can see how the attributes are being shown, which I just wrote it to my data set. And earlier I talked about the hierarchies, like how different type of arrays are stored in a hierarchy. So I just tried to create a group over here, and you can see how this has a parent and children and children of children. So yeah, you can see how these structures are. These are basically structured. They can store multiple ZAR arrays in a hierarchical manner. and you can add as many attributes and as many data to it. I also have this small, yeah. As you can see, everything is just organized in a neat fashion for accessibility and for you to work with it. Now I'm going to just try to, I mean, I've already done it, but I'm just going to try to show it. I'm going to try to convert a pixelated logo of SAR, which is in PNG format, to actually XOR format, which is actually the extension known as XOR. So I tried to load an image. So this is something I made myself with the, you know, because I do some pixel art. And I tried to load it, and it looks like this. And then I convert basically this image into a NumPy array using the as array function. And when I converted it, so I can see like the type is the NumPy nd array and the shape, and what does it look like. And now when I have to basically convert it to XOR, I just need to basically pass the numpy array over here into the XOR array function. And as you can see, it just gets converted. And I didn't, so there's, I mean, in the earlier code, I basically, yeah, I basically indicated the shape and the chunk and everything. But if I don't do anything, like if I just pass the array, it's capable of doing everything on its own. And so over here, I just created that without specifying chunks, compressor, or the shape and everything, and it does everything on its own. You can see the data type and the number of chunks. There are essentially four chunks, and you can see how much it is taking on the disk and everything. I tried to basically attach the attributes like I just showed before, and you can see these custom attributes which I've attached to the pixel, the XOR pixel logo. And if I, yeah, so this is basically me just trying to visualize the ZAR array, which I just created. And yeah, so if I have to show you like how does it look like. So this is what we have just created. So this is actually the logo of the ZAR. So this is just the image. And it has, if I do this, I have the Z array file because it's like hidden. So I can just hide it. This is actually your image, and you can store any data, like any data you have, as large as like TBs, and I'm going to show a sample data set of 54 terabytes, which is stored on Amazon AWS, and this is it. So your data is stored over here, and you can convert any data using ZAR in this manner, and this is the data that we have created earlier, which is the 10,000 by 10,000 chunks, so this is how the chunks would look like, and this also has this z-array and z-attrace file at the top. Okay, coming back to the slides. Yeah. Yeah, so why you should use a chart, because there are a couple of reasons that I would like to show you. You can chunk arrays along any dimension, so the chunking that I have done was basically the default chunking, but you can chunk across any dimensions, like across or vertical or horizontal or beneath the depth. And arrays can be written concurrently from multiple threads and processes. And this is really helpful when you're working with a large data set across cloud or in local machine. It's easy to extend. The styling is mostly similar to NumPy, like how NumPy works. And the compression support is really great. You can use any compression. And the NumCodex is actually a dependency of XAR. So yeah. And so the last point is simple. It's simple, and it's open specification, which allows it to be hackable. So the specification basically is open source, which allows anyone, like, you can just go home and try to implement XAR into one programming language, and it would work easily. So everything is, like, just open. And, like, when you should basically use XAR, so when you have, like, absurdly large data sets. So let's just say if you are dealing with a... Hold on. Yeah. So this is, like, a nice graphic. So let's just say you're dealing with this 120 terabyte of file which is in TIFF format. So this is like a big monolithic file you have. And let's just say if you want to access the middle part, which is highlighted in the middle, and how would you do it? You have to basically load the whole big monolithic file into your memory to work with it. But if you have a format which has chunked your data sets into small, small chunks, you can actually access that data set using that key, which I showed you earlier in the illustration, work with it, and then store it back into your main data set. and you have these attributes and all these stuff which you can basically work with. Yeah, and if you want to share a dataset, I mean, essentially, I think this has been the case earlier. Like, people have used, you know, hard disk and pen drives to actually share a dataset physically from one place to another, but having, like, a chunk format, like something like XAR, makes it very easy to share across cloud storage. And yeah, I mean, this is like an illustration. Like, sometimes, like, earlier, people have to actually download the whole dataset if they want to work on it. But yeah, that's not the case now. You can just retrieve those things that you want to work with. Yeah, so this is, if you want to see more illustrations, like these ones, you can go to this link. This was made by this person, Henning Fock, which the name you can see at the bottom. So yeah, you can take a picture or so. Yeah, so just a little bit about specification. This is the technical specification, which actually provides a protocol. Is anyone familiar with web standards, like what web standards are, W3C protocols, like how basically internet works and how basically two points talk to each other? So this is, so XAR specification is something similar like that. And you can go to this link at the top and you can see the specification. So currently version two is in effect and we have just released version three, which is gonna be out in like a month or so. So it has like really, really good, what do you call it, support for extension points. So extensions are something which you can basically add without losing the existing capability of ZAR. I can talk about it more after the talk. So just coming back to what does the beauty of ZAR means, so this is on the left-hand side of your image, this is like a 54-terabyte image of an oceanography. This is like sea surface temperature. And on the right side, this is the microscopic image of the COVID-19 infection in lungs. And this is basically everything in XAR. You can go into slides, and you can check this out. And this was basically visualized using this vitessi. I don't know if I'm saying the name right. But you can see on the top, there's a URL. And this is basically a visualizer for n-dimensional arrays. So this whole data set is in XAR. And yeah, you can see how beautiful it is. Take a moment. Yeah, just to talk about interoperability, I think folks are familiar with what Dask and X-Ray is, right? So you don't need to basically install XAR to use XAR. You can use XAR through X-Ray and Dask as well. You can open your XAR data sets using Dask, and you can write to it as well. So these are the implementations I was mentioning earlier. Like you can see Java, C, Julia, JavaScript. So you don't need to just, I mean, Python user to use XAR. You can use XAR through any other language as well. And, yeah, it's severely, like, easy to implement XAR from scratch, so I think we are lacking R, sorry, no, Rust and Go implementation. So if any of the folks want to give it a try, feel free to. Yeah, and XAR community is like everyone who loves XAR or who works with XAR, and if you are a user, if you're a developer, if you're just an occasional contributor, you're welcome. I'm the community manager of XAR, so I take care of everyone who is inside the community and who basically wants to contribute and we have just developed this no it's been a year that we are working through this process known as zip which is this which is basically similar to pep but it is for our specification how the changes should be incorporated into bizarre specification what does v3 looks like it's mostly a change in the metadata and how the chunks should be handled but it's just evolutionary like we were trying some benchmarks earlier and it's been super fast since the v2 and if you want to join our get join our getter you can just go to the link at the top at the bottom uh this is our channel which is also like an open source open source communication channel uh these are some of the data sets which are on the cloud right now like cm cmip6 which is the uh public data set of the uh climate model this is like uh one petabyte and the nick on the on the right hand side of the screen you can see this is the sea surface temperature i think this this was hosted by NASA, yeah. Yeah, this is hosted by NASA. It's also 54 terabyte in total. And this is like one single ZAR store. So you don't need to like actually load this 54 terabyte data to work with it. Like you can just load few MBs or few GBs to work with it. But you can just go, I can share the link of these datasets and you can see, have a look at this. Yeah, I mean, these are just some things like, if I wanted to show, do I have time? Okay, cool. These are some of the universities or research groups or companies who are using XAR for their storing data set, like Genelia, Ali, Microscope, NASA, NCAR. OME stands for open microscopy, and mostly the domains which basically produce large data sets are geospatial, microscopy, genome sequencing, and data science. So these fields have been using XAR heavily for the last five or six years. And yeah, one more thing, like, which I want to mention is, like, this is, like, a very versatile format, and there have been development of conventions on top of ZAR. So you can see, like, I mentioned GeoZAR over here. So GeoZAR is actually the geospatial extension of ZAR, which actually fiddles with the metadata to a level which is readable by satellite. And OME ZAR is actually the microscopic version of ZAR, like how you deal with microscopic images of ZAR. NCZAR is, I think people are familiar with NetCDF, NetCDF data format. Oh, yeah, so nczar is actually the extension of the NetCDF version of XAR. And yeah, I think that's it from my side. I may have rushed a little bit, but yeah, feel free to join our office hours and community calls if you want to learn more. These are the handles if you want to have a look. Yeah, I mean, any questions?
+
+**Speaker 2** _[23:19]_
+
+Thank you very much for your presentation. So far, I think we don't have any questions from Slido, but I think that's also no problem. So I will ask, oh, yeah, maybe could you enter it in Slido? Yeah, I'll just pause the microphone.
+
+**Speaker 3** _[23:49]_
+
+Thank you very much for the presentation. It was very interesting. I'm just trying to get a better understanding of how ZAR compare to format I know. I'm trying to get a better understanding of how ZAR compare to other formats that I know. So you are talking about using ZAR for very large data sets. So for instance, if I have a large data set of images, I will store them as a JPEG. And if I have a large data set of structured data, We store them as pockets. So how does that compare to that? How is it better?
+
+**Speaker 1** _[24:24]_
+
+Yeah, so I mean, I would just ask you another question, like how much larger, like what's the largest image size you have dealt with?
+
+**Speaker 3** _[24:34]_
+
+I don't know, a few millions? Sorry? A few millions?
+
+**Speaker 1** _[24:38]_
+
+No, I was talking about image like what's the largest size of the image or JPEG you have dealt with
+
+**Speaker 3** _[24:43]_
+
+How many images you mean no
+
+**Speaker 1** _[24:44]_
+
+No, like a single size of the image. Oh, single size, sorry.
+
+**Speaker 3** _[24:47]_
+
+Sorry, yeah, like, I don't know, 1,000 by 1,000, something like this.
+
+**Speaker 1** _[24:52]_
+
+Yeah, so that would be somewhere around few hundred MBs or it may be basic
+
+**Speaker 3** _[24:56]_
+
+I'm not sure about the site, sorry.
+
+**Speaker 1** _[24:57]_
+
+Yeah, basically it was easy to load in your memory, right? Yes. Yeah. So, I mean, your laptop didn't crash when you were trying to load it. But let's just say if you have an image size, so I was just showing this single image. Yeah, so this single image is like 30 GB. If you try to load it in your memory, it's just going to crash it. So you need like a chunked format which you can easily load the essential part of the data set you want to work with, and then you can store it back. And I mean, you don't need to like actually load the whole image to visualize it. There are multiple visualizers, like n-dimensional visualizer. Have you heard about Napari? Napari, there is NeuroGlancer. They basically visualize your n-dimensional areas, no matter how big it is, on the web browser.
+
+**Speaker 3** _[25:38]_
+
+Very clear. Sorry, I didn't see that slide. I was...
+
+**Speaker 1** _[25:40]_
+
+Yeah, no worries, no worries.
+
+**Speaker 3** _[25:41]_
+
+Yeah, no worries.
+
+**Speaker 2** _[25:44]_
+
+I will go to the next question.
+
+**Speaker 4** _[25:47]_
+
+So, question. How does the performance compare to just using NumPy?
+
+**Speaker 1** _[25:54]_
+
+performance like in Watsons.
+
+**Speaker 4** _[25:57]_
+
+You want to perform some operation over this array. You want to find the sum.
+
+**Speaker 1** _[26:04]_
+
+I mean, I haven't done any benchmarks yet, but I think it's quite similar. Because ZAR pulls NumPy as one of their dependencies.
+
+**Speaker 2** _[26:18]_
+
+I hope that answered the question. I will move on.
+
+**Speaker 1** _[26:24]_
+
+What types of data do you think XAR is potentially not the most suitable for? So I think one of the, when I see the GitHub issues and all this stuff, people from the deep learning and the machine learning community have been coming to us, and they were thinking like how they can store their CSVs and Parquet files, which are like very big. And mostly, as I mentioned earlier, the domains which are using XAR more are the geospatial genomics and microscopy, not the deep learning and machine learning folks. So I think this is the question that needs to be answered, and this is, I think, the answer for your question as well. I haven't experimented myself, but I think this is a big question mark, if it can handle CSV and Paracare row data sets.
+
+**Speaker 2** _[27:14]_
+
+In the meantime we got one question from Slido and this is how does SAR compare to Parkit? I was sorry, okay, so then I will move on, sorry.
+
+**Speaker 4** _[27:27]_
+
+Thanks for the talk. Yeah, we've also been using Zara, and it's awesome. I have a question concerning version 3, because I think version 2 has some issues when you store very small chunks on cloud storages which have high latency. So we're really looking forward to version 3, and my understanding was that there's the specification, which seems to be rather final, but no final implementation, only for experimental ones. So maybe you can clarify that.
+
+**Speaker 1** _[27:56]_
+
+because it's really interesting.
+
+**Speaker 4** _[27:56]_
+
+Yeah, yeah. Really interesting for me.
+
+**Speaker 1** _[27:58]_
+
+Give me a second. So I have this issue already open on my laptop. So this is the issue which was created two weeks ago. And this is the final, what do you call it, final checkpoint to the completion of the ZEPP one, which is actually the version 3 of specification. ZEPP is actually the ZAR enhancement proposal. And the first ZEPP was the V3 specification. And if you have to, you can take a picture or so, if you can see the link. And on the bottom, you can see there is this implementation, which is the closest implementation of the V3 specification, which is known as Zorito. So you can have a look at this. I can share the link with you after the talk. And this is the prototype implementation because V3 is still in the review. And it's going to take like a month or so to complete the review and just implement it in ZorPython. But there is also a V3 implementation in ZorPython as well. But there's a technical gap because the V3 implementation was implemented somewhere around July last year. And there has been changes to the specification a lot since then, because we have been developing the specification since two or three years. So this is the closest one if you want to try v3. And after v3 is finalized, you can actually jump back to XAR Python with the actual implementation.
+
+**Speaker 4** _[29:12]_
+
+Cool. Yeah, thanks a lot.
+
+**Speaker 2** _[29:15]_
+
+So, thank you very much. I think we have to close the session right now. I think if there are any more questions You will be happy to answer the questions on in person or via your Channels you showed in your talk. Thank you very much. One more round of applause for Sanko dentists
+
+---
+transcript_status: auto
+---
+transcript_language: en

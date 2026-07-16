@@ -1,33 +1,101 @@
 {% extends "layout.html" %}
+{% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
 
-{% block title %}
-{{ this.title }}
+{% block title %}{{ this.title }}{% endblock %}
+
+{%- set is_archive = this.url_path.startswith('/archive/') -%}
+{%- set archive_year = (this.url_path.split('/')[2] if is_archive else '') -%}
+
+{% block structured_data %}
+{{ super() }}
+{%- set crumb_trail = [] -%}
+{%- if is_archive -%}
+  {%- set _ = crumb_trail.append(('/archive/', 'Archive')) -%}
+  {%- set _ = crumb_trail.append(('/archive/' ~ archive_year ~ '/', archive_year)) -%}
+  {%- set _ = crumb_trail.append((this.url_path, 'Talks')) -%}
+{%- else -%}
+  {%- set _ = crumb_trail.append((this.url_path, 'Talks')) -%}
+{%- endif -%}
+{{ breadcrumb_jsonld(crumb_trail) }}
+{# ItemList of every talk on this listing — mirrors the /speakers/ pattern
+   so crawlers and AI assistants can ingest the programme in one
+   structured document. Each entry references the talk's Event @id so
+   the connection between the list and per-talk Event schema is
+   machine-readable. #}
+{%- set branding = bag('branding') -%}
+{%- set host = branding['canonical_host'] -%}
+{%- set real_talks = [] -%}
+{%- for t in this.children -%}
+  {%- if t['_model'] != 'redirect' -%}{%- set _ = real_talks.append(t) -%}{%- endif -%}
+{%- endfor %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "@id": "{{ host }}{{ this.url_path }}#talks",
+  "url": "{{ host }}{{ this.url_path }}",
+  "name": {{ this.title|tojson }},
+  "numberOfItems": {{ real_talks|length }},
+  "itemListOrder": "https://schema.org/ItemListOrderUnordered",
+  "itemListElement": [
+    {%- for talk in real_talks -%}
+    {
+      "@type": "ListItem",
+      "position": {{ loop.index }},
+      "url": "{{ host }}{{ talk|url }}",
+      "name": {{ talk.title|tojson }}{% if talk.code %},
+      "item": { "@id": "{{ host }}{{ talk|url }}#event" }{% endif %}
+    }{{ "," if not loop.last }}
+    {%- endfor -%}
+  ]
+}
+</script>
 {% endblock %}
 
 {% block body %}
 
+{%- set is_current_talks = this.url_path == '/talks/' -%}
+{%- set visible_trail = [] -%}
+{%- if is_archive -%}
+  {%- set _ = visible_trail.append(('/archive/', 'Archive')) -%}
+  {%- set _ = visible_trail.append(('/archive/' ~ archive_year ~ '/', archive_year)) -%}
+  {%- set _ = visible_trail.append((none, 'Talks')) -%}
+{%- else -%}
+  {%- set _ = visible_trail.append((none, 'Talks')) -%}
+{%- endif -%}
+{{ breadcrumb(visible_trail) }}
+
 <div class="subsite">
   <div class="subsite-title">
     <section class="content">
-      <h2>{{ this.title }}</h2>
+      <h1>{{ this.title }}</h1>
+      {% if is_current_talks %}
+      <p class="archive-pointer">
+        Looking for sessions from earlier conferences?
+        <a href="/archive/">Browse the talk archive (2016–2026)</a>.
+      </p>
+      {% endif %}
     </section>
   </div>
 </div>
 
 <section class="subsite">
     <ul class="talks">
-        {% for talk in this.children %}
+        {% for talk in this.children if talk['_model'] != 'redirect' %}
         <li>
             <a href="{{ talk|url }}" class="content talk">
-                <h3 class="talk-title">
+                <h2 class="talk-title">
                     {{ talk['title'] }}
                   {% if talk['is_keynote'] %}
                     <span class="keynote-label">Keynote</span>
                   {% endif %}
-                </h3>
-                <h4>
+                  {% if talk['youtube_id'] and not talk['do_not_record'] %}
+                    <span class="recording-badge" title="Recording available on YouTube">▶ Recording</span>
+                  {% endif %}
+                </h2>
+                <p class="talk-speakers">
                     {{ talk['speaker_names'] }}
-                </h4>
+                </p>
                 <div class="talk-info-container">
                   <div class="track-container">
                     <span class="track">{{ talk['track'] }}</span>

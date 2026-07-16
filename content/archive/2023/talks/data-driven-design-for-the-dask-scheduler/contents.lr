@@ -1,0 +1,177 @@
+title: Data-driven design for the Dask scheduler
+---
+description: Historically, changes in the scheduling algorithm of Dask have often been based on theory, single use cases, or even gut feeling. Coiled has now moved to…
+---
+created: 2023-01-05
+---
+code: Q9GVEK
+---
+slug: data-driven-design-for-the-dask-scheduler
+---
+speaker_names: Guido Imperiale
+---
+speakers:
+
+
+
+### Guido Imperiale
+
+_About — in the speaker's own words_
+
+I come from a 12 years career in orchestrating Monte Carlo simulations for finance, sized at 1500+ CPU hours each. For the last two years I've been an OSS engineer at Coiled, building up the foundations of the Dask library.
+---
+abstract:
+
+
+Historically, changes in the scheduling algorithm of Dask have often been based on theory, single use cases, or even gut feeling. Coiled has now moved to using hard, comprehensive performance metrics for all changes - and it's been a turning point!
+---
+full_description:
+
+
+Any developer worth their salt scrupulously practices functional regression testing: all functionality is covered by automated tests, and every time anybody changes something all tests must remain green.
+Performance testing however is a much fuzzier and often neglected area, typically due to the fact that, frequently, in order to measure realistic performance you need a production-sized test bench, and that performance typically includes some degree of variance.
+
+Historically, changes to the scheduling algorithm in Dask have gone through this thought process. There have always been plenty of functional unit tests that verify that the scheduler does whatever minute decisions the developers expects, but until recently there weren't any end-to-end, production-sized test benches on realistic use cases to measure performance.
+
+At Coiled, we have now implemented a new test suite that does just that - statistical analysis of performance metrics - that lets us understand if a change is beneficial or detrimental in terms of runtime and memory usage.
+
+This presentation delves into how we collect data, visualize it, and act on it and how much it changed our development process for the better.
+---
+room:
+---
+day: Tuesday
+---
+slot_date: 2023-04-18
+---
+start_time: 14:10
+---
+end_time: 14:40
+---
+slot_id:
+---
+track: Programming & Software Engineering
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 2521
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Novice
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/Q9GVEK.png
+---
+youtube_id: niioB7W5o-I
+---
+video_link: https://www.youtube.com/watch?v=niioB7W5o-I
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT28M7S
+---
+video_thumbnail: https://i.ytimg.com/vi/niioB7W5o-I/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:02]_
+
+Thank you and welcome. Let me present myself. I am an open source engineer at Coiled and I've been working for the last couple of years on performance, chiefly on Dask. What is Dask? Dask is a fairly complicated orchestration system that pushes through several tens of gigabytes worth of data on thousands of workers on the cloud every in minutes. So I want to ask this room, how exactly do you test changes when it comes to performance? When you have a customer that comes to you and says your software is low, how do you change something to make things better for your customer and then you run a test and how do you say yeah now my software is faster what does faster mean for you so before we talk about performance specifically I would like to talk about something that most people in this room and in this conference should know from the back of the hand. How do you do functional testing? So you have a function, you have some kind of environment for it, you have inputs on the left, outputs on the right, and you test that given the same inputs you get a certain expected output. This is box standard, everybody does it. So how do most people do it? Well, somebody opens a PR on GitHub, GitLab, whatever, and as As soon as that PR is opened, your CI kicks in and starts spawning CI hosts and deploys everything, deploys the PR on multiple environments, multiple different configurations, four different versions of Python, three different versions of your dependencies, et cetera, and reruns a very torrid battery of unit tests that every single possible permutation of your inputs Is the output what we expect? Yes. Green light? No. Red light. And only as when you have a green light, you can go to the next step, which is code review and possibly merging to main. What are the key features or functional design that frequently we don't think about because they are our everyday life and we just give them for granted? One is that it runs at every change. You don't get to the end of a month-long spring without having ever run the regression test. You run it for every single small PR, or as small as possible so that you can trace regressions to the change and that those regressions don't even get into your main. This is something we say, yeah, of course, but go back 15 years, 20 years, and it was not like that. You would have a giant testing sprint at the end of a giant development sprint, and things were going very badly, typically. Another key feature of functional regression testing is nobody needs to remember to start it. It just does it. regression testing starts on its own and you will get a red or green light on its own another thing is that it runs on CI which is a standard environment you know it's reproducible you can run it a hundred times you will get the same results you will not have the situation where the developer says yeah I run the test suite on my machine everything was green I don't know why the client is complaining. And finally, the developer thinks, yeah, I changed X, Y, and Z, and maybe possibly W is also impacted. CI does not care. It doesn't know. CI reruns everything from scratch. And very frequently, it will find something that the developer and the code reviewer didn't think about that was also impacted so in this room who does this for functional regression testing raise your hand do who does okay as expected most of the room now when it comes to performance so not testing what comes out but how fast comes out who does it one two three well more than I expected actually so performance regression testing is painful frequently and also very necessary what are the industry standard solutions for it well one which some people may know is airspeed velocity. ASV is it looks and feels like pytest you write a function which instead of being test underscore is time underscore and you run some code it runs it a few times and gives you mean and standard deviation on how long it takes and then it compares it to a database of all the runs to say hey this runs faster or slower. It's great but it's got limitations it's a micro benchmarking tool meaning everything is great as long as what you're testing is small it takes microseconds or seconds it runs on a single host and the only thing you care about is runtime but maybe performance for you is not just runtime maybe it's also memory usage by throughput on your metered cloud connection and whatnot and the other thing that is important when you run on ASV is that you need to trust that your performance will scale linearly if you run those NPS as array once and it takes two microseconds you need the confidence to say that when you run it a million times on a thousand different workers in parallel you are gonna have one microsecond multiplied by 1 million divided by 1000 which is a very very big assumption which frequently is not true so why is a tool like ESV not for purpose for people like us at Coiled well what do we do at Coiled we develop Dask and we deploy Dask on on the cloud, on Google and on AWS. When we say deploy, we mean large numbers of workers at once. We can have 1,000 workers that go up, push several hundreds of gigabytes worth of data through and communicate with each other, producing a few terabytes worth of network communication, produce the result and shut down. In this three lines example, on the very first line after the import we are starting a cluster with 40 CPUs and 160 gigabytes of RAM. I could have literally added a zero there and it would have had 400 CPUs in exactly the same time. The second line we are connecting a Dask client to our cluster and then we're doing stuff for example we are reading a data set which I believe in that case is 80 gigabytes and we are saying okay in which specific area around Manhattan take a specific area about Manhattan that's New York City taxes and give me the average trip time and push button where you have 80 gigabytes worth of Parquet data that go through into AWS are filtered and processed and you can have however many complicated calculations you want get the result shut down and this is a simple filtering and aggregation but you could also have machine learning or anything what are the challenges here well first of all performance does not scale linearly when you have hundreds of gigabytes terabytes of data hundreds tens thousands of EC2 instances that need to communicate with each other in peer-to-peer you do not see linear scaling in performance if you have something that is very performant on two hosts you have no guarantee that is going to be performant on 200. For example where you may have hit bottlenecks in the scheduler which is a single host which is at the center of the star configuration of the cluster and the moment that the scheduler reaches 100% CPU everything starts slowing down and you will not reach that until you start having hundreds of workers and then you have the problem of network latency which is major and again you can't really reproduce it on local host where everything is instant if you run it on localhost you will have a certain performance profile which is completely different from when you run on the cloud and is completely different from when you run on a client's corporate network that maybe was not updated for the last five years so what do we do what did we do in at coiled to say okay we want to make this faster I I thought I made this faster what do I do well norm historically we were retesting a single use case by hand so customer complained this use case is slow okay I did a change and run this change I start a cluster once measure yeah it's 20% faster ship it to the client this was a very bad practice first because every time you needed to craft your use case to measure and that was out of repetition a lot of mistakes very frequently the developer would test only the use case that they knew about but actually when you start changing a generic system like a scheduler then you're not gonna be restricted to only that one use case and we don't fork our software for five or all different class customers so you would have one customer which is very happy because their use cases faster and another that the next week starts screaming and finally there is variance when you have many many many many many workers that run on EC2 you don't have you cannot expect precise timings like if you're running three times you will have plus minus five percent ten percent twenty percent that entirely depends on what you're doing and very frequently developer only run it once and go hey 20% faster great except that if you run it five times you get 20% faster 10% slower 20% slower and the average you actually made it slower how did we solve this problem we created a repo on github which is called benchmarks and on this repo we've wrote a wealth of end-to-end tests these are basic pi tests that instead of running on a single host on very small data like you would be used to see on pi tests they start full-size coil clusters 10 20 100 workers and run a whole array of use cases with as much comprehensive as you would expect in a functional regression test suite so you will have dot product you will have data frame joins who will have machine learning training I don't you don't you have the whole thing we are adding to it and every time a developer does a change for for example speeding up data frame join they will go through everything else as well whether they want it or not and they will get the result whether they thought about there would be an impact there or not in this repo we have two operating modes nightly regression tests and a B testing nightly regression test is exactly what the name implies we did get tip we rerun nightly the whole thing over and over again and every morning we have a new report that shows the last several months worth of runs for all of our tests and show if there is any change also since we don't really want to have somebody whose job is just to open this report and look through it we have automated systems that spot automatically regressions in performance say at least 10% lower than the last week there is automatically a GitHub issues opened for us look at in this example for example we have a shuffle operation on a data frame and you can see that performance is pretty much consistent over time at some point in October 2022 it became 5 10 20 10 20% faster and then was nothing to report about for several months until one day on March 5th where somebody did something uncouth and they deployed a patch into mainline which made it five times slower. We got a GitHub issue, the developer was noticed with git blame and fixed the problem and you see that the problem was resolved. The other thing that we do is A-B testing. We push manually into the repo to conda environments one with our baseline which is what we know and love and the other with something much more experimental like some PR that has not been merged yet CI will take it in and run the whole thing again not just once but five seven ten times however many you want and run and run and run and do statistical analysis on that and you can configure on the fly the size of our clusters. Nightly regression tests, we just do 10 workers because that costs money and it runs a lot. But sometimes for problems that only appear when you have 200 workers, we just tweak the number there in a config file and rerun everything. And all the tests automatically scale up in size so that they thoroughly occupy a very large cluster, which is representative of what you will actually pay us for. For example, this is the output of a sprint that I did recently that I was tasked for make spilling to disk faster, and at the end of my work, I ran A-B tests. And I was convinced that spilling would become faster, And what I got was that spilling became actually 80% slower. And some completely unrelated tests that I didn't even know about, that I didn't even know would make this KIO became 50% faster. And I was like, oh, well, that's interesting. Back to the drawing board. And that PR did not get much. And this is the thing. Back in the day when we were doing manual testing, that PR would have just gone into main and the next week somebody who heavily relies on disk IO because it doesn't have enough memory would start complaining because we would not notice. We also do something that is called null hypothesis analysis which is tests have noise. Some tests are substantially more noisier than others. So we run the baseline twice in two sets, five times on its own, and then five times again without changing anything, and compare them, pretend that there was a change. And the idea is that that report must not show you anything. If it does, that's noise. And if you see a change on the same test, on the actual A-B test, you know you really shouldn't pay any attention to it. For example, here we see a cutout where we have a test called testing of future, which is say, hey, in this A-B test where you change absolutely nothing, we have plus minus 30% depending on how you run it, and that means that test is not good. Other tests say you have plus minus maximum 5%, so that's reliable. in those tests I can see suddenly at 30% on the actual A, B, you know you can rely on it. After you see this very high level summary of the whole test suite you can start drilling down in individual tests, here for example we have a view for just two tests, at the top we have one that actually changed and we see mean, median and the standard deviation, the median is the blue bar, the mean is the crosshair and the standard deviation is the horizontal extent of the black line and you can see on the top we have something that was actually much faster in my experimental branch and with very little noise and at the bottom we see a very noisy test which maybe is faster in a my by branch but actually the signal to noise ratio is so bad that I really shouldn't look at it and this is exactly this one that I was showing before and at the top is exactly the one the blue line that I was showing before which was already solid blue I already knew but this tells me something more and finally if I still don't know so this is showing me every one of those bars is five to ten tests five to test test runs if I want to see what actually happened in every one of them I can open our Grafana this is something that is available to all of our coil customers and I can see okay there were these many tasks at this point that were using this much RAM and at this point it started spilling to disk so it started being slower or we were doing a lot of network IO etc we can eviscerate it as much as we want to go down and down and down into detail until we understand exactly the small details of what changed so what are we going from here first of all we need to polish it we this is something that is amazing for internal use it's not quite yet something we would like to offer to customers because it's a bit hacky at the moment we want to make it smoother cleaner polish it up and we would also like to use expose more metrics to it at the moment we have end-to-end runtime peak memory usage every average memory usage they are super useful but I have questions like how much more networked IO did I do how much time did I spend on good CPU seconds and how much did I waste on guild contention all these sort of questions we have answers to those we just need to expose them to this system then we could also make it more interactive just have you can click on okay I want this this and this metric and have a portal that gives you the answer on the fly and finally eventually we will have something where a call customer says or goes on the dashboard and says okay I have this this and this run on my A set this this and this run on my B set give me some performance insights about how these two sets of runs are different any questions that people may have
+
+**Speaker 2** _[22:15]_
+
+Well, Firth, thank you for your great talk. We have one question until now, but I think you can write your questions on Slido. What kind of visualization are you using for the testing timings?
+
+**Speaker 1** _[22:31]_
+
+So, these graphs use Altair, which generates static HTML files, which we can get published on GitHub pages. This is very crude, not really practical, but it was something that was very hacky and quick. It's not going to last in the long term. As I said, we are going for something more dynamic and interactive that we want to be able to click through on the fly on a portal and have data that is extracted on the fly. This one instead is Grafana, which extracts data on the fly from Prometheus and is much more powerful, much nicer. It offers a bit less flexibility it in terms of crazy aggregations that you want to do in for example to generate these graphs I needed to write some bootstrap analysis which Grafana doesn't do on out of the box but we can make things smoother
+
+**Speaker 2** _[23:45]_
+
+Question by Mr. B. Does your system also benchmark memory?
+
+**Speaker 1** _[23:49]_
+
+Yes it does. Yes it does. I don't have screenshots for that but at the moment we
+
+**Speaker 2** _[23:50]_
+
+Yes.
+
+**Speaker 1** _[23:57]_
+
+have again three measures end-to-end runtime, average memory usage across the cluster, peak memory usage and we could add more again we have for example we have the information of managed versus unmanaged memory where is managed is what Dask knows about, user's tasks, unmanaged memory is everything else that we have no idea, heap, leaks, etc. We can break that down, we can expose it to this kind of metrics and analyze, oh hey, in this PR you had a 30% increase in unmanaged memory. Why? I don't know, maybe because your heap is larger, because your your chunk sizes become larger.
+
+**Speaker 2** _[24:45]_
+
+How do you distinguish performance tests already conclusive on single machines from the ones where you really need to spin up a huge cluster?
+
+**Speaker 1** _[24:55]_
+
+The short answer is none that you run on a single machine is conclusive It as I said when you run on local cluster Your performance profile is so completely different from when you run on a huge easy to cluster where you have hundreds of thousands of gigabytes worth of RAM, hundreds of CPUs, and network latency through and through. Local cluster, yes, good start, but then don't assume that your thing is doing what it does until you see numbers on the cloud or wherever else your production is going to run.
+
+**Speaker 2** _[25:41]_
+
+Isn't testing at this scale extremely costly?
+
+**Speaker 1** _[25:45]_
+
+Actually, no. Our overnight tests at the moment are about a hundred dollars a pop worth of EC2 time, so it's not terrible and whenever we need to do something serious like 500, 1000 workers that of course cost substantially more but it also doesn't happen every day and it's typically money very well spent.
+
+**Speaker 2** _[26:15]_
+
+Is it possible to add p-values to the A or B tests?
+
+**Speaker 1** _[26:20]_
+
+read it there. We already used p-values. That's what you have at the, yeah, you can read it on the overlay.
+
+**Speaker 2** _[26:34]_
+
+Is the plan to open source this project eventually?
+
+**Speaker 1** _[26:40]_
+
+well actually the project is already there it's just you need the whole account to run it which will cost you money that said if you are a heavy DAS contributor we probably be happy to have a chat with you and just give you some call time for free if you're developing DAS why not we are already talking about that with NVIDIA as a matter of fact
+
+**Speaker 2** _[27:08]_
+
+Would it be possible to simulate or emulate network performance on a single machine instead of actually running on a cluster?
+
+**Speaker 1** _[27:17]_
+
+Yes, theoretically. Practically it's a big kind of worms and that depends on how much you need to do it and how much time you need to develop such a thing which you will never quite know if you did it quite right. But yes it is possible, just not something to say oh yeah I can totally simulate this. Yes you can but careful.
+
+**Speaker 2** _[27:42]_
+
+Okay, the last question I have is, is the cool GitHub stuff you showed in a public repository we can look at?
+
+**Speaker 1** _[27:51]_
+
+Yes, yes, it's public called benchmarks.
+
+**Speaker 2** _[27:51]_
+
+Yes. thank you again for your talk and have a nice day.
+
+---
+transcript_status: auto
+---
+transcript_language: en

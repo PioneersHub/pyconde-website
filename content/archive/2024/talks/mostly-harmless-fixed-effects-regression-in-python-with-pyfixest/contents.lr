@@ -1,0 +1,210 @@
+title: Mostly Harmless Fixed Effects Regression in Python with PyFixest
+---
+description: This session introduces PyFixest, an open source Python library inspired by the "fixest" R package. PyFixest implements fast routines for the estimation…
+---
+created: 2024-01-04
+---
+code: UXQJTF
+---
+slug: mostly-harmless-fixed-effects-regression-in-python-with-pyfixest
+---
+speaker_names: Alexander Fischer
+---
+speakers:
+
+
+
+### Alexander Fischer
+
+_About — in the speaker's own words_
+
+Economist and Data Scientist. I spend most of my week working on online auctions at Trivago and open source packages for regression modeling and inference in R and Python.
+---
+abstract:
+
+
+This session introduces PyFixest, an open source Python library inspired by the "fixest" R package. PyFixest implements fast routines for the estimation of regression models with high-dimensional fixed effects, including OLS, IV, and Poisson regression. The library also provides tools for robust inference, including heteroscedasticity-robust and cluster robust standard errors, as well as the wild cluster bootstrap. Additionally, PyFixest implements several routines for difference-in-differences estimation with staggered treatment adoption. 
+
+PyFixest aims to faithfully replicate the core design principles of "fixest", offering post-estimation inference adjustments, user-friendly syntax for multiple estimations, and efficient post-processing capabilities. By making efficient use of jit-compilation, it is also one of the fastest solutions for regressions with high-dimensional fixed effects. 
+
+The presentation will cover PyFixest's functionality, design philosophy, and future development prospects.
+---
+full_description:
+
+
+When regression models contain very high-dimensional categorical features, estimation can become cumbersome: inverting a matrix with more than a few hundred rows is no simple task! Fortunately, the problem of estimating models with high-dimensional fixed effects has been effectively solved since at least the 1930s. A range of software packages now implement what is known as the Frisch-Waugh-Lovell Theorem (FWL) for efficient estimation of regression models with high-dimensional fixed effects. These packages are available in various programming languages, including Stata, R, Julia, and Python.
+
+Among these, the R package fixest particularly stands out. It is not only blazing fast but also offers an innovative and user-friendly post-estimation functionality and syntax. 
+
+When I started my journey with Python, fixest was the R package I missed the most. In fact, I missed it so much that I began working on PyFixest, a software package that aims to faithfully replicate all of fixest's innovations in Python.
+
+In this talk, I will introduce the audience to both fixest and PyFixest and the FWL theorem that underpins these packages. We will explore how PyFixest can be used for analyzing AB Tests and for conducting event studies with staggered rollouts.
+
+For more information:
+
+-    PyFixest GitHub repository: https://github.com/s3alfisc/pyfixest
+-    Introduction to PyFixest: https://aeturrell.github.io/coding-for-economists/econmt-regression.html#regression-basics
+-    PyFixest Documentation: https://s3alfisc.github.io/pyfixest/
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2024-04-24
+---
+start_time: 13:45
+---
+end_time: 14:15
+---
+slot_id:
+---
+track: PyData & Scientific Libraries Stack
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 3578
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: None
+---
+domain_expertise: Novice
+---
+supporting_material_url: https://github.com/s3alfisc/pyfixest
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/UXQJTF.png
+---
+youtube_id: kSQxGGA7Rr4
+---
+video_link: https://www.youtube.com/watch?v=kSQxGGA7Rr4
+---
+video_published_at: 2024-06-23
+---
+video_duration_iso: PT25M7S
+---
+video_thumbnail: https://i.ytimg.com/vi/kSQxGGA7Rr4/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:06]_
+
+Okay, yeah, hi. So the title of the talk is, as we said, mostly harmless linear regression with PyFixedR. PyFixedR is a regression library that I've been working on over the last year. It is more or less a Python port of the FixedR library, and in the next 30 minutes I will try to make the case why it's valuable to port this library from R to Python and then and show you little things that you can do in Python with PyFixist. So yeah, I'm Alex, as I said, and here are three things that I love, and you can take a look at that. There's a very cool assignment operator from the R programming language that everyone that codes in Python despises, I think. But yeah, this is R code, and I really like R code. That's what I did during my dissertation, and I actually worked a lot on something called the wild cluster bootstrap. I wrote a package here. It's a really cool thing, so I get very excited about that one. As well, and lastly, we have linear regression and one particular library, which is basically fixest, which, well, more or less runs the fix effects ordinary least squares regression model in the column above. So cool things, and yeah. Okay, R code at a Python conference. I'm sorry about that, but I have to build up how nice the fixes library is, I think, in order to pitch to you that it's so great that we should have it in Python as well. So you'll see a lot of R code in this talk. While cluster bootstrap, yeah, I just love it. That's why I mention it. If you want to read a really interesting paper on how to speed up an algorithm like crazy, this is the one. I could not believe it when I ran this data module. It was absurdly fast in comparison to everything that was out there. But yeah, Y-linear regression, so more or less it's the Swiss army knife of statistical modeling. It has a couple of nice properties. It's easy to compute most of the times. I'll show you some counterexamples in a couple of minutes. It's quite interpretable. It's really flexible. And because I'm an economist, I really like it, because basically all empirical research in economics uses one statistical model, and that's linear regression with or without high dimensional fixed effects, and nothing else, except for, yeah, maybe at the bleeding edge, people try some things. Okay, anyways, so linear regression is so popular that maybe you might have seen this meme here. So basically this guy is saying, well, we have a problem, and every problem is a nail if you have linear regression, something along these lines, right? So takeaway is, whatever happens, linear regression is the answer to your problem. All right, cool. That's where we are. So how do you fit one of these linear regression models? And so here, very simply, we have more or less this one equation and a couple of variables. We have the dependent variable on the left-hand side, we have a set of features that are just purely numerical features, and then we have this additional matrix D, which is more or less a matrix of one hot encoded variables, or more or less mappings of very high-dimensional categorical variables into, yeah, into a matrix that we can actually do an estimation on. And yeah, u is an error term, so that's just standard procedure, and we are more or less in the world that I live in interested in estimating the coefficient beta and not so much in alpha. And so one example, one direct use case where you would have such a problem is, for example, you can think about, oops-a-la, within subject designs, right, where you observe multiple subjects multiple times, and they get treatment that is switched on and off, you might not be as interested in the individual fixed effect itself, but you want to estimate the treatment effect over all individuals. Okay, so that's more or less the problem that we're going to look at, and then you estimate it with the so-called ordinary least squares estimator, and for simplicity, I kind of introduced this new thing, X tilde, which is just concatenating the two matrices I showed you earlier, X and D, and then you have basically a formal cross product which you need to invert, and that's more or less the solution, this formula that I put there is what R's LM formula would do or what SAS models or less module would implement. Now the problem is basically if this matrix D gets too wide, so if your categorical features have too many dimensions, basically the problem explodes, and, yeah, it will become very, very cumbersome to actually compute this, to compute this formula. And I'll show you this with a code example. And I downloaded a really big data set, which is the New York City taxi data set, which some of you might have seen here and there, and I more or less queried with DuckDB, and You'll see a lot of Duck TV in this talk as well, because it's very nice. OK. So we have this data set and more or less a couple of variables. I limit it to 10 million observations. We have basically the total amount, which is the number, basically the total value someone has to pay for the trip. We have a tip amount and a couple of other variables, like how many passengers actually sat in the taxi, what was the type of the payment, which hour of the day did the taxi ride actually take place. And so basically what we want to know, OK, what is the relationship between the price and the tip? So what share of every euro that the user has, all right, I have to spend, is basically tipped. And so this we can do with linear regression. We'll include a set of features, categorical features, just to look at the dimension of some of them, are really high dimensional. I'm not going to use the highest dimensional ones, but for example, we'll use day of week, that has a dimensionality of seven, or hour of day, we have 24 dimensions, and so that adds then 24 columns to this design matrix D. Okay. And we're going to do this in Python via stats models, and first we have to do some pre-processing, and we'll use the formulaic library for it. And yeah, here's some code that basically does it using this nice Wilkinson formulas syntax. So basically here, we have a tip amount, right? And then we regress a couple of variables on it. And here we compute the fixed effects by using the C operator, transforming them, or one-hot encoding them. And then we concatenate, we have X tilde, and it's actually pretty big, right? We have this matrix that is 10 million times 38. So that's quite big. And that already takes four seconds, and formulaic is really fast. It's a really fast library. there's a couple of benchmarks on the GitHub repo, but already that is a little bit annoying. Okay, and then we can fit it with stats models. It's quite simple, right? We put y and x tilde into the object, and then estimate how long it would take, and oops, okay, 45 seconds is what it took on my laptop, which admittedly is a couple of years old, but that's very annoying, And I take no pleasure waiting, waiting on results. Okay. So let's try the same thing in R with the fixed library. And again, we query now using the R duck DB code. And basically the same thing again, 10 million observations. And fit exactly the same model. But we've put the fixed effects basically here in the second part of the formula. And we actually by doing so tell fixes, okay, these are actually fixed effects that we want to have projected out in the estimation procedure. And then we fit the same model and take the time. Okay. But first, let's take a step back. Let's look at the results. What is it that we see? More or less for every dollar that is being spent on a taxi ride, the tip is basically 13 cents, holding all things equal. And I think that's more or less reasonable. This data set is from, I think, 2013, before we had this tipping inflation. So 13% sounds somewhat fair. Okay. But here's the benchmark from FixEx. Okay. Only takes 6 seconds versus 4 plus 45 from stats models. And that's obviously super neat, right? What is that? Almost a 10x improvement in performance. Amazing. Okay. Cool. My conclusion is this one here. Basically the hill I will die on. Fixest is currently the best regression package that is out there. All right. And I'll try to convince you of that, actually, or you can try to change my mind. So there's a couple of arguments for Fixest. First it's really fast. There's a couple of benchmarks through the bench with the competition. There are one very popular one is REC HDFE, which is a stator package economists really like. That's through the bench much, much slower than Fixest. There's an older R package, LFE, is significantly slower as well. The only one that is somewhat competitive is a Julia implementation of a fixed effect regression routine here called fixed effects models. So where does the performance improvement come from? Well, more or less, the takeaway is there's a cool theorem from econometrics from, I think, the 1920s called the Frisch-Walk-Lowell theorem that's more or less applied in FixEst, and I'm not going to explain it because I don't have the time, but you find it in any econometrics textbook or as a one-page proof also on Wikipedia of it. Then the core algorithms are implemented in CPC, they're parallelized, and then this package is optimized and optimized and optimized again. Okay. So there's a couple of other reasons that I think make Fixas really nice. We use work in some formulas to basically decode, create the design matrixes, the syntax for multiple estimations, they're pretty sensible defaults through the bench. It automatically drops multicolinear variables by default, which is quite nice, I think very user-friendly. You have a lot of add-ons, you can compute tables that you can easily put into presentations or papers. You can visualize results, and you have more or less all the tools that you would like for advanced inference, and the predict model method that actually works with fixed effects. But, okay, here's the big but. Obviously it's an R package, and this is a Python conference, so that makes us a little bit sad. Okay. So just one example, here we have multiple estimations. So you have this very cool shorthand syntax where in one line you can express or ask fixers to fit multiple models in one go, and so for example here you have the shorthand cumulative stepwise regression which basically says, okay, first fit a regression where you regress total amount on tip amount, then fit a regression where you regress total amount and trip distance on tip amount, and then basically all three of them on tip amount, and you can do that on both sides of the formula, and basically here in one go, I think I've estimated 11 or 12 regressions. And then we have a very nice method to visualise results. And so doing so, there's also some performance optimisations that you can do, a couple of things that you don't have to do for every single regression model, so there's also an additional speedup there. OK. You can compute, recompute your variance-convergence matrix after fitting the model, which is very nice. If you have already fitted a model, it took 20 seconds, you don't want to fit it again, you just want another variance-convergence matrix, so you just compute that, pass that into a summary function, your e-table, and all your results are updated automatically. But yeah, Fixest is written in R, unfortunately. And so my personal situation was, well, I switched out of academia, and I was allowed to do whatever I want, started working at Trivago, there was also a lot to do whatever I want, but none of my colleagues were working in R, so I had to do the switch at some point. And yeah, at some point I decided, okay, someone has to try to implement Fixest in Python, so here's the task that I gave myself. More or less, I started working on PyFixest, and the idea is to truthfully implement all of the core API innovations of Fixest in Python. So the main idea is if you know fixest from R, you shouldn't have to read the PyFixS docs in order to be able to get started. So it's supposed to be a one-on-one translation of the API. And so it's super important that it's easy to use, at least to me. And then I want to implement the most important features of fixest, which are OLS regression with high-dimensional fix effects, IV regression, and Poisson regression with which. And so a couple of options to compute standard errors, multiple estimation functionality, nice post-processing options, yeah. As a last criterion, PyFixes was supposed to be fast, but it wasn't the prime goal to write the fastest library out there, so it should mostly be nice and faster than alternatives in Python. Okay. And the design philosophy actually was build lots of features really fast, show this thing to the world and try to convince people that there's actually value in continuing working on it and, yeah, starting to help me build PyFixS. Okay. So let's do the New York taxi regression in Python. Again, we load the same data set in DuckDB. You've seen this before. And now we're ready to run a regression in PyFixS. And more or less you might think you have seen this already. It's because you have seen it already. The only difference between the Python version and the R version is you load the library a little differently. Here you have to put a string, and we have this PF.feols operator, but beyond that, the main function is the same, the main function arguments are exactly the same, and most importantly, the behavior of the function arguments is exactly the same. And then we can benchmark this, and say here's the moment of truth, and wow, okay, we also managed to fit this model in six seconds, and I'm very happy with that, actually. Okay. So that's cool. Yes. Thanks. Here are the results from PyFixS. Basically, again, we have a point estimate on total amount of .134, and if you recall, that was the same one that we saw with the R version. So that's cool. Results match. Here's a more detailed comparison. Unfortunately, this broom tidy method didn't want to print six digits for total amount. But yeah, if you look at, basically compare these two coefficients here, if you round this one up to three digits, basically then you get the same point estimates. The standard errors here, you actually see them match exactly. That was a lot of work actually to get right because of small sample differences. It was very annoying. I spent a lot of time actually getting this right, and it felt completely unproductive. But yeah, now things match pretty exactly with one minor detail that you can ask me later about. OK, we can also look at confidence intervals. And also here, basically, they match more or less identically. So that's quite neat. And that's also something that I actively test for in the unit tests, right, where I use some, how's it called, RPI2, I think, to basically run models in both languages and then see, okay, do we actually get identical results. Okay, so we have all the nice features of fixes. For example, we can also implement multiple estimations. Here we have a stepwise operator, which means that first we have only the day of week fixed effects in a model, then we have vendor ID in a model, and then we have payment ID in a model. So we're left with three estimated models, and then coveplot uses the let's plot library, and the key reason for that is that I have still not managed to properly learn matplotlib. So if you feel there's value in using matplotlib in this library, there's a very nice PR that could be open to the report. Okay. That's also an e-table function to compare regression estimates. Here it's actually a method for multiple estimation objects, but there's also a function for single objects. You can also pass a list, and then you can easily compare these results, and you can, I think, get Markdown output, but also LaTeX if you're an academic and still do LaTeX. And after estimation, you can adjust your standard errors. What What is the time? Five minutes. Perfect. So for example here, there's a variance-covariance method. We computed identically distributed standard errors. Now we want it to be heteroscedasticity robust. We just apply the method, summarize our results, and then we have heteroscedastic robust results. Beyond that, we can also have cluster robust. So this is like now getting for more advanced inference techniques where you can have cluster robust inference techniques, and there's two variants of that that are actually feasible to compute in time, so CRV1 and CRV3 is something that we can do. Okay. So here are the fixed performance benchmarks I showed you earlier. And so basically we have PyFixed here in violet, and the takeaway is fixed is still the fastest package out there, PyFixed is on par with the Julia implementation. One caveat is that all these benchmarks are from the Fixed offer, and I think they were last run in 2021, so I didn't recompute all of them, so things might have changed. So compared to 2021, this is where PyFixed stands these days. Okay. Now, I want to give a shout-out to Stephen, who's a PhD student in Zurich, who basically made FIX as fast as it is. And generally to the open source community, I want to share a nice experience I had. So to make FIX by FIX as fast, I use Numba, but I'm not very good at it. I can't implement a basic algorithm, I cannot make it really fast. So very hopefully, I posted this in the Numba forum, basically saying, oh, I implemented this, but it's not fast, and what am I doing wrong, basically, and please, can someone help me? And basically, three days later, here, Stephen has a PR for me with accelerated code, and it was 5x faster. So super cool. I was extremely happy. Okay. I'm running out of time. So a couple of other cool features I want to mention. So you can run personal regressions. You can run models if you want that. You can conduct nonlinear hypothesis tests with the Pi marginal effects package. If you don't know it, it's basically a part of the marginal effects R package, which is just fabulous. There's a couple of these new difference-in-difference estimators implemented, so linear projections and two-stage difference-in-difference estimator, a couple of features for inference gourmet, if you consider yourself one. So a range of robust standard errors, wide cluster bootstrapping, simultaneous confidence bands, multiple hypothesis corrections, and here this cluster causal variance estimator by Fe et al. So if you need these things. What are the next steps? A lot of things, like there's a bug, and I haven't fixed it yet. Code quality should be improved. I want to find collaborators, free exclamation marks, so if you're interested, please come and talk to me. There's a lack of IV diagnostics and a couple of other smaller things that still need to be tackled going forward. Okay, I want to conclude with some acknowledgments. First to mention is Laurent, who is the original FIXEST author, then all the people that have so far contributed to PyFIXEST, Arthur for basically embracing PyFIXEST from the start and keeping me motivated, and then the package authors, most importantly of Formulaic, without none of them, that this would have been possible. Okay, at last, there's a logo. I need to stop. Yes, okay, and that's it.
+
+**Speaker 2** _[22:00]_
+
+But that's amazing.
+
+**Speaker 1** _[22:03]_
+
+So
+
+**Speaker 2** _[22:05]_
+
+We're going to run through some quickly.
+
+**Speaker 1** _[22:08]_
+
+Uh, so...
+
+**Speaker 2** _[22:09]_
+
+So is there any way to measure practical significance with fixes?
+
+**Speaker 1** _[22:15]_
+
+I'm not sure I understand the question.
+
+**Speaker 2** _[22:17]_
+
+Um factor. I also don't understand it clearly, but OK. So this is an interesting one. Sorry, the runtime scale, how does it scale with increasing dimensions?
+
+**Speaker 1** _[22:33]_
+
+I haven't fully tested it. There's a couple of different things that are tricky in these comparisons. The fixed effects, first, the dimension of fixed effects matters. Of course, the dimension of your data set matters. And then also the structure of the fixed effects matters. So how, for example, if they're nested within each other or not, matters for the performance of the demeaning algorithm. So I haven't tested this fully and I also don't have a theoretical answer.
+
+**Speaker 2** _[23:06]_
+
+The other one is comparison with stats, stat as models. Would it not be fair to compare fixed with stat as models after demeaning the alphas? And this person also actually made the same mistake like me, fixed test.
+
+**Speaker 1** _[23:23]_
+
+But it's fixes. Yes. Yes. I disagree because most users wouldn't use stats models and the mean The mean yeah the fix effects first, right? So that's not the like-to-like comparison and how we how you would normally use the packages
+
+**Speaker 2** _[23:39]_
+
+Can one also do GLS slash WLS?
+
+**Speaker 1** _[23:43]_
+
+You can do generalized 3-squared as Poisson regression that is implemented, nothing beyond that. You can run weighted least squares for all s, but not for Poisson regression.
+
+**Speaker 2** _[23:56]_
+
+You already spoke about looking for contributors, so that's answered. What's their question?
+
+**Speaker 1** _[24:00]_
+
+What's the question there?
+
+**Speaker 2** _[24:01]_
+
+in the medical field we often have small data sets with many features frequently with
+
+**Speaker 1** _[24:01]_
+
+Yeah, yeah.
+
+**Speaker 2** _[24:07]_
+
+p greater than n can fixes or pi fixes also handle high dimensional data
+
+**Speaker 1** _[24:13]_
+
+Well, not p greater than n. No, that doesn't work.
+
+**Speaker 2** _[24:19]_
+
+Have you thought of teaming up with linear models package?
+
+**Speaker 1** _[24:25]_
+
+I have not I have not yeah, maybe I should
+
+**Speaker 2** _[24:32]_
+
+Oh, so this would be the last one. If Fixus is based on C++ core, couldn't you write Python bindings directly?
+
+**Speaker 1** _[24:41]_
+
+I could if I knew how to do it if you know how to do it, please come and talk to me. That would be amazing
+
+**Speaker 2** _[24:47]_
+
+That's amazing. So that's a shout out for, oh, Simon. That's the name of the person.
+
+**Speaker 1** _[24:52]_
+
+person. Okay.
+
+**Speaker 2** _[24:53]_
+
+That ends the awesome presentation. Please kindly thank again.
+
+---
+transcript_status: auto
+---
+transcript_language: en

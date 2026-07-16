@@ -1,0 +1,188 @@
+title: How to Improve the Python Development Experience for Millions of Ubuntu Users
+---
+description: Have you ever tried to install a different Python version on Ubuntu or tried to upgrade your current one? Lots of posts exist, many are outdated, and some…
+---
+created: 2023-12-22
+---
+code: DKL7YQ
+---
+slug: how-to-improve-the-python-development-experience-for-millions-of-ubuntu-users
+---
+speaker_names: Jürgen Gmach
+---
+speakers:
+
+
+
+### Jürgen Gmach
+
+_About — in the speaker's own words_
+
+I am a software developer with a passion for Python and Linux, developing open source software both at my day job at [Canonical](https://grnh.se/5d948ffe1us), and at night as a maintainer of [tox](https://github.com/tox-dev/tox) and many other projects.
+
+I would love to connect with you!
+
+- [My blog](https://jugmac00.github.io/)
+- [Mastodon](https://fosstodon.org/@jugmac00)
+- [Twitter](https://twitter.com/jugmac00)
+- [LinkedIn](https://www.linkedin.com/in/j%C3%BCrgen-gmach-b24363226/)
+---
+abstract:
+
+
+Have you ever tried to install a different Python version on Ubuntu or tried to upgrade your current one?
+
+Lots of posts exist, many are outdated, and some even lead to a broken Ubuntu installation.
+
+This talk will introduce the most common options and their ups and downs in-depth.
+
+We will also give an outlook on what Ubuntu could do to make it even easier for you and everybody.
+---
+full_description:
+
+
+Updating your current Python installation, or installing a different one on Ubuntu is not an easy task.
+
+There are many reasons why you want a different Python version on Ubuntu:
+- you want to use the latest version, but Ubuntu comes with an older one pre-installed
+- a Python app requires an older Python version
+- you want to test your Python library against multiple Python versions
+
+Unfortunately, `apt install python-<version>` won't work.
+
+After googling some time, you'd learn that you have many options:
+- pyenv
+- deadsnakes
+- mamba/conda
+- or even compiling Python yourself
+
+Why isn't there a single way, and which one fits your needs the best?
+
+And why doesn't `apt install python-<version>` just work?
+
+There are many blog posts and tutorials out there to install a new Python version, but they lack the depth to understand the core of the problem.
+
+And are they up-to-date? Do you trust them not to break your Ubuntu installation?
+
+This talk will not only introduce and compare all the most common options to update a Python version or to install a new one on Ubuntu but will also convey the knowledge to assess the existing and upcoming options yourself.
+
+We will also look into the future.
+
+What new tools are on the horizon?
+
+And especially, what could Ubuntu do itself to make it easier for you and everybody?
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2024-04-24
+---
+start_time: 11:40
+---
+end_time: 12:10
+---
+slot_id:
+---
+track: Python Language & Ecosystem
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 3578
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Novice
+---
+supporting_material_url: https://jugmac00.github.io/data/improve.python.development.experience.berlin.pdf
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/DKL7YQ.png
+---
+youtube_id: WueCxRoMQ_I
+---
+video_link: https://www.youtube.com/watch?v=WueCxRoMQ_I
+---
+video_published_at: 2024-10-28
+---
+video_duration_iso: PT26M31S
+---
+video_thumbnail: https://i.ytimg.com/vi/WueCxRoMQ_I/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:05]_
+
+Today I'd like to share my vision with you of how to make the Python development experience on Ubuntu the best it could be. So as a disclaimer, this talk is not about the best IDE or editor. So it's not about Vim versus Emacs. So maybe you remember those silly discussions back then. In the meantime we all know that Vim is better, right? But as a matter of fact, as the results of the Python Developer Survey 2022 show, the bulk of the users now either use VS Code or PyCharm, with a very long tail of other editors. So, no, I won't tell you which IDE to use. And I think it's even a good thing to have a development set up which is not specific to an IDE, especially when you think about collaboration with your colleagues or with some open source projects or contributors. Imagine you run all your linters via VS Code plugins and the other folks prefer a different editor. So it's very hard to sync the linter versions. So when we don't speak about IDE, what else do we need in our development environment? We need both Python along with some libraries and a couple of tools like a test runner, linters, formatters, tools to build the documentation. And these tools need somehow to get into your dev environment. But before I tell you about about those. First about me. My name is Jürgen Kmoch. I'm a senior software engineer at Canonical, the company best known for creating Ubuntu. I work in the Launchpad team, so I take care of the build and the publishing infrastructure of Ubuntu. So anytime you do an opt-install, this goes through my little machines or some mirrors. So if something doesn't work, you can blame me. So I'm not working in a Python toolchain team. And you might wonder, why do I even care about Python, the Python experience on Ubuntu. And I really fondly remember when I first got those shiny Ubuntu CDs back in the time, like 2006 or 2007, and I certainly enjoy Python as a development environment on Ubuntu to this day. But when you have been using something for such a long time, you tend to develop a blind spot for issues new users could face. And making the experience as smooth as possible, that's the motivation for this talk today. You can always reach out to me on Twitter or on Mastodon. I'm also one of the maintainers of talks which will be replaced by Hatch as we all learned on Monday, the talk by Florian. So good news, no more unpaid work for me. That's good. I'm also a fellow of the Python Software Foundation and I live at the outer reach of the Bavarian forest and that's all possible because of this new remote and digital world right but actually that's not new for canonical we have been remote first and only for 20 years and if you want to like I'm looking for a colleague if you want to work with me please reach out after this talk but back to the topic click speak about Python what is even Python so it's we all know it's the programming language Yes. It's also the interpreter. Also yes. Is it the Python implementation which most of us use? Probably. So you see, it's not a trivial question. And I don't want to even start with micropython or different implementations we heard about today. So and what about pip, The Env and the friends. These are also part of Python. And now it gets hairy. They are certainly kind of necessary for a flawless Python development experience. But are they actually part of Python? When you see Python core developers, they have a very strict opinion on that. And some of them would even suggest to not use the name Python when you deliver the Python interpreter without pip or the Env. Others might not share that opinion. So vmf is definitely a part of Python. It's a module of CPython. But what about pip? Pip is developed separately from Python. But what would you do with Python without pip? You can certainly run your applications, but development might be a different story. So let's speak about Python and Ubuntu. Well, this is a short one, right? Python just comes with Ubuntu, but not that fast. The Python pre-installed on Ubuntu is special. It's a fixed version. You will get security updates, maybe critical bug fixes, but no version updates. For example, Jammy Jellyfish, the, as of now, latest release of Ubuntu, just for the last couple of days. My colleagues are currently sweating, creating the latest Ubuntu release while I'm here and having fun with you. So Jammy Jellyfish comes with Python 3.10. And I created this little table because I can't remember all the versions myself. But what is when you want to try the latest and cool stuff which is only available with Python 3.12? There is no opt install Python 3.12 available. And there is especially no opt upgrade Python available. Each Ubuntu version comes usually with only one associated Python version. Why is this so? Ubuntu makes sure the packages it comes with can be installed together, and Ubuntu comes with 10,000 of packages, so we need to test the compatibility. And there are also like 3,500 packages out there which directly depend on the Python interpreter, the Python package. 800 of them are binary packages, so maybe they make use of C extensions, and they need to compile from scratch. Can you imagine what happens if you just quickly update Python 3.10 to Python 3.12 on Gemi? You also need to know that the Python installation which comes with Ubuntu is used by important system tools like Opt, the package manager itself, and other tools. So it's probably not a good idea to uninstall Python 3.10 and install Python 3.12 on Gemi. And I hope you have nerves of steel, because I want to show you a couple of examples from Ask Ubuntu, the Stack Overflow flavor for Ubuntu-related questions. So this poor fellow cannot start the terminal anymore after manipulating the system Python. Or this one gets a trace back when trying to use Opt. And I feel very sorry for those people. Honestly, honestly, before we think about how we could prevent those issues, we need to investigate what actually is Python on Ubuntu. So yes, it's Python, but not all of Python. There are a number of packages which are not installed by default. Most notably, this is the vm package. So when you try to run Python-m-vmf-vmf, it fails. And this is certainly annoying. But why is this so? Ubuntu is not only a desktop environment for Python developers. It is also used in many other contexts. And at one point, it was decided to deliver a certain subset of Python as a base and offer ways to install the other parts. So if you want to have the complete access to all parts of Python, you need to install the Python3-full package. So by default, it is not all of Python. But in some ways, it's even more than just Python. For instance, Ubuntu comes with the Python3-yaml and the Python3-requests system packages. So what is the difference between Python3-yaml or the system package? and PyYAML from PyPI. So Python 3-YAML is a fixed version from at the time of the Ubuntu release. It won't get regular version updates, but you get security fixes from the canonical security team, and it's guaranteed to be compatible with other installed Python packages. So this is ideal if you want to write a long-term application which needs to be maintained for many, many years. But there are also some pitfalls of using system packages. As mentioned, you won't get version updates. And you will have issues with flexible deployment, as you can only deploy the application on the same Linux distribution where those packages are available. And you might run into issues with testing. When you think about TOX, TOX creates an isolated test environment for each test run, and as it is isolated, it cannot access the system packages. But there is a plug-in out there called TOX Current Env, which disables this test isolation. With all that said, we have now learned that we definitely do not want to upgrade an existing Python version on Ubuntu. But how do we install a new one? And actually, there are many ways to do this. First, I want to introduce you to the DeadSnakes PPA. A PPA is a personal package archive. It is basically a custom repository, like your own PyPI, but for dev packages on Ubuntu. The DeadSnakes PPA provides additional Python versions, but only for LTS releases and only for Ubuntu, not for Debian or other derivatives. You need to install or add this PPA to your sources and then you are finally able to opt install Python 3.12 or even the bleeding edge Python 3.13 or developer version. But you need to be aware that Dead Snakes is not maintained by Canonical or by Ubuntu, by the Ubuntu community in general, but by down there, this single person from Nebraska. I'm not sure whether Anthony Sotile is really from Nebraska, and I just randomly learned at Python Pizza in Prague a couple of months ago that Anthony is not a single maintainer, but also Lukasz Langer is part of the Dead Snakes PPA team. But still, you need to trust those people. Keep that in mind, especially when you think about the recent XSAT security incident. You could also compile Python from source and this might sound scary right but at the end it's downloading the source, installing a couple of dev dependencies and then entering a few well-defined commands like configure make, make install, wait maybe not make install don't use make install but use make alt install to indicate this is an alternative Python version and you don't want to replace the existing one to avoid issues with the system Python. So if this has not scared you, you need to be aware that this installation won't get any updates, no bug fixes, no security fixes. You need to take care of that yourself and compile new versions from time to time. And you should see compilation from source as a last resort. As Stefan Benel, one of the CPython core devs, mentioned earlier to me this week, when you just compile Python, you get something. So it's not an optimized build for your architecture, for your computer, for your setup. There's also PyEnv. PyEnv lets you easily switch between multiple Python versions. It's simple, unobtrusive, and it follows the Unix tradition of a single-purpose tool, which does one thing very well. At the high level, pyenv intercepts the incoming Python commands using a shim executable. You can imagine that there's some kind of proxy which intercepts the commands. And it then, at the back end, determines which Python version has been specified by application and passes the commands along. This sounds perfect, right? But there is one thing that scares me. first thing you can read on the project website is let's change the global Python version and meanwhile we know these things could wreak havoc on Ubuntu but the maintainers certainly figured out a way to avoid any issues hopefully the pyenv also has the advantage that you can very easily install even a specific minor Python version so quite a while ago I needed to debug an error which only existed on Python 3.5.0, but not in the latest Python 3.5 versions. And here PyMF shines, as you can easily specify the exact Python version you want. There's also Hatch, where Florian told us more about that on Monday. This is a modern extensible Python project manager. So we heard about it on Monday. So reading the description of Hatch, we would expect that this is about building packages, so maybe in running tests and other things, but actually Hatch can also manage Python versions. Unfortunately, I was not able to find information easily how this works behind the scenes, and I'm not currently clear whether you can use those Python versions for other projects or only for Hatch. And I have the impression that Hatch wants to become the one tool to rule them all. And this has worked very well for Golang and for Rust, but it opposes the Unix mantra of doing one thing and one thing well, which I usually like a lot. But I think we will hear a lot more from Hatch in the future. Rai is a comprehensive package and project management system for Python. It's born from the creators I decided to establish a one-stop shop for Python users. So this sounds familiar, right? So Rai provides a unified experience to install and manage Python installations. It was initiated by Armin Rönnecke, the creator of the Flask framework. And this seems like just yet another standard on top of the many other standards. But if you followed the news in the last months, you might have heard of UV, the ultra-fast Python package resolver and installer, which is there to replace PIP and other tools. And UV is seriously backed financially. And they announced that they want to integrate UV into Rai. so with some money involved and some commercial interest we are not really sure whether this will be the 15th or even the 16th standard now we can use but I know that especially the team behind UB has already shown with Ruff, the ultra-fast linter that they can disrupt the Python ecosystem easily so let's see then there is certainly Conda which I think most of the people will be more familiar than me as I have no data science background. Conda provides packages including various Python versions, dependency and environment management for any language. So it's not only about Python. So you cannot compare Conda to pip, but more like apt and yum. It's mostly used in the scientific community, especially as some of the tools are a pain to install from scratch, and Conda helps a lot. I think we have Yanis Lytle here at the conference, who works for Anaconda on Conda. And there is also my friend Rema Bauer, who has very deep knowledge of Conda and the many ways related to software like to manage software like Mamba, MiniConda and Pixie. Pixie, I just learned about last week, is built on top of the Conda ecosystem, rewritten in Rust as so many new tools, blazingly fast and it comes with built-in support for log files and it claims to have better integration with PyPI. We also have a dedicated talk about Pixie later today. So please join Wolf-Holbrecht and Ruben Arzt to learn more about the project. So now we heard about a number of ways to install a new Python version of Ubuntu. And I'm 100% sure there are many more ways out there. So which is the right one? This might heavily depend on your use case. But most especially, this is also a trust issue. Do you trust Anthony Soltar, the maintainer of the Dead Snakes PPA? Do you trust the PyAmph maintainers? Maybe yes, but I think ideally Ubuntu would come already with all upstream maintained Python versions, right? But there is an issue Let's have a look again at Gemma Jellyfish, Ubuntu 22.4. It comes with Python 3.10 and Currently, there's also Python 3.8, 3.9, 3.11 and 3.12 maintained upstream So Ubuntu 22.4 should offer those and including Python 3.10 those five versions, right? Python releases new versions every year, with Python 3.13, for example, already to be released in October. So when you run Ubuntu 22.04 in October, you certainly want to use Python 3.13 there, right? So while Ubuntu LTS releases are maintained for five years by default, with Ubuntu Pro you get support for 10 to 12 years. That means Ubuntu needs to maintain 5 plus up to 12, that's 17 Python releases with a single Ubuntu version. And this is getting out of hand, you know. But maybe there is a new way. Maybe you can think of a solution. And we should all think about a better solution here. we should also try to avoid to introduce standard, what is it meanwhile, 18th? This whole problem space also applies to tools. The versions provided by a given Ubuntu distributions are fixed as we learned already. They do not follow the upstream development. For example, if you want to use rough, the new kit on the block for linting with daily releases, you don't want to use a version from two years ago, apart from the fact it even didn't exist back then. So, you certainly don't want to do sudo pip install and break your system. You can still find this kind of instruction in readmes out there, even today, and this is very bad. This would install the package into your global site packages, into your system Python and as we learned this can break your CPC and since Ubuntu 23 or 4 you cannot use pip this way anymore there was a pep about preventing things and thanks to everybody who was involved in that but as you know now people even share workarounds to re-enable that bad way and to shoot themselves in the foot again like why would you use dash dash break system packages with a command but do you really need to install all those tools locally there are a couple of tools out there like pre commit or talks which can install and manage all your linters and other tools so you only need one or two of those tools on your computer the beauty of these tools are that the linters versions and their configurations are stored in configuration file, committed to your repository. So all contributors have the same configuration, independent of the IDE, and this also applies to CI. But you may want to have some linters installed locally, and at the very least you need to have TOX or pre-commit or Hatch, right? For that you can use PIPX. PIPX is an awesome command line tool which installs and manages other Python command line tools. It creates an isolated environment for each of your tools. So in a new system, I just do a pipx install tox, pipx install pre-commit, and I'm basically done with my development setup. So I use pipx to install tox, to run pre-commit, to run flake8. This sounds pretty complicated, right? But now you have one tool, which does one thing very well, and you have everything in very clean and easy to read configuration files in your Git repository. This leaves us with the essential question. How do you install pipx? I'm afraid, I just saw I'm running out of time, so I'm happy to chat with that after. Just joking. I think you can use apps to install pipx because pipx is rather stable, that's okay. So this sounds all very complicated, a lot of tools, a lot of options, but I think we live in exciting times. I'm especially curious how UV and the related tools will evolve. And at Canonical we are aware that it is not very easy now currently to install new Python versions. So if you have any ideas to make things easier, you have other paper cuts you experience, please reach out to me during the conference or via this course, see the barcode, to make Ubuntu the best Python environment it can be. I would love to start a discussion with you. Thank you very much for attending my talk and thanks to the organizers and to the helpers and thanks to Canonical for making it possible to be here. Thank you.
+
+**Speaker 2** _[22:30]_
+
+Okay, thank you very much, Jürgen, for the very comprehensive overview. I'll start with the first question. Will immutable distros or package managers such as Nix solve this problem once and for all?
+
+**Speaker 1** _[22:44]_
+
+I've used NixOS for quite a while at my previous gig and I liked it a lot. You can basically spin up a new shell with a new Python version easily. There are still some issues because NixOS is very, very different from the usual Linux distributions and some packages don't really work easily with NixOS, but I think that's definitely a way to do it and as mentioned the immutable distal this is a thing also for canonical i think also fedora has a one of them and it certainly can help to not nuke your system
+
+**Speaker 2** _[23:26]_
+
+Okay. Second question is, do you have an opinion about managing the Python version via ASDF? It seems similar to PyEnv and lets you set global and local versions.
+
+**Speaker 1** _[23:38]_
+
+have not included this in my list I have heard of it but I have not used it myself before so I think it has it's a similar tool like IEM but I have not used myself
+
+**Speaker 2** _[23:50]_
+
+Another question would be, does pipx also install new Python versions in a separate environment, or does it just set up the dependencies? Like, for example, just a bad example, if talks needed Python version 3.11 or newer, and you don't have it on a system, will pipx take care of that or not?
+
+**Speaker 1** _[24:11]_
+
+No, pipx only handles Python packages like Python libraries in a sense of Python applications.
+
+**Speaker 2** _[24:12]_
+
+No.
+
+**Speaker 1** _[24:18]_
+
+Basically Python command line applications. So you need to take care of yourself of installing Python. That problem is not solved by pipx.
+
+**Speaker 2** _[24:25]_
+
+Okay. Another question for myself. I'm not a very experienced Linux user. Does the same problem exist with other Linux distros, or is this relatively specific to Ubuntu?
+
+**Speaker 1** _[24:37]_
+
+So this is, well, a couple of issues are maybe specific for Ubuntu. That's why I especially talked about this today. For instance, Fedora does it in a different way, and I think they do it pretty good. And when you basically, when you install TOCs on Fedora system, your system packages, it automatically installs all upstream maintained Python packages. So I think they do a very good job in that way, and maybe this is something we can have a look at. The difference is certainly that Fedora, I think, usually only supports Fedora version for nine months and then comes the next. And for Ubuntu, as I just mentioned, we maintain those for 12 years. So this is about the exploding number of Python dependencies. So we need to think about a way. But we have already thought about one way. I don't want to disclose it yet because I want to try it, whether this works out. But, yeah, I think different distributions handle those things a little bit different, yeah.
+
+**Speaker 2** _[25:34]_
+
+Okay. And maybe one final question. Not to be an advertisement, but if you yourself personally need to install a new Python version on Ubuntu, which tool is your tool of choice? It would be Dead Snake or any other?
+
+**Speaker 1** _[25:47]_
+
+I like to use Dead Snakes. I have been using it a lot. Anthony Sotal was a co-maintainer of TOX also, so I know him pretty well. And I also know Lukasz Langer, and I think I trust him. I use Dead Snakes for my development environment. Maybe I would not use it for production. So for production at Canonical, we use only basically, in order to upgrade the Python version, we upgrade the distribution. We always follow the system Python because this is security maintained by our professional colleagues and that's why we use this that way.
+
+**Speaker 2** _[26:19]_
+
+Okay, great. Thank you very much again for the talk. Put your hands together one last time for Jürgen.
+
+---
+transcript_status: auto
+---
+transcript_language: en

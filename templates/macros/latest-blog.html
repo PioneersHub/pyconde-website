@@ -1,0 +1,71 @@
+{#
+  News — latest blog posts
+  ────────────────────────
+  Surfaces up to `max_posts` blog posts on the front page as linked
+  cards: posts flagged `featured: yes` (models/blog-post.ini) first,
+  the rest newest-first. /blog children are ordered -pub_date
+  (models/blog.ini), so both groups inherit release-date order.
+
+  Usage:
+    {% from "macros/latest-blog.html" import render_latest_blog %}
+    {{ render_latest_blog(bag('frontpage/sections/latest_blog')) }}
+
+  Databag schema (frontpage/sections/latest_blog.yaml):
+    display: true
+    section_title: "News"
+    max_posts: 3        # upper bound; fewer posts → fewer cards
+
+  Self-hides when display != true or there are no blog posts.
+#}
+
+{% macro render_latest_blog(data, section_label='Latest from the blog') %}
+
+{% if data and data.display != false %}
+
+{%- set blog = site.get('/blog') -%}
+{%- set max_posts = data.max_posts or 3 -%}
+{%- set all_posts = (blog.children|list) if blog else [] -%}
+{%- set posts = ((all_posts|selectattr('featured')|list)
+               + (all_posts|rejectattr('featured')|list))[:max_posts] -%}
+
+{% if posts %}
+
+<section class="latest-blog" aria-label="{{ section_label }}">
+  <div class="content">
+    {% if data.section_title %}<h2 class="latest-blog__title">{{ data.section_title }}</h2>{% endif %}
+    <ul class="latest-blog__grid">
+      {% for post in posts %}
+      <li class="latest-blog__item">
+        <a href="{{ post|url }}" class="latest-blog__card">
+          {% if post.social_card_image %}
+          <span class="latest-blog__thumb-wrap">
+            <img src="{{ post.social_card_image }}" alt="" class="latest-blog__thumb" loading="lazy" decoding="async">
+          </span>
+          {% else %}
+          {# No post image — python on a blue colour field (§05 illustration) #}
+          <span class="latest-blog__thumb-wrap latest-blog__thumb-wrap--brand">
+            <img src="/static/pythons/Python_50.png" alt="" class="latest-blog__thumb latest-blog__thumb--python" loading="lazy" decoding="async">
+          </span>
+          {% endif %}
+          <span class="latest-blog__info">
+            <span class="latest-blog__name">{{ post.title }}</span>
+            {% if post.author or post.pub_date %}
+            <span class="latest-blog__meta">
+              {% if post.author %}{{ post.author }}{% endif %}
+              {% if post.author and post.pub_date %} &middot; {% endif %}
+              {% if post.pub_date %}{{ post.pub_date|dateformat('medium') }}{% endif %}
+            </span>
+            {% endif %}
+          </span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+
+{% endif %}
+
+{% endif %}
+
+{% endmacro %}

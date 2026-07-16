@@ -1,16 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   {% if "http" in this.target %}
-       <meta http-equiv="refresh" content="0; URL='{{ this.target }}'" />
-    {% else %}
-       <meta http-equiv="refresh" content="0; URL='{{ this.target|url }}'" />
-    {% endif %}
+  <meta charset="UTF-8">
+  {%- if "http" in this.target -%}
+    {%- set target_url = this.target -%}
+  {%- else -%}
+    {%- set target_url = this.target|url -%}
+  {%- endif -%}
+  <title>Redirecting…</title>
+  <meta http-equiv="refresh" content="0; URL='{{ target_url }}'">
+  <link rel="canonical" href="{{ target_url }}">
+  <meta name="robots" content="noindex, follow">
+  <script>
+    // Client-side fallback for the meta-refresh, useful for old user agents
+    // and search-engine crawlers that follow JS redirects faster than meta.
+    window.location.replace({{ target_url|tojson }});
+  </script>
 </head>
 <body>
-<div>
-    <p>Redirecting to <a href="{{ this.target }}">{{ this.target }}</a></p>
-    <p>If you are not redirected, please click the link above.</p>
-</div>
+  <p>Redirecting to <a href="{{ target_url }}">{{ target_url }}</a>. If your browser does not redirect automatically, follow the link.</p>
 </body>
 </html>

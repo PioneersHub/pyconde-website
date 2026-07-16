@@ -1,0 +1,2909 @@
+title: Tools that help you get your experiments under control
+---
+description: There is now a wealth of tools that support data science best practices (e.g. tracking experiments, versioning data). Let’s take a look at which tools are…
+---
+created: 2019-05-24
+---
+code: CWMAE7
+---
+slug: tools-that-help-you-get-your-experiments-under-control
+---
+speaker_names: Katharina Rasch
+---
+speakers:
+
+
+
+### Katharina Rasch
+
+Katharina Rasch is a computer scientist with a PhD from KTH Stockholm. From 2014 to 2017 she was a data scientist / computer vision researcher at zalando. Now she is a freelance data scientist in Berlin. At the moment, Katharina is obsessed with professionalising AI development. Less chaos, please!
+---
+abstract:
+
+
+There is now a wealth of tools that support data science best practices (e.g. tracking experiments, versioning data). Let’s take a look at which tools are available and which ones might be right for your project.
+---
+full_description:
+
+
+As a data scientist I often feel envious of the tooling available to software engineers. Tools for build automatisation, continuous integration, code review, etc help software engineers follow established best practices. In contrast, many of us data scientists have taken to building our own tools for things like managing experiments, for tracking data, for enabling reproducibility. Of course, writing such tools is **hard** and takes a lot of effort. 
+
+Fortunately, the good news is: more and more software supporting data science best practices is becoming available to us. From stand-alone packages such as DVC, polyaxon to Software as a Service solutions such as floydhub, valohai. The bad news is: there really are **a lot** of these tools around and it is hard to know which one to go with. 
+
+In this talk I want to show you, how readily available tools can help you follow best practices in data science. I will focus on the model development phase of a data science project, I will not be talking about tooling for model deployment. I will start with an overview of available tools and will then do a deep-dive comparison of 2-3 tools and show how they support you with things like
+
+* Versioning data
+* Tracking which data / code / library versions / parameters are used in which experiment
+* Easily comparing / visualising experiment results
+* Enabling everybody in your team / future you to replicate experiments
+
+I will also compare them on non-technical dimensions such as
+
+* Ease of use / collaboration
+* Price (especially for SaaS solutions)
+* Vendor lock-in
+
+After this talk you should have a good idea of which tools already are available and which things you can/should look for when deciding if a tool is right for your project.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: PyData
+---
+tags:
+---
+submission_type: talk_long
+---
+submission_type_label: Talk (Long)
+---
+submission_type_id: 96
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: none
+---
+domain_expertise: some
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/CWMAE7.png
+---
+youtube_id: Rb3_FTu7Ftc
+---
+video_link: https://www.youtube.com/watch?v=Rb3_FTu7Ftc
+---
+video_published_at: 2019-12-08
+---
+video_duration_iso: PT37M37S
+---
+video_thumbnail: https://i.ytimg.com/vi/Rb3_FTu7Ftc/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Thank you very much, Alan, for the warm welcome. May I ask maybe for people to defragment a little bit because there are some people that still want to join, so move together a little bit. Unfortunately, we had some technical problems this morning. Fortunately, that means I had no time to be nervous.
+
+**Speaker 2** _[00:20]_
+
+Tools that help you.
+
+**Speaker 1** _[00:22]_
+
+you get your experiments under control.
+
+**Speaker 2** _[00:24]_
+
+is the title of the talk.
+
+**Speaker 1** _[00:26]_
+
+of the talk as you've seen it
+
+**Speaker 2** _[00:27]_
+
+You've seen it in the program, but as it goes, the essence.
+
+**Speaker 1** _[00:28]_
+
+in the program. the essence of what one wants to say sometimes only appears when you
+
+**Speaker 2** _[00:33]_
+
+when you actually start doing the work.
+
+**Speaker 1** _[00:34]_
+
+doing the work. So in retrospect, I think...
+
+**Speaker 2** _[00:37]_
+
+Reproducibility in Theory and in
+
+**Speaker 1** _[00:39]_
+
+theory, and in practice would have been the more fitting title.
+
+**Speaker 2** _[00:42]_
+
+title for this talk because I want to talk about
+
+**Speaker 1** _[00:44]_
+
+talk about how can we as data scientists work in a
+
+**Speaker 2** _[00:47]_
+
+his work in a more reproducible
+
+**Speaker 1** _[00:48]_
+
+a more reproducible manner, and how
+
+**Speaker 2** _[00:49]_
+
+And how can tools support that?
+
+**Speaker 1** _[00:50]_
+
+can As Alan said, I'm a freelance data scientist.
+
+**Speaker 2** _[00:55]_
+
+scientist if that interests you.
+
+**Speaker 1** _[00:56]_
+
+that interests you, read.
+
+**Speaker 2** _[00:57]_
+
+reach out to me. The slides for this presentation are already on my GitHub.
+
+**Speaker 1** _[01:01]_
+
+on my GitHub, and I also have this link again.
+
+**Speaker 2** _[01:03]_
+
+I'll have this link again on the final slide. Consider the following situation. You just started a new data science project.
+
+**Speaker 1** _[01:14]_
+
+You finally got access to the data and you're super.
+
+**Speaker 2** _[01:14]_
+
+You f***er. and you're super excited to get started.
+
+**Speaker 1** _[01:19]_
+
+and you start making your
+
+**Speaker 2** _[01:20]_
+
+You start making your first exploration.
+
+**Speaker 1** _[01:21]_
+
+We have the first explorations, a few plots, everything looks really nice, there seem to be no obvious problems.
+
+**Speaker 2** _[01:24]_
+
+no obvious problem with the data.
+
+**Speaker 1** _[01:25]_
+
+problem with the data, you've
+
+**Speaker 2** _[01:26]_
+
+You're really itching to get that.
+
+**Speaker 1** _[01:27]_
+
+to get that first simple model trained, and that looks promising too. So you go, you make more features. Maybe you go back and do some more data cleaning. And maybe you try out more.
+
+**Speaker 2** _[01:40]_
+
+Maybe you'll try out a more complicated model. And it's all a bit...
+
+**Speaker 1** _[01:42]_
+
+It's all a bit chaotic, but yeah, I mean, you're moving.
+
+**Speaker 2** _[01:45]_
+
+mean you're moving quickly it's fun there's lots of progress but in the back of your mind you get this little nagging feeling maybe maybe there's a bit too much chaos
+
+**Speaker 1** _[01:54]_
+
+Too much chaos.
+
+**Speaker 2** _[01:55]_
+
+I don't really take I'm not
+
+**Speaker 1** _[01:56]_
+
+really taking good notes of what I'm doing. I'm not sure that in a few weeks I'll remember what I did.
+
+**Speaker 2** _[02:02]_
+
+what I did, what worked, what didn't work.
+
+**Speaker 1** _[02:06]_
+
+So maybe you start doing something like this
+
+**Speaker 2** _[02:08]_
+
+something like this. You have a false
+
+**Speaker 1** _[02:08]_
+
+You have a folder where you have pickled files of all.
+
+**Speaker 2** _[02:11]_
+
+files of all your models.
+
+**Speaker 1** _[02:11]_
+
+all your models together with some JSON information, some metadata about it.
+
+**Speaker 2** _[02:16]_
+
+data about your experiments.
+
+**Speaker 1** _[02:19]_
+
+Or maybe you'll start filling out.
+
+**Speaker 2** _[02:20]_
+
+start filling out a spreadsheet like that with information about your experiments. Or maybe you go all fancy.
+
+**Speaker 1** _[02:25]_
+
+fancy and build a little
+
+**Speaker 2** _[02:26]_
+
+and build a little web app for your experiment management.
+
+**Speaker 1** _[02:30]_
+
+of those things kind of sound familiar to you, then this is your talk.
+
+**Speaker 2** _[02:33]_
+
+then this is your talk.
+
+**Speaker 1** _[02:36]_
+
+Let's look a bit closer.
+
+**Speaker 2** _[02:37]_
+
+closer at this nagging feeling.
+
+**Speaker 1** _[02:40]_
+
+feeling. What is behind this?
+
+**Speaker 2** _[02:41]_
+
+What is behind this nagging feeling?
+
+**Speaker 1** _[02:42]_
+
+nagging feeling that maybe there's a bit too much chaos.
+
+**Speaker 2** _[02:45]_
+
+chaos.
+
+**Speaker 1** _[02:47]_
+
+For me, a big reason
+
+**Speaker 2** _[02:48]_
+
+A big reason is pride. I call myself...
+
+**Speaker 1** _[02:50]_
+
+call myself a data scientist. It means I should be working in a science.
+
+**Speaker 2** _[02:54]_
+
+be working in a scientific manner. I should take...
+
+**Speaker 1** _[02:57]_
+
+Take good notes of my experiments.
+
+**Speaker 2** _[02:59]_
+
+I should be able to reproduce my results.
+
+**Speaker 1** _[02:59]_
+
+I should.
+
+**Speaker 2** _[03:02]_
+
+And honestly, I worry.
+
+**Speaker 1** _[03:04]_
+
+I worry that I did something stupid while moving.
+
+**Speaker 2** _[03:04]_
+
+I worry. stupid while moving quickly.
+
+**Speaker 1** _[03:06]_
+
+And if I can't go back and check because I've already changed it.
+
+**Speaker 2** _[03:10]_
+
+changed that code, for example, that it
+
+**Speaker 1** _[03:12]_
+
+If I didn't do something stupid, there'll be...
+
+**Speaker 2** _[03:12]_
+
+didn't there'll be lots of worry.
+
+**Speaker 1** _[03:16]_
+
+And that's sad because I want to trust my.
+
+**Speaker 2** _[03:18]_
+
+my results. And I want that other
+
+**Speaker 1** _[03:19]_
+
+And I want that others can try.
+
+**Speaker 2** _[03:20]_
+
+Others can trust my results.
+
+**Speaker 1** _[03:23]_
+
+And really, how can there be teamwork if other people in my team aren't?
+
+**Speaker 2** _[03:28]_
+
+in my team aren't able
+
+**Speaker 1** _[03:29]_
+
+aren't able to take my models.
+
+**Speaker 2** _[03:29]_
+
+to take reproduce them.
+
+**Speaker 1** _[03:32]_
+
+Reduce them and then add
+
+**Speaker 2** _[03:33]_
+
+and then add their own ideas. As you can see,
+
+**Speaker 1** _[03:38]_
+
+reproducibility as it is at the
+
+**Speaker 2** _[03:38]_
+
+reproducing is very easy. that is at the core of all of these feelings.
+
+**Speaker 1** _[03:44]_
+
+So today, I want to build some kind of framework.
+
+**Speaker 2** _[03:48]_
+
+Framework of reproducibility.
+
+**Speaker 1** _[03:49]_
+
+reproducibility for
+
+**Speaker 2** _[03:50]_
+
+for data science in the theory part.
+
+**Speaker 1** _[03:52]_
+
+theory part. And then I'll look specifically at some tools to tell you how they can help.
+
+**Speaker 2** _[03:56]_
+
+they can help you achieve that.
+
+**Speaker 1** _[03:58]_
+
+that. Before I do that, I'll have
+
+**Speaker 2** _[03:59]_
+
+I'll have to do.
+
+**Speaker 1** _[04:00]_
+
+to look a little bit at, narrow down the scope of what I want to talk to you about a little bit,
+
+**Speaker 2** _[04:08]_
+
+it just so that we're all on the same page.
+
+**Speaker 1** _[04:08]_
+
+just so that we all can see it. Everything I'm talking about today is kind of
+
+**Speaker 2** _[04:14]_
+
+today is kind of guided by my experiences as
+
+**Speaker 1** _[04:16]_
+
+experiences as a data scientist, if you can't find yourself here at all, and if you
+
+**Speaker 2** _[04:20]_
+
+at all, and if you were completely different,
+
+**Speaker 1** _[04:21]_
+
+work completely differently, I would love
+
+**Speaker 2** _[04:22]_
+
+differently, I would love to hear from you.
+
+**Speaker 1** _[04:23]_
+
+to hear from you get your perspective the situation I drew earlier is one of
+
+**Speaker 2** _[04:31]_
+
+of model exploration here on the left hand side.
+
+**Speaker 1** _[04:31]_
+
+model explore
+
+**Speaker 2** _[04:34]_
+
+We want to try out many different models, many different features, different settings for parameters.
+
+**Speaker 1** _[04:39]_
+
+But we probably will be using only one data set because we...
+
+**Speaker 2** _[04:43]_
+
+because we need something to compare on.
+
+**Speaker 1** _[04:45]_
+
+compare on. And errors are expected to happen. I mean, okay, it's annoying, this experiment failed, but okay, I'll fix it.
+
+**Speaker 2** _[04:53]_
+
+Hey, I'll fix that bug and I'll restart.
+
+**Speaker 1** _[04:58]_
+
+What I really value is
+
+**Speaker 2** _[04:59]_
+
+you is flexibility I don't want
+
+**Speaker 1** _[05:00]_
+
+I don't want to be held back by any tooling that makes me move less fast.
+
+**Speaker 2** _[05:05]_
+
+Less fast, less freely.
+
+**Speaker 1** _[05:07]_
+
+Contrast that with the other side.
+
+**Speaker 2** _[05:08]_
+
+with the other side, when you've now found a nice model.
+
+**Speaker 1** _[05:10]_
+
+a nice model.
+
+**Speaker 2** _[05:12]_
+
+model type is fixed, your features parameters are all fixed.
+
+**Speaker 1** _[05:15]_
+
+But it's likely that you'll have to retrain frequently.
+
+**Speaker 2** _[05:17]_
+
+retrain frequently, for example, nightly if new data is coming in. You really don't want errors to happen
+
+**Speaker 1** _[05:23]_
+
+Because that means that somebody will get a call at
+
+**Speaker 2** _[05:23]_
+
+because that means... get a call at 4 a.m.
+
+**Speaker 1** _[05:26]_
+
+At 4 a.m. in the morning.
+
+**Speaker 2** _[05:27]_
+
+in the morning and has to go and fix something.
+
+**Speaker 1** _[05:29]_
+
+So your system should be reliable and it should.
+
+**Speaker 2** _[05:31]_
+
+and it should be well monitored.
+
+**Speaker 1** _[05:33]_
+
+And I think the rigidity of something like a pipeline system can be really helpful.
+
+**Speaker 2** _[05:37]_
+
+can be really helpful in this phase.
+
+**Speaker 1** _[05:40]_
+
+Of course, no data science project has just one of each of these, but you're often moving between.
+
+**Speaker 2** _[05:45]_
+
+between these different phases. And today...
+
+**Speaker 1** _[05:48]_
+
+I'll be concentrating on the left.
+
+**Speaker 2** _[05:50]_
+
+on the left face.
+
+**Speaker 1** _[05:54]_
+
+The second scope thing is a little bit on terminology.
+
+**Speaker 2** _[05:56]_
+
+A little bit on terminology.
+
+**Speaker 1** _[05:57]_
+
+technology. Together with reproducibility, you'll all
+
+**Speaker 2** _[05:58]_
+
+Usability, you'll also find the words repeatability or replicability.
+
+**Speaker 1** _[06:02]_
+
+replicability. These range
+
+**Speaker 2** _[06:03]_
+
+These range in meaning from...
+
+**Speaker 1** _[06:06]_
+
+I can redo what I just did.
+
+**Speaker 2** _[06:07]_
+
+to I can write up
+
+**Speaker 1** _[06:08]_
+
+I can write up what I did for.
+
+**Speaker 2** _[06:09]_
+
+up what I did, for example, in a scientific paper.
+
+**Speaker 1** _[06:11]_
+
+paper somebody else can implement it and we'll get
+
+**Speaker 2** _[06:13]_
+
+and will get the same results. Unfortunately, these terms aren't used the same in different fields.
+
+**Speaker 1** _[06:20]_
+
+So what is called reproducibility in one field might be called replicability.
+
+**Speaker 2** _[06:23]_
+
+called replicability.
+
+**Speaker 1** _[06:24]_
+
+in another field. Today, I've chosen...
+
+**Speaker 2** _[06:27]_
+
+I've chosen the word reproducibility simply because I've
+
+**Speaker 1** _[06:29]_
+
+because I've heard
+
+**Speaker 2** _[06:30]_
+
+heard it in use in data science a lot already.
+
+**Speaker 1** _[06:33]_
+
+And today it shall mean the ability to obtain the exact
+
+**Speaker 2** _[06:37]_
+
+The exact same model with reasonable efforts.
+
+**Speaker 1** _[06:40]_
+
+There's two somewhat undefined words here with what is a same model and what are real.
+
+**Speaker 2** _[06:44]_
+
+and what are reasonable efforts. And we'll talk about both of these things. Let's say you wanted to obtain the...
+
+**Speaker 1** _[06:52]_
+
+obtain the exact
+
+**Speaker 2** _[06:52]_
+
+exact same model.
+
+**Speaker 1** _[06:54]_
+
+With that, I mean, if you pickle the two models.
+
+**Speaker 2** _[06:57]_
+
+the files will be bitwise the same. Well, obviously, you need the exact same data, the exact same code.
+
+**Speaker 1** _[07:05]_
+
+same code, the exact
+
+**Speaker 2** _[07:06]_
+
+the exact same command line or environment variables.
+
+**Speaker 1** _[07:10]_
+
+If your model uses randomness,
+
+**Speaker 2** _[07:11]_
+
+randomness in any way.
+
+**Speaker 1** _[07:12]_
+
+in any way like a
+
+**Speaker 2** _[07:13]_
+
+like a random forest or a random...
+
+**Speaker 1** _[07:14]_
+
+or random weight initialization in the neural network, you will have to set exact...
+
+**Speaker 2** _[07:19]_
+
+exact same random seed different versions of
+
+**Speaker 1** _[07:23]_
+
+of, for example, scikit-learn might differ
+
+**Speaker 2** _[07:26]_
+
+might differ slightly in their implementations.
+
+**Speaker 1** _[07:29]_
+
+So you need to use the exact same versions.
+
+**Speaker 2** _[07:31]_
+
+the same versions of your language libraries.
+
+**Speaker 1** _[07:34]_
+
+Different versions of Python, for example, differ also in
+
+**Speaker 2** _[07:36]_
+
+will differ also in their behavior.
+
+**Speaker 1** _[07:36]_
+
+their behavior. Look at the difference in floating point behavior between
+
+**Speaker 2** _[07:39]_
+
+between Python 2 and 3.
+
+**Speaker 1** _[07:41]_
+
+So you want the exact same version.
+
+**Speaker 2** _[07:43]_
+
+same version of your Python interpreter. You might also want the exact
+
+**Speaker 1** _[07:47]_
+
+the exact same version of any kind of
+
+**Speaker 2** _[07:49]_
+
+of any kind of system libraries like CUDA.
+
+**Speaker 1** _[07:49]_
+
+system. like Judah.
+
+**Speaker 2** _[07:51]_
+
+or your operating system.
+
+**Speaker 1** _[07:52]_
+
+rating system or the hardware the experiment
+
+**Speaker 2** _[07:54]_
+
+where the experiment is run on.
+
+**Speaker 1** _[07:56]_
+
+I mean, you kind of already think like the further we go down.
+
+**Speaker 2** _[07:58]_
+
+we go down in this hierarchy, the less it does seem to matter, right?
+
+**Speaker 1** _[08:02]_
+
+We expect Psyched Learned to be
+
+**Speaker 2** _[08:03]_
+
+We learned to be
+
+**Speaker 1** _[08:05]_
+
+robust
+
+**Speaker 2** _[08:05]_
+
+robust against different system libraries.
+
+**Speaker 1** _[08:06]_
+
+experience different system libraries against...
+
+**Speaker 2** _[08:08]_
+
+against difference operating system.
+
+**Speaker 1** _[08:09]_
+
+rating system. We expect our models to be
+
+**Speaker 2** _[08:11]_
+
+to be robust against different random Cs.
+
+**Speaker 1** _[08:14]_
+
+random seeds, because otherwise they would be kind of
+
+**Speaker 2** _[08:15]_
+
+be kind of shitty models.
+
+**Speaker 1** _[08:16]_
+
+shitty. So, today, let's concentrate only on this.
+
+**Speaker 2** _[08:21]_
+
+on these parts of the hierarchy.
+
+**Speaker 1** _[08:23]_
+
+And let's try to obtain not the exact same model, just the same.
+
+**Speaker 2** _[08:24]_
+
+And let's... just the same model. In practice, however,
+
+**Speaker 1** _[08:33]_
+
+I think it's rarely going to be.
+
+**Speaker 2** _[08:35]_
+
+It's rarely going to be necessary that you actually need to reproduce something. What...
+
+**Speaker 1** _[08:41]_
+
+And what is important is that you can if you need to. A little bit like backups. What is important in your day-to-day life?
+
+**Speaker 2** _[08:50]_
+
+day-to-day life as a data scientist is more the ability
+
+**Speaker 1** _[08:52]_
+
+It's more the ability to compare models.
+
+**Speaker 2** _[08:54]_
+
+I've called the information.
+
+**Speaker 1** _[08:54]_
+
+I've called the... needed for comparing models here on the left-hand side provenance I'm not super sure about that word again what
+
+**Speaker 2** _[09:02]_
+
+Again, would appreciate some feedback.
+
+**Speaker 1** _[09:02]_
+
+some feedback
+
+**Speaker 2** _[09:06]_
+
+You see how the
+
+**Speaker 1** _[09:07]_
+
+the information on the left-hand side.
+
+**Speaker 2** _[09:09]_
+
+hand side aligns with the information on the right hand side. So, for example,
+
+**Speaker 1** _[09:12]_
+
+So, for example, if you wanted to compare
+
+**Speaker 2** _[09:13]_
+
+compare two models. You don't
+
+**Speaker 1** _[09:15]_
+
+You don't care to look at the...
+
+**Speaker 2** _[09:16]_
+
+to look at the actual data that these two models were trained.
+
+**Speaker 1** _[09:18]_
+
+models were trained on. What you care about were they trained on?
+
+**Speaker 2** _[09:21]_
+
+Were they trained on the same data?
+
+**Speaker 1** _[09:21]_
+
+the same data or not. So you'd simply need some kind of identifier and that could be an explicit version or it could be a
+
+**Speaker 2** _[09:27]_
+
+or it could be a hash calculated.
+
+**Speaker 1** _[09:29]_
+
+calculated over
+
+**Speaker 2** _[09:30]_
+
+the data set and how you do this comparison
+
+**Speaker 1** _[09:34]_
+
+comparison. There's an obvious UI for that. It's something like this kind of experiment table.
+
+**Speaker 2** _[09:40]_
+
+experiment table, often called a leaderboard, where you have
+
+**Speaker 1** _[09:45]_
+
+some kind of matter, so it's one row per experiment, and you have some kind of matter information for every experiment.
+
+**Speaker 2** _[09:50]_
+
+every experiment, like here I use the timestamp, as well as these provenance attributes.
+
+**Speaker 1** _[09:54]_
+
+Revenants attributes we saw on the
+
+**Speaker 2** _[09:55]_
+
+we saw on the previous page.
+
+**Speaker 1** _[09:56]_
+
+as well as, of course, any kind of metrics that you.
+
+**Speaker 2** _[09:58]_
+
+metrics that you want to compare your models on.
+
+**Speaker 1** _[10:03]_
+
+I have seen a lot of tools allowing you to give a name for your experiment. I personally don't find that very...
+
+**Speaker 2** _[10:10]_
+
+I don't find that very useful because
+
+**Speaker 1** _[10:10]_
+
+useful because it will quickly end up filling up with useless information.
+
+**Speaker 2** _[10:13]_
+
+useless information like this.
+
+**Speaker 1** _[10:17]_
+
+I like to think of my experiment as being characterized
+
+**Speaker 2** _[10:20]_
+
+characterized by their
+
+**Speaker 1** _[10:20]_
+
+by their combinations of provenance at
+
+**Speaker 2** _[10:23]_
+
+provenance attributes.
+
+**Speaker 1** _[10:23]_
+
+So I want to sort, I want to filter, I want to search.
+
+**Speaker 2** _[10:27]_
+
+by these kind of things and not
+
+**Speaker 1** _[10:28]_
+
+things and not by
+
+**Speaker 2** _[10:29]_
+
+Not by a name.
+
+**Speaker 1** _[10:30]_
+
+a name I made up.
+
+**Speaker 2** _[10:31]_
+
+at some point. Let's look a bit more in detail.
+
+**Speaker 1** _[10:35]_
+
+a bit more in detail at these parameters.
+
+**Speaker 2** _[10:36]_
+
+at these parameter columns.
+
+**Speaker 1** _[10:37]_
+
+or columns like parameters,
+
+**Speaker 2** _[10:38]_
+
+parameters are here
+
+**Speaker 1** _[10:39]_
+
+here I mean anything that steers how
+
+**Speaker 2** _[10:42]_
+
+you get from your raw
+
+**Speaker 1** _[10:43]_
+
+from your raw data to your final results.
+
+**Speaker 2** _[10:45]_
+
+to your final result.
+
+**Speaker 1** _[10:46]_
+
+And that might mean steering the way you do your data cleaning, steering the way you do data and perturbation.
+
+**Speaker 2** _[10:52]_
+
+imputation.
+
+**Speaker 1** _[10:53]_
+
+Imputation, steering, how you, if you do oversampling or not.
+
+**Speaker 2** _[10:57]_
+
+oversampling or undersampling steer
+
+**Speaker 1** _[10:59]_
+
+how you do your feature engineering, and of course,
+
+**Speaker 2** _[11:01]_
+
+and of course the hyperparameters that you give to the model.
+
+**Speaker 1** _[11:03]_
+
+model. And there's different ways of getting your parameters
+
+**Speaker 2** _[11:07]_
+
+parameters into the system, of course, command line parameters, environment variables, config
+
+**Speaker 1** _[11:07]_
+
+into this.
+
+**Speaker 2** _[11:12]_
+
+files, or simply having them in code.
+
+**Speaker 1** _[11:15]_
+
+you're going to do that.
+
+**Speaker 2** _[11:17]_
+
+It depends a lot on the tool you're going to use.
+
+**Speaker 1** _[11:18]_
+
+on the tool you're going to use. And it's a thought I'll revisit.
+
+**Speaker 2** _[11:20]_
+
+I'll revisit in the second part of the talk.
+
+**Speaker 1** _[11:26]_
+
+It's also obvious that
+
+**Speaker 2** _[11:27]_
+
+that all the parameter columns and all the matrix columns are extremely project dependent. So there needs to be some flexibility in this UI.
+
+**Speaker 1** _[11:36]_
+
+In fact, I'd even say that at the beginning of your project, you don't.
+
+**Speaker 2** _[11:40]_
+
+You don't, you won't.
+
+**Speaker 1** _[11:41]_
+
+You won't know what kind of metrics you want to compare on at the end of the project, and you won't know which parameters will be important.
+
+**Speaker 2** _[11:48]_
+
+will be important to you at the end of the project.
+
+**Speaker 1** _[11:51]_
+
+And that means that for some...
+
+**Speaker 2** _[11:52]_
+
+that for some older experiments
+
+**Speaker 1** _[11:53]_
+
+All the experiments you have, you will not have.
+
+**Speaker 2** _[11:55]_
+
+have stored relevant parameters. You will not have recorded
+
+**Speaker 1** _[11:59]_
+
+have recorded.
+
+**Speaker 2** _[12:00]_
+
+relevant metrics.
+
+**Speaker 1** _[12:02]_
+
+I think this is a comment.
+
+**Speaker 2** _[12:03]_
+
+a compromise, a pragmatic compromise that we need to
+
+**Speaker 1** _[12:06]_
+
+that we need to make here that is unavoidable if you don't want to get into some kind of analyzes, paralyzes.
+
+**Speaker 2** _[12:11]_
+
+is paralyzed at the very beginning.
+
+**Speaker 1** _[12:12]_
+
+at the very beginning of the project or you want to set up everything.
+
+**Speaker 2** _[12:14]_
+
+to set up everything perfectly from the beginning. The troubles now start when the left-hand side,
+
+**Speaker 1** _[12:21]_
+
+side, the provenance, and the right hand.
+
+**Speaker 2** _[12:22]_
+
+the provenance, on the right-hand side, reproducibility.
+
+**Speaker 1** _[12:24]_
+
+Get out of sync.
+
+**Speaker 2** _[12:25]_
+
+meaning what is in the table
+
+**Speaker 1** _[12:26]_
+
+What is in the table doesn't.
+
+**Speaker 2** _[12:27]_
+
+doesn't reflect the experiment that you've actually ran.
+
+**Speaker 1** _[12:30]_
+
+And that can easily happen.
+
+**Speaker 2** _[12:32]_
+
+Let's say you run an experiment
+
+**Speaker 1** _[12:35]_
+
+made some changes, started it again, and oops, you forgot to do your game.
+
+**Speaker 2** _[12:39]_
+
+to do your git commit of the new code.
+
+**Speaker 1** _[12:42]_
+
+And if your provenance is the most recent case,
+
+**Speaker 2** _[12:45]_
+
+most recent git commit hash.
+
+**Speaker 1** _[12:46]_
+
+git commit hash, then of course there will be wrong information in that table. It does not reflect the actual experiment.
+
+**Speaker 2** _[12:51]_
+
+experiment that was run.
+
+**Speaker 1** _[12:52]_
+
+That was run, and your experiment will not be reproducible. Or let's say...
+
+**Speaker 2** _[12:57]_
+
+you installed the newest version of scikit-learn
+
+**Speaker 1** _[12:59]_
+
+so I could learn because it implements that fancy new algorithm.
+
+**Speaker 2** _[13:01]_
+
+that fancy new algorithm you wanted to try out.
+
+**Speaker 1** _[13:04]_
+
+Ah, but you forgot to...
+
+**Speaker 2** _[13:06]_
+
+to update your requirements file again.
+
+**Speaker 1** _[13:08]_
+
+The provenance information will be wrong and your...
+
+**Speaker 2** _[13:11]_
+
+and your experiment will not be reproducible.
+
+**Speaker 1** _[13:16]_
+
+Or you made some changes to your data set but forgot to calculate.
+
+**Speaker 2** _[13:19]_
+
+calculate a hash over the new data set.
+
+**Speaker 1** _[13:22]_
+
+data set. Again, your provenance information will be wrong.
+
+**Speaker 2** _[13:24]_
+
+will be wrong, experiment will not be reproducible. So there's really a lot to remember for every experiment, right?
+
+**Speaker 1** _[13:31]_
+
+every experiment, right? Need to ensure using the right data hash. You need to ensure that there's no local changes in
+
+**Speaker 2** _[13:36]_
+
+changes in my Git repository.
+
+**Speaker 1** _[13:37]_
+
+my Git repository. You need to ensure my requirements are up-to-date and
+
+**Speaker 2** _[13:41]_
+
+I need to ensure I'm using the correct Python version.
+
+**Speaker 1** _[13:45]_
+
+And it's too much responsibility. I don't want to have to remember.
+
+**Speaker 2** _[13:48]_
+
+have to remember all of these things.
+
+**Speaker 1** _[13:49]_
+
+Well, that's okay. I mean, we can tell a tool to do it.
+
+**Speaker 2** _[13:49]_
+
+But that's okay. to do it for us.
+
+**Speaker 1** _[13:54]_
+
+But I'm sure a lot of you are already thinking right now.
+
+**Speaker 2** _[13:57]_
+
+Ah, that's a lot of hassle, like every-
+
+**Speaker 1** _[13:59]_
+
+every time i want to run experiment that thing is going to nag me to commit my local code it's really annoying i want my tools to support me not to hold
+
+**Speaker 2** _[14:08]_
+
+not to hold me back.
+
+**Speaker 1** _[14:10]_
+
+Now you're going to be with me.
+
+**Speaker 2** _[14:13]_
+
+One thing I've seen tools do is what I call the zip mode, where instead.
+
+**Speaker 1** _[14:17]_
+
+Instead of using Git as your provenance and reproducibility source of information, you upload the actual...
+
+**Speaker 2** _[14:26]_
+
+the actual source code directory and store it in the experiments database.
+
+**Speaker 1** _[14:31]_
+
+I personally am not a super fan of this because number one, you're losing like the provenance, like the comparing different experiences.
+
+**Speaker 2** _[14:37]_
+
+different experiments aspects.
+
+**Speaker 1** _[14:39]_
+
+as well as like what are you going to do
+
+**Speaker 2** _[14:41]_
+
+going to do with this isolated zip file?
+
+**Speaker 1** _[14:43]_
+
+You have no history.
+
+**Speaker 2** _[14:44]_
+
+You have no history.
+
+**Speaker 1** _[14:45]_
+
+You don't have any of the nice tooling that gives you that.
+
+**Speaker 2** _[14:47]_
+
+that kid gives you
+
+**Speaker 1** _[14:48]_
+
+It gives you to compare it to a different.
+
+**Speaker 2** _[14:50]_
+
+to a different version of your code. Instead, I think your tool should support a development mode, which basically is just best effort reproducibility, like as much hassle as you can stand to live with in your day-to-day life.
+
+**Speaker 1** _[15:05]_
+
+And this is for any kind of just trying out type of experiments. And you might have a zip mode or you might not upload code.
+
+**Speaker 2** _[15:11]_
+
+upload code at all.
+
+**Speaker 1** _[15:12]_
+
+at all. The important thing is these experiments are still in your leaderboard.
+
+**Speaker 2** _[15:16]_
+
+In your leaderboard view, you can still compare.
+
+**Speaker 1** _[15:18]_
+
+compare them with other experiments you still have all the
+
+**Speaker 2** _[15:21]_
+
+you still have all the nice tooling.
+
+**Speaker 1** _[15:21]_
+
+nice tooling available to identify
+
+**Speaker 2** _[15:24]_
+
+how
+
+**Speaker 1** _[15:24]_
+
+and how they relate to other experiences.
+
+**Speaker 2** _[15:26]_
+
+relate to other experiments, and really dig down and see different plots. As soon as you have found a nice model, you're too late.
+
+**Speaker 1** _[15:34]_
+
+Your tool should allow you to switch into reproducibility
+
+**Speaker 2** _[15:36]_
+
+reproducibility mode.
+
+**Speaker 1** _[15:37]_
+
+where it really does
+
+**Speaker 2** _[15:39]_
+
+It really then enforces
+
+**Speaker 1** _[15:39]_
+
+And enforce it.
+
+**Speaker 2** _[15:40]_
+
+that you are using the correct data and forces that you have no local
+
+**Speaker 1** _[15:43]_
+
+you have no local changes.
+
+**Speaker 2** _[15:44]_
+
+changes and forces that your requirements are up to date. And it's important that
+
+**Speaker 1** _[15:50]_
+
+that in your UI, you can visually...
+
+**Speaker 2** _[15:52]_
+
+distinguish between those two modes. So this is a screenshot from
+
+**Speaker 1** _[15:56]_
+
+Screenshot from a software as a service.
+
+**Speaker 2** _[15:58]_
+
+for as a service solution called
+
+**Speaker 1** _[15:58]_
+
+solution called Valohai.
+
+**Speaker 2** _[16:00]_
+
+where they use this nice little
+
+**Speaker 1** _[16:01]_
+
+This nice little lab icon to identify.
+
+**Speaker 2** _[16:03]_
+
+to identify what they call an ad hoc experiment.
+
+**Speaker 1** _[16:12]_
+
+But let's drive this thing with the mobile.
+
+**Speaker 2** _[16:14]_
+
+thing with the modes a bit further.
+
+**Speaker 1** _[16:15]_
+
+Oh, it's a bit further.
+
+**Speaker 2** _[16:16]_
+
+So, sorry, consider the third row here.
+
+**Speaker 1** _[16:16]_
+
+Ha! row here. I'll call it reproducibility.
+
+**Speaker 2** _[16:20]_
+
+Reproducibility++ mode.
+
+**Speaker 1** _[16:22]_
+
+mode where you're not actually running the experiment on your local machine but you're running it on some remote
+
+**Speaker 2** _[16:28]_
+
+remote machine. And this
+
+**Speaker 1** _[16:28]_
+
+machine. And this gives you the added reproducibility bonus that you
+
+**Speaker 2** _[16:32]_
+
+that you know your code.
+
+**Speaker 1** _[16:33]_
+
+your code can run
+
+**Speaker 2** _[16:34]_
+
+can run somewhere else, you know?
+
+**Speaker 1** _[16:34]_
+
+somewhere You know you're not using some random file somewhere on the file system that you at some point linked to your project.
+
+**Speaker 2** _[16:40]_
+
+to your project.
+
+**Speaker 1** _[16:43]_
+
+It also has benefits if you need some special hardware like a GPU.
+
+**Speaker 2** _[16:47]_
+
+like a GPU that you don't have on your local machine.
+
+**Speaker 1** _[16:49]_
+
+So you start developing locally.
+
+**Speaker 2** _[16:49]_
+
+So you start...
+
+**Speaker 1** _[16:51]_
+
+As soon as you need to, you'll send this area.
+
+**Speaker 2** _[16:54]_
+
+send this air experiment somewhere remote. We can drive that even further. Why not something similar to
+
+**Speaker 1** _[17:00]_
+
+to CI continuously.
+
+**Speaker 2** _[17:01]_
+
+continuous integration mode
+
+**Speaker 1** _[17:03]_
+
+where it's not actually I who says this is an experiment I want to be recorded,
+
+**Speaker 2** _[17:03]_
+
+where
+
+**Speaker 1** _[17:09]_
+
+but rather I work on it.
+
+**Speaker 2** _[17:10]_
+
+work on a different branch and as soon as I'm
+
+**Speaker 1** _[17:11]_
+
+And as soon as I'm ready, I'll open a merge request or a pull request.
+
+**Speaker 2** _[17:14]_
+
+or a poll request and the CI will
+
+**Speaker 1** _[17:16]_
+
+I will pick up on it and run.
+
+**Speaker 2** _[17:17]_
+
+and run my experiment on a remote machine. I've seen one software...
+
+**Speaker 1** _[17:22]_
+
+Software as a Service Solution.
+
+**Speaker 2** _[17:23]_
+
+so have a solution do something
+
+**Speaker 1** _[17:23]_
+
+do something like that.
+
+**Speaker 2** _[17:24]_
+
+like that that's called gradient and it that
+
+**Speaker 1** _[17:26]_
+
+And it does similarly, like a CI system, plug into GitHub and directly...
+
+**Speaker 2** _[17:31]_
+
+and directly tells you if the experiment worked or failed.
+
+**Speaker 1** _[17:34]_
+
+Unfortunately, I have to tell you, this didn't really work.
+
+**Speaker 2** _[17:37]_
+
+But in principle, I really like this setting.
+
+**Speaker 1** _[17:41]_
+
+I'm not sure if this could be, should be called like continuous evaluation, continuous experimentation. Both terms I've actually.
+
+**Speaker 2** _[17:47]_
+
+terms I've actually already seen.
+
+**Speaker 1** _[17:48]_
+
+already seen other people use in data science.
+
+**Speaker 2** _[17:49]_
+
+use in data science literature, meaning something completely different. So let's see.
+
+**Speaker 1** _[17:52]_
+
+So let's see what will prevail.
+
+**Speaker 2** _[17:54]_
+
+prevail. The question now is
+
+**Speaker 1** _[17:58]_
+
+now is, how do you want to work? Which
+
+**Speaker 2** _[18:01]_
+
+to work. Which of those modes
+
+**Speaker 1** _[18:01]_
+
+Which of those modes works for you?
+
+**Speaker 2** _[18:04]_
+
+How much hassle can you stand in exchange for the freedom from worrying?
+
+**Speaker 1** _[18:17]_
+
+So, you might think, okay, let's tell me a little bit about some tools that are...
+
+**Speaker 2** _[18:22]_
+
+tools that are available. There's a lot.
+
+**Speaker 1** _[18:25]_
+
+This is all the software as a service solutions I found that try to do that. And there's new ones popping up all the time.
+
+**Speaker 2** _[18:30]_
+
+all the time, as well as all of these open source solutions. Again, new ones popping up all of the time. I'll concentrate on the open source.
+
+**Speaker 1** _[18:39]_
+
+the open source ones today. Let's remove all the ones that did not have...
+
+**Speaker 2** _[18:44]_
+
+not have a git commit in the last year.
+
+**Speaker 1** _[18:49]_
+
+So we left with these ones and then I picked the ones that
+
+**Speaker 2** _[18:52]_
+
+that I've heard the most buzz about from other data scientists.
+
+**Speaker 1** _[18:57]_
+
+And that is MLflow, Sacred, and...
+
+**Speaker 2** _[19:00]_
+
+and DVC.
+
+**Speaker 1** _[19:01]_
+
+Both MLflow, so there will be a tutorial on MLflow tomorrow morning.
+
+**Speaker 2** _[19:04]_
+
+tomorrow morning.
+
+**Speaker 1** _[19:05]_
+
+as well as another talk that does seem
+
+**Speaker 2** _[19:07]_
+
+talk that does seem quite similar to my talk.
+
+**Speaker 1** _[19:09]_
+
+my talk that also mentions DVC.
+
+**Speaker 2** _[19:11]_
+
+DVC tomorrow morning.
+
+**Speaker 1** _[19:12]_
+
+tomorrow morning, unfortunately, at the same time.
+
+**Speaker 2** _[19:14]_
+
+at the same time.
+
+**Speaker 1** _[19:16]_
+
+So if you want to get some more details than I'll give you today, please.
+
+**Speaker 2** _[19:19]_
+
+please check out those events. Let's talk about Sacred. That's a library that you just simply pip install. You create your experience.
+
+**Speaker 1** _[19:32]_
+
+You create your experiments, then you have the publicist's ability to add a research
+
+**Speaker 2** _[19:35]_
+
+add a resource.
+
+**Speaker 1** _[19:36]_
+
+source. In this case, I use
+
+**Speaker 2** _[19:37]_
+
+In this case, I use my data set, and that means a hash is...
+
+**Speaker 1** _[19:39]_
+
+a hash is calculated over that dataset and attached to it.
+
+**Speaker 2** _[19:42]_
+
+to the experiment.
+
+**Speaker 1** _[19:44]_
+
+You can log any kind of metrics as well as add additional artifacts. Here I have a plot of the predictions I made so that I really can dig deep.
+
+**Speaker 2** _[19:52]_
+
+really can dig deeper into how my model is performing.
+
+**Speaker 1** _[19:55]_
+
+performing. What I really like about Sacred is this idea of a conflict.
+
+**Speaker 2** _[20:01]_
+
+of a config where
+
+**Speaker 1** _[20:02]_
+
+where config is the combinations of different parameter values. And I found that there's some really nice automagic thing happening here.
+
+**Speaker 2** _[20:11]_
+
+that I defined this
+
+**Speaker 1** _[20:14]_
+
+config name, config call
+
+**Speaker 2** _[20:16]_
+
+config called baseline.
+
+**Speaker 1** _[20:17]_
+
+And then Sacred makes it so that I can just call my training.
+
+**Speaker 2** _[20:20]_
+
+all my training script with the extra command line parameter.
+
+**Speaker 1** _[20:22]_
+
+command line parameters with
+
+**Speaker 2** _[20:23]_
+
+with baseline.
+
+**Speaker 1** _[20:25]_
+
+And I can just go to my colleagues and say, if you want to run the baseline, just...
+
+**Speaker 2** _[20:28]_
+
+Just run this command.
+
+**Speaker 1** _[20:30]_
+
+command. And I found that really convenient to work with.
+
+**Speaker 2** _[20:32]_
+
+to work with.
+
+**Speaker 1** _[20:33]_
+
+However, a bit limiting when I wanted to do.
+
+**Speaker 2** _[20:34]_
+
+when I wanted to do grid search.
+
+**Speaker 1** _[20:38]_
+
+Sacred doesn't come with its own leaderboard UI, but there are several open source projects that build on top of the Sacred database.
+
+**Speaker 2** _[20:46]_
+
+Here is a screenshot of something called
+
+**Speaker 1** _[20:46]_
+
+Here's a screenshot. of something called Omniboard. I haven't looked at the other ones. It's perfectly usable. Like UI, you can click on each experiment and see some details.
+
+**Speaker 2** _[20:55]_
+
+You can see some details, it's very nice.
+
+**Speaker 1** _[20:56]_
+
+It's very nice. One thing I missed here.
+
+**Speaker 2** _[20:58]_
+
+missed here is the ability
+
+**Speaker 1** _[20:59]_
+
+is the ability to display parameters.
+
+**Speaker 2** _[21:02]_
+
+parameters as columns. So you can't really filter by different settings that you ran your experiments with.
+
+**Speaker 1** _[21:09]_
+
+And I like to use that to give me
+
+**Speaker 2** _[21:11]_
+
+to give me some
+
+**Speaker 1** _[21:11]_
+
+some ideas on how to progress, what kind of
+
+**Speaker 2** _[21:14]_
+
+what kind of other experiments I should be running next sacred supports both
+
+**Speaker 1** _[21:20]_
+
+both development as well as
+
+**Speaker 2** _[21:22]_
+
+as well as a reproducible
+
+**Speaker 1** _[21:23]_
+
+well as a reproducibility mode. However, you do have to remember to set a specific flag.
+
+**Speaker 2** _[21:29]_
+
+flag to enforce reproducibility.
+
+**Speaker 1** _[21:30]_
+
+reproducibility mode. Otherwise, it will not complain if you're
+
+**Speaker 2** _[21:33]_
+
+if you're a local source.
+
+**Speaker 1** _[21:34]_
+
+local source quote there.
+
+**Speaker 2** _[21:35]_
+
+code directory is.
+
+**Speaker 1** _[21:37]_
+
+is dirty.
+
+**Speaker 2** _[21:42]_
+
+it to reproduce in sacred. There is a
+
+**Speaker 1** _[21:45]_
+
+there is a good amount
+
+**Speaker 2** _[21:46]_
+
+good amount of manual steps necessary.
+
+**Speaker 1** _[21:49]_
+
+I personally don't think this is much of a problem. Like I said,
+
+**Speaker 2** _[21:54]_
+
+I said important is that you can
+
+**Speaker 1** _[21:56]_
+
+You can reproduce if you need to.
+
+**Speaker 2** _[21:56]_
+
+reproduce I think, personally, it's okay.
+
+**Speaker 1** _[21:58]_
+
+I think... it's okay if that includes some manual steps.
+
+**Speaker 2** _[22:01]_
+
+manual steps.
+
+**Speaker 1** _[22:02]_
+
+However, again, with the backup analogy, if it's annoying to try out your backup,
+
+**Speaker 2** _[22:08]_
+
+backup, you're probably going to do it, right?
+
+**Speaker 1** _[22:10]_
+
+to do it, right? So you're not really sure.
+
+**Speaker 2** _[22:12]_
+
+if you can reproduce or not.
+
+**Speaker 1** _[22:13]_
+
+reduce or not if you haven't actually gone through
+
+**Speaker 2** _[22:15]_
+
+gone through these steps at least once.
+
+**Speaker 1** _[22:16]_
+
+this. MLflow is actually somewhat similar.
+
+**Speaker 2** _[22:22]_
+
+somewhat similar, again it's a
+
+**Speaker 1** _[22:23]_
+
+Again, it's a Python package. In this case, you have to menu.
+
+**Speaker 2** _[22:27]_
+
+You have to manually register any parameters you want to have displayed.
+
+**Speaker 1** _[22:31]_
+
+which Seiko did
+
+**Speaker 2** _[22:32]_
+
+sacred did for you automatically.
+
+**Speaker 1** _[22:35]_
+
+What I really like about
+
+**Speaker 2** _[22:37]_
+
+about MLflow is the way
+
+**Speaker 1** _[22:39]_
+
+way that it unfolds.
+
+**Speaker 2** _[22:39]_
+
+that... That it enforces.
+
+**Speaker 1** _[22:40]_
+
+that your local environment, like virtual environment or condo environment, is clean.
+
+**Speaker 2** _[22:46]_
+
+clean.
+
+**Speaker 1** _[22:46]_
+
+in a super non-intrusive way.
+
+**Speaker 2** _[22:48]_
+
+intrusive way, like you're
+
+**Speaker 1** _[22:49]_
+
+like you don't have to do anything and it just checks that it's it's up to date and it's
+
+**Speaker 2** _[22:53]_
+
+up-to-date and installs it's necessary I found that really really nice
+
+**Speaker 1** _[22:56]_
+
+But really, really nice.
+
+**Speaker 2** _[22:58]_
+
+Another thing I found nice is this idea.
+
+**Speaker 1** _[22:59]_
+
+nice is this idea of this ML project file, which is somewhat similar to a Docker file in that it defines
+
+**Speaker 2** _[23:05]_
+
+that it defines different entry points for.
+
+**Speaker 1** _[23:06]_
+
+Three points for your...
+
+**Speaker 2** _[23:08]_
+
+for your training process.
+
+**Speaker 1** _[23:11]_
+
+As soon as you add this ML project file to your project,
+
+**Speaker 2** _[23:13]_
+
+project file to your repository.
+
+**Speaker 1** _[23:13]_
+
+to your repository, you can just give somebody the...
+
+**Speaker 2** _[23:17]_
+
+URL of the Git project.
+
+**Speaker 1** _[23:18]_
+
+of the Git project and tell them to do MLflow run URL of that project.
+
+**Speaker 2** _[23:22]_
+
+and it will run and you will
+
+**Speaker 1** _[23:24]_
+
+run and you will get reproduced.
+
+**Speaker 2** _[23:24]_
+
+get reproducible results. So that is also pretty cool.
+
+**Speaker 1** _[23:30]_
+
+MLflow comes with its own.
+
+**Speaker 2** _[23:32]_
+
+its own leaderboard.
+
+**Speaker 1** _[23:33]_
+
+One thing it didn't seem to do automatically is flag whether an experiment failed or did not fail.
+
+**Speaker 2** _[23:39]_
+
+So all of these that are like empty in the last metrics column.
+
+**Speaker 1** _[23:41]_
+
+matrix column there actually failed but it doesn't display it to me in a nice visual manner parameters however are done extremely
+
+**Speaker 2** _[23:49]_
+
+done extremely well in this. So you can, you will have.
+
+**Speaker 1** _[23:51]_
+
+and you will have like a dictionary-like parameters column and just can click on.
+
+**Speaker 2** _[23:57]_
+
+Click on one of these and explode.
+
+**Speaker 1** _[23:58]_
+
+and exploded to being its own column. And I found that really nice and convenient.
+
+**Speaker 2** _[24:02]_
+
+really nice and convenient to work with.
+
+**Speaker 1** _[24:06]_
+
+MLflow does have a development as
+
+**Speaker 2** _[24:08]_
+
+as well as a reproducibility mode, however...
+
+**Speaker 1** _[24:14]_
+
+It does, if you do not
+
+**Speaker 2** _[24:15]_
+
+If you do not MLflow run some URL, but rather do MLflow run your local directory,
+
+**Speaker 1** _[24:21]_
+
+It will not enforce you to commit your local changes. And there is no way to make it do it. And it will record the old commit.
+
+**Speaker 2** _[24:30]_
+
+the old commit hash with a...
+
+**Speaker 1** _[24:30]_
+
+which is now outdated, so you will have...
+
+**Speaker 2** _[24:33]_
+
+So you will have wrong information in your experiments database.
+
+**Speaker 1** _[24:36]_
+
+So be aware of that. You can already guess being able to reproduce is much easier in MLflow. You need to obtain the data in some way. MLflow does not care about data.
+
+**Speaker 2** _[24:49]_
+
+about data at all, and then it's just run.
+
+**Speaker 1** _[24:50]_
+
+then it's just running one simple command. The final one I want to look at is...
+
+**Speaker 2** _[24:57]_
+
+want to look at is DVC data version control.
+
+**Speaker 1** _[24:59]_
+
+version control. And you already heard in the name where the
+
+**Speaker 2** _[25:01]_
+
+where the focus of this tool lies.
+
+**Speaker 1** _[25:06]_
+
+you get
+
+**Speaker 2** _[25:06]_
+
+Not a Python library, but rather a command line.
+
+**Speaker 1** _[25:07]_
+
+another a command line uh
+
+**Speaker 2** _[25:10]_
+
+a tool that has an interface quite similar to Git.
+
+**Speaker 1** _[25:14]_
+
+And you use that to manage your data. So at the beginning of the project, you would add your data to your repository. And then DVC works in a pipeline.
+
+**Speaker 2** _[25:27]_
+
+In a pipeline manner, meaning you set up a pipeline.
+
+**Speaker 1** _[25:30]_
+
+So set up a pipeline from your raw data to your final results.
+
+**Speaker 2** _[25:34]_
+
+And then when anything changes,
+
+**Speaker 1** _[25:35]_
+
+changes, if you change any file that is included in that pipeline, you can just use one simple
+
+**Speaker 2** _[25:40]_
+
+one simple command to rerun everything that is necessary.
+
+**Speaker 1** _[25:44]_
+
+I urge you to read the documentation like the Getting Started.
+
+**Speaker 2** _[25:48]_
+
+the Getting Started Guide for DDC. It's really, really nice.
+
+**Speaker 1** _[25:50]_
+
+Really, really nicely written. Really impressive. One thing DVC does not try to solve is...
+
+**Speaker 2** _[25:57]_
+
+to solve is a leaderboard what you if you
+
+**Speaker 1** _[26:00]_
+
+If you want to compare your models,
+
+**Speaker 2** _[26:02]_
+
+models, that is the only thing that you get.
+
+**Speaker 1** _[26:03]_
+
+that you get, a very...
+
+**Speaker 2** _[26:04]_
+
+A very simple text.
+
+**Speaker 1** _[26:05]_
+
+Simple text view. There's no idea of like recording permit.
+
+**Speaker 2** _[26:08]_
+
+parameters or something.
+
+**Speaker 1** _[26:08]_
+
+or something like that, there's no certain
+
+**Speaker 2** _[26:10]_
+
+There is no sorting, searching, filtering, nothing like that.
+
+**Speaker 1** _[26:15]_
+
+which also means that a development mode is created.
+
+**Speaker 2** _[26:17]_
+
+and mode is kind of a moot point.
+
+**Speaker 1** _[26:19]_
+
+point. And as you can see, DVC really concentrates.
+
+**Speaker 2** _[26:24]_
+
+really concentrates on data and code,
+
+**Speaker 1** _[26:27]_
+
+doesn't really care about any of
+
+**Speaker 2** _[26:28]_
+
+about any of the aspects of reproducibility.
+
+**Speaker 1** _[26:33]_
+
+one thing I see a bit critical here
+
+**Speaker 2** _[26:36]_
+
+critical here is that you really need to make sure that
+
+**Speaker 1** _[26:38]_
+
+to make sure that your pipeline
+
+**Speaker 2** _[26:39]_
+
+that your pipeline is set up correctly.
+
+**Speaker 1** _[26:41]_
+
+If you add a new data.
+
+**Speaker 2** _[26:42]_
+
+Add a new dataset or
+
+**Speaker 1** _[26:42]_
+
+set or fire.
+
+**Speaker 2** _[26:43]_
+
+file. Or if you
+
+**Speaker 1** _[26:44]_
+
+if you add a new script,
+
+**Speaker 2** _[26:45]_
+
+add a new script file and you'd
+
+**Speaker 1** _[26:46]_
+
+script file and you do not include that in the pipeline, then DVC will not know that it needs to rerun something if you
+
+**Speaker 2** _[26:53]_
+
+something if you changed that file.
+
+**Speaker 1** _[26:55]_
+
+So there's definitely a need for code.
+
+**Speaker 2** _[26:57]_
+
+a need for code review so that you review other people's pipelines.
+
+**Speaker 1** _[27:04]_
+
+So reproducing with DVC is the most straightforward for all of the tools I've showed you because you don't even have to get the data. DVC does all of this.
+
+**Speaker 2** _[27:15]_
+
+That's all of the things for you.
+
+**Speaker 1** _[27:18]_
+
+And the question now, again.
+
+**Speaker 2** _[27:19]_
+
+Now, Aganis, how do you want to work? I think these tools...
+
+**Speaker 1** _[27:24]_
+
+kind of reflect how their developers want to work as a data scientist.
+
+**Speaker 2** _[27:28]_
+
+scientist, that
+
+**Speaker 1** _[27:29]_
+
+Does that match how you want to work?
+
+**Speaker 2** _[27:31]_
+
+Maybe one of the other tools out there.
+
+**Speaker 1** _[27:33]_
+
+other tools out there are the right ones for you. I hope that with the framework that I've given you,
+
+**Speaker 2** _[27:39]_
+
+That you are able to go and evaluate.
+
+**Speaker 1** _[27:41]_
+
+and evaluate how well
+
+**Speaker 2** _[27:44]_
+
+the tool does on reproducibility.
+
+**Speaker 1** _[27:45]_
+
+reproducibility and how
+
+**Speaker 2** _[27:46]_
+
+and how well it matches the way that you...
+
+**Speaker 1** _[27:48]_
+
+that you want to work.
+
+**Speaker 2** _[27:54]_
+
+The reason I wanted to give this talk that I did not talk about at the beginning is envy. I do feel envious of software engineers.
+
+**Speaker 1** _[28:03]_
+
+When I look at...
+
+**Speaker 2** _[28:04]_
+
+at their, what seems to me, very much established
+
+**Speaker 1** _[28:06]_
+
+very much established best.
+
+**Speaker 2** _[28:07]_
+
+best practices like code review like
+
+**Speaker 1** _[28:10]_
+
+review, like continuous integration.
+
+**Speaker 2** _[28:11]_
+
+continuous integration, like unit testing, and how they have really nicely usable tools that support them.
+
+**Speaker 1** _[28:17]_
+
+support them.
+
+**Speaker 2** _[28:18]_
+
+in following these best practices.
+
+**Speaker 1** _[28:23]_
+
+I do recognize, however, of course, data.
+
+**Speaker 2** _[28:24]_
+
+Of course, data science is a much younger discipline. I hope that with talks like mine,
+
+**Speaker 1** _[28:29]_
+
+like mine, and other similar
+
+**Speaker 2** _[28:30]_
+
+And other similar talks at this and other conferences. We can have it.
+
+**Speaker 1** _[28:33]_
+
+We can have a discussion about
+
+**Speaker 2** _[28:35]_
+
+What should our best practices be?
+
+**Speaker 1** _[28:36]_
+
+practices be and
+
+**Speaker 2** _[28:37]_
+
+be? And how should tooling look like?
+
+**Speaker 1** _[28:39]_
+
+What does schooling look like to support?
+
+**Speaker 2** _[28:39]_
+
+to support these best practices.
+
+**Speaker 1** _[28:43]_
+
+So the thought I want to leave you with today, the question I want to...
+
+**Speaker 2** _[28:47]_
+
+The question I want to leave you with today is how do.
+
+**Speaker 1** _[28:48]_
+
+is how do we...
+
+**Speaker 2** _[28:49]_
+
+we, as data scientists, want to work. Thank you. Thanks, Kat, for this wonderful talk. Is there anybody who has questions for Kat still? Let's start with you up here.
+
+**Speaker 3** _[29:15]_
+
+Yeah, thank you for a nice talk. You talked a lot about and focused on the reproducibility with these tools. I'm not sure, and I hopefully look it up afterwards, how the tools support data pipelines themselves and distribute the stuff that needs to be done, gathering data and everything. have you seen the talk about Kedro yesterday and can you do you know about Kedro which seems to be another new open source tool about data pipelines and that also might support this kind of reproducibility I'm not sure if that's a goal
+
+**Speaker 1** _[29:52]_
+
+I don't know that, but can I ask you to maybe, I'm sorry, I kind of want to have this a bit more discussion also, learn from you.
+
+**Speaker 2** _[29:59]_
+
+Where do you see the need for
+
+**Speaker 1** _[29:59]_
+
+Where do you see? the need for these data pipelines in this
+
+**Speaker 2** _[30:04]_
+
+in this setting.
+
+**Speaker 1** _[30:04]_
+
+setting.
+
+**Speaker 3** _[30:05]_
+
+Okay, for me, I'm not in this 100% data science workflow because we are training model like on a weekly basis and applying it. So there's more for us, the training data is constantly changing.
+
+**Speaker 1** _[30:23]_
+
+Well, then, I guess, sorry.
+
+**Speaker 3** _[30:25]_
+
+So generating the, okay, this is the training data we are using for training our models, which takes a lot of time, is like a big part of what we need to invest work in. And training the model is rather stable because we have this model that we found out is good and aren't working on it too much.
+
+**Speaker 1** _[30:46]_
+
+too much then i think your use cache actually is following on the right hand side that i did not consider today and i think tooling i'm not saying that there can't be tools that
+
+**Speaker 2** _[30:54]_
+
+There can't be tools that support both.
+
+**Speaker 1** _[30:55]_
+
+support both. But I think tooling for the left-hand side will look, has very different requirements.
+
+**Speaker 2** _[31:00]_
+
+requirements than tooling on the right-hand side.
+
+**Speaker 1** _[31:03]_
+
+Yep. Thank you.
+
+**Speaker 2** _[31:06]_
+
+Who has the next question? Okay.
+
+**Speaker 4** _[31:13]_
+
+Hello, thank you for your talk. I'm not really a data scientist. I'm more a classical scientist using Python for some stuff. And I'm wondering if what you're saying here, which is merely, I think you apply it more to the machine learning and the data computer world thing, in how far you see overlaps or in your search have found connections with classical science experiments, where, as example, massive parts of the flow you do has nothing to do with software but has to do with, I don't know, telescopes or, in my case, electromagnetic fields you measure and your settings and so on. Can you comment? Have you seen some interaction with that world?
+
+**Speaker 1** _[31:55]_
+
+with that world. Yes, definitely.
+
+**Speaker 2** _[31:57]_
+
+Definitely, and you definitely need to.
+
+**Speaker 1** _[31:58]_
+
+Definitely need different, maybe not tooling, different.
+
+**Speaker 2** _[32:01]_
+
+tooling, different protocols to support classic science workflows.
+
+**Speaker 1** _[32:04]_
+
+workflows I do see one difference though that your outcome like your your outcome of a classical science experiment is the often the
+
+**Speaker 2** _[32:13]_
+
+often the essence.
+
+**Speaker 1** _[32:14]_
+
+the essence of what it's
+
+**Speaker 2** _[32:15]_
+
+of what it's all about, right?
+
+**Speaker 1** _[32:16]_
+
+all about, right? For us, the outcome is the model. But in a classical science experiment, you want to have a paper that really describes the
+
+**Speaker 2** _[32:23]_
+
+the essence of your experiments.
+
+**Speaker 1** _[32:23]_
+
+effect. your experiments, what do you draw from
+
+**Speaker 2** _[32:27]_
+
+you draw from this experiment?
+
+**Speaker 1** _[32:28]_
+
+from this experiment and then somebody can take that and implement.
+
+**Speaker 2** _[32:30]_
+
+and implement it on their own, and this is where I kind of see the difference. And we don't really have that, so classic science needs more.
+
+**Speaker 5** _[32:44]_
+
+Thank you for your talk. It was great. And I wanted to ask you that you've been talking about all these tools like DVC MLflow and so on. Don't you think that they kind of cover all the important stuff, but it feels like one of the tools, one of them covers one important thing, another important thing. Can we do something like contribute to those tools or should we like develop something else? because in my practice, when I tried to use all of them, it was like, I need these, but it lacks something another tool has. So I ended up in building something more or less custom, which wasn't really convenient because when you're just one data scientist, you cannot build something really convenient, great in terms of code quality, UI, and all this kind of stuff. So what do you think about that?
+
+**Speaker 1** _[33:37]_
+
+I completely agree with you.
+
+**Speaker 5** _[33:38]_
+
+I,
+
+**Speaker 1** _[33:39]_
+
+None of these tools really covers all.
+
+**Speaker 2** _[33:41]_
+
+covers all the bases.
+
+**Speaker 1** _[33:43]_
+
+So far, the best that we have, all of these are open source tools.
+
+**Speaker 2** _[33:47]_
+
+source tools, so yes, you can contribute.
+
+**Speaker 1** _[33:50]_
+
+I kind of want to take up again this idea of a discussion. Not just me telling you how I work and how that influences what kind of tools I would use, but rather that we have a discussion.
+
+**Speaker 2** _[34:02]_
+
+have a discussion and find how we
+
+**Speaker 1** _[34:03]_
+
+how we work,
+
+**Speaker 2** _[34:04]_
+
+work. what our best practices and our tooling could look like.
+
+**Speaker 1** _[34:04]_
+
+what, tooling could look like. And I don't think we're there yet.
+
+**Speaker 2** _[34:07]_
+
+I don't think we are there yet. I completely agree with you. Maybe you are there. Hi, and thanks for your nice talk.
+
+**Speaker 3** _[34:20]_
+
+Um, I
+
+**Speaker 1** _[34:21]_
+
+I was a little
+
+**Speaker 2** _[34:22]_
+
+I was a little bit wondering...
+
+**Speaker 1** _[34:22]_
+
+bit wondering um
+
+**Speaker 2** _[34:24]_
+
+is there still a place in your
+
+**Speaker 1** _[34:25]_
+
+place in your kind of model
+
+**Speaker 2** _[34:26]_
+
+kind of model exploration development workflow for Jupyter notebook or are you doing everything in like separate scripts because I I think most
+
+**Speaker 1** _[34:34]_
+
+I think most of the tools you showed, they were all kind of working on Python.
+
+**Speaker 2** _[34:38]_
+
+on Python scripts.
+
+**Speaker 1** _[34:39]_
+
+Python scripts, so maybe you can elaborate a little bit on that. Absolutely, I didn't expect that question. I do love Jupyter notebooks as a tool for any kind of exploratory work, for plotting, for visualization. I do not believe that it
+
+**Speaker 2** _[34:54]_
+
+that it is the right to
+
+**Speaker 1** _[34:55]_
+
+Right tool for writing.
+
+**Speaker 2** _[34:56]_
+
+for running reproducible experiments.
+
+**Speaker 1** _[34:59]_
+
+I don't believe that because of issues that you get with out-of-order execution, of scoping issues.
+
+**Speaker 2** _[35:05]_
+
+issues that are inherent
+
+**Speaker 1** _[35:06]_
+
+that are inherent to Jupiter.
+
+**Speaker 2** _[35:08]_
+
+to Jupyter Notebooks.
+
+**Speaker 1** _[35:09]_
+
+So, yes, in my view of this, it's...
+
+**Speaker 2** _[35:14]_
+
+Using notebooks for exploration.
+
+**Speaker 1** _[35:15]_
+
+for exploration and then
+
+**Speaker 2** _[35:16]_
+
+and then start using scripts.
+
+**Speaker 1** _[35:18]_
+
+In fact, one of these libraries, I think Thackert or MLflow, actually forbids you to use them in a notebook.
+
+**Speaker 2** _[35:18]_
+
+In fact, one of these book. It will throw an error if you try to do so. One last question, perhaps? So many people. I've not been in that corner yet.
+
+**Speaker 3** _[35:36]_
+
+Hello, I'm a fellow data scientist, and what we heard a lot of times is that it's very important to document your stuff. I mean, you do experiment, you probably scoped your experiment before, and do you document it in your Git history, do you have a separate file, do you document your Jupyter notebook? i mean you can put your documentation at a lot of places but um i think it's very important if you establish some workflow like this that you have also done an overview what you have done and also to do it in a consistent way and i've tried a lot of ways to do it but i haven't come up with a good solution yeah i would say because always a little bit different i
+
+**Speaker 1** _[36:28]_
+
+I can't offer you a good solution either,
+
+**Speaker 3** _[36:28]_
+
+Thank you.
+
+**Speaker 1** _[36:32]_
+
+especially for this whole writing some kind of report or final document.
+
+**Speaker 2** _[36:37]_
+
+documentation about what you found
+
+**Speaker 1** _[36:38]_
+
+what you found in this project. I'm sorry, I can't answer that part of the question. However, I want to point you again to the Git mode. I'm not searching for it now. Because in that mode, you need to have everything to run that experiment somewhere, right? It needs to be documented in some kind of file that sets up your continuous...
+
+**Speaker 2** _[36:59]_
+
+your continuous experimentation framework.
+
+**Speaker 1** _[37:02]_
+
+And thereby, you do have...
+
+**Speaker 2** _[37:04]_
+
+have documentation.
+
+**Speaker 1** _[37:05]_
+
+documentation by the sheer necessity of having it. So it's not text somewhere, it's in a configuration file. And anybody who wants...
+
+**Speaker 2** _[37:13]_
+
+to manually reproduce on their machine
+
+**Speaker 1** _[37:15]_
+
+their machine can look at that file
+
+**Speaker 2** _[37:17]_
+
+and get all the information there.
+
+**Speaker 1** _[37:18]_
+
+information they need on how
+
+**Speaker 2** _[37:19]_
+
+They need on how to get.
+
+**Speaker 1** _[37:20]_
+
+how to get set up. And I find that a really nice, like implicit documentation benefit.
+
+**Speaker 2** _[37:24]_
+
+implementation benefit that you also see in a lot of software engineering tooling. Thank you very much, Kat. Thanks for the wonderful talk again.
+
+---
+transcript_status: auto
+---
+transcript_language: en

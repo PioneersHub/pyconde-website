@@ -1,0 +1,162 @@
+title: 5 Things we've learned building large APIs with FastAPI
+---
+description: FastAPI has become a very popular framework for building high-performance and well documented APIs in Python 3.6+. In this talk we share 5 things we've…
+---
+created: 2022-03-01
+---
+code: KXJP7B
+---
+slug: 5-things-we-ve-learned-building-large-apis-with-fastapi
+---
+speaker_names: Maarten Huijsmans
+---
+speakers:
+
+
+
+### Maarten Huijsmans
+
+_About — in the speaker's own words_
+
+I am reasonably skilled Python developer. In the past I've worked quite a lot with Django. 2 years ago I started using FastAPI and was impressed by the powerful combination of Starlette and Pydantic to quickly build a well documented API. 
+
+At InvestSuite I work on multiple microservices: public & private API's, streaming financial data, machine learning models, etc.
+---
+abstract:
+
+
+FastAPI has become a very popular framework for building high-performance and well documented APIs in Python 3.6+. In this talk we share 5 things we've learned while building multiple APIs at InvestSuite.
+---
+full_description:
+
+
+FastAPI follows the UNIX philosophy of "do one thing, and do it well". By using Starlette and Pydantic, FastAPI provides you with powerful tools to build a beautiful API. This gives you a lot of freedom to decide how you organise the rest of your codebase. The level of freedom also comes with some challenges once a codebase grows.  
+
+
+In this talk we explore some of the common challenges in building FastAPI apps, and share how we solved them:
+
+1. Minimizing the global state with dependency injection
+2. Reducing the complexity of testing a FastAPI app
+3. Pitfalls of async FastAPI
+4. Supporting multiple authentication schemes
+5. Modelling the relations between patch, response and database models
+6. 🎁 Bonus: Using Hypothesis to test your API
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: Web
+---
+tags:
+---
+submission_type: sponsored
+---
+submission_type_label: Sponsored Talk
+---
+submission_type_id: 1806
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: some
+---
+domain_expertise: some
+---
+supporting_material_url: https://github.com/investsuite/pycon-2022
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/KXJP7B.png
+---
+youtube_id: DpCuo5fiKME
+---
+video_link: https://www.youtube.com/watch?v=DpCuo5fiKME
+---
+video_published_at: 2022-05-06
+---
+video_duration_iso: PT26M56S
+---
+video_thumbnail: https://i.ytimg.com/vi/DpCuo5fiKME/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+So, good morning, everybody. This is my second public speaking, so my first public speaking looked a little bit like this. That's not me, but it's just from Google, because in my time, there were no, like, that kind of whiteboards. So, a little bit of myself. I'm a Python developer. I work at InvestSuite, which is a Belgium-based fintech startup. So, what does InvestSuite do in a little nutshell? InvestSuite is a B2B2C company. We build digital wealth tech solutions and one of the flagship products is a portfolio optimizer which puts your savings on autopilot it's not a quick rich scheme it's decent investment if you want to get rich by crypto or nfts so we're going to talk about fast api it's we use it all over the place at InvestSuite. We have a microservices architecture. So what is FastAPI? It's a relatively new API framework built in Python. It's built on top of Starlet. It gained a lot of traction quickly. It's created by Sebastian Ramirez. I assume that he's somewhere in the room here. And I already want to thank him for all his efforts and all the contributors to that because it's actually a fantastic framework, and also the documentation is brilliant. I mean, if you don't know Python yet, you can just start and it will work. So some assumptions. I hope you know some basics about FastAPI or Pydantic or some web development and obviously Python. So in the next 25 minutes by now, we're going to talk about some five learnings that we We learned at InvestSuite while we were working with FastAPI. So we had some challenges left and right. So that's what I'm going to talk you through. So the first learning is try to minimize or minimize your global state with dependency injection. So a quick refresh. What is global state? It's app. That's the global state. It's on top of your application. So it lives there. it gets loaded or executed when your code base is loaded, so this can be a bit problematic. Because what you start to do is when you want to connect to a database, you just add it there and you connect to MongoDB or to Kafka or to Redis, anything else that you want to connect to. And that's fine for small applications. But generally, and also in other languages, global state is not such a good practice, but you easily end up putting a lot of stuff in your global state when you just start. Don't read documentation like I sometimes don't do. So you put a lot of stuff in your global state, and fast API is in the global state, so you automatically start adding it there. it's hard to patch in your unit tests so how can you solve that you can move the global state towards your function and just connect there to the database but a downside of that is that mongodb or kafka or redis they use connection pooling or they have persistent connections so you always have to do that extra network traffic to to set up that connection so this This is not an ideal solution either, but luckily, FastAPI has a nice mechanism which is called dependency injection. What it basically does is you can inject a state or a previous executed function into your route. In this case, we are injecting the connection of MongoDB. It's not really PyTonic because you're executing a function as a default, but it's a nice mechanism and easy to use. If you run MyPy on this, it will blow up, and you will kick out MyPy and start crying. Or the other way around. So this is all documented at the FastAPI documentation, but I strongly advise to read the dependency mechanism before you start to do anything else because it will ease your life. But if your application grows, you're not going to put everything in app.py. You're not going to make a pyfile. You're allowed to, but you're not going to make a pyfile of 2,000 lines because you want to logically group certain API calls into a router. But by using dependency injection or by using the dependency mechanism of FastAPI, you can easily reuse that in your router. So you can put your dependencies and your config in a separate file, and you can just reuse them in your app or in your router, and your router remains, stays a clean thing, and you don't have to import global state from somewhere else. So by using dependency injection of FastAPI, it will make your life easier to build a big application so then we're quietly go to the second step which is also easy because if you do the previous thing you're writing your unit tests or setting up your unit test pipeline will be way more easier and you won't be frustrated the whole day behind your computer doing things that you don't understand so what are typically the things that you do when you're setting setting up a test suite is you start overriding settings, you mock or patch functions left and right, you set up a test client, either authenticated or not authenticated, to test your API calls or other parts of the code base. At InvestSuite we use PyTest, not going to debate whether that's the tool, I don't like that that much. One thing that help you to organize your tests or to easily patch tests is by centralizing your application settings. And that way, you don't scatter environment variables everywhere in the codebase. You don't need to read or validate or parse them. You can centralize them in one go. The big benefit of this is that when you set up a test, your codebase gets loaded, also your environments get loaded and, let's say, executed at that time, which makes them hard to patch. And you could decide not to patch them and just rely on your environment settings, but then your tests will fail or might fail because your environment settings changed. So you want to do that in code. And by centralising your config, you can do something like this. You can define that in code. This is the settings that I want. This is how it has to look like. And FastAPI has foreseen that, that you can, let's say, override dependencies. So you can easily override all the dependencies. And in that way, as long as you don't have global state, you're actually pretty safe. You can override any dependency injection that will be used in every endpoint that you will subsequently call in your tests. They remain clean, your tests. Another benefit is that, or that's at least what we try to do, we keep our endpoints lightweight. They serve as input of data. They pass it on to some other Python functions to do computations, and we return the result of that. By using dependency injection, you will be forced to handle that configuration of things somewhere else, which you pass on to your other parts of business logic. And you end up with actually pure Python classes and functions which are also easy to test because you can just instantiate it or call it if it's a function and give it the right config. You don't need to do complex patching and mocking things everywhere else in the code base. And then this is my favorite part, also the hardest part, some pitfalls of asynchronous Python. This actually can be a talk on its own, maybe next year, maybe by somebody else. It's not really a problem of FastAPI, it's just how the asynchronous Python thing works. Asynchronous Python is not as easy as it looks like. If you have ever worked with Node, I think Node is easier to use in an asynchronous way than Python, because Python, it wasn't asynchronous before, so they added it later on, and that results that a lot of libraries are not asynchronous they don't implement an async await interface so they're still synchronous and that is a problem which i will show later on and for the ones that already dived into the global interpreter lock that's also be can also be a pain in the ass which i'll also try to explain later on so a short recap of how Asynchronous Python works. It's an event loop, which is a single thread in a single process. This has benefits on performance if you're fully asynchronous, but there is also quite a downside being single threaded, and that's not a problem of fast API, it's Python. So what you see on the left is a very small Python application that just blocks. blocks. So when you look at the function time one, there's a time.sleep. If you call that function, that end point will wait for ten seconds. If you in the meanwhile call the function hello, it will be blocked for ten seconds. And the reason is that it's single threaded, so time.sleep just blocks the entire thread for ten seconds. On the right side, you see a simple solution. You can just use a sync sleep, and then it's solved. But it's solve for sleep. It doesn't solve anything magically for when you're connecting to a database or anything else in your code base. So this is just an alternative for the sleep thing. Then a second thing is the global interpreter lock or blocking CPU. So I wrote a stupid function, which is a loop that lasts quite a while, and this is actually this blocks your CPU. And in Python, this is not exactly a correct example, but imagine some machine learning or heavy mathematical computations, they will claim the interpreter, and it's a problem in Python that you cannot get around. Whether you're a sync or not, it's there. So this is kind of like hard to solve. So when you call function count, it will block until the while loop ended, and hello won't respond as long as the while loop is running. So this is basically how I feel about asynchronous Python. It's also how I feel about making my slides. So you're basically a bit on your own when you're doing asynchronous Python. So the lesson we learned here is a lot of Python libraries that we use, they're not asynchronous. And when you're doing asynchronous code, you always have to think about when you're writing a line of code, is this blocking or is this not blocking? Which is tedious. And if you have a large code base, you might see that your application is blocking or hanging, and you don't know where this is happening. Because an endpoint might be blocking, so you start looking at the endpoint, but it's not that one that is blocking, it's something else that is blocking. And especially when there is load and requests from everywhere in the place, you don't know where it originates from, it's very hard to debug. So what can you do, or what did we do? we basically removed all async functions from the code base. So, the way it's solved in fast API, and this is nice, if there is async in front of a function, if it's defined with async, it will be executed in the event loop. If async is not there, it's just a multi-threaded application like Django, like Flask. And that solves a lot of problems, basically all of of your problems, except for the GIL. So what can you do with CPU-intensive code? You can run it in a process pool executor. There are parts, there is functionality in FastAPI and Starlet that allows you to do that. What does that do? Your main process, which is the FastAPI process, remains responsive, it doesn't do blocking CPU, and all the heavy lifting goes to another process. There might be challenges there. Another thing that we did is we moved a lot of heavy lifting code, heavy CPU code to AWS Lambda, and that's basically multiprocessing of the shelf that you get there. We also use FastAPI there because Lambdas, they're executed in parallel different containers that will be spinned up. and another solution is putting things on a queue and some other process handles it and you can solve that with asynchronous REST API schemes where the result will end up a little while later so before you start doing asynchronous Python think twice read this documentation Also, dive a little bit deeper into the async IO of Python itself. If you're a bit too lazy or you don't really like it, then just don't do it, and multi-threading is fine. Your product manager doesn't care whether it's async or multi-threaded. So the result is the same. And the fourth part is at InvestSuite we wanted to have two different authentication mechanisms. So we wanted to authenticate people or machines using JWT or API keys. We had our reasons for that, so this was kind of a bit challenging. So what FastAPI provides you, there's a lot of utilities to deal with API keys, basic auth or O2, it's all covered. It plays very nicely or it integrates very well with OpenAPI, everything that you do in FastAPI, it generates beautiful documentation, the swagger is completely useful and interactive, The Redoc is also very, there's a nice overview that automatically gets generated from a code base. There's extensive documentation also on the side of FastAPI with a lot of code examples. But what you have to keep in mind, it's actually not with batteries included. And I think that's a fine decision for a framework like FastAPI. Because it's a framework, it gives you tools, but it doesn't do everything for you like, for example, Django does. So there's also the benefit is you have the full freedom of how you implement your authentication. And you still have to do that. So you still have to copy-paste code examples to get it working. And FastAPI is built on top of Starlet. And they differ a little bit on how they see authentication. So the way Starlet does it is on the left. They use middlewares, where the authentication is handled by the middleware. A middleware is something that you put in front of a request and behind a request, if you want. And the authentication is handled there. And the endpoint, it just gets a user. Whereas FastAPI adopts, uses its dependency mechanism, where you just inject a user. And that's where we struggled a bit on how we could support two different authentication mechanisms there. So the way you can solve it, or how I started to solve it, is I added it as two dependencies to another dependency. So it accepts, it injects a JWT token, and it injects an API key header. but yeah the problem is that when the JWT token fails that function will fail and you're not authenticated so that basically makes your API key header useless you never reach that so a simple solution is use auto error set it to false so what it means is when it fails it doesn't do anything or it just returns null so you end up in a dependency where you get two optional num values and then you can write the logic yourself where you decide okay do I have credentials return user do I have a key I return another user based on logic that you decide yourself but if you want to use authentication and in an API you usually you you shield everything behind authentication so you have to repeat that on every endpoint. But if you don't want to do that, you can do that at router level, but then you don't have the user anymore in your endpoint, because you're not injecting it anymore in that specific endpoint. So this was... We had to go about it, like, how do we want to deal with it? So a lesson that we've learned, but we haven't implemented it or we haven't really discovered it yet but what we're thinking about doing is actually to adopt the way starlet works and using middlewares because in the endpoint you actually don't care how the user is authenticated you just want a user and starlet puts that on the request it gives you also more flexibility to define entire routers like, I want to have the entire router authenticated, and then you don't have to care that much in the router itself how that works or how that has been set up. So then the last lesson that we learned, I don't know how much time I still have left, so ten minutes, that's faster than I practised. So, obviously, when you build an API that is consumed by users, you're going to store data. I think everybody does that. I'm hitting too much buttons. So, the beautiful thing about fast APIs, it relies heavily on Pydantic. If you're not familiar with Pydantic. It's like data classes in Python, but a bit more powerful. And FastAPI automatically based on Pydantic models validates your input and output. So if somebody sends in crap as a JSON crap into your endpoint, FastAPI will fail and will properly show exceptions like where did you violate certain validations or constraints. And it generates beautiful documentation. If you document stuff in your code properly, otherwise, you have empty documentation. So that's why we wanted to rely also heavily on Pydantic. But as we are lazy Python developers, we don't want to duplicate a lot of stuff. So we came up with a mechanism. So maybe quickly an example is how FastAPI does it. So you define a Pydantic model, in this case portfolio, you document it, there's a name, there's a description, and there's an example, and if you see on the right side, FastAPI generates that for you. So there is the example. If you do it yourself, you can also click or you can scroll down and you can also see how the model looks like. So it's for users of that documentation, it's very easy to deal with. But as I said, as we are lazy Python developers, we don't want to duplicate ourselves. And in a lot of cases, you want to have crud and points where you want to create, update, and delete and list stuff from the database. So we came up with three layers, actually patch, response, and a DB model. This allows us that also the DB models were fully documented, readable in the code, and also the API was very readable also for the CRUD and the DELETE for every endpoint that we created. And each model is actually a subset of another model. So we started out with a patch, which is actually the lowest level, where we define the fields that we allow that people can patch in the API. In this case, it's name and currency. Then we have the response, which inherits from the patch where we add an ID, which is the ID of the database field. And then the database model actually inherits from portfolio response, and that adds a field which is purely internal. In this way, we only have to define everything only once. We don't have to write complex logic to map database models on response models. We can just directly use it, and it's in the API, and it works fine. If you put all of this together, these are like the three endpoints. There's an overview, there's a create, there's a patch, and you see that all of these endpoints get generated and documented, and also the models, they appear in the schema. If you click on it, they will all have the same information that we've described only once in the codebase. But lessons learned here. The DB models, if I go back to this example, this is a small example, but in reality, our portfolio is much, much bigger, and it makes the DB model hard to read, like which fields are actually on that model, because we inherit from a lot of stuff. And also, when we want to change something on the API, we're actually too tightly coupled with our database, so we have to do a migration, and the other way around. If you want to do a migration, we break our API contract, which is... We're struggling with it. We chose to be fast and don't repeat a lot of codes. So what are some... Maybe a question here. Is there anybody who wants to decouple database models from API models? Okay. Then you should come and work and fix the problem. So, yeah, what we're currently doing is we're investigating to decouple the database models from the API models, but we're still going to use the inheritance structures at the API level, so we don't really want to repeat the documentation. thing that we're investigating is there's in one of the latest versions in Python there is this thing called annotated which is you can type you can annotate types with it and you can add extra context to it as you can see in the class portfolio fields we've defined a few fields and we've annotated them and we still use the pidentic field definition and in that way we can reuse those fields in an inherited structure. So we still don't have to do the documentation over and over again. This is a simple example, but fields can be very extensive. There's examples documentation constraints in there.
+
+**Speaker 2** _[24:51]_
+
+thank you for the great presentation it was really amazing we do have a lot of questions so let's see what what is about it so one of the most liked question is does the dependence injection solve the issue of the lack of connection pool for Kafka Redis and Mongo etc
+
+**Speaker 1** _[25:13]_
+
+Yes. Yeah, I forgot to mention that in the presentation. So dependencies are cached. So you have to deliberately say if you don't want to have it cached. So the first time they're executed, FastAPI keeps track of them.
+
+**Speaker 2** _[25:28]_
+
+Wow, there is another one here. Would you use FastAPI again or go with the Django REST framework?
+
+**Speaker 1** _[25:35]_
+
+I would use it again, actually. But I did do Django before I joined InvestSuite, but the reason why we use FastAPI all over the place is that not everything requires a database, not all microservices require a database, and then Django is a bit of an overkill. But if I would build an MVC application, I would consider Django, definitely.
+
+**Speaker 2** _[26:01]_
+
+Okay.
+
+**Speaker 1** _[26:02]_
+
+well done
+
+**Speaker 2** _[26:04]_
+
+Do you consider using Celery for asynchronous tasks scheduling with FastAPI?
+
+**Speaker 1** _[26:10]_
+
+Not at this stage, because we adopted Kafka. We have other kind of services, which are written in Scala and Node.js, and then Kafka is more general purpose.
+
+**Speaker 2** _[26:23]_
+
+How to deal with redundancy management between database and pydantech models? I'm also curious.
+
+**Speaker 1** _[26:30]_
+
+I don't know exactly what. Okay. I think I kind of... No, I don't know if I answered that already.
+
+**Speaker 2** _[26:37]_
+
+Fair enough.
+
+**Speaker 1** _[26:38]_
+
+Fair enough.
+
+**Speaker 2** _[26:40]_
+
+I think that's it, because we had a lot of questions, and the speaker needs to rest. But if you want to.
+
+**Speaker 1** _[26:46]_
+
+you can come by our booth and I assign you to somebody else
+
+---
+transcript_status: auto
+---
+transcript_language: en

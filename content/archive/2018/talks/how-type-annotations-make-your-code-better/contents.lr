@@ -1,0 +1,94 @@
+title: How type annotations make your code better
+---
+description: The real world examples on how type annotations make your code better and less complex for other developers.
+---
+created: 2018-06-03
+---
+code: XX8KJD
+---
+slug: how-type-annotations-make-your-code-better
+---
+speaker_names: Igor Davydenko
+---
+speakers:
+
+
+
+### Igor Davydenko
+
+Developing web applications with Python for 10+ years. Trying to make them as maintainable as possible. Using latest Python in production, cause what to wait for?
+---
+abstract:
+
+
+The real world examples on how type annotations make your code better and less complex for other developers.
+---
+full_description:
+
+
+Type annotations still not received that amount of popularity, that should. People still finding them hard and sometimes ambiguous to use. But if you start new project in Python in 2018 you should consider using type annotations in your code and this short talk describes why.
+
+I'll go over examples, where type annotations helped my team to create less complex code, and how using type annotations changing your mind for projecting & implementing features for your project.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track:
+---
+tags:
+---
+submission_type: lightning
+---
+submission_type_label: Lightning Talk
+---
+submission_type_id: 9
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: basic
+---
+domain_expertise: some
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/XX8KJD.png
+---
+youtube_id: hHxZkdDA-l0
+---
+video_link: https://www.youtube.com/watch?v=hHxZkdDA-l0
+---
+video_published_at: 2018-11-05
+---
+video_duration_iso: PT20M19S
+---
+video_thumbnail: https://i.ytimg.com/vi/hHxZkdDA-l0/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:02]_
+
+Yeah, hi everyone. I'm very glad to be here. Let me... yeah. So, I'm talking about MyPy for two or three years already. And I'm still a bit frustrated because it's still not a hot topic. And today, first of all, this is I. I'm a speaker. I'm Igor Denko. I know Python and JavaScript. And today I will talk about this stuff. I will talk about maintainability code, code predictability, developer experience, and tool set for type annotations. And I will talk with my own experience for this period of time of how I use in real projects type annotations and how this changed my skill set and how this changed my vision of the code. And we will start with maintainability. It's a very interesting topic. I really like the talks by Hinek that he talks about how he makes his code maintainable, how he takes a vacation for five, six weeks, and everything works. I really like these talks, and I believe that type annotations is one tool that makes your code more maintainable. Let's start with the question, what is a good code? I believe many of you somehow describe the good code. But code without type annotations is not self-documented. Code without type annotations still needs to have documentation. Code without type annotations in many, many times is not very easy understandable by other teammates. Which arguments should be passed to that function? How can this class be instantiated? The code without type annotations is not that easy to refactor. And the last part, the code with type annotations on my practice is not easy coverable with tests. And I start with a very simple example. So, this is a very simple Python function for generating a GVT token. And from first view, the function is pretty clear. Yeah, we have three arguments, email, expert, add, and secret K. And it works, and we for sure know that the result is a string, because this is a Python 3 code, so we decode the bytes to the string. But, what about input? What about input? What email is? Email is the string, or email is some other instance. What about expired at? Expired at is a daytime date, or daytime, daytime, or this is a float. Secret key, secret key is the bytes, or string, again. It's very hard to understand from this code what, in which environment should it be used, and how it should be used. And when we just added the type annotations for this particular function, our code became better. Because we understand that email is a string, and we expect that email will be the string. Expired is a flawed value, and secret key is a byte. So we just started better understanding our code by adding type annotations. the problem that many of people are afraid of adding type annotations because that's in their mind adding the complexity to their projects and really the best case is starting new code a new project and just add the type annotations for all the code so that's the easiest way but we're not living in the world where we can do some easy stuff a realistic case that we just gradually add type annotations. And even on MyPy documentation, they ask you to gradually add type annotations. So we just need to find out the core place of our code base and start adding type annotations here, there. We don't need to cover all the code with type annotations. We just need to find out the cornerstone of our project and adding type annotations there. And just after that, just adding type annotations for other parts of our code. I have a very simple example. I had a project, my pet project, only 2,000 lines of code, and I decided to add type annotations. So the most interesting part here is this stuff, that I not only add new type annotations, but I also delete unnecessary code after the type annotations, Because I understand, I just look into the code and understand that many codes are already dead. They are already obsolete, and I don't need this code. So I'm not only adding the type, when I start adding the type annotations to the project, I'm not only adding complexity, but I'm also adding its maintainability to the project. And here I also want to show you that right now we can add the type annotations not only for the projects, but for the libraries. Hail to the PEP 561. We right now just need to have the PyType file in any project, in any library that's published to PyPy. And afterwards, MyPy understands that this library should be used to check the type annotations. So if your Python library has a py.typed file in any package that's provided by your library, mypy and other type checkers will understand that your code is type annotated and will use your type annotations provided. And here is the last part. Many are afraid of adding type annotations to their projects because many of the code still will not be type annotated. for that reason, or another reason, because many people are using many shared code in this nature of Python, because we're using many, many external libraries. But here, where TypeShared and other libraries like MyPyDjango, SQLAlchemy, MyPy, are worth looking for, So the type shed is an official Python library that contains the steps for standard libraries. So we can ensure that many, many standard libraries' features are already covered with type annotations. So then type checkers can check properly code that's used from standard library. And many popular Python libraries also type annotated, like Request, Jinja, and others. For some time, the SQLAlchemy also was at TypeShed, but it was completely incomplete coverage, and it makes more problems. So people from Python code developers decided to strip SQLAlchemy stops from TypeShed. And Dropbox guys just started a project that's named SQLAlchemy MyPy that added stops for SQLAlchemy. And there are not official yet projects that are adding the type annotations for Django. so you can use type annotations in your Django projects. So, with adding, I'm showing a very simple example, but with adding the type annotations for your project, your project became more maintainable. Second, I want to talk about predictability. So, before type annotations, we choose all the data. we trust our settings because our settings are completely true we know that our settings contains only valid data in most cases we trust our request or response data and we trust how we work with database with proxies so we just know that django model SQL alchemy array model or any other model they provide gets attributes and we can get any attribute and we trust that at that moment the data is there and that's not the true so again very simple example we adding the new project this IOHTP code so we adding new project We're validating data, so we ensure that right here in data, we have valid data. But here at this line, we make a typo. We make a typo. We're using not the name K from valid data dictionary, but we're using the num. And that's the real story. We all can make typos. That's not the problem with typos. The problem is that we need to have a tool that can say that this is a typo. Hey, check this line. This is a typo. We can get the k errors in runtime. We can get the attribute errors in runtime. That's a completely real situation with our code. And that enforces us to add more and more tests for our code. So we're just spending a lot of time for adding tests for our code. And that's good from one side. From the other side, let's start from the data. What if we prepared the data that way that static type checker like MyPy understands that we make a typo here. We just have enough tools for that. Starting from Python 3.6, we got the nameTaple. NameTaple, I believe many of you know this from collections nameTaple. This is just the typed version of nameTaple. So it validates at project function we said that we got the any string keys and any string values and we return the ads at project struct and then when we can when we make a typo the mypy or other checker type checker said no no this is a typo your code is not valid to run in production if you don't want to use the name tuple if you still want to use digs, what if you just need to use type-addict instead of simple wildcard digs? Type-addict is MyPy extension. And here is pretty, again, simple declaration of your data. So you declare your struct. And again, if you make a typo, you got the message from the MyPy. Python 3.7 added the data class. So the Python code developers understand that name tuple is not powerful enough and name tuple relies on just eval code that's generated. So they designed a new way of working with data and named it data class. And data class is a much more powerful tool for working with data. But it misses one point. It misses the point of data validation. And here, where the very good library is named Pydentic, I don't know how to spell it, Pydentic, is very usable. So PyTendek checks the type annotations and validates your data based on your type annotations. So here, again, in that moment, we understand that we will use the add project data structure. And if we make some mistake, if we make some typo, if we start using some attributes that are not yet declared, we got the message from the MyPy. So after type annotations you start thinking in structs. You start thinking like a Rust programmer. So you need the structs for everything. You need the structs for get the data, you need the structs for respond with the data. And these are very good for not only for you but it's very good for your teammates, because teammates see the type annotations in your project and understand that you expect some data and you respond with some data that's already typed and you understand which data you use. And more, static type checker like MyPy makes sure that you know redefine the var. The variables are very frequently redefined when you use just Python because Python allows to do it but that's not very very good because that's maybe result in bad logic in your code and maybe sometimes you don't want to that were to be redefined and like again my pie doesn't allows you doesn't allow you to change the method signatures on inserting some objects and again you just start became avoiding some complex data structures because when you need to type the complex data structure data structure you just start to thinking why why I need to do this why I cannot use more floods structure more predictable more simpler structure and you start avoiding any data you start trying to be your code more predictable and again more type it so I not sure how how properly to explain it but you start thinking in some some some structures and that's that's great and let's talk about developer experience after type annotations so first of all no dogs no problem that's that's not true but I need to have this light I just want to say that you have properly type annotations your simple function and you understand what's need to be what's need to be passed into functions and what's result of the functions That allows you to, first of all, to editor became your friend. So everyone right now have a lot of memory on their laptops. And they can just parse all the tree of all the structures that you use. But right here you see, yeah, we type the build secret. And we starting with dot. And dot flow. And we understand that the next function can be just this and not the other one. So we just start typing much faster with untated code. We just understand that we cannot use others. We cannot use other attributes that do not exist there. So editor became our friend. And no tests, yes, is still a problem. But with MyPy, you became another level of robustify your code. you have another level of how your code became more stable because MyPy allows you to find additional problems with your code yes, you still need to write tests I'm not saying that you don't need to write tests just use MyPy, that's not true but for sure MyPy allows you to find additional problems additional problems with your code And, funny enough, but type annotations became a better programmer in a way that you started better understanding other languages. Like, here's an example of Rust, and you understand what's going on here. It's like, where is the function, what's the arguments of the function, what's the result of the function, how, what's the structure, which attributes, which types can be used for structure attributes, same for flow, flow type is a subset of JavaScript, so, yeah, again, it's, see that code, that code not understandable for you, you understand how to work with different kind of code. When the code is not type annotated, you are in the black hole, but when you have this type annotations, when you have this help messages from other colleagues, you became better understanding other languages. And this Elm, and final, just final set of my talk is a tool set. So, first of all, this is mypy, this is the current installer for annotations in Python, the static type checker, MyPy right now bundles with two extension libraries, I'm not sure why two, but they have MyPy extensions and typing extensions, for example, in typing we got the final in the latest MyPy version, so we can set that the variable cannot be changed at all, and then we have the Pyre, Pyre is And if you need the faster type checker, the guys from Facebook have written the type checker for Python at OCaml. I still want to try it on a real project, but guys, Facebook is really happy with the performance of Pyre. Then we have the monkey type and PyAnnotate. That's the tool that allows you to gather the information about your code in the runtime. For example, when you run your tests and you get the stops for your code. So if you have a very large code base, maybe it's worth to check these two projects to make your life better. Then again, we have a pedantic tool. I'm not sure. Sorry. So when you need to validate your data, you have three ways. Base model for basic validation, data class for better integration with MyPy, and base settings. And finally you have MyPyC, it's very esoteric tool, if you want to generate Python C extensions from type untated code you can do it, it's product from MyPyAutos. So conclusion, untate your code for all good things and thanks.
+
+---
+transcript_status: auto
+---
+transcript_language: en

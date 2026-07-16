@@ -3,11 +3,50 @@
 {% set bag_name = bag_name|default('faq') %}
 {% set faq_data = bag(bag_name) %}
 
+{% block title %}{{ this.title }}{% endblock %}
+
+{% block structured_data %}
+{%- set branding = bag('branding') -%}
+{%- set host = branding['canonical_host'] -%}
+{#- Build a flat list of (question, plain-answer) tuples.
+   Lists become joined paragraphs; HTML markdown is stripped to plain text. -#}
+{%- set qa_pairs = [] -%}
+{%- for section in faq_data.sections if section.display -%}
+  {%- for qa in section.qa if qa.display -%}
+    {%- if qa.answer is string -%}
+      {%- set answer_text = qa.answer -%}
+    {%- else -%}
+      {%- set answer_text = qa.answer|join(' ') -%}
+    {%- endif -%}
+    {%- set _ = qa_pairs.append({'q': qa.question, 'a': answer_text|striptags|truncate(900)}) -%}
+  {%- endfor -%}
+{%- endfor -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "{{ host }}{{ this.url_path }}#faqpage",
+  "url": "{{ host }}{{ this.url_path }}",
+  "inLanguage": "{{ 'de' if faqs_in_german else 'en' }}",
+  "isPartOf": { "@id": "{{ host }}/#event-{{ site.config.PROJECT.year }}" },
+  "mainEntity": [
+    {%- for pair in qa_pairs %}
+    {
+      "@type": "Question",
+      "name": {{ pair.q|tojson }},
+      "acceptedAnswer": { "@type": "Answer", "text": {{ pair.a|tojson }} }
+    }{{ "," if not loop.last }}
+    {%- endfor %}
+  ]
+}
+</script>
+{% endblock %}
+
 {% block body %}
 <div class="subsite">
     <div class="subsite-title">
         <section class="content">
-            <h2>{{ this.title }}</h2>
+            <h1>{{ this.title }}</h1>
         </section>
     </div>
 </div>

@@ -1,0 +1,94 @@
+title: Python Birdies: Codegolfing for better understanding (and fun)
+---
+description: Codegolfing, the art of condensing ones code, seems counterproductive to good programming standards. In this talk, I will argue, with the use of examples,…
+---
+created: 2018-06-03
+---
+code: K7VAR3
+---
+slug: python-birdies-codegolfing-for-better-understanding-and-fun
+---
+speaker_names: Jonathan Oberländer
+---
+speakers:
+
+
+
+### Jonathan Oberländer
+
+Jonathan started programming at the tender age of 12, after accidentally buying a book about C++. He quickly moved on to other languages (VBScript, AutoIt, PHP, Javascript, Perl, ...), but it wasn't until his Bachelor studies in Computational Linguistics (Saarland University) that he started learning Python, after having to choose between it and a Java course. Since then, he has mostly stayed true to Python, except for the occasional affair with esoteric programming languages. After finishing his Master's in Cognitive Science (Trento) and Computer Science (Prague), he started working as a full-time Python developer at the German price comparison website billiger.de
+---
+abstract:
+
+
+Codegolfing, the art of condensing ones code, seems counterproductive to good programming standards. In this talk, I will argue, with the use of examples, that this need not be the case, that playing with a language can give you better understanding of its internals, and in turn make you a better programmer.
+---
+full_description:
+
+
+Codegolfing means taking a programming task and trying to answer it with a byte-minimal correct solution. Such an answer often takes shortcuts, is horribly inefficient, and definitely violates almost 100% of PEP 8. Like any playful interaction with a subject, it can however improve your understanding of it, as well as teach you about weird interactions regarding operator precedence, lexer quirks and more.
+
+After going over basic definitions, I will take a small number of well-known or straightforward programming tasks and go through the act of golfing an answer together step by step.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track:
+---
+tags:
+---
+submission_type: lightning
+---
+submission_type_label: Lightning Talk
+---
+submission_type_id: 9
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: expert
+---
+domain_expertise: some
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/K7VAR3.png
+---
+youtube_id: DPKSSxtVXuY
+---
+video_link: https://www.youtube.com/watch?v=DPKSSxtVXuY
+---
+video_published_at: 2018-11-05
+---
+video_duration_iso: PT13M42S
+---
+video_thumbnail: https://i.ytimg.com/vi/DPKSSxtVXuY/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Yeah, thank you very much This is my name. This is the company. I work at but there will be nothing about that in this talk I have another talk tomorrow with a colleague of mine sitting somewhere in the audience If you're interested in what we do then you can do that. So now without further ado, let's go to Code golfing or actually with further ado Am I in here it doesn't I have to warn you that doing anything you see here at work might get you fired, and rightfully so. Right, so what is code golfing? Code golfing is the art of writing code that is technically correct, uses as few bytes as possible, so it's as short as possible. There's other languages where you measure it, not in bytes, but in other units, but in Python, we measure in bytes. And there's no step three. So that's all. So that means no comments, no white space, no braces, if you can get away with it. Only one letter variable names in languages that allow it, like Python, usually leads to terrible code, to terrible complexity. You care about computability, not about complexity. That's what I mean with technically correct. All right. So now we're going to go through an example. I'm sure you all have seen this before. This is fizzbuzz. So the challenge of a typical whiteboard interview challenge, you go through the numbers from 1 to 100. And you print them, except if the number is divisible by 3, then you're supposed to print fizz instead. If it's divisible by 5, you're supposed to print buzz instead. If it's divisible by both, so by 15, you print fizzbuzz. So far, so obvious. So this is a straightforward implementation. Notice the number on the bottom left. This is the amount of bytes. And we're going to try to take that down a bit. And I want you to think about what number do you think we can reach. Yeah. So let's see. Another thing is I won't start with removing the bytes space. It would be probably the easiest thing. You could get rid of the indentation. But just for the sake of readability, I will defer that to a later point in time. OK, all right. So we are right now at 182 bytes. The first step is, we spend a lot of time using, in the conditions in the first version, so Python has this neat exception thingy, which is really smart, and smart is good because it means we don't have to do it, Python does it for us. So instead of asking for, checking these conditions, we have a list here, one letter variable name, where we store the result of the modulo of the number divided by 15, 3, and 5. And then we, so this will either contain some, it might contain a zero, or it might not contain a zero. If it's not divisible by anything, it will not contain a zero. If it's divisible by, let's say, three, the second number will be a zero, and the others won't be. And then what we do is we take this list, fizz, buzz, fizz, and buzz, and find the first element of the list where there is a zero. So that means the order matters here. If we have, if it's divisible by both 50, by both three and five, then it will be all zeros. look for the first element where this is true, we will find fizzbuzz and print that fizzbuzz. And if there's no 0 in the list, then we will fail. We will throw a value error, I guess. And then we'll use a bare accept, terrible, great thing to do, of course. And then we'll print the number itself. So here, the order matters, as I said. I said one-letter variable names are great, that's true. But what's better than one-letter variable names is zero-letter variable names. So we can, instead of declaring the variable whenever you can, you should try to put it directly in there, especially if you use it only once. So now we are at, sorry, the previous one was 142 bytes, now we're at 132 bytes. Right, so what is shorter than exception handling? No exception handling. So what we can do is we can just put the number there, the number itself in the list too, and put a zero in the list of potential zeros, so we will always find a zero. And in that case, we will get away with not having to do the exception handling. And now we're at 96 bytes. Now is the time for getting rid of the white space. So this is 84 bytes. Another thing, notice that there are no line breaks here anymore. The line breaks are just for wrapping, so you can see it better. It would be very small if it would all be in one line. But there's no actual line breaks here. So this is exactly the same thing as before it except we put it in all in one line We got this is a one line one line for loop probably also not used that often in normal code All right We're not there yet, so we can get this shorter The next solution is not by me. I still like it. It is 62 bytes. So let's let's see what this is what we're doing here We're using two cool tricks here. The one thing is sequence multiplication And the other is lazy evaluation of Boolean operators. So, to the sequence multiplication first, you probably all know this, that if you take a sequence, like a list or a string, and you can multiply it by an integer and you'll just get this sequence, but that many times. So, fizz times three is fizz fizz fizz, but importantly fizz times one is fizz, and fizz times zero is fizz, is the empty string. Also in Python, true and false are just one and zero, so you can also multiply strings by true or by false to get the string or an empty string. We also use this lower than one here. This is a bit weird. Why do we do lower than one? Well, what we really want to do is to check whether the result of the modulo equals equals zero. And equals equals zero is not really the same thing as checking for whether it's lower than one, but always a good code calling thing practice. Even if it's wrong, if it technically works in this value range because we have only non-negative integers, then use it. And so what we also do is now that we don't have to separately check for the 15 anymore because we just concatenate the strings and the other thing is I said is that and and or evaluate value to the last evaluated argument So that means that or if the first if the first argument of or is truthy Then we will just return that if the second value second if it's not then we will just return the second thing No matter what it is. So in this case if we have fizzbuzz or fizzbuzz we return that string But if we have an empty string because it's not divisible by any of these numbers, then we will return I Right Does anybody think we can shorten this? We can by one byte Yeah So first the first thing you might notice is that I cheated with the syntax highlighting here Most of this is just one big string from the beginning of the print until the multiplication operator on the bottom there. So what do we do? We again use sequence multiplication, so we generate a long string times 100. So this string just times 100, and then we exec it after initializing i to 0. The rest is a bit complicated, but not so bad. So first of all, we now iterate over the numbers from 0 to 99 instead of the numbers from 1 to 100. So we'll have to account for that. We changed our condition again, from the lowercase lower than 1 to something else, simply because now we can get rid of the parenthesis and we save one byte per expression, so two bytes in total. So what do we do here? We do integer division, this is Python 3, I think you can also do it in Python, it's sort of like Python 2's division except it's always truncating the division. So let's say we are at the number 6, which is divisible by 3, then an i is actually 5, and 5 modulo 3 is 2, and 2 integer divided by 2 is 1. Any value that's not divisible by 3 will get a 1 or a 0, and 1 or 0 divided by 2 is 0 when you truncate. Then there's the, we do the same thing with buzz, except with four instead of two of course. In the end, we do build sort of our own for loop with incrementing i there. And then there's this other expression there after the or. Do you all know what the tilde operator does in Python? It's the invert operator, it basically does a bit flip, it flips all bits. So algebraically this does minus x minus 1 essentially. So minus x minus 1, minus that again, if you have 7, then minus 7 minus 1 is minus 8, and we negate that again as 8, so basically minus tilde something is just that something plus 1. Why do we do that? Because then we don't have to use parentheses here, or we don't have to use spaces here after the or, because this is unambiguous for the Python grammar, so you can get away with just writing it like that. Yeah, OK. So this is the final solution that I found, or that actually is also not written by me. I also found this on Stack Overflow. But if anybody will find a shorter solution, shorter than 61 bytes, please talk to me. I'm interested. All right, so you might be rightfully scared or discussed it now, but I still think that code golfing is good for you, for several reasons. So first of all, puzzles are good. By restricting your vocabulary, in a sense, you become more creative and you will also improve your skill when you remove that restriction. So I would always compare this to poetry, where you also restrict your literary output to a certain format, depending on the kind of poetry you write. or the literary movement of Ulipo, where people write whole novels without the letter E. And similarly, I would say that those people are pretty good authors. Understanding of this is good. So through code golfing, you get an understanding of things like the Python grammar, the lexer, the parser. Operator precedence is very important. Yes, and finally, knowledge of this is also good. For me, this is sort of in the same category as meta classes, descriptors, the ask module, the inspect module, in that use of it is generally considered harmful, but knowing it still helps you, and there's maybe one or the other, some edge cases where it can actually help you. Well, I'm in time. So, before I stop, I want to send you to these sites, I like this codegolf.sackexchange.com. This is not just for codegolfing, also for programming puzzles in general. There's codegolf.io, this is sort of like vimgolf if you know that, just for all languages. And of course there's always a relevant xkcd. And you can find me on GitHub and Mastodon. Thank you for your attention. So we have time for several questions. Is it bytes or unicode code coins? Good question. It is bytes. So there are letters in this case then? Correct, correct. This is, of course, you can do it however you want. It's based on convention. But even in Python 3, we can't usually do this in bytes. Because otherwise, there's pretty cheaty solutions. So this code solving community is obviously not just Python, but all kinds of languages. then there's people who write languages specifically for code golfing. And then you can pretty much fit anything in one letter, because you can use all of Unicode and have one letter that does fizzbuzz, one letter that does hello world, one letter that does, and so on. So you count in bytes, but importantly, the final new line that you usually have doesn't count. So you can strip that off. Yes? I don't think that's something that's very popular at the club. I don't think the opposite works for Perl programmers at all. How can you? Actually, I don't see so much Perl there, but yeah. Do you have a question? Yes. How long do you have to wait for Python 3? Yeah, of course. I mean, the solutions I showed was Python 3 only. I don't work with outdated Python versions, except at work. But I think you could actually get this one byte shorter in Python 2 because of print. But yeah, I try not to think about that. Great. OK. Let's see.
+
+---
+transcript_status: auto
+---
+transcript_language: en

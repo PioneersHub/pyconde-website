@@ -1,0 +1,196 @@
+title: Making the complex simple in data viz
+---
+description: Creating graphics that convey the desired message, are easily interpretable, but also beautiful can be a daunting task. This talk will demonstrate how to…
+---
+created: 2019-05-26
+---
+code: NC8VVA
+---
+slug: making-the-complex-simple-in-data-viz
+---
+speaker_names: Tania Vasilikioti
+---
+speakers:
+
+
+
+### Tania Vasilikioti
+
+First exposed to programming with R in an econometrics course in university, Tania was quickly fascinated by the beautifully (and sensibly!) structured world of `ggplot2`.  Moving to Python last year made her realize that building graphics is not at all as easy as Hadley Wickham [made it seem](http://vita.had.co.nz/papers/layered-grammar.html). This spurred a quest to find the best framework to think through when designing graphics, and a way to apply it practically in Python. 
+
+Tania is a Data Scientist at Babbel in Berlin and fights daily for the best way to visualize complex data in simple ways.
+---
+abstract:
+
+
+Creating graphics that convey the desired message, are easily interpretable, but also beautiful can be a daunting task. This talk will demonstrate how to use *The Grammar of Graphics* framework to conceptualize the elements of any graphic, in Python.
+---
+full_description:
+
+
+When building a data visualization in Python from scratch, we quickly stumble across multiple questions: "What type of plot to use?" "How to scale the axes?" "How many dimensions?" "Should I use colors?" In trying to answer these, we can easily get lost in multiple exploratory trips to Stack Overflow, documentation pages, example galleries, and tutorials, often resulting in code that utilizes three different libraries, is more than 50 lines long, and leaves us with a feeling that our graphic's language is lacking structure.
+
+Part of the problem is the abundance of data visualization packages available in Python and their very different syntactic patterns. Each package uses different ways to change elements like axis features, labels, annotations, titles, or even gridlines. Even the way the input data needs to be structured can differ. As a result, the analyst is often absorbed more by figuring out how to adjust each visual detail, instead of thinking of the graphic as a system of logically structured elements, and mapping the data to each of them separately.
+
+Enter *The Grammar of Graphics*, a framework conceptualized by L. Wilkinson in 1999, which helps us better understand the underlying structure of every graphic. The talk will introduce the framework by deconstructing a simple chart into its constituent "grammatical elements": *Aesthetics, Algebra, Scales, Statistics, Geometry, and Coordinates*. I will discuss each and explain how every element directly translates to the decisions we take when designing a graphic. 
+
+Then, I will practically demonstrate how plotting with a grammar can be highly liberating, as it makes otherwise complex plots easy to think about and then to create. Even though *The Grammar of Graphics* (and its sister *The Layered Grammar of Graphics*, Wickham 2010) is most famously implemented in R's `ggplot2`, that doesn't mean the framework is language-specific – it can be used with any Python visualization package. To demonstrate, I will show an application of the framework by building a chart in the Python `plotnine` package, and then explaining how we can use *the grammar* as a guide to let us build the same chart in `matplotlib` – one grammatical element at a time.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: PyData
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 95
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: basic
+---
+domain_expertise: some
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/NC8VVA.png
+---
+youtube_id: pwzsGHjTDa4
+---
+video_link: https://www.youtube.com/watch?v=pwzsGHjTDa4
+---
+video_published_at: 2019-12-08
+---
+video_duration_iso: PT31M32S
+---
+video_thumbnail: https://i.ytimg.com/vi/pwzsGHjTDa4/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+Hi everyone, thank you for coming here. So today I want to talk to you about my approach for making data visualization simpler, especially when talking about more complex graphs. So a bit of my motivation for this talk. So I work as a data scientist in product analytics at Babbel, which is a language learning app. And in my role, I have to daily communicate with a lot of different people, some of them technical, some of them less technical. and I have to explain to them stories usually about our learners' data. And fortunately or not, these stories are actually usually quite complicated. So we have users who are dormant, who are super active, who are on different devices at the same time. And when I have to kind of visualize this information in a graphical way, often it becomes kind of a mess in my head. How do I go about visualizing this complexity? So the key challenge that I face is, how do I make a chart really that is complex in meaning, yet in my code and its implementation is simple to understand for me? And so, what's on today's menu? First, I'll talk to you about the grammar of graphics, and specifically about the layer grammar of graphics. As we saw in the previous presentation, this is a topic that is kind of related to ggplots in R. Then I'll talk about implementations in Python, and specifically the ones that I like to use. And finally, I'll give you a little bit of how I use the grammar as a mindset, not just in terms of its implementation as a package in any language, but just as a mindset that will help me to frame graphics in a more concise way. So what is the grammar of graphics? It's basically a tool, set of rules, framework, whatever you want to call it, that allows us to describe graphics in a more logical way, in a more structured way. A little bit about its history. So, 2006, there's this great book by Leland Wilkinson, The Grammar of Graphics. Very thick, very dense, very theoretical. It kind of establishes what the basic elements of a graphic are, which are data, transformation, elements, scales, guides, and coordinates. And I will talk about these in a second, more about when we talk about the layered grammar graphics. So, key takeaway, we now have kind of these rules established on what Grammar Graphics is. Then, enter 2010, Hadley Wickman, that we also heard about before, kind of a cult figure in the art community, comes out with this paper and a package, Gigi Plot 2, where he explains how do we take this theory from Wilkinson and how do we create a package out of it? You know, how do we actually code these layers and these different elements? in this paper I find really cool I really recommend you read it actually if you like visualization he describes how to plot this chart which is a sort of famous chart by Menards he plotted it by hand in 1869 I think this is the progression of French troops towards Moscow in red and then how they retreated and this is if you just look at it this looks like a really complex graph like how would you go about plotting this and he makes it very, very simple to understand. If you understand the structural elements that make up this plot, you would go about coding it in X-Way. So what are the actual components? I will quickly go through a little bit of the theoretical part. There's no code involved, and later I'll talk about the packages that I like. So components of a layer, and I'm always referring to the layer grammar of graphics more than this paper. We have our data, our aesthetics, geometries, and statistics, and I'll explain in a second what they are exactly. And these are kind of the mandatory, the core elements of every layer. Then we have facets and coordinates and sometimes scales or scale manipulations that can belong to multiple layers. And finally, we have themes that are usually globalism, more like the visual elements that are not related to the data. So let's go one by one. The first ingredient we need are data. So I'll walk you through this by looking a little bit at the, by using as an example, the diamond data set. This is a very typical data set used when learning about data visualization. It basically has a bunch of diamonds, their price, their different cuts, the size, carats is the size, the cut is kind of the quality, and then you have all of these other dimensions. So it's a good mix of categorical and numeric data to play around with different visualizations. important next ingredient are the aesthetics so aesthetics are essentially mappings between the variables in our data to the visual properties of the graph so for example when we're talking about a scatter plot scatter plot has a dot in a cartesian plane and we have to match every element of our data frame of our data sets our variable to a certain element of that visual scatter plot So a scatterplot has every dot has an X position, a Y position, and perhaps we can add color to it, right, or a size of the dot. So we'll say in this case, we will map the price of the diamonds to the Y axis, the carats to the X axis, and the color of the diamond to the color of the dots on our graph. Then come geometries, and geometries are really what we think about when we say, oh, this type of chart. So when we say a line plot, a scatter plot, a histogram, a violin plot, all of these are essentially geometries. And geometries are very interesting because they imply in them a lot of other things that we talk about the data. So, for example, a line plot as a geometry already implies in it the kind of visual elements we can map our data to, right? So it implies that we have an X position, a Y position, a thickness of the line, the color of the line, right? A histogram has bins or bin sizes, etc. Statistical transformations are not directly intuitive. I'll try to illustrate with an example. They're basically manipulations of our data, of our original data that have to happen so that we can map it to this visual element on a screen or on paper. So if we look again at only the cut, so the quality of the diamond and the price, we can actually aggregate this data in different ways right so if we just looked at the raw data observation by observation this wouldn't one-to-one translate to a bar plot that shows us the average price right we have to aggregate based on the cut and take make some kind of statistical transformation so that's the mean and the same goes for the median for example Another very obvious example is a boxplot. So a boxplot takes the raw data and it calculates the median, the quartiles, the whiskers, right, to tell where the outliers are. So these are all manipulations to our data that are done implicitly when we think about a specific type of geometry. And so what about some additional elements to a graphic that are not necessary to form a layer? So we have scales and scales for me, this is probably the hardest layer to understand because scales would have to do with the different elements of the plot or the graphic that we try to map our data to. So for example, we can map, as we said, our data to a numerical value, right? So a value on the X axis and the Y axis, but we can also plot it. We can also map it to a color or a shape or a size of a dot. And so scales determine how the data in a real data set are mapped to this kind of linear or color space. So for example, here we take the size versus, we're trying to look at the size of the diamond versus the price. On the top, we're just looking at the raw dates and the bottom, we make a log transformation on the x-axis, perhaps to see the relationship a little bit better. and this is a this is a transformation in terms of the scales we scales are also if we map color for example we have to tell what is the minimum and the maximum value of the color range that we're talking about right if a color is discrete we want to say what is bad what is good right what is the red what does a green one mean and legends are in fact kind of inverse decodings of a scale. Then facets, facets are, we use facets to, in a way, slice our data based on some kind of categorical variable that is not explicitly shown in our plot. So, for example, if we're talking about, again, the size of the diamond versus the price, we plot them and we get some kind of the trend, right? And we say, all right, we see some kind of positive relationship, But does the same relationship hold if we change the type of the diamond? Is it the type, the quality of the diamond? So we take an external parameter, which is not included in the first graph, right? We take the cut of the diamond, fair, good, very good, premium, ideal. And we split our data based on that. But we plot them on a common chart. So the one on the right is one chart. I mean, it has subplots, but it's really telling one story. Then we have our coordinate system. I guess this one is sort of basic. Most people see we have our Cartesian coordinates usually and polar coordinates. So you can plot the same type of data in a Cartesian space or polar space. And finally, we have the theme, which is really everything else that doesn't have to do directly with the data. So, for example, annotations, titles, the fonts we use, etc. Importantly, theme is really what allows us to tell an economist plot from an XKCD plot, even if the data is exactly the same. It's the theme that makes it feel like that. I found this really nice animation that I think kind of helps put it all together. That we put each element of the layers together and all of them, when they are layered on top of each other, create the graphic. now what about implementations in python so i'll start with a little side note which is that there are actually a lot of libraries out there in python that are at least a little bit inspired by the grammar of graphics um i think before someone mentioned altair there was actually a great talk from last year's pi condi talking about uh grammar graphics and altair specifically And also, Bokeh says that it's kind of a little bit inspired by grammar of graphics. But today, I'll talk to you about two other packages that I actually personally use. And maybe we'll just try to uncover how the grammar of graphics reveals itself there. So, our first one is Plot9. And Plot9, especially from someone coming originally from R, like me, is really neat. Because it's a direct implementation of ggplot and the ggplot syntax in Python. So, you just pip install plot9, from plot9 import everything, and then use the usual ggplot syntax, and I will explain in a second how everything maps. So, for this example, I'll use this Pokemon dataset from Kaggle, it's really neat. It's a dataset of 800 known Pokemon's demand, with all of these different characteristics about their skills in terms of defense, attack, speed, HP, has a lot of other variables. And then the type that the Pokemon belongs to and its legendary status. Hopefully it'll help you choose the best Pokemon, the starter Pokemon. So how does it work? First, we start with the data. So Plot9 uses the same kind of additive syntax that ggplot does. We start with creating a ggplot object. and plot9 is also based it takes its fundamentals from matplotlib so it tries to kind of map all this the primitives of matplotlib to a more ggplot like syntax so we start by defining our data so our data is the pokemon data frame and then we define our geometry and geometries are defined by adding geometry underscore whatever geometry you want so You can have a point, which is scatterplot, bar, density, area, histogram, boxplots, violinplot, whatever you want. And then we start adding our aesthetics. And aesthetics, like we said before, they are tied to the geometry, right? So a lineplot will have different possible aesthetics than, let's say, a barplot or histogram, right? So here we map the aesthetics on the x-axis of this barplot. we want to split our data based on the type that the Pokemon belongs to. So we have these bug, grass, normal, etc. So we have the counts of each Pokemon in each group. Then what if we want to do statistical transformations? So there's two ways, both in ggplot and plot9, to do this. Statistical transformations can be defined either outside as a separate additive element or inside the geometry. Here, I personally prefer, it's more intuitive for me to define it inside. So we say, for this geometry, a column geometry, I want to make statistical transformation called summary, which is the average. So here we're looking again at the... Here we're looking instead of the count of Pokemons based on their type, we're looking at how well do they perform in terms of their attack. So the average attack strength. how about coordinates so unfortunately because plot9 is an implementation of ggplot in python not everything is yet there you're of course welcome to go to project and contribute but for example if you want to plot your pokemons in a pie chart in plot9 you wouldn't be able to do that because we don't have the polar coordinates and then we have facets so So let's take a step back and say, okay, I want to look at how the attack capacity of these Pokemons is distributed, is split between legendary and non-legendary and how this different really, how big this difference is based on the type of the Pokemon type. So we facet on the Pokemon type, we keep fixed scale so we can compare each facet element to each other. and then inside each plot we have kind of the density distribution of the attack scale of the pokemon interestingly so for me as i said scales are a little bit hard to understand and especially when we talk about color because it's not something i guess that intuitive so here we have one aesthetic that we have is the fill right so it's the color that we give to each distribution and the fill is really it is a map it is mapped to the data it's mapped to the fact whether a pokemon is legendary or not and since it's mapped to the data it also has a scale so the scale of the fill can be also manipulated so for example when we say that not legendary pokemons are green and legendary are pink we're defining the scale of this color dimension and this is a different scale right and finally themes are defined again as external parameters you can I mean you can create this object right because it's based on matplotlib and add whatever aesthetic elements you want afterwards but this is there's also some predefined themes that come in they're kind of nice. Next is Plotly Express. Plotly Express is a high-level wrapper basically around Plotly. I think it came out in March this year. We use it in my team. People like it. The whole premise of Plotly Express is that you can make really complex graphs in one line of code, interactive. So you import Plotly Express as PX and Plotly Express is directly inspired by layer grammar graphics. You can find that in the documentation. And the whole focus of the package is conciseness. I don't know if you've ever used Plotly before, but it's often like there's different syntaxes that you could use. Often you get lost in these endless traces or list comprehensions, et cetera, and Plotly Express tries to get rid of this. So the basic way that a Plotly Express object maps to the grammar graphics is the following. So we start with creating an instance of the class that represents the geometry. So px.scatter is the object and the geometry that we want to plot. We want to plot a scatter plot. Then we have data frames, x, y, color, size. All of these are aesthetics, But some of them can also be linked to the scale that they represent. So we have the X limit, Y limit, color minimum, etc. And finally, we have the facets. So let's go through this example. Here, we're going to talk about this, the Gapminder data. Gapminder Foundation collects data about different socioeconomic indicators in different countries around the world. and here we're going to talk about specifically gdp per capita versus life expectancy in 2007 this is a nice example because allows us to have there's multiple dimensions can be mapped to different features of the plot and we'll see how that goes in plotly express so we start by defining our geometry so first thing you really have to choose is the geometry you want to plot. So geometries you can choose are scatterbar, corp-left, parallel coordinates, anything you want. There's a lot of different geometries you can choose from. Then you choose, you put in as a parameter your data, and you specify the mapping of your aesthetics to the data in your dataset. I think Yuta mentioned before that tidy data is really, well, it's kind of necessary and very tied to the ggplot and tidyverse universe. And I think Plotly Express is also kind of built around this. Well, you kind of have to use a tidy dataset to make it work better. So let's say here we define four different aesthetics, the x dimension, the y. So the position on the x-axis, position on the y-axis, the color of the bubble and the size of the bubble. And those are mapped to different variables. Now we have scale, so something you saw before is that it's kind of hard to see the difference between the bubble sizes, and the reason really is that the package automatically kind of scales your data, and the way it scaled it before wasn't possible to see it. So what we want to do is we want to adjust the scale. So we adjust the size of the bubbles to a certain maximum. So we set the limit and we make it a little bit more visually interpretable. And then we also want to make a log transformation to the x-axis. Also very easy to do inside of the parameters, which allows us again to see better this relationship between GDP per capita and life expectancy. Statistical transformations in Plotly Express are implicit in the type of geometry that you choose. You can't necessarily define them directly. So in the example of a box plot, your Plotly Express will go there and calculate the median, the quantiles, the whiskers, etc. If you want to do any other kind of statistical transformations, you would have to do them beforehand or outside the plotting function. Facets are also very easily defined and coordinates are also inbuilt, same as the statistical transformations are inbuilt in the type of geometry that you choose. So this is some different data but it shows you what kind of... you can build a polar bar plot very easily. And finally themes are the themes that are inherited from Plotly. The default themes, since you are using Plotly, essentially you can always go and define your own themes, you can create whatever kind of aesthetic space you want. So these are kind of two different themes. So as a summary, Plotly Express allows you to build interactive plots in one line of code. So this is, I forgot to put the code, but this is just one line of code. So this is going back to the Pokemons, we can see how their HP score is dependent on the type, the first type, the second type, generation, and their legendary status. So finally, just very shortly, I'll give an example of how I use the grammar just as a mindset. So big disclaimer is that I actually really like matplotlib. I always use matplotlib to make static plots because I think it's very flexible, allows you to create high quality plots that are, you know, very adjustable to what you want. And so my philosophy is to still use the grammar of graphics as a mindset and then map everything I have in Matplotlib to that. So as a challenge, let's try to build this chart in Matplotlib. So this was done in Plotly Express. I mean, this was originally an interactive chart. You can save it as a static one. Let's try to build this in Matplotlib. so what I would do is I would take the elements of the grammar of graphics and I would think about each of them okay in this case what do I what does each element translate to my use case and where exactly in matplotlib am I going to find it so geometry is a scatterplot right we this is easy matplotlib pi plot scatter great what about the aesthetics aesthetics are also defined inside the scatterplot. They're the x parameter, the y, the s, the c. So we say in our data, the x will be the GDP, etc. Scales, this really depends, right? So matplotlib is really great at allowing us to adjust numerical scales. But in terms of color scales, for example, or the sizes of the bubbles, those are things that would probably have to be done manually. So in this case, I'll show you in second I actually went ahead and I trimmed the population and just divided it by 200,000 to make it fit in the scale of the bubble chart. Facets in matplotlib are really a way you have to kind of iterate through these subplots and populate them independently. It's a little bit ugly but I guess this is a matplotlib syntax. And finally themes are also you kind of have to think about but what is it exactly that you want to do? For example, in this case, colors that were dependent on the facet that you're in. So since we're talking about subplots, you have to take the color you want and put it inside each. So this is the outcome. This is what we have with Plotly Express on the left, with Matplotlib on the right. And this is the amount of code it took to do this in Matplotlib, because you had to iterate through every single subplot. And this is the amount of code it took in Plotly Express. And as you can see, I actually used Plotly to update the layout because I wanted to remove this legend in the end. So it's not one line of code, it's two. So that's it. Thank you very much. Thank you. Are there any questions? Yeah. Let's start.
+
+**Speaker 2** _[25:08]_
+
+thank you very much was very good if just one question might be a little bit specific but in Plotly Express you have those hovers and so if you hover over one point yeah I'm just wondering do you know any way to edit the hovers because sometimes it might be nice to show a picture or anything have you any experience
+
+**Speaker 1** _[25:30]_
+
+I don't know, but I think you would have to use the underlying Plotly syntax to fix these kind of things. I found Plotly Express to be quite restrictive in general. So for simple things, it's great. For editing things, mm.
+
+**Speaker 2** _[25:48]_
+
+Okay, thanks.
+
+**Speaker 3** _[25:59]_
+
+Could you pass it on?
+
+**Speaker 2** _[26:05]_
+
+Thanks for the great talk. So I found myself often using this more complicated, more higher-level plotting libraries which you introduced here, or seaborne or something like this, but then returning back to MapPlotLib because I need to really have a fine control over every feature. Do you have any idea how I can start off with this more higher-level library, but then do the fine-tuning only just inside maplolib, so how I can integrate these two different levels of libraries, or should I just start off using maplolib and do everything by myself, basically?
+
+**Speaker 1** _[26:48]_
+
+It's a great question, and I think about it all the time. I don't know if I have an answer. In my experience, I will usually try to build something like with Seaborn, right? Because I'm hoping that it will give me the result I want. But then I realize, okay, for smaller details and fine-tuning, I have to actually adjust them. Perhaps if you actually thought about this, if every time that we built a graph, we kind of took a step back and we said, all right, we want these elements. like regardless of code we just want these elements and then we say all right do all of these elements exist in seaborn in an easy way and then go ahead and do it um on otherwise i think it's actually maybe better to learn to do matlab lib very well sorry
+
+**Speaker 3** _[27:41]_
+
+First of all, thank you for the presentation, really cool insights, but I had a question
+
+**Speaker 1** _[27:47]_
+
+I had a question.
+
+**Speaker 3** _[27:48]_
+
+It's here in the front.
+
+**Speaker 1** _[27:48]_
+
+I had a question. in the front hello hello
+
+**Speaker 3** _[27:51]_
+
+So, we use data visualizations to break down complex problems on a daily basis. So, there's a lot of abundance of types of data visualizations that we can do with all these packages. But I was wondering, is there a framework that you use if you want to visualize a problem or something? Is there a framework that you use to choose which type of data visualization? And taking in consideration the people that you're trying to present this for, also the data literacy that they have. For example, some of these data visualization types can be a bit more advanced or a little bit more, and that it can lead to bias or some. So is there a framework that you use? And what are the most common types of visualizations that you opt?
+
+**Speaker 2** _[28:51]_
+
+for
+
+**Speaker 1** _[28:54]_
+
+Great question. So actually, I do have a sort of framework that I like. It comes from, I guess, maybe I shouldn't call it framework, but there's this book called Storytelling with Data by Cole Nafik. I can't pronounce her name. I think it's considered like a very important book in this more modern way of thinking about data visualization. It goes really into detail about, okay, first you have to like think about your audience this is the first thing before you even start plotting anything uh and then she progresses to explain okay how do uh different types different geometries right different types of visualizations are better for explaining different problems and the simpler actually usually the better regardless of what your audience is then again there's a difference in terms of if you're building a visualization that is um explore explorative or explanatory exploratory or explanatory right so an interactive visualization like the person could go in and play around and do whatever they want like a dashboard but if you want to make a point uh it's a very different question it's like in a presentation right you want to highlight one line out of many uh i really recommend that book um But in terms of visualizations that I, in that work, we use the most, usually it's actually the simplest ones, like line plots. We use histograms a lot to look at time that it takes users to do different things. But we rarely go into more complex statistical ones. I've only ever done, I don't know, some kind of density function to just demonstrate statistical concepts, but not actually to model or to display our data. So I think simplicity is, in the end, much, much better in a work environment, in a business environment. Hello. Hello.
+
+**Speaker 2** _[30:55]_
+
+Thanks for this comparison of those high-level APIs. So not all the data can always fit into a data frame, like structurally, maybe a sparse time series or so. So which of these plotting libraries is most useful when you cannot put your data into a single data frame?
+
+**Speaker 1** _[31:16]_
+
+I don't know the answer to that. Sorry.
+
+**Speaker 3** _[31:22]_
+
+Okay, sadly time is up for further discussion.
+
+**Speaker 2** _[31:23]_
+
+time is up for further questions you have to take
+
+**Speaker 3** _[31:25]_
+
+You have to take them offline.
+
+**Speaker 2** _[31:26]_
+
+them offline so
+
+**Speaker 3** _[31:26]_
+
+Cool.
+
+**Speaker 2** _[31:27]_
+
+cool
+
+**Speaker 1** _[31:27]_
+
+Thanks again.
+
+**Speaker 3** _[31:27]_
+
+Thanks again.
+
+**Speaker 1** _[31:28]_
+
+Thank you very much.
+
+---
+transcript_status: auto
+---
+transcript_language: en

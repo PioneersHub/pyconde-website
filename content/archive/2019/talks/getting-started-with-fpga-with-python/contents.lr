@@ -1,0 +1,151 @@
+title: Getting started with FPGA with Python
+---
+description: In this review, we'll look into frameworks that will help Python developer start working with FPGA without prior knowledge of Verilog or VHDL.
+---
+created: 2019-05-17
+---
+code: PHYCJL
+---
+slug: getting-started-with-fpga-with-python
+---
+speaker_names: Olga
+---
+speakers:
+
+
+
+### Olga
+
+Backend Engineer living in Amsterdam, originally from Russia. 
+Work with Python for 5+ years. Have extensive QA experience.
+---
+abstract:
+
+
+In this review, we'll look into frameworks that will help Python developer start working with FPGA without prior knowledge of Verilog or VHDL.
+---
+full_description:
+
+
+FPGA is becoming more and more popular in many fields such as IOT, video processing. It also used to make computations for machine learning and trading technologies more effective. 
+Unfortunately for newbies to this technology, it is quite complicated and usually requires using specific languages: Verilog and/or VHDL. But with frameworks such as myVDL and PYNQ Python developers also can explore these opportunities. 
+We'll look into FPGA technology, touch what it is and where and how it's used. Also, where can Python developers start and what they can achieve.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: PyConDE
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 95
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: basic
+---
+domain_expertise: none
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/PHYCJL.png
+---
+youtube_id: aTi35MMAVLs
+---
+video_link: https://www.youtube.com/watch?v=aTi35MMAVLs
+---
+video_published_at: 2019-12-16
+---
+video_duration_iso: PT24M2S
+---
+video_thumbnail: https://i.ytimg.com/vi/aTi35MMAVLs/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Let's get started. Pun intended. So who knows what FPGA is? Cool. Who not only knows, but also worked with it? Still quite cool. Maybe someone worked with Python with FPGA. Okay, cool. You'll help me in the end when questions come. so for those who doesn't know what it is FPGA it's for field programmable gate arrays for me at least when I first time heard this full name for this abbreviation it didn't say anything and Wikipedia says that it's a device with configurable blocks which can be used to implement custom logic after the manufacturing. So, yeah, practically, it's just buildable hardware. So, most of hardware you use, it's set up already at the moment when you buy it. And with FPGA, it's not the case. you can adjust this board to the custom needs and it helps you yeah for example if you know that you are going to perform some operations you can adjust your hardware to these operations and it can increase performance for your calculations. It often means that operations are just faster, and these boards are usually used in some compute-intensive fields like automotive, security, IoT, whatever. And it's not a new thing. It's here for a while already, but it used to be much more expensive now hardware is cheaper so more people can use it in their projects or how does it look like for example here is a scheme for multiplying matrixes so we have a lot of cells and every cell calculates its own part so and if you look at it it just like it was created to multiply matrices and also Benchmark says that modern FPGAs are comparable with modern GPUs because they can provide parallel calculations and yeah that's how it looks like to work with FPGA you have to use hardware descriptive language and And usually it looks like this. But I'm a Python developer. I don't like these things. It's hard to read. It's probably hard to write. It's hard to reuse. And yeah, no offense to author of this code. It's not the project itself who blame. It's a language. so um of course at some people at some moment people came to an idea that they can use python for fpga why because of several reasons first and foremost i would say that it's easier for developers i used to work in trading company and we had a whole team of fpga engineers and position for FPGA engineer was open like all the time and they never could fill it because not because requirements were too high but just not a lot of people in the market and also Python known by it easy readability and it helps with faster implementation. Also there is a different pain in testing on FPGAs and Python would help here as well because Python is also known as a language for widely used for testing. Code could be reused and we are less dependent as developers on a platform. For example, I love my Mac and neither Verilog nor VHDL, it's like the most popular HDL languages, don't have a proper text editor or whatever IDE for Mac, of course. So here comes my HDL. What's that? It's a Python library that can translate Python code to Verilog or VHDL. It also can generate test benches in Verilog or VHDL. Why would we use it? It's Python. You can write it in any platform. It's really easy to test and it's open-sourced. Also, the developer and creator of this library, he lives in Belgium, so you can take a train and go and discuss some things. So, if we look at this scheme, here we can see stages of developing code for FPGA. Green parts could be covered by MyHDL. And after verification, we have already very local VHDL code that has to be translated to a bytecode. and this thing is not covered by my hdl but the good news is uh it's covered by another tool and it's quite mechanical so you don't basically you don't have to think you just deploy this thing to software press buttons and here it is of course you can say the same thing about python but Yeah, it's a little bit less, a little bit more mechanical. And then, after you have a bytecode, you can deploy it on actual board and look how it works, or if it doesn't work. Let's look at some code. What we are going to implement. It's a basic flip-flop. it's probably like the simplest thing you can imagine um and um what do we have here we have clock it's the first uh column is that actually it's yeah it it's a time timeline uh we have input and we have output and basically what this thing is doing uh it delays uh on input it delays signal on input on one step and in my HDL code would look like that actually and this thing is yeah it's a generator and this thing is one of the fundamental objects in my HDL Why? Because it kind of fits into logic very well, because we have something on the input and basing on this input, we have a next step output. So yeah, it's practically a generator. And this Python object fits so well, so it's used everywhere. you're probably wondering what is decorator always. Decorator always means that we're executing code inside this decorator always. Yeah, basically it's while true decorator. What other decorators do we have here? Instance that does nothing. AlwaysComp implements asynchronous logic. And alwaysSec resets functionality inside the decorator. Okay, now we have some code. Let's create some tests for it. What do we see here? We had three signals. Signal time, signal input, signal output. And we have to work with time. And what do we want to see here? Yeah, let's just make it blinking. So every 10, I think it's nanoseconds, we will have change of signal. So it's like on, off, on, off every 10 nanoseconds. Then we have a simulation function. And it simulates input. And we want to give an input like just random signals. That's how we're, yeah, that probably would cover our test cases pretty well. So we write simulate function and voila, some test function was, test file was generated. It looks like that and it's quite big. it uh like if you look at the size it's like five times bigger than code was so if you think about uh how would you write these tests manually and what happened if you i don't know forget some hashtag somewhere or i don't know and you have this one million lines code Yeah, it's complicated, and it's much easier when you see something like that. But these test cases, it's just a code, but it would be nice to see how it actually works. And here comes GTKWave. it's a software that actually shows you what do you have in in your test file so here we see our three signals first one is clock and you see that yeah it goes on and off on and off every period of time then you see output and then you see input and we can see that in the input we Sometimes it's on, sometimes it's off. That's a random function that we created. And on the output, we actually see what we wanted to see. So it delayed input function for one period of clock. So perfect. Our function works fine. So we can now translate it to Verilog or VHDL. So it's, yeah, also pretty straightforward. We have to say our converter that this code has to be converted. We have to say to what language it has to be converted. And yeah, pretty much it. We can also, here we are converting it to VLog. We also can convert it to VHDL. And after this conversion, we have these two files. So at this moment, we can go to our translator HDL to bytecode and use these files to run it on an FPGA. so our job here is done the other project I wanted to tell you about is pink it's a board and it looks like it and it's pink look what you see is what you get this board is made of Z-Links Z-Links produced this board and what's a good thing about it every data scientist can use it because it runs Jupyter Notebook directory from here so you can take your I don't know beloved MacBook ethernet cable and connect this board to your beloved MacBook. And it is already it has already pre setup drivers for audio and video calculations. So with this thing you can do lot of stuff so like like what it has libraries for parallel things for parallel executions on hardware it also has libraries for frame high frame rate video processing and yeah everything here um so good thing is you can use it as normal jupiter laptop uh notebook um so it has numpy it has matplotlib it has skypy skykit everything you usually using uh if you need to install something else you also can do it like the only thing you have to do here is connect this board to the internet and yeah it's easy also you can upload files so if you want to upload your i don't know images or data or whatever it's also you just click upload and upload this file to your machine. If you like SSH, you can use SSH as well. So here is an example.
+
+**Speaker 2** _[16:15]_
+
+Um...
+
+**Speaker 1** _[16:19]_
+
+where developers created a classifier for objects that recognizes blue and green eyes in the pictures. And it didn't fit all on one slide, but it did fit on two. But still, you have, like, I don't know, 100 lines here. And this 100 lines, it recognizes blue and green eyes on the pictures. It's not because developers wanted to disregard like 95% of mankind with dark eyes. I think it's just because it's easier, like it needed less samples of data to work. but it is pretty fast. The thing is, I'm a back-end developer, I'm not a data scientist, but unfortunately I cannot show it right now, but I was able to connect this board to a camera and learn this thing to recognize the intruders. So it could see whatever, from the camera what this thing could see and it could recognize that it sees a person is a person not me and it is working not on so and I didn't have to adjust anything it just worked from the box so but But the thing is, not an idea of using FPGA for, of using other languages instead of HDL or Verilog for FPGAs is, like, it's not new. A lot of work has been done by big companies like MathWorks and Intel in MATLAB and C++ accordingly. Also a lot of, I'm not sure about a lot of, but there are enthusiasts who are working on it. Like this guy from GitHub, who likes C-Sharp apparently. And yeah, please try this at home. Because as here was mentioned not once, the strongest part of Python is community. And more things we are doing at home, driving with our enthusiasm, better Python gets. I think this is the end, we have plenty of time for asking questions.
+
+**Speaker 2** _[19:46]_
+
+This could be nice, but how is it different from a controller board like a Dino or a MicroPython or Beagle board?
+
+**Speaker 1** _[19:56]_
+
+I haven't worked with it, but MicroPython is already set up. So you cannot say you have to calculate this thing on this ping and this thing on this cell. So it somehow handles it itself. And with FPGA, you can.
+
+**Speaker 2** _[20:28]_
+
+You can program your pins in Arduino, for example. So is that different? For example, the object detection that you showed, we can do it in Arduino with a camera plugged into the board. So I was just wondering, because you mentioned that FPGs are comparable in performance with GPUs, so I was wondering if they offer, like because Arduinos and maybe also Linux boards are kind of slow, So I was wondering, we can leverage the performance of FPGAs. Is it in that way different from...
+
+**Speaker 1** _[21:03]_
+
+It's kind of one level lower. Oh, a lot of questions.
+
+**Speaker 3** _[21:13]_
+
+Thanks for the talk.
+
+**Speaker 1** _[21:13]_
+
+Thanks for the talk.
+
+**Speaker 3** _[21:13]_
+
+Could you describe your what?
+
+**Speaker 1** _[21:14]_
+
+your interest in getting started with FPGAs? As I told, I used to work in a trading company and I helped with these test benches before so I felt this pain on my skin and I didn't have a chance to work with Python on it back then but it kind of drove me to this topic.
+
+**Speaker 3** _[21:43]_
+
+My question is also related to the performance comparison to GPUs. As we have seen in talks or will see in talks, data science is moving towards training on GPUs because of their supreme parallel performance. Can you imagine something that we would have an FPGA farm instead of a GPU farm and train data on that? Yeah. Yeah. And, well, another question. Does that pinky really have an FPGA on it, or...?
+
+**Speaker 1** _[22:17]_
+
+Yeah, but the thing is, it's already set up. So it's set up for, actually for tasks that data scientists need. So you can use it, but you cannot have this fun of creating almost the lowest level of programming.
+
+**Speaker 4** _[22:54]_
+
+Hi, thanks for the talk. I wanted to follow up on this GPU comparison. So could you maybe give examples of applications where at least there's an intuition that FPGA can be much better than GPUs?
+
+**Speaker 1** _[23:14]_
+
+I'm not sure about much better, but it makes sense to use FPGAs with video, with audio signals, with everything around it. And also, if you need to work with low latency things, it also could be implemented on FPGAs. Thanks a lot. That's all for this session. please thank the speaker with me
+
+---
+transcript_status: auto
+---
+transcript_language: en

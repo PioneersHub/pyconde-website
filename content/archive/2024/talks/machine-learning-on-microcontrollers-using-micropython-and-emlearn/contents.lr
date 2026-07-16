@@ -1,0 +1,160 @@
+title: Machine Learning on microcontrollers using MicroPython and emlearn
+---
+description: This presentation will show you how to deploy machine learning models to affordable microcontroller-based systems - using the Python that you already…
+---
+created: 2023-12-21
+---
+code: NYHFSB
+---
+slug: machine-learning-on-microcontrollers-using-micropython-and-emlearn
+---
+speaker_names: Jon Nordby
+---
+speakers:
+
+
+
+### Jon Nordby
+
+Jon is a Machine Learning Engineer specialized in IoT systems.
+He has a Master in Data Science and a Bachelor in Electronics Engineering,
+and has published several papers on applied Machine Learning,
+including topics like TinyML, Wireless Sensor Systems and Audio Classification.
+
+These days, Jon is co-founder and Head of Data Science at Soundsensing,
+a leading provider of condition monitoring solutions for commercial buildings and HVAC systems.
+He is also the creator and maintainer of emlearn,
+an open-source inference engine for microcontrollers and embedded systems.
+---
+abstract:
+
+
+This presentation will show you how to deploy machine learning models
+to affordable microcontroller-based systems - using the Python that you already know.
+Combined with sensors, such as microphone, accelerometer or camera,
+this makes it possible to create devices that can automatically analyze and react to physical phenomena.
+This enables a wide range of useful and fun applications, and is often referred to as "TinyML".
+
+The presentation will cover key concepts and explain the different steps of the process.
+We will train the machine learning models using standard scikit-learn and Keras,
+and then execute them on device using the emlearn library.
+To run Python code on the microcontroller, MicroPython will be used.
+We will demonstrate some practical use-cases using different sensors, such as
+Sound Event Detection (microphone), Image Classification (camera), and Human Activity Recognition (accelerometer).
+---
+full_description:
+
+
+Modern Machine Learning makes it possible to automatically extract valuable information from sensor data.
+While Machine Learning is often associated with costly, compute-intensive systems,
+it is becoming feasible to deploy ML systems to very small embedded devices and sensors.
+These devices typically use low-power, microcontrollers that cost as little as 1 USD.
+This niche is often referred to as "TinyML", and is enabling a range of new applications
+in scientific applications, industry and consumer electronics.
+
+While microcontrollers are getting more powerful year by year,
+it is still important to fit within the limited RAM, program size and CPU time available.
+emlearn is an open-source Python library that allows converting scikit-learn and Keras models to efficient C code.
+This makes it easy to deploy models to any microcontroller with a C99 compiler,
+while keeping Python-based workflow that is familiar to Machine Learning Engineers.
+Via emlearn-micropython it also supports MicroPython, a Python implementation designed for microcontrollers.
+MicroPython runs on practically all microcontrollers with 16kB+ RAM,
+and this makes it possible to write an entire application for microcontrollers using Python.
+The emlearn-micropython packages provided as a set of MicroPython modules
+that can be installed onto a device, without having to recompile any C code.
+This preserves the ease-of-use that Python developers are used to on a desktop system.
+Compared to pure-Python approaches, the emlearn-micropython models are typically 10-100x faster and smaller.
+
+The models in emlearn support the core Machine Learning tasks types: classification, regression and anomaly detection.
+Additionally there are also tools for data preprocessing, feature engineering and estimation of compute requirements. 
+Since the start in 2019, emlearn has been used in a wide range of applications,
+from detection of vechicles in acoustic sensor nodes,
+to hand gesture recognition based on sEMG data,
+to real-time malware detection in Android devices.
+
+While emlearn and MicroPython can target a very wide range of hardware,
+we will focus on the Espressif ESP32 family of devices.
+These are very powerful and affordable, with good WiFi+BLE connectivity support,
+gpod open-source toolchains, very popular both among hobbyist and companies,
+and have many good ready-to-use hardware development kits.
+
+The audience is expected to have a basic literacy in Python and proficiency in programming,
+and familiarity with core Machine Learning concepts such as
+supervised/unsupervised learning, classification/regression, et.c.
+Familiarity with microcontrollers and embedded systems is of course an advantage,
+but the talk should be approachable to those who are new to this area.
+---
+room:
+---
+day: Monday
+---
+slot_date: 2024-04-22
+---
+start_time: 15:35
+---
+end_time: 16:05
+---
+slot_id:
+---
+track: Machine Learning & Deep Learning & Stats
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 3578
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Novice
+---
+supporting_material_url: https://github.com/jonnor/embeddedml/tree/master/presentations/PyDataBerlin2024
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/NYHFSB.png
+---
+youtube_id: S3GjLr0ZIE0
+---
+video_link: https://www.youtube.com/watch?v=S3GjLr0ZIE0
+---
+video_published_at: 2024-06-23
+---
+video_duration_iso: PT25M52S
+---
+video_thumbnail: https://i.ytimg.com/vi/S3GjLr0ZIE0/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:06]_
+
+Hi everyone. I'm glad to see that so many are curious about microcontrollers. I believe it's the only talk on this subject or anywhere close at this conference, so it's very good to see a full room. I have with me, before I start the presentation, a bunch of MicroPython-compatible devices, as much as I could find around home, maybe 10 or so. So afterwards, I am planning to go downstairs to the outside the tutorial area, and anyone who wants to play with some MicroPython is welcome to join, related to machine learning or not. You only have 10, so you have to play nicely together, maybe, if there's many interested. So I'm the head of data science at SoundSensing, who are a provider of predictive maintenance solution for ventilation systems in buildings. So we work a lot with sensor data, and we use Python as much as we can for data science, IoT, and the backend tasks, and the goal of today's presentation is that you, as a Python developer with some experience with standard Python machine learning libraries such as scikit-learn or Keras, is able to deploy a machine learning model to a microcontroller device, even though you've maybe never done anything like it before, using EMLearn library and MicroPython. So as a quick outline, we'll cover very briefly just some background, so we know that we're talking about the same thing. And then I'll give a super brief introduction to MicroPython, which is a Python implementation for microcontrollers. And then cover more in depth the EMLearn TinyML project. And then how to use EMLearn with MicroPython in a practical example setting. So what is a microcontroller? Well, it's a tiny programmable chip. And although you might not see them much, they are basically all around us. So any electronics device that you have in your home will have, from the last 20 years or so, will have one microcontroller or two or three or so inside that is controlling that unit. And a modern car, for example, has over 50 microcontrollers as a working combined system. and there are over 20 billion microcontrollers shipped every year so that's more than what five times the population of the world every single year so this stuff is like dust it gets everywhere but it's also it's mostly used then in like very industrial settings but it's increasingly more and more accessible for hobbyists so there was this arduino project started in 2010 which really made some big steps in making it easier to access at a lower cost and like friendly documentation no signing of ndas or like all that kind of industry standard bullshit and then in 2014 there was a micro python project was started and first release so that's when you could start to use micro python on search devices but and then going to 2019 we got much better hardware so you can have micro python based devices that no longer feel like so constrained you'll have a lot of RAM which by my micro controller standards is like several megabytes it's not just kilobytes, it's megabytes of RAM imagine that and you have devices that may be around the power of the original Pentium 1 devices which you can do a lot with If anyone has worked with Amiga in the way past, that's basically, we are now above that. You can get Amiga-grade device for under $1. So, yeah, it's all around us. And when it comes to machine learning on microcontrollers, we're obviously not going to be running any large language models or generative image models or anything like that. But one use case where machine learning is incredibly useful is in analyzing sensor data. So sensor data has gotten very, very good and very cheap as well in the last years, mostly driven by smartphone development, microphone, accelerometer, all that kind of stuff, cameras. But then to get some interesting information that you want to act on, for example, out of these in an automated way, you often need to use machine learning to analyze this raw data. And if you do this all on the device, it's a bit trickier than just sending it to the cloud and using all your existing tools that you're familiar with. But you get some good benefits. The system can work 100% standalone without any network connectivity. It can have a low latency. For example, if you're supposed to react to something, do something in the physical world with this understanding that you've gotten through the ML. You can also make highly power-efficient systems that can run on battery for years. And you can preserve privacy by not transferring the raw and potentially sensitive sensor data. Instead, just extracting what is interesting and not privacy sensitive and transmitting that. And they can be very low cost, which makes them possible to have really large scale. For example, to put a sensor on every single pump. So there are many applications of machine learning microcontrollers. Some are already quite standard. So when you say, hey, Google, or Alexa, or Siri, and so on, listening for that phrase specifically is usually done by a low-power microcontroller. And then once that phrase is triggered and recognized by machine learning, it will then hand over and buffer the data and send it to the cloud for the full speech recognition, which does not happen on the action door. And sleep tracking, for example, is another standard application or activity tracking in general. Also activity tracking for cattle and livestock. that's an application that has been done with this library, because you can detect whether they might be sick or there are some stressors that are influencing them. And then we work with pumps and make sure that their health is good. And then there's also a lot of just hacker fun projects. For example, don't you want a cat door that will automatically open for your cat and not any other cat, but only if it doesn't have a mouse or a snake or something like that in its mouth. So this is something that someone has really built. And down here is a magic wand, so you can make a gesture, like it's from Harry Potter, and then to trigger whatever you want, like turn off the lights. So there's applications everywhere. And it's getting more and more common and fun to play with. So EMLearn is a machine learning library, open source library for implementing such systems basically scikit-learn for embedded systems and two key features is that you have convenient training so you use just your standard scikit-learn keras tools so you don't need to learn anything new there and then as time progresses they improve and you get all these improvements in these projects too then you have a easy way to export that into a C model, and this is the core library, and we're going to work on the MicroPython bindings a bit later, and then the SQL itself is embedded-friendly, so you can use it in a professional project, has test coverage, it supports the tiniest microcontrollers as well, yeah, so that's the core, and supports the most common tasks for embedded or even standard machine learning. You want to do classification usually, maybe some regression, and maybe some anomaly detection. And it supports a set of models, not everything that you have in scikit-learn, but this subset that we've implemented and that are useful for these kind of devices, which still are constrained on memory and compute. So tree-based models are very efficient. K-Nearest Neighbors is very useful. You can also do on-device learning with that. And Gaussian Mixture Models and simple neural networks we support. So the library has been around for around six years now. It was started by me, and it's been maintained by me since that time, with a couple of contributors here and there. And I'm aware of at least 30 R&D projects or industrial projects that have published papers that have used this library. and there's probably things that they don't know either. It's typical for open source, including some stuff from research from Samsung and this cow tracking research from Virginia Tech and from Sandy National Labs about monitoring large electrical grids. So the part that's most interesting here is that we quite recently, like last year in August, started to make micropython bindings. So in the same way that, you know, you use probably NumPy, Pandas, TensorFlow, all these libraries all day, they're implemented usually in C++ or maybe in C. But then they have Python bindings, which makes all that power available to you in a very convenient manner. And that's the goal of the MicroPython bindings for EMLearn on these small devices. So, yes, to balance that convenience and productivity with the speed of C. I haven't done a lot of benchmarks, but here's a small benchmark to some pure Python implementations of Random Forest. They generate a small piece of Python code, or it's quite large, usually the trees. And EMLearn is around 100 times, or up to 100 times faster than that, while still having it. It's very easy to install. It doesn't require much more tooling. And this is possible because MicroPython has a nice feature where you can install these native C packages at runtime, which is quite unique, I think, in this high level for microcontrollers. I haven't seen it anywhere else. So it's an early open phase, and we're planning also to add some multi-layer perceptional and convolutional neural networks. So quickly on MicroPython. Anyone here is familiar with this project? Either played with it or heard about it? Yeah, there's a couple. That's cool. And then the rest we'll learn a little bit about now. So it implements a subset of Python 3 and for devices which have at least 16 kilobytes of RAM, and this used to be a lot, now this you can get a couple of megabytes, has support for at least eight microcontroller families, so you can use a lot of different hardware. It tries to be be as compatible as is possible with CPython. But there are of course constraints in terms of memory usage, in terms of how to efficiently implement even basic things like floating point operations and so on. And it's mostly to the level of Python 3.6, and it has support for some of the features that have been added after that, a little bit of a mix. So there's like a documentation page on the micropython which says some things that are implemented, some things are not planned, and some things are maybe coming, if someone helps to contribute, maybe. But there is no cffi or c-module compatibility. So that means that the whole world of PyData, which is usually quite a lot of native libraries, such as in Pandas, NumPy, TensorFlow, and so on, they will not work, and will never work. And they probably wouldn't work even if you would implement it. Because if you have one megabyte of RAM, NumPy will just eat it very quickly. And you will not be able to do much useful work with it. So there's a different world, right? We're talking about 1,000 times or smaller than even the cheapest laptop that you could get, or phone. But it's as compatible as is possible. So small scripts that you have that are pure Python will mostly work, maybe with some minor modifications. But you will not have this huge set of libraries for data science. So inLearn provides some of that. It has a package manager, which is also really cool. On the microcontroller, it did not used to be standard at all. And this package manager supports loading C modules at runtime. So you can get, even though it's implemented in C, and there was a compilation process and so on, you can get the Python experience. You just MIP install it instead of PIP install it on your device. And that's really what I want to have, this Python experience. I mean, if you're comfortable with doing C, you could already use him learned as a C library. And you can still do that. But this is really to make it accessible on the Python level. So the world of hardware is huge. There's not a billion of different variations, but there are thousands of different devices. So if you are considering getting started with MicroPython, I would recommend you start with the ESP32 family of devices. There's everything from bare chips. Don't start with that, probably. And development boards for a few dollars. And then you have complete devices. Like here I have a watch that runs Python, which is super nice. And there's like this middle one has a camera and this peer detection. So you can do motion detection and a little screen. And then there's this little USB stick, which I really like to just have in my backpack because it's super easy to just plug it in and I'm testing on that environment on a real device without any plugs or something like that. It's also great to, as a sensor, just put it on one of your old USB chargers and then you plug it into the wall and it has Wi-Fi and Bluetooth. So it has a lot of connectivity, huge ecosystem. It's probably the most popular also for MicroPython and also like arduino tutorials find a lot of hobbyist stuff and it's actually in the esp edf which is under there that the sdk from the vendor is actually also pretty good which is not common for hardware that software is good it's usually very bad and so you get a complete devices for 20 to 50 dollars super super and powerful um how would you install micropython uh you can download you will usually pre-download pre-built firmware and there's like a generic one that support most of these esp32 devices you have to install a tool but the tool is on pip so that's super nice you um kind of erase it so you cleared any old code that's lying around you write up the flash image and when you've done that and the device will restart and it will appear as a usb serial port which has a familiar python repl and there you have modules to access the peripherals and everything that is accessible on the device and then you there's a tool called mp remote which you can install on your host um which i usually use to trigger this uh repl but you can also then copy files and so forth. There's also ID support, so there's like Tony which is a super simple ID but it's very nice to just play with this stuff or you can set up VS code of course to work with these kind of devices for more professional learning. So how would you make in machine learning application in with combining this? So as an example this is like a yeah like a taken from an example by Edge Impulse, they have some data available, and so I downloaded that, and they can detect basic gestures such as this continuous gesture, differentiate between waving, or this kind of snake motion, or up and down, so they're very simple things, but it's good for an example. So first you need some data, now we downloaded some, so it's easy in this case, although you usually want to do at least your validation and test data from your device, because there's As always, in data processes, there's small variations, and those variations can mess up your machine learning model. And then you install libraries, so we'll show that, and you train a random forest model on your computer. You export the model with emlearn, and then you load the model in MicroPython and run. We'll go to this quickly. So just as a tip for recording training now, we're not doing it here, but I have done it otherwise. There's multiple ways. you can transmit it to your computer but then you have a wire which can be problematic if you're doing workout detection and you don't want to be on a wire and you can transmit wirelessly because those things have Bluetooth and Wi-Fi but it's also just convenient at least for extra-model data where it's not so huge you can just store it to the internal flash and it's exposed as a file system so you know how to do this already so it's just some simple code to write CSV without a library and just write it to a file somewhere on the disk. And you can just timestamp it. For example, you have an RTC that tells you the real time. Yeah, because you have eight megabytes of internal storage. So that's always available. Super easy to just get started with recording training there. And how to install emlearn MicroPython. The emlearn package that you use on your host, on your PC that you install with pip, as usual. and then you the micro python library which will go on to the device you download from the github and then you copy it and those magical bolded things there extends so in 6.2 that's like it has to do with the architecture that we're on because this is compiled stuff and which binary version it is so it's attached to the micro python version and you can in the docs it says It's like, oh, for this micro-byte version, use this, and for this ESP32, use this. And then you copy that to the file system using this MP remote. Ideally, this would just work with MIP install, as you kind of expect. But right now, there's no support for native or binary packages are not yet in this MIP repository. That will hopefully be there in the future. Make it easy. so one thing that's maybe not familiar to you when you are doing this sensor data accelerometer for example or sound it's a continuous stream of data and then your model needs a fixed length set of data so how to like get these worlds to combine and the standard approach is that you take your stream of input data and you you slice it into these windows and you usually have a bit overlaps your model has like multiple chances to kind of catch the same phenomena like a gesture that happens and then you do some usually some processing into features pass it to the model and then you get your output class in this case so each window is then the the actual thing that we're predicting is the input to them to the model as independent instances just some tips on the sensor data readout. It's generally good practice to use the embedded storage in these accelerometers, kind of let it fill its buffer there, and then you read out that all the time because it is perfect sampling. But it's actually quite important in MicroPython because we do have a garbage collector. So if you would be trying to read 100, like every 10 milliseconds, so 100 hurts you would occasionally be thrown into the garbage collector and you might miss that 100 millisecond window so you get some jitter um but even even in c it would be best practice to use this the first in first off buffer that are in these devices and it's quite doable so we wait for the there's to be enough data on the device so now we're talking about the sensor that is attached to our microcontroller buffer there and then we when there is enough we just read a suitable amount and we do this windowing that I showed in the previous one and we decode the data we run it through our pre-processor I'll show an example of that I think and then we pass those features to the model and we get our output and then we would do something with this like blink a led or send a bluetooth message that goes to your phone or trigger something on your smart home from wi-fi whatever you want so this feature engineering the best it's as always in my you must make sure that it's compatible when you're doing machine learning and now you have to kind of you have two worlds device world and your training world to make sure that they are have compatible preprocessing so the best is to write the preprocessor that is compatible with micropython and then reuse the same code in python and you know that it's compatible and there's like if use the micropython specific things like it has a assembler that is accessible in python so like number um basically uh number jit that will run on device it's super cool because that allows you to get like c close to c speed in pure python on the device um you have then you have to call micropython as a program that runs on your computer uh yeah so the training of the model you do in the standard way. Here's the example of how to do the pre-processing features. Got another batch. And then we create a standard random forest classifier from Scikit-learn. However, you miss the defaults for Scikit-learn are quite large models, 100 trees or something like that, and infinite depth. So that can easily become too large. So you probably want to start something closer to this, not to blow up all the space. and yeah so this is a very familiar and you do your relation and so on so this was the results on that very simple task uh near near perfect on the test um yeah and then once you have that model with standard python process then you can export this and this is where em learn comes into place because we do a little bit optimization and then we have a csv kind of format that you export so So these are the weights of your model that can be loaded. And then on the device side, you need to copy the CSV to the device, and on the device side you create a model, and you have to specify manually the capacity, like how big could this model potentially be. And then you can load the model, or load the weights into that model. So a couple of lines on each side is all you need, and then that will be a branding system which will classify gestures in this case. And this would basically be the same exact approach if you have other type of accelerometer type data, for example, like fitness tracking, a number of repetitions, or just a classic smartphone functionality or smartwatch functionality of running versus jogging versus biking versus sleeping and so on. So this is the entire process. So to summarize the talk, machine learning and microcontrollers, so-called tiny ML, it's a good keyword to search if you're looking for more information, is useful to extract information from sensor data. Accelerometer, images, microphone, et cetera. radar is getting very cheap, lidar as well. Lidar is with a lot of data but doable as well. And current microcontrollers can actually run micropython in python familiar environment too which is super cool I think. And emlearn micropython is a machine learning library which is designed to be easy to use and have the C performance accessible package. So that's all I had.
+
+**Speaker 2** _[24:46]_
+
+Alright, thank you John for your presentation. Maybe one question. Does EMLearn MicroPython provide access to microcontroller hardware specific function such as timer interrupts because they are not provided with Python?
+
+**Speaker 1** _[25:04]_
+
+Yeah, that's a great question. Yeah, there's a machine module and a couple of other modules which will give you access to basically all the microcontroller-specific functionality from Python. So yeah, everything that you would normally, not necessarily everything, but the goal is to have everything accessible. Maybe on most ports, 90% of the stuff is accessible from Python.
+
+**Speaker 2** _[25:30]_
+
+All right. Thank you. So just a reminder for any more questions, follow John and maybe you are lucky one to get one of these microcontrollers. And for now, please give another round of applause, please.
+
+---
+transcript_status: auto
+---
+transcript_language: en

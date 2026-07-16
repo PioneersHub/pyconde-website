@@ -1,0 +1,233 @@
+title: From Tensors to Clouds — A Practical Guide to Zarr V3 and Zarr-Python 3
+---
+description: A key feature of the Python data ecosystem is the reliance on simple but efficient primitives that follow well-defined interfaces to make tools work…
+---
+created: 2024-12-22
+---
+code: ABWHSD
+---
+slug: from-tensors-to-clouds-a-practical-guide-to-zarr-v3-and-zarr-python-3
+---
+speaker_names: Sanket Verma
+---
+speakers:
+
+
+
+### Sanket Verma
+
+Sanket is a data scientist based out of New Delhi, India. He likes to build data science tools and products and has worked with startups, governments, and organisations. He loves building community and bringing everyone together and is Chair of PyData Delhi and PyData Global.
+
+Currently, he's taking care of the community and OSS at Zarr as their Community Manager.
+
+When he’s not working, he likes to play the violin and computer games and sometimes thinks of saving the world!
+---
+abstract:
+
+
+A key feature of the Python data ecosystem is the reliance on simple but efficient primitives that follow well-defined interfaces to make tools work seamlessly together (Cf. http://data-apis.org/). NumPy provides an in-memory representation for tensors. Dask provides parallelisation of tensor access. Xarray provides metadata linking tensor dimensions. **Zarr** provides a missing feature, namely the scalable, persistent storage for annotated hierarchies of tensors. Defined through a community process, the Zarr specification enables the storage of large out-of-memory datasets locally and in the cloud. Implementations exist in C++, C, Java, Javascript, Julia, and Python, enabling.
+
+This talk presents a systematic approach to understanding and implementing the newer version of [Zarr-Python](https://github.com/zarr-developers/zarr-python), i.e. Zarr-Python 3 by explaining the new API, deprecations, new storage backend, improved codec pipeline, etc.
+---
+full_description:
+
+
+Zarr is a data format for storing chunked, compressed N-dimensional arrays and is sponsored by [NumFOCUS]((https://numfocus.org/project/zarr)) under their umbrella.
+
+It is based on open-source technical specification and has implementations in several languages, with [Zarr-Python](https://github.com/zarr-developers/zarr-python) being the most used.
+
+After the successful adoption of Specification V3, our team has worked tirelessly over the last year to ensure the Python library's compliance with the latest spec.
+
+## Outline
+
+First, I’d be talking about:
+
+### Understanding Zarr basics (5 mins.)
+
+- What is Zarr, and how it works?
+    - The inner workings of Zarr using illustrated graphics
+- What is the Zarr Specification?
+    - What's new in Zarr Spec V3?
+
+Then, I'll be talking about the new Zarr-Python 3 and its significant features:
+
+### What's new in Zarr-Python 3? (15 mins.)
+
+- Major design updates
+    - New storage backend
+    - Creating Zarr arrays and groups asynchronously
+    - New and improved codec pipeline
+    - Native GPU support for creating and writing arrays
+- Changes and deprecations
+    - Overview of the new API
+    - Optimising performance for large arrays
+    - Deprecation of several stores like LMDBStore, SQLStore, MongoDBStore, etc.
+- 3.0 Migration guide
+    - Steps to migrate from Zarr-Python 2 to Zarr-Python 3
+- Extensions
+    - How can Zarr-Python 3 be extended to add new custom data types, stores, chunking strategies, etc.?
+
+Then, I’d be doing a hands-on session, which would cover the following:
+
+### Hands-on (5 mins.)
+
+- Creating Zarr arrays and groups using Zarr-Python 3
+    - Plus walkthrough of the new features (mentioned above)
+- Looking under the hood
+    - Use store and info functions to explain how your Zarr data is stored and display important information
+
+### Conclusion (5 mins.)
+ 
+- Key takeaways
+- How can you get involved?
+- QnA
+
+This talk aims to address an audience that works with large amounts of data and is looking for a transparent, open-source, reliable, cloud-optimised, and environmentally friendly format.
+
+The tone of the talk is set to be informative, story-telling and fun.
+
+Intermediate knowledge of Python and NumPy arrays is required for the attendees to attend this talk.
+
+### After this talk, you’d:
+
+- understand the basics of Zarr and what's new in V3,
+- leverage the new functionalities of Zarr-Python 3 with improved performance,
+- make an informed decision on what data format to use for your data
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2025-04-23
+---
+start_time: 12:25
+---
+end_time: 12:55
+---
+slot_id:
+---
+track: Data Handling & Engineering
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/ABWHSD.png
+---
+youtube_id: 8FX4AXhRNMA
+---
+video_link: https://www.youtube.com/watch?v=8FX4AXhRNMA
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/8FX4AXhRNMA/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+Hello, everyone. I'm audible. Yeah. So welcome, everyone, to the talk, From Tenses to Clouds, Guide to XAR Python 3. This is 23rd April, 12.25 p.m. So let's dive into it. This is me, Sanket Verma. You can read about me. Among other things, I take care of the OSS and community of the XAR project. I have been maintaining the project for the last three and a half years now so yeah if you want to learn more about me you can scan this QR code yeah if you want to follow along the presentation for slides you can go to this QR code which cool which will take you to the Google slides or you can just type this bitly link I'm just gonna pause for like five seconds before I move on to the next slide And there's also a notebook I've prepared for the demo session, and it's in this GitHub repository. So, you can also check this out. I'll again wait for five seconds. Okay. Moving on. So, I've divided the talk, like, simply into, like, four topics, which is basically the fundamentals or the 101 of XOR, the next part would be what's new in XOR Python 3, so as you can see there has been versions 1 and 2, so there's three, and there have been a lot of improvements and changes we have done in the version 3. There's going to be a Jupyter notebook with demos, with a demo, and I'll be showing that, and in the last I'll just state how you can get involved with the project if you like the stock or if you like working with big arrays. But yeah, before I dive into the basics, I just want to get the feel of the audience. How many of you heard about this project? Oh, wow. And that's really good. And how many of you have used Xao Python 3? Okay. Cool. So I think I'm in a good place. So arrays, like, you know, they have various dimensions for storing data sets. And we store arrays in 1D, 2D, and 3D. If your array is small enough, it's easy to work with, easy to store in memory, but if it gets too big, it becomes too complicated to work with. And this is where basically XOR comes in. It divides your big array into small parts, which are known as chunks, and compresses those each chunk into small sizes so that the whole, the large array gets reduced into small sizes. And the retrieval works in a way that only the selection, the desired chunk will be loaded into your memory, not the entire whole array. Every chunk is assigned a key for identification and retrieval purposes, and the value is actually the data stored in it in a binary format. These graphics were kind of donated by this person, Trevor Mann, so thank you, Trevor. You can store arrays into multiple hierarchies, like a tree structure, which is essentially known as our group. And this is basically how the structure looks like, the JSON format, the JSON is the metadata of the array, which contains the shape of the data set, size of it, custom attributes that you can assign, and all the other things which are essential for the metadata. And this is basically the chunks which contain the actual data sets. In the demo, I'll be showing how this is stored in actual local store, so you'll have a clear image of how this looks like in an actual computer. XAR is basically based on a specification, so there's the link for the spec website, and we have evolved over the years to version 3. Specification is just a fancy word for technical document which lays out the rules, how the project should work. the metadata strategies, the metadata format, the chunking, how the hierarchies are ordered, what type of attributes you should add, data types and node names. I should have waited here for like five seconds, but if anyone wants to take a photo, they can have a look. Okay. Yeah, so I'll be talking about XAR Python mostly, but it has implementation in all the major languages, and I think that was one of the most important goal of going to version three to increase the interoperability among the ecosystem. So if you're not a Python user, please try one of these implementations in XOR. So yeah, let's dive into the core part of the presentation, but I just want to know, is everyone with me so far? Okay, awesome. So before I dive into this, I have prepared just like one slide, which basically tells about the motivation, why did we start working on the version three. And the first part, the first reason was the interoperability. So version two specification was kind of, was highly entangled with the Python, so Python language. And it was not easy to implement. There were implementation in the version two, but there was not easy to implement in other languages. So that's why we shifted from version two to version three to increase the interoperability, which basically opens the door for implementation in very fast languages like Rust, C, C++, and others. There were some issues that we were facing when working with the high latency storage, like cloud object storage. And the other goal was to address those issues when working for XARP Python 3. And the other most important part was the extensibility, which you're going to be seen in the upcoming slide, is to let the community and the users add their own custom extensions, like data types, chunking strategies, shape of the chunks, and how they manage their data sets. And this has played, like these three were the most important reasons why we started working on XARP Python 3. Yeah, so before I go, you can also do this pip install or you can install it via conda that's fairly easy and if you are looking to install the special groups which are with extra dependencies you can go with this pip installs are extra very extra equals to GPUs and remote GPU supported GPU support for czar is added by a qpie and remote support is added by fspec which lets you write the data set like the czar data to cloud storage like s3 and GCS. So the major design updates, which is basically the highlight of this talk. So we added a new abstract base class. So earlier, there was used to be a mutable mapping, which basically lets you map every chunk to a value. But we removed that in the XOR Python 3 and added an ABC store class. The reason for adding this was to enable the users to add custom storage classes to their implementations and this has been like super super useful because people have been developing storages which were kind of similar to the git so think of a storage format which is similar to a version control system and this kind of this ABC store enables that and the other other important part of adding a be store ABC store was that previously we had so many exotic stores like SQL MongoDB, and it kind of bloated the library a lot. So we wanted to slim the library, lean it, and make it fast and efficient. So we removed all these stores and only kept the zip store, which basically lets you zip the XOR array into a one zip file, local store, which is directory store, and FS store, which is the remote store. The other important part was to add custom codecs via entry point mechanism. So previously there was this library numcodex which enabled you to use 20 compressors and it was fine because it was not in the ZAR Python codebase but we wanted to enable users to add their codex like in the storage. So we enabled this entry point mechanism which enabled users to add new custom codex and And we included the most used and important codecs into XARQ Python. So XARQ Python currently contains only BLOSC, 0 standard, and GZIP. And all the other codecs, they are in the num codecs. And XARQ, and they can utilize the entry point mechanism we have developed for the codecs. So basically, keeping all the essential and three to four codecs and storage into XARQ Python, and keeping everything outside, and allowing the users to add these new custom codecs and storage systems via entry-point mechanisms. And also like we added the GPU support for XAR, so basically if you are on a system which has GPU and you want to load the data set, load the arrays into GPU memory, you can do this via enabling the GPU command. And currently it only reads the array into GPU memory, but the encoding and decoding it still happens on the CPU. And the next hope is to basically add the codex which will allow the encoding and decoding on GPU memory. Yeah, so changes and deprecations. So what changed? So I think previously there were many ways you can create SAR which kind of signifies the leaky abstractions of the library. And we kind of like simplified that. So if you want to create an array and group, you have to use like create array and group. Earlier it was open and all these other things. So we boiled down to like very simple notations of how you can create arrays and groups. And the storage class was kind of like changed into Xar.storage. And you can, so basically you have to use this Xar.storage import local store instead of this which was the earlier one. These are the list of the modules which have been deprecated and there are some of them which do not have no replacement and the mostly these packages have been moved, these functionalities have been moved to a separate package or they have been absorbed into the current code base under different classes. I'm just going to pause here for five seconds so everyone can have a look. And yeah, so we also were able to get together a migration guide which can be seen here which lays out how you can pin your dependencies and what you need to basically make sure in in order that your project doesn't break if it uses ZAR. So this graphic basically lays out the difference between the V2 and V3 arrays. As you can see, initially the metadata was kind of split into two parts, the custom attributes and Z-array, but right now it's consolidated into the ZAR.json. And the arrays and the chunks are kind of like grouped together in various separate folders. which is similar for the, you know, ZAR groups as well. If you're interested in sharding codec, which I'll be showing in the demo, which basically lets you group together many chunks into small units, shards. So let's just say if you're working with an array which has, I don't know, 100,000 chunks, it becomes super, super difficult to work through a lot of storage. And this is where basically sharding comes in, because it lets you group chunks into small parts, which makes it easy to read and write across high latency storages. As I said before, extensions. So the storage system that I was mentioning, which was similar to Git, this is basically IceJung, which has enabled us to, which was basically responsible, which was basically enabled through the ABC store class. Then there is the Zaris, which is the Rust library for storage format. And the Zaris Python kind of works as a bridge between these Python implementation and the Rust implementation. So the reason that I showed the ABC store and the custom codecs because that was the, because these kind of experimentation and new things were enabled. And recently like we have been working to add the new data types to these format, essentially the data types which are used in the AI space for storing model weights and steering data. And there have been like so many requests from the AI community and stuff. So if you are interested in helping out with that, you can read this repository. And if you are interested in adding your own extensions, you can look at that. So yeah, let's see some code. Yeah, I think it's visible, right? Is it visible in the back? Okay, cool. So, yeah, as you can see, I think the recent version 3.0.7, which was released two days ago. We have this. So what we are doing here is we have initialized a store, a memory store. We are not storing that data into the local store because it's still in the memory. we have defined the shape of the array, which is 10,000 by 10,000 and chunks 1,000 by 1,000. And we have used data type int. So as you can see that we have this ZAR array initialized, it's C order, row major, and number of bytes are this. So earlier there used to be, so one more difference, like earlier there used to be an info function which prints the information about the ZAR array. But it was also doing a little bit of computation in the back. So we kind of split that into info and info-complete. So when you do z.info, it doesn't do any computation in the back. It doesn't fetch the size of the chunk. It doesn't fetch what kind of chunks were initialized or not. But if you do info-complete, it's gonna show you information more than that, which is basically like the storage ratio and number of chunks which are initialized. After that, I'm writing some scalar value to the empty array and you can see the chunks have been initialized. Like all the chunks have been initialized because I used the colon here. Yeah, as I said before, like if you're working with like scientific data sets from domain like geospatial or bioimaging, you need to have some attributes to identify what type of data set you're working with. And this basically zartas functions allow you to add custom attributes to your data. So if you're working with like different storages and you want to store that XOR array into a persistent memory and that can be moved across like various storage system, we have allowed the persistent array. And what you can do here is like you can just use the create function to create the array and you add some like scalar value to it and you can see like it's initialized over there. and there's like no need to close the error because the flushing and the closing will take, will happen automatically. Earlier you had to explicitly mention that you are closing the error and flushing it. So that has been taken care of by the library itself. As I said before, like the compressors have been like removed, like have been moved into XARPython. The compressors which are in the XARPython are BLOSC, C standard and GZIP. And you can add multiple, like you can add the shuffle level and what kind of codec you are using, using this argument, and you can just create a data, you can just create a XOR array, and this will look something like this. And earlier, we were using, I think it was BLOSC, the default is BLOSC, but we used the different shuffle level here. Yeah, so now coming back, coming to the groups. So group was basically the hierarchical structure of storing these XOR arrays. So what I'm doing here is I've created a root, which is here, then I have created a foo, which is another node, and in the bar, I've created another node, and in the bar node, I've created an array. So you can see like this, it looks something like this. So tree functionality is not the part of XOR Python, so you would need to have this rich dependency installed in order to have this diagram. Yeah, and as always, the info and info-complete will work as just as, and it'll lay out information about the members, the arrays, and groups. So another thing about the group which is new to the XOR Python 3 is earlier, if you want to create a long group, you had to explicitly go and create an array at each node. But now you can just add this notation over there and the create hierarchy function will automatically understand that you are going to create a group with A as a first node, B as a second node, and C as a third node. And it takes care of that. And yeah, it looks something like this. We are also using the don fic Python library to handle the configuration values of these R's. So the default value for creating and storing R is row major. But if you want to change that, you can just do that using the config.set and, yeah, I'll just change it back. But if you want to enable the GPU support, you would also need to use this config.set and enable GPU. a bit about the optimizing the performance. You can slice the chunks across both the dimensions or single dimension, depending on the use case. And there was this other query about what should be the ideal chunk size when I'm creating a XOR array. So we kind of like added this auto keyword over here, which basically chunks your entire array based on heuristics. First of all, it's not optimal because it guesses on simple heuristics. So if you are being super lazy, you can do that. But I would recommend doing the chunk size on your own. Sharding, as I've told before, it has this big array which chunks the error into small parts and store that bigger small chunks into small shards. Here I have this small demo which of convert the pixelated logo of XAR into P, from PNG format to XAR format. This was just my experimenting to see if everything is working fine in XAR Python. I have imported this logo and converted this logo into, like, NumPy array, and then back to XAR. And then to XAR array, I added some of the Z items over here. And, yeah, you can see, like, the logo shows back, and we get the original picture back. And I've saved it. So if I have to see, this would be something, date, notebook, data. So this is essentially the logo in ZAR format. And these are the chunks which have been initialized and you have the, oh, sorry, the JSON, which has the attributes and everything. So, here are some examples of what the V3 datasets look like, you can just see these, these are visualizers which are available on the web, NeuroGlanser is being developed by Google, there is this OME and GFF challenge which basically was an effort to let the institutions collab on creating larger systems of Python v3. If you are interested in using this library and contributing, and if you have any questions, feel free to join in on any of these office hours or meetings, there's the link for the website. And I think that's it. Thank you.
+
+**Speaker 2** _[21:58]_
+
+Awesome. Thank you for the talk. Very informative. Now for questions. I have zero questions on Slido, so please, if you want to get wiser about XAR, this is your chance. And in the meantime, I'm going to ask one, so it gives you the time to post your questions. So XAR Python is an open source project. Do you welcome contributions? And if so, what ways of contributions are the best for your project?
+
+**Speaker 1** _[22:24]_
+
+Yeah, definitely like I think the answer is yes, we welcome contributions and It's hard to say what's the best way to contribute to the project I think like every contribution matters like be it like technical or non-technical so if you're using a project and if you came across an issue and Which which basically says that the product shouldn't be working as expected just file an issue And I think that's in contribution If you see docs if you read it if you're going through tutorials and if you see something is off you can just file an issue and edit that if you want to get more involved and dive deep dive into the features and start working on some functionality that's like the soup that's a great that's very great so I think like there are various ways we can contribute to the project
+
+**Speaker 2** _[23:07]_
+
+Thank you. And about the Czar spec, I mean, I don't want to talk about v4 since v3 just came out, but is that contributions also goes for the specifications or?
+
+**Speaker 1** _[23:19]_
+
+Yes. Contribution definitely goes to specification. So some of the ideas which I have talked about here, like the custom storage and the custom codecs, they were originally motivated from Xar Python use cases. So people were coming with their requests and they were like, we should do this and that. And we realized that our spec is not that flexible to add that functionality. So we kind of like went back to the spec, made some changes, and then came back to the Python and fixed it. So I think it's like a two-way process.
+
+**Speaker 2** _[23:53]_
+
+Thank you. In the meantime, I'm getting questions in. So let's go with the first one. If ZAR array is still used to convert from NumPy, why did you go to create a new create array function?
+
+**Speaker 1** _[24:07]_
+
+Yeah, I think we're talking about the notebook, right? Oh, yeah, so yeah so if you want to so basically what I did here was I converted the image into the numpy array and And then I converted the numpy array into czar because there's a function which lets you can wait convert the existing numpy array into czar array and Basically what czar acts as is like a numpy container. So you have a numpy array and you have a czar array The difference is like this it's chunked. It's divided into small parts and there's a metadata top of it So that's the basic difference between a NumPy and XOR array. And there's other things like when you have divided your array into small parts, it lets you talk with Cloud Storage very easily and all that stuff.
+
+**Speaker 2** _[24:51]_
+
+Great. Next question. Does ZARv3 support usage of async I.O.? Does ZAR Python support it?
+
+**Speaker 1** _[25:01]_
+
+Oh yes, XAR, yeah so XAR Python version, XAR Python 3 codebase is completely asynchronous. So we have heavily used the Python asyncio library, so yeah, we can use it.
+
+**Speaker 2** _[25:17]_
+
+next question what is your feeling about keeping different czar implementations in sync regarding extensions and such
+
+**Speaker 1** _[25:27]_
+
+I think this is more of like a social challenge and a technical challenge. Most of the implementations that we have under the XAR banner, they are being maintained by researchers and academics in various institutions. And they develop features and stuff according to their need. So our recommendation is always to keep up with what XAR Python 3 is doing. Sorry, what XAR Python is doing. But it depends on the use case. So yeah, I think the original motivation is to yes, please keep up with all the extension, but it also depends on what kind of work you're doing.
+
+**Speaker 2** _[26:07]_
+
+We got more questions going in meantime. I guess we can go until 55 since we're out of schedule. What are the competitors in this space and what does Czar do that is unique compared to them?
+
+**Speaker 1** _[26:24]_
+
+OK, I'm a bit uncomfortable answering things. I'll tell you, there are various junk formats which are out there in the market. There are commercial ones as well as open source ones. And I cannot speak for the commercial ones, because they are more in the closed source space. But as for the junk formats, which are in the open source space, we try to maintain feature parity with them and try to be more welcoming as to be repulsive. As for the features, sorry, as for the edge as compared to these formats, I think, yeah, it's like we are more open. We do things what you require, and we mostly take care of all the community feedback in order to proceed forward. Maybe that's not the best answer, but yeah, so.
+
+**Speaker 2** _[27:22]_
+
+Thank you. Moving on to the next question. Is it possible to use ZAR libraries slash functionalities that work with NumPy arrays, or do they need to be modified in some ways to be compatible?
+
+**Speaker 1** _[27:34]_
+
+No, you can use it for a number.
+
+**Speaker 2** _[27:36]_
+
+Yep, that's right. Next question. Is Zark recommendable for data streaming to disk from, say, a camera source?
+
+**Speaker 1** _[27:46]_
+
+What source?
+
+**Speaker 2** _[27:47]_
+
+Camera. Camera source.
+
+**Speaker 1** _[27:51]_
+
+OK. So it's really good because when I come to these conferences, I get to hear the use cases which we haven't seen. So I'm not aware of that, if this would be a good. I'm not aware if someone has used as a camera source to stream data to using ZAR. But I think as for the safety, it's fine. The library is being used in production. We have like 24 million downloads a month. So I think you are safe. As for the intricacies and how to design it and how to manage the pipeline, I'm not aware of that.
+
+**Speaker 2** _[28:27]_
+
+Thank you. These were all the questions. Thank you again for your presentation. Thank you.
+---
+transcript_status: auto
+---
+transcript_language: en

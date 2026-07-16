@@ -1,0 +1,254 @@
+title: Raised by Pandas, striving for more: An opinionated introduction to Polars
+---
+description: Pandas is the de-facto standard for data manipulation in python, which I personally love for its flexible syntax and interoperability. But Pandas has…
+---
+created: 2023-01-04
+---
+code: Z8PESY
+---
+slug: raised-by-pandas-striving-for-more-an-opinionated-introduction-to-polars
+---
+speaker_names: Nico Kreiling
+---
+speakers:
+
+
+
+### Nico Kreiling
+
+Nico is a Data Scientist at scieneers, co-organizer of PyData cologne meetup and host of the Techtiefen podcast. His passions are quick and simple solutions and the constant expansion of his and the communities' knowledge base.
+---
+abstract:
+
+
+Pandas is the de-facto standard for data manipulation in python, which I personally love for its flexible syntax and interoperability. But Pandas has well-known drawbacks such as memory in-efficiency, inconsistent missing data handling and lacking multicore-support. Multiple open-source projects aim to solve those issues, the most interesting is Polars.
+
+Polars uses Rust and Apache Arrow to win in all kinds of performance-benchmarks and evolves fast. But is it already stable enough to migrate an existing Pandas' codebase? And does it meet the high-expectations on query language flexibility of long-time Pandas-lovers?
+
+In this talk, I will explain, how Polars can be that fast, and present my insights on where Polars shines and in which scenarios I stay with pandas (at least for now!)
+---
+full_description:
+
+
+Pandas and Polars are both popular open-source libraries for data manipulation and analysis in Python. While both libraries offer a range of powerful tools for working with data, there are several key differences that users should be aware of when choosing which library to use.
+
+One of the main differences between Pandas and Polars is the way that they handle data processing and evaluation. Pandas uses a traditional, eager evaluation model, in which operations are immediately evaluated and the results are returned. In contrast, Polars offers optional lazy evaluation, which allows users to delay the evaluation of certain operations until they are actually needed. This can be especially useful for large or complex datasets, as it can improve performance by reducing the amount of data that needs to be processed at any given time.
+
+Another key difference between the two libraries is the way they handle data storage and indexing. Pandas is built around a powerful indexing system that allows users to quickly access and manipulate specific rows or columns of data. However, this indexing system can be complex and can sometimes lead to slower performance. In contrast, Polars does not use indexes, which can simplify the underlying data structure and improve performance.
+
+In terms of functionality, Pandas has a number of features that are not currently available in Polars. For example, Pandas offers built-in plotting functionality, which can be useful during explorative data analysis for visualizing and interpreting data. Additionally, Pandas has a much stronger integration in the PyData ecosystem and is more widely used in data analysis and scientific computing. This can make it easier for users to find resources and support when working with Pandas.
+
+One notable difference between the two libraries is the syntax and API. Polars is inspired by the popular distributed computing library Apache Spark, but uses a column-based API in contrast to the row-based API within Spark. Generally the polar's syntax will be more familiar to spark users.
+
+Overall, both Pandas and Polars are powerful libraries with a lot to offer for data manipulation and analysis in Python. Which library is the best choice will depend on the specific needs and goals of the user. By understanding the differences between the two libraries, users can make an informed decision about which one is best suited for their needs.
+---
+room:
+---
+day: Monday
+---
+slot_date: 2023-04-17
+---
+start_time: 15:10
+---
+end_time: 15:40
+---
+slot_id:
+---
+track: Data Handling
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 2521
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/Z8PESY.png
+---
+youtube_id: 7xcUvzERwx0
+---
+video_link: https://www.youtube.com/watch?v=7xcUvzERwx0
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT29M47S
+---
+video_thumbnail: https://i.ytimg.com/vi/7xcUvzERwx0/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:02]_
+
+Yes, thank you very much. This is the first of two talks in a row here about Polars, and as said, it's an opinion introduction, so basically my opinion. So, you might want to know a little bit about the guy who wants to talk to you about his opinion. So, I'm a data scientist working for Sioneers, doing all kinds of consultancy, machine learning, engineering, this kind of stuff. And I'm doing this kind of data work for 10 years kind of now, and starting back in R and then quickly switching to Python. And since then, I was always kind of wrangling, mutating some kind of data, mostly in Pandas, as probably most of you, and also a lot of Spark in the early days. And since then, I tried a couple of different frameworks, so Dask, Modin, whatever. But recently, I discovered Polars, and this one really got me excited, and yes, that's the reason why I want to talk to you about it. So if you think, like, okay, there are so many frameworks, why should we care? Maybe for the same reason I cared, because I was scrolling through Twitter, and then I saw these benchmarks coming by where I thought, that looks cheesy, that looks kind of too good to be true, like, how can something be like that much faster on something where so So many libraries already try to do it that fast. So I tried it out myself. So basically, if you look there, there's like a small, tiny bar in Violet, and that's basically the time it takes Polars to run certain queries in some well-known benchmark regarding analytical workloads. And yeah, to take that ahead, I also discovered a great increase of speed with Polars. Maybe not that crazy, but still like four to five times. And this is a game changer. If something in Pandas runs before for you like ten seconds, some query, and then it takes only two, that really changes quite some stuff. So how can this be possible? How can Polars be so much faster? Well, Pandas isn't perfect. And that's well known. Wes McKinney, the author, basically stated by himself that when he started founding and developing Pandas, he didn't know too much about software engineering and the architecture, and so in the beginning he did some things he probably wouldn't have done later again, and he laid them out in a nice blog post already back in 2017. And in this blog post, he highlighted actually 11 points of things he hated in pandas, and he would like to change. And this is a long list, so I don't want to go over all of them right now, but we will take that list along with us across the talk and go over those different points. And they are really different. So some are regarding speed, like parallelization or memory management, others are also the not so well support of categorical values or missing data and so already 2017 six years ago Wes McKinney stated that he co-founded actually Apache Arrow and at that point when Pandas integrates Arrow completely you might call that Pandas 2.0 this is basically what happened just a couple of weeks ago with the official release of Pandas 2.0 and yeah so What is Apache Arrow? Apache Arrow is a library a lot of other libraries use under the hood these days, and they mostly do that for performance. Arrow is basically a standardization of an in-memory data format and for analytical workloads, so basically columnar, but it's not only a standardization. It's also a lot of basically drivers or libraries to implement this in different languages, And thereby different frameworks, even written, for example, Spark, running in a Java runtime can access exactly the same data such as Polars or Pandas in the new version now with Arrow under the hood, and thereby exchanging data. And it did a lot of things better than Pandas does. So for example, it supports missing values by default. It has a much faster string support. A lot of that stuff is already mentioned two talks ago in the Pandas talk. This is all great, and by implementing this in Pandas 2, if you use that, because you have to name those columns explicitly that you want to use arrow under the hood with Pandas 2, but if you use that, a lot of those problems already go away. You have now a good support for missing data, so integers are not automatically converted to floats anymore if you have a none once in there or that cheesy stuff. And yeah, so a lot of stuff will go away. It's easier to append data categories to support. But Polars has that as well, and all the other libraries we saw before have that, because Basically Pandas is rather a late adapter there than an early one. So let's go a little bit over those different points and how they can result in such a speed up. So one thing when we talk about speed is always SIMD instructions. So single instruction, multiple data. The idea is pretty simple. Basically instead of handling every row after every row again, you do an operation of all of them in one bulk together. much, much faster, and that's also what made pandas faster than the early days. And this is also what you break if you make pandas apply and apply some lambda functions. Basically this will dramatically decrease your performance, so always try to avoid this. As often as you can, try to not use pandas, apply lambda, whatever. But this is a little bit tricky with Pandas, and basically in Polars, that's a little bit better. For that, let's have a look on how the Polar syntax actually looks like. For those, it might be maybe a little bit confusing. The most projects before we talked about, which raised up, they basically try to imitate the Pandas syntax, and Polars doesn't do that. Polars looks more like Spark maybe, but also has some familiarity with Pandas. So you create a couple of data frames, and the major difference there is that you don't have any indexes. Polars doesn't use indexes at all, basically they are not needed, often it gets confusing anyway and you select by some filters, whatever, and not necessarily over the indexes, so basically you have a numeric index, that's all. And what polars use a lot is the with columns, that's your go-to functions whenever you either want to mutate a column or whether you want to add an additional column. So in here we are adding a new column, and this column shouldn't be based on an existing but rather of a value of stars. So what I did here for this small example, I scraped together the stars some popular Python libraries have on GitHub and the number of pull requests just to have some data. And as I want to append them, I want to have this additional column. So basically with column and PLLit, I'm creating a new column basically there of all the different of stars, and giving it the name metric, basically by specifying an alias. And then I'm concatenating those two data frames, and I'm sorting them. Good to mention there, there's nothing like sort values or so, because we don't have indexes. So basically sort always requires some column or multiple columns to sort by. Okay. Now we have some data frames. We want also to use this expressive API and do some classical aggregations. So what we are doing here is basically again the with column to add some additional columns. And here we select a couple of those. Normally for that you always use this pl for polars.call to select a couple. And then you decide what to do. So for example here, I'm creating a diff of always the row before and the next row to see basically how the stars have changed over the years. So normally this would overwrite the existing columns, so I need to give it a new name to add those columns, and therefore I'm using the prefix function to give it a new name. And one really nice syntactical sugar in there is the over keyword. Over allows you to create some boundaries. So normally if I'm using the diff function, for example, every row is going to the next and looking what's the difference there. But we don't want to create a difference over different metrics. So there we want to have a split. And therefore we use the over keyword, then it creates this boundary and will not create a wrong value which doesn't make sense. Normally in Pandas you would need to create a group by and then later join that and so this way it's much faster. And by using the syntax we gain actually a lot of different benefits. So some takeaways, Polar doesn't have indexes, it has a really powerful expression API, the The over keyword is nice, and something which I didn't mention yet is that it supports both an eager and a lazy execution. So eager is what you know from Pandas, basically calculating everything at the point where you kind of enter a cell, for example, in the Jupyter notebook, and the lazy mode is well known from Spark, where you basically create a graph in the background of all the different computations you want to get, but it's only actually calculated at the point when you call a collect function in the end. And this has a big benefit because it can be much, much faster. So the great thing, for example, here in this example, which is an obvious one, is that normally if you make like an eager mode, you have first to read all the data, and then we show the first five lines. But if we have a lazy mode, we say, please read the data and give me the first five lines, and then it starts going back and realizes, okay, I don't need to read the full data. I can just take the beginning and then stop because I don't need more. And this is one obvious idea how you can save a lot of time there. But there's much more you can do with such a lazy mode. So by query optimization, you can do prediction. So basically guess beforehand which data you will need next for your operations and thereby reduce cache misses. So there are some nice blog posts of the author of Polar's, how he spent a lot of time basically to reduce them, so a cache miss is if you load data into your pipeline of your CPU cache which you don't need, then you have to basically drop that and get other data from the RAM and that takes time. And by doing all those different things you can save a lot of time which is only allowed by using another syntax because pandas by default is eager and you couldn't do that optimizations with an eager mode. So as I said, we are optimizing here the ego evaluation, which was a problem with pandas back then, and also the complex group by operations which are slow can get much faster. But for this, we need to think about parallelization. So parallelization can be basically done by, basically you can have no parallelization such as old pandas, or you can also try to parallelize things, and a lot of libraries do that, but it's tricky. You can get stuck at some point, and maybe you don't know what will happen then. Yeah. Good motivations, but you have to do it right. So there is an easy way, basically, when you have, like, different calculations, which are clearly separated, and they don't need to communicate with each other. Then it's an easy thing. Then you can basically use a classical old MapReduce paradigm. But what do you do when you have data that needs some kind of communication between them? So there are different ideas. You could basically take the whole data frame, and maybe if you have two workers, then the first half goes to the first worker, the second half to the second. But maybe you have some certain keys which fall into both workers, and then the aggregations are invalid, so you need some kind of synchronization step afterwards to make them valid, and that takes a lot of time. Okay, if that's a problem, we just allow them to communicate. So again, two workers, the first half, the second half, and they have some common interface, some thing where they can basically both access and block each other. That works maybe for two workers, but if you have more workers, the blocking gets a harder a problem if they all operate on the same storage. So that might also be not the ideal solution. What Polar does is basically every worker reads the full data, because data can be read easily and fast by using Apache Arrow under the hood. Everything is in memory anyway. And then within the operation, the worker decides whether they are responsible for this part of data. So basically they calculate a hash sum, a hash value and then a modular function and thereby they decide whether this point of data is within their responsibility. So thereby you can make sure that certain keys only fall into exactly one worker and then in the end you can just make a simple concatenate and you have all your data. What What we will lose by this is basically the order. But order, you will realize if you use polars, is something kind of flexible. So the things change the order quite often, so you have to get used to if you have something that is order-relevant sorted first. But still, it's much, much faster this way, and it can parallelize nicely. So by doing this, we also have now a library that really, by default, tries to use all your CPU cores they can get and they are like the first two points which are really kind of like yeah something special so Wes McKinney stated that pandas is kind of far away from the real metal there and cannot do all the optimizations and also he says yeah memory map data sets would be nice and polars yeah polars has all that as well so basically polars is written in Rust, which is not just super, super fast, because it's this language similar to C, but either to program, but it's also you don't have any dependencies, and that's a nice feeling, seriously, when you pip install something, and the dependency resolution basically is just not necessary, because there are no dependencies. So of course, in reality, you will have some things you want to operate together and so, But it's a nice thing. Another thing is that Polar doesn't scale across multiple servers. So it's not like Dask or so, which runs on big clusters, it's running on a single machine. But it's using all the cores in there, and with cloud computing you can easily get quite big machines. And if your data is still too large for it, and you cannot operate on all of them at the same time you can basically do an out-of-memory operation so what it does is basically it in a lazy mode it scans some data set apply some transformation on it and then writes it to another data set and by this it can operate on smaller chunks of the data and work on it this is not possible for all the different operations so you cannot do everything with it but still is something pretty nice to be able to work on data which doesn't fit into your memory. By doing this, we also got rid of the first two points and we kind of settled the full list of things he kind of wanted to see in such a library. But basically that's not all the points I would like to see. So this is now my personal summary of what I like about Polars and not so much. So Polar's is great for its speed, so really it's much faster to try it out by yourself. I thought of showing you some notebooks where I run different cells and the timing, but just try it on your own data, you will see that it is really fast. I personally love the support of both, of eager and lazy mode, because it depends on what you do from my point of view. If I'm developing something in a notebook, I like the eager mode, because it gives me me the direct feeling. How long is something running? Is it maybe not as I expected? I have a better feeling for the data and the operations later because I see how they're running and actually this way for me it's faster because it's running in this time while I'm thinking about the next cell and it's not just running at the point when I'm basically finished with thinking and now it needs to calculate everything. So for that I like the eager mode but of course if you're doing something in production it's much faster with the lazy mode and you can easily switch. The expression API of Polars is also pretty nice. It takes you some time to get used to it. So you probably need to spend a few hours if you are well known to Spark, it's easier. The way Polars is written is also a little bit different. I would say it's a little bit more verbose. You often use this pl.something, but for that, maybe it's also a little bit more maintainable. So I think it's pretty good readable and therefore better maintainable, but it's a little bit more of typing, which is for production code probably a good trade-off. On the other hand, there are some things I don't like so much about Polar. So as said, I'm a data scientist, so I'm doing a lot of explorative work in some Jupyter notebooks and stuff, and then I often, for example, don't know my dataframe so well yet, so I want to try it out. So what I'm doing is I'm having my dataframe, and in the cell I'm typing df. and I get my column names by autocompletion. And I don't remember them exactly how to write them. And this doesn't work with polars. In polars you always have to explicitly name as a string somehow which columns you want to operate on. Probably there will be some workarounds maybe later or so, but currently this blocks me in the way I would like to operate while doing explorative work with it. It doesn't do any of the nice pandas ecosystem around, so it has no plotting functionality, not this nice highlighting and visualizing of data frames, and also the compatibility with other libraries like scikit-learn, PyTorch, and so it's not there yet. So if you basically load data from there, send it to one library, take it to the next library, you will often need to transfer to Pandas between and maybe then Polar is not the best tradeoff. And Pandas is a little bit more typing efficient, but I think that's kind of like a feeling. So if you have something where performance is critical and where you probably also have like a big data set, which takes some time to run, give Polars a try. It takes some time to load, but I really like it for this now. If you're doing explorative work or basically using Pandas to glue different things together, I think maybe it's not the best choice yet. And that's basically my personal summary of it. Here are some more links of basically where I got the information from. The next talk here will be also a little bit more not comparing to Pandas, but also a lot of DuckDB stuff, I hope, at least. And, yeah, then I'm happy to get your questions. Thanks.
+
+**Speaker 2** _[21:31]_
+
+Thank you, Nico.
+
+**Speaker 1** _[21:32]_
+
+So we have already.
+
+**Speaker 2** _[21:32]_
+
+already a lot of questions. The first question is how stable is Polaris? Would you recommend it using it in production code and client projects?
+
+**Speaker 1** _[21:41]_
+
+Yeah, so that was exactly what I wanted to find out myself. So because basically I got the link like one and a half year ago of a friend really early these days, and he said, yeah, do you want to give it a try? And I tried it, and basically a lot of things didn't work out. And I was really excited how many issues I needed to file while testing Polars, and I didn't have to. I had to ask two Stack Overflow questions because I didn't get stuff, but aside of that, I didn't need to file any issues yet, so I think if maybe not like the most important system yet, because of course always start with the small ones, but I would give it a try also for production workloads here.
+
+**Speaker 2** _[22:26]_
+
+Okay, next question no dependencies does it actually have no dependencies or are all that all of them in rust And we just do not have any visibility into them being outdated and insecure
+
+**Speaker 1** _[22:39]_
+
+So definitely there are dependencies, yes, they are in Rust, you don't just see them. Whether they are outdated, of course, that might happen if the project gets stale at some point or so, but if you at least see the current development, everything is really active, a lot of things, new releases coming by every day, so currently I would say the stuff doesn't get outdated there, but yeah, they are just somewhere else, that's true.
+
+**Speaker 2** _[23:07]_
+
+Okay, why did Polar's ditch indexing?
+
+**Speaker 1** _[23:12]_
+
+Basically, the argument of Richie Fink, the author, is that you just don't need it. He says it doesn't give you a real benefit of performance because you also need to maintain and build this index and thereby often use copying and stuff with pandas. You don't have that, so it doesn't give you a performance boost. Also from usability perspective, to be honest, I also mostly filter about the columns and not really about the indexes, but that might depend on how you use your framework.
+
+**Speaker 2** _[23:44]_
+
+When would you say is it worth to migrate a large panda-based code base to Polars?
+
+**Speaker 1** _[23:50]_
+
+I would say if the speed is not enough for you, so basically if you get annoyed by the time it takes to run or you're having problems with memory, then I would give it a try. I mean, otherwise, if everything works for you, why should you migrate?
+
+**Speaker 2** _[24:08]_
+
+Would it be considered bad practice to cast between polars, pandas, data frames within the same code base when using PyArrow backend?
+
+**Speaker 1** _[24:16]_
+
+I don't think so. So basically, I think that will be the future also much more by more libraries basically implementing this PyArrow thing under the hood that you can really easily switch between them and maybe not for every single transformation. But if you have like a lot bigger transformation here and then need some library which is only supported in Pandas yet, I think there's nothing against switching between them. It doesn't come with a lot of or like almost no cost.
+
+**Speaker 2** _[24:45]_
+
+Okay, how do you configure how many CPUs polars use?
+
+**Speaker 1** _[24:50]_
+
+So by default it takes all it can get but you can configure it somewhere I cannot take it out of my mind, but it's in the documentation
+
+**Speaker 2** _[25:00]_
+
+The API looks quite strongly typed, i.e. things like pl.column, column1, column2. Is there a way also to use attribute accesses to get nice auto-completion?
+
+**Speaker 1** _[25:13]_
+
+If there is something out there, I would be really curious in it. I'm missing exactly this. I'm not aware of it yet. Let's see what will happen in the future. You don't always have to use the PL call, so often there are some smaller or shorter versions which are not the first one written in the documentation, but which are also official, like basically just using the strings instead of PL call and so. But auto-completion for column names, for example, that's exactly what I'm missing.
+
+**Speaker 2** _[25:40]_
+
+How does Polaris compare to data table in terms of speed and functionality?
+
+**Speaker 1** _[25:46]_
+
+So if you take the benchmarks, it's kind of no data tables, I Think it's kind of the same area. But yeah, I personally didn't use data tables. So I cannot really compare it by myself When you look at the performance benchmark, I think it's kind of the same area of speed It may be a little bit faster. But yeah, that depends on what Benchmark you're looking at
+
+**Speaker 2** _[26:12]_
+
+Okay, next question. How does Polar's compared to PI spark?
+
+**Speaker 1** _[26:17]_
+
+Basically, it has some familiarity with the syntax, but aside of that, there are different things. Spark scales across big clusters, therefore it comes with a higher latency of getting data in and out and stuff. It is therefore really big workloads, and Poldus is coming more as a replacement for Pandas for the small stuff, but being able to also scale more into the direction of Spark, But of course, Spark can handle bigger data sets than Polar CS.
+
+**Speaker 2** _[26:50]_
+
+Would you recommend polars for time series where all the matter?
+
+**Speaker 1** _[26:54]_
+
+Yeah, you can do a lot of the time-series transformations there as well. I didn't try it too much whether you often need to sort it by something there. To be honest, I'm not sure about it. I would need to dig a little bit into it as well. You say yes?
+
+**Speaker 2** _[27:19]_
+
+He said so the next talk will be about it. So the questioner can stay
+
+**Speaker 1** _[27:19]_
+
+He's Okay. How does...
+
+**Speaker 2** _[27:25]_
+
+How does John operation work in cases where need a full data data frame fit in memory?
+
+**Speaker 1** _[27:33]_
+
+I can only guess that it might read single columns. So basically if you're having a lazy API and you only also the same way we had in the example with the head only the first rows you can do the same basically with columns. So basically just if you just mention certain columns it will read only those ones from from Parquet, and therefore you of course reduce your memory requirement, but if this one still doesn't match into that and you want to use the out of memory, I don't know, I didn't test it.
+
+**Speaker 2** _[28:12]_
+
+How hard is it to migrate large use cases from pandas to polars?
+
+**Speaker 1** _[28:18]_
+
+So, this is not like you just take it and five minutes later you're finished. If you know it, it's doable, and probably JetGPT and similar will soon probably help us there, I guess. Even that for polars it doesn't work so well yet, probably because of the old age, but yeah, it takes some time to transform it, yeah, you have to rewrite basically everything kind of
+
+**Speaker 2** _[28:45]_
+
+When developing a library, how do you decide on the syntax grammar of the library? Example, while very similar to PySpark, Polar still has some differences.
+
+**Speaker 1** _[28:59]_
+
+Okay, I didn't get the question how I did.
+
+**Speaker 2** _[29:01]_
+
+The question was, when developing a library, how do you decide on the syntax grammar of the library?
+
+**Speaker 1** _[29:10]_
+
+Okay, I'm sorry, I don't really get that. Maybe come to me, talk later, and we can have it in a direct discussion.
+
+**Speaker 2** _[29:19]_
+
+How powerful is the execution optimization is it comparable to spark
+
+**Speaker 1** _[29:26]_
+
+The execution.
+
+**Speaker 2** _[29:27]_
+
+optimization
+
+**Speaker 1** _[29:29]_
+
+So, probably it depends a lot on your workloads, but from my point of view, it's much faster than Spark.
+
+**Speaker 2** _[29:38]_
+
+Okay, thank you, give a warm applause to Nico.
+
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -1,0 +1,168 @@
+title: Enhancing Software Supply Chain Security with Open Source Python Tools
+---
+description: The Cyber Resilience Act (CRA) is focused on improving the security and resilience of digital products. But to comply with the CRA, businesses will need…
+---
+created: 2024-12-20
+---
+code: M98YBR
+---
+slug: enhancing-software-supply-chain-security-with-open-source-python-tools
+---
+speaker_names: Anthony Harrison
+---
+speakers:
+
+
+
+### Anthony Harrison
+
+Anthony Harrison has been developing and delivering mission-critical applications for over 40 years working on various complex programs where he held various roles in software, systems and cyber engineering, as well as providing technical leadership for a number of programmes.
+
+He is the Founder and Director of APH10, and co-founder of SBOM Europe, and is a leading source of expertise in Software Bill of Materials (SBOM). He has been developing open source software actively for a number of years; most recently, the applications have been related to supporting the software supply chain through utilities to generate and analyse software bills of materials (SBOMs).
+
+He has been a mentor for the Google Summer of Code for the past four years via the Python Software Foundation and is a mentor for his local CoderDojo in Manchester teaching students Python.
+---
+abstract:
+
+
+The Cyber Resilience Act (CRA) is focused on improving the security and resilience of digital products. But to comply with the CRA, businesses will need to start preparing the necessary evidence to ensure compliance if they want to continue to deliver digital products to the EU market once the CRA is in force. 
+
+Key requirements within the CRA include implementing robust security measures throughout the product life-cycle, adopting secure development practices and implementing proactive vulnerability management processes.
+
+This session will show how a number of the requirements for the CRA can be achieved by use of a number of open source Python tools.
+---
+full_description:
+
+
+The Cyber Resilience Act (CRA) is aimed at improving the security and resilience of the software components within a digital product. This session will provide a high level overview of the CRA and demonstrate how to enhance software supply chain transparency, manage risks effectively throughout the Software Development Lifecycle (SDLC), and achieve the necessary compliance by leveraging a suite of open-source Python tools. 
+
+Key areas to be addressed will include:
+
+- Learn how to create comprehensive and high quality SBOMs to gain a clear understanding of all components within your software.
+- Discover how to identify and mitigate potential risks and threats within the software supply chain throughout the entire SDLC.
+- Explore effective strategies for identifying, assessing, prioritising and remediating software vulnerabilities.
+- Understand how to adopt best practices to ensure compliance with relevant regulations and industry standards.
+
+The Python tools/applications to be referenced will include sbom4python, lib4sbom, lib4vex, lib4package, distro2sbom, sbomdiff, sbomaudit and cve-bin-tool.
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2025-04-23
+---
+start_time: 17:10
+---
+end_time: 17:40
+---
+slot_id:
+---
+track: Security
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Novice
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/M98YBR.png
+---
+youtube_id: NnxAHdLY058
+---
+video_link: https://www.youtube.com/watch?v=NnxAHdLY058
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/NnxAHdLY058/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+Thank you. Okay, good afternoon everyone. This is a very important topic. The software supply chain is a big challenge for us all. This is part of the security track. Security should be everybody's problem. So there's my details. and why we're here it's all about leg regulation EU cyber resilience act that became the end of last year became law and we're now in a transition period so what are those key requirements how do you meet them which is a main meat of this talk and hopefully a bit chance for Q&A but I've got a lot of slides so okay Who am I? I've been around a bit. I have seen software change. I've seen technology change. I've seen lots of generations of technology, lots of languages change. So I deliver software that never finishes, complex systems, critical infrastructures. Software takes 20 years to build and it never finishes. I now run my own company where we're looking after software risk. are you developing secure software, and particularly looking at the software supply chain, and you'll see why that's a real interest now. I'm also a co-founder of an organization called SBOM Europe, where we deliver training in this area. Active in open source software, both as a mentor and a developer. I teach Python to students, part of something called Coda Dojo, Raspberry Pis, for those of you familiar. and I'm a mentor for the Google Summer of Code for the Python Foundation. So I do a lot of things and I occasionally do running around fields like most weekenders. Right, why are we here? Cyber Resilience Act. It's all about cybersecurity for digital products. Identify a product that hasn't got a digital element these days. There's very few. Your toys have got them, your wearables, your smart devices as well as things like your routers and switches and so the CRA is looking at the cyber risk and it's looking at how to protect the users so the obligation is on the manufacturer of the product not the user big change and the other thing is this applies to the lifecycle of the product so it's not a case of sell it and forget about it you have an obligation beyond that sale so you have to support it and we're in the transition period so December last year it got approved took a long time we've got the first stages come in phase next September 20 20 26 and it comes fully available the it towards the end of 20 27 and then who knows when fines start appearing 20 28 and beyond. So I want to pick out two key requirements. There's lots of requirements, but I've chosen two. First one, just look at that requirement. Make your product available on the market without any known exploitable vulnerabilities. I've highlighted the word exploitable, because we all write software, and I don't think many people write software without any vulnerabilities or bugs. The second one is you've got to draw up this thing called a bill of materials, software bill of materials. And it's also got to look at the dependencies. And it says top-level dependencies of your product. I will challenge that later on. But that's a good starting point. These are all the dependencies your application needs to use. so if you're using numpy or pandas or whatever those are the types of top level dependencies so let's talk about the first one software building materials that's not new and one of the first things that president biden did was an exec order 14 028 very important in this industry and he was saying understanding the supply chain of software and an S-bomb was considered a useful artifact for you to have. So you could then use that to analyze vulnerabilities. All good. But then you start looking about where does software come from? We look at the supply chain. It's not like a traditional supply chain in the manufacturing, you know, like you get something that grows something in a field that ends up on a shelf in the supermarket. Software supply chain is a lot more evolved. you've got open source developers, maybe just hobbyists, you've got foundations, you've got organizations who are integrating software. And if you're a manufacturer, you're getting your software from all these different sources. How are you correlating that? How are you capturing that before you pass it to your customer? So what is a software building material? So I like to use an analogy. So whenever I go to a restaurant, the first thing I'm ever asked, even before I actually say where we'd like to sit is do you have any allergies that's part of their risk management approach they don't want you to have an allergic reaction which could be quite serious and they're only able to understand that risk if they understand all the ingredients that have gone in to create that meal so they need to understand where their suppliers are and they may be you know a role as got they've got a supply chain behind that. It's got flour and other sorts of ingredients. But the other thing you want as a customer is you want the ingredients to be fresh. So what's the analogy with software? The ingredients of software are components, are libraries. Fresh software is up-to-date, maintained software. The allergic reaction you do not want is a result of a vulnerability leading to a data breach and exploit. So SBOMs is all about sharing information as part of your risk management approach, and it should be shared within your organizations and across organizations, maybe with some controls, maybe to regulators, but basically they need to be available and shared. And this has been going on probably since SolarWinds, which was a real catalyst, and then I've seen various organisations throughout the world, US, Europe, Far East, the UK is a little bit behind, but we've now got this momentum where software-billed materials are being talked about. We need to understand these ingredients. 2023, October 2023, all the medical devices sold in the U.S. have to have esophageal materials available and the FDA can request that. So as a manufacturer, if you're already selling to the U.S., you're probably familiar with this. And I know companies that started doing that and started looking at their supply chain were rather surprised to find out how many components they were actually using in their products. But ultimately, an SBARM is just data. It's got a bit of metadata. It's got a detail about components. It's got relationships. Unfortunately, there are two standards. I say unfortunately because really it would really help if everybody, if we just had one standard. But there are two standards, SPDX and Cyclone DX. They're coming from slightly different angles. SPDX comes from the Linux Foundation and they've looked at, they came from the open source license compliance market and then have grown into software. The Cyclone DX is OWASP and that's come more looking at the software composition market. They're both very solid standards. They're both international standards now and you can transform the data. It's not perfect because there may be some lossy data, but generally you can exchange the information. And let's not forget PEP 770 that got approved this month. SBOMs may be coming to Python packages, so hopefully we should see more SBOMs appearing on things like PyPy. One of the things that I feel a lot of people fail to recognise is there are different types of SBOMs. And the different types of SBOMs really dictate where you are in the software lifecycle. So you can start at the design stage where maybe you're going to say, OK, I may be using NumPy. I don't know what version of NumPy, but basically it's a design constraint. All the way down to maybe the runtime when I know exactly which version of NumPy I'm using and which version of operating system and which version of Python. These are all decisions you make later on in your design and development process. So when people ask for an SBOM, you should be asking on what type of SBOM do you want because they're not all the same and they have different levels of information that depends on the use cases. So if you're using it for vulnerabilities, you need build and beyond because that's when you start resolving versions of components and dependencies. So the process is very simple. You generate an SBOM. And it will surprise you. I've been writing some SBOM tools that work at different levels of those types. So from the source level all the way down to the deployed level. And these are all available on GitHub. There's a link at the end. And they work regardless of the format. So they are agnostic to the format, whether it's SPDX or CycloneDX. And that's deliberate decision because you want to give that flexibility to your customers and the people who are creating the SBOMs. So you've got things like for Python, JavaScript, PHP, there's more, there's only so much I can do in the spare time. But these have been benchmarked independently to be high quality in terms of the level of component data that's included them, the level of rich data. So that's been independently verified by Carnegie Mellon University. And this is what you're going to get. You're going to get things like checksums for your files. You're going to be able to work out maybe what licenses, what copyright statements. All good. Do all your developers put copyright statements in all the files? The answer is often not. And then when you start then going towards the build stage, you start getting, okay, where's the software come from? What's the version? Where's the download come from? And then you've got some identities. And we'll talk about identities of components later on. But generation is the start of the SBOM lifecycle is not the only thing. And I think a lot of people thought job's done once they've generated an S-bomb. No, let's start looking at what the data is going to reveal. So if you maybe run an audit process, you can find components that have got no licenses. When I was development manager, I would not let developers use components that had not got an identifiable license. That's risk to you as a business. I'm also looking, am I using the latest version of the component? And when I ran this, what we identified is we weren't using the latest version, but I've done a clean virtual environment. Oh, maybe we've pinned some versions. And this is actually a dependency that was not a top-level dependency. So you can start getting these things. That may be a risk because that means you're not getting updates from that supply chain. and you can see how frequently are you changing your version components if you if you don't have pin dependencies how quickly is they what's the velocity of the changes where are those dependencies very simple this one blue ones are the top level dependencies but you can probably see the bottom does that mean you're not interested in the bottom one markup safe it's not directly dependent but that's part of your attack surface. So you're delivering that component. So sure, you should be interested in vulnerabilities from that component as well. And then, I'm sure you're all very familiar, you can read JSON or XML quite happily. Lots of compliance people can't. So let's make it easy for them to understand what's in an F-bomb, make it in a readable format that they can understand. I mentioned naming. We have a problem as an industry in terms of we're not very good at naming components. There is one standard called the CPE, which came from the US government, which was used to drive the National Vulnerability Database, but it's a free format text. It specifies a vendor and a product name, and there's no validation to ensure that the name and the vendor name is consistent. So there are different ways of specifying Microsoft. Is it Microsoft or Microsoft Corporation, for example? So one of the things that the open source community has been trying to do is to try and rationalize that. So when you get a component called open site like OpenSSL, is it OpenSSL or is it the OpenSSL in the Python ecosystem that's the one that's got vulnerability? And this is where Perl package url comes and that gives you that sort of increased granularity and it may then also say and it only appears on a particular distribution maybe about ubuntu distribution or a particular architecture so it gets a far better resolution that's going to help you when you identify is that vulnerability exploitable because it's going to probably get rid of quite a lot of false positives. I suggest you go and have a look at the PERL specification. It's hopefully will become an international standard this year. Just have a look at the level of information for the Darius ecosystems. This is now a call to the community is, can we also be consistent with license names? SPDX has a set of license identifiers. I think at the latest count, it's 500 different license identifiers. Can we be consistent to ensure that your packages have valid SPDX license identifiers? That's what the standards require for SBOMs. Don't just say Apache or Apache 2.0, which is what I see a lot of Python packages do. Can we be more precise? And I also see some packages where licenses disappear when they go and update. Well, that's not really useful either. So try and keep your metadata. So if you're a maintainer, make sure you're trying to be as accurate as possible. So I looked at the top 100 Python packages last week to see how many dependencies. A lot of them are interdependent, which is quite interesting. I found 16% didn't have any identified author. So if you've got a problem and the COA requires you to go upstream, if there's a vulnerability, to contact the upstream developer to get if there's a vulnerability and get it fixed. If you can't identify it, that's a bit of a challenge. Interesting, lots of different licenses. Okay. That's just the ecosystem. But I found some that didn't have identified licenses. These are important licenses with hundreds of millions of downloads a month, and there's no identified license? That's a bit of a concern. But it's interesting, quite a lot of them are being updated pretty regularly. So if you're updating them, can you be also checking the metadata as well? But then there's a few that are not being maintained. Are they being maintained it's not been updated for two and a half years is that an indication that they are perfect or being forgotten about and so then you're going to get a decision you're going to have to prioritize how you're going to fix them fix them and then you start again so this is a continual process part of your pipeline, part of your dev process, part of your release process. Don't think it's just a one-off. You just do it before going to production. So let's look at now vulnerability management. Another project I'm involved in is CVE Bintool, which is where one of the things I do with Google Summer of Code. So we get students to actually add features. Very, very, very rewarding. And it's had support for SBOMs for a number of years now. This is important because it provides a vulnerability from a number of data sources. There are lots of other vulnerability scanners. Just one, this is written in Python. A lot of them are written in Go or other languages. But the real challenge is you scan and then you get a list of vulnerabilities. What do you do? And I hear most people say, it's not my job. Vulnerability is in someone else's package. it's not my job. So they ignore it. Don't think that's what the CRA really wants you to do. It is your job. Your job is to analyze it, communicate your analysis, and remediate if required. And the remediate if required means, is it exploitable? So you're going to have to really do a little bit of thinking about that. And I think this is one of the biggest challenges. People are not really expecting that. I'll just put it in the backlog. So the process you're going to have to do is you get your vulnerabilities, you get your SBOM, you scan them together and you're going to have to triage that data that you're going to get and then you're going to have to report what your results of that triage is. Is it exploitable? Is it a false positive is it not applicable because it's only available on a different architecture and it's not applicable this architecture or we didn't use it it's not applicable because we didn't use these compile line options unfortunately that's quite manual unless we can get ai to do it so one of the things that people are going to have to do is it to have a machine readable format of exchanging vulnerabilities and that's called vex vulnerability exploitable exchange and it's like a security advisory but it's not it should be giving you that communication so you can then feed that in and hopefully it will save time because once you've done the triage you don't have to do it every time you know every time you do a scan you've not got you can remember um and it should be another machine readable format fortunately there are four formats never mind um but i've I've tried to help by abstracting that by creating another library called lib4vex. I would dearly love people to help make that better because this is going to be the thing that's going to pull vulnerability management for the CRA together. So to summarize, I think the CRA is really requiring the software supply chain to be understood I will be very surprised if anyone in this room doesn't find something they weren't aware of. I think everyone's going to find something lurking in the weeds that they didn't know about. SBOMs are really important, really valuable. But the quality of data is just as valuable as well. So as a community, I hope we can make the data in the Python ecosystem better because it's going to help everybody make better digital products. Vulnerability management is all about assessing the risk, but we need to share data between ourselves, between communities, between organizations, and that's where VEX is going to come in. And hopefully I've got a few tools that might help you. More than happy to try and help develop more tools. Always looking for funding. There's some of the links of the tools that I've mentioned in the talk. So they're all on PyPy. Just search me in PyPy. Or you can go and search the in-progress work on GitHub. Or you can go and lurk on Pestamy on LinkedIn. Thank you very much. Any questions? Thank you.
+
+**Speaker 2** _[22:33]_
+
+Thanks, Anthony. Sorry, I thought you wouldn't make it because you said you have so many slides, but you're actually super on time. So first question, how to best set up your tech stack to incorporate this process? It's another 30-minute talk, right?
+
+**Speaker 1** _[22:52]_
+
+Okay. I'm an architect. So you start from day one. It's really hard to put security in after the event. I think we all know that. So there's a big drive, things called security by design. yes it's painful it's going to be painful but you've got basically once you get over that initial thing you're going to get some bad news bear with it you're actually going to get a better product out of that bad news ignoring it for as long as you have is only going to bite you later so the COA OK, 2027 start today don't start in 2027 you won't have enough time
+
+**Speaker 2** _[23:41]_
+
+There are no more questions so far, so I'll add one from me. So you asked at the beginning who was not from a new country because you said that the previous talk people were surprised. Surprised about what?
+
+**Speaker 1** _[23:52]_
+
+Okay, so I'm from the UK. If I am a manufacturer in the UK and I want to sell to the EU market, this applies. So the people, they still want to sell out of the US, US selling into Europe. Europe's a big market. You're the big market, you're attractive. So if people want to sell digital products to the EU market, they're going to have to comply. So is that China, is that Japan, is it the UK? so this is why it's important and I don't think there's enough awareness so I gave a talk a few weeks ago to the UK and a lot of this was very new to a lot of people the obligations that they were having to do this level of compliance level of assessment that they're going to do what we're going to have to do is still be made up it's still work in progress from the standards bodies but actually I'm hoping that what's being done in other countries is going to be roughly what's required in the EU no more standards please, no new standards you know, EU has got some very good approaches so let's follow those approaches but this applies globally and I expect this will become like GDPR is becoming like a global standard I think the CRA will become a global standard for any digital products and it's going to benefit humanity.
+
+**Speaker 2** _[25:18]_
+
+Ultimately. Oh, yeah, definitely. I mean with somebody as somebody with a low degree. I mean, it's called exported law, right? That's like so if you exactly want access to that market then you need to comply and this way like sooner or later the whole world Cool two more questions First one. That's the as bomb for Python package also scan for vulnerabilities
+
+**Speaker 1** _[25:38]_
+
+No, okay. I presented a lot of this at FOSDEM a few months ago, and I got asked, why have I got so many tools? I come from an old school of basically, you write one tool to do one thing. Well, so the generator is a tool on its own. The scanner is a tool on its own. There are other tools out in the market that do both. Things like Trivia was mentioned on another talk earlier this afternoon. sift, sift and quiet they're slightly different and so they are separate deliberately so you can generate the SBOM and then you can put it to multiple SBOM vulnerability scanners which is what I do and I keep those loosely coupled deliberately
+
+**Speaker 2** _[26:24]_
+
+Awesome, thank you. Next question. Under CRA, can you ship software where dependency has a CVE which is not affecting you? What about potential privilege escalation?
+
+**Speaker 1** _[26:34]_
+
+Depends. Sorry. I'm like a lawyer now. If you have done the assessment and documented your purpose of your assessment at that moment in time to say, your product is not exploited on the basis of the information you have received at the time you ship your product, fine. But you need to make sure if that vulnerability then finds more information comes on later, then you need to reassess so it's a continual process it's not a file and forget
+
+**Speaker 2** _[27:11]_
+
+What would be the top three most effective low-effort measures to give people something to implement easily? Well, there are no free lunches, are there?
+
+**Speaker 1** _[27:20]_
+
+Quick, generate an S-bomb, there are lots of tools out there, you know, if you just went and asked, I don't know how many of you are devils or how many of you are architects or product managers, if you went and asked your architect what dependencies are used, I would be surprised if he could tell you every dependency, and particularly would he be able to tell you which the versions of each component that he's using, that would be really good. So I would say, start generating S-bombs. You're not going to fix all the problems, but let's just grow that awareness.
+
+**Speaker 2** _[28:03]_
+
+I like this one. Because I was thinking of that as well. Would it make sense to assign people in the team or hire dedicated people carrying CRA responsibilities similar to a GDPR officer?
+
+**Speaker 1** _[28:14]_
+
+Probably, I think one of the things I'm trying to encourage people is raise awareness. So the UK, people aren't aware of it, so I'm having to raise awareness. I think you need to raise awareness in the senior leadership to realise that this is coming and it's not, this is going to actually have, there may be some business decisions you make about do you support, do you kill a product or support, you know, what's the reinvestment you require if you find the product has got so many issues you may have to make a business decision to say it's no longer financially viable to support continue that process beyond December 2027
+
+**Speaker 2** _[28:57]_
+
+Okay, there are five more questions, but unfortunately we're out of time. That's great But yeah, will you be around?
+
+**Speaker 1** _[29:04]_
+
+I'm here for three days, so please track me down.
+
+**Speaker 2** _[29:08]_
+
+So, yeah, thank you very much for this great talk. I think that deserves a round of applause.
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -1,0 +1,178 @@
+title: Unleashing Confidence in SQL Development through Unit Testing
+---
+description: As the landscape of data-driven applications expands, the need for robust SQL development practices becomes increasingly critical. This conference talk…
+---
+created: 2023-12-12
+---
+code: EMZ7L7
+---
+slug: unleashing-confidence-in-sql-development-through-unit-testing
+---
+speaker_names: Tobias Lampert
+---
+speakers:
+
+
+
+### Tobias Lampert
+
+_About — in the speaker's own words_
+
+I'm an experienced technical leader with expertise in Data Science and Data Engineering. For over 20 years I have been designing and implementing data-intensive applications end-to-end, from data ingestion to deployment and have build solutions which generate insight from data using statistical analysis and machine learning. My passion is building user-friendly, high-performance and cost-efficient data platforms.
+---
+abstract:
+
+
+As the landscape of data-driven applications expands, the need for robust SQL development practices becomes increasingly critical. This conference talk addresses the challenges faced by data teams in maintaining and evolving complex SQL models for their Data Warehouses, and shows how unit testing can play a vital role in ensuring data quality.
+
+We will delve into the significance of SQL unit testing, highlighting its ability to quickly validate modeling logic and making sure that modifications do not break existing behavior. With the ease of mind of an automatically verified SQL logic, changes to existing data models can be shipped with confidence, ultimately contributing to faster deployment cycles.
+
+Get detailed insights on  the structure and functionality of Lotum’s SQL unit testing framework, built in Python using pytest and tailored for BigQuery. With Lotum processing millions of events from mobile games every day, explore how this robust framework allows for efficient testing, ensuring the accuracy of the SQL logic. Learn how test cases with small sets of static mock data can be defined effortlessly so that they help pinpoint potential code errors easily.
+---
+full_description:
+
+
+The conventional approach to data model development frequently involves a repetitive cycle: crafting a query, executing it, examining a portion of the result, and iterating through the process with each subsequent query modification. This method becomes particularly challenging when dealing with the evolution of mature, extensively-used data models, where multiple developers collaborate without sufficient testing. In such scenarios, the iterative nature of this process poses significant risks, potentially leading to overlooked errors and compromised data quality.
+
+The talk showcases the tangible benefits of having a well-designed unit testing framework, providing ease of mind to developers working collaboratively on the same model, and enabling the early detection of hard-to-spot errors before deployment.
+
+During the development of new data models and during the integration of new data sources, the absence of large amounts of production data makes verification of the model outputs difficult - clearly defined tests for scenarios not yet observed in production play a crucial role in overcoming this hurdle. SQL unit testing becomes especially relevant when refactoring existing data models and can be very helpful to ensure the logic is unchanged, even for edge cases.
+
+I outline the requirements for an effective SQL unit testing framework, emphasizing the use of the database or query engine to verify SQL statement correctness without persisting any data in the database. The presented framework supports the definition of atomic test cases, where each test case consists of minimal input datasets and expected output datasets and it is verified if the output of the query when run on the defined inputs matches the expected output.
+
+The practical implementation of a SQL unit testing framework will be shared in detail, by giving insights into Lotum’s pytest-based SQL unit testing framework and demonstrating how a test case for a SQL statement with mock data can be built effortlessly with minimal code redundancy. 
+
+Internal workings of the framework will be explained, including the mechanics to define and run a unit test: By injecting mock data into an existing SQL statement, replacing references to production tables by the injected mock data, and executing the resulting fully-static statements in the query engine, the framework evaluates the transformed data against expected outputs. This way, the correctness of the query can be verified on a case-by-case basis without manually modifying the query code itself.
+
+Attendees will leave the session with a deep understanding of the importance of SQL unit testing, equipped with insights into building an effective framework, defining test cases, and ensuring data model robustness. The talk provides a roadmap for data teams to embrace a test-driven development approach, enhancing code quality, and fostering a culture of confident SQL development.
+---
+room:
+---
+day: Tuesday
+---
+slot_date: 2024-04-23
+---
+start_time: 10:30
+---
+end_time: 11:00
+---
+slot_id:
+---
+track: Programming & Software Engineering
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 3578
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/EMZ7L7.png
+---
+youtube_id: ykNv7FP1494
+---
+video_link: https://www.youtube.com/watch?v=ykNv7FP1494
+---
+video_published_at: 2024-10-28
+---
+video_duration_iso: PT30M33S
+---
+video_thumbnail: https://i.ytimg.com/vi/ykNv7FP1494/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:06]_
+
+Good morning, everyone, and welcome to my talk on unleashing confidence in SQL development through unit testing. Who am I? My name is Tobias Lampert. I work at Lotum as an analytics engineer in their business intelligence team. I used to be a backend developer in my early career, and for the past eight years, I focus entirely on the data space. I work at the intersection of data engineering, data science, data architecture, and data platforms, which is great because at LOTUM, there's plenty of things to do in all of these areas. So who's LOTUM? LOTUM, we are a game development studio for mobile games located in Bad Nauheim, half an hour north of Frankfurt in Germany. We have 50 employees in the business intelligence team. The mobile games we have created so far have 900 million downloads combined. These are our main games at the moment. Maybe you know some of them. Who's playing them? Anyone know them? Whoo! Amazing. Wonderful. So, analytics engineering at LOTUM. We have this fairly standard ETL pipeline at LOTUM. The data practitioners among you should know this. It shouldn't look too unfamiliar. We collect tracking data from our mobile games, everything the users interact with, what they click on, what they saw. what they actually did in their games also extract data from external sources and this amounts to about 300 million events per day we store that in a staging area and then transform it and load it to our data warehouse and from the data warehouse we power all the analytics which drives most of our business decisions and these transformations to the data warehouse are done through many pretty complex SQL statements. And whenever we change something to these statements, there's always the question, how can we make sure the pipeline still produces the expected output after the code change? Well, it's pretty easy to make sure that is guaranteed. But we want to avoid one particular case, basically the case is if we make a change, even a small one, a tiny one, that may sound or may seem harmless, it can introduce a tiny error. And this tiny error can stay undetected. And maybe weeks later, somebody notices, hey, this data is actually not correct. But by then, the data has already compromised our insights, maybe even led to wrong business decisions, and we may need to orchestrate a very expensive, time-consuming, and high-effort data backfill to repair this. So this is definitely something where we don't want to end up. So how can this be prevented? It can be prevented by testing our SQL statements. Why does testing matter? Well, if you test your SQL statements, you can ensure they're accurate and reliable. You can ensure that they meet the defined requirements and specifications. And also by testing, you can actually detect errors, like the ones I just mentioned, very early in the development cycle, way before the code actually is in production. And testing also enables you to catch these stealthy errors, which otherwise would be completely undetected. After all, testing makes sure your data is trustworthy and as a data practitioner that's exactly what you want. So I've talked to a couple of companies on testing SQL statements and the traditional approach what most companies do who claim yeah sure we test our SQL statements that is something along those lines what they do. They take snapshots of their production tables, they run the SQL statement through these snapshots and store the result in a temporary table. And then this temporary table is compared to another snapshot of the live result table, and then they verify. If they didn't change the logic at all, they verify if it's a one-to-one match, or you can verify whether the assumptions about your data still hold. If the row count is the same, if there's no unexpected null values showing up, if the value ranges are still the same, if you don't have any duplicate keys, and so on. This approach, although it's pretty common, does have a couple of disadvantages. So first of all, it's stateful. It relies on specific data states in your database. Then you need to duplicate your data. You may need to copy pieces of your production data into a testing environment. It also has very limited scope. Since it works on production data, it can only work on data where you already have production data for. It cannot account for data which has never occurred in production, cases which you have never seen before. It's difficult to isolate. It needs a dedicated test environment, dedicated test tables, copy of your data, maybe even a dedicated test instance for your testing. It's non-atomic, so if something goes wrong, you know, oh yeah, my statement may not be correct, but it's very hard to isolate what the actual problem is. It doesn't show you, hey, this specific functionality of your statement is broken. It just tells you, hey, the statement is broken as it is. And in the end, it can be pretty slow because you're doing this on production data, lots of production data. It takes time. It can be very resource intensive and cost you a lot of money doing this. So is there a better way to test this which doesn't have all these disadvantages? And I say there is, and it's called unit tests. So what is a unit test? Let's have a quick look at what Wikipedia says. Wikipedia says in computer programming unit testing is a form of software testing by which isolated source code is tested to validate expected behavior. yeah, that's kind of what I want, isolated. My SQL statement is isolated. I want to test whether it has expected behavior. And also, according to Wikipedia, a test case describes the expected behavior, and this is the output of the code under test for a particular setup. And this is the input. And that's exactly what I want. I want to test whether my SQL statement behaves as expected for a given set of input by checking if it delivers a given set of output. But I don't want to do this for an entire database table. I want to do this for a very small, well-defined set of input data. So how does this look like for SQL statement? Wikipedia is very generic on software development, but we want to have a look at how this could work for SQL statements. Well, we have to construct some sort of a test case for an SQL statement. The test case contains some input data so that would be at least one or zero rows for all the source tables your SQL statement is referencing and you need some expected output data and this also could be a zero or more rows maybe the statement doesn't return anything at all for that given input data. The output data describes the intended behavior of the query. What you can do then is take this input data execute the SQL statement in your query engine and you get the actual output data that the query delivers given the set of input data. You can compare this and only if it's a one-to-one match you can say yes for this test case my statement behaves as expected. So how should test cases look like? Well I'd like to have my test cases atomic. They should be focusing on a very specific isolated functionality of the SQL statement. I want them to use only required fields which are necessary to test this specific functionality. I don't want the test cases to include any clutter, any unnecessary complexity. And also, I want my test cases to be compact. I want them to use as little rows as possible, not to be bloated, not to include anything unnecessary. So to sum it up, a test case should have as few input rows with as many empty fields as possible. So let's write some tests then. And this is the year 2024, nobody writes code by hand anymore, I'm pretty sure none of you does. It's all AI, code assistants, code generators, AI, pair programming, so let's use GitHub Copilot for that. GitHub Copilot has this nifty feature where you can write slash tests in the chat box, and it generates some unit tests for the selected code. So, well, let's open up an SQL file and let's have it generate some unit tests then. Unfortunately, GitHub Copilot is not particularly cooperative in this case. It says, as an AI programming assistant, I can help you generate tests for your code. However, the code you provided appears to be SQL code. And writing tests for SQL code is not a common practice. Writing tests for SQL code is not a common practice. Yeah, that's disappointing, but it has a point there. I have not seen this in a lot of companies where it actually is a common practice to write unit tests for SQL code, but I say it should be. So since AI doesn't help us or doesn't want to help us in this case. Let's do it by hand and I'll show you how. So our requirements when we thought about unit testing SQL statements at LOTEM, we had a couple of main requirements which we wanted to fulfill. So first of all, I mentioned this before, we did not want to persist any data in the database for our unit tests. Also, we wanted to be able to test in a production-like settings, as close to our production environment as possible, ideally using the exact same query engine and the exact same environment. The test definition itself should be independent from the SQL statements. We did not want to modify our SQL statements so that they are testable. We wanted to leave them as they are, exactly unmodified, and define test cases and the test logic somewhere else. And obviously, I mean, we're at a Python coding conference here. We wanted to define our test cases as code. So let's dig into this and do it really from the ground up. So at Lotum, we define our test cases as Python dicts. Every table row is represented as a dict. So if you have this sample database table here, three columns, three rows representing employees, you can represent them as well as Python dicts where the dict key is the column name and the dict value is the column value. That's pretty straightforward. So how would a test case for an SQL statement look like? I have this sample SQL statement here, which doesn't do much. It takes an employee's table, groups the data by department, and calculates the average salary for each department. So a very simple test case that would test the most basic functionality of the statement would need at least one input row. I define one input row here as a Python dict where I have department one salary 100, and my expected output data would be pretty much the exact same thing because for one row there's not much of an average calculation to do with department one average salary 100. So if we make this a little more complex to actually test our average calculation, you would need two rows, obviously, with employees from the same department but different salaries, and then my expected output would be an average salary of 25. so um but in real life obviously uh tables and statements are much more complicated they have more than just two rows um and your statement may have i don't know 10 20 uh columns it's dealing with it may group by not one but five other columns and it may output not one or two columns it may output 10 of them so defining the test case may be a very uh time-consuming and elaborate task. So and obviously in order to test your statement you need to provide all these fields or at least some value for all these fields. So I mentioned this before I want my test cases to be compact and I want to define test cases in such a way that they only need the data that actually is required to test this very specific functionality. So what we do at Lotum is we define default rows in our database. So, for instance, we define this as our default employee. And from the default employee, we derive test cases where we just define what has changed to the default employee in order to test this functionality. And it looks like this. I'll give you some examples. We use dict merging for this, which is not very commonly used. Dict merging is a technique where you take one dict and you replace or add keys to the dict using the pipe operator so we have our default employee here which is the dict which I just showed you it contains the the default values for my default employee and for a particular test case I only want to specify hey there is two fields which are different in this default employee and I need only these two fields for my test case all the other ones, I can leave them as a default. I need to specify them, my statement needs them, but I only want to focus on this exact change of the default employee. And the first test case I showed here is kind of the continuation of my average salary verification. I have two employees with different IDs and different salaries and a lot of other fields, but I don't really care about them and the same goes for the second test case where I just want to verify what happens if I have two users which have the same email or a user with a higher date in the future and you can iterate on top of that think about like testing stuff like you add a null value somewhere you add like a negative salary zero salary you have duplicate keys or you have a test case where there is no input data at all like zero rows something like that so you can really like whatever you can imagine whatever you can come up with define a test case like this it's very compact doesn't need a lot of code and it allows you to define test cases in such a way that you only need to write what data you need to actually test this particular functionality of the SQL statement. So I talked about defining test cases a lot. I want to verify if my test case works correctly, though. And as I said in the very beginning, we don't want to persist any data in the database. So we don't want to write this data to the database first to execute the SQL statement and verify whether it produces the correct output. I want to do this on the fly without storing data in my database. So how do I do this? Well I combine the SQL logic with the input data and I do this by inserting the test data into the SQL statement itself. So basically what I do is I insert virtual tables into the statement for each reference in the SQL statement I populate these tables with static data, and then I substitute the original table reference by these virtual tables. Let's have a look at how this looks like in code. So if I have my sample case, the most simple sample case here, just one row of input data defined as a list of dicts, I can transform that into SQL code, which contains the exact same information. It would look like this. This is called an SQL CTE, common table expression. Common table expression, basically, you can think of it as a temporary table that only exists for the duration of the query itself. Apart from that, it works like any other database table. You can use it to select data from it, and I call it mock data employees, and it contains the exact row of data which I have in my Python dig. For some SQL practitioners, this may look a little odd because there's no from statement here, but this is actually entirely valid SQL code. It just carries its own static data. It does not reference any live database table anymore. You can do this with more than one row as well, but you just have to union all the rows, so that would be my definition of test cases as Python dicts on the left side and the SQL equivalent on the right side. So, to actually inject this test data into my statement, I have to combine this CTE, which I derived from my Python dicts, with the original SQL statement, like this. And the only thing I need to do then is I need to change the reference. This statement select from an employees table, which obviously is a live database table. I want to replace this reference by my mock data employees virtual table, which I just defined like that. And there you have it. Now you have a statement that's entirely self-contained. It doesn't reference any live database tables anymore. It contains its own test data. You can run this through the query engine and without requiring any live database table as well, the tables don't need to exist even, you get the result for this test case back from your live query engine. So if we put this all together, we define the test cases as Python dicts, we generate SQL code from these dicts, we combine it with the original SQL statement, which gives us the statement with the injected test data, run it through the query engine, and that gives us the actual query result for our test case. And then we can make a one-to-one comparison, whether that meets our expected output, which we defined as a Python dict previously. How do we integrate this with PyTest? This is straightforward. I'll give you some insight on how we implemented this at Python. We want to define a single test case here, and for that, we wrote a class that's called mock table. Mock table acts as a container for these virtual tables, which I just talked about, and it does all the handling with the CTE generation and querying the data, the query engine for us. We have to define three mock tables in total. One contains our input data for this test case. The other one contains our output data. and the third one doesn't get any data but it has a reference it references a other mocked table which I just defined and this actual mock table this will do kind of under the hood run the input data through the query engine and get my expected my actual output data and the only thing I need to do then in the end make an assertion whether my expected output actually matches my actual output. So running the test suite at Lotum, this is actually how it looks like in production in our case. So we have 94 tests defined here, which ran in four minutes, 10 seconds. We grouped them in various Python files, depending on the statement we're testing. and that's actually pretty quick and this is how it looks like if everything goes right and this is a very relieving thing to see if I know well I just tested 94 completely different aspects of my statement and they all work as expected. So let's have a look again at all the disadvantages of the traditional approach which I mentioned in the very beginning. The traditional approach is stateful. The approach I just described is completely executed on the fly, stateless. You don't need any data in your database or query engine at all. You don't need to duplicate any data. And the limited scope is not an issue as well for me because I can handle test cases with unseen data. Everything I can imagine that could come up, anything that could cause problems for my statement, I can test it with this approach. It's absolutely easy to isolate because it's entirely self-contained. You can run this anytime, anywhere, even in parallel, even in your production environment. There's nothing interfering with these statements, and you don't need to isolate them from the rest of your production code. I said it's non-atomic, the traditional approach, in our approach, gives you the capability to exactly detect what the problem is. So, when one of these atomic test cases fails, you know exactly, hey, this is an issue with a certain calculation, or this is a certain issue with a group by, because I'm getting duplicate rows, and so on. So, you can really pinpoint the problem. The framework we wrote gives you an exact information and says, okay, there's an extra row here, or there's a row missing here, or there's a wrong field value there or there's an extra field there or it's a wrong type here. So it really, really gives you in-depth information what your problem actually is. And since the traditional approach can be really slow, our approach is super lightweight. It's very fast. As we just saw, 94 tests executed in four minutes. The average test case in our production environment is executed in 2.9 seconds. Depending on the query engine you use, we're using BigQuery. Depending on the query engine you use, this may be even much, much faster in your case. So to wrap it all up, unit testing improves your code quality because it ensures the expected behavior, even in unencountered data scenarios. It minimizes errors already in development. So a lot of times, actually, it happened to me. I wrote an SQL statement. I thought it's finished. It's perfect. I want to deploy it. Then I wrote the tests and I realized, oops, this actually is not ready at all. There's some edge cases I totally forgot. And this really opens your eyes if you do this and gives you a better understanding about the quality of your SQL code. And in the end, it boosts your confidence because you don't need any manual verifications anymore. You don't need any expensive data comparison. And it gives you that peace of mind that when all the tests have passed for your statement, you can rest assured it behaves as expected, at least for the cases you could have imagined. So that's a wrap. Thank you for your attention. My name is Tobias Lampard. I work for Lotum. And by the way, we're hiring. So if you want to work in the gaming industry, let me know.
+
+**Speaker 2** _[25:11]_
+
+Thank you, Tobias, for your talk. For all the audience, please stay in your seat as we go now to the Q&A. The first question is, what are your thoughts on DBT testing?
+
+**Speaker 1** _[25:23]_
+
+DBT testing, yes. It's a little bit of a different approach. I'm not super familiar with DBT testing, but what I've seen so far is compared to my approach, the syntax is quite bloated. You have to modify your SQL statements. However, I see DBT becomes very popular. And there are a couple of frameworks which can be integrated with DBT, which follow more closely like this approach, which I just described.
+
+**Speaker 2** _[25:55]_
+
+How do you test on data with complex relationships between multiple tables?
+
+**Speaker 1** _[26:00]_
+
+tables? Yes, this is something I couldn't show, unfortunately, in this short amount of time. But
+
+**Speaker 2** _[26:01]_
+
+Yes.
+
+**Speaker 1** _[26:06]_
+
+obviously, this can be done not for just one input table, you can also do this on multiple input tables. And if you remember the slide where I showed where we derive test cases from kind of a default row, if you do this for multiple input tables, and we have complex ones, which like use like seven or ten input tables at Lotum as well. So it just makes your test case a little more complicated. Then you say, okay, in input table this, I need this row, and in the second table you need this other row, and usually, if the question is about complex cases, usually only a few of the input tables actually need to change in order to test a certain functionality. You don't need changes in all of your input tables, So that keeps your your test case really compact
+
+**Speaker 2** _[26:58]_
+
+And does testing framework work in case SQL isn't written in raw statements but rather in sculpture misqueries?
+
+**Speaker 1** _[27:08]_
+
+And SQL alchemy queries. Yeah. So what I showed you is kind of the very, very generic approach. The framework we wrote is a little more complicated under the hood. And it takes into account a lot of kind of specialties of our pipeline. So in this case, you would need to kind of wrap this a little bit I don't think this approach works kind of all out of the box with SQL alchemy You know, we would need some kind of intermediate layer for that
+
+**Speaker 2** _[27:39]_
+
+Is your mock table implementations open source available?
+
+**Speaker 1** _[27:42]_
+
+I was expecting that question. It is. Our library is not open source because it's very, very specific to what we do at LOTEM and that we don't think it's generic enough to provide value for the open source community. But there are a couple of frameworks which are open source, which follow a very similar approach, defining test cases as Python digs and then using ZTEs to inject the test data. if you want to look for instance as at SQL Mesh or SQL Mock or SQL Glot that would be another one so these are all frameworks which are open source which kind of follow this approach which I just showed.
+
+**Speaker 2** _[28:23]_
+
+modifying the from to mock employee instead of employee changed the SQL statement which you said was not the desired behavior how do you deal with that
+
+**Speaker 1** _[28:36]_
+
+Okay, we don't change it permanently the framework changes the statement on the fly, but just replacing the reference But we don't change the source code of the SQL statement itself. That's what I said We don't want to modify the source code the changes we do to the SQL statement There are tiny changes just replacing the references. These are all done on the fly and they're not permanent
+
+**Speaker 2** _[28:58]_
+
+How do you handle migrations for the test?
+
+**Speaker 1** _[29:02]_
+
+That's a tricky question. What sort of migrations? Who asked the question? Yeah, well, anytime you change something major, obviously, you have to change your tests as well. That applies at any time. So basically, if you make a major change to your database, the structure, anything, you cannot expect your tests to work. You always have to do this in parallel. Change the underpinnings and change the tests as well.
+
+**Speaker 2** _[29:37]_
+
+We have just time for one more question. Could you please explain why you don't use temporary tablets with value statement instead of CTE, given that you have the permissions to create templates?
+
+**Speaker 1** _[29:50]_
+
+Well, as I said, temporary tables have a couple of disadvantages. So you have to create them in the database. You have to make sure nobody's interfering with your temporary tables. You need to have your own dedicated test setup. And my approach is it's all self-contained. It's all virtual. Obviously, I would have the permission to do so, but it comes with all these drawbacks. I don't want to modify my database at all and don't persist any data in the database. my approach is completely kind of on the fly and doesn't rely on storing anything.
+
+**Speaker 2** _[30:23]_
+
+Okay, Tobias, thank you for bearing for all our questions.
+
+---
+transcript_status: auto
+---
+transcript_language: en

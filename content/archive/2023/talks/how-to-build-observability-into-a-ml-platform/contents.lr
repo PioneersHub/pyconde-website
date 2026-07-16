@@ -1,0 +1,164 @@
+title: How to build observability into a ML Platform
+---
+description: As machine learning becomes more prevalent across nearly every business and industry, making sure that these technologies are working and delivering…
+---
+created: 2023-02-28
+---
+code: TGZFSF
+---
+slug: how-to-build-observability-into-a-ml-platform
+---
+speaker_names: Alicia Bargar
+---
+speakers:
+
+
+
+### Alicia Bargar
+
+Alicia is a coding polyglot with over five years of professional engineering experience applied to R&D platform development and data engineering. As a Senior Data Developer at Shopify, Alicia works on the Machine Learning Platform team, working on designing and implementing data quality monitoring.
+---
+abstract:
+
+
+As machine learning becomes more prevalent across nearly every business and industry, making sure that these technologies are working and delivering quality is critical. In her talk, Alicia will discuss the importance of machine learning observability and why it should be a fundamental tool of modern machine learning architectures. Not only does it ensure models are accurate, but it helps teams iterate and improve models quicker. Alicia will dive into how Shopify has been prototyping building observability into different parts of its machine learning platform. This talk will provide insights on how to track model performance, how to catch any unexpected or erroneous behaviour, what types of behavior to look for in your data (e.g. drift, quality metrics) and in your model/predictions, and how observability could work with large language models and Chat AIs.
+---
+full_description:
+
+
+As machine learning becomes more prevalent across nearly every business and industry, making sure that these technologies are working and delivering quality is critical. In her talk, Alicia will discuss the importance of machine learning observability and why it should be a fundamental tool of modern machine learning architectures. Not only does it ensure models are accurate, but it helps teams iterate and improve models quicker. Alicia will dive into how Shopify has been prototyping building observability into different parts of its machine learning platform. This talk will provide insights on how to track model performance, how to catch any unexpected or erroneous behaviour, what types of behavior to look for in your data (e.g. drift, quality metrics) and in your model/predictions, and how observability could work with large language models and Chat AIs.
+---
+room:
+---
+day: Monday
+---
+slot_date: 2023-04-17
+---
+start_time: 16:20
+---
+end_time: 16:50
+---
+slot_id:
+---
+track: Sponsor
+---
+tags:
+---
+submission_type: sponsored
+---
+submission_type_label: Sponsored Talk
+---
+submission_type_id: 2525
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/TGZFSF.png
+---
+youtube_id: bsXCxK99cKU
+---
+video_link: https://www.youtube.com/watch?v=bsXCxK99cKU
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT30M2S
+---
+video_thumbnail: https://i.ytimg.com/vi/bsXCxK99cKU/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:02]_
+
+Hey, y'all. Nice to meet you. I wish I had a cheesy title up here for you all, but I was working on it at the time. So it's exactly what it says it is. We're going to be focusing on building observability tools to be able to better understand how machine learning models function and when they don't function. So let's talk a little bit about me. I'm Alicia. I go between the titles of data engineer, machine learning engineer, and the machine learning platform. And in this talk, I'm really focusing on data aspects. so we're going with that. I'm focusing on the machine learning feature store. I'll explain a little bit more about that in a moment if you don't know what a feature store is. I'm based in Amsterdam in the Netherlands. You can probably tell from my accent that I'm not Dutch. I wish I was, that'd be cool, but I'm from the US. So one other thing you should know about me is I tend to like to walk, and I know I'm not supposed to. So I've got this little bear here for all the remote presenters. Maybe they can hang out and see the bear when I am gone from this. So anyway, let's talk about observability. Why do we care about it? Most people don't. At least not to start. What they want to do is solve hard problems, and usually machine learning is one of those tools you use to solve the problem. You work on it, you figure out the right parameters, the right type model, and you finally want to release it into the world, and it totally bombs. Why does it bomb? That's the stuff I care about. I want to know when the model has issues. That's the most fun thing for me. And there's a couple ways to deal with when a model has issues. One obvious and really important aspect, I'm going to slow down because I think I'm getting too excited about the whole model having problems thing. You want to introduce alerting and monitoring because if the model has a problem, if, for example, it's just not responding, if there's a model outage, you want to know that fast. You want to have a monitor in place that will let you know that, hey, we're not getting any hits at this end point, it's not responding, or that the predictions it's giving aren't making sense. We want to be able to catch when it's at risk, but what I'm going to talk about today is how we know how to improve the model, how to better understand what went wrong so we can fix it next time. So that's observability, and now I'm going to take this weird kickback to explain a little bit about what machine learning platform is, because I want to present this in the context of how we went about building tools, and one of the big aspects is that there are multiple players in this whole game of developing observability. So I mentioned I work on the feature store. What is a feature store? Our feature store is sort of like the membrane that sits between the data platform and all of its pipelines and the machine learning platform world. feed data pipelines into the feature store that are specifically designed to serve up features that we want to use in one or more models. We think of it as a marketplace, where the feature store is the broker that is managing the sharing of data between the people providing it and the people pulling data from it, so that we can maintain some metadata around what the features are and be able to track various aspects about it. We also have core, core, basically making sure that we're allocating the right computational resources to be able to serve a model, making sure that we have allocated the right amount of GPUs, CPUs, memory, that sort of thing. And on top of it, pipelines, that might be a little bit less clear. It's how our data scientists design the training and serving of models. I'm actually going to go into that a little bit more. registry is where we save our models alongside metadata and be able to pull them in. It's sort of like our Git repository for models, I'm trying to think of how to explain that in case people here don't do machine learning. And then also we serve models at endpoints to be able to handle online predictions, and that's our online inference system. Our focus today is going to be on the feature store pipelines and online inference because Because these are the three different parts of our platform that were deeply involved in surfability. I kind of like to think of it as, you know, we're sort of like collaborators in this fight against model breaking edge. And on the other side of our, you know, three players, we have our three big challenges, which I like to think of as our boss fights. I have to disclaim that we are in prototype phase. So we have built end-to-end prototypes for this, but these are not necessarily things that are going to be like build. So I'm going to I can mention along the way what we used, but if you're like how did this work in production, I can tell you, well, our build is happening, so we'll find out. Maybe I'll give a talk on how this all sucked. But for now, we've been doing prototyping and testing phases, and I can share with you a lot of the designs we've been working on. Our first boss fight is one I worked on. Data quality, issues when your data is just wrong, when maybe it just decided not to show up that day, so you need fresh data and it isn't there, or it showed up but it has random nulls in it, or data values that you know aren't accurate. Maybe it's passing in the wrong type. There's a lot of different things that can happen here, but, essentially, the data is not accurate, and it's not accurate in a way that we, as data engineers, can catch. We focus on the feature store in this one, because, after all, the feature store is the one working between the data pipelines that are feeding it in and the consumers that are taking data out, so we chose this part of the platform as the one that made a lot of sense to be where we validate, where we define what the validations look like, and we actually validate the data that's coming in. I picked a robot because I didn't want to make one that looked like myself in a robot. How do you visualise a feature store as a character? Let me know if you have better ideas. One of the most simple things we actually did was we actually needed to find a way to define what validations looked like, and this isn't Python, which is actually weirdly the point because we realised that we needed to run these validations using different libraries depending on what our performance requirements were, but we also didn't want to be the people in charge of defining what valid data was. People who best know what the data should look like are the people who are providing it, the people who design the features. So We wanted to give the feature owners the way to be able to define their data quality metrics or data quality rules and the way that we could under the hood implement it and also be able to raise this metadata through various parts of, for example, our data catalogue for other people to be able to see and easily understand. That's another thing. Performing code isn't necessarily easily understandable code. So it's really valuable to be able to have this easy way for people to look at the data. So I will point out that, actually, we did run validations using a couple of different libraries to test implementations, so including Red Expectations, and the one that we actually ended up using was Ylogs. It can go into that probably at the end. I want to make sure we have time to cover everything. The other thing that we needed to do is make sure people could actually see whether the data matched those rules, because it's one thing to set these rules, it's another thing to know, hey, is this feature actually meeting its quality standards? So for this, we had to address a couple of different use cases. As an engineer on the platform, I need to know if there's something going wrong on our end. So, for example, if an entire set of features from the same table are just, like, not showing up, is that an issue with the pipeline that's being fed in, is there something going on with our feature store that's not accepting data? People who are wanting to use a feature might want to know whether or not that feature is valid before making the decision. That way if you have multiple variations of the same feature defined, they can make the decision that's right for them on what the most valid version of that data is, the most valid version of that feature is. Ideally you don't have the case where you have multiple people defining the same feature, but this is a potential thing that could arise where, for example, one feature is based on outdated data, you make it a new feature using the new improved pipeline. One other thing that we need to consider is the people who are providing the data recognise the feature is invalid and they recognise what is going on. To be able to debug what's going on, they need to know what rule specifically failed and be able to understand, like, okay, at what point in time did this rule start failing? At what point did we start getting negative values for, like, you know, for sales or something like that? I don't know. Because I really wanted to show you, we did actually build it all, to show you the ugliest graph ever. Because in order to make enough errors, we had to randomly throw in a bajillion of them. So this is an example of just like being able to track errors over time. If it was real data and not randomly generated, you should be able to see degradation as the errors were visualised, seen, debugged, and addressed. I also want to mention the gauges because you might have the case where you know you're having noisy data with potential errors and you might have thresholds for when you want to be alerted. So instead of not just having the historical point of view, but knowing like, okay, like what percentage of this incoming data is showing errors at this point in time. That's all I got to say about that, I think. How are we doing? Okay. Cool. So, let me click. It's not clicking. Let's try that again. All right. So, the other thing we need to address is, again, volume, and the fact that there's this big trade-off between data freshness and valid data. Some use cases need to have fresh data available, for example, for online use cases, and there are certain types of validations. When we talk to our users, they're like, well, you know, obviously it matters if this data is going to break the model's code. If someone flipped up whether it's a string or an integer and that breaks our code, that's not going to work, but if it's like an anomalous value, I don't care unless it hits that certain threshold of percentage of invalid data. So at that case, they actually need the most fresh data in order to be able to give the best possible prediction for the online use case. So we had to end up breaking this down so that you could see not just the amount of incoming records and written records for a given feature or feature set, but also the validation errors and specifically ones that hit that highest severity level that would cause the record to not be written to the online store. So in this case, it kind of breaks down the validation rules where, like, okay, there's something going on, and we need to, like, we need to track the history of this to see if there's, you know, if it's the occasional null versus, like, a lot of nulls affecting this feature's validity versus, like, you know, an error that would cause, like, a fatal issue with the served model. I feel like I said that weird, so I'm not going to be surprised if someone asks me a question about that in a moment. But anyway, that's the general issues, recognising that validations have different levels of severity, and we put them all at highest severity by default, but the feature providers sometimes will need to recognise, OK, this is something we want to keep track of, but it isn't necessarily at Sabir's other issues. I want to get on to our next boss fight, though, which is something that I actually have no idea if people know about either Data Drift or why on earth there are sea otters here. So Data Drift is the situation where the distribution of data is changed. So for example, if you've trained your data and then when you release it you realise that the data that you've trained it on is different, has a different distribution than the incoming data that you're seeing in production or that is changing over time for outside reasons. For sea otters, they deal with drift in water by holding hands in order to make sure they stay close together. But unfortunately, we don't really have that option as machine learning engineers. All right. So instead, what we do is we I mentioned earlier pipelines, and I promised to explain a little bit more. The concept of pipelines is essentially an API for data scientists to be able to define the machine learning training and I said training production. But really here it's machine learning training steps and also prediction, batch prediction in production steps using a simple API, and the way we will use it here is we introduce new steps where they can snapshot distributions in order to monitor them. I think I need a visual to make this make a little bit more sense. So essentially they define their data ingestion step, any additional post-processing they they need to do after ingesting the data, and then training their model. And same thing for the production pipeline. They define the data ingestion, feature post-processing, and the batch prediction steps. And then the training, both of these are similar. It's the same API, but you can run it locally for experimentation. Or for the production pipeline, you can transfer that API to an Airflow DAG that will run it on a regular basis. So how do we introduce drift monitoring to this? We basically add in an additional step where you can add data ingest and snapshot data, feature processing snapshot, feature distribution training, snapshot the label distribution. When you introduce this to the production pipeline, The reason it's valuable to mention the Airflow DAG is when you can run this, and then when you push it as a DAG, it will actually run those steps whenever you run the DAG, and then we save those snapshot distributions. What do we do with the snapshots? So these snapshots, again, we use Ylogs in this prototype, and Ylogs provides a statistical profile which provides insight into distribution in different statistical values, like the min, mean, most frequent values, that sort of thing, but in a much more condensed form. And what we can do is when that snapshot is made, data scientists have, well, before even the snapshot is made, data scientists can customise the report template for how they want to visualise that profile. So this is an example of someone has made a profile template where they want to be able to see the distribution and general count of the distribution, total count, and various values about this profile, like, for example, how many missing values do they have for a given feature, what's the general mean, that sort of thing. And then whenever the DAG is run or whenever you run the training pipeline, the SNAP profile was made, then it's added to, it's combined with this data report, and generated into an HTML file that's saved in the model registry so that someone can go to the model registry, go to that model, and see, okay, here's the snapshot that we got in the last run. Here's the report I've customised to be able to see the different statistical qualities that I care about. This is really helpful if, for example, you want to do segmentation, which might be specific to your specific set of data. One example use case might be if you want to look at overall statistics for sales but then you want to be able to break it down and track distributions per country, you could do that with a report like this because you can customise the exact types of statistical analyses you see. And I think that, yeah, so that was why I was in the data report template and actually in the model registry, we prototyped that part with our comma ML model registry. Mentioning sec, because people keep asking me, and I feel like it's valuable. So boss fight three, so you bring your model home, and you know you want it to behave in specific ways, but you really don't know what it's going to do. This is my cat, and this is basically what he gets up to all the time. But with models, you actually have a little bit more hope of understanding what they are doing. So when our model isn't working as expected, how can we dig into what went wrong? Or see that it went wrong? For this, we instrument our online endpoint. So this is really helpful, well, this is actually the main way that we are, you know, we're already serving our model at this endpoint. So we can go ahead and instrument it to track various properties about the model that can help us better understand what it's being exposed to and how it's acting. Oh, God, I'm doing it. Okay. So... Sorry. All right. So we're currently evaluating these. We're looking at a couple of different solutions. But these were, you know, talking to a team that's currently doing the evaluations. These are things that we're caring about the most at the moment. First, we need to know that the model is available. I mentioned that earlier, but I think a good metaphor for this is one that my team mate gave me is this concept of with drift, you know that ice cream sales will change from summer to winter, but what we really care about is making sure that the ice cream truck didn't break down. So if the model is out, then, like, that takes out everything else. We know that with online inference, one of our big things is we need to make sure we have low latency and responses. So we need to know that whatever solution, however we're instrumenting the end point, it shouldn't introduce additional latency if possible, if we should introduce this like a sidecar solution. One other situation that we need to handle is anomalous inputs. I think I alluded to this, maybe didn't explicitly say this earlier, but with the feature store, We need to consider whether, well, I did mention this, that sometimes we need to block records if they're erroneous in a destructive way. We can't really address this in the same way with an online model, because we get a request, and the data we get is what we got. So we need to be able to handle the imperfect data, but we also want to know that we got invalid data, because if the model is giving out a weird response, we need to know, okay, This is a problem with the data sending the request, and maybe that implies an issue with whatever software is sending that request to us. So being able to track that is important, and, of course, same thing with batch prediction, in online inference, we also care about tracking changes in data and label distributions over time. Let me go quick to, obviously, I've been talking a lot about observability in normal models. By normal, I mean models that were not generative AI. That did not involve prompts. That did not involve needing to think about whether or not the user was engaging with the model and how much they value interacting with it without worrying about the model hallucinating very confident-sounding answers. But actually, now we kind of have to. So that's kind of fun. I don't like parrots, so whenever I see the slide, I'm like... But okay, so what are the things we need to think about? I actually started writing a lot of, like, here's different methods, and then, like, this field changes every day. So I think it's actually better to step back and focus on the basics. So with data quality, are we providing the right information for the model to accomplish the task? One thing that's really interesting is the concept of model degeneracy with generative AI. If you're talking to a few people about this, about the fact that if you make the prompts too long, the model isn't used to that, or the model is expecting a specific structure. And so if it doesn't get the structure it expects or the prompt is too long, it will behave in ways you don't expect. So this is broad things, different examples of whether or not the data is matching the expected training data format. So this might be something that, like, I can't solve hallucinations, but I can, when tracking incoming data that's going to be fed to a generative AI model, check and make sure that it's actually matching the expected format. Data drift. This is kind of changing as models are starting to get access to up-to-date databases. But if your answers you have require needing to know something about the current state of the world, does it actually have the ability to get that? Prediction performance, this is another thing that is sort of like an interesting ongoing situation. We look at things like how is the search compared to our traditional search or how is the summarisation compared to our other summarisation approaches. But one thing that we have to take into account is this new focus on user engagement, which is more along the lines of, like, you know, what is the how do we qualify the quality of an ongoing conversation between the user and the bot? I'm low on time, so I'm going to move ahead to takeaways. The takeaways are I mentioned three different parts of the platform. We work together to make sure that we have a consistent interface for our users to be able to engage with the different observability tools. We also made it we try to focus a lot on things like picking the same libraries for prototypes. That's why I mentioned Y logs a lot. They ended up being our best fit for the overall components. We also focus a lot on data, yeah, data scientists being able to own their process and make it easy for them to understand how to do it. And there's all the people that were involved, and I'm now available for questions. Thank you for doing a great job on time monitoring.
+
+**Speaker 2** _[23:46]_
+
+Thank you, Alicia Barger, for that vivid lecture. I think we can all go more energetic into coffee break. But first we have some questions. You can also type in your questions via Slido. I will read them out now. Who are usually feature owners?
+
+**Speaker 1** _[24:07]_
+
+Okay. Feature owners, this can be a couple different things. So we have at Topify, we have data developers, analytic engineers, and data scientists. Analytic engineers sort of sit in between the two where they design tables that are meant to capture the underlying quality of a feature. So I'm sure when we have an analytic engineer, they'll be like, no, that's not right. But that's how I understand them to be. So the feature owners are typically data scientists working with data engineers or analytic engineers to register their pipeline to the feature store.
+
+**Speaker 2** _[24:44]_
+
+So could a Star Wars style droid be one of the feature owners?
+
+**Speaker 1** _[24:51]_
+
+A Star Wars droid.
+
+**Speaker 2** _[24:53]_
+
+like a bartender droid.
+
+**Speaker 1** _[24:53]_
+
+Like. If they define their feature and they can write it up in the feature store, they might not be the best maintainers, especially if it's a bartender robot, they might be busy doing other things. Typically these are internal feature producers and consumers, I should clarify that.
+
+**Speaker 2** _[25:16]_
+
+Next question is, which tool platform are you using for the drift report?
+
+**Speaker 1** _[25:22]_
+
+Okay, so the drift report, so the statistical profile is generated using the Y logs library, which is an open source library provided by Y labs. The report template is being, like, the actual ability to host it, actually, I think Y logs provides the ability to generate the report as well. It's the hosting and the combination with the template that is provided by Comet ML's model registry.
+
+**Speaker 2** _[25:51]_
+
+Next question is, how do you handle the problem of having too many dashboards, alerts, etc., which all kind of seemed relevant to implement but are too many to keep track of?
+
+**Speaker 1** _[26:02]_
+
+That's totally fair. So and I'm glad that was mentioned because one thing I didn't mention is that remember that data quality monitoring dashboard with bajillions of errors, that was actually made in Grafana, which we host internally as our tool Observe, and we've tried to focus as many of our monitoring reports there as possible. The snapshot report template is in the model registry because that is where we felt like it made sense. But if people felt like that was too many dashboards, they'd probably move into observe. Grafana provides a lot of customizability around the alerting so that you can choose to alert based on strict rules, like, oh, there's an error in your data, or you can provide specific SLOs. We've decided to let the feature owners or model owners customise that, but that's been our approach to handling the noise. So focus everything in one place and give them ownership so if it's too much for them and it's irrelevant, they know what it is and can modify it as need be.
+
+**Speaker 2** _[27:19]_
+
+then who really checks the dashboards? PMs, data scientists, engineers, or who?
+
+**Speaker 1** _[27:27]_
+
+I would say it probably matters which dashboard we're talking about. I think that the ones that are going to be around the drift distribution and model performance are going to be primarily the model owners. Sometimes it will be people from my team as well, because we want to make sure, for example, if all the models are out, that's probably our fault, right? So sometimes we also help people understand what went on with their model to make sure it's not an infrastructural issue. For the feature dashboards, that might be people considering using that feature. So if they're evaluating what features to add to test in their model, they might be looking at that, as well as people who are actively using it, trying to figure out what went wrong with their model, or people who received an alert because they own it. The owners, the people who are in charge of fixing it, are usually the people that we have being alerted. So for the data quality, that would be us, because I'm in the feature store and we need to know that, but also the people who own that data pipeline.
+
+**Speaker 2** _[28:32]_
+
+Are all tools custom solutions or are open source tools I used?
+
+**Speaker 1** _[28:39]_
+
+Right now, we did this full prototype with the exception of Comet ML. Those were all we've been using open source. We are currently evaluating more stuff in Google Cloud, which is a cloud provider. So, like, whether or not to use different tooling from Vertex AI. But that's where I was saying I'm in the prototype phase. So, like, everything that you've seen thus far has been, with the exception of Comet ML, has been open source. I can't say in the build phase what it will look like.
+
+**Speaker 2** _[29:12]_
+
+Okay, last question before coffee break. I mentioned Airflow DAG. Do you use it only to check the task, progress, or status?
+
+**Speaker 1** _[29:21]_
+
+We use air flow to schedule like batch prediction jobs as well as like, you know potential like batch dumps We you know, the feature store accepts like batch produced data as well We also run it like it's over general is Shopify's general scheduling Infrastructure so anything that needs to be on the schedule we use air flow. Is that did that answer your question correctly? Okay
+
+**Speaker 2** _[29:47]_
+
+Thank you for your presentation, for answering to all these questions. To you all, have a nice coffee break. Again, thank you.
+
+**Speaker 1** _[29:56]_
+
+Thanks for coming.
+
+---
+transcript_status: auto
+---
+transcript_language: en

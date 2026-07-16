@@ -1,0 +1,165 @@
+title: Death by a Thousand API Versions
+---
+description: API versioning is tough, really tough. We tried multiple approaches to versioning in production and eventually ended up with a solution we love. During…
+---
+created: 2024-12-21
+---
+code: ZMKJAY
+---
+slug: death-by-a-thousand-api-versions
+---
+speaker_names: Stanislav Zmiev
+---
+speakers:
+
+
+
+### Stanislav Zmiev
+
+Experienced platform engineer and architect with a passion for open source and developer tools. The author of Cadwyn -- a sophisticated API Versioning framework based on FastAPI. A contributor to numerous projects such as CPython and tortoise-orm. Currently building the future of finance at Monite.
+---
+abstract:
+
+
+API versioning is tough, really tough. We tried multiple approaches to versioning in production and eventually ended up with a solution we love. During this talk you will look into the tradeoffs of the most popular ways to do API versioning, and I will recommend which ones are fit for which products and companies. I will also present my framework, Cadwyn, that allows you to support hundreds of API versions with ease -- based on FastAPI and inspired by Stripe's approach to API versioning.
+
+After this session, you will understand which approach to pick for your company to make your versioning cost effective and maintainable without investing too much into it.
+---
+full_description:
+
+
+Web API Versioning is a way to allow your developers to move quickly and break things while your clients enjoy the stable API in long cycles. It is best practice for any API-first company to have API Versioning in one way or another. Otherwise, the company will either be unable to improve their API or their clients will have their integrations broken every few months.
+
+I'll cover all sorts of approaches you can pick to add incompatible features to your API: extremely stable and expensive, easy-looking but horrible in practice, and even completely version-less yet viable. I will provide you with the best practices of how you could find or implement a modern API versioning solution and will discuss the versioning at Stripe in great detail.
+
+When you leave, you'll have enough information to make your API Versioning user-friendly without overburdening your developers.
+---
+room:
+---
+day: Friday
+---
+slot_date: 2025-04-25
+---
+start_time: 10:55
+---
+end_time: 11:25
+---
+slot_id:
+---
+track: Django & Web
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Novice
+---
+supporting_material_url: https://youtu.be/_jmLqOSKIJU
+---
+slides_link: https://docs.google.com/presentation/d/1oLSxjLqIKfo-879XpRrt5_wMqgyEUFyc/edit?usp=sharing&ouid=114690075567381653244&rtpof=true&sd=true
+---
+social_card_image: /static/media/social/talks/ZMKJAY.png
+---
+youtube_id: kzpcqAiveyg
+---
+video_link: https://www.youtube.com/watch?v=kzpcqAiveyg
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/kzpcqAiveyg/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+Hello, everyone. My name is Stanislav Zmiyev, and I work as a technical lead at SEMA. At SEMA, we help engineering teams and product teams stay on top of their roadmap by using AI and analyzing the entirety of Git commits and Jira tickets and then matching them together and then giving insights on what is going on and what is going to happen. when we're talking about apis it always comes back to the big players to the players that made their ux and ui i mean their api experience so good that everybody started following them everybody started mimicking them and so throughout my talk i will come back to stripe as they've had a huge impact on the industry, and I guess companies like them are one of the reasons why we are still trying to make UX really good for our APIs, and one of the reasons why it's even important. So remember this. Let us make a short and simple API. We have our users, we can create them, we can get them, and users just have an address. Simple enough. Sounds really logical. API makes a lot of sense. Let's say that a hundred clients integrated with this API and they're using it to track their users. Good. And then, all of a sudden, some new big client comes to you and says, hey, what about multiple addresses? Some of my clients have shipping addresses. Some of them have billing addresses. My clients need more than one address. Some of them have ten addresses. We can't just create a new user for every address. That is going to be crazy. And then you think, well, it's simple. It's a simple problem to solve. I'll just extend the API. That's good enough, right? Well, your business logic now complicates a little bit. And all of the new clients, when they see this in their open API spec, they go like, is there a difference? Is one of them deprecated? And then you can work with deprecation. You can mark things, but it's not going to be pretty. And at the same time, if you make enough of such changes, your API is going to look horrifying. And then you might say, well, just ask your old clients to migrate to addresses. Simple. Most of the big ones will just tell you, we can do this in six months or in 12 months or in the next two years. Who knows? If it's a huge company, it's not on their roadmap and it probably never will be because they want to integrate with you once and then forget about the integration. They just want it to work. And some engineer in the room might say, okay, let's use GraphQL. It doesn't have such problems, right? Well, that's true. GraphQL, it doesn't solve them, but it makes versioning problems a little easier to some extent. Problem is, if you have a hundred clients and some of them have a long roadmap, we'll probably never see it. As I said, the world is going to be looking very different by the time all of them learn GraphQL and migrate to it. So that's not an option. And so we're left with the only option and the topic of this talk, API versioning. It sounds simple enough. You might think, well, I know versioning. I have seen articles on versioning. I've read 100 articles on versioning. It's all very simple. You just version using either headers or paths or query parameters, and then you do semantic versioning or date-based versioning. What's so hard about it? That's true. And so this is the approach that I prefer to take. So version headers with dates without semantic versions because semantic versions don't really make sense for APIs. Semantic versions make sense where our clients have to pull the new versions. But when we are sending it to them in the web, it doesn't make sense. We just need to tell them about the breaking changes, which is why we're marking them as dates. However, how do you actually version? I mean, yeah, you could say that you do that using headers, but how do you implement it? How do you make sure that your developers do not go insane after, I don't know, five versions? Six versions? What if you have to maintain all of them at the same time? And if you say, well, we can just delete them, of course, delete them. And then most of your clients will say, guys, we can't do this. This is too much. We can't reintegrate with you every few months. So as with my previous talk on tests, you know, I like tradeoffs. So let's discuss the versions in terms of the tradeoffs. Oh, the colors here are horrifying. But you can kind of see them. So essentially, I give three criteria. of old versions from newer bugs, so we really want our new versions to not affect the old versions. We don't want our old versions to break because we're adding some new feature in the new version. However, we don't want to spend years implementing our API versioning solution and we want the new people to be able to get there, understand it quickly and start working, start bringing us money. And then the ease of maintenance. How hard is it to support a lot of versions for a long time? And so let us start with GraphQL, again, versionless solution. The versions are possible to support. You can support a huge amount of versions with GraphQL by just adding and removing fields. Your server is going to be pretty complicated, which is why the simplicity is at the bottom. Whereas learning GraphQL for a junior engineer at the same time as just learning the product of your organization and understanding the business logic is going to be horrifyingly hard. And isolation is as good as you can make it. So you can split things or you can keep things in the same place and it all depends on how well you decide to isolate things. I would not recommend GraphQL if your problem is versioning. If your problem is versioning, you should probably stay away from this and you should probably solve the problems with GraphQL when you have those problems, when you have the problems that are relevant to it. Now, we could host our versions on different servers or in different Kubernetes deployments, whichever you prefer. That's a good solution. That solution really works well when we need to have the maximum security, when, for example, human lives depend on the old versions not breaking as a result of new things that we're doing. So let's say that we have multiple branches, one branch per version, and then we support them all at the same time, and they're deploying from different repositories, from different branches, and it's quite simple to understand. It's a little bit of infrastructure, but most of us have enough infrastructure to handle this kind of versioning. However, if you have five versions, you have five duplicates of your code. And if you want to fix a bug that was introduced a long time before, you're going to have to fix it five times. And if your code base has already changed, if you changed frameworks, if you changed framework versions, if you migrated from Pydantic 1 to Pydantic 2 and that bug is kind of specific to one but not specific to the other one, but the other one has another problem, yeah, it's not going to be fun. It's not going to be pretty, but if you need security, that's the best solution you can get. But you've got to decide whether you version your database or not. For most cases, I think that you should not. For most cases, I believe that your API versions are views of your API. You're versioning the interface, not the actual program underneath. But there are still cases where you do. So when you think that this solution is too difficult, we can go to single deployment, full app duplication, where we just duplicate the business logic into different directories, and then we solve some of the problems that we had with per deployment approach. Well, no, actually, you just sacrificed isolation. Now you can update a library in the newer version and break all of the old versions. But at the same time, now your test suite is going to run infinitely, because you have to run all of the tests for all previous versions. And if you think, well, I just won't run the old tests, ah, everything's just gonna be breaking because if some developer needs to fix a bug in the old version, what is going to test it? What is going to test that any changes to the old versions do not break them? Well, you gotta keep the tests. And if you wanna update, again, from Pydantic 1 to Pydantic 2, Now, you don't even have the option to update just the latest version. No, you have to update everything. And if you have 10 versions, well, now a simple code base of like 8,000 lines long now becomes 50,000. Who knows? It's going to be really painful. And unlike the solution with deployments, here you don't even have the option of having a good UX for your developers. Because now when developers search for calculate tax function, they're going to find five of them or six of them or seven of them. That is going to be bad. That is really bad. And so we called this versioning by suffering. And I really don't advise you to use this almost ever. Of course, there are some cases where it's relevant, but I just couldn't come up with those. The next one is the simplest one. Just copy the route. If you need to version a route, if you need to fix something small like the address thing, just copy the relevant routes. This solution is the easiest one to implement. You don't even need the framework, but if you want the framework, you can use FastAPI versioning. It's quite great. But your junior developers are going to immediately understand what's going on. You are not duplicating the entire code base. And if you want isolation, you can point them at different pieces of your business logic, the old versions and the new versions. And it's also possible to maintain 10 versions like this, unless you need to make big changes to the API. If the changes are small, then you can support a pretty huge number of versions without extra churn. But if you do have many versions, and if you do want to support them for a long time, And if you do want to stay sane while doing this, then probably this is one of the approaches you would think of. So splitting your versioning logic from your application logic and then migrating. So let's say that request came in version 1. Then we have a converter that migrates version 1 to version 4. And then it goes to our app. And then once our app returns the response, the response is migrated from version 4 to version 1 because we remembered that we used version 1. Not too difficult, but also this is the most involved approach of all, except for maybe GraphQL. However, it allows you to support even more versions because now your business logic does not get more complicated or almost does not get more complicated as a result of new versions. This is a really good approach, and if you don't have a sophisticated framework, who knows if I'm going to be talking about it. But if you don't have anything that can help you, this is probably the simplest approach that you can pick if you have big changes in your API, if you expect to support them for a long time, and if you have many endpoints. However, when I worked at finance, we had more than that. We had 200 endpoints, or even 300 maybe at this point. So it was a lot. We had more than a dozen versions and we needed to support them for a long, long time because most of our clients didn't really want to switch. Of course, they're in finance. Why would they switch? And so we needed to think of something else. We needed to think of something better, something where someone else came up with a good approach. And I thought long and hard about the trade-offs. Like, what could we sacrifice? Because if it's trade-offs, then that means that I can sacrifice some of them to amplify the others. And that's true. We could sacrifice isolation because we had really good automated testing. And, by the way, my previous talk, watch it. It's really good on how we made our automated tests good. So, we were pretty sure that our tests are going to find all of the failures that we introduced in the new versions and that cascade to the old versions. We also didn't hire as much, like the people stayed at the company, it was a stable team, so the onboarding could just be extended, and as long as we document our solution really, really well, maybe it would have been okay-ish in terms of simplicity. The only one that we couldn't sacrifice was ease of maintenance. Because the only way to improve that is to hire more people to manage the versioning. And even that won't help. Because once you have 20 versions, that is not going to help you. Your team is going to be split into people working on versioning and people not working on versioning. And there's going to be extra communication between them. And you know how that ends. So I thought of databases and Git. they also have a problem with versioning, but they support a huge number of versions. Well, databases mostly support just one version, but then you have migrations that allow you to go from one version to another. And the greatest thing about those migrations is that you write them once and in 99% of cases, they never change. So you have like a hundred versions of your database, but you don't need to maintain them. You're maintaining only the latest one, or I guess You create only the first one, and then you go through the migrations. It's a tough topic. For Git, it's very similar. So our repositories have versions. We keep the head, and then we use the diffs to go back in time. So if we applied this approach, we would be able to have a single version of our API, but then just migrate to previous versions like we did with the migration step, But the biggest difference being we are not migrating from version 4 to version 1. No. We just write a migration that allows us to migrate from version 4 to version 3. And then when we created version 3, we did the same migration to migrate from version 3 to version 2. So it's like version chaining in a sense. And I wasn't the first one to come up with it. Guess who? It was Stripe. They also came up with it. And thanks to Brander Leach, by the way, recommend his Twitter, recommend his blog. It's really good. The guy is really smart. They came up with it first. They implemented it. And it served them really well until recently. Because recently they realized that 10 years worth of versions might be too much. And we need to still make people switch off from versions. Because some versions from 2012 are still being used. People integrated once with Stripe. And then 12 years later, or 13 years later at this point, it's still working. People are still working on those versions. It's amazing. And so they came up with this approach. And once I read this article, everything clicked. And that's when I created Cadwin. The thing about Cadwin is you define your version changes. Then your customer sends a request. And that request goes through these version changes, like version gates, that each one migrating it from one version to another. And then it reaches your business logic. Your business logic handles it as if it's the latest version. And then you pass your response back through the same version gates, but different methods in them, which migrate them back one version at a time. And our user gets a response in the version that they requested. Very, well, not simple, but very elegant. Now, our versions are not isolated at all, because we have only one version. Like, our code has exactly one version, so there is no isolation. That's a good thing and a bad thing. If you're not worried about breaking your versions, or if you have good enough tests, that's a really good thing. Because if you have a bug in a really old version, you can fix it in all versions at once. with a single commit, with a change of a single file. It's so simple, it's outstanding. And then, if you don't have good enough tests, and if you are worried about isolation, the reverse is true. If you break something in the latest version, you will, by cascade, break all of your versions. Not fun at all. Not fun at all if you are not sure about your tests. So now let me show you the syntax. I'm so sorry for the people in the back. But let me just explain it using words so first we define how to migrate our open api schema so we say field addresses didn't exist in the old version and then the field address existed as a string. And cadwin just using this information is capable of regenerating all of the old api open api schemas and all of the old by dantic validators so essentially it. generates your Pydantic schemas at runtime, enums too, and all of that goes into your OpenAPI, and all the validations still work for old versions, even though you don't even have the code for those validations anymore. The next thing is we define how to migrate requests from previous version, from before this change to after this change. It's very simple. We just say, okay, the address, okay, it's really hard to wrap your head around it because you've got to go back in time. So the address becomes the addresses and we put it in the list. And now we do the reverse. We describe how to migrate our responses back in time. So we pop the first address. You just got to make sure that you have at least one address. And then you put them into response body address. That's it. Just this thing allowed us to solve the addresses problem. Our users on the old versions didn't notice it. Nothing happened for them. Our users on the new versions are now using multiple addresses. And our developers don't even remember that there was a single address to begin with. They don't see it because it's hidden in those migrations. Of course, they write these migrations, so they probably know about them. Pretty good. And finally, we attach it into the version bundle, and we're done. Now, thanks to Airflow 3.0, CADWIN is now extremely popular, not in terms of the stars, but in terms of the downloads. It has, I think, about 400,000 downloads a day at this point. And it's also used by dozens of companies at this point, so it's really starting to work really well, really well, but it's not just about FastAPI. I'm not sure if I even mentioned it. It's originally based on FastAPI, so it's fully compatible with FastAPI. It's like all of the features of FastAPI are there, and most of the libraries that are trying to work with FastAPI will work with CADWin because it uses it under the hood. But CADWin is not just about FastAPI. CADWin is, for me, a journey that I took into versioning into the worst ways to version. And now I am ready to present to you a lot of theory, not just the documentation on how to use CADWIN, not just the concepts that I used when creating it, but also the theory on how to create an API versioning framework like CADWIN. And I keep a list, an up-to-date list of frameworks like CADWIN in other technologies. I think I even have an article about how to do this in Django. I have like two frameworks in Ruby that do do the same thing. And at the same time, yes, and at the same time, we do this in, like, multiple technologies, and I have instructions on, like, what you should be wary of when you're building such a framework. Now, Cadwin is great. We should all use it for all versions that we have, right? No. It's a sophisticated technology, really powerful, so you should only use it if you have this kind of problem, which is, like, 20% of companies, maybe less. Because if you use Cadwen, you still have to invest a lot of time into learning it, into setting it up. It's a process. I try to make it as simple as possible, but it's still a larger investment than just copying a few endpoints. And so for most companies, I advise to just copy the endpoints. Keep it as simple as possible for as long as you can. For companies that need security for their versions, that need them isolated, please deploy them separately. This is the best and the safest way to do this, but if you have many endpoints, and if you have many versions, and if you have a public API, and you want to keep those versions for a long time, and you want your developers to stay sane, Kadwin is maybe for you. So that's it.
+
+**Speaker 2** _[22:30]_
+
+Okay, first of all, thank you, that was a great introduction. I never heard about API versioning before, and I'm glad, kind of. But well, if I ever come across someone that could use it, I'll definitely recommend Katlin. We do have a few questions, so I'm just going to start with them. Why would you choose a header for versioning rather than a path component?
+
+**Speaker 1** _[22:53]_
+
+So, it all comes back to Stripe, I would assume, because Stripe chose it. Why they did so? Good question. For me, the biggest benefit of header-based versioning is that you can make the versioning header optional. You can, so, essentially, your client sends the header once, and then you can make it optional for all the other times so your client doesn't even think about versioning. That's the biggest benefit. with the paths you don't have such an option because you always have to have the version in your paths
+
+**Speaker 2** _[23:27]_
+
+Alright, what's your opinion on versioning individual resources instead of the API as a whole?
+
+**Speaker 1** _[23:33]_
+
+Oh, versioning, that's actually the approach that I recommend. So for most people, just, so if you're using fast API versioning, the library, then you're going to be versioning your API as a whole. But for most people, I recommend to just ditch the frameworks, forget about everything, and just put the V2 at the end. Or in the beginning of like a single endpoint. It's ugly. It's horrible. But if you have a small API, don't overburden yourself. Your clients are going to be okay. Your clients are going to understand that, okay, this is v2, this is v1. I probably should use v2. So I agree with the question.
+
+**Speaker 2** _[24:14]_
+
+All right. How can you deal with fields that get deleted and also the underlying data getting deleted from the database due to schema and business logic change?
+
+**Speaker 1** _[24:24]_
+
+Very, very good question. That is one of the biggest problems that you face with API versioning. In CAD1, I have like five articles on it just in the documentation. Essentially, you got to version your API, not your data. So if you get your data deleted, if your newer versions have significantly more or less data, then you're not doing API versioning correctly. The correct way to do it is to do it in the same way as you would do it in your database. Let's say that we got a new field added. Let's say it's a middle name, right? And our old APIs didn't have that. Our new APIs have that as like required everywhere. What do we do with it? How do we fix it in terms of the API? Well, in the same way you would fix it in terms of your database. What did you do for the middle name in the database? Well, do the same thing for API. If it's a smart default, do a smart default. If it's a null value, do a null value. But it's a long discussion. It could go on for days. Same goes. Same goes. You've got to have a default. You've got to have a default for old versions.
+
+**Speaker 2** _[25:38]_
+
+Sorry for the people in the stream. Could you repeat the question? Oh, could you repeat the question for the people?
+
+**Speaker 1** _[25:42]_
+
+Oh, yes. Sorry. So they asked what happens when you delete something. If you delete something from the new we would assume from the newer version and let's say that we actually delete the last name in the newer version for some reason, so now our old versions are like new resources in the old versions don't have access to this data which they required before, right? and not an easy problem to solve, and that's, I don't even think that it's a versioning problem to solve per se. You just got to decide whether you ship the default or whether you only delete it in a new set of endpoints, so like that we're not even available in the old versions. It's a trade-off, it's a decision, and it's a really tough decision, and it doesn't even depend on the API versioning scheme that you're using. Even if you're deploying them separately, you're still going to have this problem.
+
+**Speaker 2** _[26:39]_
+
+All right, how can we address testing multiple versions given the code changes from potential library or significant code changes?
+
+**Speaker 1** _[26:46]_
+
+Well, so if it's Per deployment that it's simple. You just keep the tests in the branch if it's single endpoints, then it's simple You're just testing as is if it's versioning by suffering then good luck. I have no idea which right it was horrible Any solution didn't work if it's CAD when I have a guide in CAD when if you go to Concepts it has the guide for testing What you do is essentially you cover your latest version with tests and then each time you make a new version You make the breaking changes you take a look at which tests break and you duplicate just those tests So every change between versions is covered but also the latest version is covered which allows you to keep the minimal amount of tests while not While also being secure on like you testing everything
+
+**Speaker 2** _[27:40]_
+
+What method do you recommend for switching an API from Java to Python and improving the schema while still supporting the old versions? Yeah, that's what I thought.
+
+**Speaker 1** _[27:51]_
+
+That's a really good question, actually. So I don't recommend to improve the schema when you're switching the language. I don't recommend to do any changes besides the switch. If you try to do multiple things at once, you will fail.
+
+**Speaker 2** _[28:12]_
+
+All right other ways to version API endpoints with different versions of streaming responses
+
+**Speaker 1** _[28:19]_
+
+with different versions of streaming responses Cadwin has an issue for For this and I like it's not a solved problem for me yet. So I am not sure If anybody wants to contribute to this to Cadwin if anybody wants this to start working and to be a thing Please be my guest because I'm also not sure
+
+**Speaker 2** _[28:48]_
+
+Alright, last question. Can you elaborate between Solution 4 and Solution 5? Migrations and converters seem to be the same.
+
+**Speaker 1** _[28:54]_
+
+They do look similar. The difference is each version change only knows about the next version and the previous version. Nothing else. If you use converters, most of the time you're going to be migrating from version 1 to version 4 directly. So you will have to duplicate everything. It's a little bit of a different concept than migrations. It's converters.
+
+**Speaker 2** _[29:20]_
+
+All right. That's all. That's all the time we got. Give a round of applause for our amazing speaker.
+---
+transcript_status: auto
+---
+transcript_language: en

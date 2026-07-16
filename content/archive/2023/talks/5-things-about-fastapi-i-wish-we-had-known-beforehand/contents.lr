@@ -1,0 +1,269 @@
+title: 5 Things about fastAPI I wish we had known beforehand
+---
+description: An exchange of views on fastAPI in practice. FastAPI is great, it helps many developers create REST APIs based on the OpenAPI standard and run them…
+---
+created: 2023-01-09
+---
+code: GBYWCY
+---
+slug: 5-things-about-fastapi-i-wish-we-had-known-beforehand
+---
+speaker_names: Alexander CS Hendorf
+---
+speakers:
+
+
+
+### Alexander CS Hendorf
+
+Alexander C.S. Hendorf is an independent AI and open-source strategy advisor working with companies in regulated industries. With 20+ years of hands-on experience across 50+ technologies — from the Python ecosystem to vector databases — he bridges the gap between boardroom decisions and technical execution. Alexander is a [Python Software Foundation Fellow](https://https://www.python.org/psf/fellows-roster/), serves on the board of the [Python Software Verband]([url](https://pysv.org/)) and has delivered 100+ talks in 15+ countries. 
+He writes at [hendorf.com](https://hendorf.com/)
+---
+abstract:
+
+
+An exchange of views on fastAPI in practice.
+
+FastAPI is great, it helps many developers create REST APIs based on the OpenAPI standard and run them asynchronously. It has a thriving community and educational documentation. 
+
+FastAPI does a great job of getting people started with APIs quickly.
+
+This talk will point out some obstacles and dark spots that I wish we had known about before. In this talk we want to highlight solutions.
+---
+full_description:
+
+
+An exchange of views on fastAPI in practice.
+
+FastAPI is great, it helps many developers create REST APIs based on the OpenAPI standard and run them asynchronously. It has a thriving community and educational documentation. 
+
+FastAPI does a great job of getting people started with APIs quickly.
+
+This talk will point out some obstacles and dark spots that I wish we had known about before. In this talk we want to highlight solutions.
+
+This talk will include the following:
+
+### fastAPI is built on the shoulders of giants I: [pydantic](https://docs.pydantic.dev/)
+FastAPI makes extensive use of [pydantic](https://docs.pydantic.dev/). [pydantic](https://docs.pydantic.dev/) parses data, can validate (and transform) data, and has built-in interfaces to export OpenAPI definitions among many other features. 
+
+### fastAPI is built on the shoulders of giants I: [starlette](https://www.starlette.io)
+Routes and middleware are managed by [starlette](https://www.starlette.io). In this section we will explore how to create custom middleware and what we learned along the way. 
+
+### fastAPI has tutorials, but is this documentation?
+The fastAPI page provides a good introduction. The more we worked with fastAPI, the harder it was to find accurate documentation. Looking at the source code, we really missed DocStrings! Introspection to the rescue - will probably include a rant about missing DocStrings!
+
+### DRY ("Don't repeat yourself") with pydantic
+
+For our use case, we decided to use strict models to validate our data structures, as we work in a highly regulated industry where no mistakes are allowed to happen. Setting up the REST API was much easier than developing consistent models that generalise well. We follow the "single source of truth" paradigm, entering redundant definitions is an absolute no-go.
+In this section we show how to create highly reusable pydantic model pools with inheritance for use in fastAPI. For testing, we also created models from metadata!
+
+
+### "The road not taken": pydantic Depends()!
+
+API routes often consist of a request model and a response model. But what about cases where the models alone don't work and a model and e.g. query parameters need to be mixed?
+Apart from flake8 complaining about having callables in the signature, this can be quite a difficult use case. Strategies for resolving model/parameter conflicts.
+
+Bonus - if time:
+### Integrating fastAPI with Sphinx.
+Demonstrate how to integrate OpenAPI with your Sphinx documentation.
+
+The talk will show how fastAPI is built and how well introspection can help you understand what is going on under the hood and which library is actually doing the heavy lifting where.
+---
+room:
+---
+day: Tuesday
+---
+slot_date: 2023-04-18
+---
+start_time: 11:40
+---
+end_time: 12:10
+---
+slot_id:
+---
+track: Libraries
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 2521
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/GBYWCY.png
+---
+youtube_id: KNeHNEs_I3k
+---
+video_link: https://www.youtube.com/watch?v=KNeHNEs_I3k
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT32M31S
+---
+video_thumbnail: https://i.ytimg.com/vi/KNeHNEs_I3k/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:02]_
+
+So this talk addresses basically this was a perfect introduction. Thank you because it addresses I always think if I talk about technical stuff, I try to say hey me and my team How what did we encounter in the first place because we all start with things. Oh, that's really simple. There's a nice tutorial let's get this started and we have like a Hello world or something working like five minutes and all the rest that comes afterwards So this talk is based on use cases So, use cases around data hubs, around data services, around building domain-driven data service clients, around it, on-premise, for the cloud, mixed, and, of course, a lot of migration as probably some of you will already have guessed already. We also cover, like, inclusive access, so business, there's also, like, these business users with Excel that should be covered as well, and microservices, and, of course, FastAPI is a very popular choice nowadays, and many people follow just like why choose FastAPI, and I'm lazy, so this is what JetGPT told me, and I know JetGPT, and I know double-check facts, and I double-checked the facts, and it was accurate, so it's fast. It's a fast web framework. I think also part of the success of FastAPI is it's very similar to the design of Flask which was also very popular in the Python community already. And FastAPI just took things to another level. So it was a really fast-growing project as well. It gives us a very scalable, flexible architecture for building things. But as Max said in the introduction, you start with it, you think it's easy, and I would like to introduce you to some use cases, solutions, and things you probably don't need to stumble across as we did. week. I'm Alexander, I'm part managing partner at Koenigs week, we have a booth outside, come by with a PlayStation to win. I'm also part of multiple Python ecosystems, this conference for me, community and knowledge exchange is very, very important, and if you want to discuss things with me, come talk to me. I also have to do a disclaimer because some parts might be a bit opinionated or exaggerated, I want to have a full disclaimer. I still love fast API, so it's not like a talk why not to use API, just like to how can we make use of API, fast API better and also it's a very active community and I especially also want to thank everybody who contributed code, tutorials, whatever in the ecosystem And I think Sebastian is doing an amazing job as organizing and enabling this community. Let me introduce you to a prototypical fast API journey. There's a requirement. Fast API utilizes the open API standard which has been established for many years. So if you haven't heard about it, just like a quick preview, this is like these nice pages where people have documentation generated from code on web pages so you can interact and understand the API way easier. This is also, I would say, an industry standard nowadays. Of course, you look for framework, very likely you sample, of course, FastAPI nowadays. There used to be others, like I also like connection, but unfortunately, it was neglected for some time and FastAPI is now a bit better. You can do like a hello world in five minutes and it gets you going really fast. And, of course, soon you say, okay, I only need to know fast API because this solves all my problems. This is like a typical mistake. Humans, engineers, I do. Oh, that sounds really great. I've never tried it. It must be just so good and perfect. And it promises everything. And you can build stuff one tutorial at a time. And this is how many people start to use fast API. And some next steps on that journey, of course, you want to add more end points, you want to add more request models, you want to have contracts, you want to make sure everybody talks to your API in a standardized, well readable, easy to understand fashion and of course you also want to say, okay, this is the feedback you're going to get and here's the documentation for it. And of course, once you get started, you have more complex models, you want to validate data, you want to be consistent in naming and, of course, operation stuff like middleware for logging or context like correlation IDs and on and on and on. Some challenges I found on the journey was when we were working on it, you just don't basically need to know fast API. Fast API is more than just fast API. Pydentic is a very big part of fast API under the hood. Starlet is a really good big part under the hood. You have to be aware that one challenge is everything is solved by just like another layer of abstraction. So it's basically like an onion which is deeper and deeper and deeper and it's all really well implemented, it all works really well together, but it's not usually like you're not really sure which framework is responsible now for this and that. It's very packed. And of course you need to think about designing sustainable endpoints that are understandable. You want to think about your modelling, also like how can you enable your organisation by these models, because building one service for a small team is easy, but once you have a definition done, you want others in other departments also to use it, not to have them reinvent other models, and this actually also already starts with, hey, is that ID, is that asset ID, and all these tiny questions that need to be answered. And so, the summary is, not the summary of the talk, the summary is, so, what I want to talk about today is fast API is built on the shoulders of giants, and great tutorials, but is this documentation from a middleware use case, and also how not to repeat yourself with Pydentic, and I really want to start with Pydentic, because I think Pydentic, who Who knows Pydantic? Almost everyone? Yeah? So, let me introduce everyone who isn't familiar with Pydantic yet, Pydantic, you can build models. You can define models with Pydantic. So it's very similar to data classes. You can also say this is an improved data class or data classes with extras or benefits. It's really easy to define an endpoint as we see above here, like have a response model asset, and asset is just defined as a class that has an asset ID, a name, and a currency code. And this is just like being used by Pydentic already to generate, for example, the documentation which we already saw in the open API standard. So actually Pydentic does a lot of the heavy lifting. It parses the input data, and I think there's also, like, often understood here, because it parses the data, so still, if you give a list of integers, of strings there, which can be parsed to an integer, PyIdentic will make a list of integers there. So it's not validating, no, sorry, please, I'm expecting a list of integers, just from scratch, because it's still built to work in REST slash web applications, and, of course, if you send something to a server as a JSON or via URL or query parameters, of course, a query parameter is always text, so and, of course, Pydantic takes the text and parses it and says, okay, yeah, that's a list, I can parse it and integers, all good, but it It will not complain if you send something which is, yeah, it will not complain if you always send something that can be parsed in an integer. Just like it's a very simple and basic example. So it does not validate aggressively. It says, okay, looks good, and I can basically transform it into the target format. And there's many misunderstandings with Pydentic, for example. So it's really easy to build a model, to add documentation. I kept it short so it fits on the slides. Of course, you can do way better descriptions, what is inside, give example data, which are again displayed in the open API standard. So it's very good to make people understand which data models do you expect, which models do you return? For example, the validator costs a few hours of lifetime for many developers. I think validator is not the optimal name for that. The validator is you can add a validator to validate asset ID here and we just want to validate is it an integer between zero And my expectation was, hey, it's a validator, and if the assert doesn't raise, all good. It's a validator, right? Because I've also worked with other validator frameworks as several before, and actually if several said no, it's not an integer, it raises. But here, actually, we get a non-returned. So for the validator, you always have to do many checks. You can use it for data mangling or cleansing which is really handy as well. So what you really need to know, okay, if you want not something like none back, you have to return the original value if it passes all tests. And yeah, so it's a great feature once you understand it. And we will hear a bit more about it later. Another good thing is to know Pydentic defaults. Pydentic comes from well chosen built in defaults. But you should not just you should be aware of them. I'll just give you a very simple use case. Imagine we have our REST API defined with response and request models. So, we basically know which data or how the JSON in this case has to be structured when we send it off to the back end, and of course we have a return here. So what happens? There was a front-end developer and said, oh, I have this new feature request, and I just add something extra to the JSON, and everybody said, hey, cool, we have models, we are basically safe, because, like, if something does not really fit to the back end, the back end will raise a validation error. But in this case, it didn't. anybody an idea why? Yes. Yes, correct. You didn't restrict the model because the default in this case here is extra, I don't know, it's just like to allow extra attributes. And if an attribute you sent to your request model is not just known, it's just ignored. And this is what happened here. So the front-end designer said, okay, or front-end developer said, hey, cool, I don't get a complaint. From the back-end team, nobody noticed because there was no exception, nothing, until people realized, oh, okay, somewhere in the business code, also, if no value was given, they used the default, and of course, it didn't really work as expected. And nobody was able to notice it. So I think it's very important. So my suggestion is always to not to use extra allow, to use extra forbid to be more like hey, let's make contracts, let's define the models, define them more in a strict fashion because sometimes or very often teams work distributed and with extra forbid you're in the safe zone. It's a design decision. So if you like Python code with a lot of double star quarks and pass it around through many other methods or classes, then please do extra allow. But if you more like to design which is more well defined, extra forbid, I think it's better for teams and especially if you build critical business applications. That was the first part about Pydentic. We will come back to Pydentic later. The next giant I really want to mention and promote is Starlet, actually. So what is Starlet? This is just copied from the Starlet website. So Starlet is a lightweight framework. And you already see, like, HTTP, background tasks, startup and shutdown events, and responses, session cookie support. You see there's many features. Fast API exposes also directly via fast API, but you see it's all basically it comes from Starlet under the hood. So I think it's very important to not give all, like, a shout out, because I think Starlet, they did an amazing job. But I think it's also like a very good practice to look into the Starlet documentation and to know better what is happening here, how Starlet handles things. So this is like a simple Starlet example. So you build a middleware, we add middleware, for example, for context, to follow up on requests for logging, filtering stuff, allowing things, it's just like a generic example. And then you already see, like, there's an ad app on event startup. You see, oh, okay, it's a startup event. You basically can imagine from just what I read on the slide before, hey, this is just like a wrapper that takes you to Starlet from fast API. And one use case we really had to go deeper here, I want to summarize it real short. So we built an interface to a data hub. The data client is supposed to be a convenient self-explanatory interface, so check, fast API with all the documentation, everything attacks, that's a very good choice. But we also want to, well, we build a data client around it. So data client means, that's the example with client.portfolio benchmark, just like a simple function, a business user can easily remember and use this code completion to say, okay, I want to compare two portfolios. This is a finance boost use case, and I have one portfolio I want to compare, and I have a benchmark, and the benchmark, if none, is just like default benchmark which belongs to the portfolio. That's a very simple interaction there. So fast API, the data hub uses fast API.
+
+**Speaker 2** _[15:52]_
+
+um, uh, and, and,
+
+**Speaker 1** _[15:52]_
+
+easy, simple end point, portfolio benchmark, and request model ID benchmark.
+
+**Speaker 2** _[15:53]_
+
+and,
+
+**Speaker 1** _[15:59]_
+
+How can we generate the client automatically was the first question. And okay. To sum this up in the use case, there's some auto generators, but they did not meet any of our expectations in coding standards, redundancy, also in terms of the many Python object connections which is lost because you generate code again from the YAML and you don't have a direct connection to the Python code which we were actually looking for. So, the solution was actually to render the client ourselves with Ginger 2 which worked really well. But the other issue was that we had some path parameters. So, if you put something in the URL as query parameters or to send data and model parameters which you can post in the JSON. There were some ambiguities we wanted to solve that was a harder task and we were asking a question, can we fix it somehow in the middleware and this took us to the journey to enabling user by simplifying interfaces with middleware. So my suggestion is don't try this at home. So it was a spike story to inspect how can the middleware help to mangle requests within the middleware, to moderate data, to make the interface easier for business users especially. And we found out it's very complex and hard to find. It's solvable, but it's not as easy as you think because there's many things that are not clear how actually the inner mechanics work because a thing here is we miss a lot of documentation around here and this brings me to the next topic. So there's great tutorials with FastAPI and the ecosystem around it, but where are the doc strings? And so I counted the doc strings for FastAPI, I think that's one of the more recent versions. So fast API has 6,000 lines, it has 259 classes and 429 functions or methods and I only was able to identify 11 doc strings, is that a good number for doc strings? No? I hear disagreement from the audience. The design of fast APIs with many layers of instructions, even if you work in a debugger, So we would really love to work to use the debugger to see what's really happening, what is happening where, just find out with the debugger to correct the use case. But sometimes it's very often it was really hard because there's no doc string to give you a hint, you're here, you're here, this is happening here. It's basically just like functions with names and it's really hard to find. But also, I checked for starlet, actually, that's the wrong number, let's skip that. I can tell you in the break, I have it on my computer. So I think it's a call for more doc strings. I don't know why there are so few doc strings, because around it there's many tutorials, great documentation, but if you really want to see something in context, that's really hard. Another very good learning was don't repeat yourself with Pydantic, because of course You start to build models like the assets. There's more models coming in. There's more definition. The whole thing grows. So this is just like a little reminder for everyone who is not familiar with Pydantic yet. This is a very simple model. But as you see, for example, in the next slide, you could also abstract it further. Like to say, okay, we just have one model for the asset ID. because we want to make sure every model who contains the parallel asset ID should use the same and we just want to reuse it because we don't want to rewrite repetitive examples because writing examples is not as easy as you think and it's just like quite boring as well. So, you can abstract this into multiple layers like here and for consistency, for reusability, I'm a strong believer in don't repeat yourself, try computing, so make sure everything in your code, there's only one line to fix things or to update, and this brings us to pydentic inheritance, which is also a little bit counterintuitive, so we have decomposed everything here into smaller pieces, so you see we added a period which is from to date, asset name, and we We all can basically compose it together in the compose class here, and so we now have a model with four attributes. This is really nice. It's clean. It really helps. We decided to build an internal package around it to make it available to multiple other in-house libraries. But of course, Pydentic inheritance has also like a little danger zone. For example, here I updated the validator we saw earlier with a star. So star says here please validate each and every attribute. But it's not the instruction please validate each and every attribute only of the class where I reside. Basically this is also inherited and if you have this validator in inheritance it will try to validate everything, and fun fact, not everything is an integer, and this is basically also misleading. It's not, another thing is, Pydentic gives great exceptions, readable exceptions, but sometimes it's really hard if something odd happens to find out what is actually happening and where's the oddness, and sometimes it points a bit on the wrong side. So to sum up, the use case defining models for an entire organization was to introduce and enable with standardization, I'm a big fan of standardizing things and discussing things upfront and building a nice architecture, bringing everybody on board, especially departments from the business know-how side. It's really important to have clear and concise design rules, including naming conventions and of course you can centralize, but also lessons learned was you can do too much centralization, so it's really good to have stuff like asset, something which is basically used and repeated everywhere and in many other libraries, it's very good to centralize them, but you shouldn't be too dogmatic about it, because it's okay if another service defines its own models reusing stuff from the core library. And, yeah, it's easier to define cross organization attributes which are like very important core and others you can define yourself. And you need also somebody who takes these calls and decisions in the team. It should be just not between the development teams because this can be heated. You need somebody to coordinate but also to promote. Hey, we have this. Please use this. It's usually decentralized organizations and many companies now. I also want to notice five things. I love the fast API. I think the accessibility in general of another layer of extraction is great. It's you can really see what's happening until you get lost. A dynamic creation of routers is great. Custom validation for error handling is awesome, middleware is easy to add, and the fifth thing is actually five more things. It has many great features. I think I have like one minute left, and I can take you to the bonus. You can also render open API in Sphinx if you use Sphinx documentation. You don't necessarily need to have a server running up to the open API page here. You can just include it into your documentation. All you need is the things contribute open API extension. You can add it to the things extensions just like any other things extension. The important things here are you need to export your open I definition to a YAML file, for example. That's built in fast APA already, and guess what? Stalat is handling it. And you have to add it, of course, to your index. And another thing, and this is like the output here, you can just like add this page to your documentation and things, publish it on the website, you don't need to have a server running to interact with things. And then I thought this was really useful and helpful and nice, and one more pointer here is you also need to add this dev setup somewhere in your app. If that's missing, it's not taking the connection, that's something you just have to know, but friendly people on Stack Overflow referenced here have published it. All right. Thank you very much.
+
+**Speaker 2** _[25:35]_
+
+Awesome. Thank you so much. That was a really interesting talk, and it's really been great to hear your perspective as well.
+
+**Speaker 1** _[25:40]_
+
+Can I add something? Please do, yes. Yeah, so I want to thank my colleagues and peers mentioned here on the slides, yeah, because this is all team efforts and learnings and very useful discussions, yeah, and also thanks for Lambda Labs for putting the model online on Hugging Face for the images.
+
+**Speaker 2** _[25:59]_
+
+Okay, great. So I've just got some questions that have just come in now, so I've got quite a few to ask you. We've got about three minutes, so we'll do what we can. We might be able to run over very slightly because it is lunch next. You're also welcome to run fast and far. First question here, did you consider using Flask or API Flask instead of FastAPI at any time during this project? No. No. Easy question.
+
+**Speaker 1** _[26:20]_
+
+That was the easy one.
+
+**Speaker 2** _[26:20]_
+
+That was an easy one. Okay. How should you handle mapping between different application layers? The question is how should you handle mapping between different application layers?
+
+**Speaker 1** _[26:32]_
+
+Oh, yeah. Actually, like, between applications, our solution was to say to build a library and publicize it internally. But that's not as easy as you think. Sure. Yeah. It's basically more coordination than...
+
+**Speaker 2** _[26:48]_
+
+Fair enough. So another question here from Anonymous who writes in to ask the question, what do you think of the robustness principle that says we should be liberal in what we accept but conservative in what we send considering the forbid option?
+
+**Speaker 1** _[27:03]_
+
+Well, as I pointed out earlier, I think in business applications, I'd rather say let's define how we talk and the protocol, like on which data structures we accept and which data structures we will respond. But I know that there are many use cases where flexibility is better for the project. It actually, I think it depends on the business use case. And if it's just like, okay, we can ignore it and all is fine, it's good. I mean I like to work efficient and this is for many use cases probably a more efficient way but in the space where we use work is we have to be like super reliable because mistakes there in backends can be expensive.
+
+**Speaker 2** _[27:45]_
+
+Yeah, I think question that we generally ask as well as what's the cost of fixing a bug and that
+
+**Speaker 1** _[27:49]_
+
+That generally stays with you, right?
+
+**Speaker 2** _[27:51]_
+
+So a few more questions for you, and a few more coming in. One here, and this is actually one I had as well, so thank you to Anonymous for asking that one. Great work. So you chose to use Pydantic inheritance rather than composing models. So I use Pydantic in my day job, and I've definitely got into composing model hell where I end up composing something which is made up of models and models and models. Why did you choose to do it the way that you did?
+
+**Speaker 1** _[28:16]_
+
+Actually, it was work in progress, so starting to bring a team on also at the client, one model at a time, and then we thought, okay, there's a lot of repetition, and so we decided for inheritance. There's also multiple other ways. You can even build models just like from code or jumble definitions, but we decided against that in this case, because for us, the code complication in the IDE is very important, and we don't really want stuff to be generated.
+
+**Speaker 2** _[28:43]_
+
+Yeah, we found the same, actually, generating from a very complicated open API spec.
+
+**Speaker 1** _[28:47]_
+
+Yeah, actually we also found out you can really generate code with Ginger too, it's really
+
+**Speaker 2** _[28:47]_
+
+It wasn't a good time.
+
+**Speaker 1** _[28:53]_
+
+good so I'm a big fan of code generating at home now.
+
+**Speaker 2** _[28:58]_
+
+Got some more questions. We have some more ones about the talk, but there is one that's overwhelmingly been upvoted, which is, where are you getting those awesome pictures from? Memory address or artist name, please?
+
+**Speaker 1** _[29:10]_
+
+Oh, actually, the artist name. Yeah, that's an interesting thing. So, actually, this is the stable diffusion model from Lambda Labs. I found it on Hugging Face. So, it's a public model. So, I said, thanks for sharing, Lambda Labs. And, actually, as every image generator, it's a little bit more loud. The challenge is now not to generate images, just to put in the right keywords. And, actually, so, the artist keyword I put in there was Max Ernst, which is a German surrealist. And Max Ernst worked really well because photorealistic pictures, they are not really presentable. But Max Ernst and surrealism really worked great. But if you know other talks from me, I used to do style transfer for like five, six, seven years now, and this is a new technology. But I had some transfer from arts and, yeah, so I had some names in my head. Diggie Riera also works great. But Van Gogh also works great. But it's always Starry Night that's the problem because there's too much bias in the models.
+
+**Speaker 2** _[30:15]_
+
+That would make sense actually and there's a few more questions coming in So, you know you are free to leave lunch might be served at some point But I'm gonna keep asking them as long as Alexander here is happy to handle
+
+**Speaker 1** _[30:25]_
+
+Yeah, there's lunch downstairs.
+
+**Speaker 2** _[30:27]_
+
+So I might see a mad rush, but question here actually one that's just a bit up voted to the top Where can I find your slides?
+
+**Speaker 1** _[30:35]_
+
+I can publish them later on Discord. That was my plan. Awesome. On Twitter.
+
+**Speaker 2** _[30:39]_
+
+discord or twitter or alternatively i'm sure you'll be around for the rest of the conference
+
+**Speaker 1** _[30:43]_
+
+Also, if you have a question or if you want to connect, there's a QR code, just connect on LinkedIn and I'm happy to give you some guidance if needed.
+
+**Speaker 2** _[30:54]_
+
+A few more questions. What's a good practice if you want to share the Pydantic models that you've created with your teams, for example, a Python backend with a React frontend, and you want to integrate? How do you find that that process is for you?
+
+**Speaker 1** _[31:04]_
+
+processes for you. No, actually, our way was to publicize internal models, but you also need an infrastructure for that. Sure. Yeah. But I think you could accomplish the same just by sharing a library on a repo because it's really easy. So that's another really handy thing to know. If you build models and you want to share, you can also just pip minus e install them. So even if you make a new pull request, you don't need to reinstall it with pip. It automatically updates whatever you updated because compiling and setting up everything is sometimes time consuming. One of the challenges here is actually there's a model update, but you're working on something else in the application and somebody else does a model update and then keeping things in sync is with the centralization. That's an issue, so that's a good workaround, especially when you start ramping things up. Once you have established standards and libraries and everything builds up, because this is just like a process and it will take some time until you have a certain amount of stability. But in the ramping up phase, it's really handy also to use pip-e install.
+
+**Speaker 2** _[32:12]_
+
+Sure. We have a few more questions, but I think it's best to maybe let everyone go for lunch now. So, you know, if there are questions, you can find Alex.
+
+**Speaker 1** _[32:21]_
+
+I'm at the Koenigsweg booth with the PlayStation.
+
+**Speaker 2** _[32:24]_
+
+Thank you very much. Thank you very much.
+
+**Speaker 1** _[32:27]_
+
+Thank you. Thank you.
+
+---
+transcript_status: auto
+---
+transcript_language: en

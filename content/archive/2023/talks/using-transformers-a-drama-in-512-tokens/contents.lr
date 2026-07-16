@@ -1,0 +1,154 @@
+title: Using transformers – a drama in 512 tokens
+---
+description: “Got an NLP problem nowadays? Use transformers! Just download a pretrained model from the hub!” - every blog article ever As if it’s that easy, because…
+---
+created: 2023-01-04
+---
+code: SJCEFG
+---
+slug: using-transformers-a-drama-in-512-tokens
+---
+speaker_names: Marianne Stecklina
+---
+speakers:
+
+
+
+### Marianne Stecklina
+
+_About — in the speaker's own words_
+
+As a deep learning engineer at omni:us, I'm working on different NLP topics related to document understanding.
+---
+abstract:
+
+
+“Got an NLP problem nowadays? Use transformers! Just download a pretrained model from the hub!” - every blog article ever
+
+As if it’s that easy, because nearly all pretrained models have a very annoying limitation: they can only process short input sequences. Not every NLP practitioner happens to work on tweets, but instead many of us have to deal with longer input sequences. What started as a minor design choice for BERT, got cemented by the research community over the years and now turns out to be my biggest headache: the 512 tokens limit.
+
+In this talk, we’ll ask a lot of dumb questions and get an equal number of unsatisfying answers:
+
+1. How much text actually fits into 512 tokens? Spoiler: not enough to solve my use case, and I bet a lot of your use cases, too.
+
+2. I can feed a sequence of any length into an RNN, why do transformers even have a limit? We’ll look into the architecture in more detail to understand that.
+
+3. Somebody smart must have thought about this sequence length issue before, or not? Prepare yourself for a rant about benchmarks in NLP research.
+
+4. So what can we do to handle longer input sequences? Enjoy my collection of mediocre workarounds.
+---
+full_description:
+
+
+“Got an NLP problem nowadays? Use transformers! Just download a pretrained model from the hub!” - every blog article ever
+
+As if it’s that easy, because nearly all pretrained models have a very annoying limitation: they can only process short input sequences. Not every NLP practitioner happens to work on tweets, but instead many of us have to deal with longer input sequences. What started as a minor design choice for BERT, got cemented by the research community over the years and now turns out to be my biggest headache: the 512 tokens limit.
+
+In this talk, we’ll ask a lot of dumb questions and get an equal number of unsatisfying answers:
+
+1. How much text actually fits into 512 tokens? Spoiler: not enough to solve my use case, and I bet a lot of your use cases, too.
+
+2. I can feed a sequence of any length into an RNN, why do transformers even have a limit? We’ll look into the architecture in more detail to understand that.
+
+3. Somebody smart must have thought about this sequence length issue before, or not? Prepare yourself for a rant about benchmarks in NLP research.
+
+4. So what can we do to handle longer input sequences? Enjoy my collection of mediocre workarounds.
+---
+room:
+---
+day: Tuesday
+---
+slot_date: 2023-04-18
+---
+start_time: 11:40
+---
+end_time: 12:10
+---
+slot_id:
+---
+track: Natural Language Processing
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 2521
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: None
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/SJCEFG.png
+---
+youtube_id: TigtGzXnwJ8
+---
+video_link: https://www.youtube.com/watch?v=TigtGzXnwJ8
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT31M22S
+---
+video_thumbnail: https://i.ytimg.com/vi/TigtGzXnwJ8/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Hi. Welcome to my talk. Thanks for showing up. Also, hi to the remote attendees. To get us started, and because I'm actually really curious, I would like to ask who of you is currently using a transformer model in production? Quick show of hands. Who is currently in the phase of trying it out, like experimenting a bit if it works for your use case? Who hasn't tried it out yet and is here to learn a bit about the topic. Okay. Quite equally distributed, I would say. That's nice. So, I hope you will all get something out of this talk. So, for the last years, I had the impression everyone in the Internet is trying to tell me that got an NLP problem nowadays, use transformers. Just download a pre-trained model from the the hub. And let me start by saying that's not bad advice. Despite everything you will hear in the next 25 minutes, I would still recommend you the same. But my personal transition from training recurrent neural networks from scratch to fine-tuning pre-trained transformer models has not been straightforward. To give you some context, I'm a deep learning engineer at Omnius and we automate claim handling. That means I'm working with documents you would send to your insurance in case you break your car or you manage to set your flat underwater. And I realized quite early on that these documents were too long to work with all these Internet tutorials out of the box. And figuring out what are the underlying reasons for that and how to circumvent them took me a lot of time. I'm reading papers, searching documentation, digging into code, and I hope this talk will be a nice summary of what I learned over the last years, and it will help you get started faster if you are in the same situation and have to work with long input sequences. So my documents being too long means usually longer than 512 tokens. That is the limit that really many of the pre-trained transformer models have. So my first question was, how much text can I actually fit into 512 tokens? So what is a token? Anything essentially between a full word and a single character. The important part is that it is part of the Transformers vocabulary. So the vocabulary you can see here on the left, so it's a set of common words like invoice, Sub words like at gmail.com and all of the characters you might find in your texts And every entry in the vocabulary is mapped to a vector representation that gets learned during training so now if I want to use a transformer on Let's say my text my invoice I take the text invoice 417 and the first step is to tokenize it so since invoice is quite a common word it would become a single token most likely but the inverse number 517 it's an arbitrary number so it would not be part of the vocabulary that's why it gets split into multiple tokens in this case most likely down to the character level like split into single characters now that every token is part of the vocabulary we can go back to this embedding matrix and pick the vector for each token and this is what then gets feed into the transformer model. At the end you will get out a feature representation for every token. So in this particular example we started with two words of text in voice 417 and we got four tokens out of it. So how does this token to word ratio look in general? For that you have to know that the vocabulary depends on a pre-training corpus, so it is selected to represent the pre-training corpus well, so the words and subwords that are common in your pre-training corpus will make it into the vocabulary. So now if you take this pre-trained model with its fixed vocabulary and apply it on new data, the token-to-word ratio depends on multiple factors. So one of them is how similar is your data to the pre-training corpus, so if you're applying the model on the same language, same domain, you will get a pretty low token-to-word ratio. What also matters is the frequency of rare words, so as I showed you in the example, invoice numbers are never part of the vocabulary, IBANs are never part of the vocabulary, same for phone numbers, email addresses, rare last names, so if your texts have a lot of these content, then you will end up with a lot of tokens. Funnily enough, the language itself also matters. For English, you get along with very few tokens, while for languages like Finnish, Greek, Tamil, you tend to get a lot of tokens per word. In absolute numbers, if you are lucky, you can achieve something like 1.2, so let's say you have plain English text and an English pre-trained model. If you are me, it's more like two to three tokens per word, rather in the direction of three. So with a 512 tokens limit, that would make like around 200 words of text which you can input into your transformer. So 200 words might still be difficult to imagine. That's why I brought you some example documents I'm working on. So these are all invoices. And the text you can see here highlighted in yellow is what fits into these 512 tokens. So this is the maximum most transformer models can process. And as you can see, I cannot even fit a one-page document. And if you manage to set your flat underwater for real, I assure you, you're not going to be done with a one-page invoice. So still, my impression is the amount of text I want to process here is not absurd. So I bet that some of you will also run into this 512 tokens limit. Takeaway from this first part is 512 tokens might not be enough for every use case. So as I said, I was coming from training recurrent neural networks where I can feed any sequence length I want. So why do transformers even have a sequence length limit? that we need to dig a little bit into the architecture. So, the mechanism to figure out the relationships between the different input tokens in a transformer is self-attention. And self-attention itself has no understanding of order. To make this a little bit more tangible, if we have this text and this sequence of input tokens, we could actually swap the order of tokens, and we would still get the same output. So if we would swap here, invoice and one, we would still get for every token the same output representation. So really like the transformer doesn't understand the order of the tokens that go in, or like self-attention in itself doesn't understand it. So we need some way to provide information about the position of tokens in the sequence. And one way to do this is absolute position embeddings. The mechanism here is very similar to what we've seen earlier for the token embeddings. So the model has an embedding matrix which is learned end-to-end, and instead of the vocabulary on the left side, we have absolute positions in the sequence. And for every position, we can look up an embedding. So if we look at the model again, we now have two inputs, the token embeddings and the position embeddings. And this works like this. So for example, invoice is in the sequence at position one. So I would go back here to the metrics, pick the entry from position one. Forest at position two. So I would go back here, pick the entry from position two. So now imagine if I would have a sequence that is longer than 512, I would get essentially an index error if I wanted to perform this operation. Absolute position embeddings is what the early transformers used, so for example BERT, and since many, many papers built on top of that, it's still very common nowadays. People also developed alternatives, relative position embeddings, so here the idea is a bit different. The position information is not added to the model as part of the input, but the idea is to modify the self-attention mechanism. So if we go back to the example, the idea here would be if we compute the attention between invoice and four, we would say, okay, the relative distance between these tokens is one, while if we compute the attention score between invoice and one, we would say the relative distance is two. So it's not that the token invoice always has a fixed position embedding, but it depends on what's the pairing token to compute the attention. There's different flavors of this, and I linked you here the train short test long paper, which is a really nice comparison of training and inference speed, memory consumption, generalization to longer sequences for these different methods, but the key takeaway here is that if you have relative position embeddings, there is no token limit. You can feed a sequence as long as you want to the transformer. Or rather as long as your GPU wants. So if you're working with long sequences, chances are quite high that you also run into hardware limits. I don't want to go into details here, but the good news is there's a lot of research on that on making the attention mechanism more efficient, so the vanilla attention has quadratic memory consumption with respect to the input sequence length, but there's a lot of work on making this, I don't know, linear or in some way more efficient than quadratic. I also linked you a very nice comparison paper here which contains so many methods that it's actually impossible to process that all. Now let's have a look at the most downloaded models from the hiring phase hub. So in this table you can see the different model types and which type of position embeddings they use and if they use some sort of efficient attention. And I think the picture is quite clear. So most models use absolute position embeddings and I want to emphasize it it again. These models cannot predict on sequences longer than 512 tokens. As we've seen before, this is like half a page of document. So, funnily enough, I want to highlight the entry for layout.lm here. So, layout.lm is a transformer that was designed for working on documents. So it was designed for use cases like mine, and it still has this 512 tokens limit. And for me, this slide also shows the big problem of this pre-training and fine-tuning paradigm. So it's not enough that techniques like relative position embeddings are invented, but the people who open source the pre-trained models also have to adopt them. It doesn't help that I now have the theoretical knowledge how to do this better. I don't have the resources to create my own pre-trained model. So yeah, the takeaway here is that most models are limited to 512 tokens. But for a very long time, I was wondering, like, I can't be the only one with sequences longer than 512 tokens. Don't people at least occasionally encounter these longer sequences? So what do they do then if the models have absolute position embeddings? So my first idea was to go and look at the paper who developed the models. So you know how the abstracts read nowadays. I just pasted you some examples here. New state of the art on this, this, and this data set. So the new models get evaluated on so many benchmarks. There must be some examples and some of these benchmarks that are longer than 512, no? So what I did next is look into the details of how they applied these models when they evaluated on those benchmarks. So what did the authors mention, how they handled these longer sequences? And the sad summary is they don't mention anything at all. So also I pasted you some examples here, and they might get very detailed, like the GPT-2 example here. Okay. We added this prompt. We used this sort of sampling strategy, these parameters, and we picked up the first three sentences. Okay. Pretty detailed. Or the other example, we follow common practice as in reference to the BERT paper, and then if you go check that paper, there's actually no information about long sequences. So that's the point where I got really skeptical. So my next question was, do our benchmarks even have long sequences? And by the way, it was impossible to figure out these statistics anywhere online. So I ended up downloading the test sets of a lot of benchmarks and do the counting myself. What I found out is that indeed many benchmarks don't have long sequences. When I realized that this was also true for the benchmarks used to evaluate document understanding like Layout AM, I was like, what? This is the same use case I have. How can these documents look like that there is no example of more than 512 tokens? And I gave you one here, so I sat at home thinking I should just ditch my car invoices. I should work on crispy choco invoices instead. My life would be so much simpler. Well, my take on this slide is that there's plenty of benchmarks with short sequences only, and I think that's why so many papers get away with continuing to use absolute position embeddings and not think about how to use them then for predicting longer sequences. But I also found some benchmarks which do have longer sequences, so here I plotted you the distribution of sequence lengths for docvqa, race, and CNN daily mail. So the red line you can see in the plots is this 512 token limit, so all the examples that are on the right of this red line cannot be processed by the models. Still I've read papers where they used absolute position embeddings and evaluated on those benchmarks, and still there was no mention at all of how they did it. So I was wondering, people just secretly truncate their sequences? And the only ever confirmation I got for this hypothesis was the Roberta paper. So here they say about their evaluation on the race benchmark. We truncate question-answer pairs that are longer than 128 tokens and, if needed, the passage so that the total length is at most 512 tokens. So if we look at the distribution of race, and knowing they truncate to 512 tokens, that means they would in some cases discard 50% of the passage, the passage that is needed to answer the question. And apparently most paper authors think that this is too unimportant to even mention. So I don't know, I'm just really, really confused about that. So to end this block with some good news, there is progress on the benchmark front. A while ago, Long Range Arena was released. That's a set of tasks specifically designed to evaluate on long sequences, and there's a public leaderboard comparing different model architectures. I think it's great that we have this benchmark, and I've seen people use it, but my impression is that there's people working on long-range arena on the one-hand side, and then there's the other people working on the short benchmarks. My impression is that these communities are still pretty separated. Okay. So, here we are. We have a lot of great models that unfortunately don't work on long sequences. So, what can we do in practice? I would say my first recommendation is to be smart in your choice of model. If you have long sequences and you want to avoid a fixed token limit, for example 512, I recommend you to use models with relative position embeddings. Example architectures for that are T5, Transformer XL, XLNet and Bloom. If that doesn't work and you do use a model with absolute position embeddings, then you can pay attention that at least it supports a large number of position embeddings. To be honest, there's not too many of those, but Big Bird, for example, supports more than 4,000 tokens, which should be enough for plenty of use cases. The other limitation, like the GPU memory limitation, for that I would recommend you to use models with efficient attention. Examples for that are Long T5, Big Bird, Long Forma, Reforma and many more. The nice part about Long T5 and Big Bird is that they kind of help you on both fronts with the token limit and with the GPU limit. If you're not just using a pre-trained model but also fine-tuning it on your data and GPU memory is a concern for you, then I recommend you to learn about techniques to reduce this memory footprint during training, so that I linked you a very nice overview by hugging face here. Of course, if you want to pay attention to choosing models with relative position embeddings and all that, you are a bit limited in your choice of models. So on the very top here, you can see the whole Hugging Face hub has more than 100,000 models to choose from. If you limit it to, let's say, T5, because you want T5's relative position embeddings, then you can still choose from 5,000 models, and then if on top you also want the efficient attention, that would make it long T5, and then you're down to 83 models you can choose from. And then it becomes more likely that you can't find a model for your language, your domain, on your task, and in the size you were actually looking for. So choice of model would be my first advice. If here you can't really solve the problem, but you're fine-tuning on your own documents, then there's something you can do about the token limit for absolute position embeddings, which is you can resize the position embeddings matrix, so you can add more entries, as you can see here on the bottom. We just add a new entry for absolute position 513 and 514, and these vectors are initialized randomly so you need to fine tune on long sequences to update these vectors so that over time they become as meaningful as the initial 512. Code wise that's really easy so there's nice convenience functions to do that. I never tried it myself so I can't tell you if this representation will ever get as good as the initial 512. If that's also not really an option for you, then you can see if you just take a problem at prediction time. So there's different ways you can use these models with token limits during prediction. So as we've seen from the papers, one option is to just truncate your input sequences to the allowed limit. That's very easy to do and quite fast. And I linked you here a paper which evaluates different approaches for long document classification and they find that truncating is actually still pretty competitive. So I would recommend you to check your sequence lengths, like if you're just a little bit over the token limit or not for too many of your examples at all, then this might be the perfect approach for you. That's not for you. What you can do is take your long input sequence, split it into multiple shorter chunks, predict on every chunk, and try to combine the results. This combination of results will look differently for every task, and maybe it's really hard to do for some. I guess the easiest would be if you're working on named entity recognition, for example, translation then okay you have multiple chunks you produce the sequence of output tags or translated sentences and then you just concatenate them that should be fine for summarization at least theoretically you can do the same so generate a summary for each paragraph separately and then concatenate the results I'm a bit skeptical though if you wouldn't get any duplicate content in the output. If we move on to classification, also a very common task, here you would have the situation that you get a different distribution of classes for every chunk. So what you could do is try to average those and then pick the class with the highest probability, or you could try to somehow stack another layer on top to learn end-to-end how to combine these multiple chunk predictions into a single prediction in the end. Another popular task is extractive question answering, so I guess here the challenge is that in order to extract the answer, it needs to be fully contained in one of the chunks you predict on, so you probably need to use overlapping chunks to make sure that the answer is at least fully contained in one of them, and then you can have a look at the confidence of your predictions and pick the one with the highest confidence. But also, I don't have to tell you that this is quite compute-intensive, so, yeah, mediocre workarounds. That's how I titled this section, I think. Another approach for the question-answering problem could be some sort of two-stage procedure, so that you, for example, using heuristics, select a short paragraph that is relevant first, and then you apply your question-answering transformer on top of that. So I think that's all the ideas I had on the topic, so just to summarize the last 25 minutes, 512 tokens is too little for some use cases. The token limit is caused by absolute position embeddings. If you work on long sequences, you should choose your model wisely. I recommend you to use long T5 or Big Bird. And if model choice doesn't solve your problem, then you can apply different prediction strategies like truncating or predicting on chunks. I will make the slides available, so if you want to look through them again or follow up any of the links, then you can check them out at Speaker Deck, and I think we will also distribute the content of various talks in the Discord. So then my last slide is this one. I think I got the perfect spot, actually, the perfect time slot, so I'm really curious to hear about your experiences using Transformers, what worked for you, what didn't work for you, if you ran into the same issues, or, of course, if I'm overlooking something obvious so I would just like to invite you for everyone who wants to chat about Transformers over lunch to just gather here in the corner, like stay here after the call so we can continue the conversation over lunch. That would be great.
+
+**Speaker 2** _[25:50]_
+
+Thank you Marianne great talk talking through about long sentences a tough game Is there some question here? Yes Thanks, so I vaguely remember that positional encodings are created by using the sine function to encode the positions. I'm just not remembering why you wouldn't do this on the fly. Like why is it needed that it, I mean faster lookup for sure, but why wouldn't just the models use like on-the-fly positional encoding? Do you have any clue why that is?
+
+**Speaker 1** _[26:40]_
+
+Let's maybe look back, so I mean you're right, I kind of skipped this part, so the very early transformers instead of using learned absolute position embeddings as here, what is happening? Instead of using learned absolute position embeddings like here, they use some sinusoidal like computed embeddings, and for that it's true you could actually extend it under, yeah, Like there's no limit in that sense. So you could go on and compute these embeddings for like higher positions than 512. But so I linked here this paper, train short, test long, which also compared these sinusoidal or however they're called embeddings. And the truth is it doesn't crash, but it generalizes very badly to longer sequences. So you can use it, but the performance will be bad.
+
+**Speaker 2** _[27:43]_
+
+Another question? Tell your question, I will rephrase it.
+
+**Speaker 1** _[28:07]_
+
+So you mean that... I'm sorry.
+
+**Speaker 2** _[28:08]_
+
+Yeah, so the question is a bit difficult for me.
+
+**Speaker 1** _[28:15]_
+
+Then let me try to repeat it. So the question was, if you have relative position embeddings, then there is no explicit limit anymore. But if you don't have an implicit limit, because the model during training has never seen very large relative distances, is that what you mean? And it's kind of implicitly somehow Let me try to answer. I'm not sure if it will answer your question. So the idea for the relative position embeddings is usually that you have specific embeddings for specific distances. So you have an embedding for distance of 1, 2, 3, 4, 5. And at a certain point, that just gets truncated. So, at a certain point, your embedding will be 100 tokens of distance or longer, because the assumption is that if it's more than 100 tokens of relative distance, it's just far away. So, in that sense, I'm not sure if this is really a limitation in practice. Does this answer your question? Yeah? Cool. Okay.
+
+**Speaker 2** _[29:31]_
+
+We have some time for our last question.
+
+**Speaker 1** _[29:43]_
+
+So, we need some sort of position information, because otherwise it would just look like a bag of words to the model. This is what I tried to show here, so if you don't insert position information anywhere, then the model wouldn't understand that the sequence has some sort of order. But then how you insert the position information, there you can go for absolute or relative. So if you don't have position information, it just looks like a collection of words. Like the model won't be able to process like the sequence, the words in a sequence. I'm not sure if I fully heard it, like did you say, wouldn't it be better to use like a back-of-words method instead of encoding the order? Yes, for some use cases that might be the case, definitely, but I guess there's other use cases where the order is actually important, yeah, that you need to check on your use case.
+
+**Speaker 2** _[31:12]_
+
+Thank you Marianne. Thank you. A round of applause for Marianne.
+
+---
+transcript_status: auto
+---
+transcript_language: en

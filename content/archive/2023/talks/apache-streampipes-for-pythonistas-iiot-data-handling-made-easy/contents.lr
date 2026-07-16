@@ -1,0 +1,202 @@
+title: Apache StreamPipes for Pythonistas: IIoT data handling made easy!
+---
+description: The industrial environment offers a lot of interesting use cases for data enthusiasts. There are myriads of interesting challenges that can be solved by…
+---
+created: 2023-01-04
+---
+code: LXBGZS
+---
+slug: apache-streampipes-for-pythonistas-iiot-data-handling-made-easy
+---
+speaker_names: Tim Bossenmaier, Sven Oehler
+---
+speakers:
+
+
+
+### Tim Bossenmaier
+
+Tim Bossenmaier works as a Data Engineer at inovex. There he develops and builds modern data infrastructures in customer projects, from streaming ETL pipelines to data catalogs. He is also a developer and member of the project management committee of Apache StreamPipes, an open source solution for IoT data analysis.
+
+### Sven Oehler
+
+_About — in the speaker's own words_
+
+I study Applied Artificial Intelligence at the Offenburg University of Applied Sciences and I am very interested in Data Science and AI. During my internship at the startup Bytefabrik.AI in Karlsruhe, I came in touch with the Apache StreamPipes software and became a committer for this project. I work on the python integration to enable easy access to live data streams that can be quickly connected by StreamPipes.
+---
+abstract:
+
+
+The industrial environment offers a lot of interesting use cases for data enthusiasts. There are myriads of interesting challenges that can be solved by data scientists. 
+However, collecting industrial data in general and industrial IoT (IIoT) data in particular, is cumbersome and not really appealing for anyone who just wants to work with data.
+Apache StreamPipes addresses this pitfall and allows anyone to extract data from IIoT data sources without messing around with (old-fashioned) protocols. In addition, StreamPipes newly developed Python client now gives Pythonistas the ability to programmatically access and work with them in a Pythonic way.
+
+This talk will provide a basic introduction into the functionality of Apache StreamPipes itself, followed by a deeper discussion of the Python client. Finally, a live demo will show how IIoT data can be easily derived in Python and used directly for visualization and ML model training.
+---
+full_description:
+
+
+The industrial environment is becoming an increasingly attractive use case for data enthusiasts with challenges ranging from predictive maintenance to robotics to autonomous vehicles.
+Building a full-fledged IIoT architecture is a big endeavor, especially for small and medium sized companies with limited resources. It requires IIoT specialists with extensive knowledge of industrial protocols, software architects capable of designing an IIoT platform, and cloud specialists able to operate an infrastructure at scale that can handle potentially massive data streams. However, the added value lies not in the technical infrastructure, but in the data itself. Therefore, it should be as easy as possible for data scientists to analyze data to gain new insights without worrying about underlying technical details. But such a project has many pitfalls, which is why many projects are not even initiated because the costs seem too high. These pitfalls are addressed by Apache StreamPipes, an end-to-end toolbox that allows anyone to easily extract, explore and analyze IIoT data. With its new Python client, it targets Python data enthusiasts (e.g., data scientists) who want to work with IIoT data but don't want to get their hands dirty interacting with industrial systems.
+Via an easy-to-use python client, it is possible for developers to get streaming or historic data from StreamPipes internal data management layer in a pythonic representation like dictionaries or pandas dataframes. This allows data scientists to work with their familiar tech stack and use the extracted data directly for analytics, visualizations, or even machine learning. StreamPipes handles all the infrastructure such as the message broker or time-series storage and provides many out-of-the-box features that ease data analytics of industrial sources: More than 20 data adapters for quickly getting access to a variety of industrial protocols, built-in pre-processing rules to harmonize sensor and other data on the fly and a pipeline editor featuring over 100 algorithms and a rich user interface to interactively build data processing pipelines.
+
+Apache StreamPipes is a large and mature open source project which started as a research project in 2015 and made its way to an Apache top-level project in November 2022 with a community of currently more than 25 active contributors.
+ 
+The talk will provide a basic introduction to Apache StreamPipes, followed by a deeper discussion of the Python client focusing on the target audience (Python developers). The main part is about data handling with python, and design decisions within the client for common patterns will be discussed in detail.
+ 
+As a conclusion we will show how IIoT data can be extracted via Apache StreamPipes and used for further analytics within the Python world. Attendees will get familiar with Apache StreamPipes in general, its mission, and its core modules. In addition, common IIoT patterns will be presented and illustrated using the Python client of Apache StreamPipes. The presentation includes an extensive demo with many hands-on examples.
+---
+room:
+---
+day: Monday
+---
+slot_date: 2023-04-17
+---
+start_time: 10:50
+---
+end_time: 11:35
+---
+slot_id:
+---
+track: Data Handling
+---
+tags:
+---
+submission_type: talk_long
+---
+submission_type_label: Talk (Long)
+---
+submission_type_id: 2520
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: None
+---
+domain_expertise: None
+---
+supporting_material_url: https://github.com/bossenti/pycon-23-streampipes-pythonistas
+---
+slides_link: https://github.com/bossenti/pycon-23-streampipes-pythonistas/blob/main/2023_pycon_streampipes_pythonistas.pdf
+---
+social_card_image: /static/media/social/talks/LXBGZS.png
+---
+youtube_id: buAukOE8oEY
+---
+video_link: https://www.youtube.com/watch?v=buAukOE8oEY
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT41M35S
+---
+video_thumbnail: https://i.ytimg.com/vi/buAukOE8oEY/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Thanks a lot for introducing us. Welcome to our talk. We're very honored to have one of the first slots of this conference. So we somehow introduced the CS PyCons, which made us very, very glad. Yeah, we're happy to share Apache Stream Pipes with you and especially Apache Stream Pipes for Python, which is a new major, which is a new major feature of Apache Stream Pipes. Can you hear me now clearly? Okay, great. Yeah, and we want to show you how Apache StreamPipes kickstarts your handling of IoT data and enables you to directly start with the fun part. Yeah, so we have prepared a short slide about us. A lot of information have already been mentioned, but since some people are joining still, I will just have the short introduction. Yeah, my name is Tim. I'm working as a data engineer at Innovex, And more than that, I'm also actively contributing to Apache Stream Pipes. I'm also part of the PMC, which stands for Program Management Committee, which can somehow be compared to the core maintainer team around Apache Stream Pipes. I came across with Stream Pipes during my time at university, and are now, I think, for two or up to three years, contributing to Stream Pipes. And I'm very happy to share this talk today with Sven.
+
+**Speaker 2** _[01:32]_
+
+Hello, my name is Sven. I'm a student for artificial intelligence at the university in Offenburg and I'm also a working student at Bytefabrik AI. I'm a committer for the Apache Stream Pipes project and I worked on the Python library that we will show you later.
+
+**Speaker 1** _[01:52]_
+
+All right, but very important to mention here is that StreamPipes is not about only us two. So we are only holding this talk on behalf of the StreamPipes committer community. And in total, we are around probably 25 committers across several countries and even continents. Okay, so much about us. Let's start with the actual talk. If you remember last autumn and winter and maybe even summer, energy has been a huge topic during the world and especially Europe and Germany I have brought here some newspaper articles that just very drastically show what the fears were during the time luckily things didn't turn out that bad like these media articles have implied but we are still facing an energy crisis and we realize that especially Germany has a need to modernize in how we produce and consume energy especially in the heating technology so one one approach of one technology that is recently very widely and also actively discussed is this one I brought here it's a heat pump and yes that's probably one way people can modernize their energy concept prediction in yet in the upcoming years and I think what's also changed besides more focusing on new technologies is also the willingness to measure one's energy consumption and also having more insights in how we consume energy and how we efficient are in this. And these were also some thoughts that Sven and his family had and they also invested in such a heat pump and now they were interested in how this heat pump actually performs and and when it's most efficient. So luckily, the most modern industry devices have somehow an interface to extract data. And this is also the case for this heat pump. So they offer Modbus as a protocol to get data from it. That's pretty cool, they thought, so let's build an appealing dashboard. And the next step is to have a look at Modbus. So Modbus was invented in 1979. It's a very old industrial protocol for communication between programmable logic controllers, so that are electronic units that are inside every larger industrial product. Modbus supports only four type of data or objects. Two of them are represented only by one bit, so you can only store Boolean values in it, and the other two allow you to store 16-bit, which are then smaller integers. And you have also to take care about the addresses and all the registers, so you have to exactly know where you stored your data and where you can get them from. So to be honest, this does not really sound really fun or convenient to work with, and that's exactly the place where Apache Stream Pipes come in. So Apache Stream Pipes is an open source industrial IoT toolbox that enables non-technical users to connect, analyze, and exploit IoT data streams. And we're not only focusing non-technical users, but also persons who are people who doesn't like to get involved in all this IoT protocol stuff and all the pitfalls they have. Stream Pipes is a project of the Apache Foundation, and we have been graduated to a top-level project some months ago. Yeah, and we have recently launched version 0.91.0, which, as I already mentioned, mainly includes our Python support. StreamPipes, at the core, follows an event-driven approach, so every data point inside StreamPipes is represented as an event and therefore is shared and processed during StreamPipes. As a next step, I just want to share some of our core features with you and give you a quick walkthrough through them. The first one is StreamPipes Connect. exactly the place when you just want to adapt a data source for the first time. Connect is somehow a marketplace for all the adapters we have in place in StreamPipes. It allows you to quickly connect industrial data sources in real time. We have around 20 adapters currently that we support and we also allow you to apply some pre-pressing rules for data harmonization directly at this point. So for example if you want to transform a data point in its unit of measurement and we We also demonstrate you how this works in our demo later on. The next step is you have now your data within stream pipes and you probably want to somehow manipulate them or process them and share them at other places. So therefore we have the pipeline editor where you can define your data pipelines within an interactive UI. And we have plenty of predefined data processing, data processes, they're currently around 100, I guess, and they're ranging from simple threshold or alerting processes up to embedding AI models or more complex stuff. We also offer an SDK so that you can write your own processing elements. Currently, this is only possible in Java, but we're planning to add this feature to our Python integration as well. And if you now have your data in the shape you want, we have two ways to actually present them in Streampipes. The first one is a live dashboard. This just allows you to easily visualize some live metrics and KPIs with predefined widgets that allow you to easily show your data in a gauge or as a simple line chart. And the second data analysis tool we offer is the Data Explorer, which is somehow a bit more advanced. So this allows you also to analyze your data in a historical representation, and this offers more extensive features to find correlations in your data to just create more appealing and also more advanced plots. All right. Now I have shown you the exact features in a more detailed fashion, and now I want to have a look at how streampipes look in an end-to-end manner. At the left-hand side, we already start with some data sources, right? And usually they're heterogeneous. In this case, we have some OPC UA data, an MQTT device, and for example, a Modbus device like the heat pump I've just mentioned. We then use Streampipes Connect to connect all of the data sources. We can then combine them in our pipelines and enrich them, transform them, and manipulate the data in any form. Within Streampipes, data is handled in two ways. So you can either persist them in our time series database, or as long as you process them as live events, we do this via our message brokers where we also support multiple ones. If the data is now in that shape as you like it to have, we have three different options of how you can interact with your data. The first one is the graphical user interface, which I have just shared with you. So the pipeline editor, the live dashboard, and the data explorer. And then you can also programmatically interact with the data, and that's what we mainly show you today. So we have for longer already in Java SDK but now we also have in Python SDK and this is what the second half of the talk will mainly be about. And an important aspect always is also you can easily share your data with external third party systems. So be it for example Kafka, RocketMQ, IoTDB or other databases like PostgreSQL, whatever you can imagine. All right. This already brings us to our first demo. So I would show you the example of the heat pump I've already mentioned. Of course, we cannot directly ingest the data from the actual heat pump, but we have brought you a little simulator that just simulates a Modbus device showing the, yeah, that contains real data of the heat pump of Sven's family. All right, so let me just switch my screening. Okay, yeah, that's now Apache StreamPipes and I will now show you how you can get the data from the Modbus device within to StreamPipes. As I already said, we have this connect module. Maybe I'll just make it a little larger so that you can better read it. And we will now create a new adapter. Now we can see a subset of all the adapters that are available. And in our case, we want to integrate data from a Modbus device. That's why we choose the Modbus adapter. And now the only information I need to provide is the address where the Modbus device is available. In our case, this is just the local host within a Docker container. then the port where it is available, it's in our case 5002, and then I need the ID of the device, which is in our case, zero. And then I need to add for Modbus all the data that I want to get from it, and in our case it's, how was the name, sorry. Sorry about that Okay, then I need to provide this address which are which is what I already mentioned and Simple selector register. So usually for example for the heat pump or Sven It is then described in manual where you can find the data. So this should then be easily easy to fill up for you As I already said stream perhaps is fully event-based that means every every data point always needs a timestamp. This data source does not provide a timestamp yet, that's why we add one within StreamPipes. And then we just give it a name. In this case, it's heat pump Modbus. And then we also can select here that data is directly stored within the StreamPipes internal data lake. This allows it then to easily view them in the data explorer, which I will show you later. And then you can already start the adapter. And here you can then, okay, I forgot one point. Damn. So Modbus allows you only to store integers, right? And usually, for example, for temperatures, they are not integers, they are float values. And that's why you see here 459, because we have multiplied it by 10, And then you need to, this is a simple trick you already do in Modbus, so you multiply values by, for example, 10 or 100 or whatever, and then redo the transformation within your data analysis platform, or in this case, DreamPipes, and you can simply add the transformation rule when you created the adapter. That's the aspect I forgot about. I'm very sorry about this. Nevertheless, I can now show you how you can now analyze the data. Data is now flowing into stream pipes and we can now create, so here you can now select the proper data source, that's the one I've just created. And then we can also select a type of visualization, I think in this case a time series is the most easiest one. And then you get directly created a nice chart here. where you can select the time window you want to see. And yeah, so you can just have a view on the actual temperature that your device is sending. As I said, I'm a bit sorry that I missed this data manipulation part, but yeah. All right, so then let's get back to our slides. And now Sven will tell you a bit more about the Python part.
+
+**Speaker 2** _[15:04]_
+
+Thank you, Tim. I will now continue with our StreamPipes Python library. And I think our demo showed how easy it is to connect and to store data with StreamPipes. But we wanted to combine it with Python for the data analytics part and therefore created StreamPipes Python. Our motivation was to address the amazing data analytics and data science community to benefit from the already existing Python libraries. Now let's take a look at some basic information about StreamPipes Python. It was freshly released with the new StreamPipes version and you can easily install it via PyPy. You can just type in pip install StreamPipes and then everything will be installed. We are also working on a Conda4 package and this will follow soon. For more information you can have a look at our documentation where you can find some tutorials and code explanations. Now let's take a look at the features of Streampipes Python. It contains two basic features which is the client and the function. The client interacts with the Streampipes API and there you can get data from databases and get data like the meta information or the data stored in our time series databases. It allows to interact with the API as I already said and it connects to a running StreamPipes instant. The second feature are the StreamPipes function. They are there to interact with the live data from the stream pipes data streams and they are a lightweight processing element. They only exist at runtime and they allow to customly add functionalities that you want so you can manipulate the live data with the functions and there are some built-in features like an easy integration for online machine learning for the RIBA library. Now let's have a closer look at the architecture of the client. So the client interacts with the stream pipes API which is in REST API and uses different endpoints to communicate with these API and it also provides different endpoints for different resources so there's one endpoint for the data lake measures and one for the data streams. Then you can get the data by either using the all method which will provide you with all resources of this time and this also supports the slicing, indexing and looping operators. On the other hand you can get a single resource by providing the idea of this resource and And then you can get just a single resource. After you got the data, you can also represent it in different ways. So there's a representation as a pandas data frame, as a dictionary or as a raw JSON. Now let's see an example how it looks in the code. you can configure your client and you can add so the user name and API key but I will show this more detailed in our second demo and then you can configure some things like the host address and the port and after that you can create a client with this configurations and then get the data as I showed before and you You can also see the tutorial section of our documentation if you want to try it out yourself and want to get more information. Now let's move on with the architecture of the function. They don't only interact with the Streampipes API but also with the messaging layer of Streampipes and the messaging layer uses different brokers to broadcast the live messages between different components of stream pipes. So therefore we have the function handler that interacts with that and it internally uses as the stream pipes client to interact with the API. And in this case in particular gets the meta information about some data streams which is used to connect to them. After that you can register different functions that you want we also have a function zoo where you can use some predefined functions like a live printing function of the data or a function to integrate online machine learning models and you can create your own function and add some functionality that you want and the final part are the brokers they communicate with the messaging layer and they make sure that every function get the right data from the right data stream and make sure that everything works the right way now let's see this this in live and I will show you how you can do this in a second demo. So this demo will show you how you can get your data from a Streampipes data lake into Python and it also shows how you can subscribe to live data from a Streampipes data stream. But first of all we have to create a client. Therefore we import all necessary modules and then you can set the environment variables for the user and for the API key. I will quickly show you how you can get your API key in Streampipes. Therefore we go back to Streampipes and in the top right you can go to your profile, then go to API, enter a name for your RP key and then simply create it. After that you can copy your API key and insert it into your notebook. After that you can create the configuration for the client, so here you load the environment variables and set the host address and the port. And then we can create the client. We will quickly test if everything works by using the describe method. And as you can see, everything works fine. You can see that we successfully connected to stream pipes and that we have two data lake meshes and two data streams available. We can also have a closer look at the data lake measures. And here, we use the API for the data lake measure and want to show all of the data in a pandas representation. So that's exactly the architecture as I showed before. And here, you can see we have our data lake that we created in this first demo which is here the Modbus heat pump and we have another data lake where we already stored all data before and we want to get this data now. So now we can simply extract the data from the data lake and use the get method and we can simply insert the identifier that we can see here to import the data. I also do some pre-processing for the date time which we will use for later data analytics. And as you can see we now get a pandas data frame where we have different values of the heat pump like some temperature values or the power consumption of the heat pump. And we can also customize this request and we can add different options like a limit, how many data points we want and we can also select some columns. So here we select different columns that contains a temperature value and it's also possible to configure a start and end date for this data. And here I get this data and show it with the Plotly library. And now you can see that we get the different temperature as a plot. But before we have a closer look at this, I first want to give you some basic understanding of the data. So we have our heating pump right here. And the heating pump heats up the water and this water is used to either heat up the hot water tank or the buffer tank which is used for the heating circuit. So here the water gets heated through some heating coils and then goes through the heating circuit where it goes through different radiators to heat up your room. So now let's go back. Here you can see the different temperatures. So in blue there's the outside temperature and on top you can see the actual temperature and the target temperature for the hot water. be loaded that's the same for the heating circuit and if we have a closer look here so here we can see the the target temperature of the hot water variates between different times of the day and here you can see how the hot water gets heated up by the heat pump and after that slowly gets colder and there are sometimes some huge drops in the temperature and that's probably when somebody had a shower and used a lot of hot water at once and now we want to have a closer look at the efficiency of our heat pump therefore you we need to know how we can calculate it so the efficiency is just the heat output put which is generated by the heat pump to heat up these two tanks divided by the car power consumption that the heat pump uses as electrical energy and yeah we can calculate this efficiency in Python right now. Therefore when we first calculate the total produced energy in form of heat per every day and create a new column for the day and group by this day. After that we can add the heating energy and the hot water energy together and plot the results and here you can see the total power consumption for every day for this time range and we can exactly do the same for the consumed power where we just add the power consumption for the heating circuit together with the power consumption of the hot water. We will also plot this and here you can see how it looks like with this bar chart. And with these two values we can now calculate the efficiency of the heat pump and we just use the formula that I I showed before so we take the heat and divide it by the consumed power and then we get our efficiency and we also want to compare the efficiency with the outside temperature at the corresponding days and therefore create a new column where we insert the mean temperature for this day and that's just some code for the plotting I won't go into detail here. And as you can see we now get our efficiency with the blue bars which reaches from about three to six which means that the heat pump produces three to six times of the energy that it consumed and as you can see they are very efficient and which makes them so environment friendly. And as you can see there's also a strong correlation between the temperature and the efficiency and we want to have a closer look at this in another data analysis. Therefore we can calculate our efficiency by using pandas and can also plot these two values together in a The scatter plot as you can see there's a really high correlation between these two values with about 0.8, and there's a clear trend that it order it gets the more efficient the heat pump works Now Our next step is to get the live data from stream pipes and therefore we want to look at the available data and streams and we just use the structure that I showed so we use the data stream API get all data streams and convert it to a pandas data frame and as you can see there are the two different data streams the one we created and the one we used for to get all data. We will now connect to the Modbus data stream and therefore copy this element ID and then we want to create a function to get this data. Therefore we need to implement the four following methods. The first one is the required stream IDs where we will insert our copied stream ID then there's an onServiceStarted method which gets called when the function gets started and here you can create and we will create a dictionary to save all the data and print out that the function gets started. The most important function is the onEvent method and it's called whenever a new event arrives and there we will save all the live data in our dictionary and we will also create a live plot for this data. And the final method is the onService. and there we will just print out that our function got stopped. Here you can see exactly what I told you in code. I won't go into detail here but you can find this notebook in a GitHub repository if you want to have a closer look at this. There's just one extra thing you have to know. We can set this column we want to plot for this live plot function and then it will plot this data live. We can now create our live plot, therefore we need another environment variable where we tell where the host is and after that we can initialize a registration where we can register our function which is the life plot function I defined before and there we want to plot the actual temperature of the hot water and then we can create the function handler that handles all the data and we can initialize it.
+
+**Speaker 1** _[33:38]_
+
+Because then we okay, so I think so the problem is here. We have chosen a different name for for the actual Column, I guess that's why why it's not working. I think out of time we have to skip it now I'm very sorry about it But what you what you now would see here is the live interaction. So you would now see a live plot I'm sorry about that
+
+**Speaker 2** _[34:02]_
+
+I will quickly try if I get it to work, if not we will just stop it. I think it's a different mistake, I'm sorry, right now it's a stupid mistake but I just forgot to insert the actual ID, so I'm sorry about this. So now everything should work, I hope so. Oh. Yeah, okay. Okay, yeah, I'm sorry, that's the bad thing about live demos, I'm, yeah, really sorry. And yeah, you could, if it would work, then easily disconnect this function. so that's all I wanted to show you for this demo and and there's a lot more you could do so you could use the online machine learning functionality to get some more information about the data you could easily create notification with stream pipes and you could also use this data to optimize your heat pump by changing configurations and then monitor the changes of the efficiency.
+
+**Speaker 1** _[35:31]_
+
+Right, so I think this pretty well highlights, so Sven showed some really powerful tools of how you can analyze data in Python, and that's just the interface we want to address, right? So we want to have Stream Pipes as a tool which allows you to easily, to easily get access to data from industrial context, and then use the power of Python to create amazing results of it. So that's already the main part of our talk. we now somehow need a bit of your help so we love your support if you're interested in contributing in streampubs we're always open to that otherwise maybe just give it a try um provide us some feedback could be either positive or negative we're happy about both um if you like it it's always great if you spread the word and if you have some interesting use cases you want to share with us or the wider community it would also be great if you just approach us and then we can and maybe think about a blog post or something else. If you want to talk about StreamPipes later than this talk, we're happy to welcome you at our InnoVac stand, which is just directly across the food area, and I will be there from time to time, and if not, my colleagues will surely approach us. And as Sven already mentioned, we have created a GitHub repository where you can just find the whole demo and all of the things you need to reproduce it. So if you're interested in give it a shot, then you can go here. Then my last words will be thank you a lot for your attention and your interest and enjoy the conference.
+
+**Speaker 3** _[37:16]_
+
+Well, thank you very much, team. Thank you very much, Ben. I think it was a very nice and interesting presentation. If you want to ask any questions, please go to Slido.
+
+**Speaker 2** _[37:27]_
+
+to Slido.
+
+**Speaker 3** _[37:28]_
+
+um there the code it's
+
+**Speaker 1** _[37:29]_
+
+it's
+
+**Speaker 3** _[37:31]_
+
+PI con de PI data 23. I think the QR code is also outside and There are some questions already. So I will ask you questions and So the first one is how can you extend string pipes with connectors for additional custom protocols?
+
+**Speaker 1** _[37:49]_
+
+That's rather easy. So similar to pipeline elements. We also offer an SDK to easily create your own adapter for for stream pipes and This is currently also only possible in Java But there are is I would say an extensive extensive documentation and also some code generation around so that you only need to implement the stuff that matters for your Connector and not all the boilerplate that is required by stream pipes
+
+**Speaker 3** _[38:19]_
+
+In our question is is there a query language for the data lakes in the Python SDK that supports time-based aggregation? something like flux for influx DB
+
+**Speaker 1** _[38:31]_
+
+Yes, so currently we stored data internally in a influx database, and we make it extensible to the outer side via the REST API. So currently it's not possible to directly query data via query language, but via the REST API, which then allows you to handle the data within the Python environment and use pandas or polas or whatever you want to use.
+
+**Speaker 3** _[38:57]_
+
+And our question is what does the deployment model look like for stream pipes?
+
+**Speaker 1** _[39:03]_
+
+So Streampipes is a microservice-based tool. So we have a couple of Docker images in place. And then you're able to start Streampipes simply with Docker Compose. That's the most convenient and easiest deployment solution. And in case you want to actually work on Apache Streampipes, then the CLI is probably more the way you want to go. And if you want to use Streampipes in a more mature way, we also have a Helm chart in place so that you can easily deploy stream pipes within a Kubernetes setup.
+
+**Speaker 3** _[39:38]_
+
+Thank you, there are two more questions one is can timestamps be defined as part of the parameter list
+
+**Speaker 1** _[39:45]_
+
+Guess so Probably the question is about when I query the data from from the API Sure, it can since we have an event based schema and we always talk about time series The timestamp is always per default Trends transmitted and you will always get a data within the times with the timestamp. So yeah
+
+**Speaker 3** _[40:12]_
+
+Another question that I think it's also interesting because I was wondering myself this it's if I wanted to try Stream pipes out at home. Do you know any accessible IOT devices to practice with?
+
+**Speaker 1** _[40:24]_
+
+That's a good one Yes, so usually I think I personally are not aware of any public available IRT devices Maybe some others are but for certain protocols, for example for UPC UA There are some demo services online publicly publicly available that you can just connect them to stream pipes I'm also or you use for example the simulator that I have used in this demo which is also included in the repository we share here.
+
+**Speaker 3** _[40:56]_
+
+Thanks. And one last is, what is your focus for further development? Web app or Python SDK?
+
+**Speaker 1** _[41:03]_
+
+Definitely both. So we will, next time, work a lot on the Python integration to make that more mature and also more feature-rich. But the UI part is always a central component of StreamPipes and will also be further developed. So I think it's definitely both, yeah.
+
+**Speaker 3** _[41:23]_
+
+Okay, great, so let's give them one more applause
+
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -1,0 +1,70 @@
+{#
+  Homepage section dispatcher
+  ──────────────────────────
+  Renders one front-page section by id, mapping it to the existing
+  section macro and enforcing the per-section `display` flag from
+  `databags/frontpage/sections/<id>.yaml`. The master order + display lives in
+  `databags/frontpage/config.yaml`; the landing template iterates that list
+  and calls this macro per id.
+
+  A section renders iff:
+    - the master entry `display` is true (checked by the caller's loop), AND
+    - `bag('frontpage/sections/<id>').display != false` (checked here).
+
+  Both default true. Add a new section by: appending to homepage.yaml,
+  creating databags/frontpage/sections/<id>.yaml, and adding one elif branch here.
+
+  Usage:
+    {% from "macros/homepage.html" import render_homepage_section %}
+    {% for sec in bag('frontpage/config')['sections'] if sec.display %}
+    {{ render_homepage_section(sec.id) }}
+    {% endfor %}
+#}
+
+{% from "macros/intro.html" import render_intro %}
+{% from "macros/hero.html" import render_hero %}
+{% from "macros/programme-status.html" import render_programme_status %}
+{% from "macros/keydates.html" import render_keydates %}
+{% from "macros/topics.html" import render_topics %}
+{% from "macros/keynote-teaser.html" import render_keynote_teaser %}
+{% from "macros/carousel.html" import render_carousel %}
+{% from "macros/why-attend.html" import render_why_attend %}
+{% from "macros/community.html" import render_community %}
+{% from "macros/past-editions.html" import render_past_editions %}
+{% from "macros/latest-videos.html" import render_latest_videos %}
+{% from "macros/latest-blog.html" import render_latest_blog %}
+{% from "macros/tickets-cta.html" import render_tickets_cta %}
+{% from "macros/sponsor.html" import render_sponsors_list %}
+{% from "macros/sponsoring-cta.html" import render_sponsoring_cta %}
+{% from "macros/newsletter.html" import render_newsletter %}
+
+{% macro render_homepage_section(id) %}
+{% if id == 'intro' %}{% set d = bag('frontpage/sections/intro') %}{% if d and d.display != false %}{{ render_intro(d) }}{% endif %}
+{% elif id == 'motto' %}{% set d = bag('frontpage/sections/motto') %}{% if d and d.display != false %}{{ render_hero(d) }}{% endif %}
+{% elif id == 'programme_status' %}{% set d = bag('frontpage/sections/programme_status') %}{% if d and d.display != false %}{{ render_programme_status(d) }}{% endif %}
+{% elif id == 'keydates' %}{% set d = bag('frontpage/sections/keydates') %}{% if d and d.display != false %}{{ render_keydates(d) }}{% endif %}
+{% elif id == 'topics' %}{% set d = bag('frontpage/sections/topics') %}{% if d and d.display != false %}{{ render_topics(d) }}{% endif %}
+{% elif id == 'keynotes' %}{% set d = bag('frontpage/sections/keynotes') %}{% if d and d.display != false %}{{ render_keynote_teaser(d) }}{% endif %}
+{% elif id == 'featured' %}{% set d = bag('frontpage/sections/featured') %}{% if d and d.display != false %}{{ render_carousel(d['featured_items'], carousel_id='featured', mode='multi', image_dir='featured', section_label='Featured speakers and sessions') }}{% endif %}
+{% elif id == 'satellite_events' %}{% set d = bag('frontpage/sections/satellite_events') %}{% if d and d.display != false %}{{ render_carousel(d['items'], carousel_id='satellite-events', mode='multi', image_dir='featured', section_label='Satellite events and initiatives', header_title=d['header_title'], header_teaser=d['header_teaser'], cta_text=d['cta_text'], cta_url=d['cta_url']) }}{% endif %}
+{% elif id == 'masterclasses' %}{% set d = bag('frontpage/sections/masterclasses') %}{% if d and d.display != false %}{{ render_carousel(d['items'], carousel_id='masterclasses', mode='multi', image_dir='', section_label='Masterclasses', header_title=d['header_title'], header_teaser=d['header_teaser']) }}{% endif %}
+{% elif id == 'why_attend' %}{% set d = bag('frontpage/sections/why_attend') %}{% if d and d.display != false %}{{ render_why_attend(d) }}{% endif %}
+{% elif id == 'about' %}{% set d = bag('frontpage/sections/about') %}{% if d and d.display != false %}{{ render_community(d) }}{% endif %}
+{% elif id == 'past_editions' %}{% set d = bag('frontpage/sections/past_editions') %}{% if d and d.display != false %}{{ render_past_editions(d) }}{% endif %}
+{% elif id == 'latest_videos' %}{% set d = bag('frontpage/sections/latest_videos') %}{% if d and d.display != false %}{{ render_latest_videos(d) }}{% endif %}
+{% elif id == 'latest_blog' %}{% set d = bag('frontpage/sections/latest_blog') %}{% if d and d.display != false %}{{ render_latest_blog(d) }}{% endif %}
+{% elif id == 'tickets' %}{% set d = bag('frontpage/sections/tickets') %}{% if d and d.display != false %}{{ render_tickets_cta(d) }}{% endif %}
+{% elif id == 'sponsors' %}{% set d = bag('frontpage/sections/sponsors') %}{% if d and d.display != false %}
+<section class="sponsors content-block">
+  <div class="content">
+    {% if d.title %}<h2>{{ d.title }}</h2>{% endif %}
+    {% if d.body %}<p>{{ d.body }}</p>{% endif %}
+  </div>
+  <div class="content">
+    {{ render_sponsors_list() }}
+  </div>
+</section>{% endif %}
+{% elif id == 'sponsoring' %}{% set d = bag('frontpage/sections/sponsoring') %}{% if d and d.display != false %}{{ render_sponsoring_cta(d) }}{% endif %}
+{% elif id == 'newsletter' %}{% set d = bag('frontpage/sections/newsletter') %}{% if d and d.display != false %}{{ render_newsletter(d) }}{% endif %}
+{% endif %}
+{% endmacro %}

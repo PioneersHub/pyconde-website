@@ -1,0 +1,18 @@
+# Single source of truth for selective builds — see plans/selective-builds.md.
+#
+# current_excludes: Lektor record subtrees whose artifacts are NOT built when
+# BUILD_MODE=current (the fast production/staging build). They are static
+# after their initial generation and stay live in S3 from the last archive
+# deploy (the production sync never deletes). The on-demand archive workflow
+# (.github/workflows/archive-build.yml) rebuilds them and derives its S3 sync
+# scope from this same list via utils/selective_build_sync_args.py — build
+# scope and deploy scope cannot drift apart.
+#
+# Note: this list controls WHICH artifacts get built, never what they
+# contain — every page that does build sees the full record tree and renders
+# identically in every mode. Cross-edition pages (homepage, sitemap segments,
+# topic hubs, llms.txt) therefore stay complete and fresh on every deploy and
+# must NOT be listed here.
+current_excludes:
+  - /archive # all past editions (talks, speakers, tracks, blog, transcripts)
+  - /attendee-certificate # certificates: issued once per edition, archive-scoped

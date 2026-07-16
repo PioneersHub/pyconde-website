@@ -1,0 +1,179 @@
+title: From Idea to Integration: An Intro to the Model Context Protocol (MCP)
+---
+description: The Model Context Protocol (MCP) has emerged as a standard for connecting Large Language Models with diverse data sources and enabling interactions with…
+---
+created: 2025-04-04
+---
+code: J7YKEE
+---
+slug: from-idea-to-integration-an-intro-to-the-model-context-protocol-mcp
+---
+speaker_names: Julian Beck
+---
+speakers:
+
+
+
+### Julian Beck
+
+_About — in the speaker's own words_
+
+Cloud Platform Engineer @ inovex, I specialize in designing scalable cloud infrastructure solutions. My expertise spans cloud architecture, container orchestration, and infrastructure automation. Beyond my core work, I maintain active interests in web technologies and mobile app development, exploring solutions that bridge the gap between platforms
+---
+abstract:
+
+
+The Model Context Protocol (MCP) has emerged as a standard for connecting Large Language Models with diverse data sources and enabling interactions with other systems. In this talk, we’ll introduce the MCP standard and demonstrate how to build  a MCP Server using real world examples. We’ll then explore its applications, showing how it empowers developers and makes data from complex systems accessible to non-technical users. Finally, we’ll dive into recent protocol updates, including improvements to Streamable HTTP transport and security enhancements, and share practical strategies for deploying MCP servers as well as clients.
+---
+full_description:
+
+
+### From Idea to Integration: An Intro to the Model Context Protocol (MCP)
+
+The Model Context Protocol (MCP) has emerged as a standard for connecting Large Language Models with diverse data sources and enabling interactions with other systems. In this talk, we’ll introduce the MCP standard and demonstrate how to build  a MCP Server using real world examples. We’ll then explore its applications, showing how it empowers developers and makes data from complex systems accessible to non-technical users. Finally, we’ll dive into recent protocol updates, including improvements to Streamable HTTP transport and security enhancements, and share practical strategies for deploying MCP servers as well as clients.
+
+ **Talk Outline:**
+
+**Introduction to MCP**
+  - What is the Model Context Protocol?
+  - Core concepts: context exposure, streaming, and stateless interaction
+
+**MCP Architecture**
+  - Overview of MCP Servers and Clients
+
+**Building an MCP Server**
+  - Creating an MCP Server for Home Assistant
+  - Connecting to a SQLite Database
+
+**Real-World Use Cases**
+  - Demo: How MCP empowers developers with contextual tooling
+  - Demo: How MCP enables non-technical users to access complex data
+
+**Recent Protocol Updates**
+  - Streamable HTTP transport improvements
+  - Security and authentication updates for MCP servers
+
+**Deployment Best Practices**
+  - Deploying MCP servers and clients
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2025-04-23
+---
+start_time: 17:50
+---
+end_time: 18:20
+---
+slot_id:
+---
+track: Generative AI
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Novice
+---
+supporting_material_url: https://github.com/julianfbeck/mcp-pycon-de-2025
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/J7YKEE.png
+---
+youtube_id: 6QiL3qWNtq8
+---
+video_link: https://www.youtube.com/watch?v=6QiL3qWNtq8
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/6QiL3qWNtq8/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+yeah so thank you and welcome all to I think one of the last talks today I'm happy that so many people showed up I'm guessing it's because the MCP thing is is a really big hype today and yeah I will present to you today from idea to integration an intro to the model context protocol it will be really basic and yeah I hope you enjoy it so a few sentence about me and I'm a cloud platform engineer I have nothing to do with with Python or data science but I'm here today to present a topic because I'm really interested in integrating the the LLM technologies into yeah into the should I plug in different port okay okay I will continue so I love integrating AI in existing systems and combining it with infrastructure and yeah we will look at this today and I'm also here from the from inner wax we are IT project center we are here with 20 attendees and we have six talks so please come check out our other talks yes so and model context protocol was introduced by entropic in late November and tropics are the makers of the Claude AI and they released model context protocol with the latest and AI model cloud 3.7 and when it was first released for me I didn't didn't hurt and anything about the protocol for me when I first heard about the MCP and was when cursor the IDE fork from vs code integrated the model context protocol and then I think this was in late February this year it really blew up and it was all over Twitter LinkedIn and yeah everybody had to say something about this then also shortly after open AI announced that they will also support the standard and will add support across all of their different products yeah including in their agent SDKs and also their desktop app so what is the model context protocol the MCP allows you to MCP is an open standard that allows you to connect LLMs with tools data and services this means for example if you have a database if you have a customer database and you want to integrate this database into your LLM flow you can write a MCP server that queries the database and then further processes the data so you can you can write the server and and to query data to take actions and not only to query data but also like execute all kinds of actions so it allows you to build complex workflows on top of LLMs and it it allows you to easily use pre-built integrations for example already there are lots of MCP servers from different cloud providers or or software as a service systems and the protocol gives gives you bit best practices for securing your data within your infrastructure so right so I thought to best show the the MCP protocol in action and I will start with a short demo and and what I did is I downloaded the schedule from the talk put it into a SQLite database and then I wrote a small little MCP server that allows the AI to query the the database which is I think a really cool little example we can now ask Claude here so I will ask it what talks are about MCP and and then I hope the live demo works yes it says hey I want to I want to execute this tool to get the database schema then I want to execute another tool to run the query and then it says hey I found three talks about the MCP protocol one is from me and I think the other one is tomorrow by Martin sailor so come check it out I think it is a bit more advanced and also to talk about scraping illegal for fun also uses the MCP protocol so yeah this is a small little demo so and then now let's get into how something like this works if the screen come back comes back yes thank you so and the model context protocol architecture consists out of three components we have the MCP client which is what I just used to query the conference database for example Claude or or we have cursor or you can build your own client then we have to protocol and then lastly the core component the MCP server so let's look at the different built-in transport types and the current protocol supports the standard input output for communication so just console it is and it also supports HTTP with server sent events and which uses server sent events for server to client messages and HTTP post for client to server messages and the ladder protocol with the server sent events is not it idea and it was changed but I will come back to it later so currently mostly use is the standard input output where you install a small little library or I think most of the time currently it is an NPX package and which then runs the MCP server. So these are built-in transport types. Then we have the MCP server. Shortly after Claude announces the protocol there are already I think so many different frameworks. As I said before I'm not I'm in the Python ecosystem but I looked at the fast MCP server from Python and it looked great so I decided to use it so this is the server component and yeah I use the fast MCP because it supports both as part of both transport types yes so okay so then one component from the in the MCP architecture are the MCP resources and MCP resources allow you to expose data and contents from your servers to your LLMs and when it is a resource it should be asynchronous resources for example logs or I think most commonly a database schema and these resources can the LLM request instantly without doing any compute. It just can say to the server hey I want the data and the server returns it. The most important component in the MCP architecture are the MCP tools this is where the magic happened where you perform action computation where you create a database called API yeah it enables to perform the action for example I have here a small little tool that shows you how to add two numbers which is really basic but yeah and and below that I have a small little section from the code I used to query the SQLite database and where you can pass the query and it returns the rows you can also specify a type schema if you if you know that you have it have a Jason then you can say it and the MCP server realized that to the model so that the model knows and what the format needs to look so now the MCP client and the MCP client connects all those components together it coordinates the communication between the user LLMs and MCP and server and it's it the architect is really simple what the MCP client does it gets all the different tools you have and then it sends the tools as an and preamble at the beginning of the user request and so it includes all the different tool descriptions so that the LLM knows what tools are there and how to call them so if you have a database and it needs right as you light there is a comment says hey you need to write SQLite when the LLM then wants to call one of those tools it has a tool use message which says to the client hey I want to use this tool then the tool gets executed and the MCP server execute the tool crazy database calls the API and then the return return tool result gets returned to the client and the client gives the message back to the LLMs and that happens until the request is over. So yeah now I want to show how this looks from the from the MCP, from the fast MCP which I use for the conference you can see here this is just the there's just a SQLite database we have the resources the resource for this for the schema and then down there we have the tool to query the database and this then gets integrated and for me it gets it's the MCP server gets called via the transport and we are the console and transport protocol so sorry is bit small but if I go here to edit config then yeah it's it's really small but it says here hey call call call the Python script and with this command yes so and now I want to get into the latest specification that got released and late March which I think it's one of the most yeah most important changes and which will make the MCP protocol even better as it is today and and the latest specification added two big things. First it added a comprehensive authorization framework based on OAuth 2.1 and it replaced the previous HTTP and server-sent event transport with a more flexible streamable HTTP transport which is great. I will first say a few sentences about the authorization framework. There are multiple authorization variants now and this just shows the authorization code grant type and which just allows you allows the MCP server to be an authorization server which means if you call an MCP server the MCP server can trigger open browser event that you can log in and then you have permission to call the MCP server but also you can program and that you that user maybe the maybe the user only has permission for certain resources to be created with the with the MCP server for example if you have a customer data a database and you want certain people from your company only to use the MCP tool to gravity customer database so and now we come to the streamable HTTP and the current implementation of the server sent events and required maintaining a long-lived connections and it lacked connection resumption capabilities which may wish made is really difficult to host those those server sent events on con cloud infrastructure mainly because the service and events and need to keep a connection even if you don't use the MCP tool and also from from from my use case I had lots of issue when trying to use the service and events and the servers crashed for me no matter what different framework I used to build the MC MCP server so the streamable HTTP changes this and it supports a stateless server operations through client provided session IDs which make the crate to host your MCP server on things like and RBS lambda or or even cloudflare workers and and it enables an on-demand server sent upgrade as a server sent event upgrades when you when you need to when you need streaming and you want to be able that the server sends notification to decline when a compute computation is finished so and I think yeah in the in the praxis it then looks like this you have a this is a different framework because the support is not not already not there and in the practice it then looks like this you have a port and you host the server and then the the standard says hey you have a slash MCP endpoint and then you can connect your client against this slash MCP endpoint and you are connected you don't need to install some kind of binary or Python or yeah JavaScript package to run your server so like I said before I think those changes will be really great because currently the MCP setup most of the time most of the time looks like this you install the MCP client you install and you install the MCP server for example it's now here this cloud MCP then you have to add your API key so Cloudflare knows that you are who you are and then you can execute your action against the MCP server. But with the new protocol you can easily connect against the slash MCP endpoint of your of for example CloudFlare or maybe your company and you can use the authorization framework to get authenticated and this also allows you to then build something like this for your company where you can say hey I have one central MCP server that I can use if I want to create a database get data from the CMS or get new SEO SEO information yes so I'm I'm really hoping or hoping that this new standard and gets gets out there quickly because currently it is sadly so that the frameworks are already here the MCP frameworks slowly slowly get here from from the server side but on the client side if you want to use cloud desktop or cursor there are all currently not supporting the new protocol and I think you have to use your own you have to write your own client at the moment yes because I'm from I'm from the infrastructure I I also want to present and this project as my final slide, which is open control. Open control is from the people from SST, which is an infra provider, something similar like Terraform. And what they normally do is they provision your infrastructure in the cloud, and they do lots with Lambda and function as a service. and what they now do is they just say hey we not only provision your infrastructure but we also deploy MCP into your infrastructure and MCP client that you can connect with your AI but it also has a web interface and you then can call your database which is already provisioned in the frame in the in your infrastructure and it's already inside your infrastructure you then can call from your MCP without having having to configure any any connections or yeah virtual private clouds and you can just connect to it which is awesome because it is just so good integrated and I can and I'm thinking that something like this will be the default in the in the future I also use the open control now to to host the application which I showed before so I can now go it is black on black which is not great but I can now go on here and can also ask here so I'm asking it and who has more than two talks and then it was it says hey I will check the schema and like like before but this time it is in the in the infrastructure and it is accessible we are yeah okay nobody has as more than two talks but nine speakers have exactly two talks okay yes yes so um this was it for me and you can you can play around with the with the icon with the with the icon schedule it is it is life scan the QR code or use the password and the code is also also live on on github if you want to play around and yeah I encourage you to if you have time write a quick MC piece of it makes a lot of fun and if you have data somewhere living it is it is so fast to integrate it and yeah thank you
+
+**Speaker 2** _[21:54]_
+
+okay there are some questions in the slider so first question what is the benefit of MCP over standard tool calls or rag to access relevant context
+
+**Speaker 1** _[22:06]_
+
+So, I'm not from the data science world, but I'm guessing that the MCP, it gets the data as it is in the database and then it works with it. And if I'm not correct, the rack does a bit more pre-processing.
+
+**Speaker 2** _[22:31]_
+
+Okay, another question, is it different from creating a REST API on the back end and expose the features as endpoints?
+
+**Speaker 1** _[22:40]_
+
+And no, I I don't think that it is different but there is a standard for it and you can quickly build it and
+
+**Speaker 2** _[22:51]_
+
+Should every bit of functionality have its own MCP server, it feels overkill to refactor extensions or tools into so many servers instead of serving one backend.
+
+**Speaker 1** _[23:00]_
+
+Sorry, I didn't get it. Yeah, I mean from the, the question was regarding the Authentication from the database. I mean, it makes sense if you query the mcp with your llm That you have a user that only makes sure that the llm can only LLM can only query and don't destroy anything in the database.
+
+**Speaker 2** _[23:31]_
+
+When you query a database via MCP, do you need a technical user to query or can you pass user-specific authentication?
+
+**Speaker 1** _[23:41]_
+
+yeah sorry this is the question I answered yes yes and you should you you don't need a user but you should create a user for your query
+
+**Speaker 2** _[23:52]_
+
+Okay, is there a possibility to integrate a MCP server into my first API or Django API? This would be extremely convenient
+
+**Speaker 1** _[24:00]_
+
+Yeah, I'm probably guessing that you can add a new endpoint in fast API if the new HTTP streaming is out there.
+
+**Speaker 2** _[24:15]_
+
+Does MCP support servers calling the LLM in reaction to an event rather than only the LLM calling the server?
+
+**Speaker 1** _[24:23]_
+
+server I'm not sure about it
+
+**Speaker 2** _[24:29]_
+
+Why did MCP blow up while other protocols did not? For example, OpenAI had plugins using manifest YAML, which was a flop back then.
+
+**Speaker 1** _[24:40]_
+
+I think MCP won because it was just so easy to integrate and they had the clients, the servers ready and you saw how short it is and you can just plug it in and it works.
+
+**Speaker 2** _[25:00]_
+
+Okay. Thank you, Julian, for this wonderful talk. Please give him a round of applause.
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -1,0 +1,238 @@
+{% extends "layout.html" %}
+{% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
+{% from "macros/funnel-cta.html" import render_funnel_cta %}
+{% from "macros/newsletter-inline.html" import render_newsletter_inline %}
+
+{% block title %}{{ this.name }}{% endblock %}
+
+{% block og_type %}profile{% endblock %}
+
+{%- set branding = bag('branding') -%}
+{%- set host = branding['canonical_host'] -%}
+{%- set is_archive = this.url_path.startswith('/archive/') -%}
+{%- set archive_year = (this.url_path.split('/')[2] if is_archive else site.config.PROJECT.year|string) -%}
+{%- set edition_id = (host ~ '/archive/' ~ archive_year ~ '/#event-' ~ archive_year) if is_archive else (host ~ '/#event-' ~ site.config.PROJECT.year|string) -%}
+{%- set talks_root = '/archive/' ~ archive_year ~ '/talks' if is_archive else '/talks' -%}
+
+{% block structured_data %}
+{#- Normalise each social field to a canonical URL. Speaker data was
+    imported across years with mixed shapes: bare handles, @-handles,
+    full URLs, mastodon webfinger ids, etc. The `social_url` filter
+    converts each recognised form to https://… or returns '' when the
+    value is blank / unparseable. The same filter is used below for
+    the visible <ul class="speaker-socials"> so what users see and
+    what crawlers see always match. -#}
+{%- set socials = [
+    this.homepage|social_url('homepage'),
+    this.linkedin|social_url('linkedin'),
+    this.github|social_url('github'),
+    this.mastodon|social_url('mastodon'),
+    this.threads|social_url('threads'),
+    this.bluesky|social_url('bluesky'),
+    this.twitter|social_url('twitter'),
+] | reject('equalto', '') | list -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": "{{ host }}{{ this.url_path }}#person",
+  "name": {{ this.name|tojson }},
+  "url": "{{ host }}{{ this.url_path }}",
+  {%- if this.avatar %}
+  "image": "{{ host }}{{ this.avatar }}",
+  {%- endif %}
+  {%- if this.job_title %}
+  "jobTitle": {{ this.job_title|tojson }},
+  {%- endif %}
+  {%- if this.company %}
+  "worksFor": { "@type": "Organization", "name": {{ this.company|tojson }} },
+  {%- endif %}
+  {%- if this.biography %}
+  "description": {{ (this.biography|striptags|truncate(400))|tojson }},
+  {%- endif %}
+  {%- if socials %}
+  "sameAs": [
+    {%- for url in socials -%}
+    {{ url|tojson }}{{ "," if not loop.last }}
+    {%- endfor -%}
+  ],
+  {%- endif %}
+  "performerIn": [
+    {%- for code in this.talks -%}
+    { "@id": "{{ host }}{{ talks_root }}/{{ code }}/#event" }{{ "," if not loop.last }}
+    {%- endfor -%}
+  ]
+}
+</script>
+{%- set crumb_trail = [] -%}
+{%- if is_archive -%}
+  {%- set _ = crumb_trail.append(('/archive/', 'Archive')) -%}
+  {%- set _ = crumb_trail.append(('/archive/' ~ archive_year ~ '/', archive_year)) -%}
+  {%- set _ = crumb_trail.append(('/archive/' ~ archive_year ~ '/speakers/', 'Speakers')) -%}
+{%- else -%}
+  {%- set _ = crumb_trail.append(('/speakers/', 'Speakers')) -%}
+{%- endif -%}
+{%- set _ = crumb_trail.append((this.url_path, this.name)) -%}
+{{ breadcrumb_jsonld(crumb_trail) }}
+{% endblock %}
+
+{% block body %}
+{%- set visible_trail = [] -%}
+{%- if is_archive -%}
+  {%- set _ = visible_trail.append(('/archive/', 'Archive')) -%}
+  {%- set _ = visible_trail.append(('/archive/' ~ archive_year ~ '/', archive_year)) -%}
+  {%- set _ = visible_trail.append(('/archive/' ~ archive_year ~ '/speakers/', 'Speakers')) -%}
+{%- else -%}
+  {%- set _ = visible_trail.append(('/speakers/', 'Speakers')) -%}
+{%- endif -%}
+{%- set _ = visible_trail.append((none, this.name)) -%}
+{{ breadcrumb(visible_trail) }}
+{% if is_archive %}
+<aside class="archive-banner" role="note" aria-label="Archived speaker" data-pagefind-ignore>
+  <div class="content">
+    <strong>Archive</strong> — speaker profile from the
+    <a href="/archive/{{ archive_year }}/">{{ archive_year }} edition</a>.
+  </div>
+</aside>
+{% endif %}
+
+{%- set year_label = archive_year or site.config.PROJECT.year|string -%}
+<article class="speaker-article" data-pagefind-body>
+  <meta data-pagefind-meta="kind" content="Speaker">
+  <meta data-pagefind-meta="title" content="{{ this.name }}">
+  <meta data-pagefind-meta="year" content="{{ year_label }}">
+  {%- if this.company %}
+  <meta data-pagefind-meta="company" content="{{ this.company }}">
+  {%- endif %}
+  {%- if this.avatar %}
+  <meta data-pagefind-meta="image[src]" content="{{ this.avatar }}">
+  {%- endif %}
+  <span data-pagefind-filter="year:{{ year_label }}" hidden></span>
+  <span data-pagefind-filter="kind:Speaker" hidden></span>
+  <header class="subsite">
+    <div class="subsite-title">
+      <section class="content speaker-header">
+        {% if this.avatar %}
+        <img src="{{ this.avatar }}" alt="Portrait of {{ this.name }}" class="speaker-avatar" loading="lazy" width="240" height="240">
+        {% endif %}
+        <div class="speaker-meta">
+          <h1 class="speaker-name">{{ this.name }}</h1>
+          {%- if this.pronouns %}<p class="speaker-pronouns">{{ this.pronouns }}</p>{% endif %}
+          {%- if this.job_title or this.company %}
+          <p class="speaker-role">
+            {%- if this.job_title %}{{ this.job_title }}{% endif -%}
+            {%- if this.job_title and this.company %} · {% endif -%}
+            {%- if this.company %}{{ this.company }}{% endif -%}
+          </p>
+          {%- endif %}
+          {%- if this.city or this.country %}
+          <p class="speaker-location">
+            {%- if this.city %}{{ this.city }}{% endif -%}
+            {%- if this.city and this.country %}, {% endif -%}
+            {%- if this.country %}{{ this.country }}{% endif -%}
+          </p>
+          {%- endif %}
+          {%- if this.is_first_time_speaker %}
+          <p class="speaker-badge">First-time speaker at PyCon DE &amp; PyData {{ archive_year }}</p>
+          {%- endif %}
+        </div>
+      </section>
+    </div>
+  </header>
+
+  <section class="subsite speaker-body">
+    <div class="content">
+      {% if this.biography %}
+      {{ this.biography|shift_headings }}
+      {% endif %}
+
+      {%- set socials_list = [
+        ('homepage', this.homepage|social_url('homepage'), 'Homepage'),
+        ('linkedin', this.linkedin|social_url('linkedin'), 'LinkedIn'),
+        ('github', this.github|social_url('github'), 'GitHub'),
+        ('mastodon', this.mastodon|social_url('mastodon'), 'Mastodon'),
+        ('threads', this.threads|social_url('threads'), 'Threads'),
+        ('bluesky', this.bluesky|social_url('bluesky'), 'Bluesky'),
+        ('twitter', this.twitter|social_url('twitter'), 'X (Twitter)'),
+      ] | rejectattr(1, 'equalto', '') | list -%}
+      {% if socials_list %}
+      <ul class="speaker-socials" aria-label="Speaker links">
+        {% for slug, url, label in socials_list %}
+        <li class="speaker-social speaker-social--{{ slug }}">
+          {#- rel="me" only on mastodon/bluesky which actually support it;
+              other platforms ignore it. Use noopener/noreferrer everywhere. -#}
+          <a href="{{ url }}"
+             rel="{% if slug in ('mastodon', 'bluesky') %}me {% endif %}noopener noreferrer"
+             target="_blank"
+             title="{{ url }}">
+            <span class="speaker-social__label">{{ label }}</span>
+            <span class="speaker-social__handle">{{ url|social_label(slug) }}</span>
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  </section>
+
+  {% if this.talks %}
+  <section class="subsite speaker-talks">
+    <div class="content">
+      <h2>Sessions at PyCon DE &amp; PyData {{ archive_year }}</h2>
+      <ul class="speaker-talks-list">
+        {%- for code in this.talks -%}
+        {%- set talk = site.get(talks_root ~ '/' ~ code) -%}
+        {% if talk %}
+        <li>
+          <a href="{{ talk|url }}">
+            <span class="talk-list__title">{{ talk.title }}</span>
+            {% if talk.track %}<span class="talk-list__track">{{ talk.track }}</span>{% endif %}
+            {% if talk.youtube_id and not talk.do_not_record %}<span class="recording-badge">▶ Recording</span>{% endif %}
+          </a>
+        </li>
+        {% endif %}
+        {%- endfor -%}
+      </ul>
+    </div>
+  </section>
+  {% endif %}
+
+  {#- Cross-edition continuity: a speaker who used the same Pretalx code in
+     more than one year. Codes drift between editions, so this catches only
+     direct matches; a future databags/speaker_aliases.yaml can extend it. -#}
+  {%- set my_code = this.code or this._id -%}
+  {%- set other_editions = [] -%}
+  {%- for year_path in ['/archive/2018', '/archive/2019', '/archive/2022', '/archive/2023', '/archive/2024', '/archive/2025', '/speakers'] -%}
+    {%- set sp_root = (year_path ~ '/speakers') if year_path.startswith('/archive') else year_path -%}
+    {%- set other_year = (year_path.split('/')[2]) if year_path.startswith('/archive') else site.config.PROJECT.year|string -%}
+    {%- if other_year != archive_year -%}
+      {%- set other_sp = site.get(sp_root ~ '/' ~ my_code) -%}
+      {%- if other_sp -%}
+        {%- set _ = other_editions.append((other_year, other_sp)) -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {% if other_editions %}
+  <section class="subsite speaker-other-editions" data-pagefind-ignore>
+    <div class="content">
+      <h2>Also at PyCon DE &amp; PyData</h2>
+      <p class="speaker-other-editions__intro">{{ this.name }} has also appeared in other editions:</p>
+      <ul class="speaker-other-editions__list">
+        {%- for year, sp in other_editions|sort(attribute='0', reverse=true) %}
+        <li>
+          <a href="{{ sp|url }}" class="speaker-other-editions__link">
+            <span class="speaker-other-editions__year">{{ year }}</span>
+            <span class="speaker-other-editions__count">{{ (sp.talks|length) if sp.talks else 0 }} session{{ '' if (sp.talks|length) == 1 else 's' }}</span>
+          </a>
+        </li>
+        {%- endfor %}
+      </ul>
+    </div>
+  </section>
+  {% endif %}
+</article>
+
+{{ render_funnel_cta(bag('site_state')) }}
+
+{{ render_newsletter_inline(bag('frontpage/sections/newsletter')) }}
+{% endblock %}

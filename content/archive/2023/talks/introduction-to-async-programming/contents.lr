@@ -1,0 +1,193 @@
+title: Introduction to Async programming
+---
+description: Asynchronous programming is a type of parallel programming in which a unit of work is allowed to run separately from the primary application thread. Post…
+---
+created: 2023-01-04
+---
+code: PPXA79
+---
+slug: introduction-to-async-programming
+---
+speaker_names: Dishant Sethi
+---
+speakers:
+
+
+
+### Dishant Sethi
+
+_About — in the speaker's own words_
+
+I am a software engineer who loves being a problem solver. I am equipped with experience in web development, Cloud Engineering, and DevOps. I am self-motivated and able to work independently with minimal supervision. My experience in software development from open-source contributions, internships, and personal projects gives me confidence in my ability to be fit for the role.
+
+I am passionate about supporting the education system and meeting new people. I believe in free and open information/internet access for everyone.
+
+Interested in opportunities to contribute as:
+♦ Web Developer
+♦ System / Cloud Engineer
+♦ DevOps
+
+Talk to me about:
+♦ Web Development Practices
+♦ Free and Open Source Software (FOSS) Community
+♦ Starting Software Engineering Journey
+---
+abstract:
+
+
+Asynchronous programming is a type of parallel programming in which a unit of work is allowed to run separately from the primary application thread. Post execution, it notifies the main thread about the completion or failure of the worker thread. There are numerous benefits to using it, such as improved application performance, enhanced responsiveness, and effective usage of CPU.
+
+Asynchronicity seems to be a big reason why Node.js is so popular for server-side programming. Most of the code we write, especially in heavy IO applications like websites, depends on external resources. This could be anything from a remote database POST API call. As soon as you ask for any of these resources, your code is waiting around for process completion with nothing to do. With asynchronous programming, you allow your code to handle other tasks while waiting for these other resources to respond.
+
+In this session, we are going to talk about asynchronous programming in Python. Its benefits and multiple ways to implement it.
+---
+full_description:
+
+
+How Do We Implement Asynchronicity in Python?
+1. Multiple Processes: The most obvious way is to use multiple processes. From the terminal, you can start multiple scripts, and then all the scripts are going to run independently or at the same time. The operating system that's underneath will take care of sharing your CPU resources among all those instances. Alternatively you can use the multiprocessing library which supports spawning processes as shown in the example below.
+2. Multiple Threads: The next way to run multiple things at once is to use threads. A thread is a line of execution, pretty much like a process, but you can have multiple threads in the context of one process and they all share access to common resources. But because of this, it's difficult to write a threading code. And again, the operating system is doing all the heavy lifting on sharing the CPU, but the global interpreter lock (GIL) allows only one thread to run Python code at a given time even when you have multiple threads running code. So, In CPython, the GIL prevents multi-core concurrency. Basically, you’re running in a single core even though you may have two or four or more.
+3. Coroutines using yield: Coroutines are generalizations of subroutines. They are used for cooperative multitasking where a process voluntarily yield (gives away) control periodically or when idle in order to enable multiple applications to be run simultaneously.
+4. Asynchronous Programming: The fourth way is asynchronous programming, where the OS is not participating is asyncio. Asyncio is the new concurrency module introduced in Python 3.4. It is designed to use coroutines and futures to simplify asynchronous code and make it almost as readable as synchronous code as there are no callbacks.
+5. Using Redis and Redis Queue(RQ): Using asyncio and aiohttp may not always be in an option especially if you are using older versions of python. Also, there will be scenarios when you would want to distribute your tasks across different servers. In that case, we can leverage RQ (Redis Queue). It is a simple Python library for queueing jobs and processing them in the background with workers. It is backed by Redis - a key/value data store.
+
+A practical definition of Async is that it's a style of concurrent programming in which tasks release the CPU during waiting periods, so that other tasks can use it. In Python, there are several ways to achieve concurrency, based on our requirement, code flow, data manipulation, architecture design, and use cases we can select any of these methods.
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2023-04-19
+---
+start_time: 14:35
+---
+end_time: 15:05
+---
+slot_id:
+---
+track: Programming & Software Engineering
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 2521
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/PPXA79.png
+---
+youtube_id: osGGX3tcwkc
+---
+video_link: https://www.youtube.com/watch?v=osGGX3tcwkc
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT25M39S
+---
+video_thumbnail: https://i.ytimg.com/vi/osGGX3tcwkc/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:02]_
+
+Yeah, so let me start by my introduction. My name is Dishant, and today I'll be talking about asynchronous programming, and actually it's my first talk at a conference like this, and in fact, this is the first time I'm speaking in a room full of this much gathering. So yeah, over the years, I had the opportunity to work on various web applications, ranging from very small applications to large and complex systems. So there I got introduced to asynchronous programming, and I'm excited to be here to share my experiences and insights on how you can achieve concurrency and scale your applications to millions of users. So the first thing I'll start with is by asking a question. How many of you have heard developers say that by implementing asynchronous programming their code is now running faster and they are able to scale very well? Amazing. And how many have already implemented asynchronous programming in any of their projects? So I am assuming that you would have used one of the methods I'm going to discuss as we proceed with the presentation. So if I try to explain what asynchronous programming is, let me take a small example to explain this. Suppose we have a task to figure out if the number is prime or not. So what's the first step? You write a function which actually does the job for you, which actually determines if the number is prime or not. So as soon as you start the function, as soon as you run the Python script, what happens under the hood is a Python process is started, and the CPU starts doing its operations and start calculating if the number is prime or not. Now in this case, the CPU is being utilized, the CPU is not sitting idle, the Python process is working, and everything is working fine. But now if you take an example of reading a file from the disk, what do you think who is working under the hood? Even though we have the Python process, even though we started the Python script, but under the hood in this case, the disk controller is actually responsible for reading the file. It's not CPU, it's not the Python process. So what is Python process and the CPU resource which is being allotted to that particular Python thread is doing? In this case, the CPU is sitting idle, the Python process is sitting idle, and we are actually letting our Python process and the CPU to sit idle and do nothing. As a solution to this, we have asynchronous programming. So this is a type of programming in which we can leverage the power of concurrency and parallelism and do operations parallel to each other. So in this case, let's suppose we implement a code in such a way that as soon as we come across a function which do not need CPU, we spin up a new process altogether with a different memory, with a different CPU resource allotted to it, and now we have multiple processes which are doing our job. So in this case, as soon as we spin up a new process, our main Python process is not blocked, and we can continue running our main Python process, which now we have parallel Python code running, it will be faster, right? So now that we know that asynchronous programming is great, we can actually scale our code and we can actually run our code very fast using this technique, figuring out where these techniques can be useful is very important. So if you take an example of prime number again, implementing asynchronous programming in that case is I guess not the best solution because in that case we are already very efficiently utilizing our CPU, and by achieving parallel programming in that case, we will only make our code less readable and more complex. But on the other hand, if we implement asynchronous programming in the case of the example when we are reading the file from the disk, that would be a better option. So you can consider wherever our application has to wait for the response from any third party, be it a network call or reading from the disk or reading from the database or any input output of the file, that is where the use cases of asynchronous programming lies. So imagine if we do not implement asynchronous programming in these use cases, what will happen? We will implement this solution synchronously. That is one after the other. In synchronous programming, you will see a small amount of delay in every operation, in every task you are performing, right? And now if you are running at a very high scale, if you are getting millions of hits per second, those small delays will cost a lot to that company, right? That is why asynchronous programming can be used as a solution to do this. Now the question comes how Python can be used to achieve asynchronous programming, right? So in this talk, I am going to discuss four different ways to achieve asynchronous programming, and the four different ways are multi-processing, multi-threading, asyncio, which is a Python library, by using Celery and Redis. And by the end of the talk, I will also quickly compare the results of all the methods I'm going to show you. Before actually diving into the methods I have just showed you to implement asynchronicity, there is a small code snippet which actually runs synchronously. So if you look at the code snippet, what I'm doing is I have a third-party server, which which is this http.bin.org. What it does is if I make a get call to this server, it just simply returns a unique ID for me. And I'm iterating over this and making 50 HTTP calls, so I actually ran this when I was trying to implement this. If we see, you can see a small little delay in every HTTP call, right? So, I already know that these 50 HTTP calls took around 30 to 35 seconds to finish. Imagine if you have to hit 100 API calls. It will take around one minute to 80 seconds to do this task synchronously, one after the other. This delay actually costs a lot to the company. And this is what we are going to solve by by implementing the asynchronous methods. So the first way to achieve asynchronicity is multiprocessing. So how I take multiprocessing is imagine you have a Python script, and in the terminal you can run the script manually as many times as you can in different terminals. So in that case, your Python script will be running independently on different terminals and all those scripts will have their own memory, their own CPU resource. That is handled manually in that case. So how I take multiprocessing is simply having multiple Python processes running parallel to each other. Alternatively, instead of doing this manually in a terminal, we have a library called multiprocess, which provides us a process class to actually create a new process. We have a queue class to actually share the data between different processes. And we have few synchronization primitives such as logs, semaphore, and stuff like that. And what happens under the hood here is the operating system is responsible for allotting the CPU resource to different processes. So the library is not doing anything. the actual operating system is responsible for giving the CPU resource to different processes. So imagine if you have a server with four core CPU, you can run four different processes at a time. So earlier what we were doing was in synchronisation method, we have one process and that process was responsible for handling the tasks. Now we have four different processes in which we can do the context switch and perform the same operation. So I have replicated the same code which I showed you earlier. Again I'm making 100 HTTP calls to the same server using the request method, and this is a small decorator which actually works as a wrapper to the main function and figures out for how much time the actual function was running. So in this I've implemented multiprocessing, and I'm using something called pool. And what pool is basically the encapsulation of all the processes I want to run for this particular script, right? And in this instance, my laptop is 8-core, I am actually running eight different processes at a time to do the same task, to actually hit the third-party API 100 times. And if I run the script, we can see it's much faster than before. Earlier it took us around 70 seconds to make 100 HTTP calls, but if you implement multiprocessing, it is going to take us around only 10 seconds. No, 12 seconds. Something in this range, 10 to 15 seconds. Now the question is can we even make it more fast? So obviously yes, we are engineers. So what was happening earlier was we were having multiple processes, and the processes have threads in it. So what was happening is we have one process, and inside that one process we have one single thread that was actually performing the task for us. Now what we are going to do is implement multithreading. Now one process can have multiple threads in it. Again in this as well, the operating system is responsible for sharing the CPU resource to every process. But the catch here is due to the GIL, which is a global interpreter lock, which actually restricts the Python process to have only one thread running at a time. So even though a process can have multiple threads, only one thread can run at a time. So if we take a look at this image, we have two threads in the first process. The thread zero starts its execution. We come across a task in which the CPU is not utilised, in which actually we have to wait for the response. The execution of thread zero stops. The execution of the next task starts from the next thread. This is how we achieve context switching in different threads, in multiple threads we we have. Also one of the drawbacks of this method is GIL, which restricts us to have only one thread running at a time in one process, but we can still use this library in the use cases where the output is not limited to the global interpreter log, for example, network calls, where we We are getting the response from a third-party server. The same code is being replicated by using multi-threading. Here I'm using a thread pool executer to do the same. Again I'm making 100 HTTP calls to the same server by using the request library. So if you recall, in synchronisation technique, it took around 60 to 70 seconds for making 100 HTTP calls. Then we moved ahead with multiprocessing, which took around 12 seconds. Now we have implemented multithreading. Now we have multiple threads in our multiple processes. Now let's see how fast is this. Simple. So now 100 HTTP calls took only three seconds to finish its execution. Okay. So the third way, and the second last way, which is quite popular in the industry, it's heavily being used, it's called AsyncIO, it's a library, which also does something similar to multithreading, it also does context switching between multiple threads we have. But the catch here is, earlier, the operating system was responsible for sharing the CPU resources to the processes and the threads. But here, the library itself takes care of that as well. And earlier, the context switching between the threads was handled by the library. But this library is flexible enough to give us the control to do the actual context switch. Now we have the power to control when our function is going to stop, when we are going to pause our function, when we are going to resume our function, how we are actually managing the context switching between the threads. Now this library follows the principle of one process, one thread at a time. So in one process, we cannot have multiple threads, we will only have one thread, but the context which the library, which the multithread library does itself, we can manage it by ourselves. So no OS involved. So before diving deep into this library, there are two concepts which we need to take a look into. And those are coroutines and event loops. So what coroutines are, so coroutines are basically Python functions, which are actually using in which we actually use an async keyword in front of that. If we are using an async keyword in front of any Python function, that becomes a coroutine. And the power of coroutine is we can actually pause that coroutine and resume that coroutine whenever we want, right? And in this case, and what event loop is, basically it handles, it takes the responsibility of running all the coroutines in which we have in our event loop. So the same code is being replicated by using this library. Now in this, instead of using a request library, I'm using AIoSTTP library, because a request This library is itself blocking in nature, and to actually solve that problem, we have a new library called AOSGTV. So again, 100 HTTP requests to the same server, and I'm printing the unique ID in the terminal. So let's see how fast is this. So the multi-threading took around three seconds to make 100 HTTP calls. But by using asyncio library, we reduce that time to only 1.5 seconds. So that's the power of asynchronous programming. And the last way I am going to discuss to achieve this is by using a library called Celery and Redis. So Celery is basically a queuing mechanism for Python. So instead of, like, starting the operations of a particular task, instead of executing a particular task at that particular time, what Celery queue does is we send all those tasks to a queue. And we cannot, we do not execute that at a particular time, instead, we send all those tasks to a queue. And that queue is responsible of figuring out when the task is to be executed and where in which server, in which worker, in which node that particular task we have to send. And for that, we use message brokers like or RabbitMQ. So you can consider the architecture like this. We have our backend server. we have a salary queue, and to pass the task from our server to the salary queue, we use a message broker, which Redis, in this case, I'm using. And again, when the tasks took place, when the execution takes place of our salary tasks, we have to save the results of those tasks in a backend system. And again, Redis can be used as a backend system for this technique as well. So, if we take a look at the code, once again, so this is where I have declared the message broker for this particular example, which is the Redis, and again, Redis is being used as a results backend, which is actually where the result of the Celery tasks are being stored. And this is how a Celery task looks like. Again a request, a get request to this particular URL, and by using this decorator which Celery us, we can declare that this particular function is a CeleryTask, and, okay, again, in the main function, I'm iterating for 100 times, again, 100 times this particular CeleryTask, this fetch CeleryTask is being called, and what this delay function does is instead of executing that particular task at that point of time, it pushes the function, it pushes the task to the Celery queue we have maintained. Okay. Again 100 HTTP calls to the same server, done, done in 0.1 seconds. So we have reduced from 70 seconds which took at the time of synchronisation code to 0.1 seconds by using Celery and Redis. So that is how we can scale our applications, very, very low-level way of scaling our applications and handling a lot of requests. And yeah, there can be multiple use cases for which we use asynchronous programming, not only STDB requests, but as I discussed earlier, whenever we are making a read from the disk or writing something to the database or reading from the database or anywhere our application has to wait for the response. So yeah, that's about it.
+
+**Speaker 2** _[20:10]_
+
+Thank you very much for the talk. Updating slider. I don't think I have a, wait. So someone is up. Martin is thanking you a lot for the talk and asking, could you kindly share the code examples and slides?
+
+**Speaker 1** _[20:35]_
+
+Okay, you can find the link here. You can find the slides and the code examples here on my GitHub profile.
+
+**Speaker 2** _[20:42]_
+
+How many threads can you have per CPU? You used 40 for 8 cores.
+
+**Speaker 1** _[20:48]_
+
+Okay, so we can actually define how many thread workers we want, but as we go forward, we can actually what do we say? We can have as many threads as we want, but it depends on the use case and it depends on our execution on how many threads actually we need. So in that particular example, I used 40 threads. For that 40 threads, it comes out that I'm able to make the 100 HTTP calls in 0.1 seconds. But if I've used 80 threads, our underlying operating system, the underlying process, was not able to perform in an efficient way, because it took more time to do the context switch between the threads, and it was more efficient when we have less number of threads, the context, which also takes time. So it depends on the use case, and by head and tail, you can figure out how many threads do you need for your particular use case.
+
+**Speaker 2** _[21:51]_
+
+There was something about the context, but a question about the method, like what method do you suggest for the inter-process communication, especially from the sub-process back to the main process, pipes, mem-map, future results?
+
+**Speaker 1** _[22:06]_
+
+So, I'm a big fan of Celery and Redis, I would definitely recommend Celery and Redis.
+
+**Speaker 2** _[22:14]_
+
+Why is Celery faster than asyncio?
+
+**Speaker 1** _[22:17]_
+
+It's not actually faster, but for this particular example, it's faster. So there can be different use cases in which we can use asyncio, and there are particular different use cases in which we have to use Celery and Redis. So for example, if you are working on any older version of Python, you cannot use asyncio because that's not available for older versions of Python. And suppose if you have a use case in which you have to run the Celery tasks periodically, So if you have a use case in which you have to run any particular task in every five seconds, or you have to run cron jobs at a particular time. So for that use cases, Celery and Redis would be a better option, because I guess AsyncIO does not provide that functionality. But yeah, it depends on the use case, which option you have to consider.
+
+**Speaker 2** _[23:06]_
+
+I really like this question because I am a JavaScript developer, don't judge me. But what impact have you noted on the maintenance effort on code that uses these techniques to run faster?
+
+**Speaker 1** _[23:21]_
+
+So, again, since Celery and Redis is helping us do our tasks very fast, it actually requires more maintenance, it keeps on upgrading, and the maintenance of each software development project depends on the new versions we have, suppose, both AsyncIO library and Celery library have their newer versions, which gives you more functionality and more optimized way to perform your task. You would have to upgrade and maintain your project to keep up the market standard and improve your code. So yeah, it's about how efficient you want your software to run and how much resources you have to maintain your softwares.
+
+**Speaker 2** _[24:12]_
+
+Tricky answer, that one. But which of those four approaches do you prefer on a daily basis?
+
+**Speaker 1** _[24:19]_
+
+It again depends on the use case.
+
+**Speaker 2** _[24:24]_
+
+In your case, like your projects.
+
+**Speaker 1** _[24:28]_
+
+So in my project so far, I have used both asyncio and Celery because it's very hard to maintain multi-processing and multi-threading code because it's very complex to write and very complex to understand as well, it's not readable, and the rest of the two libraries provides great support, they have great documentation as well. So yeah, I prefer both asyncio and Celery, but again, it depends on the use case.
+
+**Speaker 2** _[24:54]_
+
+In order of salary fixed or can a race condition happen?
+
+**Speaker 1** _[25:01]_
+
+Sorry, I didn't get it.
+
+**Speaker 2** _[25:02]_
+
+In the order of salary fixed or can, yeah, I didn't get the question.
+
+**Speaker 1** _[25:02]_
+
+In the other...
+
+**Speaker 2** _[25:08]_
+
+If you can explain or rewrite it. I'll jump to the next one, and that will probably be one of the last ones before we switch rooms. Is multi-threading suitable for large functions, such as one for data processing? No. Okay, then you'll get an old one. Thank you so much. There's a bunch of others if you want to try to take a look.
+
+---
+transcript_status: auto
+---
+transcript_language: en

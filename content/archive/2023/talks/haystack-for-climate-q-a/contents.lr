@@ -1,0 +1,193 @@
+title: Haystack for climate Q/A
+---
+description: How can NLP and Haystack help answer sustainability questions and fight climate change? In this talk we walkthrough our experience using Haystack to build…
+---
+created: 2023-01-04
+---
+code: SVXFP8
+---
+slug: haystack-for-climate-q-a
+---
+speaker_names: Vibha Vikram Rao
+---
+speakers:
+
+
+
+### Vibha Vikram Rao
+
+_About — in the speaker's own words_
+
+Hi,
+I am Vibha Vikram Rao.
+I currently work as a (Senior)ML engineer at Climate Tech Startup --Briink based out of Berlin.
+The reason I got into NLP was with the hope that someday every child would have access to an amazing tool which  would be able to read books and would be able to explain it to the child even if they don't have access to good teachers.
+So I started my NLP journey with text Summarization systems.
+I have a total of around 4 years of experience in Applied NLP.
+---
+abstract:
+
+
+How can NLP and Haystack help answer sustainability questions and fight climate change? In this talk we walkthrough our experience using Haystack to build Question Answering Models for the climate change and sustainability domain. We discuss how we did it, some of the challenges we faced, and what we learnt along the way!
+---
+full_description:
+
+
+Haystack is a framework that enables you to build powerful and production-ready pipelines for different search use cases. You can use the State-of-the-Art NLP models in Haystack to provide unique search experiences and allow your users to query in natural language.  It is built on a modular fashion so that you can combine the best technology from other open-source projects like Transformers, Elasticsearch etc.
+We use the Haystack pipeline to build Question Answering systems to answer domain specific question for climate change and sustainability topics.
+We would like to talk about the challenges we faced, how we do it and how using haystack can in help companies do quicker POCs and eventually take it to production.
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2023-04-19
+---
+start_time: 10:50
+---
+end_time: 11:20
+---
+slot_id:
+---
+track: Natural Language Processing
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 2521
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/SVXFP8.png
+---
+youtube_id: whh3xlPdYks
+---
+video_link: https://www.youtube.com/watch?v=whh3xlPdYks
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT26M37S
+---
+video_thumbnail: https://i.ytimg.com/vi/whh3xlPdYks/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:02]_
+
+Thank you everybody for joining my talk today. So I'm Vibha, I work as a machine learning engineer at Drink. So we are basically a sustainable finance startup and we use technology to help investors and businesses make more environmentally sustainable investments. So a little bit about me, I started my NLP journey around four to five years back and back then there were very few ML frameworks I started with text summarization systems and to make something even very simple you had to deal with a lot of tensors and write a lot of code and there was no unified way of basically doing anything. But now we live in a very different world. We have a lot of great ML frameworks and the way we think about and build our ML application changed significantly and one such ML framework is Haystack, which I'm quite fond of. I will explain why soon. So basically what we're going to talk today is what is the Q&A task? How does a typical Q&A system look like? How do you build such a Q&A system using Haystack to answer questions on a sustainability report? And then, yeah, we'll open it up for Q&A. So what is the extractive Q&A task, right? So it's basically a flavor of question answering. And in today's talk, we would consider extractive question answering over a closed set of documents. Meaning to say that the user asks questions over a closed set of documents. And the answer that you get is from within the document itself. So yeah, this is one of the flavors of Q&A. And there are other flavors of a question answering task as well. Such as you can probably ask questions over the contents of a web page. And generative question answering, et cetera. But we would not be discussing those topics today. But I think that you can, knowing these concepts, you can extrapolate these concepts to the other flavors of the Q&A task as well. So how does a typical question answering system look like, right? So a question answering system basically has two important moving parts. One is the retriever and the other is the reader. So what is the retriever, right? So the retriever is basically it can be an algorithm or it can be a model. And given a question, what it essentially does is that it and of course a set of passages, what it essentially does is that it ranks these passages based on how relevant these passages are to that particular question. So the most relevant passage would get the highest score and would be ranked number one and then followed by the subsequent lesser relevant passages. And then what you do is that you choose the top K, so this top K can be like top 5 or top 10 depending on your use case. And then you take these top K passages and pass it to the next stage which is the reader stage. Now what the reader essentially does is that it basically, so basically given the same question and a passage what the reader essentially does is that it predicts the answer span so for example here if there is a question so what is the company's approach to climate change and you see a paragraph that has been sent by the retriever to the reader and what the reader does is that it predicts the span so in our case probably it's from the 0th character to say the 250th character right so it basically predicts the span and it kind of shows where the exact answer lies in that passage. So this is basically what a typical reader retrieval system would look like. And I think one thing that I think anybody who's building a Q&A system should probably remember is that the retriever is more important than we think. Because as we saw in the previous diagram, the output of the retriever is the input to the reader. So if the paragraph that actually has the correct answer has not been picked up by the retriever, even if you have like the best reader model in the world, you would still not be able to derive, you know, like come to the correct answer. And hence, when something is going wrong in your Q&A system, it's really important that you see, you know, how the reader is performing. And I think a very helpful indicator would be what is the position that the reader is giving to the correct answer, right? So monitoring this would actually help you fix your QA system if something is going wrong. So yeah, there are basically two types of major types of retrievers. One is the term-based retriever and the second is the semantic retriever. So the term-based retriever, the retrieval basically happens based on the term matches between the query and the passage. So for example, if you're looking for environmental impact assessment, then the passages which actually contain these tokens in some way or form would be ranked higher, whereas in the case of semantic retriever, the retrieval happens based on the semantic embeddings of the query and the passage. So even suppose there is no term that matches between the query and the passage, even if If they semantically have a similar meaning, then the passages would still be picked up by the retriever. Some examples of the term-based retriever are TF-IDF and BM-25, and some examples of the semantic retriever are the DPR, which is the dense passage retrieval, and the embedding retrieval. So we just went through what a typical QNA system looks like. how do we build such a system, right? So if you have to build such a system from scratch, like just using plain Python and an elastic search client, et cetera, it's quite a lot of work. And even to just do a very simple POC, it can probably take a few weeks or a few months to even just see initial results. And God forbid if you make even a small mistake, you know, there would be it's just hard to debug and, you know, you can just get erroneous results. So, that doesn't seem like a good way to go about it. So, how do you, what is a better way to handle something like this, right? So, Haystack, right? So, Haystack is an open source framework that makes building NLP systems in general more straightforward. So, Haystack, the way I see it is like, Haystack is basically like a toolbox that has all the tools that you need to build NLP systems. And yeah, you just have to choose the tools wisely. Okay. So let's try to build a simple Q&A system using Haystack. So here we have a sustainability report of a company, which is around 62 pages. And we want to find an answer to a question. So Our question being, what's the company's approach to climate change, right? So this is our question. And how do we go about doing this, right? Okay. So the first thing that you have to do is basically create a document store, right? So the document store is where you store your documents and index your documents, right? So you can use different types. So in our case, we're using the Elasticsearch document store, but Haystack also allows you to use other document stores like Pinecone, Vivid, FAIS, et cetera, et cetera. And then you basically have your Elasticsearch instance running on your local system or on the Elastic Cloud, and you just need to pass the host name, the port where it's running, and the user name and the credentials. And also the index that you want to index on. So you pass all these parameters. And then when you run this, when you basically create an elastic search document store, what essentially happens is that it creates an index for you. So in our case, it's just April 17th, test one. So basically, as you can see, there is nothing that's indexed currently. It's just an empty index that was created for you. The next thing that you have to do is basically you need to index the document to the document store, right? So now we have a PDF document which contains, I mean, yeah, it's basically a PDF document. So you need to first extract the text out of this PDF document. So you can do this using something like PyTesseract or something if you want like better accuracy and like better quality of results, you can use something like Google Doc AI and basically perform an OCR on your PDF and extract all the text out. And once you've extracted all the text from your document, what you essentially need to do is that you need to break this text into smaller chunks. So you can do it using some heuristic like maybe based on the newline character or maybe on a paragraph level or a block level. And basically, now you have all these chunks, right? So the next thing that you have to do is that you create this document object. And then you have, you basically take the text, I mean, you basically need to send the content, right? chunks that you had prepared earlier. So, you basically fill in the content. And then, you also can have, like, these metafields, which are the fields on which you can perform a filtration later. So, your metafields can be something like the document name or the date and the time that the document was created, et cetera. And so, yeah. So, you can basically create these metafields. And so, you would finally end up with, like, a list of documents. Right? And then what you do is that you just have to do a very simple thing. You just have to call the write documents function over your document store. And what this would essentially do for you is it would write all the documents onto your elastic index. So here, as you can see, we had around basically the 62-page PDF was converted into 953 chunks. And this one line basically inserted all of those chunks into our document store, right? So which is pretty nice. And then the next thing that you have to do is create your retrievers, right? So your retriever is basically a layer on top of your document store. So that determines what is the retrieval algorithm that needs to act on your document store. So it can be something as simple as BM25 or something sparse like that, or it can also be a dense retriever. So in our case, we have chosen the embedding retriever. And then you have to specify the document store on which you want the retrieval to happen. And then in our case, we are using the sentence transformer model to actually create these embeddings. And when you call the document store.update embeddings, a lot of things happen under the hood. So, what essentially happens is that for each of the documents that you had previously indexed, they would be passed through the sentence transformer model. And the embedding is obtained. And they are even stored back into the index, into your index. So, in this case, we have, like, a new field called embedding, which is, like, 760, I think in this case, it's around 768 dimensions, so, basically, the embeddings are stored back to your index itself, and this is just done by, like, one single line of code. Okay, so, the next thing that you have to do, which in my view is optional, is create a reader. I mean, it depends on your use case as to what you want to do. But you can create a reader on top of this. So in our case, we are choosing the Roberta, which is fine-tuned on the squad to data set, which is a question answering data set. And yeah, we create a farm reader. And we basically create a reader. And finally, all you have to do is that you have to basically create your pipeline now. So you have your extract. So in our case, we want to create an extractive QA pipeline and just pass it the reader and the retriever, right? So your extractive QA pipeline is ready. It was like just a few lines of code and it's ready. And then the next thing that you do is you basically have to run your pipeline with your query and you can also pass some parameters like the top K retrieval, the top K values for the retriever and the top K values for the reader. In our case, the retriever top K is 100. That means it says pass the 100 most relevant passages to the reader. And the top K value for the reader is 10. So that means pass the top 10 answers in which you have, like, most confidence back to the user. And actually you can also pass filters in this stage like you can filter by a certain date and say that you know I want only documents that have that were inserted in the system after Jan 15th or whatever you know you can specify that date and maybe you can also specify the document from which you want these answers to come from so you can also have these filters and yeah and then you get the answer so in our case the question was what is the company's approach to climate change and our answer is it's methodical so SAF Holland approaches the topic of climate protection methodically the point of departure was to draw up a life cycle assessment etc and yeah so and it also gives you the document from which this content was pulled so the source from where this content was pulled tool. And this is honestly the tip of the iceberg, right? So, there is so much more that you can do using Haystack. You can collect feedback using the Haystack annotation tool. And then you can use the train method of the reader and retriever and fine tune the reader and the retriever. And that's quite straightforward. And then you can also and in the latest releases of Haystack, the concepts of prompt templates and prompt models and agents, and using this you can also leverage the capabilities of GPT 3.5 and GPT 4, and also do multi-hop QA, et cetera. And another thing I feel that it's definitely worth checking out is Langchain. So Langchain, I would say, is very similar to Haystack in a lot of ways. It also acts as a glue to kind of glue a lot of, you know, like, basically, like, glue a lot of components and build a similar system. But I feel both of them have their own pros and cons. For example, Haystack is, I mean, is really good on building question answering systems, whereas Langchain is good at building chatbots. But then more or less, they kind of have the same functionality. So I think it's like if you can try them both and, you know, see which one suits you better. Yeah. And yeah, so I have created a small repo which has an example of everything that we just spoke about. just created a notebook which has all the code about what we just spoke and feel free to give it a try and yeah let me know what you think about it
+
+**Speaker 2** _[17:39]_
+
+Thanks very much. Also perfect on the time, we have a bunch of time for questions. There's two on Slido, of course. I forgot again to mention that we're using Slido to collect the questions also for the remote viewers. So please, if you have any questions, head over there. I think by day three, most of you are aware of how that works. What method do you use to create the document chunks?
+
+**Speaker 1** _[17:59]_
+
+Currently, we use Google Doc AI, so that already has this concept of blocks, and we use that. But of course, depending on your use case, you can also use paragraphs or you can use just new line characters. Yeah, it really depends on your use case, and you can, like, you know, do a bunch of experiments and see what's really giving you good results. And also depends on the type of documents that you're working on. if it's like slack messages or something like that, I think that would be like a totally different way of handling it, but of course if it's a PDF document, I think paragraph level would work pretty well.
+
+**Speaker 2** _[18:41]_
+
+Why did you decide to use Elasticsearch instead of Pinecone when you generated the chunks with Elastic? Which text are you looking for?
+
+**Speaker 1** _[18:49]_
+
+I mean, one thing is that, you know, Elasticsearch is open source. That's one reason. And, I mean, we are kind of probably will have to move to Pinecone because, I mean, Pinecone has, like, a lot more functionality. But for now, I think Elasticsearch is, like, pretty good, and it was good to do trials, and, yeah, it's free and open source.
+
+**Speaker 2** _[19:16]_
+
+How to come up with good hyperparameters for top K in retriever and reader?
+
+**Speaker 1** _[19:24]_
+
+Okay. So I think, I mean, this is a very tricky question, right? Because it depends really on your use case. In my case, what I did was I did a bunch of experiments to come up with what is a good top K value. But ideally, I feel like, you know, if the correct answer is not coming within the top 10 at max from the retriever, I think you need to go with fine-tuning the retriever because if the correct answer is not coming in the top 10, then you'll be sending a lot of data to the reader, and reader is a very computationally intensive step, so you need to make sure as much as possible that you stay in the top 10 at least. I think, yeah, I think, yeah, that would be my answer.
+
+**Speaker 2** _[20:18]_
+
+Is it possible to extract answers that are distributed over different passages?
+
+**Speaker 1** _[20:23]_
+
+Yes, it is, I mean, with whatever I showed you currently, that does not cater to that, but it is definitely possible to do long-form Q&A using Haystack, there are separate modules for that, and it's definitely possible, you can have like your answer being spread out on two, three documents, and you can still do that.
+
+**Speaker 2** _[20:45]_
+
+Why would you say that Langchain is better suited for chatbot and Haystack is better for QA system?
+
+**Speaker 1** _[20:53]_
+
+Okay, so I mean, the reason why I feel that is that because, you know, initially Haystack, it was, I mean, it was meant to kind of find the answer in a Haystack, right? Because like everything, like currently, they're moving towards, you know, like giving support to chatbot systems, like doing multi-hop QA and everything. But initially, when they started off, it was that that was not really their goal. so I personally feel I'm more comfortable using Haystack for Q&A because that's what they were really good at but now they're also trying to move into doing things like multi-hop QA and things like that but Landchain I feel like their main aim was not for question answering it's always been about creating agents having multi-hop QA and things like that so I think it's just that they have grown in a certain vertical and they have grown in a certain vertical so I feel that you know they're good in their own spaces but I think both of them are trying to like do everything so I think yeah they're growing in both like each of them are growing into each other's spaces so I think that's how it's going forward.
+
+**Speaker 2** _[22:05]_
+
+Is there a limit of data which can be sent to the reader?
+
+**Speaker 1** _[22:10]_
+
+I mean, I have not faced, yeah, of course, there is a limit to the data that you can send to the reader, but I have not faced that problem because we send only paragraph chunks, so those are not really long, but yeah, I think that there is, I mean, depending on which model you're using for the reader, I think it may be like 512 tokens or something like that, but yeah, there would be a limit depending on which model you're using for the reader. How long does it take?
+
+**Speaker 2** _[22:41]_
+
+How long takes the chat to answer it? We compute the embedding of the PDF and store them in a vector database. So you avoid to search in the text.
+
+**Speaker 1** _[22:50]_
+
+Yeah, that's exactly what we're doing, that, you know, we would store the embeddings of every passage in the vector store, and finally you're searching only on the embedding space. You're not searching on the text anymore. At least with dense retrievals like the embedding retriever.
+
+**Speaker 2** _[23:14]_
+
+Where is the computation happening to retrieve the results?
+
+**Speaker 1** _[23:18]_
+
+I mean, you can actually, I mean, currently it just happens on a single system, but you can actually separate out the nodes on which these computations are happening. You can use frameworks like Ray and you can actually like split out the compute intensive reader part onto another node and have the retriever on another node that's possible. But yeah, I'm currently not using it, but it's definitely possible.
+
+**Speaker 2** _[24:02]_
+
+Sir that contains or processes this information
+
+**Speaker 1** _[24:07]_
+
+It depends on what kind of image. If it is a graph or if it's something like a table, I think you'll have to have, like, the current, whatever I showed right now would not really do that. You'll have to have abilities to basically process that graph or that table and extract information from that and go ahead. So I think there are some models that do that, especially for tables. I think there are some models that have the ability to extract information from tables. But that's something that we are yet to explore. But at least for tables it does exist, but for graphs and other kinds of images, I'm not very sure. Thank you.
+
+**Speaker 2** _[25:02]_
+
+If not, one final question. Oh, yeah, sure.
+
+**Speaker 1** _[25:05]_
+
+So you said that your company is focused on sustainable finance, right? But have you thought about maybe productionizing whatever you managed to build for, like, other... to sell it to, like, other companies or other completely different contexts, like, I don't know, history or whatever other use cases? You mean, like, using similar models for different use cases? Yeah, but, like, outside of sustainability. Theoretically, these concepts can be used outside sustainability as well, but currently we don't, I mean, because of our business model and everything, we do not, I mean, that's not, that's not on our roadmap, but, and this is, this is a part of the project. There's also a platform where you can actually manually do reporting and everything, and this is going to augment that. So, yeah, this is not yet in production.
+
+**Speaker 2** _[26:11]_
+
+One final question from Slido. Thank you very much for the nice talk. Are your slides going to be published somewhere?
+
+**Speaker 1** _[26:18]_
+
+Yeah, I think so.
+
+**Speaker 2** _[26:20]_
+
+So you can upload them. I think they will be uploaded to the schedule. So if you check the schedule later on pre-talks, that's where they will be. All right, thanks very much again. Please, another warm applause. And enjoy your lunch.
+
+---
+transcript_status: auto
+---
+transcript_language: en

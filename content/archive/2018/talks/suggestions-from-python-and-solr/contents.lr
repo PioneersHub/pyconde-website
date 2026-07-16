@@ -1,0 +1,200 @@
+title: Suggestions from Python and Solr
+---
+description: Trying to guess what a user wants when she's typing something into the search box of our price comparison website is a surprisingly complex endevour. Our…
+---
+created: 2018-06-03
+---
+code: 8DL88C
+---
+slug: suggestions-from-python-and-solr
+---
+speaker_names: Jonathan Oberländer, Patrick Schemitz
+---
+speakers:
+
+
+
+### Jonathan Oberländer
+
+Jonathan started programming at the tender age of 12, after accidentally buying a book about C++. He quickly moved on to other languages (VBScript, AutoIt, PHP, Javascript, Perl, ...), but it wasn't until his Bachelor studies in Computational Linguistics (Saarland University) that he started learning Python, after having to choose between it and a Java course. Since then, he has mostly stayed true to Python, except for the occasional affair with esoteric programming languages. After finishing his Master's in Cognitive Science (Trento) and Computer Science (Prague), he started working as a full-time Python developer at the German price comparison website billiger.de
+
+### Patrick Schemitz
+
+Patrick is a Senior Scientist at solute GmbH. An avid Pythonista since 2003, his main responsibility is the billiger.de search functionality, which he (co-) wrote using first Lucene, later Solr and now SolrCloud. Besides that, he wrote much of the SVM-based offer categorization at billiger.de and has a keen interest in machine learning. Patrick holds a Ph.D. in particle physics from Karlsruhe university.
+---
+abstract:
+
+
+Trying to guess what a user wants when she's typing something into the search box of our price comparison website is a surprisingly complex endevour. Our solution is based on the Solr SuggestComponent, heavily fortified with Python logic.
+---
+full_description:
+
+
+When a user types a query into the search box of our price comparison website, we try to figure out what they search, and provide suggestions as they type along. What product, what brand, from which categories? Solr provides a SuggestComponent that is a good start, but in a lot of situations we need fallback strategies: what should we show to a user searching for just a brand name? Or for a singular offer we can't actually show them? What alternatives can we dig up? And behind all this backfill logic lurks that dreaded question: what amount of irrelevant garbage is worse than the horror vacui of an empty result set?
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track:
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 10
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: basic
+---
+domain_expertise: some
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/8DL88C.png
+---
+youtube_id: Z17JLncewyo
+---
+video_link: https://www.youtube.com/watch?v=Z17JLncewyo
+---
+video_published_at: 2018-11-05
+---
+video_duration_iso: PT30M16S
+---
+video_thumbnail: https://i.ytimg.com/vi/Z17JLncewyo/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+Hi, and welcome to this talk. I'm Patrick, this is Jonathan, and we're going to present to you suggestions from Python and Solr. We wrote an autocompletor for the Billigay price comparison site. Oh, okay, screensaver. So we work at this company here based in Karlsruhe. We have a booth down there. We're an e-commerce company, and today we're talking about the Billiga.de price comparison website. So, the basic problem is this. We have this price comparison website where we got about 60 million offers from several thousand online shops, and we want to allow the users to search in them. We group those 60 million documents into about 1 million products, and in one product there are the offers that pertain to the same article, so the same iPhone X or the same television model, whatever. And then we group products into categories, like all the TV sets and all the cell phones and all the tires and all the fridges and stuff like that that's the basic data types in our index there's more data types coming later in the talk but this is all for now last year's topic was the search in the documents and filtering and browsing and this year's is autocomplete So, what we're talking about is this. This is familiar to everyone. So, you type something into the search box up there, and you get suggestions while you type. And I need you to remember this image, because this will show up during the talk quite often. The results are grouped into two bars. On the left, there's the products, and on the right, there's categories. And as I said, this is pretty standard. Basically, every website that has a search box has this auto-completion. So there ought to be a standard solution, right? And in fact, there is. We went for the solar auto-suggest component. first of all because in the internets some smart people figured out that it is more configurable, more flexible than the Elasticsearch suggests but also and quite importantly because we already use Solar Cloud for the normal search so all the infrastructure is already in place we have monitoring the Nagios checks are in place all the deployment thingies have been worked out and the data feeds are already available, and that is very important. It shortens development time quite significantly. Now, the SolarSuggest component is very flexible indeed. There are like nine different lookup algorithms, and we needed to choose some. And the first thing you do in this situation is, of course you look at the data. What are our users searching for? Now, one glance at these examples will show you that the queries are in fact very diverse. They range from things like searching for a brand name, like LG in this example, to parts of product name, like iPhone. It's actually a product family. Couldn't be more specific. Category queries are quite different thing indeed. It's like this toaster is one of the examples or cell phones in general, TV sets. It's quite different. And then there's weird stuff like UE55 and U8008. Anyone venture a guess what that is? Very good. It's a Samsung TV. Excellent. And another thing that occurred us when we were looking at the data, is that the match position of whatever the user entered within the document is not all that relevant. Like the LG example, this will match at the very beginning of the document of this TV set, whereas the iPhone example will match in the very middle of the document. So the position of the match within the document is not that relevant. so after some experimenting with these lookup algorithms we chose those two the analyzing infix lookup factory it's a factory, it's Java, obviously everything is a factory and the fuzzy lookup factory and the analyzing infix for those who have already some experience with Solar or Lucene analyzing means you have to configure tokenization. You have to split up the input into tokens. So the infix, the beginning, is referring to a token. This is just a fancy way of saying the start of a word. This is very good for precision. However, we might miss some recall and for that we also configure the fuzzy lookup factory which can be given a maximum Levenstein distance which we allow so we can account for typos. But we will prioritize the precise hits over the more recall-oriented fuzzy hits. So we will see this in the code. There is another thing that's a bit peculiar about the suggest component. That is, it's not sorting by any of the usual information retrieval scores like BM25, OKP, or TF-IDF, but it's in fact using a weight field. And for weight field, we chose the click-out relevance. That is basically the number of clicks the document got in the last couple of days, weeks, whatever. This is kind of like an a priori probability of the document being relevant. We chose that as the weight. I'm going to spare you the configuration because it's all XML, and this is PyCon, so let's not pull that thread. But I would like to refer you to the really excellent Solar Reference Guide. This document is actually quite well-maintained and well-written and rather helpful. So now let's delve into the code. In our company, we have a standard, and that is we use Apache and Pyramid for web services. So we built a thin wrapper around the actual code to make it a JSON RPC service. And this is the entry point for the service. The suggest method gets the Pyramid request and the query string. and I'm going to develop this code a bit or we are going to develop this code a bit as we encounter more non-trivial scenarios but this is the start the initial thing so we get from the from the pyramid settings we get the solar Earl and then we call the get solar suggestions function give it pass it the Earl and the query and this will return then return some suggestions and these suggestions are then passed to a second function get relevant suggestions relevant suggestions which will then post process the suggestions. And we should now delve into these two functions. This is the call to the SOLAR suggestors, just SOLAR, so it's HTTP protocol, GET request and you get some JSON response. We set the query to whatever user passed into our function. We request 50 suggestions and we call those in the infix and the fuzzy dictionary they're called here the parameters are called dictionary we do the get request get the Jason and then we fetch the relevant the relevant fields from the result this is a bit arcane you can actually feel kind of like feel that it's trying to speak XML to you but you can force it to speak Jason ish and here you can see what how prioritize the infix over the fuzzy suggestions. And then there's two things we need to do. First of all, we have two suggestors, the fuzzy and the infix, so there might be duplicates. They might both come up with the very same suggestion, so we have to deduplicate, and this is what we do here. We remember what we have already seen, compute a key for every document we try to append, and if we haven't seen it, we append it and remember the key. And the second thing we need to do is, remember that screenshot I showed you, which I asked you to keep in mind, that is, we have these two bars in the search result, the products and the categories, and we have to split here. And this is what we do in this line. We have a result as a dictionary, and for every type, we append every document to each sub-list. And this is iterating over the suggestions, converting it to a format that is more suitable for us, we won't go into that, and appending it according to its type and deduplicating it. And as a finishing point, we truncate it so we don't return too many suggestions. So that's pretty straightforward. A few lines of Python, a bit of configuration. We're done, right?
+
+**Speaker 2** _[10:36]_
+
+Yeah, and then we gave the finished product to our product development department. And they did a more systematic and broader testing of it and found some problems. And we're going to go through some of the problems here and how we approached them. So the first thing they noticed, or one of the first things they noticed, is that it didn't work so well for short queries. So the problem here is if you type three or two or one character, there's really not enough information in what you type to know what you really want. So we get tons of false positives here. I think the first example that they found was when they tried to slowly search for an iPhone, I-P-H, then they found inhalators because it's Levenstein distance of one if you only consider the length of the prefix of it. This was the one reason why this was bad. The other thing was that due to the way we calculate this click-out relevance, categories would always be found and would displace the products because categories essentially get the relevance of all their products combined. And so our solution to this is that we do a normal search for words that start with the input. So when we have a short query, we don't actually call the suggestor component, but we do a normal search in the same index. Filter for products only, and again sort by click on relevance. So this is what the updated suggest function looks like now. We have this check here that if we have a query that's longer than three characters, then we do what we did before, and otherwise we use the getSolderShortSuggestion function. From both we get suggestions and both afterwards we just put them again in the relevant suggestions function. So this is how this looks like. This is a normal SOLAR request to the select endpoint. We do a query of the title and star, so of this prefix really, filter query for products, and sort by the click on relevance. And this is the result. If we type LG, now we actually get LG TVs. This is all great. The only problem is that we now have no categories because we filter only for products, right? So how can we provide category suggestions? Because this is really the worst possible scenario for product development because emptiness is terrible. And so what we can do is we can use the categories associated with the products that we found to enrich our category space there with categories. So what we do is we take the, yeah, as I said, the categories of the LG TV, for example, Fernseher, TV set in German, or the phone there is Handys und Vertrag. And right, you might see the side-by-side fridges. Where do they come from? Well, because you remember that we got 50 results from the solar endpoint, not just six. This is just a truncation at the end. So there are more products considered for these categories than just the ones that are displayed here. And we may even include parent categories. So if we don't have enough categories yet, we walk up our category tree and add. Most mobile phones on our site are in a category called Handies ohne Vertrag, mobile phones without a contract There's another category, mobile phones with a contract And they together are under the category mobile phones So now we have mobile phones without contract and mobile phones Even though no actual mobile phone is in that category
+
+**Speaker 1** _[14:40]_
+
+So now we have an idea what to do when we don't have any products. But what about the other way around? What is if we don't have enough categories? I'm sorry, but what if we don't have enough products? Like, this is already the finished result. What if someone's searching for, like, the word TV set or the word cell phone? It turns out that basically none of the cell phones contains the word cell phone. Like, everybody knows it's a Galaxy and it's an iPhone and whatever, and the term itself is not included. And that's true for quite a lot of categories, TVs as well, and this is the example for that. So no TV contains that word. So what do we do? What we do is, from the suggestions we do have, and that is probably just the category, we're harvesting categories and, while we're at it, also brands. So when we're iterating, this is an extension to the relevant suggestion function. You might notice it's got an additional parameter. Well, it's got an additional parameter. Now, where's my pointer? It doesn't work. It was pointing at myself. That's really useful. There's a new parameter, backfill. And when we iterate over the suggestions and convert it and append it like we used to, we now also examine their category ID and their brand ID. We get this from the suggested document. And we collect them into this list called cat brands. This complicated if is really just deduplication and avoiding empty IDs because not every document has a brand or a category, so we protect against this. So afterwards, we have a collection of category-brand combinations. And if, after we're finished with all the initial suggestions, we don't have enough in the product column, we call backfill. We call the backfill function and give it the harvested cat brands and then iterate over those suggestions, convert them, and append them. And afterwards, we truncate. Now, what does this backfill function look like? It looks surprisingly familiar because it's just another SOLAR request as Jonathan just presented. So we're building a query here with the cat brands. This is just building a filter query. Don't bother about it. And we do form a SOLAR search request query, filter for products, and do the get request to SOLAR, get the JSON, and return the documents. So now we have those backfill responses. But there's a little detail. I'm taking a technical detour here. This function has two parameters. And maybe you remember on the last slide, we called it with only one. And I show you why. And this is the new updated suggest endpoint. In the call to relevant suggestions, we pass it as a backfill function. We use functools partial to already preset this first parameter. If you don't know functools, really check it out. It's fun to use. It's really neat ideas in there. So we have this already pre-filled parameter, and we can now hide the fact that we have to pass this URL from the relevant suggestion function.
+
+**Speaker 2** _[18:35]_
+
+So now we've been backfilling categories and products, so now it's time to step back a bit and to look into what's actually in our index. So we have products. This is the simplest case. This is a product that refers to an article, refers to an iPhone, for example, a black iPhone with 64 gigabytes, and it basically combines multiple shop offers of the same article. The products live in categories, as we said, so all things like products, also the offers, that have a certain type, like toasters or laptops. Then we have filtered categories. These are basically a category page, except that we set a filter on some value, usually on a brand, so we can have brand-filtered categories. We could also filter by other properties, but yeah, we already showed that on a previous slide that we have mobile phones by Apple for example and then we have another weird thing which is called topic page this is because of search engine optimization we have something that's very similar to a filter category also category with filters and possibly a search term attached to it examples TVs with integrated tuners as I said they're very similar and the The difference is that topic pages are manually created, whereas filtered categories are on the fly, automatic. Essentially, you can filter a category on any properties that it has, and this also causes some overlap between them. So we have some topic pages that are essentially exactly the same as filtered categories. Then we come to the real world again. The product design, there's some product design decisions That is that mixing products and categories or product-ish things and category-ish things, like we also consider topic pages and filtered categories to be something like a category. Mixing these is confusing for the user. You don't want to have a category, then a product, then a category, then a product, and so on. But if we saw it by relevance, as I said earlier, that would lead to categories displacing products altogether whenever we find any categories. And the solution is to collect our results in different result buckets. product-ish, that's the left column that you saw all the way in the beginning and category-ish, that's the right column we designed this in such a way that these buckets can be configured by the end user, by the client this is for several reasons A, then we don't have to make changes in our code when product development decides now they want a different grouping of the types also we make this suggestion suggest service available via our syndication API syndication partners to one syndication partner really and we didn't want to be backwards incompatible so we have a default configuration of these buckets that is the same as it was before so this is how this works instead of having empty results we have another parameter here We have buckets in addition to the backfill thing. And buckets is a dictionary that maps document types to buckets. There can be an arbitrary amount of buckets. The bucket names are not important. This is all made up by the client. So category is a category-ish thing. Topic page is a category-ish thing. And products are product-ish things. The real truth is that there's even other things that are also product-ish, but we won't go into that. Then we essentially invert that dictionary by making it a dictionary that goes from category-ish to the list of category and topic page, from product-ish to the list of product. And additionally, we put another key in there, none, with an empty list for reasons that will become apparent in a second. Because now we can change our append suggestion functions. I took out the deduplication here, it's still in there, but essentially what we can do is we can do result of buckets.getOfType.appendOfDocument. The implication of this is that if we should have new document types in the index, and they are not configured by the client in the bucket configuration, .get will return none, and so this will be appended to the none list there. and in the end after we did all the other post-processing steps we just pop the values the none key from the dictionary and throw it away that's all the special cases we have had time for, now it's time for some reflection as with all problems that interface with humans, this is a complicated problem there's not really a correct way in most cases for even manually you couldn't uh given a query say what is the correct thing to show to show now so it's hard to guess the right design direction in this often um but we found that an iterative design process helped so we um whenever there was a new requirement we started simple with some hack that we put somewhere um then we put another hack in there and then we generalize later when we have enough special cases accrued. Usually this was about the third or second, third, fourth hack that we introduced and we refactored this and made it into a more generic solution. This was both with these buckets, with filters, we also had in the beginning special case filters for brands and colors and then later it was generalized. And Python really actively supports this by making it possible to swap out components if they just quack the same. And yeah, this is pretty much all for today from us. Thank you very much for listening. And we're open for questions. Thank you very much for your talk. We now have some time for questions. Are there any questions?
+
+**Speaker 1** _[25:02]_
+
+Thanks for the talk. You made your decision which items to show mainly based on the feedback of product design. So you could also include some additional measurements like conversion rate. So did the customer research it, actually buy it, and then actually optimize this number? Did you do anything like that or did you see any feedback? How good this system performed? implicitly yes explicitly no so yeah we're monitoring the click-through rates but there is no automatic feedback for that so explicitly no but implicitly yes because we sought by click out relevance so every time user clicks on one of the results this will then this will of course get registered and then this will get back into the click out relevance and thus into the scoring. But for the suggester, we have such a mechanism which you're talking about in the actual search. If you check out the YouTube video from last year's PyCon, I explain it there. Thanks. Okay, open it.
+
+**Speaker 2** _[26:22]_
+
+Thanks.
+
+**Speaker 1** _[26:23]_
+
+Um, sir, you're using the
+
+**Speaker 2** _[26:24]_
+
+you're using the click out for your relevancy metric um i'm just wondering is that uh
+
+**Speaker 1** _[26:31]_
+
+generally regarded to be the best metric for
+
+**Speaker 2** _[26:34]_
+
+for this sort of suggestion.
+
+**Speaker 1** _[26:35]_
+
+sort of suggestion problem or...
+
+**Speaker 2** _[26:37]_
+
+And did you actually try...
+
+**Speaker 1** _[26:39]_
+
+like the M2
+
+**Speaker 2** _[26:40]_
+
+like the M25.
+
+**Speaker 1** _[26:41]_
+
+2025, IDFN founded.
+
+**Speaker 2** _[26:43]_
+
+and found that it was better.
+
+**Speaker 1** _[26:48]_
+
+For the backfill, we tried that. For the suggestion itself, there is no BM25. The suggestions won't return that. You have to actually specify a weight field. For the suggestions we did, but the thing is this matches so many documents that neither term frequency is usually one anyway because the products don't contain many duplicate words in general, Johnson & Johnson being an exception to that. But the inverse document frequency has its own drawbacks because this will reflect on the amount of offers that carry the same word. For instance, there is one category, toners for printers, for which we have an incredible amount of offers. So the inverse document frequency is totally arbitrary in this case. So for single words, the IDF isn't really that helpful, especially for partial word matches.
+
+**Speaker 2** _[28:07]_
+
+Okay, thank you. Are there any more questions?
+
+**Speaker 1** _[28:18]_
+
+Have you tried to incorporate any word embeddings or document embeddings in Solr? Or if not, do you know if it's possible?
+
+**Speaker 2** _[28:26]_
+
+it's possible.
+
+**Speaker 1** _[28:32]_
+
+We tried some named entity recognition early on, but we generalized it away.
+
+**Speaker 2** _[28:41]_
+
+I don't think with the with the suggestor components of SOLIR that's possible, no. With a completely handmade solution it would probably be possible, but we're missing the training data, I guess.
+
+**Speaker 1** _[28:53]_
+
+We try to emulate some simple named entity recognition by putting entities like a color in special fields in the index. But really, it added a lot of complexity and didn't give us too much gain.
+
+**Speaker 2** _[29:15]_
+
+There's time for one last small...
+
+**Speaker 1** _[29:16]_
+
+one last smart question. Okay.
+
+**Speaker 2** _[29:20]_
+
+Holy smoke.
+
+**Speaker 1** _[29:22]_
+
+So, my question would be, have you considered multi-armed bandit strategies to optimize? Multi-armed bandits? No, we're not at this stage yet. Right now we're still operating by the, there's something that comes up in product design and they come up with use cases where they don't like the result and then we get back to that. to that isn't it's basically that is one of the areas where we need to improve is more automated automatic quality checks that is something where we are not there yet all right thank you also thank you for showing so much code was nice to see See you at the Fighting Code this conference. I appreciate it.
+
+---
+transcript_status: auto
+---
+transcript_language: en

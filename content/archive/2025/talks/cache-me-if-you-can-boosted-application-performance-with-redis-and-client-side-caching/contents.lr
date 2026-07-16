@@ -1,0 +1,214 @@
+title: Cache me if you can: Boosted application performance with Redis and client-side caching
+---
+description: Did you know Redis can notify your app about server-side data changes? This feature enables client-side tracking and caching in redis-py, helping to…
+---
+created: 2025-04-01
+---
+code: 3FSWJU
+---
+slug: cache-me-if-you-can-boosted-application-performance-with-redis-and-client-side-caching
+---
+speaker_names: David Maier
+---
+speakers:
+
+
+
+### David Maier
+
+_About — in the speaker's own words_
+
+I am a creative Software Engineer and a skilled Consultant with experiences in Software Project Management, for both Product Development and Customer Projects. Furthermore I have a strong Database background by being specialized on NoSQL Database Systems. My experience with Redis spans performance engineering, post-sales consultancy, technical education, and client library and ecosystem integration engineering.
+---
+abstract:
+
+
+Did you know Redis can notify your app about server-side data changes? This feature enables client-side tracking and caching in redis-py, helping to reduce network round-trips and optimize performance. In this talk, we explore how client-side caching works in redis-py and how you can use it to make your applications even faster.
+---
+full_description:
+
+
+Did you know Redis can notify your app about server-side data changes? This feature enables client-side tracking and caching in redis-py, helping to reduce network round-trips and optimize performance. In this talk, we explore how client-side caching works in redis-py and how you can use it to make your applications even faster. The following topics are covered:
+
+- Quick introduction to Redis
+- Redis as a cache
+- What is client-side caching?
+- What's new in redis-py
+---
+room:
+---
+day: Thursday
+---
+slot_date: 2025-04-24
+---
+start_time: 16:15
+---
+end_time: 16:45
+---
+slot_id:
+---
+track: Data Handling & Engineering
+---
+tags:
+---
+submission_type: sponsored
+---
+submission_type_label: Sponsored Talk
+---
+submission_type_id: 5089
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Novice
+---
+supporting_material_url: https://github.com/redis/redis-py
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/3FSWJU.png
+---
+youtube_id: lzxh1ZKVFqU
+---
+video_link: https://www.youtube.com/watch?v=lzxh1ZKVFqU
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/lzxh1ZKVFqU/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+So before I introduce myself, I was reminded to remind you guys that you can get scanned, or you can scan actually your QR code later to win a prize. And if you let yourself scan, then you will get the slides in exchange after the call, right? Well done. That's it. I'm done. Bye. No, just kidding. Let me introduce myself. My name is David and I would call myself a NoSQL geek and database guy. I worked over the years with Relation Database Systems for a company called Ingress. Who knows Ingress? It's an indicator that you're old, by the way. Anyway, then some graph database stuff with a small graph database startup which did something very similar to Neo4j but in the .NET world. then document databases with Couchbase, and I think I've worked with Redis since about eight years now, right? In different functions or so doing some customer stuff. Right now I'm responsible for clients and ecosystems engineering at Redis, which is the reason why I'm talking today about clients at caching, right? Good. Who of you knows Redis? Raise your hand if you know Redis. Oh, that's easy. So who of you knows that Redis can do more than caching. Oh man. Okay, anyway, so before I talk about caching, let me clarify that Redis is in general a data structure store, a memory data structure store, and as a memory data structure store, it has a bunch of use cases. You can do queue management, you can do streaming, you can do time series data management even, but you can also use it for vector similarity search. So Redis nowadays is also a vector database. So if you didn't know, right, you might consider using it as such in the future. Who of you knows what a vector database is? I guess everyone, right? Ah, kind of, okay. So basically a vector is more or less a mathematical vector that you can embed in the database into a vector space, and then you can kind of do vector similarity search, right, by kind of looking for vectors around it. So what you need typically is, you need to have a machine learning model which embeds any of your data, pictures, whatever, right? By calculating your vector, you store the vector in a vector database, and then in the next step, you basically search for vectors that are similar to that vector, whereby the similarity is kind of expressed as the distance within the vector space, right? Simple, I would say, right? And you can use this, for instance, are for doing retrieval augmented generation or for doing semantic caching and so on. But that's not the talk topic. So meaning let's talk about our clients at caching in a second, right? Clients and ecosystems engineering. So our part of the introduction is that I'm part of the clients and ecosystems engineering team. And what we do is basically develop client libraries for Redis. For you guys, for instance, RedisPy. Who of you knows RedisPy? Some of you. I guess most of you use Redis just as part of their normal frameworks, like in Flask caching or whatever. But if you would use Redis Greenfield in Python, then you would use a library like RedisPy. That library is developed by my team. In addition, by the way, also flat, so hey. And then in addition, we are responsible for ecosystem integration work, right? So by ensuring that the frameworks you're using are working nicely with Redis. Okay, Redis is a cache, right? So I guess I can skip here a bit through by not telling you too much what a cache is. But, right, I think most of you know that you use a cache in order to speed up the access, right? so instead of you accessing your relational database system or another primary system what you would do is you would access it from a cache maybe from memory in case of redness and this basically gives you quicker response times or the main reason why we see that people use caches is that the main systems like your relational database system for instance might have some scalability limitations right so it's not that easy to scale it horizontally but but it's easier to scale a cache horizontally. So you put a cache next to it, right? By kind of mitigating your issue, your scalability issue, right? Good. Some caching basics. There are some general patterns in caching, right? So one is write through. Write through means you kind of write first to the cache. And after you wrote to the cache, you would basically kind of synchronously write down to the primary system, right? and you would prefer the read from the cache, depends. Sometimes the data in the cache is invalidated and then you would still read it from the primary system. Then write behind is very similar to write through, just that the write operation happens asynchronously behind the scenes and then there's read through. So you kind of read always through the cache, let's say, right, but basically ensuring that all the data that you access is in the cache. So that's just for your information, right? Actually, if you want to implement those patterns with Redis, you need to do this by yourself. Most of the times Redis is used with those two patterns here, right? There is lookaside. So if you use Redis as a cache right now, then you typically use lookaside, right? You double check, is the data in the cache? If there's a cache miss, it would basically go to the primary system, fetch it from there and then put it into the cache. And the next time you would like to access it, you access it from the cache, right? That's the look-aside pattern. And then there is another pattern that you can use with Redis data integration, which is a dedicated product, which is called CDC. Who of you knows CDC, Change Data Capture? Few. It's quite common. So what you do is basically you write to your primary system, and then you have kind of a transformation pipeline set up that in real time takes the data from your primary system or transforms it into the right format for your cache, and then you read it from there, right, for speeding up some of the accesses. Okay. Now, what is actually important for caching in general is the accuracy of the cache, right? So it's always a bit of trade-off. So performance versus accuracy in a case, or you could also say performance versus consistency see in this context because let's assume you you put data into a cache and you always access it from the cache and never invalidate it in the cache right then you you can always access it fast but you have always outdated data it's also not actually what you would like to do right instead you have to kind of use mechanisms to make sure that your data is from time to time refreshed and one of the mechanisms to use there is expiration so redis has a feature that allows you to set a key in red is everything is a key value pair whereby the value can have a specific data structure you can set a key with an expiration so which means after a specific period of time the data deletes itself and then causes that you need to refetch it from the primary system right kind of makes sense another our kind of mechanism is eviction so as soon as your cache gets full you need to kind of decide how to basically evict data right how to get space for other data which might be more relevant right in your cache and therefore you would use an eviction policy are very common ones are least recently used and least frequently used least recently uses or more more time-based right so the one that was busy data that was not that or not accessed for a period of time is going to be evicted data which was recently accessed is staying right and LFU means basically data that was very often accessed is basically kind of staying in the cache and data that's not that often accessed is evicted right good so far so good right I think we understood caching basics now right but why do we want to use client-side caching then right client-side caching or kind of is a is a way to cache data very close to your client application right so redis most of you know redis is a server solution right you have the remote dictionary server where you kind of cache your data and in order to access this remote dictionary server you have the challenge that you need to have around network roundtrip, right? And this network roundtrip can actually kind of kill your performance to a degree, right? I mean, it's very minimal in some cases. It depends on your network environment, right? But it's visible if you do it millions of operations per second, for instance, right? So meaning sometimes there are reasons why you would like to avoid this network latency for performance and scalability. a good example is let's assume you have a hot key in redis right hot key is something which is accessed very often by you right and maybe because you access this key or very very often right so in proportion more often than other keys let's say right there there's a scalability impact because normally in a in a distributed system you would kind of try to balance the accesses out somehow for performance reasons and scalability reasons right now you could avoid hotkeys by breaking them up to multiple keys and stuff like that sometimes there are use cases where you can't do this right and or clients that caching could potentially help with that because now your application has a copy of this hotkey right your application instance or in its own cache right and the other application instance has the copy in its own cache and so on right so each application instance, accesses basically this key first from its cache by making the cached key and the actual cache less hot. That makes sense? Good. I have a little demo here. I hope I have enough time. That's only two minutes, so let's see. Okay, a little bit about the demo, because I can answer some questions but the demo is constructed in a way that i have a sequential access pattern so i basically just kind of create keys sequentially and access them sequentially sequentially right so no random access for the sake of this demo now are i just used 10 000 keys or i only have a capacity of the local cache the client-side cache of our 10 of 1000 elements so 10 right is on the client side and the payload is not that big and as a network i by intention use the network which gives me some limitations so i uh yeah so reality is we just had easter right i visited my my mother-in-law and i was sitting in her office room with very shitty internet connectivity right and had to kind of connect this uh this demo however right i think it kind of makes a point about the fact that the worse your latency in the network is the more beneficial can be or something like client-side caching right so bear with me a bit especially about the total performance numbers redis is usually able to do something like hundreds of thousands millions of operations per second right even if you don't need it maybe sometimes but our the demo kind of shows you okay so again sequential workload pattern one right for two reads we are taking our we are connecting to Redis with a bunch of connections one for right one for uncached one for cached and now we are basically running the uncached workload and what you can see here is Redis cloud so the Redis cloud UI and the monitoring metrics being visualized there what's happening it usually has a bit of delay right it refreshes every few seconds or whatever but I think the story comes through anyway so what you can easily see here is here in this case with this bad network I kind of pushed with something like 600 reads per second and 300 rights because one right operation to read operations right and I don't use kinds of caching right now and you can see it took but yet maybe in a second you can see that or the traffic should drop then I wait 20 seconds and I wait by intention 20 seconds there in order to make it more visual on on the UI that we changed some setting so now you can see how long it roughly took to complete this workload right so the sequential writes of those 10,000 keys with two reads per key and then again 20 seconds maybe I should have prepared something like a singing act or whatever right to just fill those 20 seconds but okay fine now are now we start the the cached workload right and we're done right because now most of the reads or half of the reads were basically kind of cached and what you can easily see here is that we had half of the or let's say half of the reads that we had before right and we because we used basically the the client-side caching here right we actually kind of uh increased our our rights uh by the by the same amount and hope this makes sense. Okay. So how does it work, right? So Redis has a feature and this feature is called client tracking, right? So client tracking is basically, and we remember I spoke about accuracy of a cache and invalidation and that this is a problem that you can solve via TTL. But here in this case, this client side cache, so the cache that is living within the application, basically, right, is kept up to date automatically by Redis. So whenever you change a key on the server side, Redis is sending a push notification to this client connection by telling this client connection, hey, your key is invalid, let's say, right? And then the client can basically delete this key from the cache by making sure that the cache is more accurate, let's say, right? The way how this works is you need to kind of send a command on the same connection to the server, which is like, hey, let's enable the client tracking. Optionally, you can redirect the invalidation messages from that connection to another connection. That's most importantly necessary if you use RASP2 because RASP2, or the Redis serialization protocol, doesn't support push notifications, but only pops up on dedicated connections. But this is a technical detail that's not that relevant. Then you can filter, you can podcast to all of the client connections, or you can kind of opt in by default. You would basically need to opt out, right? But you can also say, hey, I would like to make sure that before I kind of cache anything or I need to send this client caching, yes. Okay, so where does it live in a client library? So that's more or less the architecture of RedisPy. So if you look at this RedisPy, and usually people think that client libraries are easy, right? And they are, RedisPy is actually one of the more simple ones, I would say, right? There are others like, he's saying no. But if you compare it with something like Lettuce, I'm not sure how many of you are Java guys, Lettuce being an asynchronous client library, right? Doing some reactive stuff and using Netty and stuff like this, it's much more complex, right? Behind the scenes. But in general, you basically have the actual connection, even a TLS or keeping a socket connection being TLS encrypted, then you have some abstraction, serialization, deserialization, then your client library needs to be able to discover the topology changes on the server side. So basically if you have a cluster, you would like to find out if a node kind of moves and would like to inform the client so the client can proactively reconnect and so on, right? There's a lot of stuff that a client library actually does. And what it does in addition is, for instance, client-side caching, right? Or also sometimes token-based authentication. Good. So how we implemented it in RedisPy is more or less like a second layer of look-aside, right? So what we do is we basically say, okay, fine. We read on miss of the remote cache from the primary system, let's say, right? And then we basically kind of put it into the application, put it into Redis as your main cache, right? The next time we would read from the main cache, let's say, so level one, let's say, right? Or it depends how you define this. You would basically retrieve it from Redis and put it into your local cache, right? Because the next time you would like to basically read it from the local cache, right? And then as soon as you read it from your local cache, right, you read it from your local cache until someone changes the data again in Redis, right? So Redis being used as your main cache, maybe. And this kind of pushes an invalidation message up to the application or to the client library precisely. And this client library then is basically saying, okay, fine, because I got an invalidation message, I'm removing this from my local cache, basically, right? Make sense so far? Okay. So it's kind of two layers of look aside, if you want so, right? So we kept it a bit simple in the first iteration. So client-side caching in general has more functionality than we have in Redis Pi right now. The first design is only on Rasp or the design that we did for the client-side caching functionality in RedisPy only uses RESP3, so only push notifications, no redirects or whatever, right? We have a default cache implementation which is just based on ordered dictionaries, right? We only support a number of elements because sometimes it's hard to kind of, let's say, predict the actual memory consumption, right, especially if you have languages that are kind of running in a script runtime or whatever. So we said, okay, fine. Instead of kind of limiting it by memory consumption, we limited by number of items we use least recently used. And the cache key, so the key within the application cache is the command that was executed plus the Redis keys that were kind of involved in this command. And then we share a cache per group of connections. So one connection pool basically has one cache, right? So instead of duplicating the cache across connections of a pool, we basically share one. Kind of makes sense. And the cache is enabled. So there's a whitelist, which you could theoretically overwrite, but right now the whitelist is on all read commands that you can do, right? So whenever you execute as a read command, search command, or whatever, you will basically of cache the data in the local cache, right? Code example, how can you use this? If you want to use it, make sure you have REST 3, so basically the Redis protocol 3 enabled because this comes with push notification support, and then pass a cache configuration. The cache configuration is very simple right now, I mean, theoretically you could implement your own eviction policy or whatever, but the one that we ship is basically the default, and the default is LRU, which leaves it to the maximum size here in this case. I played around with 10,000, right? And then that's it, basically, right? That's the only thing you need to do. You need to instantiate a cache config, basically pass it over to the Redis connection, and then you will basically cache some of the data locally in your client, right? Okay. Maybe call to action for my Side is if you want to test it by yourself, right, then You can open a free cloud account and use Redis pi 5.1.1 or higher, right, which basically Brings this as a feature. And then if you want to test In redis cloud, you can also test it with redis 7.4 or Higher on your local machine if you want, but if you want want to test with redis cloud uh ensure that you have a database that has this api version right 7.4 is the minimum version there okay a little bit about what's happening in the ecosystem beyond client-side caching or so again the library we are working on is called reddispy right and reddispy recently got token-based authentications right now in in beta so if you want to authenticate to redis specifically redis enterprise in this case right or azure cache for redis or azure managed redis you can use token-based authentication with azure entry id or then we have new commands in redis who of you knows hash field expiration never heard about it okay good so i spoke about this kind of expiration of keys and so on before right in the caching basics sometimes if Hash field expiration, I think, makes sense for this as well, but hash field expiration allows you to not expire the entire key, right? So not the entire key has a time to live, but the property within a hash, right, a dictionary that you store in Redis has a time to live, basically, right? Which is in particular useful if you do session management, right? And you would like to kind of have a session that is more or less to a degree persistent, but it gets invalidated by, for instance, expiring a token within the session, right? Something like that. Then we have hybrid vector search. Who of you uses a vector database right now? I also already asked, so I'm not sure if I can tell you what you use, so I kind of don't do it. But in principle, if you want to combine basically Vector Search with some other queries, like hey, please give me everything of this category that is close by or whatever, then this is called a Hybrid Vector Search, and we have a library that's called the Redis Vector Library and Redis VL is basically the one that's used for Vector Search and it supports Hybrid Queries and it supports it even better now. Then there is a new service that we launched, which is as a kind of preview, I would say, right? Which is semantic caching as a service, right? That's maybe interesting for you guys. Semantic caching is not just caching, it's caching plus a vector database, or in a sense, what you do is you would like, in a cache, you fetch the data always by the exact key, right, in a semantic cache, you fetch the data from the cache based on the semantic context, right? So meaning you need to have the vector database first in order to find something which is similar, semantically similar, and as soon as you found it, you can basically fetch the element from the cache, for instance, to save some tokens, right? So if you use an LLM and you don't want to pay too much for tokens, and you know you have already some of the data cached, right, some of the answers cached, you can kind of have similar questions and play out basically the cached data then based on the semantic meaning instead of... And you can use Redis VL and Redis directly for this, but we also have a new service that basically has, provides this already out of the box, right? Okay. And there is a SDK coming up for this. And then vector stuff as well. There's a new data structure in Redis that's called Vectorsets, which allows you to use Redis as a vector database. There are right now two ways to use Redis as a vector database. we can either use our query engine or you can use the VectorZ as a data structure. If you want to use VectorZ as a data structure, you can also try it out with RedisPy right now. And now I am informed that it's only one minute. So any questions?
+
+**Speaker 2** _[26:57]_
+
+yeah thank you so much david i've got a couple of questions in uh okay slide
+
+**Speaker 1** _[27:00]_
+
+Slide up.
+
+**Speaker 2** _[27:01]_
+
+But before that, even though I work with Redis day to day, it's always good to refresh the memory, especially with the different types of caching techniques.
+
+**Speaker 1** _[27:09]_
+
+Refresh your cache.
+
+**Speaker 2** _[27:10]_
+
+refreshing the caching yeah and also it was really brilliant that you used a video demo because you know demos can always go sideways when you do them live okay then I've got a couple of questions
+
+**Speaker 1** _[27:22]_
+
+questions that's the reason not because i'm shy to do live demos yeah so
+
+**Speaker 2** _[27:27]_
+
+so the first question so what's the oh it looks like a controversial question so what's the advantage of using redis over walkie can you elaborate on the open source controversy that happened
+
+**Speaker 1** _[27:39]_
+
+Yeah, MyKey is not as good as Redis. That's it. No, I mean, it's a complicated question, right? So most of you might have heard that Redis changed its license. The license change was something which we did because, yeah, hyperscalers, cloud vendors are using open source software to provide services, right? And Redis was one of the last that actually changed licenses that has, and the license change only has one implication, where you can't provide it as a service, right? And maybe I leave all the other details to your imagination, let's say, right? So you can still use it freely, right? You can still kind of take what we provide. You can take the source code. You can do whatever you want, right? However, you can't provide Redis as a service with our new license, let's say, right? And by the way, that's the same for other vendors as well. There will be Mongo, there will be Confluent, there will be...
+
+**Speaker 2** _[28:39]_
+
+whatever okay not sure looking at the time if we can manage I've got like five more questions so I'll be quick
+
+**Speaker 1** _[28:46]_
+
+So does
+
+**Speaker 2** _[28:47]_
+
+client-side caching work with asynchronous implementation and ready spy sorry
+
+**Speaker 1** _[28:50]_
+
+Right, sorry.
+
+**Speaker 2** _[28:51]_
+
+Does client-side caching work with async implementation in ReadySpy?
+
+**Speaker 1** _[28:56]_
+
+Not yet. We are working on it. There is a second iteration blend where we prioritize the synchronous API first because we believe that, but people you might correct us, we believe that RedisPy is more often used with the synchronous API than with the asynchronous one.
+
+**Speaker 2** _[29:15]_
+
+Thank you. So the next one, does the RedisPy client has any C dependency? And if you can tell if it's compatible with PyScript, Python interpreter compiled to...
+
+**Speaker 1** _[29:27]_
+
+It has an optional dependency to a C library called HiRedis,
+
+**Speaker 2** _[29:27]_
+
+It has an...
+
+**Speaker 1** _[29:32]_
+
+which we use for response parsing. So if you want to speed up response parsing, then you can plug in HiRedis. But it checks if this is there as a dependency. I think there's a wrapper Python library or whatever, right? And if this is not installed as a dependency, then it will not pull it in. Otherwise, it will pull it in. So it's an optional thing for performance reasons. Besides all that, it's pure Python. Okay.
+
+**Speaker 2** _[29:59]_
+
+So how effective is a client-side caching when using a serverless service?
+
+**Speaker 1** _[30:05]_
+
+If you use a serverless service, okay? I mean, client-side caching with serverless is as effective as if you use a server, because the application, your serverless, whatever, at the end needs to use a cache to speed up some access, and this is not different than with others. Yeah.
+
+**Speaker 2** _[30:25]_
+
+Thank you, which semantic similarity metric are you using for a Lancash which is gonna coming soon
+
+**Speaker 1** _[30:33]_
+
+Vector, which metric or which function?
+
+**Speaker 2** _[30:37]_
+
+semantic similarity metric
+
+**Speaker 1** _[30:37]_
+
+Yeah, semantic. semantic similarity metric typically the typically the similarity is given by the model that you are using right so the model is responsible for embedding it and based on the embedding model your accuracy is better or worse and then there are some some functions for finding similar elements like cosine similarity I'm not sure if this answers the question but
+
+**Speaker 2** _[31:01]_
+
+okay and the last question so with the alternatives to Redis appearing after some licensing changes will Redis pie evolved into server agnostic library
+
+**Speaker 1** _[31:13]_
+
+So RedisPy is not planning to be Redis only, right? It can be used with any kind of RASP service or RASP server right now, including Valky or any other thing that is reusing RASP. However, Redis as a company provides end-to-end support for their customers, right? And that's a reality, which means if the server solution diverges, right? And there are two communities now, right? Redis and Valky. So if the SOVA functionality kind of diverges, there's a chance that the client libraries diverge as well, right? I mean, client libraries have a purpose. They have the purpose to make the functionality on the SOVA side very accessible for you, right? And if the SOVA product diverge, then there might be a chance that the client also diverges, right? I hope this answers the question.
+
+**Speaker 2** _[32:03]_
+
+question yes it does so thank you so much for those elaborative answers and please give a round
+
+**Speaker 1** _[32:03]_
+
+Yes.
+
+**Speaker 2** _[32:07]_
+
+of applause
+---
+transcript_status: auto
+---
+transcript_language: en

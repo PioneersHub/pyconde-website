@@ -1,0 +1,288 @@
+title: Keynote - Safe Space or Trap? Creating Software like DuckDB in Academic Institutions
+---
+description: DuckDB is an in-process analytical data management system. DuckDB is free and open source and rather popular. It is one of the fastest growing data system…
+---
+created: 2024-02-09
+---
+code: HKFN8J
+---
+slug: keynote-safe-space-or-trap-creating-software-like-duckdb-in-academic-institutions
+---
+speaker_names: Hannes Mühleisen
+---
+speakers:
+
+
+
+### Hannes Mühleisen
+
+Prof. Dr. Hannes Mühleisen is a creator of the DuckDB database management system and Co-founder and CEO of DuckDB Labs, a consulting company providing services around DuckDB. Hannes is also Professor of Data Engineering at Radboud Universiteit Nijmegen. His main interest is analytical data management systems.
+---
+abstract:
+
+
+DuckDB is an in-process analytical data management system. DuckDB is free and open source and rather popular. It is one of the fastest growing data system to date, especially in the Python ecosystem. DuckDB was created at Centrum Wiskunde & Informatica (CWI) in Amsterdam, not entirely coincidentally the same place Python was created in. Later on, the we founded a commercial company, DuckDB Labs, which now drives development. In my talk, I will discuss DuckDB, its origins, and the unique benefits and challenges of maintaining popular software in an academic setting.
+---
+full_description:
+
+
+DuckDB is an in-process analytical data management system. DuckDB is free and open source and rather popular. It is one of the fastest growing data system to date, especially in the Python ecosystem. DuckDB was created at Centrum Wiskunde & Informatica (CWI) in Amsterdam, not entirely coincidentally the same place Python was created in. Later on, the we founded a commercial company, DuckDB Labs, which now drives development. In my talk, I will discuss DuckDB, its origins, and the unique benefits and challenges of maintaining popular software in an academic setting.
+---
+room:
+---
+day: Tuesday
+---
+slot_date: 2024-04-23
+---
+start_time: 09:15
+---
+end_time: 10:00
+---
+slot_id:
+---
+track: Plenary
+---
+tags:
+---
+submission_type: keynote
+---
+submission_type_label: Keynote
+---
+submission_type_id: 3574
+---
+is_keynote: yes
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: None
+---
+domain_expertise: None
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/HKFN8J.png
+---
+youtube_id: PoHfh6O43uE
+---
+video_link: https://www.youtube.com/watch?v=PoHfh6O43uE
+---
+video_published_at: 2024-10-28
+---
+video_duration_iso: PT47M58S
+---
+video_thumbnail: https://i.ytimg.com/vi/PoHfh6O43uE/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:06]_
+
+Thank you, and good morning, and it's really wonderful to see so many people up at 9 o'clock in the morning. I used to live in Berlin, and I never saw so many people in the morning, so well done you. But maybe it's all the southerners that anyways. But also I have some slight addition to Alexander's story. So when he asked me whether I wanted to do this, I was maybe slightly hungover, and I was like, sure, you know, leave me be, and here I am. So it's sometimes, you know, things come together in a good way. So I'm really happy to be here. I'm not hungover. So, you know, buckle up. And today, I'm really happy that I get to talk about DuckDB. It is my favorite thing to do, obviously, besides working on DuckDB. But as Alexander has mentioned, I'm also going to talk a bit about, you know, what it is like to create software like DuckDB in an academic sort of environment, which is where I have spent the last 20 years of my life in. And, yeah, so I'm just going to talk a bit about a journey. So since it's about a journey, I like to start with a backstory, a bit of backstory. So I'm from Stuttgart originally, and when I was a young child, I learned about this wonderful technology stack. I know it's a bit heretic to say this at the Python conference, but I started out in life as a PHP programmer, which is not cool anymore unless you work for Facebook, I guess. and this stack was great like Linux, okay, you know, Apache back then it only meant the web server and some people say, including me it should have stayed like that and then we had MySQL which now is like also mired in some sort of weird licensing sort of problem and we have PHP again, the language that's less relevant, but I was really excited about this MySQL bit, I was so excited that this was my actual license plate. Some of my first car that I had when I was like 18, you know, like it's and I was from Stuttgart, so that was like really a good coincidence. If I had been from the city starting with P, I don't know which one is that. Potsdam? Not sure. What is P? Potsdam. Maybe it would have been PHP, but hey, there you go. Okay, so at some point in my life, I indeed moved to Amsterdam, which is a beautiful place in case you haven't been. This is actually a picture of the street that we live in. I live on a ship with my family. You can see one of the masts there. And it's really a great sort of experience I can recommend. When I was in Amsterdam, I have like three hats. The first hat is I'm a senior researcher at the Database Architectures Group at the CWI. We'll talk more about that in a second. I am professor of data engineering at Radboud University in Nijmegen, which is a not so well-known but very nice university somewhere in the Netherlands. And I'm also the co-founder and CEO of DuckDB Labs, which is a spin-off company of the CWI, which, as you might be able to tell, concerns itself with DuckDB-related matters. But more on that later. I want to zoom a bit in on the CWI. Who knows about the CWI? There's a couple of people, not very many. So the CWI is a weird place, right? It's a Dutch national research lab for computer science and mathematics, okay? It's a small country. We only have one. It's not like in Germany where you have like 10 of these things and you have, I don't know how many Max Planck Institutes and how many Fraunhofer Institutes and I don't know what. We have one. It's a small country. It used to be called, it started out in life as a research institute for mathematics. And at some point, these pesky computer scientists demanded that they were going to be added to the name. So then it became the Center for mathematics and computer science. And it is actually the place where Python was invented, in case you didn't know that. So if you go into Python 3.12, latest version, praise me, type in copyright, and you look down, you will see that it will say copyright 91 to 95, Stichting Mathematisch Zentrum, which is the old name of the CWI, and it's where, you know, his guidance invented Python. And I want to say I'm in good company with that because my clickers just stopped working, because why not? Ah, there we go. Because this Gito also is a fan of the license plate. So this is Gito's license plate. So I feel like in a good company. But the CWI, as I mentioned, is a weird place. It's like an academic research environment, but you don't actually have to teach, which is a bit weird. this building looks very terrible so I don't know it's like an 80s nightmare but inside there is like these 200 researchers that are basically just pay to think and so I don't think it's an accident that Python came out of this institute because it's like this place where you can just disappear for a couple of years and do weird things and nobody really cares because we have a ton of mathematicians and that's what they do anyway right the CWI is quite proud So this is actually a picture of the room. So this was actually, this was like, I don't know, 20 meters from my office at the CBI, is where now there's a little plaque that says, this is room M353, which is where Python was invented. And you can see this is in the Netherlands because the translation to English is a bit wonky. The Dutch people think they can speak English very well. But anyways, also something I wanted to mention here is that many people also don't know this, that Guido, when he was at the CWI, was actually not part of the research team, but was part of IT. And part of the reason for inventing Python was actually because he was so fed up with batch scripts, maybe that is better known. But basically, as part of the IT department, needed just something that worked. And I think it's really interesting as a sort of, you know, philosophical sort of approach. you have all these researchers that think about programming languages and whatnot, and then you have the IT guy, essentially, going like, this is all very nice, but we need something that works, right? And he goes away. It's really impressive, you know what I mean? It's not this thing that usually happens, and you would think, oh, yeah, but the researchers come up with a new sort of, you know, like creative programming language or so, but no, it was the IT department. Then there was some drama. So as I said, Guido was working at the CWI, and the CWI is this weird place, and the Python project started picking up steam, right? As you know, you're all here, I mean. The institute wasn't so happy with that, because suddenly it turned out that basically half half the IT department was doing Python software development, right? Because that was cool, that was like, I mean, it's great to make something that people like, right? It's very motivating. And it turned out that suddenly half the IT department was basically working as software engineers for Python, half the scientific programmers of the institute were working as software engineers for Python, and the mission of the institute was to do theoretical research. Well, that doesn't really go well together. And that created drama, and if you think back of this copyright thing, it changed back from the Stichting Mathematisch Zentrum to something else, because Guido eventually had to leave with some drama, because the institute just couldn't fit software engineering, Python, like the long-term development, dealing with the growth, dealing with the manpower or pure person power that was required to build this kind of software, inside their sort of theoretical the research framework, and then we're going to come back to that, because that's important. Okay? So, so much for the backstory. Now I can talk a bit about another project that came out of CWI, which is DuckDB. So, I already have heard that many of you have heard of DuckDB. Who is using DuckDB? Can you show me? Okay, that's pretty good. I'll work very hard to try to get that percentage up. So DuckDB is a system, a data management system I will talk a bit in more detail, but it is coming out of this research institute. It's a piece of software. It's a complicated piece of software that we have built there. And it is the fastest growing data management software ever, right? So database systems, they usually take like 20 years or so to mature. Dr. B is only, I don't know, five years old at this point. And it's going pretty wild. And why is it doing that? Well, it's actually because of the burger, right? The problem with research sometimes is that we focus a lot on like the meat of the hamburger. So in data management, it is very popular to spend an enormous amount of time researching like the 1400th join algorithm or something like that, right? It's also very popular to write, you know, papers on query optimization. It's wonderful. You know, you can spend an entire scientific career doing query optimization or join algorithms or, I don't know, down, like, deep down execution engine details. Or write theory papers. Hey, why not? But the problem was that nobody really cared about the end-to-end user experience. Like, what is this actually like to use a database system? And in a sort of shocking sort of departure from normal researcher behavior, we actually went out to talk to people in, like, you know, data analysis, and we found out that they hated databases. And we were like, why? Why do you hate the thing we love? That's weird. And it turns out we had been neglecting the whole burger kind of picture, right? Like, how does this feel to install this thing? How does it feel to, you know, to run this thing? How does it feel to get data in and out of this thing? And so we realized that we needed to sort of do something new. And we needed to look at the whole burger and not just the meat or the, you know, plant-based patty. I don't want to, you know, offend anyone. And that's exactly what we did. We said we'd build a database system end-to-end. Let's see. I have to answer one short question. Why is it called DuckDB? It's called DuckDB because that's me and that's my duck, Wilbur. He was my pet, he lived with me on the boat, and at some point he flew away, and so in honor of Wilbur, the system is named DuckDB. It's also named DuckDB because I think database systems have ridiculous names, like the MySQL guy names them after his children, which is like, okay, a bit strange, but okay. Sometimes they have names like shaving products, like Mega Fast Hyper or whatever. But I think DuckDB is just sweet and people can remember. Yes, I should mention Mark, so DuckDB is a product of mainly a big team at this point with 25 people or so, but it started with Mark, who is here on the left, who was my PhD student at the time, and we'll talk a bit later on how that kind of plays into the development of it in this academic setting, but it wouldn't be here without Mark, and I want to sort of acknowledge that. Okay, a bit about DuckDB. So we use a language, DuckDB speaks a language called SQL, and in case you don't know how to pronounce SQL, I have added these helpful E's there. I'm gonna, this is like, you know, there's like these two camps, and I'm one of those camp. There has been a lot of sort of back and forth about query languages, let's say, in the last 15 years or so, but it's really funny to see how sort of the thing that everybody was called very dead has kind of prevailed it's very strange sometimes how that happens in technology right where we have like 15 years of everybody saying it's so dead it's so dead it's so dead and then it comes back um we didn't really want to like we just decided that we was going to speak sequel because it is a great way of expressing data transformations even if you're not really about it's not really about the language itself it's more about this declarative idea that you to specify what should be done instead of how it should be done. So SQL engine, and actually, in case you didn't notice, but SQL is Turing complete. So it's actually a quite complicated language. People always think it's, you know, oh, you can do select from where, how difficult can it be, but try like lateral joins with correlated subqueries or something like that. It becomes ugly quite quickly. And as I said, it's Turing complete, you can do recursive CTEs and then Turing machine no problem. That's not very different. Like, how is that different? We just talked about the burger and how people want things to be different. The one big aspect of DuckDB is its simplicity. So we went ahead and took lessons from the most commonly used database system out there, which is SQLite, right? Everybody in this very moment has like 20 copies of SQLite running on their phone without realizing it. So why is this so successful, right? They say on their website, the SQLite people, that they have like a trillion active databases and they may be right, which is kind of terrifying, right? And this really comes down to simplicity. And again, it comes also down to the burger because we noticed it's extremely hard to set up sort of traditional database systems. I don't know if you've ever tried to set up, like, a Postgres server or something like that. Like, okay, you know, like, you can, it's like, you have to start a service, and then how does this store its data, and how do I connect, and I have to set up, like, an account, and it's, like, something with sockets and port numbers and firewalls, and it's all not very pretty. DuckDB, on the other hand, says, no, we'll take the lesson from SQLite, and it's just going to be extremely trivial to install. It's just going to be a library instead of a server, right? So it's going to be something that you load into an application, or something else, instead of being the sort of standalone server thing. So it's this in-process architecture where we run wherever you are, okay? So if you're in Python, I know a bit of an assumption, you can run DECDB inside your Python process, okay? So you just go like, bloop, and it starts up, and it doesn't really start up. It's not like it's running, start like a Steam engine or anything like that. It's more like you import it, you can launch it, you can start running queries. This is like a huge departure from sort of traditional architecture, from the two-tier architecture that everybody's using, right? Another aspect of in-process is that another really giant pain point of database engines is kind of going away, which is the data transfer problem, right? Because usually you have like your data sitting, let's say, in Python, and then you need to put it into Postgres, and that's kind of an extremely slow process, and people hate it. So we like hey, why don't we put the database engine inside this Python process so we can do like memory tricks? And I'll talk about that a bit later So they're putting it in the process has two advantages one. It's easier to manage and two you have The data transfer problem becomes much easier the other thing Is the duct to be has zero dependencies so like you can it's just a package we have a zero We have nothing in our requirements dot txt right so if you were to type pip 3.11, because this is broken with 3.12. Install DuckDB. I'm sorry, I couldn't resist. Sometimes what happens in Python is beyond me. And then it will just be like, hey, you know, you want to download this 15 megabytes of stuff, and poof, that's it. Right? This will work on a naked machine. There's no, like, you don't have to sort of start install up to get, you know, I don't know, package XYZ to get it running. Everything is in there. And this is also because we realized that getting it installed was something that people routinely ran into and, yeah, and got frustrated, and we want to make them happy. Remember the burger. Dactype is also really feature-rich in terms of, like, what you expect from databases. You can have, like, transactions. You can read Parquet files out of the box. I think we have the world's best CSV parser. Like, we have one PhD of computer science who has spent his last two years on doing a CSV parser, which is, you know... You would think that's maybe a bit of overkill, but I can guarantee you it is not, and we've written papers about CSV parsing if you care about the details. The result is that DuckDB's CSV parser is really great. Like, there's a ton of other stuff. There's integrations in all kinds of languages. There's, like, lots of stuff. So it's a big project, it's not just a tiny engine. And it's fast. Like, I know everybody says their thing is fast. But what we have done is we took the state-of-the-art in data management research, which we knew because we are academics in data management, right? And we took that to sort of the open source space because actually it turned out that there has been like a growing gap between what people knew was a good idea in research and what people had sort of access to in terms of software. And with DuckDB, we basically took the latest and greatest stuff, bundled it all up in a nice and easy package, and put it out there for people to use. Then you ask, how is it fast? And I've had longer discussions with people, why is it fast? And I can only say it's magic, right? Because, as you know, of course, all sufficiently advanced technology is indistinguishable from magic. So, it is really advanced in terms of the way it runs queries. It has a parallelized vectorized execution engine for those people who care, but it basically means that it can have highly efficient code for single nodes, and then it can parallelize your queries on as many CPUs as you want, and that will look like this. There's one downside of using DuckDB on your laptop, is that you make it a hot lab. People have complained about this, and, okay, small side note here. We have lots of users in warm countries, okay? And DuckDB uses all your cores, right? So that means computers are routinely pushed over their thermal limits when they're already in a warm country by just using DuckDB, and we get these weird bug reports because memory starts going boop. And then we have to tell them, look, can you maybe tell us how hot your computer is right now? It's a weird thing to ask in a bug report, right? It's like, can you maybe tell us how warm your computer is? And people go, what? Yeah, 95 degrees. Yes, that's the problem. But the thing is, parallelization like this you will see in a couple of tools, but it's actually more complicated than this because you need highly efficient single-core code in order to have a big query processing capability because everybody can scale out. If you Spark, it will scale out as well, but it will not be very efficient on a single-core basis. DuckDB is very efficient on a single-core and distributed, so you actually get a lot of data through. DuckDB is free, it's free and open source, MIT licensed, free as in free everything. You can build a company on DuckDB and not give us anything, that's perfectly fine. And it's actually one of the issues I'm going to talk about later. No free lunch. And DuckDB loves Python. So we really, Python is a first class language for DuckDB, like lots of new features come to Python first, like they come to the C++ implementation, and then they come to Python usually. So we can do something cool. Like, for example, let's say you have a Python process, and you have DuckDB running in that Python process because it just told you it can just run in that process, right? Now let's say you have a Pandas data frame sitting in the same process, and now you want to import that into DuckDB. There's actually no need to import this, because we're in the same process. The memory layout of Pandas is weird, but well-known. So we actually implemented scan code that can essentially directly run SQL queries on Pandas DataFrames without any sort of import transformation, whatever step, because we are in the same process. We can just look at the, you know, we should get a pointer and be like, aha, pointer. This looks like a table. And we can also do the other thing, where we can take a query result inductively, say say you're running a giant transformation, and we can take that and turn it into a Pandas data frame very efficiently again, because again, we're sitting in the same process. And that's actually a core strength, I would say, of DuckDB, that you can just do this back and forth between data structures that you want to be shoving into other tools or something like that, while interacting with the database. So you can do all these crazy SQL queries, highly efficient parallelization, blah, blah, with the data structures that you already know. This also works with Arrow, so if you have Arrow stuff sitting around, we have a zero-copy integration with Arrow as well, which basically means that you can read Arrow stuff in memory directly as is, and we can produce query results back into Arrow format without anything crazy. And you would, like this little arrow there, okay, this is Arrow twice in one word. If you look at this little arrow there, you will see this hides a lot of complexity like if you think about your normal architectural diagram, we have like your Python process and your Postgres database, that little line there is actually a huge bottleneck and if you care about this sort of thing, we've written papers about database client protocols, but we don't need any of that because we're in the same process so that's really cool DuckDB adoption, yeah it's been quite popular We have about 2 million downloads per month on Python alone, so that's quite terrifying. We've also accidentally built one of the more popular websites of our country. Like 500,000 unique web visitors a month is quite a lot for the Netherlands. And all this stuff. What is interesting is like the DB engines ranking, so this is like this long-term thing where people compare relational engines and people care way too much about this. But we've made it up to 41 on the relational scale. So now we just have to defeat 40 other database systems. This is also kind of crazy if you look at these curves and how the gradient increases still. It's like, you know, I thought, okay, maybe at some point it has to flatten off, but it hasn't actually done that yet. Also super interesting is if you look at something like Google Trends, you can see that there There was this moment in 2022, and since then, it's just been going up, up, up, up. I actually don't know what happened April 3, 2022. I don't know. People write books about DuckDB now, which is also very strange to me. It's like, you know, you make a piece of software, and people go like, hey, I've written a book about it. Okay. It's like, and finally, the proof of DuckDB's relevance in the real world after months We finally got our wiki page. Obviously, they couldn't have helped to add the passive-aggressive note there. Ten minutes. Okay. And I also just want to mention that there is a company called MotherDuck now, which is a separate company from us, but they are doing DuckDB as a service. So that also happened, and they're doing all sorts of weird things. but now let me talk about the safe space or trap kind of thing so here is the ivory tower the the world of research right um and how how does this like look like if you want to if you want to develop software there well first it can be a very safe space right like you are in an academic environment um lots of the problems of your daily life as a as a sort of software developer are already solved, like you have a desk, it's warm, there's internet, there maybe is a cafeteria downstairs that will serve you food so you don't have to think about it, your people get money from somewhere, you know? It's a really great place to do prototyping, like we did with DuckDB. It wasn't the first thing we built, right? We spent a couple of years going back and forth and making small prototypes, trying them out with people practitioners seeing whether they liked it or not okay and then we could start for real with DuckDB because we knew kind of where we had to be it's also really great if you're an academic environment at least in my experience to have like a small team of people that work with you at least for a short time right because usually academic institutions will like be like sure have a PhD student have a postdoc have like a master student working with you that's limited At a time, yes, but it allows you to slowly build out a team that can work with you on your project, which is really nice. What's also nice about being in academia is that they usually don't care what you do with your source code. It's like, sure, put it on GitHub, no one cares, right? I think if you are an industry, there's much more stringent rules about what you can do with your code and whether that's becoming like a trade secret of the company or not. So that's really nice. And also impact. As a researcher, it's really nice to make software in the safe space of academia and then see people getting excited about it. I'm very honored to be here today, and I don't think you would have invited me if I had just been writing papers about queer optimization. So making software is also a really great way in academia to kind of get a bit more impact to get feedback from the real world, get in touch with practitioners, that kind of thing. However, it can also be a trap. In case you can't tell, I have small children, so I'm hard on the child references here. It can be a trap. It can be really dangerous because making software in academia when your clicker doesn't work is even harder. But it It can, it's a giant career gamble, okay? Because the thing is, oops, that really doesn't work. The thing is that if you're spending, like we spend, I don't know, years and years on developing, day and night on hacking on DuckDB, all right? The people we compete with in the academic sort of space, they don't do that, right? They write a little prototype, they get the paper, they move on to the next paper. But what is the metric that you're going to be compared on as an academic, right? It's probably going to be papers. So if you go like full on on like we're going to do this giant software project like Python, maybe like DuckDB, it is actually a gigantic career gamble because you either get this right and, you know, they invite you to the keynote, or you are actually out of the whole show and you have to do something else, which is not the worst thing, but it is a gamble of your academic career. For the same reason, like, you will also encounter a ton of resistance from things like, you know, your supervisor, the department head, the head of thing, the head of whatever, because they are, at some level, there's going to be a bean counter looking at impact factor or some other nonsense like that. And if you are like me, you know, together with Mark and other people just hiding in a corner making duct tape and writing zero papers for like three years, because it was just like, no, no, no, let's not, like, this is important. You will have to sort of deal with a bit of resistance at some point. Also, funding is an issue. And that comes, like, yes, as I said, it's one of the good things. You kind of have a small team and it's really nice. But getting money into a research organization can be really tricky. We had loads of fun with that because even if people want to give you money for your project, there's usually rules attached to what you can do as a public institution or not. And that also has to do with the team again because as your team is growing, you may want to hire professional software engineers, but then you're in an academic institution, which means that there's a table where your salary is read from, right? for everyone and that is very low if you're just a programmer just um so then you actually have an issue funding your team and it means that people maybe work for you for like personal reasons but it's not really a sort of healthy long-term sort of thing to do thank you another wonderful thing is even though i just said that if you're in in academia usually they don't care about publishing your thing as open source, there's this entirely different question, and I also didn't know about this. Like, open source and intellectual property are different things at the same time, right? You can publish your code as open source on GitHub under the MIT license, everything, but intellectual property is still an entirely different sort of thing that will be usually in your work contract assigned to your employer, the academic institution. Going to be fun later. so if I take all this together and I apply this to what happened to us you can see that we had both safe space trap and then the latest stage that I'm going to talk about in a second, business sort of phases where we started I started there in 2012, Mark joined in 2015 we started Dr. B in 2018 and then money started flowing in people started joining lots of uptick happened in the stars and we couldn't grow the team anymore they couldn't pay the team anymore so we were kind of trapped um so then we had to sort of start our own company and we're kind of reluctant we're kind of reluctant company people right like why do i don't want to deal with this i don't want to think about like buying desks um but there was no other way like we had to they had to basically get out of this and now we have the company for a couple of years now and actually now most of the team has left uh cwi and is now working at a company Actually, all of them. The exodus. Okay, for the last five minutes, I will talk about the company, DuckDB Labs. And as an academic, money is evil. And I will argue it's not only true as an academic. Eric, there is, in my opinion, no ideologically pure way to get money into a company. That is a statement, and by all means, ask me questions if you disagree with that. So there's some way in which you have to compromise. You either have to compromise your time, you have to compromise ownership of your project, you have to compromise control over the project. something you have to compromise with in order to get money into the company. And I will talk about some ways people get money into companies and what I think about them. So first, if you look at this curve again, there's this moment somewhere in 2021 where we got bombarded by VCs, venture capitalists, right? Like, hey, they all have scripts on GitHub that look at the curves of all the projects and I think they just get an email like, hey, go talk to these people. Why is venture capital so interesting? Yeah, I know. Why is venture capital so interesting, interested in open source projects? It is because they have already solved the sort of the product market fit problem, which is one of the first problems like most VC-funded startups run into, which is this, here's some money, go see if you can make something people like. But if you're an open source project with some level of traction, you already solved this for them. So for them, it's like a no-brainer, right? should invest in this project then all we have to do is find out how to make money out of this and then and then you know we have already saved ourselves we have already eliminated a ton of risk the problem with this is that you essentially give up ownership of your project and at some point there's going to be a board that says either we fire you or you change the license and there's just not a lot you can do about it there's a ton of sort of other weird things that can happen. Like maybe the board forces you to bastardize the open source project in favor of a more sort of advanced closed source variant that they have in-house. Maybe they force you to add like pointless cloud services to the thing. But some way, venture capitalists will make you pay. And this makes total sense from their perspective because they need to see like this hyperscaling curve at some point, right? But that's maybe not in your best interest. the other way that you can fund your open source project or your company that you started when you leave your academic thing is donations we tried that and it didn't work and it didn't work not because we didn't get any donations we got tons of donations but there was this, I don't know if you remember there was this slight blip in early 2023 when a bunch of people started firing corona overhead hirings whatever and everybody started stopping with the donations like overnight and that has to do with you're in the wrong cost center if you're relying on your donations. You're in the philanthropy cost center not in the cost of running business cost center at whoever you're working with and you need to be in the cost of running business cost center so they can't like just get rid of you. For the same reason grants are problematic too because if your company relies on like EU grants for example that can go away and then you're in trouble. I want to quickly talk a bit about volunteers. There are a ton of projects, big open source projects, giant open source projects that rely on volunteers. But the problem with volunteers is, of course, that it's very difficult to sort of get a vision of your project sort of executed with volunteers. And usually these people need to eat. So they have to have like day jobs or be employed to work on your project by like Red Hat or something, and then Red Hat controls your project, which maybe is also not what you want. So, and yeah, we just had this giant problem that had to do with volunteers maintaining critical infrastructure. I mean, that's also something where a big project like Python will always find enough people, hopefully, to maintain it, but you also can't just say, hey, we need to do this thing. It's a giant amount of work. Can you do it? Like, I can do that with my employees sometimes. so what I'd like to what we did in DuckTV Labs is bootstrapping which is something, this is this one trick that VCs hate, so they really hate it and it sounds, it's also they refer to it sometimes as a lifestyle business because you're just the business owner for the lifestyle you're not even serious, you're not really going for the hyperscale, bootstrapping is this weird idea where you work for money it's like you provide a service and people give you money it's totally mind blowing so we are using that wonderful method in DuckDB Labs we provide services for example we have support contracts so if you want to get priority on your issue reports you can give us money so if you use DuckDB in production and you want to have help you go talk to me about a support contract and that's a really hard thing to me to say but I had to learn it for the good of the project but really that's a great method so we've been profitable from day one we have 25 people it's all going well it's all going up and to the right it's just not aiming for this 100x growth in 5 years so do consider that I can recommend it it's a great experience to run a company especially if you already have traction in the project from, say, your academic work. Okay. So now I'm 20 seconds before the end of my slot, so I can wrap up. Academia is a great safe space for really early software development. Whether it's Python or DuckDB, it's a great place to kind of try out things, to get some sort of idea of whether the world likes it. You may sacrifice your academic career And the process but I was I was willing to take that gamble Also, just because I like you know having impact and not just papers You will have to get out eventually in that sense that you will have to find some way of avoiding the trap especially as the project gains traction and you Basically need to hire more people need to grow a bit and then it can be very interesting by the way IP questions when you exit fun stuff And, yeah, with that, pip install DuckDB, and I'm happy to take any questions.
+
+**Speaker 2** _[38:48]_
+
+Yeah, thank you. Oh, yeah. I think you liked the keynote. We have like 20 questions. Oh, so.
+
+**Speaker 1** _[38:57]_
+
+Oh, by the way, there's stickers here on the front later.
+
+**Speaker 2** _[38:59]_
+
+Oh, yes, but please stay seated.
+
+**Speaker 1** _[38:59]_
+
+Oh, yes, but please.
+
+**Speaker 2** _[39:01]_
+
+Oh, and thank you for keeping...
+
+**Speaker 1** _[39:01]_
+
+for QV. Stay seated.
+
+**Speaker 2** _[39:02]_
+
+Stay seated for the Q&A. Thank you. Lesson learned. Thank you very much. Sorry. So let's start. I'm going to... Let's go quickly.
+
+**Speaker 1** _[39:10]_
+
+Let's wait 20 questions.
+
+**Speaker 2** _[39:10]_
+
+I'm trying to... To add some. But I think you were staying around for a bit, so you can also ask questions in the hallway or downstairs. Yeah, all right. So the most popular question by Franz is, Polos is probably the best contender of DuckDB. At the moment, what are the main pros, cons of both? When do you recommend using one over the other? Okay, that's probably a rhetorical question.
+
+**Speaker 1** _[39:32]_
+
+or a thought-provoking question. No, this is a great question. And Polos is a wonderful project. Richie is also in the Netherlands, so it's really funny how we're in the same country and we talk sometimes. Yeah, Polos is a data frame library, I would say. So if your interaction style is mainly data frame-like, I would say Polos is a great system. It doesn't concern itself with things like persistence, updates, transactions, changes. It doesn't really do persistence. so I think it solves a different problem and I really think there's loads of space in this world for both projects to be doing really well also both Polars and DuckDB can use Arrow to exchange data and we actually have like some easy wrappers to go back and forth so you can do part of your pipeline in SQL and part of your pipeline in Polars if you prefer I don't it solves a different problem I would say but yes, great project Bye.
+
+**Speaker 2** _[40:29]_
+
+Thank you. Yeah, Richie is a great guy, isn't he? Yeah. So even...
+
+**Speaker 1** _[40:32]_
+
+But they just took VC money, by the way. Interesting move.
+
+**Speaker 2** _[40:34]_
+
+Yeah. So even more popular in the meantime, because people are voting up questions, is DuckTV suitable for web applications? Are there any disadvantages?
+
+**Speaker 1** _[40:46]_
+
+Yes, there's many disadvantages. Web applications is super interesting because, yes, it's very suitable. There's actually something really cool, which is called DuckDB Wasm. So because we have zero dependencies, you can actually run DuckDB in the browser. And people have built this amazing dashboards with DuckDB in the browser where essentially they have like video games sort of frame rates on the interaction with data in the browser because the whole data system, state-of-the-art query engine, runs in your VASM in the browser itself. So you can make really cool things. There's been some cool demos from the University of Washington, that kind of people. So yeah, it's really cool for that.
+
+**Speaker 2** _[41:25]_
+
+Next one, as a database newbie, what are typical use cases for in-memory databases?
+
+**Speaker 1** _[41:31]_
+
+Well, yes, newbies are very welcome. DuckDB is not only in-memory. DuckDB also does persistence, and we do larger-than-memory processing very well, actually, much better than, I think, anyone else out there, and we just wrote a paper about it. Sometimes we write papers. So the typical use case is analytics. So if you want to sort of look at single rows, update single rows, then by all means use Postgres or SQLite or something like that. If you are doing analytics, like you look at a large chunk of your data for aggregations, for joins, for reshaping transformations, then DuckDB is the better choice.
+
+**Speaker 2** _[42:09]_
+
+Is there already a database backend for Django or SQL Alchemy?
+
+**Speaker 1** _[42:12]_
+
+No, we do have a sequel alchemy backend, but I don't think we have done anything with Django
+
+**Speaker 2** _[42:13]_
+
+No.
+
+**Speaker 1** _[42:17]_
+
+But then again lots of things happen inductively land that I don't know anymore. So maybe
+
+**Speaker 2** _[42:24]_
+
+If it runs in the same process, is affected by the global interpreter log, isn't that a performance bottleneck for the database?
+
+**Speaker 1** _[42:33]_
+
+the database? Ah, this is a great question. No, it's not affected by the global interpreter lock, the famous, I call it the Guido interpreter lock, but the, no, because we don't, we actually release the GIL when we start running. So you start your query, and then we release the GIL, and we can run with like 50 threads no problem, and then collect the result, and then grab the lock again for result transformation. So it's not affected.
+
+**Speaker 2** _[43:00]_
+
+If there is no real database server, can multiple applications access the same database?
+
+**Speaker 1** _[43:07]_
+
+Aha, there's no server, indeed.
+
+**Speaker 2** _[43:07]_
+
+Aha!
+
+**Speaker 1** _[43:09]_
+
+So how do you access the same database? You can have multiple read-write sessions within the same process, so you may need some sort of RPC to talk to the database backend that you have to build yourself. You can also do multiple read-only connections from multiple processes to the same database file. Lots of people use that to serve things like dashboards. More questions?
+
+**Speaker 2** _[43:34]_
+
+Yes, tons, tons.
+
+**Speaker 1** _[43:35]_
+
+Yes.
+
+**Speaker 2** _[43:36]_
+
+They keep coming in. I think Lightning Talks is at four or so. So are there plans to improve the Python developer experience when using DuckDB? Especially autocomplete IntelliSense is not working well due to generated code.
+
+**Speaker 1** _[43:53]_
+
+And I'm not aware of this particular issue, but I encourage the person to file an issue because we care about that sort of thing.
+
+**Speaker 2** _[44:00]_
+
+Yes, please, finally.
+
+**Speaker 1** _[44:00]_
+
+Yes, please.
+
+**Speaker 2** _[44:01]_
+
+Thank you. So, DuckDB sure is great for single app use, similar to SQLite usage. How about DB systems and across multiple user and systems? Think Oracle, Postgres, et cetera.
+
+**Speaker 1** _[44:14]_
+
+Yeah, I think I think it's exactly like the simplicity that we've built introductory be with the single Single like single user single node sort of in process use case does make other use cases less interesting That's true. So if you want to use Oracle for your thing by all means it's it's solving a different problem again, right? like it's If you need like the standard two-tier architecture client server stuff, then there's probably other projects out there that are better I'm not saying it can solve everything It's a it's a weird thing for people to say I know
+
+**Speaker 2** _[44:45]_
+
+Next is a non-technical question. What do you think about being really free in what you do without having to apply for grants and everything in academia? Just being in an institute where you are paid for thinking and without pressure paper, a lot of bureaucracy. How important was that?
+
+**Speaker 1** _[45:04]_
+
+How important was that to the development of DuckDB?
+
+**Speaker 2** _[45:06]_
+
+Yes, yeah, so it was also like in your peer groups.
+
+**Speaker 1** _[45:08]_
+
+Yeah, it's actually super interesting because we only started active even I had tenure and mark was done with his PhD papers But still a time in his contract So we only started with working on ducted even we knew they couldn't fire us anymore essentially for this
+
+**Speaker 2** _[45:23]_
+
+Yeah, well, that's...
+
+**Speaker 1** _[45:24]_
+
+So you have to be careful about it, right? Like there is, if there's, it can be a very good space. We really liked it because, yeah, there's not so many expectations. I don't think in a company you could just disappear for a year with, you know, a couple of people and do things, right? That is fine, I think, in most academic environments. So that's why it's a good place to start.
+
+**Speaker 2** _[45:48]_
+
+we're already in the coffee break so we make two more questions and move the rest okay
+
+**Speaker 1** _[45:52]_
+
+the rest. Yeah, I'll be here.
+
+**Speaker 2** _[45:53]_
+
+be here left person yeah so uh what are our upcoming features you're most excited about
+
+**Speaker 1** _[45:59]_
+
+about? Upcoming features? There's actually no upcoming features I'm most excited about. I'm excited about our 1.0 release we're going to do this summer. I know, right? And we've actually paused feature development for a couple of months already, because we need to sort of, we want to make this like the LTE release or so, the 1.0, the first where we can say, okay, this is going to be fine for a couple of years. So we are currently in this kind of crazy bug fixing craze where we run all sorts of crazy fuzzers in order to make the thing bulletproof. That's what I'm excited about, the bulletproofing.
+
+**Speaker 2** _[46:38]_
+
+Last question. For very large amounts of data, do you intend to develop a distributed DuckDB engine, for example, competing with Spark?
+
+**Speaker 1** _[46:47]_
+
+No. Actually, there's a great blog post by Jordan, the founder of MotherDuck. It's called Big Data is Dead. I really suggest you read it because it's really fun. We're not going to distribute it. I think it's against the philosophy of just solving people's data problems efficiently and making people happy. If you're starting to distribute it with Spark, it's like a giant overhead to set up, giant overhead and sort of data transfer, and you can avoid all that single node. You would be really surprised how far you can go with DuckDB on single node. We did an experiment some time ago, like how many Spark nodes, how big does the Spark class have to be to beat DuckDB on single node? And the answer was like 60-something. So you need 60 computers to beat one just because of the overhead of distribution. So I think you can go fairly far with a single node.
+
+**Speaker 2** _[47:35]_
+
+Wonderful. There's probably more than 20 questions.
+
+**Speaker 1** _[47:40]_
+
+I will go to it.
+
+**Speaker 2** _[47:40]_
+
+So please just go to Hannes, ask him, he's around. And thank you so much. I think this was an awesome keynote. Thank you so much.
+
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -1,0 +1,105 @@
+{#
+  Latest Videos
+  ─────────────
+  Surfaces the most recently published past-conference recordings on
+  the front page. Walks current /talks + every /archive/{year}/talks,
+  keeps talks with youtube_id + video_published_at (not do_not_record),
+  sorts by video_published_at descending, renders `count` cards, and
+  emits an ItemList JSON-LD.
+
+  Usage:
+    {% from "macros/latest-videos.html" import render_latest_videos %}
+    {{ render_latest_videos(bag('frontpage/sections/latest_videos')) }}
+
+  Databag schema (frontpage/sections/latest_videos.yaml):
+    display: true
+    section_title: "Latest talks, fresh from the archive"
+    count: 6
+
+  Self-hides when display != true or count is empty/no videos found.
+#}
+
+{% macro render_latest_videos(data, section_label='Latest talks') %}
+
+{% if data and data.display != false and data.count %}
+
+{%- set branding = bag('branding') -%}
+{%- set host = branding['canonical_host'] -%}
+{%- set archive_root = site.get('/archive') -%}
+{%- set editions = (archive_root.children|list) if archive_root else [] -%}
+{%- set cur_year = (bag('pretalx')['events']['current']['year']|string) if bag('pretalx') and bag('pretalx')['events'] and bag('pretalx')['events']['current'] else (site.config.PROJECT.year|string) -%}
+{%- set videos = [] -%}
+
+{# Current edition talks #}
+{%- set current_talks = site.get('/talks') -%}
+{%- if current_talks -%}
+  {%- for t in current_talks.children -%}
+    {%- if t['_model'] != 'redirect' and t.youtube_id and t.video_published_at and not t.do_not_record -%}
+      {%- set _ = videos.append(t) -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{# Archive editions #}
+{%- for ed in editions -%}
+  {%- set talks_node = site.get('/archive/' ~ ed.year ~ '/talks') -%}
+  {%- if talks_node -%}
+    {%- for t in talks_node.children -%}
+      {%- if t['_model'] != 'redirect' and t.youtube_id and t.video_published_at and not t.do_not_record -%}
+        {%- set _ = videos.append(t) -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- set sorted = videos|sort(attribute='video_published_at', reverse=true) -%}
+{%- set ns = namespace(i=0, shown=[]) -%}
+{%- for t in sorted if ns.i < (data.count|int) -%}
+  {%- set _ = ns.shown.append(t) -%}
+  {%- set ns.i = ns.i + 1 -%}
+{%- endfor -%}
+
+{% if ns.shown|length %}
+
+<section class="latest-videos" aria-label="{{ section_label }}">
+  <div class="content">
+    {% if data.section_title %}<h2 class="latest-videos__title">{{ data.section_title }}</h2>{% endif %}
+    <div class="latest-videos__track">
+      {% for t in ns.shown %}
+      {%- set is_archive = t.url_path.startswith('/archive/') -%}
+      {%- set year = (t.url_path.split('/')[2]|string) if is_archive else cur_year -%}
+      {%- set thumb = t.video_thumbnail or ('https://i.ytimg.com/vi/' ~ t.youtube_id ~ '/maxresdefault.jpg') -%}
+      <a href="{{ t|url }}" class="latest-videos__card">
+        <span class="latest-videos__thumb-wrap">
+          <img src="{{ thumb }}" alt="" class="latest-videos__thumb" loading="lazy" decoding="async">
+          <span class="latest-videos__play" aria-hidden="true">&#9654;</span>
+        </span>
+        <span class="latest-videos__info">
+          <span class="latest-videos__name">{{ t.title }}</span>
+          <span class="latest-videos__meta">{{ t.speaker_names }} &middot; {{ year }}</span>
+        </span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "@id": "{{ host }}/#latest-videos",
+  "name": "Latest talks from PyCon DE & PyData",
+  "itemListElement": [
+    {%- for t in ns.shown -%}
+    { "@type": "ListItem", "position": {{ loop.index }}, "url": "{{ host }}{{ t|url }}", "name": {{ t.title|tojson }} }{{ "," if not loop.last }}
+    {%- endfor -%}
+  ]
+}
+</script>
+
+{% endif %}
+
+{% endif %}
+
+{% endmacro %}

@@ -1,0 +1,170 @@
+title: PDFs - When a thousand words are worth more than a picture (or table).
+---
+description: PDF, a must-have in RAG systems, ensures visual fidelity across platforms and devices, at the expense of compromising what would be the core condition for…
+---
+created: 2024-12-13
+---
+code: UVPALT
+---
+slug: pdfs-when-a-thousand-words-are-worth-more-than-a-picture-or-table
+---
+speaker_names: Caio Benatti Moretti
+---
+speakers:
+
+
+
+### Caio Benatti Moretti
+
+Caio holds a PhD in Computer Science and has been working with data and AI both in academia and industry since 2014. Currently working as a DS/MLE Consultant at Xebia Data, he is particularly keen on neural networks in its many forms and applications. His enthusiasm even led him to make a neural network fit inside a business card. With experience designing and taking applications into production, Caio has been recently focusing on how (Generative)AI can augment human productivity.
+---
+abstract:
+
+
+PDF, a must-have in RAG systems, ensures visual fidelity across platforms and devices, at the expense of compromising what would be the core condition for computers to properly process and interpret text: semantics. That means any logical arrangement of text, upon rendering, explodes into dummy visual shards of data that literally portrait the bigger picture for the human eye to perceive, but no longer convey the information computers should grasp. Such a bottleneck already makes proper ingestion of text-only documents a big challenge, let alone when tables or figures come into play, the ultimate nightmare for PDF parsers, not to say developers. The rest you must have already foreseen: a RAG system barfing unreliable knowledge from bad chunks (based on regular PDF parsing), if those ever get to be retrieved from a vector database. In this talk you can gather some vision-driven insights on how to leverage the strengths of PDF and language models towards good chunks to be ingested. Or, in other words, how multimodal models can go beyond trivial reverse engineering by decomposing tables into its building blocks, in plain language, as how those would be explained to another human; or better yet, as how humans would ask questions about such pieces of knowledge. And from such a strategy, we transfer the same rationale to figures. Come along, gather some insights, and get inspired to break down tables and figures from your own PDFs, and to improve retrieval in your RAG systems.
+---
+full_description:
+
+
+PDF, a must-have in RAG systems, ensures visual fidelity across platforms and devices, at the expense of compromising what would be the core condition for computers to properly process and interpret text: semantics. That means any logical arrangement of text, upon rendering, explodes into dummy visual shards of data that literally portrait the bigger picture for the human eye to perceive, but no longer convey the information computers should grasp. Such a bottleneck already makes proper ingestion of text-only documents a big challenge, let alone when tables or figures come into play, the ultimate nightmare for PDF parsers, not to say developers. The rest you must have already foreseen: a RAG system barfing unreliable knowledge from bad chunks (based on regular PDF parsing), if those ever get to be retrieved from a vector database.
+
+In this talk you can gather some vision-driven insights on how to leverage the strengths of PDFs and language models towards good chunks to be ingested in a vector database. Or, in other words, how multimodal models can go beyond trivial reverse engineering by decomposing tables into its building blocks, in plain language, as how those would be explained to another human; or better yet, as how humans would ask questions about such pieces of knowledge. Consequently, it brings robustness to retrieval, the backbone of RAG. And from such a strategy, we can transfer the same rationale to figures.
+
+Get ready to boost your retrieval skills, as we:
+- Analyze the semantical bottlenecks, from the anatomy of a PDF stream, to how parsers traverse it;
+- (Briefly) approach the never-ending debate on the ideal chunk format for ingestion in vector databases;
+- Build some chunks using multimodal models to decompose tables into its building blocks, preserving plain language;
+- Conduct an experiment on measuring quality of retrieval and compare the decomposition strategy against PDF parsers and reverse engineering techniques;
+- And last, but not least, transfer the same rationale to figures.
+
+By then, you'll have enough food for thought to get your hands dirty, clone the repo, and give tweaks to the experiment yourself. Come along, gather some insights, and get inspired to break down tables and figures from your own PDF files, and to improve retrieval in your RAG systems.
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2025-04-23
+---
+start_time: 15:10
+---
+end_time: 15:40
+---
+slot_id:
+---
+track: Generative AI
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/UVPALT.png
+---
+youtube_id: UywLYyNcA8k
+---
+video_link: https://www.youtube.com/watch?v=UywLYyNcA8k
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/UywLYyNcA8k/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+So, yeah, let's talk about when a thousand words are worth more than a picture, or specifically, in this case, tables, when dealing with PDFs in a RAG context. So, before we start, hello. My name is Caio. I come from Brazil, and I've been working with AI and machine learning since 2013. You cannot see the white hair from here. That's good, from there. So I've been working with that in many contexts, from embedding a neural network in a microcontroller. I created a library for Arduinos to run neural networks in the simplest architecture, which has been widely used until today. I also worked with stroke patients during master's and PhD, all the way to today in the industry. I work as a data scientist, also as a machine learning engineer at Xebia as a consultant. So we've been devoting efforts on generative AI-based solutions as one of the many services. So including what the talk today is about, which is more on extracting unstructured data towards preprocessing and make it structured, or even leaving it unstructured just by preprocessing it. Apart from that, I love music, I play the accordion, and I like hiking. So even though the weather is not very good today, I'm open to nice recommendations to hike around here. Alright, so let's start. I'll start in one minute or so, I cannot even call it a review, But I'll just gather some concepts of our RAG, which is still very much alive, then go through some bottlenecks of PDFs. And also, I'm going to define some premises on chunking so we can work on top of that. So then I can deliver some insights on, let's say, how to decompose tables and complex structures from PDFs. And from that, we can see the impact on retrieval. And we can discuss a little bit. And from that, we can see how we can transfer this rationale to images. Okay, without further ado, RAG. So it all starts with a bunch of PDF files that we call a knowledge base, right? So from that, we convert them into plain text. So now we have a jumbo big string we have to deal with. So okay, what do I do with that? I don't know, maybe let's cut into smaller steps. Let's call it chunking, right? And now we have, wow, documents. From those documents, just smaller pieces of string, what do we do with that? We feed them into an embedding model. So now we have abstract representations in an abstract fashion. So now we have, voila, vector space, right? So each piece of text is represented by all those dimensions. They're located somewhere in this space. All right, now we have a vector database. And don't think twice. Just make an interface for a user to barf whatever input it wants to, and just catapult it, the raw form of input, inside this vector space. Wherever it lands, just pick the top K documents, slap them into a prompt together with the user question, feed it to an LLM model, and let it answer the question, and voila, we have RAG. Cool, right? Or, I mean, if hopefully you were annoyed by my condescending tone so far, you must have realized that it's a big no. Or at most, not exactly. And it starts from the big bottleneck in here, from PDFs. So PDF stands for Portable Document Format. And that's a big thing we take for granted. Because we see a same document being displayed, the exact form, across all platforms and operation systems. We take that for granted, but we don't know that that comes at the expense of compromising, say, semantics. So arrangements of text layouts, everything is compromised because all this logical arrangement, text is broken down into dummy shards of visual elements, right? For the human eye, good, we can still read it. That's why we take it for granted, after all. But computers, for computers, this is something awful to read Because continuously, it will make no sense. So let's take this table, for example, coming from a PDF. For the human eye, we even see that in alphabetical order. So our eyes are more inclined to go bro-eyes, so A, B, C. But we could also explore tables in a column-wise fashion, so A, G, H. And let's suppose this table is rendered in a PDF file. And let's give the task to read, to traverse through this table from two different tools in Python. And guess what? They take different paths themselves. And that's for a rendered PDF. So one is going row-wise and the other one is going column-wise. So what is right, what is wrong? And not to mention how the PDF is rendered. So this is a piece of the PDF's stream. So this is what I call a dummy visual element, a dummy shard. What meaning does it have? I don't know, it's just there and it's going to be displayed in the end. I'm going to have visual fidelity. So that's what PDFs are about. But making sense, like semantics, then it's gone. So we even have the way to render the PDF documents to then know how do I even traverse this stream. And even if we change the layout, if we change how things are organized, say in columns, now we don't want to traverse this document, these dummy elements, row-wise. Because otherwise it would be this first column of now, this is the same, an example document. It makes no sense. So now it's a different way to traverse, so column-wise it makes more sense. So you see how absurd the first slides about RAG was, right? So as if that is not complex enough, and then we go to chunking already. But hey, there's a lot to do before chunking. And no matter how many fancy or sometimes useless techniques to break this jumbo big string down to chunks, so by page, by chapter, by paragraph, what is the best way to organize that? I mean, if you have felt some pain when developing RAG applications, You might agree with me that there's no closed formula, right? So allow me to just pin here to define some premises we can work on top of, so then I can deliver some insights based on those. So let's say a chunk, the ideal chunk, must have a complete scope, scope, must be a unit of knowledge, which is as complete and independent as possible. So we have the whole scope of a whole piece of knowledge there. If that's not possible, because complexity varies, then we need to break this knowledge into more pieces. So if that's really necessary in order to have the whole knowledge well organized, we We should link every chunk to the complementary ones, so we can gather all the pieces and build and paint the bigger picture again, so we can have some closed scope again. And then it takes us to the third premise that is something that I already talked about. Complexity varies. Some domains of knowledge are more sophisticated than others and might need some more thorough detailing or descriptive information, whatever. So we have to be in peace that, as complexity varies, so will the chunk size. So let's go back to the bottleneck. But bear with me with those three premises, because we're going to revisit them. So far, we saw that the strength of PDF is its visual fidelity. So we see in here, we see a document, and it's perfect for us. So if that's good for human vision, why don't we take the same vision-driven approach also? I mean, current times allows us to benefit from that with the use of multimodal models. So quick show of hands of who's familiar with the term multimodal model? Oh, OK, good. Okay, another show of hands of who's familiar with large language models. Yes, good so think of a multimodal models as large language models, but they allow different forms of input to be processed in their raw form. What do I mean by that is not only text, but it also accepts images audio and so on. Right to be again to be processed in its raw form so in here we can use text to bleed like to give some instructions but we can also generate an image out of the document to say like based on this image blah blah blah do this to that okay so we can leverage that. And we could, of course, implement some rationale on this prompt engineering part. So I would say that some tables can be complicated even for us. So I myself, when I read a scientific paper or something or an equation or a table, I take side notes. So if I want to revisit it weeks later, it's easy to grasp it again because my side notes are descriptive enough. And I would say this organic rationale is key for the prompts engineering, for the next steps, because we need descriptive knowledge. But, well, this is so basic, so it's not surprising that using multimodal models is not something novel. This is not innovation yet, right? So what I saw people doing, playing around with multimodal models, is like, okay, we take the picture of some complex structure, be it a table, some instructions, and then they retrieve some code that builds exactly the table, right? LaTeX, JSON, HTML, whatever, right? Yeah, this is good. But those reverse engineering-based approaches, they have a common denominator. They're too literal. But hey, don't get me wrong. LLMs are amazing at detecting syntax, markup, delimiters, whatever. LLMs can, if I even answer, let's suppose this table makes sense. If I ask a question and feed this in, it won't surprise me if LLMs manage to answer it correctly because they can't figure out what is syntax, what is content. However, RAG, R is a big pillar in RAG. It's retrieval. So when we think of scalability, we need some sort of vector database to host a very fat knowledge base. We need many documents. so for that we need the similarity so if the users if the user input something very organically by typing by asking as I would ask to any other human this is plain language how will it overlap with this polluted content it overlaps less so we should be less literal in here so let's take this table as an example this This is a table that I picked from the internet, so I'm not biased myself on creating an example. So let's try decomposing it. Let's break it down into more informative, more descriptive building blocks in here. And from that, let's, well, I'm sure you're going to agree with me that the knowledge is in this table, otherwise why would I even consider it? There is some knowledge in here I want to benefit from. And let's say the knowledge resides in the values. The headers, they give format to what 70, 2.4 means. But 70 and 2.4, they are the knowledge. They just need to be shaped. And with that rationale, we can use a prompt like, explain every cell in here. Right? Yeah, focus on what the value, be it a text or a number, is about, considering headers. So give shape based on headers, but describe those. And the rest is just redundant stuff, just so the LLM doesn't get bored over anything. So don't do math. Don't jump into any conclusions. Just stay down to earth, down to whatever is in here and nothing more. And then I plug this to an even obsolete model, and it managed to spit out this. So I'm asking for a redundant bullet point list for every value in here. So this is a very long list. So let's take a look at some of those bullets. So let's see. This is the first one. 150 is the number of students in the university group that answered question Q1A. Now I ask you, what else is there to talk about, about this very 150? Right? Nothing. So it's a closed scope. of the chunks on the ideal premise, it must be as independent as possible. There's nothing else to talk about it. It's boring, but it's a close scope, right? Let's go to something less boring. 73. Look at how the LLM explores around. So 73% of the students in the university group answered positively to question Q1A. It's dancing around. And it takes into account that the header, that this merged cell covers all those three columns and so on. And we can keep going. I mean, 0.9 as the chi-squared value for the comparison between university group and the school group for question Q1A, figure out that there's a comparison, it's a merged cell, and figure it out that it's about statistics because there's chi-squared in here and so on. And we can keep going. also about the comparison this comparison to figure out that this is a p-value so statistically as this comparison is not significant right and so on so it gets the full meaning of every number it exhausts everything that is about those numbers and it and guess what it's descriptive you don't see so this is the very output clean as a whistle right there's no structure there There's just a bullet, that's what you get, of structure. But nothing else. So OK, good. So how is this better than the other ones? So far, we're just following intuition. But then allow me here to show this ad hoc analysis for the lack of a benchmark on evaluating how we decompose tables. So as there's no benchmarks in ad hoc analysis, so someone minimally interested in the contents of a table like this should ask questions like, is there some statistical significance between whatever group? What is the biggest percentage point difference between those two groups in some category? Which questions show the most statistically significant difference, blah, blah, blah? So sounds pretty much down to earth if you're into statistics and if you want to know about this very table, if you want to extract something out of this table, all right? So then I carried out an experiment here, this ad hoc analysis, by comparing those three approaches. So the one that I just showed, by decomposing things, the reverse engineering, which is basically from the image, Not very different from what I'm doing except for it spits out structured output and raw PDF parsing and let's consider here. It must benefit some user. So if I want to know about something in this table. I can ask you say what is this 7 about can you help me out and then your very answer as a human would be something like this. right so and the user will organically ask a question in the same fashion because it's a large language model there's language involved so why wouldn't I be organic myself so here I'm not even in this experiment I'm not even throwing it to the LLM to answer because of course it will Here I'm just measuring how these user inputs overlap, how well those inputs overlap with this form of chunk in here compared to the structured, I even considered it HTML, but it could be JSON, LaTeX, whatever. But compared to the decomposition, which is a bit more clean, to markup or structured code, or even, I mean, my goodness, the raw parsing that we saw in the beginning, how misleading that could be, right? With all this issue on the PDF stream, how it reverses the structure, right? And I'm comparing those using cosine similarity. And we can see that it's not very surprising that raw parsing and reverse engineering, they're virtually tied. I mean, one cancels out the other in some cases in here. But there's only so much it can, there's only so far it can go. And if that's substantial or not, that's up to interpretation. For me, it's not, because I would even discard values and just see what is higher, what is lower, because the embeddings here, I even use embeddings from OpenAI. They're abstract. We don't know how we define those dimensions to even describe everything, right? So, in here, those similarities that could even seem high, but I'm not saying it's high, they are capped, up to my interpretation, to random keywords. So, if you see group, so group overlaps in here, university group, even for parsing, it overlaps with keywords, right? So, whereas decomposition, the clean, let me call it this clean form of chunk, it's as organic as the user's input. So, of course, it's going to overlap more. As we can see in here, in all cases, it overlaps more because it's naturally more organic. Now, these jumps, if they are too much or too little, now that's a conversation for another day, of course. So what next, right? So with this, we can see how we can break down tables and ask more organic questions and have the overlapping with those chunks that are better now. Oh, and before I forget, metadata is always important to retrieve the table in full because in a RAG application, if you want to deliver the answer, let's also provide. Then it's about just UX, UI, or crafting, collection requirements, whatever, whatever the user wants to see. But it's always nice to have metadata to link to the material info, right? Okay, so how do we transfer that? Now we can break down tables, but how do we do... Because the table is inside an image, right? And let's focus in here. I can even promote... I'm promoting a debate that we can do outside, of course, side, of course, because we don't have time. But in here, let's focus on images that can be a lot. Could be tables. Could be technical schematics in engineering or whatever. Could be a diagram. Could be medical imaging. Could be faces, which involves anatomy. Landscapes, right? So let's take this case into account. I think everyone is very similar and very familiar with this kind of image, especially when assembling furniture. So I won't even mention the brand, but you're all familiar with. So then let's hard code this rationale into what we're trying to break down. So this is a process. So what is hard coded here is the process itself. We know there are gonna be tasks in the image. So we should extract, we want to extract steps. We want to extract parts to use in those steps, and we should expect some action. So what do I do with those parts in this step? And then we enforce some schema, and we have a structure in here. And then you might say, oh, but this is reverse engineering somehow. And you're not wrong. The only difference is reverse engineering with tables, they have whatever layout of the table And the structure that is spit out, it varies because every table has a different layout. Here, we have a very well-defined schema, so we know exactly what kind of structure is coming. So through some code of ours, we traverse the expected and fixed and hard-coded structure to glue those parts together. And then we can make fluid text out of this structure. So we can say, oh, in one step, use one of this part to do something. Next step, use one of this part to do something else. And maybe, by the end, add another description, just for the sake of improving retrieval. And with that, we can also transfer to medical imaging. We could provide, so that's when I promote a debate because this is a rabbit hole. So then, how do we even describe, is this a process? Is this about a face, about anatomy, about equipment? There are parts in here, right? 30 seconds, please, and I'll finish. And also schematics, so is it like, what are those parts? Is this a group of electronic components that make some amplifier or that serves a different purpose. And we can ask questions about particular parts. So if you can hard code a decent representation and glue them together, then you can have some fluid text. As long as it overlaps, I think the best takeaway in here, as long as it overlaps with user inputs in whatever form, so user mostly inputs text. So as long as it overlaps with how organic text is, It's about overlapping. You make retrieval more robust, and then prompts will get to reach the prompt in the end. So then you don't have garbage in, garbage out. Just have useful input for probably, and then it's for the LLM to finish the job, a reliable answer. So yeah, if you want to replicate this experiment, I wrote a blog about it. So you can read. There's a GitHub repo. I'm telling you the whole story again. And there is a repo there that you can download, include, replicate the cloned repo, replicate the experiment, add more models. You can even add a pull request and we can chat about it. And there's my LinkedIn over there. Thank you.
+
+**Speaker 2** _[26:14]_
+
+Thanks, Kai-O. We have an amount of questions. The first question is, with the explosion in context length in recent elements, do you still see a case for REC?
+
+**Speaker 1** _[26:29]_
+
+Yes, but then we go back to the chunking. It's not a closed formula, right? We need RAG, but we're not necessarily tied to a vector database, for example. We can have agentic means to retrieve stuff, but it's still retrieval, as in RAG, R, right? So it's all about good architecture, I would say.
+
+**Speaker 2** _[26:59]_
+
+So next one is how would one evaluate table parser distance based matrix like edit distance? Will give different scores on some cosmetic difference like table boundary etc
+
+**Speaker 1** _[27:14]_
+
+How would I evaluate table parser, distance-based metrics, like edit this? Yeah, so far, I introduced an ad hoc analysis, so I think table parser itself depends on what you want in the end. If you want reverse engineering, so that's something very mechanical, too. You can't even render and compare images, but it depends on the output format that you want. If you want fluid text, then we need a benchmark on how to, which is something I didn't have here today.
+
+**Speaker 2** _[27:49]_
+
+How do you detect which parts of a page need special processing through a multimodal model?
+
+**Speaker 1** _[27:56]_
+
+Um...
+
+**Speaker 2** _[27:59]_
+
+How do you
+
+**Speaker 1** _[28:00]_
+
+Yep, that is a very good question.
+
+**Speaker 2** _[28:01]_
+
+If you have those on the page, so what do you do?
+
+**Speaker 1** _[28:03]_
+
+How fast do you do it? A short answer is it's not in the scope of this talk, but it's very much of a necessary step. Because what if I have a page full of text? I don't need a multimodal model to process that. So we could even use another multimodal call, which is a bit expensive. Or it depends on the content on the PDF. You can even use regular expression, for example, on the raw parsing to see when text doesn't make sense. So numbers, if we look at a table in here, sometimes when we render text, maybe this character would be glued in this. And maybe a p is glued to a 1. And that's not how text flows. So maybe some clever regular expression could be a cheap way. I'm not saying it's the most elegant one. But just if we can detect pages where we have those sort of weird text format, those are possible candidates for processing. And you can even use the whole page, because there is text before and after some table that gives you even more context for the LLM to figure out what the table is about. OK.
+
+**Speaker 2** _[29:22]_
+
+Another one is, how do you ensure that the multimodal model is not hallucinating?
+
+**Speaker 1** _[29:29]_
+
+Another very good question.
+
+**Speaker 2** _[29:31]_
+
+Yeah, lots of people with lots of questions here.
+
+**Speaker 1** _[29:33]_
+
+Yeah.
+
+**Speaker 2** _[29:33]_
+
+Yeah.
+
+**Speaker 1** _[29:35]_
+
+So one way to do that, and that's one thing that we even saw on our previous talk, chain of thought. I think we can even spit out not only expect as an output, not only the bullet point list in the case of tables, but also you can ask for an evidence. So give me the very pieces of string or numbers that you brought up, that you saw on the table, as is. So then you force it to be exact, right? So chain of thought is just like, show me what you use, your thought, to jump to this very conclusion, to this very output, right? So LLMs tend to be lazy when you don't ask for evidence. So short answer would be ask for evidence, even if you don't use, but just force it to output So we can link the very answer that you're going to benefit from with the very pieces that the model has found in the image.
+
+**Speaker 2** _[30:41]_
+
+Yeah, we are at the end, so we have to take the schedule. So, yeah, this was a very great talk by you, Caio. Thank you. And so, yeah, please give him an applause.
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -1,0 +1,162 @@
+title: But this is an OAuth, is it not?
+---
+description: OAuth simplified and secured third-party integrations for the end user. But for the developer of the integration, it can still present some friction. This…
+---
+created: 2021-12-17
+---
+code: XKJYW3
+---
+slug: but-this-is-an-oauth-is-it-not
+---
+speaker_names: Sara Jakša
+---
+speakers:
+
+
+
+### Sara Jakša
+
+_About — in the speaker's own words_
+
+I am a software engineer at LeanIX. There I am being a part of the team that oversees more than hundreds direct integrations with different SaaS vendors.
+
+I come from a cognitive science and economics background, so I am more likely to be interested in how to use Python to find out the answer to the social science questions, then going into the nitty picky details about kubernetes or CPython.
+---
+abstract:
+
+
+OAuth simplified and secured third-party integrations for the end user. But for the developer of the integration, it can still present some friction. This talk talks about examples of real-life problems that were encountered by implementing multiple OAuth integrations.
+---
+full_description:
+
+
+OAuth has been presented as a solution to the security issue of giving service username and password for third party integrations and it solved a lot of problems. It replaces the need to explain to people why we need their username and password,  it is easier for them to integrate, and they usually have sensible permissions so we do not need to ask for something we do not need.
+
+But creating these integrations can still bring problems. These can range from technical, team based and business related problems. From figuring out why the refresh flow no longer works after months to explaining to coworkers, why their solutions based on abstract understanding of the OAuth would not work to the dealing with people verifying your OAuth app.
+
+Our teams developed and maintained dozens of OAuth integrations. This talk is going to go through multiple real-world examples, when OAuth can still cause friction for the developer working on it.
+
+This talk does not assume any programming level or any Python knowledge. I will try to make it friendly to the OAuth beginners, but you will probably take more from the talk, if you had already tried to use OAuth before.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: Web
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 1702
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: none
+---
+domain_expertise: none
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/XKJYW3.png
+---
+youtube_id: VIS4ArPJ_Dw
+---
+video_link: https://www.youtube.com/watch?v=VIS4ArPJ_Dw
+---
+video_published_at: 2022-05-06
+---
+video_duration_iso: PT21M58S
+---
+video_thumbnail: https://i.ytimg.com/vi/VIS4ArPJ_Dw/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+I'm Sara and today I'm going to present a talk about OAuth, mostly from the perspective of what first the OAuth is and then all the, as he said, frustrations and problems that I witnessed or actually had them when developing with the different OAuth APIs. So let's first ask a question. Who knows here in the audience what the OAuth is? So let's see. Oh, almost everybody. Good. Does it mean I can skip that part? Some people said I'm not allowed to. Okay, cool. So what the OAuth is, in the distant Internet past, which we had figured out it's not that far away because the last talk said it's like 30 years of the whole history, when the service tried to integrate with the other service, the only way to do that was for the users to give username and password. Now this is potentially problematic because if you don't trust the service and you give them username and password, they can basically do anything that you could do, including deleting your account or, I don't know, messing up with your contacts and so on. OAuth was sort of a way of how we can authenticate users without actually requiring username and password. And I think I can best explain how it works with the anecdote for today. So all of you got these batches, right? So when I came today, what happened was I wasn't let in because my batch was broken, and the strap no longer, you know, attached to it, and apparently that means you're no longer allowed to enter the area. But the old one was still enough to get replaced for a new one and which makes me also realize by the way what written here doesn't matter because i was promoted to a keynote speaker which obviously this is not and what only matters is color so it doesn't actually authenticate you just tries to see okay does the person having this particular badge has the ability to the to i don't know enter the area, or maybe if you have a yellow badge for a volunteer, you can enter more areas, or I saw purple badges that had the day names on it, they could probably only enter on the specific day. So what OOAL does, it's basically the same way. It's an authentication system that allows you to check whatever the person accessing it has permission to access without needing to know who that person is that is accessing. So if you're a developer for an OAuth, you usually have to deal with different components. You usually have an OAuth application when you say, I don't know, I am an application X, and I don't know, and you usually give a description, you know, I'm going to, I don't know, impersonate you to ruin your relationships, or I'm going to, well, I don't know, it is possible to do that, and it's quite polite, you know, if you warn people in advance you're going to do that. Authorisation screen is usually what you then give to a user, so they can decide whether to give you this permission or not, you know, maybe they just want your name, or maybe they want your entire web history, or maybe they just want to post like you, or maybe they want your firstborn. I don't know. I didn't see the last one yet, so I'm still waiting for that one. Then you usually need to have some sort of way to deal with the codes. The most frequent way to deal with the codes is basically when the user gives permission, the server that is authenticating you will send the code to your own server, and then you're going to exchange it for actually a token that you can use, and then, of course, you have the entire thing of why you're doing that that we mentioned before, you know, which you either explain in the description or with the permissions. Okay. Now, let's move on to the possible complications of what can get wrong. So, developer experience. I didn't ask before. Most of you know what an OAuth is. Who ever used an OAuth API? Okay. Who actually develops OAuth API for other people to use? Okay. That second group, I don't belong it, so I'm sorry if I'm going to make it. Mine is strictly from I'm developing with the OAuth API with the dozens of them. So, the first time, you create an app, you give a description, and so on. It's really nice to actually use an account under your control. I got mostly aware of this when we went through approval process once. They asked us, you know, since you are also our customer, create an app only you can use and show us what you're going to show to the other customers using it. I gave that to a team mate and she was like, well, we have one of our customers that gave us user name and password. Can we create an app on their account so other customers can use? I can see one person laughing. Please don't do that. My reaction was also, I don't know how to answer that. Definitely a misunderstanding. And I was mostly like, I didn't meant it like that, and I still hope that, you know, she implicitly learned that this is not a good idea. We also, once, when we were still a smaller company, the developers usually used their own e-mails to create an application that they owe out apps. So what happens when one of our developers left is that we basically lose all the accounts. The password recovery didn't even work for some of them, so that means that another one had to be made, and at one point, our old email stopped working, which repeated the process. We did a lot of OAuth applications for the same services a lot of times because of that. Screw the branding. When we got acquired, they say just redo the the entire process again, which wasn't a great experience. Let's talk about approval process. In approval process, there are a lot of different things. You can go from completely technical, some people give you access to the development environment that just wants to see which endpoints are going to be using, are you using all the permissions, are you requesting something you're not going to be using and so on. These ones are great. You have some of the other ones which go from completely understandable to I don't understand why they're doing that. Completely understandable are usually the ones that want to have the documentation, they want to see clearly what we're going to do, what data we're going to collect and so on. The not understandable part was we once didn't get approved because they wanted us to use a different logo of them, and then they didn't approve us until the catching expires because they didn't know how to refresh the page. So that one was fun. And there's some also really frustrating when they're like, okay, have a privacy link on a privacy page on a home page, and you put a privacy link there, and they're like, there is no privacy link on a home page. Please put a privacy link. And you're like, I don't know, should I put it multiple times? Or I don't know. Sometimes you just give up before going to the end of it. Now, let's go to the connection place when you're asking for permissions. The most annoying thing is when you're a developer with the API, and they ask you why are you requiring these permissions, and an explanation, an API requires this permission to use the same points because we need this data is not enough. For example, I remember Slack has this way that if you want to get a user activity, you need an admin permission, and the customers don't understand why you need an admin permission for this data, and on the end, you just want to say that's not their decision, it's the API's decision, and they don't get that. I also this year had a case when they just decided to completely redo their permissions, and it's like the old one don't work anymore. was also not that great an experience. Okay. The callback links. As I mentioned before, usually you when they connect, they send a code to your server. So in order to tell them which server you're using, you have to use a callback link, and they send the code there. Now some applications allow you to use multiple ones, and some of them allow you to only use one, which can be a problem for some enterprise software when they require different regions, because of a legal requirement, you can't share this. So what happened in our case? We simply made an additional OAuth application. As I said before, we really created a lot of them for some of the services. And we stored them separately for each region until some some other team decide, you know, these are always the same. Let's just rewrite one region to all of the regions, and we lost all of the client IDs and secrets for other regions, which again, we had to create some OAuth applications, and some of them we could save from other places. So, now let's go to coding. The title of this talk is but that is an OAuth, isn't it. So the idea for this talk actually came up from a pull request. I once did an API that really advertised, we're using an OAuth, this is a secure thing, do it. Their authentication was each person should create their own app, and the client ID and client secret should be exchanged for a token. So, of course, since they advertise this is like an OAuth, the The first comment that I get, where is the refresh flow for the tokens? I needed to explain that OAuth does have different flows. You do have a username and password, which will helpfully get not used in OAuth 2.1. You have a client ID and client secret flow. You have implicit flow, which will also get away. Thankfully, you have the grant credentials flow, and each of them are different, so they shouldn't assume they're all the same. And when it comes to the refresh flow token, I think some of the OAuth APIs don't have them. Some of them have them. The best example, the best case was when the documentation said we don't use a refresh flow. The tokens are long lived, but the refresh flow worked. And it still worked. The code has been working for a couple of months like that. Still not entirely sure where the problem was there. Maybe the whole problem of I think in one of the speeches was that developers usually want to do new features and they don't want to deal with maintenance and CI and the documentation. Maybe that's a reason. The documentation was simply lagging behind, but that is a weird one. The other problems that we usually have with the refresh flow is, since we are a pretty junior team, people generally forget the refresh flow can sometimes have a limited amount of time in which you can use them, and if you don't use them in the time that expires, which means that a lot of times we lost all of the credentials for a specific service because nobody corrected a bug in that time. So that also happens. And that's simply because for some reason nobody in my team can even remember which one are OAuths and which one you actually have to be careful about. We also lost a couple of credentials like that because one of my my teammate can remember that some of the code should not be run locally and the result just thrown away. And the last part is the changing of the APIs. A lot of times the APIs would sometimes change without any sort of, you know, information in the change logs or information in the change in the documentation. The best example that I can remember that at one point we had this integration and every credentials were always lost after two weeks. And we could realize that since the refresh token should be, you know, renewed after two weeks we lost them. But even if you made it a call, you never get a new one for some reason. And the only thing that we realised is when about a year later they simply made the entire API go away, so I think that was the first way to basically force people to stop using that. I mean, communication could be technically better. Now it might seem like that I'm complaining a lot about the OAuth. I still think it's one of the best ways for the authentication, especially from the user perspective, because checking the credentials and just clicking on a list on the authorised button, I don't think you can actually beat that from the user experience. But even from the developer experience, just having something standardised is actually a lot better to do. I think I had about three more points, but I missed them, so let's skip that and let's go to the end. Any questions?
+
+**Speaker 2** _[16:34]_
+
+All right, let's take questions from the audience. Oh, there's one on line then So how do you refresh your OAuth token when they are not just not valid? With cron job or request with a token refresh token if the token is not valid anymore
+
+**Speaker 1** _[16:51]_
+
+Yes, let me see. How do you refresh your Awato vendor? Just not valid. So the question is if a refresh token is no longer valid or if the access token is no longer valid, whoever posed that question.
+
+**Speaker 2** _[17:10]_
+
+Yeah, I guess we come to discuss with that person directly over this interface.
+
+**Speaker 1** _[17:16]_
+
+Maybe it's not here.
+
+**Speaker 2** _[17:18]_
+
+So if you're listening to this, can you just post a clarification in response to that?
+
+**Speaker 1** _[17:22]_
+
+to that? I'll just answer both of them. Okay. So how do I refresh refresh tokens? We basically, our entire infrastructure works that each six hours, we try to collect the data. And if we get back that the access token is no longer valid, we then refresh the entire thing. And with the entire refresh flow, you usually get both new access token and new refresh token. And we don't actually have a way, at least practically, we don't actually refresh refresh tokens outside of that. Which is why we can sometimes use it because if there is a bug, we stop trying to, we stop the aggregation for that specific service until we correct the bug. I hope that answered the question.
+
+**Speaker 2** _[18:21]_
+
+Okay, any more audience questions hold your hand up Okay, let me ask a question Five years ago. What's your top three of things you would have liked to have known about? Five years ago. I could talk to your own self
+
+**Speaker 1** _[18:43]_
+
+About five years ago, yes Five years ago was 2017 right Okay, so I don't think I knew about all at the time that was time
+
+**Speaker 2** _[19:00]_
+
+Oh, okay. I mean, to your latest self that doesn't know of our time, has to interact with customers who...
+
+**Speaker 1** _[19:11]_
+
+Oh Basically, I would say myself to look over the complexity, because if you're using API that uses an OAuth for a personal project where you don't really need to deal with long leaf tokens, you don't need a token to be valid for a while or you can refresh it by hand, the OAuth seems to get really complicated because you have to authorize, you have to get, you have to store a refresh token, I would tell myself to look over that because once you do have a system in place, it gets a lot easier. So that's a thing one. That's a thing two, maybe to have a little more compassion about people still using old technologies, OAuth 2, for example, came, the spec was written in 2012, and you still get OAuth 1 applications in the wild, so maybe have a bit more compassion of that, but you're Python people, I'm pretty sure some of you have stories about moving from 2 to 3 Python, so I guess it's a pretty similar situation. It was free, right?
+
+**Speaker 2** _[20:39]_
+
+If you have three. I'll type them into my time machine and then send them back to you by email.
+
+**Speaker 1** _[20:49]_
+
+Don't assume other people do anything connecting with the app is for fun. That actually, that's not OAuth specific, but I remember my team lead who is always surprised when you get a new junior developer and they ask him what's the difference between a get and a post and why do we have different verbs for HTTP calls and so on, and he's always like, well, shouldn't that be, like, obvious to every programmer? And my response is always, well, no, if they never did anything with the internet. You can still, you know, program huge applications that just doesn't connect to the internet. So maybe a little less specific. Did that Does that answer your question?
+
+**Speaker 2** _[21:36]_
+
+I think the audience enjoyed it. Any questions from the audience?
+
+**Speaker 1** _[21:43]_
+
+Then maybe we can get a longer break.
+
+**Speaker 2** _[21:46]_
+
+I mean, if no one objects to that, then let's thank our speaker again for this.
+
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -1,0 +1,204 @@
+title: Unclear Code Hurts
+---
+description: Code may work or not, but it will always tell a story. Computers will not complain about how you write it (except correct syntax), but human readers will.…
+---
+created: 2022-01-09
+---
+code: GSG7KQ
+---
+slug: unclear-code-hurts
+---
+speaker_names: Dario Cannone
+---
+speakers:
+
+
+
+### Dario Cannone
+
+_About — in the speaker's own words_
+
+Data Scientist with academic experience in theoretical physics, converted into a machine learning practitioner passionate about software engineering. I spent the last four years working in an Italian financial and outsourcing company, where I built the data science team from scratch.
+---
+abstract:
+
+
+Code may work or not, but it will always tell a story. Computers will not complain about how you write it (except correct syntax), but human readers will. This talk is about writing clear code and caring for the human beings that will read it. Yourself included.
+---
+full_description:
+
+
+Every part of your code is communicating something to someone else. You communicate explicitly, writing what your program actually does, but also implicitly through all the choices you make or do not make. We all know what it’s like when code does not communicate well: hours spent trying to unveil the mysteries of our colleagues’ work, hours spent trying to remember what you really meant when you wrote yourself those infamous lines. Wading through obscure and apparently magical code is painful. And costly too, because if you can’t understand it, you can’t change it. Poorly written code hurts, and nobody deserves that.
+
+This talk is about clean code. Concepts won’t be abstract or philosophical and will be presented through real-life examples of bad code, written by me or some (informed and consenting) data scientist and developer colleagues. Looking at how those pieces of code can lie and mislead us, you will understand how to better communicate your intentions and write more readable and maintainable code. The talk is very beginner friendly and will be 5% design patterns, 5% PEP8 and 90% caring for your future readers. Yourself included.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: Python & PyData Friends
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 1702
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: some
+---
+domain_expertise: none
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/GSG7KQ.png
+---
+youtube_id: CkeuNL8LAC0
+---
+video_link: https://www.youtube.com/watch?v=CkeuNL8LAC0
+---
+video_published_at: 2022-05-06
+---
+video_duration_iso: PT30M35S
+---
+video_thumbnail: https://i.ytimg.com/vi/CkeuNL8LAC0/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+So hi everybody, thank you for being here. So this talk is about unclear code. One approach to talk about unclear code would be to start from clean code or from its definition that we could find, for example, looking at what influential software engineers or best-selling authors said. For example, one of the most famous books about clean code is Clean Code by Robert Martin, and I suggest you to read it if you haven't already. It's very, very interesting. But we are not going to follow this top-down approach here. After all, I am neither an influential software engineer nor a best-selling author, and I couldn't be able to define in such beautiful ways what clean code is for me. However, I think I know what unclear code looks like, or at least the feeling when you write or read it. We could say it starts as a surprise, as if something magical is happening behind the scenes and you're not getting it. And the more you stare at the code and can't understand it, the more it becomes frustration or distress. And I think I'm not the only one here. Probably many of us had similar feelings, at least once in their life. So I will follow this bottom-up approach to clean code, talking about what unclear code meant for me. So this discussion won't be exhaustive about this very broad topic, but we'll just focus on some aspects that emerge from three stories about three different characters. An astronomer, a data scientist, and a software engineer. They are all taken quite literally from my personal experience. There will be quite a few lines of code that we will try to read and interpret and try to understand if they are good code or bad code through the consequences they had on our characters. I hope you will be able to relate to them in some way and hopefully by the end of the talk you will have more ideas about how to write cleaner code and communicate better your intentions. My name is Dario Cannone and I write Python code since my PhD in physics. The first story comes from that time, then I worked a couple of years in consultancy while in the last four years I've worked for an Italian company that is leader in the market of credit related outsourcing services like for banks and for entrances where I was the first senior hire of the newly created machine learning team and one of my goals was to build the team itself besides laying the foundation of the initial machine learning code base and infrastructure. second and third stories come from that period. So let's start with the first one. So imagine you are an early career researcher or a PhD student in astronomy. You're working with the photometry of variable stars, that is you are studying how the light of this particular kind of stars evolves in time and one of your goals at the moment is to make complicated plots like this one That show how this light is somewhat this variability is somewhat predictable in time. There's patterns So but before you can even try to make one of these plots You need to understand better your data because you don't know it very well you have some visit with observation from some stars and You just want now to be able to print some summer information about this data set so you talk with this colleague of yours and And she tells you that she has a function written in Python that can help to do this dirty job for you. And so she gives you this print info function. You use it on your data set, and this is the output you have on your terminal. Quite easy to interpret. The table with, on different rows you have different stars, and every column is a different quantity measured on that star. But there's something that's not really clear. There are underscores here and there. They may be missing values, but you're not sure. And there's a bottom row with integer numbers that you weren't expecting. So the only thing you can do now is to take a look at the code and try to understand what's going on. So you open the file. And, wow, okay. it isn't supposed to be hard science but written in this way is quite impossible to read like there is a weird use of spacing and indentation and multiple lines collapse to single ones with semicolons and lines that are long up to 300 characters so yeah there's no point in trying to do something here you are forced to rewrite it so yeah Yeah, let's try to do it. You noticed that somewhere there, there were the names of the variables, the names that were on the columns of the table, so you single them out and you put them at the beginning. Then there are some variables, count, that are initialised to zero, but yeah, we will see later what they are used for, and then the header of the table is printed. That was easy, at least. Then a for loop starts, that must be where the rows of the table are printed. And indeed, that is what's happening. So row by row, these numbers are printed, taken from the input data set, and whenever some number is equal to zero or is null, then an underscore is printed instead. So yes, we guessed it right, the underscores were missing values. If we move on, we also find a nested for loop where missing values are counted and the initial variables that were initialised to zero are updated and finally printed as a bottom row. So the bottom row was the count of missing values. Just to summarise, at the beginning of this function, the header is printed, then in a a for loop, row by row all the numbers are printed, and when there's some missing values, underscores are substituted, and finally, missing values are counted and printed as a bottom row. So we did it, but it wasn't easy, and it wasn't free, and when written in this way, that function was perfectly working, but was completely unreadable, and we had to spend time and energy just to rewrite it, and the added value to our research in astronomy was zero. So the astronomer learned the hard way that readability can count, and probably in the future will think more about it, but actually there's no need to be creative about how to write well-formatted code. There are guidelines. You may have heard about PEP8. and also if you want to work even less then automatic code formatters like Black can help. Of course, readability is not the most important point about writing good code but it's usually the step zero after which we can reason about more interesting stuff. For example, here I noticed that the astronomer's colleague is more of a C programmer maybe than a Python programmer. The function is not really Pythonic And also, this function is trying to tell me that it just prints some information. I'm looking at its name. But inside, we discovered that it also found and counted missing values. And this point about doing more than one thing in the same place is what brings us to our next example. This story is about my first days as a data scientist in my previous job when I was struggling with the training of some neural network In the field of machine learning you usually find yourself with some model that you want to train on some data set so that it learns to perform some tasks like in my case there were classification tasks about documents or emails and I wanted this model to be able to predict the classes of these documents and emails. And, of course, I also wanted to validate the prediction of those models to tell if the model was good or bad. So I knew that I was going to repeat all this process of training and validating and predicting over and over again, so I thought, yes, I am doing all these steps many times, so better to write a general function that wraps all these steps together so that I can forget about the rest and just use this function. Also my team will do the same for many other projects so this function will be so general, convenient and time-saving that everybody will love it. So I started to write this function. At the beginning, there was just the model I wanted to train on some training data set, x train and y train, for some epochs. So epochs in neural network jargon is just the number of steps, sorry for this completely. So epochs, steps in the neural network jargon of the training, so for how much time do I want to train the model for? And for every epoch, I computed accuracy on the validation data set X val and Y val. But of course, accuracy is not the only metric in machine learning. One could want to use other metrics. So yeah, better to leave this freedom to the user so that they can use whatever metric they want to track. But also, now we are computing these metrics for every step, so we may want to be able to stop the training when one of these metrics is not improving anymore. There's no need, no point in keeping on training the model if metrics are not improving. So yeah, I added early stopping. This is a very well-known procedure in machine learning. Two more parameters to account for early stopping. Also, training in machine learning could be very long. So if they fail for any way, you may want to be able to resume the training later, so yeah, let's add a way to checkpoint the model, let's save the model in a certain frequency, like every one or two or five epochs, so that we could be able to resume the training later. But also, now I have a trained model, I may want to learn something about this model, like what, I mean, did it learn anything? So yes, let's add also the possibility to look at the internal parameters of this neural network. In our case, in the neural network case, we call them weights and activations. So plots for every epoch or when I want, like again, with a certain frequency, like every one, five, 10 epochs. Very good, now this function is very powerful and could be slow. So yeah, yeah, maybe better to add the possibility to subsample the data set so that I can train the model only on a subset of the data. And of course, we are all very good data scientists, so do not forget about setting the random state for reproducibility. But what if my team, at some point, wants to customize the training even further? Icing on the cake. More keyword arguments for everyone. So, very powerful function, I was very happy with it, And I get pushed through this function to the common repository, waiting for my team to use it. Result, nobody ever use it. Even I didn't use it. And that was, yeah, I must admit that hurts. But if I look at it now, it isn't that surprising. I mean, what does this function try, what is trying to do, like training the model, validating the model, maybe analyzing a trained model, monitoring the training of a model, probably everything, but if it's not easy to explain that it's probably a bad idea. It was a hard lesson, but it taught me about premature optimization and complexity. This function is not doing anything really, it's just a wrapper around something else like TensorFlow that was doing the dirty job of training the neural network, but it wasn't reducing the complexity of all those steps. I exposed so many parameters to the users. They had to choose many things, they had to learn many things, and at the end, nobody used it. Nobody could even probably understand it. Many programmers among you could tell me that I violated two commonly known principles of good software design, the keep it simple principle and you aren't going to need it principle. The function was complex and redundant at the same time, and that was the reason why nobody used it. So why did I write it that way? Probably I just wanted to be general, and I didn't care, I didn't pay enough attention to what the function was becoming, parameter after parameter, and I didn't care enough about the cognitive load of that function, that is the effort one needs to put in learning going to try to understand that piece of code. This point about cognitive load connects us to our last story. So now, you are a junior software engineer in this new company, your first week. This company works in the mortgage process together with banks. So today, for The first time, you're going to look at their codebase of their back-end software that manages the mortgage application process. You know nothing about mortgages, but this senior colleague of yours told you that this part of the code, at least, is simple enough that you can read it and understand it by yourself. So you start and, yeah, at the beginning you find a house class. There's another attribute, address probably, and a val that must be the value of the house. Okay. Then the mortgage application class looks more technical. Like AMT it's probably the amount of the loan that a person can ask, HS should be the house itself. After all, mortgage and houses should be linked somewhere. And here, most importantly, this reminds me about the astronomer's story. Here, everything is readable, but still, we are trying to decipher what the authors wrote. If it was just a bit more explicit, it would have been so much better. Abbreviations usually make our life worse, because they force us to remember names that are not worth remembering. They impose cognitive load. I didn't say always, though. There are some times they can be useful. In our case, for example, there's a quantity that is the loan-to-value quantity. There is the fraction of the value of the house that is covered by the mortgage that is very important. And if I saw a code written in this way, where everything is so explicit, except for that term, I understand that the author is telling me that that term is really important, that I need to learn it if I want to be successful in this domain. Indeed, in the business domain of the mortgage process, that term is really known by everyone, and we use it every day. Let's make a step further. Let's add people to the game. So a person, for us, is just another class, And we can use it, we can see on the right-hand side, for applying to a mortgage. So Alice, that is an instance of a person, applies to a mortgage that is an instance of a mortgage application class. Its usage seems clear, and the implementation too is very straightforward. the apply method of the class person just updates the application attributes of the person and the application applicant list of the mortgage application also looking at this piece of code I could try to understand something about again what the authors try to tell me I see that there is the apply method for the person but not the inverse ad applicant for example method of the mortgage application. This suggests that the author preferred to see this kind of information flow, a person that applies to a mortgage. And I wouldn't expect in the rest of the code to see the opposite way around, like a mortgage instance to which person are added as applicants. So I read it in this way where everything is very clear and explicit. I could also try to interpret how the rest of the code could work. There are a couple of subtleties, though. For example, applicant list looks a bit redundant, at least. But also, naming things after their implementation could be problematic. What if at some point someone wants to change the internal representation of that attribute to dictionary because they need to look for people like with emails as keys for a dictionary. They would either have an incoherent attribute name or they need to change the attribute name. But even trickier, applications attribute of the person is set to a single mockage application during the apply method. So what should I understand here? Is the plural just wrong? or maybe that's a bug and applications should be a list like the applicant list. In fact, is a person allowed to have more than one mortgage at the same time? So as you can see, even a very small detail like a badly placed plural can create confusion and make us wonder about the business process that is behind a very simple piece of software. So in our first week as software engineers, we have already seen quite a few things. First, we understood that abbreviations are expensive and we should avoid it, unless they really, really mean something in the business domain we are working with. Then we were able to understand and interpret some of the intentions of the authors of the code reading between the lines. And finally, we could appreciate how even the smallest details like a plural name can create confusion. So let me try to jump to a tentative conclusion of this talk. We have listened to three different stories about three different characters an astronomer, a data scientist and a junior developer They all shared a common experience They learned first hand that unclear code can hurt In our first story we talked about readability The astronomer was given a perfectly working function that was at the same time unreadable and she had to waste time just to rewrite the function if she wanted to understand what was going on. In the second story, we learned about complexity. The data scientist, motivated by the best of intention, just wasted his time trying to write a general function that was at the same time complex and redundant, and at the end, nobody used it. In the third story, we learned about the importance of naming. We could interpret some of the intentions of the authors reading what they write in their software. And we also could appreciate how even the smallest details in our choices could confuse readers. So if I have to choose a take-home message from this talk, I would say that code is always communication, and that writing good code is caring about all our future readers, including ourselves. Thank you.
+
+**Speaker 2** _[22:10]_
+
+thank you thank you very much Dario so we will start with the Q&A session please go to Slido and ask your questions so we already have the first question and it's what about the role of comments and documentation to clarify better what is happening here and there
+
+**Speaker 1** _[22:29]_
+
+Very good question, thank you. There are different... Yeah, different people say different things about comments, but they can be really useful, especially to make the details of the implementation or the choices that we, as authors, want to make. So, yes, they can be very useful, but they are not an excuse. Like, there is no way... there shouldn't be an excuse to writing bad code. They can be redundant, they can lie, comments lie, and they are expensive also to maintain because they should be maintained, like code, but they are not code. So yes, very useful, and no, there shouldn't be an excuse to writing bad code.
+
+**Speaker 2** _[23:18]_
+
+Sure, thanks. The next question is, why did you decide to not include type annotations? Well, good. Yeah. There's a second part. In my experience, they make everything more readable, e.g., prevent the plural confusion you mentioned.
+
+**Speaker 1** _[23:30]_
+
+you mentioned I completely agree and yeah that was just choice that email choices that emerged from some personal experience so everything here is just in my experience so yes I completely agree with the with the author of the of the question type hints and annotations can be really useful to make it a bit better
+
+**Speaker 2** _[23:52]_
+
+Okay, next question is have you ever tried to drive the code to be clear using tests?
+
+**Speaker 1** _[23:58]_
+
+Of course, yes. Another very big part of writing good code, if you, I mean, also in the book itself, clean code, test is one of the main part. And actually, probably no one could define good code if it doesn't run tests. So, yes, I completely, again, I agree.
+
+**Speaker 2** _[24:20]_
+
+but what if you have to write a very long variable names to make it explainable?
+
+**Speaker 1** _[24:25]_
+
+Wow, I think there's no Okay, there is no perfect rule there I tend to prefer Longer names, but yeah, but not too long So there's not really like rule them all solution But then is where probably comments and documentation come to help that could be one of the places where I would use comments over a clearly written doc string.
+
+**Speaker 2** _[25:00]_
+
+What's your take on heavy usage of functools? I commonly hear the reason it looks super clean, although less experienced engineers have to read a lot.
+
+**Speaker 1** _[25:09]_
+
+So, functools, sorry? Yes, functools. Okay, I'm not sure I could understand completely the...
+
+**Speaker 2** _[25:17]_
+
+like anonymous offer maybe
+
+**Speaker 1** _[25:26]_
+
+chain yeah I'm sorry I'm not sure I could understand I mean if you want to if someone wants to contribute and I'm happy to I'm happy to hear there's no real yeah yeah thank you I just reverse
+
+**Speaker 2** _[26:04]_
+
+Awesome. Awesome. Yeah. Okay. Next question. Have you seen a project consisting only of good code by the book?
+
+**Speaker 1** _[26:11]_
+
+Wow.
+
+**Speaker 2** _[26:14]_
+
+Plot twist? No.
+
+**Speaker 1** _[26:15]_
+
+I would like to say yes, but no, of course not, but yeah, there's probably a limit everyone wants to achieve but never achieves, so never-ending trial and effort.
+
+**Speaker 2** _[26:29]_
+
+How strict are you about clean code when reviewing PRs for requests?
+
+**Speaker 1** _[26:33]_
+
+Wow, okay, this question is probably for my team members, for the other team members, but we could ask them probably, but yeah, maybe a bit strict, but not, I mean, at some point you stop complaining, because if it works and if it does the job, at some point stops probably the point is the question I make to myself is if I don't know anything about this code how much do I need how much time do I need to understand at least the workflow at least what is doing so if it's too much if it's more than a quick look just to have a quick understanding then I would be strict otherwise if I can get the idea but then there are some details that are not really really good code that who cares I mean let's move on to the next task and maybe maybe at some point we come back then then we all know what's happened
+
+**Speaker 2** _[27:43]_
+
+Great, so is there a trick to write cleaner code when writing GUIs, e.g. PyQt? I always struggle with line too long.
+
+**Speaker 1** _[27:53]_
+
+So, yeah, many people struggle with line too long. There are beautiful talks on YouTube where this, also black itself in its documentation says 90-ish, so they're not really strict about lines. But no, there's no clean solution, rule-the-mole solution. Every single point is a compromise between the confusion you could have just reading and writing the code and the tools you have at the moment.
+
+**Speaker 2** _[28:27]_
+
+What tools other than Formatis can help us to keep the standards and simplify review?
+
+**Speaker 1** _[28:34]_
+
+yeah also i didn't of course i didn't uh talk about all the uh ci and linting and all that stuff that of course could be helpful i mean all the automation that you could build around writing good code, linting and black itself, that really helps, of course.
+
+**Speaker 2** _[28:53]_
+
+All your history about amateurs, they cannot create normal code. What can you offer to decrease complexity for professional teams?
+
+**Speaker 1** _[29:01]_
+
+What can you hope for what?
+
+**Speaker 2** _[29:02]_
+
+What can you what can you offer to decrease complexity for professional teams?
+
+**Speaker 1** _[29:07]_
+
+Okay, what can I offer? So, well, I don't know. We could talk later. Maybe that's something I could offer. I could definitely offer. But in general, probably I could just offer this experience about the question I ask myself when I do code reviews or I see code written by others. that is these questions about how much energy do I need to understand, how much time do I need to understand is this clear, so another rule of thumb that is not really a rule but yeah is always for example aim for the average programmer, not to the of course not to the beginners but not to the most expert ones because the expert ones will of course understand And I mean, whatever, I mean, they are really expert and clever people. And beginners, of course, need to learn something. But the average programmer, most of us probably, at least I, am the average programmer. So I think that aiming for that big part really is one of the probably suggestions that I could give.
+
+**Speaker 2** _[30:25]_
+
+Okay, thank you. So if your question didn't answer yet, Dario will be around. Thank you very much
+
+---
+transcript_status: auto
+---
+transcript_language: en

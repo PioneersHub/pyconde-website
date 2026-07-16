@@ -1,0 +1,229 @@
+title: Enhance your balcony power plant with Python
+---
+description: Plug-in solar systems, so-called balcony power plants, are getting more popular. This talk will cover the basics of such a system, how to figure out the…
+---
+created: 2023-12-12
+---
+code: TCSERC
+---
+slug: enhance-your-balcony-power-plant-with-python
+---
+speaker_names: Jannis Lübbe
+---
+speakers:
+
+
+
+### Jannis Lübbe
+
+2008
+M.Sc. Physics and Computer Science at Osnabrück University
+
+
+2012
+PhD in Physics at Osnabrück University
+
+
+2013 - now
+Sensor Developer at ROSEN Group
+---
+abstract:
+
+
+Plug-in solar systems, so-called balcony power plants, are getting more popular. This talk will cover the basics of such a system, how to figure out the energy consumption of a household and how to monitor and optimize the power output of a balcony power plant.
+---
+full_description:
+
+
+Plug-in solar systems, so-called balcony power plants, are getting more popular and more affordable as people want a simple way to participate in moving towards sustainable energy resources. They are easy to install without the need for an electrician.
+In this talk I will discuss how to figure out much power a household consumes and how much can be covered by the balcony power plant. I will also exemplify different user profiles, like “working from home” or the “home in idle state” and how it affects the efficiency of an additional battery system.
+The power consumption is measured by using devices, like WiFi plugs, from Shelly and myStrom, each offering a REST API. The power production is preferably recorded by using OpenDTU in combination with compatible microinverters but may be measured using WiFi plugs as well.
+These measured values are published to Redis and can be observed using WebSockets and FastAPI. 
+Additionally, these values may be pushed to a public server running on FastAPI and Redis as well. A social login like Google or GitHub can be used to control the access to this server.
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2024-04-24
+---
+start_time: 11:40
+---
+end_time: 12:10
+---
+slot_id:
+---
+track: Infrastructure - Hardware & Cloud
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 3578
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Novice
+---
+supporting_material_url: https://github.com/jaluebbe/balkonkraftwerk
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/TCSERC.png
+---
+youtube_id: 5CiDAmKi-k4
+---
+video_link: https://www.youtube.com/watch?v=5CiDAmKi-k4
+---
+video_published_at: 2024-10-28
+---
+video_duration_iso: PT30M8S
+---
+video_thumbnail: https://i.ytimg.com/vi/5CiDAmKi-k4/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:05]_
+
+Today I would like to present my personal way how to participate in the energy transition if you are living in a rented apartment. And the challenges of this are that usually you don't have access to the roof, you cannot modify the building permanently, including any modification of the electrical installation, and usually you don't have permanent access to the electricity meter. But there is a solution for that. It's the so-called balcony power plant. And just let me present how it works. This may be a laser pointer, or I take the cursor instead. You can see it. So this is a solar panel. It's a small one, very light one, 1.5 kilograms. It's just 110 watts peak. it's connected with these DC cables to the microinverter so the solar panel is providing DC current the microinverter is converting that into AC current and that can be fed with a Schuko plug to the electricity grid but there are some restrictions as we are, not all of you but many live in Germany. So the good thing is there's no electrician required. You have to ensure that the total power of the inverter is below 600 watts. You need to register at the grid operator. You require electricity meter with a backstop. And you need to register in the market master data register in German, Marktstammdatenregister. but if you wait until next Friday there may be a modification of the law that it gets a bit more simple and that the inverter power may be lifted to 800 watts I've shown you very tiny setup on the photograph before now let's look at typical arrangement of a balcony power plant so it may consist of multiple microinverters. Their total output power must not exceed 600 watts under the current regulation, and they may be connected to one or multiple solar panels. The important thing is that the ratings of the solar panels fit to the voltage and current ratings of the microinverter input, and so it's possible that you have one large one with, in this case, 370 watts peak or maybe multiple smaller ones like I've shown you before. Watts peak means the power the panel would provide under more or less optimum conditions. You would not reach that always, especially, depends especially how you mounted it. yeah and finally it's just connected to the power outlet but now let's take a look at my setup it's a bit more complicated so i have some solar panels around 440 watts peak which are connected to a micro inverter and they when the sun is shining they would just provide that power to the grid but there are some more panels about 600 watts peak which are charging a battery and this battery is discharged over another micro inverter and could provide power in the time where the sun is not shining sufficiently or not shining at all to do so i have to create some stuff from the part of more or less electrical engineering so I have to put a fuse box in between to secure the wires from overloading I have to add a protection for discharging the batteries too deep I have to limit the inrush current that the microinverter is not overloaded when being connected so it's done via resistor and time relay making a short circuit on that resistor after a few seconds and there is finally a variable power limitation which is required as we do not want always to feed 180 watts from the battery but just as much as we need and in my setup it's included in the micro inverter as I will show you later here's a view from outside so the smaller panels are those who are directly putting their power to the grid while these are the in total 600 watts charging the battery but we need to know how much consumption we have and how much energy we need to provide from our system so for that I used a lot of different devices for measurement so the The most simple one is this, where you have a display directly showing the power draw of the connected device, while all others could be read out remotely. These devices could not distinguish between current flowing inwards or outwards the socket, so even if you connect, let's say, a balcony power plant to that, they would still say it's consumption so you just have to know if it's really consumption or not another way is to connect a readout device to electricity meter and that could distinguish between consumption and production at least a newer one a really old one would just run backwards which is currently not allowed in Germany but yeah maybe change changed soon yeah but now let's take a look at some measurements I've done at first the devices which are not in the focus of my project so devices used for cooking and cleaning usually consume a lot of power which is much more than the balcony power plant could provide but operated only for a short time of the day however if you are using a balcony power plant without a battery have a good sunlight at noon yeah it would save about let's say 30% of your energy if you are cooking at that time when the sun is shining or doing your laundry at that time maybe an option if you are working from home yeah but now let's go to the more interesting devices so I did a few measurements the Wi-Fi and LAN devices in my apartment in total consume 18 watts which is 0.4 kilowatt hours per day it's yeah and yeah an important contribution to the total energy consumption similar the ventilation system with 13 watts now if you if these two devices are running all the time 24-7, which means that for consideration in my application, I could just assume them as constant energy consumption. But now let's take a look at the fridge. If you look at the energy consumption per day, it's the same as the ventilation system, although it's about five times larger power draw. That's because the fridge is not running continuously, but running at several short intervals throughout the day, which means we need a measurement for that. The same is the PC workplace. It may consume up to 150 watts, and that way I tested it. It's a significant contribution over the day, and it may vary if the CPU load is a bit lower, could go lower or higher so we should measure that as well the same for the TV it's also a relevant contribution yeah how do we measure we take these smart plugs so with these tools it's MyStrom and Shelley there is a REST API available. So here's an example request and the JSON response for the MyStrom smart plug and these are being used for measuring my consumers. However as you see these devices they do not look weatherproof and they aren't. So for read out of my balcony power plant I've chosen another solution. It's an open source project for reading out microinverters from the manufacturer Heumals. It's called the OpenDTU. It's based on an ESP32 microcontroller and at first it provides a web interface where you get the AC and DC performance of your microinverter or all your microinverters which are read out with this device. So there are two different frequencies where the inverters are operating, 2.4 gigahertz and 866 megahertz, depending on the type of inverter. So when you are getting an open DTU, you need to look up first which one you need and don't take a Wi-Fi-ready microinverter from Hoymiles so that doesn't provide that interface anymore. It's just for putting data to their cloud. And another important option of this OpenDTU is that we can set the limits of the microinverter. We can set persistent limits, which means after reboot, reboot maybe just because yeah it went dark and then the inverter shut down the next day it remembers what was my limit but in case of the battery I'm setting a non-persistent limit but not via web interface it will be done over the API so here I just show the API call to read data there is a similar API call to set the limit so here you see the limit which was currently set for that one the power voltage current and so on and also also the total yield of this device so you know what it has fed into the net into the grid since since it was connected for the very first time yeah but now as we know how to measure our consumers and our producers we can combine that to an application so it's also available as open source on github it's running on a Raspberry Pi at home it runs on a Raspberry Pi zero with Wi-Fi so the smallest one single core but I recommend the zero two with quad core but currently it's running with a single core and it works at first we start with the known consumers I mentioned before the ventilation system the Wi-Fi router maybe some other consumers I didn't mention there I added all them up put them in my config and yeah then they are always considered next and the smart plugs are read out so the devices like the TV the computer and the fridge and now I start reading out the inverters with the help of the open DTU so that I get the current yeah energy production from the solar panels and now depending on the difference I will adjust the battery inverter limits this all this information the measured values are published to read Redis channel and also appended to a Redis list. This is done in 15-second intervals, so it's repeated all the time. Yeah, this data is going to Redis, and I have a backend implemented with FastAPI listening to that channel, providing a local live view, which I will present later. In a similar way, I could also provide a review. As I mentioned before, I'm appending data to a Redis list. And for every day, there's a new list that is read out and provided as a day review. But that was a local web interface. I wanted to access my data from everywhere without sharing it with everybody. So I rented a one euro virtual machine where I run Docker, then I added a small process on my Raspberry Pi at home, which is pushing data, it listens to the Redis channel where I put my reports, pushes that data via WebSocket to my backend running on fast API on the virtual machine, and finally pushes it to a Redis channel there which is named after the email address of the user which I will explain next. So from the user's device there will be a login using GitHub OAuth where I get a cookie for my web page and then with this cookie I'm consuming the data over a web socket. And it's, yeah, the backend is listening to the individual Redis channel. For the review, it's a bit different. So the push data daemon is waiting for review requests from the WebSocket. And when it receives a request, it is pushing that report there. And it's also transferred to Redis. Now when the user is requesting a date, then yeah, it will be published to Redis. From there it will be consumed by the WebSocket where the Raspberry Pi at home is pushing data. Yeah, and then I wait for five or now it's more or less 10 seconds for the response and then I will show that. Now let's try a live demo. I hope it's working. So it takes usually a few seconds. Yeah. Now this is some data just from the electricity meter what I'm reading out as well. And now we see at home it's sunny. So 300 watts from the sun. the battery is nearly fully charged with 20 more than 27 volts the consumers are now just about 53 watts so the fridge is not running or maybe the fridge just started to run let's wait a few seconds so I'm trying to calculate unknown consumers from the difference between ah it's not just the Sun disappeared and that modified the calculation okay now let's come so I'm comparing readout of the of the electricity meter with my measurements and yeah they have a different time scale yeah now let's take a look at the data from this day so this was my consumption the peaks you see here is my fridge now let's see what we got from the sun today so yeah it was not so much but it partly covers my consumption but yesterday it was a bit more sunny so the battery was full so i nearly covered all the night from the battery and as I'm also now using dynamic pricing I could also display the prices here just for comparison and it could be maybe an option in the future if I know that my battery will not be fully charged for the whole night that I make it dependent of the price, that maybe I consume electricity from the grid overnight, but in the morning when the electricity becomes expensive again, I'm using the battery. But that's maybe some future idea. I could also use the data from yesterday. So the data here is prepared, so the plots are done with Plotly, Processing in the background is with pandas and numpy. I'm using the Plotly JavaScript version as the Python Plotly version would take for one of these plots, I think about 30 seconds. And yeah, so I'm now just using pandas to prepare the arrays using the JavaScript version. Yeah, and that's all, and I'm now open for questions.
+
+**Speaker 2** _[20:22]_
+
+Thank you so much, Janis. We have many questions here from the audience. Do you have to inform or ask your landlord to install a balcony power plant?
+
+**Speaker 1** _[20:30]_
+
+Yes, I informed them and finally they agreed. They were a bit surprised that there were more panels than initially planned. So I asked them for the first three and then the balcony was fully covered. But finally they accepted it.
+
+**Speaker 2** _[20:51]_
+
+Did you calculate the amortization time of your system?
+
+**Speaker 1** _[20:54]_
+
+Not yet, and if I would buy the devices now, it would be much lower, also because of my experience. So I also purchased some devices in the beginning, which I don't use anymore and are running maybe at colleagues' home and so on.
+
+**Speaker 2** _[21:16]_
+
+Okay, and then another question is, is it possible to scale the PV power even higher as long as the maximum power output of the inverter does not exceed 600 watts? Is there a limitation?
+
+**Speaker 1** _[21:27]_
+
+in principle it would be possible but in my case it's because of the 24 volts and the inverter maximum input is 10 or 11 amps so that's currently the limitation but there could be some ways maybe switch to 48 volts or maybe what i also tried and is working with my software just using two inverters, both running to 180 watts maximum but usually my consumption is below that and so I currently don't use it but it's possible even if you have much more space for the panels and have much more energy available
+
+**Speaker 2** _[22:10]_
+
+Okay, thank you. And then another question is, how were you able to read out oven and stove as they don't have a Schuko plug?
+
+**Speaker 1** _[22:17]_
+
+Yes, it's a bit tricky. So one option is if I'm getting the data from the readout of the electricity meter, but it's not the main part of my project. For the cooking, I have some induction plates instead of the built-in plates of my apartment, and they are just connected with a Schuko plug. yeah but in that case I just took a for the for the oven I just took a readout of the meter before putting the pizza into and then afterwards and then it's just the difference
+
+**Speaker 2** _[22:54]_
+
+Okay, thank you. And then here's another question. Which power provider is offering a flexible tariff? Do you save money with this flexible tariff?
+
+**Speaker 1** _[23:03]_
+
+And so in my case it's tipper, but I think the other provider Being here is offering Thumbs something similar, but you need a smart meter and in that case with tipper you have just this small readout device The end of the question was
+
+**Speaker 2** _[23:24]_
+
+Do you save money with this?
+
+**Speaker 1** _[23:26]_
+
+and normally yes so recently I did the laundry with 11 kilowatt hour 11 cents per kilowatt hour but as my consumption is now really low with all the the optimizations it's only a slight difference to the local energy provider because it's slightly larger a base price with that okay yeah sorry so I think my monthly price now would be in total for electricity 13 or 14 euros this month
+
+**Speaker 2** _[24:06]_
+
+Okay, and then people want to know why did you choose Redis as data storage?
+
+**Speaker 1** _[24:12]_
+
+Oh, because I'm used to, um, so I'm using it as a message broker as well as a data storage. But to be honest, I'm not storing the data there forever. It's, uh, each day there is overnight, uh, demon, um, archiving that data to Jason files, but just to save time during the talk, I didn't mention that.
+
+**Speaker 2** _[24:35]_
+
+Okay, we have still five minutes, so you have some time to answer now in more words if you want. Another question is, how did you estimate the ideal battery size? Do you know how much time it takes to get this return on investment?
+
+**Speaker 1** _[24:51]_
+
+No, it's more or less, yeah, it's trying out. So I started with, I'm not sure if I started with one or two batteries, and then a colleague purchased also one, and finally he went to 48 volts and then hit one left over, and I got it, so now I have three, but I started with two. But three are working well.
+
+**Speaker 2** _[25:16]_
+
+Okay, it's a lot of questions about return on investment and investment and another Investment question is where do you get a server for one euro?
+
+**Speaker 1** _[25:26]_
+
+So maybe look at some of the well-known providers like Strato and so on. I think they are called like Virtual Private Server Mini or however. So I started with 1U. To be honest, I'm now using one for five years, but I'm running several applications on that. But I started with a 1U run.
+
+**Speaker 2** _[25:49]_
+
+Okay, thank you, and how long did it take you to set it all up?
+
+**Speaker 1** _[25:53]_
+
+So last year, this time, I did know nothing about the topic at all, I think, and I started somewhere last summer recording data, so maybe I could even try to go back to that, but it's It's not tested before, maybe just September 20, 23. There's still some data, yeah. Yeah, it was more or less, I started recording that data at that time, but finally creating this web interface with the login and so on. It was more or less when I created the PyCon proposal in December.
+
+**Speaker 2** _[26:46]_
+
+Thank you. Another question is, could you include solar power prediction into the pipeline? Do you know any suitable models that could predict the local solar power?
+
+**Speaker 1** _[26:55]_
+
+So, I played around a bit with, I think it's called PVLIP, but it didn't match too good to my conditions, so there seems to be some factor in between, and I do not know nothing about weather prediction stuff and so on, so that's not included here.
+
+**Speaker 2** _[27:20]_
+
+Okay, thank you. Another person wants to know, can the setup be placed in a home instead of an apartment? What would you change or do different?
+
+**Speaker 1** _[27:29]_
+
+Yes, it could be, and one of my colleagues will try this soon. Maybe one advantage is to connect to maybe one socket which is directly connected to the main fuse box in the basement instead of connecting to a socket which is connected with others in the same circuit. It's maybe the safest option. you have much more space for battery panels and so on, could maybe consider really feeding maybe 600 watts over the day or however your need is.
+
+**Speaker 2** _[28:10]_
+
+Okay, and is your code open source and available on github so you
+
+**Speaker 1** _[28:15]_
+
+Yeah, go back, there it is. It's not yet documented well, so there is an installation instruction for a part of this, but just ask me if you try to get it running.
+
+**Speaker 2** _[28:31]_
+
+Okay, and then is there any professional solution available that you use for feature ideas?
+
+**Speaker 1** _[28:39]_
+
+Okay.
+
+**Speaker 2** _[28:42]_
+
+Like, is there any software that you know about that has, like, similar features that you look at and you're like, okay, I'm going to try to implement this.
+
+**Speaker 1** _[28:47]_
+
+implement this myself um yeah so i was more looking at the hardware and my uh yeah impression was that there's no um hardware available which is offering an api where i could decide by myself how to control it and maybe some commercial devices have also an option to connect these smart plugs but often you have then in that case buy them from the same manufacturer and so on and it's much more expensive than building it by your own. But maybe there, I don't know, maybe there appear soon some devices which are more useful for things like that. So I see if you want to reproduce this, the largest challenge is really to do the electricity stuff. So there you should have some knowledge, the remote control or the readout, Or you could also use the project just for measuring. So even if you're not feeding a battery, you could also use it just for measuring consumption, production, or even only consumption, only production, whatever you like.
+
+**Speaker 2** _[30:00]_
+
+Thank you so much. Janis Löwe.
+
+---
+transcript_status: auto
+---
+transcript_language: en

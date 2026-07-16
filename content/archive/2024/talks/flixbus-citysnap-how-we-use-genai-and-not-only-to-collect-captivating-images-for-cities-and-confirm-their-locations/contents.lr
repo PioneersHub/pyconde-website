@@ -1,0 +1,223 @@
+title: FlixBus CitySnap: How we use GenAI and not only to collect captivating images for cities and confirm their locations
+---
+description: Have you ever wondered how travel e-commerce companies gather photos of cities? While I can't speak for everyone, I will demonstrate the innovative…
+---
+created: 2024-01-05
+---
+code: ECCJAG
+---
+slug: flixbus-citysnap-how-we-use-genai-and-not-only-to-collect-captivating-images-for-cities-and-confirm-their-locations
+---
+speaker_names: Andrei Chernov
+---
+speakers:
+
+
+
+### Andrei Chernov
+
+_About — in the speaker's own words_
+
+Career:
+Since 2022, I have continued my career as a data scientist at FlixBus.
+From 2018 to 2022, I worked as a Data Scientist in banking.
+
+Education:
+From 2021 to 2022, I received a micro master's degree in Finance.
+From 2019 to 2021, I received a master's degree in computer science.
+From 2015 to 2019, I received a bachelor's degree in applied math.
+---
+abstract:
+
+
+Have you ever wondered how travel e-commerce companies gather photos of cities? While I can't speak for everyone, I will demonstrate the innovative approach we are using at Flix.
+
+In recent years, text-to-text models like ChatGPT and text-to-image models such as DALL-E 3 have become increasingly integrated into various industries. The main aim of these initiatives is typically to generate text or images. In our presentation, we propose a slightly different approach to leveraging these models commercially. Our objective is to gather images for thousands of cities that inspire travel. We utilize ChatGPT to tailor prompts for our business requirements, enabling efficient image retrieval through API queries from free stock image services. Then we apply image-to-text models to confirm the images' locations. Finally, we need to adjust the resolution of images for display across various platforms, such as social media campaigns on Instagram, email marketing, and on our website. To achieve this, we have used an automated cropping service to get images in the required aspect ratios, followed by Lanczos sampling for downscaling the images. This integration of cutting-edge models has resulted in an automated, highly flexible process that aligns with varied business needs. Our approach is cost-efficient; processing several hundred cities amounts to only a few euros, and we have utilized commonly available services, making replication easy for everyone.
+---
+full_description:
+
+
+Flix's buses serve over 5,000 cities, and to elevate our customers' experience, we aim to collect captivating photos for each city. Photo city collection task is not new, but previously, it was predominantly addressed with human resources. However, due to the extensive number and the growing scale of our bus network, manually gathering photos for each city is unfeasible and non scalable. In this talk, we will demonstrate how we built a fully automated end-to-end pipeline to achieve this goal. Our pipeline comprises three main steps.
+
+The first step involves collecting city images from free image stock services like Pixabay and Pexels, via API. Simple queries by city names yielded poor results as not every image is enticing enough to inspire visits to the city. People often travel to see a city's landmarks, which is why we utilized ChatGPT to gather images of prominent landmarks for each city. 
+
+The second and most complicated step is to verify that the images accurately represent the targeted cities. Initially, we relied on metadata from the image stock services, such as tags from photographers. However, this information is often not sufficient to validate an image's location. To improve accuracy, we investigated various services. Models like DALLE from OpenAI can predict image locations but currently lack an API for full automation. We found two services from the Google Cloud Platform with APIs suitable for location validation: the Gemini multimodal and the landmark detection service.
+
+The third and final step of our pipeline involves adjusting the images to various resolutions for display across different platforms, such as social media campaigns on Instagram, email marketing, and our website. This is achieved by cropping images to the desired aspect ratios using Google Cloud Vision API's smart cropping service, followed by Lanczos sampling for image downscaling, which is available in various open-source Python libraries. 
+
+Our pipeline is a cost-efficient approach using widely available services, thereby facilitating easy replication. During this presentation, we will share our results across several countries, discuss the most challenging problems we encountered, and offer insights into how this pipeline could be improved with the release of upcoming cutting-edge models. We believe that our case shows how the industry can use Generative AI not only to create a new context, but also to find, analyze and filter publicly available information for different business needs.
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2024-04-24
+---
+start_time: 10:30
+---
+end_time: 11:00
+---
+slot_id:
+---
+track: Natural Language Processing & Computer Vision
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 3578
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Novice
+---
+supporting_material_url:
+---
+slides_link: https://einfachbusfahren-my.sharepoint.com/:p:/g/personal/andrei_chernov_flixbus_com/EfTh1HRcfKFGgc3p4vf2qBEBLi90oyUX65UWh06qf6i3rA?e=eJ28ki
+---
+social_card_image: /static/media/social/talks/ECCJAG.png
+---
+youtube_id: BYbCihB3kLI
+---
+video_link: https://www.youtube.com/watch?v=BYbCihB3kLI
+---
+video_published_at: 2024-06-23
+---
+video_duration_iso: PT29M58S
+---
+video_thumbnail: https://i.ytimg.com/vi/BYbCihB3kLI/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:06]_
+
+hello everyone so my name is Andre and I work at flixbus and today I'm going to cover flix city snap project so first a brief overview what is it all about so as you might know like flix operate in over 500 5000 sorry cities right now in four continents so basically Europe North America South America and started from this year also Asia so basically as a task is very standard and like well know for all your fold or e-commerce travel companies basically we want to collect as active photos for each city so basically we want to have a data set where we have and let's say attractive photos I will define what it's mean later labeled for each city why do we need it okay there are like two main business cases first marketing we want to have these photos for like social campaigns in Instagram and such and of course like for e-commerce web platform just to enhance users more increase CVR and such to show these photos okay Okay, sounds easy, but there are some nuances which I would like to cover today. First, it's quite straightforward how to find relevant images. Again, I will cover it a little bit later. Second is how to actually verify the photo location. So we are targeting to build a fully automated pipeline, so we can't allow ourselves to have misqualified mistakes, For example, that we collect a photo, thinking that it's from Berlin, but it's actually from Munich or whatever, it will only discourage our users. And, of course, we have, as I said, several business cases, and for all business cases, we need different image resolutions. So, basically, we need to find a way to automatically adjust image size. for now we are placing our photos for internal stakeholders for four image sizes. So we have like four image sizes and we need to automatically adjust photos without loss any quality. So basically model stack. Okay, by the way, how many people know what is Gemini's? Okay. Approximately half. So basically Gemini is kind of competitor of chat GPT Gemini was built by Google But today so I show where like Gemini at least I think that outperforms chat GPT Okay, let's go step by step first about like images collection Note here that we use only images under CCO0 license or like public available license. It means that actually we can collect, modify, display these images without any annotations and such for commercial purposes. Because of this, we use Pixabay and Pixels because there are images all free to use. And also we use Wikimedia Commons as an image stock, so basically it's all images from Wikipedia, but again we take only CC0 images. Of course we all do this via API, these services have it. And we avoid Unsplash, probably the most popular image stock right now, because otherwise we will need to attribute the photos. And also there are third party services that can scrape the Google engine and give you some photos from the Google images, but again we avoid it because it's kind of tricky in terms of license. Okay. So collected images. Basically I thought it would be easier, but there are some nuances. So if you go to Pixabay and just type Munich, I'm not sure if you see, but the first image is just I type Munich in Pixabay and see the photo. So basically, okay, there are a lot of beer. Probably it's relevant for Oktoberfest, but yeah, in other season time, it's not attractive for users. Also we have a plane, which for us is kind of strange, okay, we promote buses and here the image is playing. So we need to somehow specify because otherwise the search is too broad. Okay let's pick a landmark. So in Munich Marienplatz is a well-known landmark and just type query search Munich plus Marienplatz. At this case you will have much more specific results and you're kind of sure that you don't have any beers. the photos so basically it's what we did we think that like attractions is our most captivating and like iconic places at the city actually in general speaking speaking it does not have to be only attractions you can also try to find parks I don't know government seat government buildings etc but yeah so we discussed with our holders and yeah I think it's kind of obvious that landmark is a probably well most known attributes of the city and like tourists like to visit them and can recognize a city by landmark. But now we need to garner the names of attractions for each city. Okay. This is actually much more straightforward. You can just use ChatGPT or any LLM model, just ask ChatGPT give me five attractions for cities and go to image stack API, extract, I mean in our case we extract five photos for each attraction. As a result we collect in the best case scenario 25 photos plus description of attraction. But still not so easy like riding a bike in Germany. So there is a real application business case when we were trying to collect photos for Chile last year. If you use the same approach, so here's a query Chile, Cucumba, Plaza de Armas. Cucumba is one of Chile city where currently Flix operates. You can see that only one of top five photos is actually belongs to Cucumba. It's even not Plaza de Armas, but it's still the city. So we need somehow to find a way automatically verify that image is indeed show the city which we want. Okay. There we found two tools which can do it with relative good quality. First it's kind of straightforward, Google landmark detection. So basically, as an input, you just upload a city image, and as output, you have name of the landmark, coordinates, and like even confidence of prediction. Second is actually Gemini, which I talked before. So basically, it's I would say currently the only available multi-model API multi-model. This means that you can simultaneously upload via API photo and text. So technically ChatGPT-4 Turbo in preview model now also has this functionality. But let's say for now its performance kind of suboptimal, at least for our task. For sure probably later it will be better. Personally, I think for our task, Gemini should perform better anyway because Google has much more advanced and mature technology regarding detection, everything at the map. So basically how it works with Gemini, you just also upload a photo and also a prompt in which cities this photo was taken or something like it. Actually, I will talk about prompts for Gemini later. But for now, sorry. OK. So the last part of our pipeline is smart cropping. For this, we use smart cropping tools from Google. It's called Google Detect Crop Hints. Basically, it gives you opportunity in the smart way to crop your image for desirable aspect ratio. Aspect ratio is proportional width over height of the image. And, yeah, not that it's do, it does on the smart way. So for example, it might be, you might be tempted just to crop the center, like rectangle from the center of the image. But in this case, you, of course, might lose the quality and crop some objects. So again here is a real business case where we were collecting photos for relatively small or middle-sized cities in Italy. Trapani is a city in Italy which is quite famous because of his mills. So basically here you can see that the target object, which is a mill, is not on the center of the picture. So if you just use central cropping, you will lose this object and the image will lose the quality. But yeah, so we use Google Smart Cropping tool, which could detect the main object, let's say, on the image and save it during the cropping. After that, we use just a procedure. It's called LandCross to convert an image with desirable aspect ratio to darker resolutions. I mean, you can have, let's say, a target aspect ratio one by one, then you crop your image to, I don't know, 200 times 200, but by business case, you need to have an image 100 times 100, and then you can just use upsampling procedure. It will not reduce the quality of image unless you have the same aspect ratio. So, the whole architecture, let's review it. First we just ask ChatGPT for attractions per city. Then we go to our image stocks, which are currently three, Pixels, Pixabay, and Wikimedia. Using five images for each attraction. Then we filter out falsely labeled photos, so misclassified, never mind. So falsely labeled photos using image validation techniques, as I said, Gemini, plus landmark. we are getting target image resolutions using smart image resizing and yes stores the photos and Amazon s3 back at the end but it's not so important where you store it's important that any internal business stakeholder now has access to these photos and just can extract photos for a DCT which he or she desires okay the most probably interesting part of the presentation so insights first I will say if you can just memorize one thing from this presentation I will say that you may think that you can utilize LM models not only to generate data data I mean of course it's generative AI and probably the primary goal of it just to generate a new content, but actually you can think a little bit broadly about it and also find a way to use it as our case for validation. If you think about it, to build the similar project two or three years ago, we will need to have at least two advanced deep learning models, at least for city validation or something like it. can use just API for proof of concept of the LLM models, and it's actually like two lines of the code. And I believe this opportunity should speed up R&D projects, et cetera, and decrease the cost of it. Because indeed the cost of such is very economical. So you can collect photos for Germany for each, I mean, for each city which you can find in Germany for less than ten years. Okay. The difference between Google landmarks and Gemini. So basically, if you have a primary tool to do a validation, it's better to use this tool. So in general, I would recommend to use Google Landmarks service over Gemini. But unfortunately, Google Landmarks does not perform well for cities in small and middle size, like less than 500K population, probably because primarily it was not designed to detect the landmarks like local landmarks, it was more designed to detect well-known world landmarks. And surprisingly Gemini on the small and medium-sized cities performs really well. So basically our approach for small and middle-sized cities, we use utilize Gemini, and for like relatively big cities, we use Google landmarks because, as I said, it's like more user-friendly and it gives you more. So actually also one thing to notice is the difference between prompts. Actually you can ask Gemini in a lot of different ways about a photo. So let's imagine that we want to verify the photo from Berlin. And you can ask as a prompt which city was this photo taken in, was this city taken in Berlin, Germany, and even point out the landmark, is the Berlin wall depicted in this photo. What's the difference? difference in results are very significant because if you can think about it as a trade-off in machine learning between precision and recall so basically when you don't specify the city you will get fewer positive results because okay you don't point out somehow at the prompt regarding the city But in this case, you will also get your false positive results. And once you specify the city, it's unavoidable that a model starts to give you much more positive results. And of course, some of them might be false positive. So there is like standard tradeoff between precision and recall. It also depends what do you want from the project, do you want to collect as much as possible photos or do you want to collect photos as much as accurate. If you want to collect photos as much as accurate, use a less broad prompt, namely like which city was this photo taken in and don't provide the city name. If you want to collect as much as possible and can tolerate false positive result, you can even provide a landmark name and just ask basically binary question is a Berlin wall depicted in this photo or not. Also one thing to note is that you can use Gemini not only for validation even at this case as I said before for us it's crucial not to have any additional vehicles like transport vehicles at this photos like the Chuban trains planes etc and also we're asking like we adding one row in prompt and ask about is there any vehicle on this photo and if it's yes we just keep this photo filter out so actually using one prompt you can kill two birds with one stone. And of course, LLM industry is growing and upcoming releases of LLMs are anticipated. Also like Cloud F3, which is currently not available in Europe, but yeah, it's still very powerful model, HRGPT, so Gemini itself will be only improving and it will be also increase quality for our projects just for free, we just need to change in the code the old version of the model and the new and it will be significant value for us. it's all what I want to cover today. Thank you very much for your attention. Here is a QR code on my LinkedIn.
+
+**Speaker 2** _[20:49]_
+
+Thank you so much for your talk. While I open the digital questions, do we have questions here from the audience?
+
+**Speaker 3** _[21:02]_
+
+Hi, congratulations with your session. Amazing. Did you try to ask something to ChatGPT and then ask the same thing to confirm if it's true or false on Gemini?
+
+**Speaker 1** _[21:14]_
+
+Yes, so actually I played with ChatGPT, I played with ChatGPT for when it was released without API and I also like played this year when like API was available for multimodal and I will say that for this cases it's also false positive. So if you, ChatGPT probably is not a right tool to validate locations. So it's, for now it's performed really poorly.
+
+**Speaker 3** _[21:44]_
+
+Can I have one additional question? Sure. Have you tried being co-pilot?
+
+**Speaker 1** _[21:50]_
+
+Being a pilot now. I didn't try it, but is it have like multi-modal feature. Yeah
+
+**Speaker 3** _[21:56]_
+
+Yeah, it's like Google Gemini, but like Microsoft. I think it's based on JPPT, but also with new data, and it's available in Bing search. Yeah. Have you never tried it? You should try it at least.
+
+**Speaker 1** _[22:12]_
+
+Or is it available via API?
+
+**Speaker 3** _[22:16]_
+
+I'm not sure to be honest
+
+**Speaker 1** _[22:17]_
+
+I think it's only incorporated in Bing. It can be.
+
+**Speaker 3** _[22:20]_
+
+It can be that it's only online. Yeah, check.
+
+**Speaker 2** _[22:24]_
+
+I'm still trying to log in. Do we have another question from the audience?
+
+**Speaker 3** _[22:36]_
+
+So I have two questions actually that I wrote on but and the one is why did you use GPT to retrieve the The Attractions and then did you try to use Gemini for this?
+
+**Speaker 1** _[22:58]_
+
+I mean, yes, you can use Gemini. It's a relatively easy task for LLM. I assume any LLM, even like Lama, any open source LLM can do it. But the point that you still need to have two prompts because you cannot simultaneously retrieve landmark and already have a photo to validate it. And since you still need two prompts and two requests in API, I just use ChatGPT because actually cost for ChatGPT is a little bit smaller than for Gemini.
+
+**Speaker 3** _[23:35]_
+
+Okay, but you didn't compare both both of them No for the attractions both but for the attractions did you compare
+
+**Speaker 1** _[23:44]_
+
+No, I didn't compare because, yeah, here I, as I said, it's kind of simple task for LLM and like any LLM will perform really well just to extract attractions.
+
+**Speaker 3** _[24:00]_
+
+And the other question was, it's kind of the same. Did you compare the performance of GPT in recognizing these landmarks versus Gemini? Do you have some insights on that?
+
+**Speaker 1** _[24:13]_
+
+Yeah, so as I said, I've compared it.
+
+**Speaker 3** _[24:14]_
+
+Yeah.
+
+**Speaker 1** _[24:17]_
+
+Actually, I've compared it three tools. It was not yet released Gemini when I compared it, but it was Vertex AI. It's kind of first version of Gemini. You can think about it. Then ChatGPT, and then just Google Landmarks. and at this comparison so accuracy of LM models was very close to zero so basically charge a PT could not do could not detect a lead motion well of course I'm talking about the data set for like small medium cities again because okay for Berlin probably for Paris any tool suits to extract photos but again we more interesting in more local cities and for such data sets LLM was performed really poorly but then with Gemini released I've reiterated on it and yeah Gemini performs well but ChatGPT still not
+
+**Speaker 2** _[25:26]_
+
+We actually have a bunch of questions, but the first one upvoted is why don't you just use a human to pick the pictures?
+
+**Speaker 1** _[25:34]_
+
+You mean to validate
+
+**Speaker 2** _[25:37]_
+
+To choose.
+
+**Speaker 1** _[25:39]_
+
+I mean, as I said, it's 5,000 cities. So, I mean, we will need a lot of humans to validate. And first and the second, we want to have a flexibility for our promo campaigns. Because imagine we now build kind of semantic search over Internet and, like, over images. And right now, if we want to launch a promo, I don't know, regarding to Oktoberfest, we can just specify not landmarks, but Oktoberfest places in Germany, extract them, and have with one minute this like photos for promo campaigns to use. But if we want, if at this pipeline, once we allow human interactions, the speed and flexibility of the project became much less. So we just, our primary solution here, just to automate it, to have the 100% flexibility on it.
+
+**Speaker 2** _[26:54]_
+
+I will ask the batch of three questions because I think they are similar and there's not much time But please check it out because there's a bunch One is about the precision slash recall values What are acceptable for this use case? an interesting question about I think the prompt itself about how do you structure the prompt for jet chat GPT to give the output and the third is Does the Gemini itself provide some sort of confidence on the seeds detect?
+
+**Speaker 1** _[27:24]_
+
+No confidence Gemini doesn't provide itself You can some tune hyperparameters, but not not straightforward. So the prompt for charge of tea is very easy Give me a traction for the okay. You need justice Berlin City or whatever And for Gemini as I said, yeah, it's the most important workaround with, like, Gemini prompts. As I said, so we used, at least for now, we used the first prompt because, as I said before, we cannot tolerate false positive results. So for us, it's okay. We can tolerate that we might not find photos for every city, but it's, like, okay. For us, the harm is much more if we have false positive results.
+
+**Speaker 2** _[28:26]_
+
+Is it worth the effort? How many destinations do you have? Well, you have already answered that. And how often do you have to change it? And what is the business case? I think it was kind of well covered. And do you verify the images after they were stored?
+
+**Speaker 1** _[28:48]_
+
+I should do, I mean, no, I mean, I double check, uh, no, I, I don't verify images, uh, after I start. So I reiterate algorithm, uh, for some, um, cities, uh, like, uh, let's say one time per quarter when we think we can, we have still a room for improvement, uh, and just trying find the new images but yeah change so basically once like new release of Gemini will be I will I will change the model of course on the new one and test it but except this case so I will say for now it's pretty stable because again you can form exact landmarks you can even use open source model so it's not not so crucial here. Crucial here is the image validation part.
+
+**Speaker 2** _[29:48]_
+
+perfect so big round of applause and thank you so much for sharing your experience
+
+---
+transcript_status: auto
+---
+transcript_language: en

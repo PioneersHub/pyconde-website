@@ -1,0 +1,157 @@
+title: My forecast is better than yours! What does that even mean?
+---
+description: Forecasting is one of the most popular applications of Machine Learning. In the last decades, it went from large numbers, few factors, and simple…
+---
+created: 2022-03-14
+---
+code: WHHMWQ
+---
+slug: my-forecast-is-better-than-yours-what-does-that-even-mean
+---
+speaker_names: Illia Babounikau
+---
+speakers:
+
+
+
+### Illia Babounikau
+
+_About — in the speaker's own words_
+
+I have finished PhD in particle physics in 2019 at CERN and DESY. It was fun to search for new fundamental particles with advanced ML techniques. 
+Since 2020, I have been enjoying supporting customers with BlueYonder ML solutions, developing internal tools for forecast evaluation and onboarding new data scientists.
+---
+abstract:
+
+
+Forecasting is one of the most popular applications of Machine Learning. In the last decades, it went from large numbers, few factors, and simple algorithms to small numbers, many factors, and complex ML models. Moreover, some modern forecasting models can predict not only naive point estimators of the target variable but their probability distributions. As an example, BlueYonder delivers demand forecasts in the form of demand probability distribution on a very granular level (e.g. for each product, store, and day).
+However, established forecast evaluation procedures and criteria (e.g. directly using metrics like RMAE, RMSE, MAPE, etc., and comparing these metrics between various data categories) often turn out to be inappropriate and biased. Therefore, it is important to understand the limitations of the traditionally used metrics and approaches. BlueYonder has implemented forecast evaluation techniques to address these limitations. 
+In this talk, I will present the most important issues in forecast evaluation and their possible resolutions based on the real use cases of demand forecasting developed within BlueYonder.
+---
+full_description:
+
+
+Forecasting is one of the most popular applications of Machine Learning. In the last decades, it went from large numbers, few factors, and simple algorithms to small numbers, many factors, and complex ML models. Moreover, some modern forecasting models can predict not only naive point estimators of the target variable but their probability distributions. As an example, BlueYonder delivers demand forecasts in the form of demand probability distribution on a very granular level (e.g. for each product, store, and day).
+
+
+
+However, established forecast evaluation procedures and criteria (e.g. directly using metrics like RMAE, RMSE, MAPE, etc., and comparing these metrics between various data categories) often turn out to be inappropriate and biased. Therefore, it is important to understand the limitations of the traditionally used metrics and approaches. BlueYonder has implemented forecast evaluation techniques to address these limitations. 
+
+
+
+In this talk, I will present the number of forecast evaluations issues and possible resolutions: 
+
+Main pitfalls when evaluating time series forecast for counted values. Be careful! An inappropriate metric can lead to wrong conclusions and selecting worse model!
+
+Fundamental limitations of forecast accuracy. It could be impossible to improve forecast quality. Know your limits!
+
+How to correctly compare forecast quality for different data subsets or different forecasting algorithms. Apple-to-apple comparison is not as easy as we think. 
+
+All of the above points will be covered based on the real use cases of demand forecasting developed within BlueYonder.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: Machine Learning & Stats
+---
+tags:
+---
+submission_type: sponsored
+---
+submission_type_label: Sponsored Talk
+---
+submission_type_id: 1806
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: none
+---
+domain_expertise: some
+---
+supporting_material_url: https://blog.blueyonder.com/you-should-not-always-have-known-better-understand-and-avoid-the-hindsight-selection-bias-in-probabilistic-forecast-evaluation/
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/WHHMWQ.png
+---
+youtube_id: ldzRfYeI6TA
+---
+video_link: https://www.youtube.com/watch?v=ldzRfYeI6TA
+---
+video_published_at: 2022-05-06
+---
+video_duration_iso: PT29M30S
+---
+video_thumbnail: https://i.ytimg.com/vi/ldzRfYeI6TA/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+So, thank you very much for the opportunity to talk at this conference. And today I would like to present some interesting observations and pitfalls of model evaluation. First of all, just try to think about when I say that my forecast is better than your forecast. What do you think I did? So, maybe you think I calculated one metric with your forecast and my forecast. Maybe I calculated a set of metrics. metrics. Might be I clustered my data in different subsets, different categories, and calculated metrics on these categories. Might be I calculated return of investment on different forecasts. So I might be doing different things, but what is important, do you really know if this methodology leads to selecting better forecasts? We used to do repetitive things the same in the same way, based on maybe our experience, maybe based on our experience, other experience, or maybe based on some just workflows that everybody does. So let's try to a bit rethink what we do and actually what the effect of this and what actually biases it can lead to. So first of all, let's look a bit of the history of forecast evaluation and what is traditionally done. First of all, traditional forecast is quite often quite simple statistical algorithms, some moving average, versus modern machine learning forecast is complex machine learning algorithms, okay, obvious. Also traditional forecasting was mostly done for some univariate time series where you just use your time series and do some forecasting, while modern forecasting is usually using multiple influence variables, effects, for example, for demand forecasting it will be where the price is, cannibalisation, a lot of stuff. So on top of this, we have that traditional forecasting was forecasting on quite aggregated level, because if you use time series, you need really a lot of kind of data to run a simple algorithm on quite aggregated level to pick up, for example, seasonality or whatever. While machine learning forecasting can go to a very granular prediction level and predicting product demands on really product location, our level. and so on. So now taking this in mind, what's actually evaluating traditional forecast? Quite often it's one, maybe two metrics. In sales, forecasting is actually often a mean absolute percentage error according to not so old studies. So also quite often what we need to be means that there are some arbitrary benchmarks that, OK, we have industrial benchmark of 70% accuracy. Then I ask, OK, why 70% accuracy? Because everybody uses 70% accuracy. That was the answer. That happens. And also quite often, what we observe is comparing metrics between different subsets of data. This approach is used to identify forecast problems. But can we really use the same things for machine learning forecasting on a really granular level with multiple factors? Let's discuss and look a bit further. Then let me introduce also our demand forecasting use case. So demand forecasting use case that we are mostly doing at Blue Yonder for predicting demand for retail and manufacturers has a few important features. First of all, demand is a random variable. So it doesn't matter how precise we can predict demand for tomorrow, anyway, it has some statistical fluctuations. Then demand is often a discrete quantity on countable atomic objects, would it be apples, T-shirts, MacBooks, whatever. And underlying processes are rather independent in time, and, for example, one customer coming to the shop is independent to another customer coming to the shop. It can come or not to come. That's why, for example, some underlying assumptions as post on distribution for demand can make sense. Demand can be demand as sales, for example, for grocery fashion, and typical granularity forecasting will be product store date. Also, it could be for manufacturing, like demand as an order, then it could be consumer package goods, and typical prediction granularity could be that we predict for product, location, for example distribution center or manufacturing, and for example week or even month, and maybe customer channel who is buying from the manufacturing. And traditional, of course, evaluation process is that we train on something in sample, and we predict something for out of sample, obviously, and then we compare our metrics out of sample. A few more words that for traditional forecasting, with relatively simple algorithms, we like split in trends, and et cetera, while machine learning forecasting can give us much more advanced forecast by using additional causals like weather, promotions, prices. Like here on the right example, you can see effect of promotions, and definitely if you We will not include promotions that can't be learned because they might be independent from seasonality or other time series patterns. One more important thing that model machine learning forecasting quite often is probabilistic forecasting because it's quite different things if I say that tomorrow we will sell 15 apples From tomorrow, we'll sell 15 apples on average, and there is your probability distribution. That we sell, for example, 22 apples with 2% probability, and so on and so on. There are a number of benefits that we can better control of our uncertainty, and we can do smarter objective optimization. I will tell a few words on the next slide. And for the next number of examples, we would assume the demand has a personal distribution that is kind of reasonable for retail business where we're selling apples, T-shirts, or whatever. Then let me go further, and I think the last introduction slide is what actually the main usage of such forecasting. It could be price optimisation, it could be stock fulfilment or storage replenishment. It could be promotion planning, manufacturing planning, a lot of stuff. And what are the actual benefits of this deterministic forecast? We predict 15, we might be over 15, maybe with some safety gap, who knows? With probabilistic forecast we can do much clever optimisation of some particular cost function or for example we can minimize combination of waste and loss because of the lost sales cost depending on our target function. Also limitations for example we have only 10 in stock and we predict 15 okay then we can correct our predictions and go with final position of 10 because we can sell more than we have in stock. But in limitations, when we're talking about a probabilistic forecast, we can just cut away part of the probabilistic distribution, and then we again have a nice probability distribution we can work on and optimize on. So having all this in mind, background, and our use case, let's go directly and look at our first problem about matrix selection. The main idea of evaluating forecast is for when we're talking about single-valued forecast, is just we take prediction, take observation, calculate metric. For example, relative mean error, done. When we're talking about probabilistic forecasting, there can be two approaches. Either we take the full probability distribution, compare with observed distribution of our sales, and we can calculate different statistical distances between these two shapes and these two distributions. There are a few problems with this, because first of all, if we do this, we can't really compare with the deterministic forecast, and as well it's a bit hard to derive business follow-up from this and explain to business people, not statisticians, people actually what we did and why it makes sense, and so on. Alternative way is that we have our prediction probability distribution, and then we take some point estimator from this predictive probability distribution, for example, mean. Then we also have our observation, and then we calculate some particular metric. And then the other problem arises, the different point estimator selection can lead actually to drastically different results. One thing if I select mean of my distribution, another thing if I select, for example, median. And actually a lot of metrics don't make sense for some particular use cases. as it was discussed before, like mapper for something with zero sales situations. And then we will go with this compare numbers approach for first examples. Let me just show you some formulas and have a look at two examples. Imagine we have two examples, one product that is sold on average with 9.47 sales per day, and another product that is sold 0.6 sales per day. What will be probability distribution under Poisson assumption you can see on this slide. As well you can see a mean, median, and so-called minus one median that we'll explain further for this particular distribution. And let's assume that we ideally predicted the distribution and everything fine. Then the question arises, what will be the ultimate number of our metric, and assuming that we ideally predict this distribution, but it's just taking this statistical nature. If we look at mean square error, actually the mean square error is minimized by mean of this distribution, and the mean of this distribution for the left one is 9.47, and for the right one is 0.6. So we will take this mean, incorporate in mean square error, and then we get the best mean square error. If we're talking about mean absolute error, actually it's minimized by median. So it will be nine sales for left and actually zero sales for right case. And if we're talking about a mapper, the smallest mapper is achieved with minus one median. It is median of modified distribution, as you can see here. And actually, the numbers that will minimize a mapper will be eight for relatively fast-selling products and one for relatively slow-selling products. So you can see that actually different point estimators give us really different values for metrics and actually they optimise even different metrics at the end. So it means that if you would have two forecasts that you optimise, that you create it in some way, it might be that using some particular metric will give you wrong result just because you created your forecast based on minimisation of one function and then you compare another function. And what you can do, you can select smart point estimator for this case, depending on the metric you want to evaluate your model with. So select metrics wisely and select metrics that are relevant for your business point estimator or vice versa. If you know that your focus will be related under some metric, you can find out what the point estimator is minimising this matrix and then take this point estimator from your probabilistic forecast. Now moving to a bit more general problem, it's like apple to apple comparison, that's actually not so easy sometimes and not actually so widely understood. Also called scaling problem. Let me give you a number of toy examples. For example, we have one product with the following demand, that either with 50% probability it has zero sales and 50% probability it has one sale. And then per day it was sold either one or zero times. So what will be the best demand prediction? It will be obviously 0.5. And 0.5 will lead to RME of 100% for perfect forecast. Then if we just aggregate it in time, just one bucket in two, we will get best demand prediction of one, and then we get RME of 50%, actually. So formally we took the same forecast, we just did aggregation, and we got drastically different errors. If you go and say, like, we have 100% error or we have 50% error, or sometimes customers have, or your boss or your organization has some old forecast on quite aggregated level, they calculate some metrics, then you bring some advanced granular forecast, and then they calculate the same metrics. And sometimes even forgetting aggregating the forecast to the corresponding time level or the corresponding granularity. And then it can lead to the problems. You should understand this at the end. And let's take another example for something high selling product that either sold 10 times or 20 times. So actually, with bad forecast of 10, while the best forecast will be 15 sales per day, we'll get ME of 33%. That's actually better than previous examples. So at the end, if you're evaluating on really, really different scales, focus, different focus, and you don't make your scale consistent between different forecasts, or you can end up on this pitfall of scaling issues. Yeah, so what kind of conclusions we can derive from this? First of all, we need to compare metrics for different forecasts at the same aggregation We shouldn't compare focus for apples with focus for boxes of apples. We should compare apples to apples. Then we should understand that when we compare benchmarks, we should know where these benchmarks come from. From what generality? From whatever. So, we shouldn't just accept that there is some benchmark for our forecast quality. And when we're comparing different data subgroups, for example, Apple with dragon fruits, we should understand that actually they have different selling rate and they have different statistical nature for this product. That's why some metrics that make sense for Apple, some errors that make sense for Apple, will not make sense for dragonfruits. Second problem is knowing your limits. So if your boss comes to you and asks you, like, okay, I want tomorrow you to provide focus with 95% accuracy, and it's like, what, why 95% accuracy, can we reach it? What do you do, prototyping or whatever? So it's better to understand first actually what the ultimate error you can reach. Because your error has two ingredients. First of all, it's a reducible error, for example, overall focus bias that can reduce, and irreducible error, for example, statistical fluctuations or statistical nature of your data. And if we take two previous examples, for the first example, actually best relative Relative mean absolute error is 0.17. So 70% error that we cannot go down further. And for second example, the best relative mean absolute error will be 24%. So we really can't go down below this error. And again, if your boss asks you, can you please reach 95% accuracy, then you can say, We have average sales of 9.47, and taking into account statistical nature, actually, we just cannot reach this accuracy as we cannot exceed speed of light. It's just statistical nature. We can't reach it. We can't do better than, for example, 0.24. That's why it's important before evaluating forecasts to understand what is the ultimate performance you can reach based on some reducible error, for example, based on statistical flotations. And this actually, it will highly, really depend on scale you're working on or your predicted demand scale. Yep, so because you will have different statistical uncertainty based on your predicted demand. So the next problem I would like to talk about is grouping your data in the correct way. It is important to, quite often it's important when you're evaluating models that you actually group your model, for example, between slow selling products and fast selling products. And now you both come to you and ask, actually, why is your focus so bad for slow selling products and comparing them with good products, or why some particular forecast actually better for slow-slinging products than your forecast. And then you start thinking, okay, and that maybe our methodology is not fully correct, and here you can see as an example that two examples, imagine you have demand with either the 90% probability to stay the same and 10% probability to change. And you have just two stays, 0 and 1. So either 0 sale, either 1 sale. So good forecast for the first case will be 0.9 and for the second case will be 0.1, while biased forecast will be 0.85 and 0.05. And then if you actually bin your final results in observed demand, you will end up having your actually blue, so reasonable forecast, looking like worse than actually biased forecast, just because you binned with some information that you will get for this feature information that you will get later and not now. And that could be a big, big problem in this case when you're re-levelating forecast for different subgroup of data. And what is called kind of Hansen bias, and you can go and look at this blog post for more details. And generally, here you can see on the left and right, mean predicted demand on the left with binned observed demand for Poisson numerical experiment and the Poisson assumption. And you can see that it's actually, even for ideal forecast, it will lie far from diagonal. So the conclusion on this is that better to do your demand splitting or subgroup splitting based on information available now. It may be product groups, it may be predicted rates, like being predicted demand, but not on something that we'll get in the future, like real observations based on the future, otherwise your judgment could be biased based on this. And in addition, actually, binning demand makes different product really more comparable. And now coming to my conclusion, let's take everything together and try to understand actually how we can avoid all these biases. First of all, on the left, we select some meaningful metric. For example, for us, it would be relative mean absolute error. Secondary, we know our limits, so we know that our limits, we cannot exceed and get smaller error under this red curve. Then we also bin or group by our current available data, for example, bin predicted demand, and as well, actually, when we bin and predicted demand, it makes different product groups or categories, like apples and dragon fruits, more comparable. And here you can see blue and green, focus 1 for prototype 1 and 2, and yellow and red, focus 2 for prototype 1 and prototype 2. And actually, this picture is kind of amazing, because you can extract so much information. Let me give you a few examples. You can already judge that actually forecast 1 is worse than forecast 2 because your metrics are much below for all sailing crates. And even you can see that a lot of opportunities for improving your forecast with forecast 2 you get from high-selling products with around sailing crates of 1,000 or 200. Second interesting observation is that, for example, for product type 1 and product type type 2 are not really comparable. You can see that product type 2 doesn't have high selling examples. It's mostly only within source length region with small demand. But actually, it is much closer to ideal situation. And in this case, if you would just aggregate everything, you will get worse metric. But from this, you can judge it's much closer to ideal case. And also you can judge that forecast 2 can't improve this metric much. You can't improve it much because it's already close to ideal, close to its statistical limits. So that's more or less it, what I wanted to tell you and show this picture. So think about this, think how you evaluate your forecast, understand your limits, do Do smart grouping, and let me know if you're interested in some more information. And yeah, don't hesitate, join our webpage and our blog post, we are posting more information about and more details and more math behind all these problems that I described today. Thank you.
+
+**Speaker 2** _[25:23]_
+
+Thank you a lot, Elia, for the insights today. Let's go to Slido. So the first question, you talk about picking the right metric for different scenarios. Assuming your customer doesn't understand much, isn't the answer always MIPA or MIA?
+
+**Speaker 1** _[25:45]_
+
+If the customer doesn't understand much, first you need to try to educate the customer. You shouldn't give up on educating customers. Second point is you should understand what actually is important business case for the customer and try to select metrics that correspond to the business case of the customer. Because usually metric is illustration of losses that customer will experience under some assumptions. For example, it could be like lost sales or whatever. And different metrics are actually, since they're minimizing different numbers, can be more appropriate for some particular type of loss that is important for customer. So I hope it answers this question.
+
+**Speaker 2** _[26:38]_
+
+thank you next one you mentioned you can compare the predicted distribution and the actual one how do you get the actual distribution since you just observe one sale number
+
+**Speaker 1** _[26:54]_
+
+I mean, we have quite a long correlation period, for example. I'm not talking about that we absorb exactly one, but we absorb sales over a long period of time, and we run evaluation on backtest on a long period of time, and then we already have some distribution of sales. Of course, on one number, you can't do much statistical difference between different distributions. But if you collect enough backtest data, then, yeah, you can.
+
+**Speaker 2** _[27:22]_
+
+Cool. Demand tends to be over-dispersed. Is Poisson distribution really better than negative binomial distribution, for instance?
+
+**Speaker 1** _[27:31]_
+
+for instance negative binomial is definitely better but it has two parameters so it's a bit more complex but it's definitely much more appropriate for this use case I just use as personal assumptions as a simple assumptions because it has only one parameter
+
+**Speaker 2** _[27:50]_
+
+For discrete sales forecast, should we not first discretize around the forecast before we calculate the error?
+
+**Speaker 1** _[28:00]_
+
+I think rounding should be on the part of decision-making how this focus is consumed at the end because what we would like to provide we would like to price the best focus is possible because if we when we provide the full distribution as the entry prizes full distribution and then this distribution can be optimized and distribution of formal is collection of again rounded numbers with their probabilities. So at the end, it always comes from how this focus will be consumed and how this will be focused, used at the end in some further optimization process or ordering process.
+
+**Speaker 2** _[28:43]_
+
+So we are running out of time. One minute or so has to be a short answer, this one. When predicting a distribution, isn't the mode or peak of the distribution the best point estimator?
+
+**Speaker 1** _[28:56]_
+
+It depends on the business case and the metric. Again, it was exactly the messaging that different metrics or different business cases could lead to different point estimators of your distribution as the most optimal point estimators.
+
+**Speaker 2** _[29:12]_
+
+Thank you. So we have three left over questions which you might direct directly to the speaker as we are out of time. But please join me in to thank you, Ilya, for the great presentation.
+
+---
+transcript_status: auto
+---
+transcript_language: en

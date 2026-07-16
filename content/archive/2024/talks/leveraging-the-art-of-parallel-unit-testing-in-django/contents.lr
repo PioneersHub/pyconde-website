@@ -1,0 +1,164 @@
+title: Leveraging the Art of Parallel Unit Testing in Django
+---
+description: Unit testing is a fundamental practice in software development, ensuring the reliability and maintainability of code. However, in the context of monolith…
+---
+created: 2023-12-15
+---
+code: ZKDEPW
+---
+slug: leveraging-the-art-of-parallel-unit-testing-in-django
+---
+speaker_names: Azan Bin Zahid, Syed Ansab Waqar Gillani
+---
+speakers:
+
+
+
+### Azan Bin Zahid
+
+
+
+### Syed Ansab Waqar Gillani
+
+🚀 Python Enthusiast 🐍 | Software Engineer at Agoda | Architect of Scalable Solutions | Agile Advocate | Mentor & Innovator | Speaker at XtremeJS, DjangoCon, OpenEdX, PyCascades | Let's elevate the tech game together! 💻✨
+---
+abstract:
+
+
+Unit testing is a fundamental practice in software development, ensuring the reliability and maintainability of code. However, in the context of monolith repositories, executing unit tests efficiently becomes a formidable challenge. This conference aims to explore the intricacies of unit testing in Django within monolithic codebases and shed light on how major institutions address and overcome these challenges through the implementation of parallel testing strategies.
+---
+full_description:
+
+
+Key Points to Address:
+- Understanding Monolith Challenges:
+- - Identification of challenges and bottlenecks in traditional unit testing approaches within Django monoliths.
+- - Analysis of the impact on development velocity and code quality.
+
+- Introduction to Parallel Testing:
+- - Explanation of parallel testing concepts and its application to Django unit testing.
+- - Benefits of parallelization in terms of speed, efficiency, and resource utilization.
+
+- Parallel Testing Tools and Techniques:
+- - Overview of tools and techniques available for parallelizing unit tests in Django.
+- - Practical insights into configuring and optimizing test suites for parallel execution.
+
+- Real-world Experiences from Major Institutions:
+- - Case studies from leading institutions sharing their challenges with unit testing in Django monoliths.
+- - Lessons learned and best practices in implementing parallel testing strategies.
+
+- Implementation Guidelines for Django Projects:
+- - Guidance on implementing parallel unit testing in Django projects, including code examples and configurations.
+- - Tips for integrating parallel testing seamlessly into existing development workflows.
+
+Expected Outcomes:
+- Insight into challenges specific to Django unit testing within monolithic repositories.
+- Understanding the principles and benefits of parallel testing.
+- Practical knowledge of tools and techniques for parallelizing Django unit tests.
+- Real-world experiences and best practices shared by major institutions.
+- Actionable guidelines for implementing parallel unit testing in Django projects.
+
+Target Audience:
+This talk is tailored for Django developers, software engineers, and testing professionals seeking to optimize their unit testing practices, especially within the context of monolithic repositories.
+
+Conclusion:
+Join me in this 45-minute session as we navigate through the challenges of unit testing in Django monoliths and explore the art of parallelization. By the end, you'll be equipped with the knowledge and tools to transform your Django unit testing workflows, leveraging the lessons learned from major institutions in the industry.
+---
+room:
+---
+day: Tuesday
+---
+slot_date: 2024-04-23
+---
+start_time: 14:45
+---
+end_time: 15:30
+---
+slot_id:
+---
+track: Testing
+---
+tags:
+---
+submission_type: talk_long
+---
+submission_type_label: Talk (Long)
+---
+submission_type_id: 3579
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/ZKDEPW.png
+---
+youtube_id: cpu3Sn5NXQU
+---
+video_link: https://www.youtube.com/watch?v=cpu3Sn5NXQU
+---
+video_published_at: 2024-10-28
+---
+video_duration_iso: PT25M3S
+---
+video_thumbnail: https://i.ytimg.com/vi/cpu3Sn5NXQU/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:05]_
+
+Thank you, everyone. So I'm Ansab, and this talk is mostly about parallel unit testing. But I would like to start with a small word. Who has been laid off in their entire career? Anyone? Or have seen some layoff in the recent past? Cool. So a couple of people. So the thing is, in tech world, overall, in the last, like, two decades, it's been a, you know, trend that we have spent a lot in engineering features. We did a lot of testing as well. And we didn't, we sort of, like, build an infrastructure that is costing a lot to the companies. and eventually that was a bubble that that was bound to uh like burst so this is something that i learned in the past couple of years how to reduce your expenses how to reduce the development cost how to reduce the testing and yeah this this talk is about that and i would start with my introduction. So, good internet, but there was a picture of me over there. But I'm a software engineer. I work with edX. Open edX, you might know, is the biggest open source software based out of Django, also Python framework. I also work with Agoda in the recent past and yeah most most of my work revolves around architecture and expertise in testing also i'm a data enthusiast i don't think there's a surprise in that and i'm doing a master's in data science from fowler langen so yeah and my other partner azan again no picture over here uh was he works at amazon in the tooling team he he was my uh partner when i was working in edX and open edX as well and his work uh is also in tech but it's mostly revolves around search engine optimizations so he's a great guy and unfortunately due to some work he couldn't be here so everything that I've like I'll be explaining over here is part of his work as well so I would like to give him credit rates too. So starting with two factuals. When you're creating an API out of DRF, Django REST framework, and you're covering a basic CRUD, you're bound to write at least 35 unit test cases. So your code coverage revolves around 85%. It's the bare minimum code coverage that you can create and the other factual is in Django on average one unit test takes about 30 milliseconds to execute so if you execute one API view in unit test it takes approximately one to 1.5 seconds to execute completely and I'll build on that Open edX is one of the biggest open source Django repository, and it has over 5,000 unit tests in their biggest microservice monolith, and on average, it takes about 25 to 30 minutes to execute all tests, even if they're executing in parallel. So if you're working with monolith, this is a big, big challenge. And in Agoda, it used to cost about $190 per minute as an engineering cost. So if some tests take 30 minutes, you have to multiply 190 by 30. And that's your average cost of running one pipeline. this is a breakdown of the repo so as you can see this is this by the way this is an important slide and i want you guys to take a good note of of this data they have a mono repo and they have five different modules inside that lms cms they have a common library as well some propriety Open edX libraries and X modules and you can see that average execution time takes about 20 to 25 minutes in the latest and all of these tests are run individually right it used to be in series so the total time took the sum of all of these tests in the start. So this brings us why parallel testing is important. So we are trying to speed up CI CD pipelines, we are trying to reduce our expenses, we are trying to build scalable infrastructure without spending a lot of money again and again executing the same pipelines the same CI CDs and yeah we are trying to improve our execution timing of merging the code so in big tech there's a phenomena called MLDC which is which stands for for merge line time consumed or something like that. And it's a very big number for them. And it's like the starting point when you make the first commit in the repo to the time it's merged, right? And this is something that they want to spend the most amount of money on because they want to reduce their expenses. And on average, it takes more time to merge a code in the masters than it's required to build that feature, develop that feature. So it's a very big number for them. On average, I think Google posted a couple of years ago that their MLTC is somewhere around one to two hours, right? And for them, it's a very big number. so this is a sample build pipeline when you when you try to create this you have a build pipeline you have a linting pipeline you have unit tests integration tests security tests and this is a representation of how much time it takes to execute individually and as much as it it's important to cover all of these areas. I'm just going to cover the unit test and how we can break that. But it's something that you can execute in other functions as well. So integration tests and security tests, you can also use the same knowledge to break those down. And hopefully, it's a scalable idea. So typically, if you work with software, you would see something like this. this this might be um your build pipeline so you have a build um build job and then you have a linting and unit test running in parallel uh linting mostly depends like integration tests mostly depends on linting and their execute security tests in parallel as well so this is something uh that you familiarly see uh in in your tech environment but you can see that when we try to execute we're sort of like saving some time a little bit time and sorry one more thing we're sort of like uh saving some time over here and it's really important that this uh this blue part you see there's a huge gap over here and we can this this gap is something that we can work on um Similarly, after this integration test, we see this huge time lapse that we can improve on. So coming to series unit test, this is a sample of how unit tests are executed in the majority of the applications around the world. There are different test suite. They execute one by one, and most of the flaky tests are because of this as well. So, they all depend on each other for, you know, completing their executions, and all of them are, you know, executed in series, so it takes the time taken is like sort of the sum of all of these test suites. But what if we use the common resources in the application, and we sort of use multi-threading in semaphores and other things offered by OS to execute all of the test reads in parallel. How much time can we save? So if we do that, I actually have a slide in the end which covers all of these performance, but right now I want you to understand that we are sort of like closing on this gap that we have, which is really important, considering that this was the major point of concern for us. So the other idea is that we make all of these test feeds completely independent. So that is somewhat what Open edX is doing right now. So every single microservice that they have built inside their monorepo, they have executed all of their unit tests individually. You can do similar things, create different configurations for each kind of application and focus on executing their pipeline individually one by one, and they can run parallelly. Of course, you can run in GitHub, you can run in local as well, but of course it's not going to run in a series so it's going to save a lot of time and yeah this is something it's going to look like as you can see we have unit test suite one you know we have other suite as well and they can all run parallelly and individually and they are not dependent on each other and of course we have we save a lot of time executing the pipeline as well and as you can see we have also reduce our difference to a point that it is almost negligible. So benefits of parallel testing. Speed is the number one thing. It takes a lot of, you know, it's very fast in building, like, it's very fast in executing unit tests when in parallel. It's fast to translate this time in your development timelines, and you can reduce your MLTC considerably. And secondly, it's so this is like kind of my experience as well. So I ran into a problem which was on production level and we had to revert the code. But the code was taking a lot of time executing the unit tests, executing the integration tests and everything. So we sort of like for hotfixes, we sort of had to, you know, burn, like mute all of these tests for the execution timeline and deploy the hotfix. So it was not, it was like a security vulnerability in time. So if you're doing parallel testing and you're saving on your timelines, this is a faster time to recovery from an executionable code and of course when you're scaling your application you reduce your bottlenecks you can apply different multiple environments to execute your same kind of code and test your code in different environments as well we we can separate our concerns we can build independent functions independent services and they can all be in the same microservice micro monorepo and they will all work independently so it's it's a very important concept from parallel testing what are the limitations so the primary limitation is the cost of execution when you're working with parallel testing and you're creating independent jobs you're sort of creating an overhead in the pipeline so if you're running one pipeline instead of 10 you're obviously saving a lot of cost over there we have complex dependencies so this is a problem so for example you have a lot of microservices in a single monorepo and all of these dependencies are there for each different microservice and they're running their unit tests in series, they can cause all sorts of problems, first of all and secondly, they are all using common resources that can, if there's a race condition and some resources are being used by some application. And I don't know, database is a good example. If there is a right operation being done on a particular row and there is another unit test, sort of using that row for execution of its own in Django, it can create a race condition and it can create a lot of flaky tests. So, ideally, you would want something of, like, a stable testing environment so you don't have to run the pipeline again and again for failure. And lastly, there's optimization OCD. This is something like you create a lot of unit tests and you create a lot of parallel testing environments. optimization OCD is like you're sort of driving it down to a point that it's almost negligible to optimize further and you're still optimizing it and it becomes a hassle and it's in the cost of its own. So, yeah. this is a sample run of running parallel tests in django you can see this keyword hyphen hyphen parallel which is offered in django itself and it will execute all of your unit tests in parallel by itself by default so you don't need to do anything else except run run this in your code, and as you can see, this is something you'll see that all of these processes are running all of these tests in parallel. And what are the results? Parallel testing in Django is two times faster than executing them in series. So if you run all of these tests in series, I ran Open edX over here. If you run all of these tests in series, you can see there are 591 tests and it executes in 670 seconds. Somewhere around 11 minutes, somewhere above that. And if you run them in parallel, the same amount of tests are run a little below, a little above five minutes. So it's almost like 50% reduction over here. And here's a graph, this is a very important graph. So this blue line you see, it's running unit test without using the parallel keyword in Django. And you can see that this drives up exponentially when you increase the number of unit tests over here. So right about 10,000 unit tests, you see that the difference between without parallel test environment, it's almost 10,000, it takes about 48 minutes to execute. And with parallel test, it takes about 23 minutes to execute, which is approximately 53% reduction. and then there are optimization aspects in this as well you can use build caching to improve the testing environment you can use build caching to use the same resources for multiple parallel testing environments and if you run them individually in their individual suits it sorts of become you know a straight forward a straight slope horizontal slope which does not you know take more time than than you want so 48 minutes and six minutes there's a huge difference approximately 42 minutes and yeah more than 87 percent of RUNTIME EXECUTION. AND THIS IS HOW IT INTERACTS IN OPEN EDIX. OPEN EDIX, WHEN WE RUN ALL OF THESE TESTS IN PARALLEL, YOU CAN SEE THAT THE SAME RESULTS THAT WE SAW EARLIER, LMS, CMS, COMMON, THERE'S AN AVERAGE OF ABOUT 45 TO 50% OF REDUCTION IN EXECUTION TIMELINES. And it's a, I recently, they recently sort of like, you know, moved to this and it's been a very great success for them in the pipeline. So, yeah, I kept this short for you guys. And if you guys have any questions, you can reach out to me on LinkedIn.
+
+**Speaker 2** _[21:11]_
+
+So we have a few questions and Slido as the first one is about the testing time How come the testing is only twice as fast with six times? parallelization
+
+**Speaker 1** _[21:25]_
+
+Sorry?
+
+**Speaker 2** _[21:26]_
+
+How come testing is only twice as fast even with six times parallelization, right?
+
+**Speaker 1** _[21:32]_
+
+Right, so Django takes a lot of resources to build, like it's sort of like dependent on your environment, what sort of server you're using, what sort of operating system you're using. It should take a little bit more time than, like less time than what he's mentioning, but yeah uh it's mostly dependent on what sort of operating system and uh you're using and this is this was the results on my i was using mac m1 so this was the result on my
+
+**Speaker 2** _[22:17]_
+
+The next question is about having a monorepo. If you have a testing time issue in a monorepo, would it not be easier to split the monorepo to different repos is the question.
+
+**Speaker 1** _[22:37]_
+
+that's the question again it's uh based on your um preferences but most of the big tech they want different products to be um you know tightly observant and tightly coupled with each other at least their code base they they want microservices for the improvement uh in in like their deployments but they want the code to be there for everyone to see in the same place ideally and it's a very big hassle for developers to ex like push the code in different repos when when they sort of like develop so that's why um it's a personal preference but Yeah, it depends on you.
+
+**Speaker 2** _[23:27]_
+
+Next question is, do you share test or data fixtures in the test database between the unit test suites and how to avoid race conditions?
+
+**Speaker 1** _[23:42]_
+
+Right, so in Django, it's already, since Django is open source, there's already a lot of optimizations for race conditions. And in my testing, it's 0.01% chance that like one in 10,000 operations you'll run into race conditions. But ideally, when you're executing all of these test suites, in that's why independent parallel testing exists because all of these test suites have their independent resources to run and independent jobs so yeah if you're if you're not okay with that one in 1000 chance sorry 10,000 chance then you are your preference should be to give different resources to different up.
+
+**Speaker 2** _[24:36]_
+
+So we still have some time left, so I'll pass the mic on to the audience. If anyone has a question, just raise your hand.
+
+---
+transcript_status: auto
+---
+transcript_language: en

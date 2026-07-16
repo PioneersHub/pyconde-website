@@ -1,0 +1,232 @@
+# ──────────────────────────────────────────────────────────────
+# YouTube recording mapping
+# ──────────────────────────────────────────────────────────────
+#
+# Per-edition YouTube playlist IDs (filled in by Conference team
+# when recordings are uploaded), plus an explicit override map
+# for pretalx_code -> youtube_video_id.
+#
+# utils/sync_recordings.py reads this file:
+#  - If YOUTUBE_API_KEY is set in env: walks the playlists and
+#    matches each video to a Pretalx code by hashtag in the
+#    description (e.g. "#LPUC9T"). Overrides take precedence.
+#  - If YOUTUBE_API_KEY is unset: runs in override-only mode,
+#    using just the entries below. Useful before the API key
+#    is provisioned, or for one-off manual fixes.
+#
+# Set api_enabled: false to disable the API call entirely even
+# when a key is present (e.g. to reduce quota usage).
+# ──────────────────────────────────────────────────────────────
+
+api_enabled: true
+
+# ──────────────────────────────────────────────────────────────
+# Thematic video batches — the publish unit for the rolling release.
+# `make publish-video-batch YEAR=2026 BATCH=<id>` syncs just these
+# codes, rebuilds the site (moving sitemap <lastmod> + regenerating
+# /llms-full-archive.txt), and pings search engines. Add a blog
+# ItemList post per batch (see WEBSITE-STRATEGY-2027 quick win #2).
+# Fill `codes` as 2026 recordings land; the batch id is the slug you
+# want to reference from the command line.
+# ──────────────────────────────────────────────────────────────
+batches:
+  "2026":
+    # llm-agents:
+    #   title: "12 LLM/agents talks from 2026"
+    #   codes:
+    #     - ABCDEF
+    #     - ...
+    # mlops:
+    #   title: "MLOps at PyCon DE & PyData 2026"
+    #   codes: []
+
+# YouTube playlist IDs grouped per edition / channel.
+# PyConDE and PyData are separate YouTube channels — most editions
+# publish to both.
+playlists:
+  "2026":
+    pyconde: ""        # filled in by Conference team after the event
+    pydata: ""
+  "2025":
+    pyconde: ""        # 2025 was loaded via overrides.2025 (explicit code→video map)
+    pydata: ""
+  "2024":
+    pyconde: "PLGVZCDnMOq0r2tGyr-hjbnCrjXRkCMvwB"
+    pydata: ""
+  "2023":
+    pyconde: "PLGVZCDnMOq0peDguAzds7kVmBr8avp46K"
+    pydata: ""
+  "2022":
+    pyconde: "PLGVZCDnMOq0p0Fal8_YKg6fPXnf3iPtwD"
+    pydata: "PLHd2BPBhxqRKqmjd_L-CziP-Ui5gBvegF"
+  "2019":
+    pyconde: "PLHd2BPBhxqRLEhEaOFMWHBGpzyyF-ChZU"
+    pydata: "PLGVZCDnMOq0pNHTYo3i56zYU-Tdw5Uguw"
+  "2018":
+    pyconde: "PLHd2BPBhxqRJpeduPspa9tZiHUix4X1zh"
+    pydata: ""
+
+# Manual overrides — wins over API matching for the given year.
+# Year-keyed so the same Pretalx code (unlikely but possible) can map
+# to different videos across editions without collision.
+# Format: overrides.{year}.{pretalx_code}: {youtube_video_id}
+overrides:
+  "2026":
+    # 333HDN: dQw4w9WgXcQ
+  "2025":
+    # Bulk-imported from 2025-pretalx_yt_map.json (Conference team, 2026-05-11).
+    # 148 talks with confirmed YouTube recordings; remaining ~16 of the 164
+    # confirmed submissions in pyconde-pydata-2025 have no recording (either
+    # do-not-record, sponsor sessions, or filming gap).
+    3CYZUH: ZAW99CCc6Ok
+    3DCS8K: qKrt7U2tTmA
+    3DSU8V: yhUP1C4tI4Q
+    3FSWJU: lzxh1ZKVFqU
+    3FUYVH: DYpjKY0GjM0
+    3MNGN8: r8qK7HYq0uE
+    3VYSMS: OcGxDWNXPHU
+    3WLDMQ: "--WDDsBCU4w"
+    7CAVX7: HppVxUdO6Hk
+    7CXSPN: zE4gA0So2QY
+    7FLW7F: 88IvVleJXmo
+    7PDARV: 4VuAD1Z47kY
+    7RLYSQ: vAO7fx2UAWY
+    83QH37: 7okPLbQEE1M
+    89BX8V: boqR1M7SbiQ
+    8PFFPS: 4YmFBjnOeQM
+    8S3RC3: terv7KGaipM
+    933YXH: P4Yj9oQ_AaE
+    98FQDY: AsjEHVBpPVc
+    9CRNU3: KTpG-T3DK6k
+    9NFHAS: lnMchJ22zYE
+    9TRFCK: DnXRt8u0zvk
+    9Y9DM8: rzQNmNX2u_E
+    ABWHSD: 8FX4AXhRNMA
+    ADSXCA: 8nCCnBvuvLE
+    AEUZGX: cGwKZnxL_Nc
+    AGY8CT: KgyZrqzKSZg
+    AJDYRL: qeI8ehsyeY4
+    AWPYGE: OcApL2JPa9s
+    AYN837: jnKLgqk4Wro
+    B8TUR9: 4XdyHszFRME
+    BAASYV: 1LZqimczFKw
+    BJKSGK: d2qpJPDsJEs
+    BLKYGU: ScxPMrIMahY
+    BR3D83: ZgjI0AV5eKA
+    C3RVM3: YYgHAcLzClA
+    CMTKZS: 9nTNFtmNqbQ
+    CP3TKB: xKm1TYIO7Iw
+    CPCNRZ: DJk782DWcss
+    CRNJWQ: G2GMVfMrswg
+    CUJMCD: _BtTtpaPbOM
+    CVMPVG: FXBqn_bBDf0
+    CZXBEP: HYc_51nYKQ0
+    DEHZHK: 0ya1Zeb5ONk
+    DNVCEY: 0w2q22jUqmk
+    DPAPUA: kkEFux6uek8
+    DQTMJB: Xd5nGnJv6KY
+    DSHASE: rmcWbJgUCfg
+    ECNDQM: T4GTPqy0vjo
+    EDJ8N7: JxyUKL8jhBM
+    EGNBHD: iHt3-HeLcLc
+    EN3QPQ: PIGd2lYX3N0
+    ER3V7W: tH2iE7DWeCc
+    ESD7KF: SaYC1QIn18w
+    F7RDPT: J2lUeEM9Bwg
+    F9EFXA: nmxfp-CxoXc
+    FGEUJJ: EJVD-jU1A44
+    FSK3PE: VwoGSrqh364
+    FUX3FR: lRyPdDqgqcw
+    G3AT7E: y3tag45TX9M
+    GGJDTW: UbKZESDKZN4
+    GJ9MVT: BCZRwKY6Zrs
+    GRWYQB: iBg-t99bVi4
+    GUEAHT: 2USI-Eaecn0
+    GUKTNX: tbDgPppdvCU
+    GURXPK: 3meErI1Qlag
+    GVUPQN: enhjn2ShxV8
+    HKYQDB: EE3xRZYRyyQ
+    HPGEKH: zqJrImbKHpY
+    HQWAYP: hfKdAC03bNU
+    HSFR7A: 1F_G0q3HrVk
+    HYE8EX: pjCG-LmKvKM
+    J7YKEE: 6QiL3qWNtq8
+    J8FLDN: mb7a_WErTck
+    JA9NFW: RViiO2o6RgA
+    JABVHK: OxlsHjGxMQ8
+    JH97CL: 74cW4HfZ5p8
+    JM3G8S: js7L8gDIVWw
+    JUQ9JJ: pLGoPOGpSUI
+    K9ACTV: dYwHidxANHI
+    KCSSJ7: HHr7AGN2xAA
+    KCV9RS: gbiIkrHCZ_k
+    KTJY9V: DHq-DcN3WTw
+    KZKT9W: x6UptDWh7_k
+    LBKU3T: LEZNNehGsCA
+    LNW3KE: UP-sLRPbQYo
+    LRUKZQ: EwuqWBIKhqs
+    LYDDDC: _MuCOm9Ebk8
+    M98YBR: NnxAHdLY058
+    ME7XPJ: rdzTOw2Z13Y
+    MJD7TG: OjVfonKKJ-A
+    MNTFRG: JDw0RGnV2kg
+    MRHNCV: YdFeHj5lRP4
+    MSUCAS: 6St1jRCUZT8
+    N9CAUM: KteUTU00Y2A
+    NBFH7G: "-oT9sGgGBLI"
+    NF8UPF: yXpHtgXsMz0
+    NNGWGC: 7DjU7pTawKQ
+    NPMNCE: mn-Cnuz9Kno
+    NQ3RHQ: bNqg-JPzD70
+    P8GUWG: pZ3bdLW0e-A
+    P9GRZU: Mw4-nlAhH40
+    P9VKRV: iiYKsL3YRaE
+    PDBAXQ: h3zlTirlwp4
+    PKZD8L: MNjCQSx0vfk
+    PLMJZ8: N2Wx1XZ__M0
+    PNQB7C: fzAcoz3jyFo
+    PW3VKG: C-Jle-23rQ0
+    QN3BTA: Th4q9oZdA6E
+    QXSQKL: 64jNiWtjCGU
+    RAHBEP: gH5T9A_x-Ug
+    RQ8JBM: KAopX344WGM
+    S8MUBF: qbnn_o2nMsI
+    SFDRTR: KRhdQ4kzsZ4
+    SUDMDV: p5ERIJvz0rA
+    SVLRGG: Z4p-D6Qrp3g
+    SXRVNU: dnY_80XxpDE
+    SZFRRA: 01xCBFV5_RY
+    TAXVSC: sAmh5S0MGhs
+    TMBTYH: EcVvYhh4wI0
+    TQLGA8: ZIJUyf5bcww
+    TQN98D: 37S0ZDpJpc4
+    TRUUVL: MWJW22a_XnA
+    TXKLWR: z6-ati26i4Q
+    TYXMZC: d_ha7WyCVXI
+    U9KHNA: w1EU-B5Gzoo
+    UCG9AS: zf0gUvYevyE
+    UDDTBS: n50E6k1h0HE
+    UH7FXA: X-cIxrKyhQA
+    UVPALT: UywLYyNcA8k
+    UXTCZC: BR_zakAFO0c
+    VBW3EK: _n4JOMnAeCs
+    VDG9YG: EiMPQsI2__Y
+    VFE78U: 9MWXHbF9cPA
+    VJR39N: E7p6Ata8SfY
+    VKYDBD: GA3NU7Tmb2U
+    WCDPLP: H7FCDLqEpk8
+    WJPEQH: UjDTAGHPcMI
+    WLZSEZ: n3IeBB7Q9bw
+    WMBDJ8: afnWiypKTIM
+    XB8VG7: EFMysngXGRc
+    XLZQFA: 7IZqnDX2HRk
+    XRHEYZ: 9IkwXGe2Gaw
+    YLKDJK: r32xrBzEkIw
+    Z9ZTAH: evn-_i9MSsw
+    ZACM3E: 7x1cGhyjv7c
+    ZMKJAY: kzpcqAiveyg
+    ZT3MGL: 78hdQK0pUtE
+  "2024":
+    # Conference team to fill or generate via API+playlist walking.
+  "2023":
+    # Conference team to fill or generate via API+playlist walking.

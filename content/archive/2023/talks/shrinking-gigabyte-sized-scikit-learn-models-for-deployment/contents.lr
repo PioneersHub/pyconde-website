@@ -1,0 +1,280 @@
+title: Shrinking gigabyte sized scikit-learn models for deployment
+---
+description: We present an open source library to shrink pickled scikit-learn and lightgbm models. We will provide insights of how pickling ML models work and how to…
+---
+created: 2023-01-05
+---
+code: 7EUPC3
+---
+slug: shrinking-gigabyte-sized-scikit-learn-models-for-deployment
+---
+speaker_names: Pavel Zwerschke, Yasin Tatar
+---
+speakers:
+
+
+
+### Pavel Zwerschke
+
+Pavel is a data engineer at QuantCo who is currently studying Mathematics and Computer Science at KIT.
+
+### Yasin Tatar
+
+Yasin works as a Data Engineer at QuantCo and studies Computer Science at Karlsruhe Institute of Technology (KIT)
+---
+abstract:
+
+
+We present an open source library to shrink pickled scikit-learn and lightgbm models. We will provide insights of how pickling ML models work and how to improve the disk representation. With this approach, we can reduce the deployment size of machine learning applications up to 6x.
+---
+full_description:
+
+
+At QuantCo, we create value from data using machine learning. To that end, we frequently build gigabyte-sized machine learning models. However, deploying and sharing those models can be challenge because of their size. We built and open-sourced a library to aggressively compress tree-based machine learning models: [slim-trees](https://github.com/pavelzw/slim-trees).
+
+In this talk, we share our journey and the ideas that went into the making of slim-trees. We delve into the internals of sklearn’s Tree-based models to understand their memory footprint. Afterwards, we explore different techniques that allow us to reduce model size without sacrificing predictive performance.
+
+Finally, we present how to include slim-trees in your project and give an outlook on what’s to come.
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2023-04-19
+---
+start_time: 10:50
+---
+end_time: 11:20
+---
+slot_id:
+---
+track: PyData & Scientific Libraries Stack
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 2521
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Novice
+---
+supporting_material_url: https://github.com/pavelzw/slim-trees
+---
+slides_link: not yet available
+---
+social_card_image: /static/media/social/talks/7EUPC3.png
+---
+youtube_id: dtUn1ifDBXQ
+---
+video_link: https://www.youtube.com/watch?v=dtUn1ifDBXQ
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT27M35S
+---
+video_thumbnail: https://i.ytimg.com/vi/dtUn1ifDBXQ/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:02]_
+
+Thanks for all of you for coming to our talk. Nice to see so many familiar and friendly faces. Yes, as just mentioned, we're talking about how to shrink your large machine learning models, like for deployment. That's my colleague Pavel Zversky and me. And yeah, let's get started. So this is a story about a rabbit hole that we're just going to go into, about some pickles, and finally some thin or rather slim trees. So let's have a look. First of all, a little bit about what we do at Quantco. At Quantco we do large-scale like machine learning applications mostly for economic like an economic use cases and for that we mostly also depend on open source software that we use and since in economic a lot of our data is like tabular by nature we have for example a lot of Calgary kilts we also use a lot of tree based models for example random forests or gradient boosted trees and this works very well actually this works surprisingly well the thing is though that these models tend to get large very fast for example when we look at the one model that we will go through the talk to today it's already like a simple pipeline 1.2 gigabytes large because we just have that much of data though so many features etc and this makes sharing these models hard this makes like iteratively working on these models hard and most important for us this makes it very hard to get these models like fast and efficient behind our difficult client infrastructure that's hard to work with. So we had to solve this issue. And let's have an intuitive look at what probably are our options here. I mean, the obvious first pick is to, why don't you just use another model type, another architecture? The thing is, with, for example, neural networks, you might either lose some predictive performance, which is often the case for tabular data, or you might lose some kind of interpretability that is, for example, very important if you're in claims management, what we do. So that's not always a generalizable option. Another thing might be, and that's also what we do at Quantco for some of our projects, to just transpile into other formats, for example, ONIX and use the ONIX runtime. The thing here is, though, that might also not be generalizable if you have already, for example, built your models, built your pipelines, you have very custom pipelines that are not implemented by ONIX yet. so this is like a huge engineering overhead that you first have to overcome to be able to deploy the solution and The next one is like rather very obvious. Why don't you just zip it again use lcd amazing standard etc And this works this works even like surprisingly well, and we will come back to this later actually, but we felt like okay There's there's probably more that we can take out So we like took an afternoon or two or three and went down the rabbit hole and had a look at like Like, why are these trees so large anyways? What are they made up of?
+
+**Speaker 2** _[02:56]_
+
+Yeah, so let's have a look at how Python actually saves these scikit-learn pipelines. So quickly, before we actually dive into how the saving works, just have a quick reminder of how decision trees actually work. So for an input data frame, let's call it X, a decision tree, or the inference of a decision tree, that's what we are interested in. It basically just goes down the tree, and at each node, for example here, we have X of 8, so the 8th input, the feature, the tree, for example, looks at if the feature data, if the input of column 8 is smaller, equal to then minus 0.22, then we would go to the left and we iteratively go down the tree until we reach our end here and that's basically the output of our decision tree. So now let's take a look at what actually is inside of our models and how they get stored by the pickle module. So what the pickle module does, it calls the get state magic method in Python. So in our example, we had an sklearn pipeline which consists of multiple steps, and therefore the getState method of this pipeline would be something like a list of four, in this case, four different sklearn objects. And we'll have a look at the third object, for example, that's a random forest regressor. And what pickle now does is it's calling the getState method recursively on this object. So now it would call regressor.getState, and what that would look like is something like a list of different decision tree regressors, because trees consist of multiple decision tree regressors, or random forest regressors in this case consist of multiple trees. And these trees are basically the part of our model, of our pickled model, that take up the most space. So let's have a look at what our decision tree regressor state looks like. It's basically just a dictionary of NumPy arrays, and each entry would correspond to each of these nodes. So let's have a look at, for example, the left child array of this state. The left child of the node of index 0 would be node of index 1, so that's basically that one. the zeroth index here in this left child array is 1. The left child of node of index 1 would be node number 2, and node number 2 is a leaf, that's why their left child entry in this left child array would be a minus 1. Okay, so basically all of these attributes that we just talked about, that I've shown you right now, they all consist of in64 or float64 numbers, i.e. 8 bytes per element. Our pipeline consists usually each of the tree consists of approximately 12,500 nodes, and our pipeline consists of approximately 1,500 trees. So with these 64-bit numbers times 12,000 nodes times 1,500 trees, we get to 150 megabytes per attribute, and because we have eight attributes, we have the left child, right child, feature, threshold, impurity, end node samples, weighted end node samples, and value attributes. With these 150 megabytes times eight, we get to 1,200 megabytes in total of disk space usage. That matches approximately with the 1.21 gigabytes that we saw earlier in the presentation. Okay, so let's have a look at how we can actually save some space for each of these attributes. So let's start with the left chart and right chart attribute. As we already saw earlier, these are just plain NumPy arrays consisting of numbers, and these are basically the indices of the different children. What we can see obviously, what probably all of you already noticed earlier, that we have a lot of minus one values. These are basically just the leaves. Instead of wasting these precious 8 bytes per element, we could also just only save the non-leaves and only the leaf indices of these entries, so we would only save in this case here the 1, the 2, and the 5, and that's it. And also just if it is an index, just another array, we would call it isLeaf, if it is an index, if it is a leaf or not. And also another thing that we can do is most trees have less than 65,000 nodes, so instead of using int64 for this array as a data type, we could also just use unsigned int16 instead of int64. With that, we can also get it down from 8 bytes to 2 bytes, and that's basically what our final new state would look like here, the left child is leave array. With that, we go down from 150 megabytes to 21 megabytes for the left child array and the isleaf array together. And for the right child array, since we don't need to store the isleaf array a second time, we go down to 19 megabytes. Let's go further to the feature array. This is relatively similar to the isleaf array. Here we can also see that we have a lot of minus two values for exactly the leaf indices. So these four here. Why they are exactly minus 2, I don't really know, I can't tell you. It's just how scikit-learn implemented it. But what's obvious is we can just omit them because we don't really have to look at any features in leaves. And also like before, most models have less than 65,000 features, so here we can also just use unsigned int16. And therefore we also go down to 18.8 megabytes and with that we already are from our 1,200 megabytes from before, we go down to 800 megabytes already. Now let's look at the threshold attribute. Here the threshold array basically says where we need to split. So if we have an input data and we need to split at here in this example at the first node, we want to split at minus 0.22, so all elements where the corresponding feature for this threshold would be less than minus 0.22, we would go to the left, and all where we are greater than minus 0.22, we would go to the right. And yeah, again, as with the feature attribute, we already have a lot of minus 2 values here for the leaves, we can also just omit them as before, because they are not really necessary, I don't know why scikit-learn especially used minus 2 there, but, yeah. And then another thing that we could do maybe is also downcast from float 64 to float 32. Do we actually need this super precise precision here? Yeah.
+
+**Speaker 1** _[10:25]_
+
+Yeah, but the thing with this precision here is what about our predictions? We want to have these large and good machine learning applications and we need precise results, and when we tested this downcasting from float 64 down to float 32, we actually realised, OK, we're getting a lot of problems with our predictions. They are not only a little bit different, they are vastly different in a completely different region, and you can actually see the reason here in this little example. On the left, we have our original tree, and on the right is the initially compressed tree. And the right one has a reduced precision for the threshold values. And when you now look at our features, for example, like in X, the last one, the 1.231, when you go down the tree, it ends up in a completely different region because the threshold is a little bit different and there might be some changes. So this was not acceptable, I mean, this changed our predictions, so we searched on for other solutions, and we had a look at these threshold values a little bit closer, and we realised OK, a lot of them are actually at these 0.5 splits, and this is because, as I've mentioned a few minutes ago, we have a lot of categorical features, 1, 2, 3, 4, 5, et cetera, and sklearn chooses to split these in between, like between 1 and 2 will be the 1.5 split, and thus we have a lot of these values, and the very simple idea was to just omit the 0.5 part and later add it back again so we can save a float 64 number in theory in just a small integer. And this works, it surprised us as well, it works really, really well, it's like a five time space improvement already, but it varies from use case to use case, from tree to tree of course. And don't worry, we won't have to go down the whole list because we can actually omit some of these features, take a little shortcut, because remember we want to deploy these models. This is like for inference time, we don't need a lot of these features that were used either for interpretability or for training further. For example, here, a node sample stores how many of these samples ended up in a specific node in the tree, and that's like utterly unimportant for inference later on. So the last thing we have to look at is, like, yes, just omit them, the last thing we have to look at is just the value array, and these are now our final predictions that we do at the bottom of the tree. And here we then actually chose to go down from float 64 to float 32. And now you might think, okay, isn't this the same issue all over again? But when you look closely, this is also a loss of precision in the 20th decimal point and not a completely different region for the prediction. So on all the tests we did, it had practically and significantly no effect at all. So we were able to also save a lot of space by just, like, downcasting these numbers. And with that theory in mind, like, with the numbers we just calculated here, we were able to get, like, a nine-time space improvement without having, like, any loss in predictive performance, without having to do anything super crazy. But the thing is, though, how do we, like, actually in practice then implement this and get this to work on our models.
+
+**Speaker 2** _[13:40]_
+
+Yeah, so let's quickly take a small look at how we can actually implement this custom behavior in Pickle. What Pickle allows us to do is defining custom Picklers. So usually you say Pickle.dump and then file and model. But what you can also do is create a custom Pickler. So you call Pickle.pickler of a certain file. And then you can specify the dispatch table. The dispatch table is basically a dictionary from class to method that actually handles the pickling of set class. What we can specify here is the dispatch table for the tree object in sklearn, and then when we set it to a custom method, which we called compress tree pickle, that actually handles the theory that we talked before, and then call p.dump of our custom pickler, then we are basically done. I won't bore you with the implementation details for this compressed tree pickle. It's basically just the theory that we derived earlier, but, yeah, looking at that code is probably not that interesting. Okay. Thank you. Okay. Yeah. So let's look at the benchmarks of our model. So how does it actually behave in practice? We derived the 130 megabytes before for our model. Let's actually look at how it actually does in practice. So we have our model from before, our SKlearn pipeline, which was 1.2 gigabytes in size. When we apply our methods, we get to around 175 megabytes. So that's already more than six times improvement. Not the complete nine times, but it's already pretty good. And when we then also apply a compression algorithm on top of it, we get to 102 megabytes. So that's all in all more than 11 times improvement over the original 1.2 gigabytes in size. Also now comes the bit of a trade-off, because when we actually implement custom behaviour into the pickling, we have to execute obviously this custom behaviour and do some casting at everything, and that obviously also takes some time, and here we have the base time for the saving for the dumping and the loading of the objects, that took like one second, and our new method took something like a 60% increase in time, but that's only for when you actually save the model and load the model, so only at startup time it's actually relevant. During inference both methods perform obviously the same because they are only trees in RAM. And also when we look at the other large bar here, that's just because we have the compression algorithm obviously takes time to compress like 170 megabytes of size. So that's why that's so large we can't do anything about that. Here we can also see that our method actually scales. So with different number of trees, we also got similar performance, similar compression performance, so that's also good. And now comes the part where you can actually use our methods. We created a library which is called slim trees. You can install it via pip or via conda, and then just call dump sklearn compressed and put in some kind of sklearn model, because pickle handles everything recursively. All trees are saved in a custom manner, and then specify the path and the compression algorithm that you want to use, and with that, you're basically, yeah, you basically have your model saved. So in one line of code, you're basically done. Alternatively, you can also use it as a drop-in replacement, so if you have somewhere a line where you call pickle.dump, you can also just, yeah, use another method that we provided and call sklearn3.dump.
+
+**Speaker 1** _[17:52]_
+
+And you might now think like what are they talking about? This was like pretty easy four steps, right? Like yeah, that's true It's basically a little blueprint about how you could do this for your own models You might not be using SKLearn decision trees But for example a lot of you might be using like at least a part of the room Like GBM and when you have a look at for example How does like GBM do all of this stuff when you call like get state on like GBM's for example trees? They actually present you with a string where all the data is stored like they store numbers in a string and you might think okay I can do better than a string and you might go on and parse that string for example In a dictionary apply some compression on the dictionary and later on when you want to decompress stuff You take the dictionary and recreate the string again. It's like a fun afternoon of regex and string parsing and And then you just have to do like the pickle modification stuff where you like overwrite the dispatch table entry also like a little bit of details but nothing like too crazy and that's already it like that's how we implemented also the six times improvement for light GBM and you can do this probably for a lot of other models as well when you just want to modify their pickling behavior and of course we also implemented like integrated that into the package already and we're already working on other packages for example. example, but it's like a simple four-step blueprint on how you might do that at home. So that's it, guys. Thanks for listening. We are very thankful that we had the time to do stuff like that at QuantGo. Maybe you want to, too. If you have any questions, I think we have some time left.
+
+**Speaker 3** _[19:41]_
+
+Right. Thanks a lot. There's plenty of questions actually. So starting off with a question from Anonymous. How big is the baseline model compressed with LZMA?
+
+**Speaker 2** _[19:51]_
+
+It was, maybe we have something in the slides. Yes, here we can see, not the exact number, but it was around... It's that one. Yes, that one, yes.
+
+**Speaker 1** _[20:03]_
+
+It's a little bit about 260 megabytes, I think, 265.
+
+**Speaker 2** _[20:03]_
+
+It's a little bit about...
+
+**Speaker 3** _[20:08]_
+
+Cool, thanks. Daniel asks, how easy is it to integrate your approach with MLflow model packaging?
+
+**Speaker 1** _[20:16]_
+
+Do we have experience with MLflow?
+
+**Speaker 2** _[20:19]_
+
+We don't have experience with MLflow, but I would say it's pretty easy. You just have to replace one line of code just only where you say pickle.load of this file. That's where you have to specify it and I don't have that much experience with MLflow, so If it's easy to replace that one in MLflow, then yes, if not, then maybe not.
+
+**Speaker 3** _[20:43]_
+
+Thank you. Another anonymous question. Did you also compare your improved pickling method to storing the ML model as an ONNX model?
+
+**Speaker 1** _[20:53]_
+
+That's why what we mentioned like at the beginning that was an alternative It brought like for for the basic model we used for the test here brought a lot of like space improvement I think you might even have like the concrete numbers But it only works like in the case where you don't have a lot of custom stuff in your pipeline So we didn't like go any further and included in the benchmarks
+
+**Speaker 2** _[21:15]_
+
+Yeah, I think this specific pipeline, 1.2 gigabytes, was something around 600 megabytes, something like that, in ONNX, but yeah, I don't have the exact numbers again.
+
+**Speaker 3** _[21:30]_
+
+Thank you. Another anonymous question. How are you sure that changing the D types will not change the functionality besides the prediction function? Will this work for other functionalities?
+
+**Speaker 1** _[21:44]_
+
+I mean, there are some cases where the dtype changes from a large integer to a small integer and that should have no effect at the functionality at all.
+
+**Speaker 2** _[21:57]_
+
+Wait, I think I understand what the question means. So what we do at the end, after we store it in the pickle file, what we do then by loading is we change it back again to int64 because sklearn can only handle int64 dtypes, otherwise it would crash.
+
+**Speaker 3** _[22:15]_
+
+Cool. Thank you Another anonymous question. Have you considered using other boosted tree lips such as XGB or lgbm if yes Do you have the same size problem with those models?
+
+**Speaker 2** _[22:28]_
+
+Yeah, light GBM. That was probably a question before we introduced light GBM. So light GBM. Yes, we did we did XG boost we didn't consider yet, but I think yes, and you looked at it a bit and it's
+
+**Speaker 1** _[22:40]_
+
+it we haven't tried it like really in production so i can't like really speak to that um but
+
+**Speaker 2** _[22:45]_
+
+But XGBoost uses JSON files to...
+
+**Speaker 1** _[22:48]_
+
+to store it, so that should also be
+
+**Speaker 2** _[22:48]_
+
+Exactly. that should also be um we should also also be able to get some kind of improvement maybe not as in the order of magnitude as an sk learn but yeah it should be also possible
+
+**Speaker 3** _[23:00]_
+
+Makes a lot of sense Another anonymous question. Did you try converting your features first to 32 bits train and then do the same optimization of thresholds?
+
+**Speaker 2** _[23:12]_
+
+I think sklearn only supports trees with 64 bits that's just the sklearn implementation I think so but I'm not 100% sure
+
+**Speaker 3** _[23:23]_
+
+Cool. Another viewer wonders, what would you do if your model will be upgraded to another version? Would your methods still work?
+
+**Speaker 1** _[23:34]_
+
+Like, you mean the overall, for example, the SKlearn update or model upgrade? That's my answer. That's actually a good question. I think that's a general problem of pickle itself, right? Where you are not able to transform these models into different versions because they need to save the whole environment. So we have that drawback as well, obviously.
+
+**Speaker 2** _[23:53]_
+
+obviously. But if you train a model with, for example, sklearn 1.2 and then you train another model with sklearn 1.5, as long as the internal pickling behavior of sklearn itself doesn't change, our methods still work, but that's up to sklearn.
+
+**Speaker 3** _[24:12]_
+
+Cool. Another anonymous question. Could you also PR this into the sklearn repository to have this as the default behavior?
+
+**Speaker 2** _[24:21]_
+
+Some of it, maybe yes, but for example, the whole imputation and the end node sample stuff, I don't think that the sklearn guys would welcome this change of just dropping all of that stuff in pickling. But yeah, some of the, for example, the dtype stuff could be implemented in sklearn as well.
+
+**Speaker 3** _[24:43]_
+
+Cool another anonymous question a problem with pickle shrinking is that the actual class file of the model is not saved Save does your method save the class inference inside the shrunken object?
+
+**Speaker 1** _[24:59]_
+
+I don't think we modify anything in that regard, right? No, that's a very good question. I don't think we modify any part of the pickle behavior at that place. We only change how pickle stores a single object or a class of trees, for example, but don't tell pickle what to save and what to not save in that regard. So it should stay the same.
+
+**Speaker 3** _[25:23]_
+
+I have one more anonymous question. Can you compare your solution to just compressing with G-Zip?
+
+**Speaker 1** _[25:33]_
+
+Oh, that's like the same with LZMA, like the question before, but worse. LZMA is, I think, the best performing compression so far. I think with GZIP, it was around like 400 megabytes, maybe, something like that. It was a tad lower.
+
+**Speaker 2** _[25:45]_
+
+Yeah, LMA performed a bit better than GZIP, but yeah.
+
+**Speaker 1** _[25:48]_
+
+Yeah, use LZMA if you can.
+
+**Speaker 2** _[25:50]_
+
+If you can was the that was the part where we use l that may use it was Maybe probably somewhere like here. Yeah
+
+**Speaker 1** _[25:56]_
+
+yeah all right scientific
+
+**Speaker 3** _[26:02]_
+
+One more question from anonymous. Did you explore storing the tree's parts separately in parallel? Could help to bring the safe load times down while compressing.
+
+**Speaker 1** _[26:11]_
+
+That's a very good idea, and that was also my first idea I had. The thing is, though, that parallelism in Python is first not fun, and also it's not always efficient, so it took a lot of time to start new processes, et cetera, and for these not super, super large models, it actually took longer because you have to start all these processes than to just dump them serially. But that's definitely something we're going to look into further to try and get the speed.
+
+**Speaker 2** _[26:37]_
+
+Speed yeah, also the large as the large model size in sklearn Comes from a lot of different trees and these are different tree objects and in order to parallelize these this one We would need to go really deep into pickles own behavior and re-implement some of that and that is probably not easy
+
+**Speaker 1** _[26:55]_
+
+More than an afternoon
+
+**Speaker 3** _[26:56]_
+
+Makes sense and then final question from Mustafa. Did you try the methodology with a different mix of numerical and categorical data?
+
+**Speaker 1** _[27:06]_
+
+We actually had like a whole suite of different like more or less randomly generated models that we tried this on and it obviously varied For example, the half-end compression works on categorical data way better But there was like all of them had at least a 5x improvement for example, but that's a good question
+
+**Speaker 3** _[27:25]_
+
+All right, let's thank the speakers again.
+
+---
+transcript_status: auto
+---
+transcript_language: en

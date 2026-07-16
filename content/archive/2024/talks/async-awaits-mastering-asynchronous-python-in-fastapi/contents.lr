@@ -1,0 +1,222 @@
+title: Async Awaits: Mastering Asynchronous Python in FastAPI
+---
+description: In this talk, we delve into the transformative world of asynchronous programming in Python, tailored specifically for the FastAPI framework. This session…
+---
+created: 2023-12-22
+---
+code: DPVJ7K
+---
+slug: async-awaits-mastering-asynchronous-python-in-fastapi
+---
+speaker_names: Bojan Miletic
+---
+speakers:
+
+
+
+### Bojan Miletic
+
+_About — in the speaker's own words_
+
+Hi there! I'm a seasoned MLOps professional, specializing in bridging the gap between AI/ML concepts and real-world applications. My expertise lies in transforming ML models from theoretical data lab projects into impactful proofs of concept, MVPs, and fully operational products. I'm passionate about demonstrating the tangible value of these models to investors and key decision-makers.
+
+Leveraging #Python and #AWS, I focus on extracting real business value from ML algorithms. My role extends to mentoring AI scientists in crafting clean, reusable Python code, significantly cutting costs in ML software deployment and development. Think of me as your go-to fractional MLOps expert, guiding your company through the intricate world of ML and DevOps. Join me in exploring how to effectively manage, monitor, and mature ML models in our ever-evolving digital landscape
+---
+abstract:
+
+
+In this talk, we delve into the transformative world of asynchronous programming in Python, tailored specifically for the FastAPI framework. This session will explore the fundamentals of async/await syntax, unveiling how it can optimize the performance and scalability of web applications. 
+
+Attendees will gain practical insights into implementing asynchronous operations in FastAPI, from setting up to handling real-time data processing. This talk is perfect for Python developers eager to harness the power of asynchronous programming to build faster, more efficient web applications. Join us to unlock the full potential of Python's async capabilities within FastAPI's dynamic environment.
+---
+full_description:
+
+
+In this 30-minute session, we'll embark on a journey to master asynchronous programming in Python, specifically focusing on its application in the FastAPI framework. The talk is designed to provide a thorough understanding of async/await syntax and its practical use in building efficient, scalable web applications.
+
+### Timetable:
+
+#### 1. Introduction to Asynchronous Programming (5 minutes)
+- Brief overview of asynchronous programming concepts.
+- The importance of async in modern web development.
+
+#### 2. Understanding Async/Await in Python (5 minutes)
+- Deep dive into Python's async/await syntax.
+- Key differences between synchronous and asynchronous code.
+
+#### 3. FastAPI and Asynchronous Python (10 minutes)
+- Introduction to FastAPI with a focus on its asynchronous features.
+- Demonstrating how FastAPI leverages Python’s async capabilities.
+
+#### 4. Building an Asynchronous Web App (7 minutes)
+- Step-by-step guide on setting up and coding an async web application in FastAPI.
+- Best practices for handling asynchronous operations.
+
+#### 5. Q&A and Wrap-Up (3 minutes)
+- Addressing questions from the audience.
+- Summarizing key takeaways and concluding the talk.
+
+Join us to unlock the power of asynchronous Python in the world of web development and learn how to effectively implement these techniques in your FastAPI projects.
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2024-04-24
+---
+start_time: 14:45
+---
+end_time: 15:15
+---
+slot_id:
+---
+track: Programming & Software Engineering
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 3578
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Novice
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/DPVJ7K.png
+---
+youtube_id: 1z8LLSZSWHM
+---
+video_link: https://www.youtube.com/watch?v=1z8LLSZSWHM
+---
+video_published_at: 2024-10-28
+---
+video_duration_iso: PT30M24S
+---
+video_thumbnail: https://i.ytimg.com/vi/1z8LLSZSWHM/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:06]_
+
+Thank you so much. It's wonderful to see you all here. And round of applause from me to you. Okay, so today I'll be talking about async. As you know, it's a pretty confusing topic for me most of all. So my goal for this is, especially since this is the last talk of the day, and you just had food, to make it as light as possible, and you can remember a few of my jokes, not to confuse you too much with all the stuff. As the introduction said, I mostly work with ML Ops, and I've been working with Python for the last nine years. And luckily, I didn't have to deal with async programming up until two or three months ago, so I'm pretty new at this stuff. Well, during this talk, I'll be presenting how to create the coolest and smartest AI ever. And also I'll be sharing my experience how I lost a bunch of ice cream because of the mistakes I made in Async. One of the tools that I'll be covering here that is essential for any sort of AI is FastAPI, Async, and Python. You can't make APIs without that. I love FastAPI because it's beautiful. I love beautiful things, beautiful syntax, and everything that's written here. It's elegant and makes me happy. Opposite applies to multi-processing and multi-trading in Python. It's absolutely horrible. Things that make fast API beautiful is you just type a couple of lines of decorator, you got your route. You don't have to do anything crazy. And that for me is the way to do stuff. You have type checking so you don't have to yell at front-end. They get a nice error from you telling them it's front-end fault, and also you have verification from the back-end to the front-end. So front-end will get an error when you make a fault, which makes everybody super nice and happy. It also has auto-generated documentation. You will be surprised how good this stuff is once you start trying to use manual documentation. And one of the stuff you will see on FastAPI's website is that it's asynchronous framework, Which means it's super performant. You can use it for anything. It's going to be super fast. So when I started building my AI model, first thing I decided, let's add some async. It's going to be super fast. And here's the entire code of my AI, as you can see it above. So I just dropped some async, and my expectations were, like, this is also running in unicorn. not going to comment anything else, so I tried to make it as light as possible. And how many requests do you think this code can handle per second? Excellent! And I just looked at this and said, oh, this thing does not work at all. I shouldn't be just adding this random stuff, I'll just do the regular test, use synchronous programming, because I think it does not work. Now, as luck would happen, this worked quite well for me, because when the client needed more users to use API, I would just add a few workers, and then a couple of threads inside of them, and everybody was super happy. And that works beautifully for their databases and all the other stuff. However, we have this wonderful thing called LLMs. And as most of you know, when you make a call to an LLM API, it's long. It's very, very long. I'll iterate. Multi-threading does not make me happy. And on the other hand, my clients want to have tons of people using their APIs and models. So what I did is, since I was just making calls to open AI, yeah, that's AI development now, you make calls to open AI with your prompts, I wasn't able to serve many users, especially with Gunicorn. So I just said, okay, let's scale it up a bit, I'll add ten workers, each worker can have four threads, problem solved. I just held up the container. It worked. I didn't have to change anything in the code. But guess what happens at the end of the month? AWS send you a bill. And it turns out all this fancy stuff that I did with the customerization cost me about 300 euros, which is to put it simply, 30 kilograms of ice cream that I could have eaten in a span of two or three days and won some sort of prize. So I decided to use Async, but this time for real. And before we start talking about Async, I need to explain what's the difference between concurrency and parallelism, because this is something I didn't know before. OK. So concurrency is doing multiple things at once. But not really. So if I'm making a cake, I first make the ingredients, then I put the cake into an oven, then I stir the oven to make sure my cake doesn't burn out, then I put out the cake, then I wash all the utensils, and then I can eat the cake. That's the synchronous way of doing things. Now, if I want to do things smarter way is instead of staring at the cake, I can put alarm clock, then I can watch the stuff, and I get to eat my cake much faster. That's the concurrent way. Parallel way would be to have two ovens and to get my younger brother to also make a cake. So we are doing two things at the same time. We are both building Two different cakes. Nobody bothers anybody. However, with concurrency, you get to do, okay, I'm doing this thing, this thing can stay, then I'm going to do another thing, and then I can return and say, oh, okay, this thing is still baking, I go back. And they are not mutually exclusive. You can have two things running at the same time, and one of those, let's call it a thread, doing multiple stuff at once. Not at once, but okay. This thing can wait. I can do something else. So that's concurrency and that's parallelism. Both are very good. Parallelism is horrible in Python. Because for parallelism, you need to use multiprocessing. And for that to work, you need to pickle stuff, pass it to another process, and it eats memory like crazy, and it's absolutely horrible to debug. So I'll be talking about easier stuff, which is concurrency. And to do that, we use async. Now, async is a very nice thing if you don't go too deep into it. Which I'll try to do. So main thing about async is you have something that's async, you wait for the result, everybody is super happy. Now there are a bunch of terminology here, coroutines, tasks, futures, all of that, and I'll try to avoid going into too much depth because you're all smart people, you can read the docs. My main goal is to explain how to actually use this so it's useful to you. So I took my code, and I just added async IOSleep. Which means you can notice the word there, await. My code is going to run this thingy, await the asynchronous sleep, and then it will return the results. Now, what's different with async IO is that it's non-blocking. It's not going to block the whole thread. And you will also notice this, oh, I have a small icon there. Ignore the icon. But beneath it, it says async. If you're going to use await, your function also needs to be asynchronous. And that's one of the things I hate about async. Because all this async stuff bubbles up. It spreads all over your code base. What are you going to do? So this is the best-case scenario. Your blocking library has an async alternative. So how many requests do you think I can handle now per second? 106. Which is very impressive for somebody that does absolutely nothing. If we go back to the code, this code is just sleeping. I put sleep because in the majority of applications, when you demonstrate async, it's either using sleep or using HTTP request, there is a library for HTTP request. And you're invoking LLMs, you just call them using HTTP and wait for response. And it's not half a second, it's usually 40, 50 seconds. This code is how usually API is working with LLMs look like. Now you might be wondering how many libraries support as in programming. Any guesses? Exactly. Not that many. I think useful ones I can count on my one hand. So there is a way to use the blocking behavior with async, and it's quite simple. You use async to run threads to run function. And this does not work well as async, but it's readable. I love this much more than threads. This is going to spawn a new thread for that function and run it in an event loop. gets me 10 requests per second, which is improvement from two. Still better than anything, and I just dropped the function. Now, you might be wondering what if I want to do more things. Same thing. Sleeping and invoking stuff. Now, async has this really, really cool stuff that's called gather. So you throw a bunch of functions in there, and you tell yourself, I don't really care in which order these are executed. That's the cool stuff about async. I just want to get info from them. And gather is going to handle all of that stuff for you. And you get a nice message at the end. Now, surprisingly, when using gather, I get 12 requests per second. So this is actually faster, even though I'm calling two functions, which doesn't mean it is actually faster, but probably I'm doing something wrong with testing. Now async is super good for IEO operations. If you're writing to a file, reading from a file, talking with your database, there's If you're communicating with other APIs, basically, if your program needs to do something that is not requiring CPU, but network stuff, hardware stuff, everything is super slow, async. However, if you need to do some processing, for example, calculate the response from LMs, some data processing, all the signal extraction, all that stuff, async is not going to help you. It's going to kill everything. Because async, what it does is, oh, there's nothing happening here. I'm waiting for stuff. Somebody else can use CPU. And if you're calculating something, you're using CPU. It's not going to let anybody do anything else. And you all know about global interpreter lock. We don't have threads in Python. We like to tell ourselves we do, but we don't. So if you are using some processing, and let's be realistic, you're not going to do that in API. You're going to have a bunch of microservices or functions that handle all that processing. If you want to make it faster, for me, it was either scale it up horizontally, split it up into containers, or you use multiprocessing in some cases, or hire somebody who knows how to write it in C++ and then use it. We are not very good at processing stuff, but luckily most of the applications are web-based. Now, you might be wondering how do we test all this craziness. Well, there is a very, very useful async plug-in for PyTest, and I'm really hoping you're using PyTest, because that's the best plug-in out there. I tried unit testing, it's horrible. Well, it looks like Java. So here's the simple test. You get a pi test, and then you can await something in your function. And this is it. If you were not using this plug-in, which is also a possibility, because it does tend to lag with your PyTest framework. PyTest gets updated, then it goes one, two months, and this plug-in gets updated. Then things get a bit crazier, because in order to execute async thingy, you need to do something that's called run it in the event loop, because the moment you put async in front of it, it stops returning the result. It returns something that's called coroutine. And to get something useful out of it, you throw it into event loop. Event loop then does its magic and you get a response. So without a wait, result of add two and three is going to be a coroutine. It's not going to be an integer. And that's a huge problem. if you're trying to figure this out. But if you're just wanting to use it, knowing this is perfectly fine. You don't have to go deeper into it. Now on the fast API side of things. Fast API has a wonderful way of solving stuff. They They are basically definitions of endpoints, and if they are written in the async manner, they are going to get executed in the main event loop. However, if you use in fast API def instead of async, it's going to be thrown into thread pool and then run there. It's a bit slower, but it's so much so slow that I never notice it in my mind. However, if you're doing some high-speed optimization, you really want everything to be in async. Also things that are going to hurt your performances if you're really accounting for them is dependencies. For us at API, you can assign dependencies. What you're going to mostly use as a dependency is a connection to your database. And if that connection is not also declared as async, your code is not going to be async. It's going to be synchronous code that's executed in thread loop. Not in the event loop where we want to do all the cool stuff. And with that in mind, I think I covered pretty much all the useful stuff and got you this. This is much faster than I expected. You can find me on LinkedIn, you can grab a virtual coffee with me, I love chatting about stuff. So let's stay connected. I think we have now plenty of time for questions, because I'm expecting we have a bunch of questions about asynchronous programming, since it's absolutely insane.
+
+**Speaker 2** _[17:59]_
+
+Thank you, Bojan. I'm sure a lot of us, or maybe a few of us, were first to get introduced to Async and it was quite interesting to see what Async can help us with. And let's start with the questions. First, how would you add an argument to a function you call with AsyncIO?
+
+**Speaker 1** _[18:26]_
+
+Oh, it's very simple. As you would invoke it normally with async IO, for example, just pass it and you call it. Pretend that there is no async await in front of it. Just pass it an argument and it's going to be working quite nicely. As long as you ignore the crazy stuff, it works as normal Python.
+
+**Speaker 2** _[18:52]_
+
+Okay, in your cake analogy, what's the event loop?
+
+**Speaker 1** _[19:02]_
+
+Okay, that's a very good question. Event loop would be my brain deciding not to stare into oven for half an hour. But instead of choosing to watch the dishes. So you need somebody who is checking do I need to do this or can I do something more useful.
+
+**Speaker 2** _[19:26]_
+
+Do you have advice for dealing with synchronous methods from third-party libs in async applications?
+
+**Speaker 1** _[19:36]_
+
+For synchronous libraries, yeah. My only advice in that regard would be call it as a thread. Async invoke as thread, there is a slide here, one second. Async IO to thread. And that's how you get async without using async. It's going to be much faster that way. What this does, async to thread, it creates something called task, which is for the purposes same as the async function. And then you can await it and get the result. So just wrap it like this. You don't have to do anything super crazy.
+
+**Speaker 2** _[20:27]_
+
+Okay, the next question. Some tips on increasing the throughput for CPU-bound tasks.
+
+**Speaker 1** _[20:38]_
+
+Yeah, for that, async is not going to help you. You're really going to have to use multiprocessing, and for all the examples here, I use Unicorn. That's something you use on your local machine because it has one thread. So you're going to be using something like Unicorn that has support for multiple workers, and depending on the number of cores, that's how many workers you're going to put there. But in my experience, the only way to do that, I work a lot with AWS, is to spin up a bunch of containers and create a scaling group. So if it's getting slower, just add more containers, which are super small. If there's a bunch of free stuff, just scale it down. But probably the best thing you can do is to use C++ or some other programming language that supports actually parallelising and trading stuff. And that's also the worst thing you can do because that's expensive. C++ programmers are pretty expensive and in my regard pretty grumpy people.
+
+**Speaker 2** _[21:55]_
+
+Very funny. Yeah, the next one goes, how do you get the requests slash second number? How to time measure throughput?
+
+**Speaker 1** _[22:06]_
+
+Oh! There is a very, very good library in from Java. Java actually created a couple of good stuff, like PyCharm, and this library is called JMeter. It's super simple. I install it first time today after five years. You basically just install JMeter, click, say I want 100 threads to hit this endpoint, and it's going to tell you what's the throughput, how are things behaving, what is the error, what's the latency, all the good stuff. So just download JMeter, it's under Apache license, it's completely free, and you get a bunch of cool stuff, because Java sadly has actual threads, and it can perform actual hundreds and hundreds of requests to your API, unlike Python. But we're better in every other regard.
+
+**Speaker 2** _[23:07]_
+
+Okay, did you try out the async IOS support for SQL Alchemy?
+
+**Speaker 1** _[23:16]_
+
+I did not. Okay. Yeah. My main thing is I tried to see where do I actually need to use async. Because here, where I had a bunch of external calls to API, such as OpenAI and other LLMs, I really needed to lower the performance. So I added async there. For other stuff, it wasn't so slow, so I didn't bother with that. Don't optimize things too much.
+
+**Speaker 2** _[23:48]_
+
+Okay, there are a bunch of questions related to speeding up and testing. So someone is asking, our code base has 10,000 test cases. Is there a good way to figure out which tests could make sense to run asynchronously for speeding up testing?
+
+**Speaker 1** _[24:12]_
+
+That's a very good question. First of all, if your code base does not have any dependencies between the tests, for example, this test needs to be executed before this one, each test is separated, you have plug-ins for PyTest that allows you to run tests in parallel. And for that you don't need async. Just write in parallel or on one of the projects I'm I'm doing for the client, we just split up the test base. Say, for example, first 500 tests are going to be running in this container, other 500 tests in this container, and that's it. There's no need for icing there.
+
+**Speaker 2** _[24:54]_
+
+Okay, there seems to be a lot of questions suddenly, so with the time, we still have four minutes to cover some questions, but after that, we'll strictly stop, and then we'll move on to the further things. So if I use asyncio.toThreadCall for blocking libcalls, is that same performance-wise as using multithreading? and second question parallel to that is what is the benefit of using AsyncIO in the first place?
+
+**Speaker 1** _[25:29]_
+
+Well, it creates a thread and runs it in the background. However, as you can see, it's one line of code. And for me, the main benefit is I have much less lines of code and it's much more elegant to me. I really try to avoid using multi-threading in Python because I don't like how it looks. Async is probably the same as the way I found out to do all that. So I don't expect performance boost from this to multi-training to be much significant. I would have to test it.
+
+**Speaker 2** _[26:10]_
+
+OK, I'll combine a bunch of questions which are in the similar domain. So when would you use multiprocessing in Python? And you also mentioned about parallelization, which could go on the same lines. Could libraries like ZMQ make your life easier?
+
+**Speaker 1** _[26:30]_
+
+Well, I have to admit I haven't heard about the XAML queue. Is it a message queue on the library?
+
+**Speaker 2** _[26:39]_
+
+To be honest, I'm not sure. I haven't used the library. So maybe someone?
+
+**Speaker 1** _[26:48]_
+
+Then, definitely, anything that allows you to run individual workers that are completely independent, just grab them from the message queue, it can speed up computation. Thing is, when I have to do some bunch of processing, I just grab some message queue, throw a bunch of Python workers, and grab messages and do the processing. And to be honest, unless something different happened, the last time I checked, in multi-processing, in Python is you pass it an object, the function response is the same. Now, in Python multiprocessing, feel free to correct me, it pickles the arguments, sends it a new process of Python, passes it all that stuff, executes it, provides a response, pickles it, you get it back, it unpickles it and then you get your answer. All that to me looks very horrible, so I would just use message queue as a more elegant solution.
+
+**Speaker 2** _[27:54]_
+
+Oh, thanks. On that, why is the synchronous sleep thrown onto event loop 10x slower than built-in async IO.sleep?
+
+**Speaker 1** _[28:09]_
+
+Excellent question to which I have no answer. I'm expecting that the part where it's actually writing it as a thread, creating and throwing it there, is what's making it slower. Because, one second. I think async IOSleep doesn't block, doesn't create any new threads, it's fully async. It doesn't have this all overhead. had. But at the end of the day, this is super fast, but this is also fast. It's much faster than not using it. So this gets me ten requests, and if I can use this to run five Docker containers, it's going to cost me maybe 30 euros, and that's much less than I would pay to get a build client hourly to create holy asynchronous multiprocessing stuff. You need to remember the most expensive thing right now, okay, outside of GPUs is your time. What is the fastest way you can create this? For me, it's like just try it like this instead of trying to go really in depth and optimize stuff.
+
+**Speaker 2** _[29:29]_
+
+Okay, just the last question for today's session. Can you batch functions using PyTest async IO?
+
+**Speaker 1** _[29:38]_
+
+In PyTest, you can patch stuff, and it works wonderful. Same thing as you would expect from the synchronous code execution.
+
+**Speaker 2** _[29:47]_
+
+I'm sorry, with the time restrictions, we will not be able to take the rest of the questions, but I'm sure the speaker will be happy to answer them offline after the session, and one can also meet the speaker after the session. So please, yeah, he has a contact. I would like to also thank the speaker, and from all of us, let's thank the speaker once again.
+
+---
+transcript_status: auto
+---
+transcript_language: en

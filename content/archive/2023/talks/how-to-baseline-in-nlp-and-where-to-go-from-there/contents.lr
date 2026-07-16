@@ -1,0 +1,600 @@
+title: How to baseline in NLP and where to go from there
+---
+description: In this talk, we will explore the build-measure-learn paradigm and the role of baselines in natural language processing (NLP). We will cover the common…
+---
+created: 2023-01-03
+---
+code: B7PCUR
+---
+slug: how-to-baseline-in-nlp-and-where-to-go-from-there
+---
+speaker_names: Tobias Sterbak
+---
+speakers:
+
+
+
+### Tobias Sterbak
+
+Tobias Sterbak is a Data Scientist and Software Developer from Berlin. He has been working as a freelancer in the field of Machine Learning and Natural Language Processing since 2018. On the blog www.depends-on-the-definition.com he occasionally writes about these topics. In his private life he is interested in data privacy, open source software, remote work and dogs.
+---
+abstract:
+
+
+In this talk, we will explore the build-measure-learn paradigm and the role of baselines in natural language processing (NLP). We will cover the common NLP tasks of classification, clustering, search, and named entity recognition, and describe the baseline approaches that can be used for each task. We will also discuss how to move beyond these baselines through weak learning and transfer learning. By the end of this talk, attendees will have a better understanding of how to establish and improve upon baselines in NLP.
+---
+full_description:
+
+
+In this talk, we will explore the role of baselines in natural language processing (NLP)  and discuss how to move beyond these baselines through weak learning and transfer learning.
+
+First, I will introduce the build-measure-learn paradigm, which is a framework for developing and improving products or systems. This paradigm involves building a solution, measuring its performance, and learning from the results to iteratively improve the solution. Baselines are an essential part of this process because they provide a starting point for comparison and a benchmark to measure against.
+
+Next, I will delve into the common NLP tasks of classification, clustering, search, and named entity recognition (NER). For each task, I will describe the baseline approaches that can be used. These baselines may not be the most advanced or sophisticated solutions, but they are often quick and easy to implement, and they can serve as a useful reference and guidance for further improvement.
+
+Finally, I will discuss how to move on from these baselines. One option is to use insights from the baselines to build a weak learning system, which is a machine learning model that relies on human-generated rules or patterns rather than a large dataset. Another option is to leverage transfer learning, which involves adapting a pre-trained model to a new task or domain by fine-tuning its parameters on a smaller dataset.
+
+In conclusion, this talk will provide a practical guide to establishing baselines in NLP and moving beyond them through weak learning and transfer learning.
+---
+room:
+---
+day: Monday
+---
+slot_date: 2023-04-17
+---
+start_time: 15:10
+---
+end_time: 15:40
+---
+slot_id:
+---
+track: Natural Language Processing
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 2521
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/B7PCUR.png
+---
+youtube_id: oc_p0ZgoyA8
+---
+video_link: https://www.youtube.com/watch?v=oc_p0ZgoyA8
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT30M35S
+---
+video_thumbnail: https://i.ytimg.com/vi/oc_p0ZgoyA8/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:02]_
+
+Yeah, hi.
+
+**Speaker 2** _[00:04]_
+
+that's
+
+**Speaker 1** _[00:04]_
+
+It's really really crowded. So I didn't expect that much interest in that topic. Yeah, my name is Tobias As you said, I'm a freelancer in NLP and machine learning
+
+**Speaker 2** _[00:15]_
+
+Um...
+
+**Speaker 1** _[00:17]_
+
+And yeah, welcome to my really opinionated talk on NLP baselines and how to get started with baselines in NLP, and then probably some things that you can build on top of these baselines briefly. So it's really opinionated, and let's just jump right into the agenda. So first thing is like, I'll give you a short introduction to the Build, Measure, Learn framework, the general idea, which most of you are probably at least intuitively familiar with.
+
+**Speaker 2** _[00:49]_
+
+and
+
+**Speaker 1** _[00:50]_
+
+And then from there, kind of derive what makes a good baseline, at least to me, it's the opinionated part. Then we're going to look at some examples, some kind of playground use case, so to say.
+
+**Speaker 2** _[01:06]_
+
+Thank you.
+
+**Speaker 1** _[01:07]_
+
+And then sprinkle in, I mean, it's a bit at the end, but like sprinkle in some weak and transfer learning ideas that you can mix in with these baselines or move on from to the baselines.
+
+**Speaker 2** _[01:19]_
+
+Um...
+
+**Speaker 1** _[01:22]_
+
+the large disclaimer that probably you in the back cannot read but of course you might disagree with some of the things i say there are a lot of different situations right a lot of different applications
+
+**Speaker 2** _[01:34]_
+
+Um, and
+
+**Speaker 1** _[01:35]_
+
+And yes, of course, no one-size-fits-all approach. So I hope at least the first half of the talk will also apply to general machine learning ideas.
+
+**Speaker 2** _[01:44]_
+
+Um...
+
+**Speaker 1** _[01:47]_
+
+And some of the NLP things, of course, won't apply to all NLP problems you might encounter. But it might give you some ideas. So the general guideline is, like, it's my opinion. If something sounds useful to you, just pick it up and use it. And if you do NLP, probably think about some of the things I say, if it makes sense at some point, right? So, yeah, let's just start right in.
+
+**Speaker 2** _[02:12]_
+
+Thank you.
+
+**Speaker 1** _[02:13]_
+
+So what's the framework? The build, measure, learn framework, which is commonly considered like a framework for how to come up with prototypes or minimal viable products in
+
+**Speaker 2** _[02:25]_
+
+Yeah.
+
+**Speaker 1** _[02:26]_
+
+We are building something.
+
+**Speaker 2** _[02:28]_
+
+Um, it's usually.
+
+**Speaker 1** _[02:28]_
+
+It's usually in three or four steps, so I like to include an iterate step because I think it's important to think about that you come back at the end and start over, and it will also have a bit of effect of how I consider baselines. So yeah, and briefly, I mean, you start by building something, then you collect data about it, it's the measure step, then you derive some learnings from your data, and in the end you iterate and improve building and then do the whole thing again. And let's look into the details. So at the build step, if you are presented with a machine learning problem or an MLP problem, from my perspective, you want to build a simple model or a prototype first, like as simple as possible.
+
+**Speaker 2** _[03:19]_
+
+Um,
+
+**Speaker 1** _[03:21]_
+
+That should help you get started with collecting data and testing the application, like if it's actually useful what you're building, like the problem you're working on, is it actually useful? And what does it mean for your baseline? So there are kind of two key things from this step that your baseline should satisfy. I hope you can read it in the back, it's a bit smaller, the room is a bit larger than than I expected it to be.
+
+**Speaker 2** _[03:50]_
+
+Thank you.
+
+**Speaker 1** _[03:52]_
+
+Yeah, so the two things there is, like, you should do something reasonably. Like, you should have a baseline that does something. It's not completely random or so. Otherwise, it's not useful. People should be able to play with the baseline or with the tool to see something. And then, secondly, it should be fast to develop and fast to run. Like, you don't want to wait for days to see some results.
+
+**Speaker 2** _[04:16]_
+
+Optimize.
+
+**Speaker 1** _[04:17]_
+
+Optimally, you can run it on your laptop, put it in some API quickly. That should all be easy. So the next step would be the measure step. This is the step where you collect data and evaluate the performance of your baseline. And this step is particularly important because this is also a step where you set up evaluation pipelines and think about how do you measure the things and how does it fit into the broader system your company or your project or your team is building and again how does that affect how you think about the baseline so at this step you also want people to be able to play with it so you want to put it out you want to find users that do something with it or stakeholders get involved because that helps your understanding and you want to get feedback as early as possible because like most reasons I have seen data science or machine learning projects fail is because there's no real match between what you're building and what actually is needed, and that you want to figure that out as early as possible. And Gradio or Streamlit or these kind of libraries are great for that, to get something out quickly that people can touch and play with, even with low tech experience. Cool. And now we come to the learn step. At this step, you want to understand the metrics or the business metrics better, want to get an understanding of what is actually required for the solution, like how the metrics you might pick, for example, for your classification algorithm, are they symmetric, are false positives more problematic than false negatives, stuff like this, you want to figure it out there. You probably want to acquire some of the main knowledge there yourself, like that you know what the system is actually outputting and can make some reasonable decision about the quality of that output. And you want to learn about the issues in the data and the general problem setting, like understanding what could go wrong, what is probably wrong in the data collection, in the data preparation. in the application of the system. That's what you want to learn there. And how does it affect your baseline? So the baseline here should help you to understand the problem better. So if possible, it should be no black box solution, but it should rather give you quite specific information about what is going on between the output and the input of your system so that you can understand something about the problem better. and probably you can use that later for some get some weak labels we talk about that briefly later
+
+**Speaker 2** _[07:03]_
+
+Um...
+
+**Speaker 1** _[07:05]_
+
+And after that, you go back to the table, basically, and repeat the whole process of building, measuring, and learning to continue to improve the system. There you can collect, of course, more data, receive feedback, or more feedback, and refine the performance. Yeah. So that's the general framework. And what does it mean to the baseline at this point?
+
+**Speaker 2** _[07:32]_
+
+it's
+
+**Speaker 1** _[07:33]_
+
+help you like it's one essential piece of a baseline or like property of a basin it should help you to keep track of your improvements right so that you can make educated decisions in the future
+
+**Speaker 2** _[07:45]_
+
+Um,
+
+**Speaker 1** _[07:47]_
+
+So you want to compare all further developed models or systems to your baseline to see, like, is it useful to have something more sophisticated at the cost of that sophistication, right? If you have, like, I don't know, 90% of a baseline, is it worth it to deploy, like, a crazy system for 95%? And there are a lot of cases where it's worth it and a lot of cases where it's not. So, like, get these relations straight. And that should help. And then also like measure, of course, like how much you can improve over time compared to the baseline. So you want to put up like a flag in the ground basically to say, like, this is the minimal thing I get when I'm just thinking about it for an hour or so. Or like for a day, probably, but not like for a month.
+
+**Speaker 2** _[08:40]_
+
+Um...
+
+**Speaker 1** _[08:43]_
+
+So that's a general framework and a general idea of what I think is a good baseline especially in the area of NLP
+
+**Speaker 2** _[08:51]_
+
+Um.
+
+**Speaker 1** _[08:52]_
+
+And let's let's look at some product example What's the time really good?
+
+**Speaker 2** _[08:57]_
+
+Um,
+
+**Speaker 1** _[08:59]_
+
+So let's say, so I picked a topic where all of you are kind of domain experts, right? So we want to build a software where we have a web platform based on recipes. And we want to add some, or we are asked to add some machine learning features there. And I mean, you all kind of have an opinion about food and about...
+
+**Speaker 2** _[09:17]_
+
+Um,
+
+**Speaker 1** _[09:20]_
+
+recipes, probably. So that's helpful for imagination. But in general, this might not be the case. So you might have to acquire some more domain knowledge. So so now we're presented like a website. We want people put up some recipes and we are asked to do some things And so the first thing we are asked to do is basically tag recipes in three categories based on vegan Vegetarian or with meat, okay Relatively simple So we have our domain knowledge and we think about it. I think like what what can we do and then we remember It might be all keywords, right? And I would say this is a general thing in a lot of NLP applications, or in a reasonable amount of NLP applications, a lot of the semantic meaning of a text comes from the semantic meaning of very little keywords. And of course, there are other cases, but it's important, like a lot of performance can be kind of
+
+**Speaker 2** _[10:20]_
+
+Um
+
+**Speaker 1** _[10:22]_
+
+achieved by using keyword-based approach.
+
+**Speaker 2** _[10:26]_
+
+and he
+
+**Speaker 1** _[10:26]_
+
+And here we would just go and collect some text, some words that represent meat. Like you would collect pork and whatever. And I would collect cheese in the vegetarian keyword list. And then you would just check if it's in the text, right, in your recipe. So something like this is probably a bit small now. But you would just check. And that can be improved, of course. But that's a really, really simple thing. You can come up with this in like 10 minutes. depending on how much time is spent on the lists that are not shown here. And that actually might give you a reasonable performance. It's also a really simple task, but it has to show some quite interesting benefits or like properties. For example, it's really, really easy to understand, to communicate to shareholders and also to people who, for example, would label data later. You can exactly say like, hey, look, we have a baseline that said that. Why does it say that? Because of this keyword present, for example, which might be.
+
+**Speaker 2** _[11:29]_
+
+Um, I just be.
+
+**Speaker 1** _[11:30]_
+
+Might be it might be a huge benefit
+
+**Speaker 2** _[11:32]_
+
+Um...
+
+**Speaker 1** _[11:34]_
+
+But that's really simple. It's a bit boring. But there are use cases out there where people used transformers for this kind of things.
+
+**Speaker 2** _[11:43]_
+
+Um,
+
+**Speaker 1** _[11:44]_
+
+So think about keywords first.
+
+**Speaker 2** _[11:46]_
+
+Um...
+
+**Speaker 1** _[11:47]_
+
+But let's do something a little bit more sophisticated. It's, again, a classification task. But now we want to judge how hard the recipe is to cook. Like, we want to add it in difficulty categories, basically, like easy, advanced, or hard. And now you think about, like, how would you do that? Like, sure, I mean, one safe approach could be you just pipe it all to chat GPT and ask, like, give me back something. But you would learn nothing, right? and for recipes you can make sense of it but in general it might be hard so what would we do we could think about like what what makes a recipe hard to cook and it's probably again something related to presence of certain keywords right like could be like them how many tools cooking tools are are present in the text are used how many ingredients are used might be proxy and how many cooking related verbs are there that probably describe different steps of the preparation process. And I mean you could just again create keyword lists and build rules based off the presence of these words. You could start with really simple rules, I put some really stupid simple rules there. Just count and say if there are over 15 of these keywords then you say it's hard, if they're under 5 it's easy and if it's in between it's advanced, whatever that means.
+
+**Speaker 2** _[13:12]_
+
+I'm sorry.
+
+**Speaker 1** _[13:13]_
+
+And of course, you can tune that kind of on some data by looking at it and play with it and see if that makes sense. And you can come up with more complicated or complex rules to some extent. And then you probably want to move to machine learning system. But again, like here you could say, like, if you set up a labeling tool now, you could show people who label the data, like this is the opinion of the baseline And this is the reason because we found like I don't know there were five tools involved and like 20 ingredients That's like that might be complicated Recipe or like a hard recipe, but people can have a different opinion and you can learn from that Yeah, so keywords keywords are nice And now So now quick quick introduction to weekend transfer learning. That's basically what you can do if you got the baseline set up
+
+**Speaker 2** _[14:16]_
+
+Okay.
+
+**Speaker 1** _[14:20]_
+
+So, as really brief, transfer learning basically means you leverage models trained on a lot of different data that are just around, and you leverage these models to learn something faster about your specific problem, which is quite popular right now with large-language models and fine-tuning them. And then there's like weak learning, all kind at the same time.
+
+**Speaker 2** _[14:46]_
+
+So, yeah.
+
+**Speaker 1** _[14:48]_
+
+Which is basically short for learning with weak supervision, for example, from rules or from like proxy labels you can get somewhere.
+
+**Speaker 2** _[14:58]_
+
+Um,
+
+**Speaker 1** _[15:00]_
+
+And it basically is built around this concept of a labeling function that takes the inputs and produces some label. And you can kind of build multiples of these label functions based on rules and put them together with tools, for example, like Snorkel, where they have like they've tried to figure out a smart way to combine labeling functions to get kind of probabilistic labels to improve performance of the fine tuning later.
+
+**Speaker 2** _[15:26]_
+
+Um,
+
+**Speaker 1** _[15:27]_
+
+Stuff like that or the labeling process the manual labeling process
+
+**Speaker 2** _[15:32]_
+
+Um,
+
+**Speaker 1** _[15:34]_
+
+which you can do now with this kind of baseline where you really have simple functions that you understand well.
+
+**Speaker 2** _[15:40]_
+
+Thank you.
+
+**Speaker 1** _[15:41]_
+
+And you could also split, for example, the functions you saw before in multiple functions, use them as different labeling functions.
+
+**Speaker 2** _[15:48]_
+
+Um,
+
+**Speaker 1** _[15:50]_
+
+to leverage Snorkel, for example, better. But what you also can do is you can just train the system with the weak labels. You just take Distilled Bird, like a large transformer model, give it the weakly labeled data, train it, and then mix in later in the training process, you mix in hand-labeled or manually labeled data or corrected labeled data, and then it might learn or probably will learn much faster with the help of this weak signal you get.
+
+**Speaker 2** _[16:23]_
+
+Um...
+
+**Speaker 1** _[16:25]_
+
+So, and now at this point, I want to briefly go through some other NLP, like, tasks, and briefly say, like, what might be a good baseline there, or the idea for a baseline, in the same way, like, before. Like, named entity recognition, or generally, like, sequence tagging, if you have labeled data, you can just use the dictionary approach, basically take your labeled keywords, or take the things you know you want, use them as a dictionary and test the performance on some test data. Which like basically say everything I know about people, if you want to identify people, take a list of people, check how well it performs on your test data set. Which gives you like a baseline number of how good everything that you build afterwards should be.
+
+**Speaker 2** _[17:14]_
+
+So, um,
+
+**Speaker 1** _[17:15]_
+
+And then, of course, if you have some specific things where there's no general data available, like, for example, if you want ingredients might be a bit questionable, but like rules on the parse tree that you could, for example, get from spaCy or context words might also work well as a starting point for a baseline. Like, for example, if you want to identify persons, like keywords like Mr. in front of some token might might provide some insight about the next word
+
+**Speaker 2** _[17:46]_
+
+Um...
+
+**Speaker 1** _[17:47]_
+
+Then a common thing nowadays that a lot of people are quite interested in is text similarity.
+
+**Speaker 2** _[17:55]_
+
+Um,
+
+**Speaker 1** _[17:57]_
+
+For example, in our use case, if we say, show me similar recipes to the recipe I'm looking at right now.
+
+**Speaker 2** _[18:03]_
+
+And that's it.
+
+**Speaker 1** _[18:04]_
+
+a lot of people just jump to the sentence transformer thing now but what you actually can do is like tf idf of bag of words which is basically just also keyword weighted keywords based approach I would say.
+
+**Speaker 2** _[18:16]_
+
+Thank you.
+
+**Speaker 1** _[18:18]_
+
+which can, of course, also be used for topic modeling and clustering. And then from my perspective, if you implemented that, it's really easy to just switch out the text embedding method. Like TF-IDF, back of words, gives you a vector for every text. Sentence-informer gives you a vector for every text. Both are comparing these representations by cosine similarities, so you can just replace them in your pipeline And if you figure out you need some more semantically
+
+**Speaker 2** _[18:48]_
+
+the
+
+**Speaker 1** _[18:50]_
+
+some more semantic capturing methods in your pipeline, or you can go the other route like and use something I would call like restricted bag of words where you say like oh I care about specific properties of my
+
+**Speaker 2** _[19:06]_
+
+of my
+
+**Speaker 1** _[19:07]_
+
+similarity for example I care about is it similar with regards to tools used or with regards to whatever ingredients used so you could say like okay I just restrict my bag of words vocabulary to something and then I get you get a restricted
+
+**Speaker 2** _[19:22]_
+
+Um,
+
+**Speaker 1** _[19:23]_
+
+similarity. And of course, you can balance these both approaches, right? You can say, like, oh, I take the cause and similarity from sentence transformers and add it up with the similarity from the restricted bag of words, and then you can balance kind of how much weight you want to put on some things. And you can play with that in some kind of gradial frontend, for example, to see what fits your need. And then lastly, search. So people thought about search for quite a while and there's no, like, there are quite strong baselines out there that in practice are super hard to beat, like on document retrieval or so, like BM25, like the common retrieval function in, for example, Elasticsearch is super hard to beat. And in a lot of cases, sure, there are always different situations, but this is usually a strong baseline. And for prototyping specifically, I like this LunaPy, which is basically a small implementation of something like Elasticsearch in a way, or something like the retrieval function in Luna and in Solr.
+
+**Speaker 2** _[20:32]_
+
+Um...
+
+**Speaker 1** _[20:33]_
+
+Which is really nice for prototyping Well, so so quick quick summary and too long didn't listen or too confusing didn't listening So the main point you should have taken from this brief talk is like you should try to start simple Like don't jump to large language models as the first thing if you have no strong evidence that this is the thing You should try first like try to come up with something simpler um then the next thing is build baselines where you can learn from like what is it worth if you cannot learn from the system make sure if it performs perfectly well on the first try then you're fine and you don't have to learn anything but if it's if it doesn't perform well then you're just screwed and you have to go back spend a lot of time probably need to build a baseline then
+
+**Speaker 2** _[21:22]_
+
+and that's
+
+**Speaker 1** _[21:24]_
+
+and that's most likely to happen and then i mean i said it multiple times but like i would say don't jump on the deep learning approach too early and there might be reasons again to do that early but often it's not the case so so that's the talk thank you and a small ad block so yeah you can find me on the website i'm a freelancer to be established.com i have a blog depends on the definition where I do NLP and machine learning and
+
+**Speaker 2** _[21:55]_
+
+So, um,
+
+**Speaker 1** _[21:56]_
+
+There's Twitter and there's Mastodon. So, yeah, thank you. And then... And I have another ad block quickly, really quickly. So I'm working with some German non-profit where I'm also co-founder, where we try to prevent discrimination by algorithmic systems, and we work with public sector and companies. So if you're interested in, like, kind of ethical AI and fairness, you can talk to me. and we're also developing right now it's not public yet but it's like bias lies which is a nlp bias detection toolkit basically if you're interested in that development also talk to me please
+
+**Speaker 2** _[22:36]_
+
+Um,
+
+**Speaker 1** _[22:37]_
+
+Cool, yeah, so now
+
+**Speaker 3** _[22:39]_
+
+Some questions. Thank you, Tobias, very much. Very interesting. I've checked the slider. There are no questions, but maybe some of you.
+
+**Speaker 1** _[22:49]_
+
+Everyone's happy.
+
+**Speaker 3** _[22:53]_
+
+Anybody? Here was the first one.
+
+**Speaker 4** _[22:58]_
+
+Thank you for your talk. I had one question that's a general question, more an abstract one. And that is, is it really like, I believe there are some really good baselines for various amount of topics. And I wanted to ask you if you think there is, so like, if there's a really, still a big market for, you know, developing baselines and yeah, to kind of have a, so is there kind of it's still a need for developing many baselines
+
+**Speaker 1** _[23:30]_
+
+So I'm not 100% sure if I got the first part, like why are there good baselines for all kinds of things. I mean, sure, there are some kind of standard applications that you could consider, in a way, software that you would not build for a system to get person names from newspaper articles. You would not build that yourself. You would just use spaCy or whatever, and Flare or whatever pre-trained thing. But there are a lot of things where it's no, a lot of applications that fall in some category of task, like classification or similarity retrieval or something, but it's not, there's no...
+
+**Speaker 2** _[24:12]_
+
+Um...
+
+**Speaker 1** _[24:13]_
+
+there's no one working with similar data like for example there's a lot of like really short query search things with for really specific databases or like document collections where there's no nothing as a baseline for example so there i mean there are some tasks that can be considered solved to some extent and then there are a lot of like changes on different data sets and different applications of these tasks to other there so yeah i mean i would say there is a need for baselines of course I say that
+
+**Speaker 3** _[24:45]_
+
+OK, thank you. Let's do one question from Slido. There's a question about, do you have any Python frameworks to recommend for creating baseline?
+
+**Speaker 1** _[24:57]_
+
+I mean...
+
+**Speaker 2** _[24:59]_
+
+Um...
+
+**Speaker 1** _[25:00]_
+
+So, I mean, if you can, for NLP, build on top of keywords, for example, then I would not recommend any framework and just code something up quickly if you can. But, of course, a good baseline for NLP, I would say, for a lot of tasks, is something built around logistic regression or bag-of-words vector representations, which you can get from scikit-learn, for example.
+
+**Speaker 2** _[25:22]_
+
+Thank you.
+
+**Speaker 1** _[25:26]_
+
+I've just answered the question.
+
+**Speaker 5** _[25:29]_
+
+Hi there. First of all, thanks for the talk. Secondly, I wanted to ask, especially when it comes to NLP, often data is, from my experience, one of the most pressing topics because you often get things like PDFs or file formats in a non-usable way. Do you have any experience in baselining the data, is there, do you have any sort of data collection that you could recommend for some sort of, you know, creating a quick prototype or something?
+
+**Speaker 1** _[26:06]_
+
+So you mean like pulling data out of PDFs, for example, or so I'm not sure if I got it.
+
+**Speaker 5** _[26:17]_
+
+Um, I mean if you have like the perfect Python package recommendation for that, I would love to hear it. Um, other than that, there are, you know, some sort of open source databases, um, which some could use. For example, if you have the recipe example, right, there is, I think, uh, the taste database or something that you could leverage to in order to create a prototype when the customer or whomever does not have the data ready yet.
+
+**Speaker 1** _[26:53]_
+
+So I see, so I'm sure it depends like on the use case. So in general, actually, I have to say I never worked on a customer use case where it was really useful or easy or legal to acquire public data for that use case. I mean, there might be cases where this is the case.
+
+**Speaker 2** _[27:16]_
+
+Um.
+
+**Speaker 1** _[27:18]_
+
+Yeah, but it's It's hard I guess and for PDFs I recommend PDF plumber if your PDF is not completely broken which is often the case and then you're lost but
+
+**Speaker 3** _[27:34]_
+
+I see another question.
+
+**Speaker 6** _[27:41]_
+
+Thank you for the talk. Well, I have a question because by my experience, sometimes these baselines are very good, and by implementing something very complex, the performance you get doesn't justify the complexity of maintaining it, deploying it, but in reality, you are competing. For example, you're a freelancer. You're competing with other freelancers that are trying to sell magical solutions with very complex solutions to justify their work. How would you deal with that If you know that in practice probably a baseline is good enough
+
+**Speaker 1** _[28:15]_
+
+Good question, in general people hire me to solve their problems.
+
+**Speaker 2** _[28:22]_
+
+Thank you.
+
+**Speaker 1** _[28:25]_
+
+And then if the baseline solves the problem sufficiently well, then that's often enough. And also the modeling part is often not the super critical part. The critical part is to measure it properly. And probably sometimes people can also take over and improve the solution. I mean, I know there is the feel of like, yeah, but we need a deep neural network for it because we need to tell that to management. And that happens. But in general, people are happy if they get a working solution however however that is produced do we have time for one more question
+
+**Speaker 3** _[29:01]_
+
+We have one more minute, and we have a simple question from Slido, a controversial one. Would you consider using large language models to create a baseline for NLP tasks?
+
+**Speaker 1** _[29:16]_
+
+So, I mean, I would say, like, if you consider using something simple, really simple first, like, if you think about, like, could I do this? Like, if you spend half an hour thinking about, could I do this with some list of keywords to some extent? And it's like, oh, it might be super hard to come up with something.
+
+**Speaker 2** _[29:37]_
+
+Thank you.
+
+**Speaker 1** _[29:38]_
+
+I mean, sure, you can use whatever transformer for a baseline if you have data available at some certain scale, like in the correct situation, you can do that.
+
+**Speaker 2** _[29:49]_
+
+But
+
+**Speaker 1** _[29:50]_
+
+But then you should be able to justify why no simpler solution. At least if I ask you, you should be able to say, well, I thought about it for half an hour and probably could have come up with something but it would have been complicated and the situation is complicated, so that's why we picked this one. But we wanted to classify recipes into hard and easy and we've just thrown it to sentence transformers and hoped something happened. And then we worked on it for three weeks and nothing happened. That's not good. Sure. Thank you very much. So that's my opinion.
+
+**Speaker 3** _[30:26]_
+
+Thank you very much. Debus, please give another round of applause to our speaker. Thank you.
+
+---
+transcript_status: auto
+---
+transcript_language: en

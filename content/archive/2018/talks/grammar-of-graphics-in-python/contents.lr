@@ -1,0 +1,200 @@
+title: Grammar of Graphics in Python
+---
+description: This talk will give an introduction to the concepts behind the grammar of graphics and how to use them in Python by means of the altair library and the…
+---
+created: 2018-06-01
+---
+code: 3D3BDP
+---
+slug: grammar-of-graphics-in-python
+---
+speaker_names: Malte Harder
+---
+speakers:
+
+
+
+### Malte Harder
+
+Data Scientist at Blue Yonder doing data engineering with a passion for visualisations.
+---
+abstract:
+
+
+This talk will give an introduction to the concepts behind the grammar of graphics and how to use them in Python by means of the altair library and the vega specification.
+---
+full_description:
+
+
+A grammar is, according to Wikipedia, the set of structural rules governing the composition of clauses, phrases, and words in any given natural language. A grammar of graphics is then the set of structural rules governing the composition of visual elements. Transforming data into visual representations using composition is quite powerful and allows to create complex visualisations with simple building blocks. 
+
+While the ideas behind the grammar of graphics date back well into the 80s, as a Python developer it is only quite recently that we can make use of it. Altair, backed by the vega specification, is one of the few plotting libraries in Python that provide such a declarative and compositional API. 
+
+In this talk I will give an introduction to the core concepts behind the grammar of graphics as well as practical examples how to use altair API in Python to create vega plots.
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track:
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 10
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: basic
+---
+domain_expertise: some
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/3D3BDP.png
+---
+youtube_id: SNaWwk_HzK0
+---
+video_link: https://www.youtube.com/watch?v=SNaWwk_HzK0
+---
+video_published_at: 2018-11-05
+---
+video_duration_iso: PT30M26S
+---
+video_thumbnail: https://i.ytimg.com/vi/SNaWwk_HzK0/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:07]_
+
+Yeah, hi everybody. It's great to be here and thanks for letting me talk about the grammar of graphics in Python it's going to be a talk about data visualization and I will start with my motivation, so I'm not affiliated with any of the libraries that I will mention, but I'm an interested user with a passion for data visualization and and also quite interested in the history of data visualization. And what you can see there on the right side is one of the possibly oldest data visualization from a physician in London who basically was there during one of the cholera outbreaks. And during that time, the theory was that cholera is spread airborne and that it's kind of due to bad air. And he had the suspicion that it's basically something that is spreading via water. And so he plotted all the casualties in the map and basically was kind of able to show that his hypothesis is right because the casualties were very high around a certain well where the people took the water from. And I think it's sometimes great to see what data visualization can do for you and also to remind what we are taking for granted, how this kind of came into place. So now I work at Blue Yonder right now, and I'm mostly doing data engineering these days. So no plots for me anymore, no visualizations. I used to do that a bit more. and in an earlier life I prototyped for example grammar of graphics prototype for Haskell and also I wrote a plotting library for Ruby almost 14 years ago and one of the nicer things that happened when I wrote this library was that I one day got a package delivered to me by one of my users and he sent me these three books and said look at them they are really good if you're interested in data visualization So, I can only recommend these to everybody to read them. They have a lot of good examples. They also explain why they're good examples, best practices, what not to do with visualizations. And actually, there's another old visualization that is shown in there, which is quite famous by Charles Minard, also from the 1860s. And he visualized Napoleon's campaign in Russia, and there's shown how basically the armies, the divisions are decimated on the way to there, and there's also their retreat, and you can see rivers that were crossed, and also, for example, you see the temperature and the days, and there's a lot of information shown in this graphic. And what I want to do today is actually recreate this graphic in Python. And doing that, I want to use the grammar of graphics, which is a concept already around for a while. I think late 80s. This book came out in the 90s by Leland Wilkinson describing a way to kind of structure visualizations. And he described the system infuses. I think a lot of that went into becoming Tableau nowadays. And the idea is that a grammar basically makes a language expressive. And this is a quote from the book, that a language that has words and no grammar expresses only as many ideas as their words. So the grammar basically restricting how you compose things, thereby actually making things more expressive. and I think that's a great great concept to also go into visualizations not having templates where you just fill things in but actually being able to compose things to build something that is more than the individual parts so the grammar of graphics basically is building blocks how to build individual visualizations but then also rules of composition how to compose things together in a in a very structural way so there are different parts for first for these building blocks to build a single visualization so it describes how you transform data from your input data towards something that is then on the screen or printed or can be printed and the first part that you often do in awesome data analysis are some transformations you have aggregation statistical transformations, conversions, and then the transformation to the kind of visual space comes. That's the mapping, it's called aesthetics in the book. It's the mapping from the data to actual visual properties and it's the difference of what is mapped or what visual properties represent which data. And then you have the second part of that, the scales that determine how is this map, so how is the transformation going, so how is data represented, is it a color scale, is it, I don't know, is it something that is a positional scale, and once you did all that, you can use the information that the scale determines to how to transform data to actually give some hints for the user to do the reverse mapping, because that's what the visualization is about, actually it should tell something about the data, so you need some guides, and it could be a legend or access and they all basically give the user hint how to reverse your mapping so tell you for example this color stands for a specific value that it represents So I'm gonna go give a quick rough example, so for example we have some data here and Now we say we want to visualize these this this data or some of the data in a scatter plot so we want to have a point marker and basically we say the position X and Y should be represented by the columns A and C and we have the shape that should be represented by the column D and now the step of the aesthetics and the scales is basically so you take this encoding do you map it into this marker space and have to apply the scale so suddenly here your your data now is in kind of like the spaces of your visual elements and this is now a simple recipe that you can use to make a graphic and now using the information to do the reverse transformation you can do put axis there or even a legion and that's kind of very structural way how to build build a plot that is a bit more in detail than just doing say like scatter plot or something there are a There are a lot of libraries that actually implement this. Possibly if you're used to R, you know ggplot, which follows this quite closely and even adds a bit more to the original concepts. For Python, there's now a kind of, well, triplet of libraries. The first two aren't even Python libraries, they're JavaScript libraries, but there's a Python interface for that. This is Altair, and it's an implementation of the grammar of graphics, but it also adds an interactive part, which wasn't there when the system was described in the kind of early parts. Just to give a little bit of structure to that, because at least I was quite confused when I looked at it initially, because it's three libraries. So Altair is written in Python. The input is in Python, you specify your plots in Python, but what you get as output is a JSON, which is a Vega-Lite plot, which then is fed to the JavaScript compiler for Vega-Lite, which then creates a Vega JSON, which is then fed to Vega, which can be rendered to SVG and Canvas. Luckily, that is all behind the scenes, so you don't see much of it, but it's always good to know. Also, because there's a difference between these two Jasons, the Vega-Lite is a kind of high-level grammar. It's a bit less expressive, but way more concise, and we'll look at an example in the next slides. And Altair basically is the same specification, just partially even auto-translated from the JSON schema. So you have an API that follows quite closely, but allows you to create these JSONs in a very Pythonic way then. Vega on the other hand is low level, more expressive. You can use that if you reach like real hard boundaries or if you want to kind of include these plots into your own web service or add some interactivity, you can stream data to it. So that's all part, I won't touch, but it's nice to know how this works together. Now I want to go actually look at it. I just took one of the examples from the website, from the documentation. You have a test data set. It's a car data set about cars. So car models, origin, you have the horsepower here, miles per gallon, and similar to the plot I showed before, like in a keynote example, here we encode the position by two columns in the data set, and we encode the color by the origin, and so we get this plot and this scale, this color scale, we don't have to specify something, so that's something you usually get, you get a lot of kind of same defaults, but you can always change these if you want, so it's a very good way to work, iteratively towards visualization. Now, the JSON that we get out from Altair looks quite similar. You see there's some type information that Altair deduces automatically, but it's quite close to what you specified in Python. The nice thing about this is also that it's now fully serializable. You can send it somewhere. You can store it if you have a web service or something, it's easy to send there. That's kind of one of the nice things about the library And now this one probably you can't read it anymore. This is then what actually comes out of it for Vega and There some information is actually that the library automatically deduced for you Is specified in an explicit way So it says the x-axis is a linear transformation from the data and it specifies that the domain says it's Automatically all the values that are in this column and it says the range so the map it mapped to the full width of the plot In the kind of screen space so all this theory about how to map values to the screen is encoded in there Now that we have kind of the building blocks We can compose them you have similar building blocks for like bar chart box plots and you can have a lot of kind of basic visual Visual Representations that you can use you can also compose these plots For example, I have a base chart the same I had before and I also do some binning where we're in one on the x-axis and just take the mean value for the y-axis. And I have these two charts and I now have different ways to compose them. For example, I can do a vertical concatenation, horizontal concatenation, or I can just layer them so you can build up your plot in an easy way and that's just combining these and you get new objects that you can then combine again. That's kind of a nice way to build a full kind of chart or even something close to a dashboard. There's also faceting, which is a typical thing you do, so you can here facet by origin as well, so that you get a plot for each value that you have in a column, which is then giving different colors there, or repetition, so faceting is also very easy. You just call the facet method on it, say which column you want to use, and basically you get this plot out of it. Repetition works by repeating the plot but using different columns per plot. This is a bit more complicated because you have to specify in your encoding what the x and what the y-axis are. Actually you have to say here that you want to map it to the values that you use in the row and column but still it's quite a compact way to kind of create these plots. Then, if you compose these things, often nowadays people ask for interactivity. How can we use this in an interactive dashboard? There's even some widget support, but one of the basic stuff that you can do quite easily is adding selections. So, again, having a plot where we have, which consists of two parts, you can create a selection, and basically the selection can be used in conditions, so you can have conditional, for example, coloring for the selection. You specify which plot actually creates the selection, where can you move your mouse, and you can, for example, filter input data from a selection, and for example here, now I can select an interval rectangle, and once it's selected, only the data points in there are colored because we specified that here. And on the other hand, we can filter it so that the bin plot only takes into account the data that is represented in the selection. And that is all in the plot, so once you have this JSON specification, it's loaded somewhere, there's no server needed to kind of send the data back and filter it. That's all kind of in the specification, which is also quite nice. So it's very self-contained there. So now let's start to recreate the plot I showed in the beginning. So with the data set, and we heard yesterday, readsUSV is one of the most important functions, so we're using it here. And we have three basic data sets. One gives you the troops. It gives you longitude, latitude information, the number of survivors in the army, the direction, so the advance or retreat, and there were three divisions. You have also data set about the temperatures, that was the plot, the part that you could see on the lower end, and there is also an information about the cities, so basically kind of to give a rough map, and you can get all this data. It's not very much, so it's not big data we're doing here, It's very 1860 data. So the first try is to basically build a line chart and something that took me a while because I didn't find it in the Altair documentation but it's actually in there. You can use a trail visualization because if you use a line chart and you try to encode the size, it always needs to have two points for each line, so start and end point, but if you have different sizes for each point of time, the line looks really jacked or parts are not displayed, and this trail is really the thing that you want to use there, because it gives you a kind of nice, yeah, it follows kind of the size. We also color the direction, but when we plot this here, we see, okay, this doesn't look at all where we want to go. Maybe we can roughly get a rough idea that this is closely, that this is related to the data that we've seen, but I don't know, I wouldn't like to work with this. So the nice thing, so what's not working here, longitude, latitude, mapping just directly to screen coordinates is maybe not the right transformation to use. Also, we are not taking the divisions into account. There were, like, different branches that we need to have in here, even though they have the same color. So the next iteration is, and that's really nice about Altair and Vega, it has kind of inbuilt support for geodata. So you can just say anything where you have X and Y, you can say just longitude, latitude, and specify a projection. So we use a Mercator projection here. and we directly want the right coloring so we define a color mapping between a and r so we use the same colors as in the plot from the 19th century and there's also a detail key and that's kind of an additional group by it says like that the visual elements should first group by division so that it's each gets its individual trail and there's no connection kind of when you when you end one but there's an actual break so you can add additional breaking points and if we create this this looks all already quite much more close to what we've seen so that's kind of the first step that we have but there's still more we can also do text marks we use again longitude latitude we use some nice font that it looks like the original, and we just write the survivors in the army as text up there. It's a bit overlaid, but if we look at a larger plot, that's probably going to be solved later. So that's kind of the second component for this graph. Then we have the cities. Basically, it's the same. there's some kind of small thing in there with a dx you can just do a constant offset argument and that kind of offsets all the things that you're plotting because I mean I know what comes out in the end and we need this little offset so that the texts don't overlay so that's another part so the next thing is now we have all the parts for the upper plot we want to also have the temperature chart what I'm using here, I'm directly combining two charts so I have the line that showed the temperature, I mark the text so I have the label where it says the date and the temperature so we can have a look here, I'm not using longitude and latitude anymore because it doesn't work mixed so the y-axis is temperature doesn't really work with a kind of with a longitude latitude data and you can't choose just one axis to be that but the nice thing is that in the Mercator projection the longitude is just linear so we just scale it to the right and to the right to the right range so now we have another component and basically we are there to now combine them all except the rivers that were in there and I tried to find the river data because Altair can also plot like GeoJSON but it's really hard to find local GeoJSON for for datas for rivers and get them so I didn't succeed there now we have all the all the plots so all the basic building blocks and we just layer the for the map job layer all things together we say the that the height of the temperature temperature chart should be 100 units so that it's kind of like resembling what we used and we disable the grid and set the same font for the lay for for the label that is in propagated to all excess labels and do the vertical concatenation and then what we get out there is a chart that maybe it's not publication ready it but i feel for like maybe an hour of effort this is already pretty close what used to be represented in this kind of chart from 1869 and that's a really nice way I feel to build up plots and something that you can use in Jupyter lab right right out of the box so there the workflows is really really good I on purpose didn't want to make a feature chart comparison with Plotly, Bokeh, Matplotlib you probably have to kind of find out yourself what fits your use case best because they all target a bit different use cases but in the end I think the Altair has quite a high entrance barrier because of this kind of building blocks you first have to build so it's not just a single function but you have to kind of get into the concept but once you know them you can actually see if that fits your use case and if you want to use it and yeah that's basically it thanks for listening also we hiring if you're interested we have a booth out there and yeah anyone have questions you can raise your hand and we can have a couple of questions
+
+**Speaker 2** _[23:28]_
+
+Hi, thank you for your talk. Did you publish your code somewhere so we can recreate your chart?
+
+**Speaker 1** _[23:33]_
+
+I haven't published it, but I will. Any more questions? Anybody? Yep.
+
+**Speaker 3** _[23:48]_
+
+Great talk, Malte. Thank you very much. I got a lot of insights. I'm from the R community where I'm aware of the package ggplot2. You have now just proven that everything that we do in ggplot2 also works in Python. I'm wondering, did you, this first graph that you showed with the historical visualization, I didn't really get how the soldiers were crossing over the river somehow.
+
+**Speaker 1** _[24:20]_
+
+The historical?
+
+**Speaker 3** _[24:22]_
+
+Yes, the historical one. What was the black line and the yellow line again?
+
+**Speaker 1** _[24:22]_
+
+Yes. again so one was the advance okay and the other one the retreat of the army so when they move back so it's always like one division going and going and then reaching moscow and then basically retreating and getting back i know i see
+
+**Speaker 3** _[24:47]_
+
+Now I see, thank you very much, okay. Thanks. I love that info chart from 1854 and you've done a great job in showing that you can actually kind of programmatically recreate it. I'm curious about the streaming aspect that you mentioned. So if I want to display dynamic data, Can you say a few words to that?
+
+**Speaker 1** _[25:16]_
+
+to that so um vega has a mechanism to kind of so everything in there is a kind of graph like a scene graph that takes in streams and and and plots that to to to the to the canvas or svg chart and it can kind of input change sets and um that's an api you can use but it's something that from the python side from altair isn't directly supported so it's all based on the using like csvs or directly encoding the data in json but if you have some some javascript part where you can push the data in there you can also use that to kind of actively change the data set for a plot that you created with altair for example but it's not for example if you want to have something there with a low entrance barrier probably bouquet is something where you can push the data much more easily from python into into your your plot thank you questions thank you for the great talk
+
+**Speaker 4** _[26:19]_
+
+talk, I tried
+
+**Speaker 1** _[26:20]_
+
+I tried Altair some time ago, and do you have any, or can you say where Altair has its limitations? So, when you won't use Altair for visualizations? So, one part, if you want to have, like, quick widgets or interactivity, I think Bokeh has still a lower entrance barrier, while it's I think Altair or Vega itself is catching a bit up with also adding widgets there I also find I found it quite hard to get something publication ready out of it because you to you have the SVG and you can render it or if you want to render it even to SVG and not to Jason from from from Python it's you always have to install selenium and the chrome driver and all that feels a bit kind of hard as a kind of automatic workflow for example but for stuff where I use for example Matplotlib it now replaces completely for me Thank you Any more questions?
+
+**Speaker 3** _[27:36]_
+
+Yep.
+
+**Speaker 1** _[27:40]_
+
+Is there any way to do 3D plots with Grammar of Graphics or Altair yet? As far as I know, they currently only support the two-dimensional coordinate system or like the map projections, but I think even with polar plots, it's already a bit, the support is a bit lacking right now. Yeah, so, yeah, there's one question there.
+
+**Speaker 3** _[28:14]_
+
+You had this, I think it was Vega.
+
+**Speaker 1** _[28:18]_
+
+Yeah.
+
+**Speaker 3** _[28:18]_
+
+Yeah. We got light, so can you show the bigger light specific occasion thingy? Yes, no the Vega yeah
+
+**Speaker 1** _[28:30]_
+
+Yeah.
+
+**Speaker 3** _[28:31]_
+
+And then you zoomed in?
+
+**Speaker 1** _[28:32]_
+
+Yes.
+
+**Speaker 3** _[28:33]_
+
+Yeah. So what happens if I said nice to false?
+
+**Speaker 1** _[28:42]_
+
+I actually don't know. Probably it's not that nice anymore. So anybody still have questions? I think we can have one or two more questions, and then we can have lunchtime. I have no hints.
+
+**Speaker 4** _[29:02]_
+
+I have a hint, and I stumbled over that, and it took a while. Don't run Altair on Python 3.5.2. That has a bug which breaks Altair. Okay. So we have to at least, if you use 3.5, you have to at least use point release 3.
+
+**Speaker 1** _[29:24]_
+
+Good to know. See you, Neil.
+
+**Speaker 4** _[29:26]_
+
+Xenial comes with 3, 5, 2. So use account Ubuntu or use Debian Stretch.
+
+**Speaker 1** _[29:38]_
+
+Okay, last question. Thank you.
+
+**Speaker 2** _[29:41]_
+
+Just a hint, because I've read the book, and there's a chapter in it about this nice thing. It's actually about which numbers are displayed on the Xs, because if you just use linear interpolation, you get things like 3.840, and what you have here is 40, 80, 120, which is really nice to read, and I suspect that this is the nice value there.
+
+**Speaker 1** _[30:08]_
+
+but you're there. Makes sense. Thanks. Okay, thank you very much. So I think now is the time for lunch and then let's give Matt a round of applause.
+
+---
+transcript_status: auto
+---
+transcript_language: en

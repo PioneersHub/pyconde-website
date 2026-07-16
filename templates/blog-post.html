@@ -1,22 +1,73 @@
 {% extends "layout.html" %}
+{% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
 
-{% block title %}
-{{ this.title }}
+{% block title %}{{ this.title }}{% endblock %}
+
+{% block og_type %}article{% endblock %}
+
+{% block extra_head %}
+{% if this.author %}<meta name="author" content="{{ this.author }}">{% endif %}
+{% if this.pub_date %}<meta property="article:published_time" content="{{ this.pub_date }}">{% endif %}
+{% endblock %}
+
+{% block structured_data %}
+{%- set branding = bag('branding') -%}
+{%- set host = branding['canonical_host'] -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "@id": "{{ host }}{{ this.url_path }}#post",
+  "mainEntityOfPage": "{{ host }}{{ this.url_path }}",
+  "headline": {{ this.title|tojson }},
+  "url": "{{ host }}{{ this.url_path }}",
+  {%- if this.description %}
+  "description": {{ this.description|tojson }},
+  {%- endif %}
+  {%- if this.social_card_image %}
+  "image": "{{ host }}{{ this.social_card_image }}",
+  {%- endif %}
+  "datePublished": "{{ this.pub_date }}",
+  "dateModified": "{{ this.pub_date }}",
+  {%- if this.author %}
+  "author": { "@type": "Person", "name": {{ this.author|tojson }} },
+  {%- else %}
+  "author": { "@id": "{{ host }}/#organization" },
+  {%- endif %}
+  "publisher": { "@id": "{{ host }}/#organization" },
+  "inLanguage": "en",
+  "isPartOf": { "@id": "{{ host }}/#event-{{ site.config.PROJECT.year }}" }
+}
+</script>
+{{ breadcrumb_jsonld([
+    ('/blog/', 'Blog'),
+    (this.url_path, this.title),
+]) }}
 {% endblock %}
 
 {% block body %}
-<div class="subsite">
+{{ breadcrumb([
+    ('/blog/', 'Blog'),
+    (none, this.title),
+]) }}
+<article class="blog-article">
+  <header class="subsite">
     <div class="subsite-title">
-        <section class="content">
-            <h1 class="title">{{ this.title }}</h1>
-            <span class="pub-date">published: {{ (this.pub_date|dateformat('medium')) }}</span>
-        </section>
+      <section class="content">
+        <h1 class="title">{{ this.title }}</h1>
+        <p class="pub-date">
+          published:
+          <time datetime="{{ this.pub_date }}">{{ this.pub_date|dateformat('medium') }}</time>
+          {%- if this.author %} · by <span class="byline">{{ this.author }}</span>{% endif %}
+        </p>
+      </section>
     </div>
-</div>
+  </header>
 
-<section class="subsite blog content-block--green">
+  <section class="subsite blog content-block--green">
     <div class="content">
-        {{ this.body }}
+      {{ this.body|shift_headings }}
     </div>
-</section>
+  </section>
+</article>
 {% endblock %}

@@ -1,0 +1,159 @@
+title: Build a personalized Bitcoin (BTC) virtual assistant in Python with Hopsworks and LLM function calling
+---
+description: The human ambitious desire to get rich without effort has been a major driving force behind the popularity of cryptocurrencies like Bitcoin and Ethereum.…
+---
+created: 2024-02-12
+---
+code: JRRET3
+---
+slug: build-a-personalized-bitcoin-btc-virtual-assistant-in-python-with-hopsworks-and-llm-function-calling
+---
+speaker_names: Javier de la Rúa Martínez
+---
+speakers:
+
+
+
+### Javier de la Rúa Martínez
+
+Javier is a Research Engineer at Hopsworks where he actively contributes to advancing the
+Hopsworks Feature Store platform. He is currently pursuing his Ph.D. at KTH Royal Institute of
+Technology in Sweden with a primary focus on large-scale machine learning systems
+---
+abstract:
+
+
+The human ambitious desire to get rich without effort has been a major driving force
+behind the popularity of cryptocurrencies like Bitcoin and Ethereum. However, their high
+volatility makes them too unpredictable, and keeping track of our investment gains and
+losses over time can be tedious, if not boring.
+
+In this talk, we will define the different components necessary to build a personalized
+Bitcoin (BTC) virtual assistant in Python. The assistant will help you analyze your
+transaction history, estimate future BTC prices, and calculate the future value of your
+holdings based on these predictions. It will be powered by LLMs and will make use of a
+recent technique called Function Calling to recognize the user intent from the
+conversation history.
+---
+full_description:
+
+
+The human ambitious desire to get rich without effort has been a major driving force
+behind the popularity of cryptocurrencies like Bitcoin and Ethereum. However, their high
+volatility makes them too unpredictable, and keeping track of our investment gains and
+losses over time can be tedious, if not boring.
+
+In this talk, we will define the different components necessary to build a personalized
+Bitcoin (BTC) virtual assistant in Python. The assistant will help you analyze your
+transaction history, estimate future BTC prices, and calculate the future value of your
+holdings based on these predictions. It will be powered by LLMs and will make use of a
+recent technique called Function Calling to recognize the user intent from the
+conversation history.
+
+The ML system will be built in Python, following the best practices of the FTI
+(feature/training/inference) pipeline architecture, on top of the open-source Hopsworks
+platform which will provide the necessary ML infrastructure such as a feature store,
+model serving, and a model registry.
+---
+room:
+---
+day: Tuesday
+---
+slot_date: 2024-04-23
+---
+start_time: 10:30
+---
+end_time: 11:00
+---
+slot_id:
+---
+track: Sponsor
+---
+tags:
+---
+submission_type: sponsored
+---
+submission_type_label: Sponsored Talk
+---
+submission_type_id: 3576
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/JRRET3.png
+---
+youtube_id: OyMoRMnh8bw
+---
+video_link: https://www.youtube.com/watch?v=OyMoRMnh8bw
+---
+video_published_at: 2024-06-23
+---
+video_duration_iso: PT27M30S
+---
+video_thumbnail: https://i.ytimg.com/vi/OyMoRMnh8bw/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:05]_
+
+All right. Thank you very much for coming. First of all, I can't promise anything, so don't take it seriously. So in this talk, I will show how to build a personalized Bitcoin virtual assistant in Python with HopSource and using LLM function calling. So let's first spend a couple of minutes to figure out what function calling is, actually. So, as you know, LLMs are trained with large corpus of data that provides LLMs with understanding of the human language and also broad knowledge of the world, but there are some limitations here. The knowledge is fixed, the LLMs don't learn new content, and also this knowledge is outdated. There is a cut-off date for the data that they are trained on. So basically, if we take, for example, Lama 3 that was just released last week, in these two versions, there is a cut-off date of March 2023 and also December 2023. So if, for example, I ask you, who won the European Table Tennis Championship last year? That happens in September. You may know that it was actually Sweden and Germany that won the championship. But if you ask Lama 3, you will get a different answer. So how can we fix this? There is a technique called retrieval augmented generation that helps you, or it consists of retrieving information from external data sources and basically augmented the prompt that you will send to the LLM so the LLM knows more information. So you can provide contextual data, personalized data, or real-time data as well. and so for example in our case before in this case we will retrieve the latest version of the Wikipedia page for example of the European table tennis table championship and provide it to the LLM so it knows that it was actually Sweden and Germany that won the championship so it's more or less like whispering the LLM the new information that it was not included in the train data set when it was trained, basically. But there is a problem here, and it's that in this case, it's actually the virtual assistant that should know which information needs to retrieve to basically complete the prompt so the LLM have all the information. And this is something that is hard, and you cannot, for example, in this case, retrieve all the Wikipedia content to send it to the prompt just to try to cover all the possible topics that the user might ask. So how can we fix this because this is basically not scalable. So there is another technique that is called function calling which basically delegates the decision of which data to retrieve, or in other words, which function it needs to be executed to retrieve the data. And it basically consists of asking the LLM with a different prompt. So basically you provide in the prompt all the available functions that are in the system together with the user query and expect the answer to be a function that needs to be executed and also the parameters for the function if there is any function needed to be executed to retrieve this data. So for example, extending the example before, in this case the virtual assistant instead of directly go to the external data source, first it will ask the LLM if there is something that some information that is needed, the LLM will ask yes, the user is asking for example about the tennis table championship and then the resource system can go and retrieve the latest information about this championship and include it in the prompt to ask again for an answer for the user. But functions that retrieve information is not the only option that you can do with this with function calling. So you can basically define any type of function and ask the LLM if it's needed to be executed. So for example, you can make predictions with a different model that is somewhere else or where you can perform tasks like calling an REST API or interact with a whole different machine learning system or with other LLMs. We saw how to basically what RAC is and function calling is. Now how we can actually build LLM systems. So to build LLN systems, a good practice is what we call FDI pipeline architecture which is basically composed of three different pipelines, feature pipeline training and inference pipeline. In the first one, you will have as input raw data and you will process the features that you need. It will output curated features. So in the case of text, you will create chunks and what is needed for the generating instruction set for the fine tuning of LLMs. Then in the training pipeline, you will train a model with these new features that were produced and also you can fine tune your LLMs and then in the inference pipeline, you will basically deploy your model, just use it for inference to score some batch data or make predictions in real time, and you will use in this case a function calling or retrieval augmented generation techniques that we saw before. So in this case, we're going to use HopSorgs to build this system, and HopSorgs is a machine platform that provides you with a set of abstractions that help you build this kind of systems following this good practice of the different pipelines. And these abstractions include a feature group, which is basically a group of features that make sense together. Then a feature view, which defines a query on how you want to consume these features. So you can select different features from different groups. Then also incorporates model registry so you can register your models once you train them and then model serving capabilities and so on. So in our case for the Bitcoin virtual assistant, it would look something like this. We will consume data from Binance and Twitter APIs and we will have a streaming pipeline we will curate our features from the related to Bitcoin prices and also perform some semantic analysis of the tweets that we read from the Twitter API. Then in the training pipeline, we will train a time series model with TensorFlow for predicting future prices of Bitcoin and also we can actually fine-tune an LLM, in this case we will use OpenHEMS 2.5, which is a fine-tuned version of Mistral, and then in the inference pipeline we will have on one side our predictor that was trained with TensorFlow for predicting the price of Bitcoin and on the other hand we will have a function calling and we will do some prompt engineering to actually interact, be able to interact with LLM. All right. So basically in our demo we will see how to define design three main functions that will be available, provided by the system, and one of them is retrieving historical information of the trading data of Bitcoin, given a specific date or a date range. Another function would be basically make a prediction of the Bitcoin future price, and a third one could be give me how many Bitcoins the user has in the wallet. So given these different functions that will be available, users will be able to ask questions like this one, like for example, what's the estimated price tomorrow, or what was the highest when and what was the highest or lowest closing price this year and things like that. So let's go directly to the demo. I hope you can read it properly. Like this, maybe. So this is Hopsource UI. As I mentioned before, I already created different feature groups to store our Bitcoin data and also the tweets. It looks like this. We see here different features like high, low, close price, and so on. Then we define our feature view, which is the query to how to consume these features from the different feature groups. I already trained the predictor model with TensorFlow, which is here. The data connection is a little bit, but yeah, this is our model, and also I created a deployment for it, which is running here. I will show you three notebooks just to see the code in a more interactive way, but for For example, in this one, it's basically the, it referenced the feature pipeline that we saw before in the diagram. So we have three on the left, you can see it. It's a feature pipeline, the training pipeline, and then function calling, which is the inference one. If we have a quick look to the first one, the feature pipeline, here we basically use the API for Twitter and Binance retrieve some data from there, do some feature engineering of our features just to take the ones that we are interested in and process the others. Also from Twitter, and then we will basically use the Hopsworks Python library to connect with Hopsworks, get the feature store and create the different feature groups that we you can see here, and insert the data using Pandas DataFrames directly. So this would be it, basically. The same code in this case is a notebook, but it's a streaming pipeline, so this code would be running in a streaming job in Spark, for example, or a Flink, and you would have it continuously consuming information, processing and writing the features into the feature store. Then we have the second notebook, which is the training pipeline. Here we basically connect again to the feature store, get the feature groups, and then build our query for the feature view. Which is this one, and with that one, once we have the feature view, we can generate a snapshot of the data using this query, which is basically our training data set. In this case, we are creating a training data set composed of two sets, for training and for testing. It looks something like this, and then I don't really need to go through the rest of the notebook, but basically we will train here a TensorFlow model, and here are some metrics and evaluation, and if I go a little bit down here, we save the model to the registry, and then afterwards create the deployment. But this is not really important. The most important one is this one, the most interesting as well, which is function calling. So in this one, we can see, first we connect with Hopsworks again, we retrieve the feature view that we created before, so we are able to read the features in real time. And then also we get the deployment here for predicting the prices of Bitcoin. These two objects, the feature view and the deployment will be used by the functions that we will define a bit later that will be, we will tell the LLM that they are available so they can, the LLM can decide if they need to be run or not. So okay, one second, let me run this, because it takes a little bit of time. It has to download the LLM into the GPU and so on, so I will run it. Next step, we will call this function here, load model. We can have a quick look at it, it's basically using the transformer Python library from having face to download our LLM and also the tokenizer and basically retrieve it, it doesn't do anything else, it's just downloading the model and loading into the GPU, that's it. And then we will call this other function, get element chain, which we have another quick look here, we will create a pipeline, also using the HuggingFace library and then use Lanshanes to grab this HuggingFace pipeline and basically what Lanshanes provides in this case will be a buffer for our conversation and also it allows you or helps you defining templates for your prompt and it helps you basically managing these prompts, these templates and using them to generate a new prompt that will be in the end passed to the LLM. So in this case, the prompt that we will use looks like this. It's basically we are telling the LLM you are one of the best crypto market analysts in the world, especially in Bitcoin, and then some instructions such as, for example, if you don't know the answer, just respond politely, and then don't show this, don't tell that you have this information, don't tell the other thing, and more or less how to behave. This would be the main prompt for the LLM. Then that's pretty much it from this side. So then we can keep going. It's still loading, as you can see. Then the next function, I mean, after loading the models and then defining the land chain pipeline that we have here, we can start interacting with our LLM. For that, we have this function, create it, generate a response, that if we have another look at it. where we actually first, if it's needed, we will retrieve context data to complete the user query to build the final prompt that we will pass to the LLM. This context data might return data or might not. It depends if the LLM thinks that it's needed or not. So if we have a quick look to the context data, we can see here that basically we have a function here that is called function calling that will ask the LLM using a different prompt. If based on the user query, one of the functions available in the systems needs to be executed to retrieve specific data. So this different prompt that we are using in this case to ask the LLM about the functions is the following, is this one here that says basically you are a helpful assistant with access to the following functions, and then we provide our functions, the ones that we want, the ones that we define in the system, we pass them here as serialised as JSON, and And then give some instructions saying you need to choose one of the functions and also retrieve the parameters that are needed for this function. So for example if we ask what was the price yesterday, the LLM will know which day was yesterday and basically will say, hey, I need to call this function to retrieve the history but I actually only need this day because it was yesterday. So it will pass as a parameter the date of yesterday, exactly. And then basically some instructions on how the parameters look like, or if there is no function just return no function needed, and then some examples to help the LLM understand how it has to answer and how to detect if a function needs to be called. After that, so we will get a response which is this completion variable here, and we call this other function that we basically perform some regex to see if the LLM is actually telling us that a function needs to be called. If that's the case, then we will invoke the function. And this function is basically just calling this invoke function is just calling the functions and returning the data. And then finally, after getting this data, context data, we will pass it one last time the LLM with the context and the original user query. So if we see here, okay, this is loaded, fine. It runs all of the cells. We are asking here, hi, how are you? And it's hello. The answer is hello. I'm a highly skilled crypto market analyst, specialist in Bitcoin, blah, blah, blah. Then the second question, what was the Bitcoin opening and closing prices this day specifically and I'm printing I will remove this one I'm printing here all the the information the context data that we are returning and passing to the prompt I'm just printing it here so we understand how it's interacting how it's behaving under the hood but the actual answer is is just at the end so in this case it was the LLM was asking for historical data of this specific date which is the one that we actually ask in the question and then returning the the answer saying the opening price this day was this one then if we keep asking for example what was the maximum when and what was the maximum Bitcoin price in this from this day until today the LLM knows which day is today and will ask specifically the historical data from the date that we mentioned until today, and we can see all the rows here. This will be passed to the LLM together with the user query and the LLM is able to find in all this data which is actually the day exactly that the price was at the maximum and then build an answer for it in a human language and just return it as the answer. And then if we get a bit more complicated, for example, we can mention like just this month and the LLM knows which month is it. And then just two last questions before we finish is, well, for example, the last one, will the bitcoin predicted price be tomorrow in this case the llm as we can see here was asking to call the second function the one that is asking the other model to predict the new uh the price for the for tomorrow and based on this uh prediction is building an answer saying the predicted bitcoin price for tomorrow which is this day uh 24th will be this amount and then the last question is that we will see here is this one. How much has the Bitcoin closing price changed in the last three days? So in this case, the LLM is not asking anymore about information because it's already in the context, in the history of the conversation, because we asked before different questions that was able to retrieve this data already so it knows already um how much has the the different prices of the the last three days so it will just compute the difference and say okay in this case has increased 10 percent in the last three days and then some advice like be careful, the market has been quite volatile and so on. So yeah, basically we have built a virtual assistant for helping us understand the trends in the Bitcoin prices and basically just retrieving information from Binance API and Twitter API to make predictions of future prices and using function calling to help the LLM ask for the information that is needed to basically provide more informed answers. And, yeah, that would be pretty much it. If you have any questions about something that was not clear, just feel free to... APPLAUSE thank you
+
+**Speaker 2** _[23:34]_
+
+Thanks a lot, Javier. That was a great talk and really interesting. Thank you for your questions. So one of the questions here is, although you said we don't have to take it too seriously, have you done any backtesting and do you trust the model's predictions of tomorrow's price?
+
+**Speaker 1** _[23:53]_
+
+I wouldn't bet my money on this. No, I wouldn't put my money there, no. Yeah, it's clearly not... This is something that is fun building, but it's really far from being reliable. Like, you cannot trust really. It's really volatile, so...
+
+**Speaker 2** _[24:15]_
+
+Maybe reliability is another good topic. So how reliable have you found the function calling to be? Was that hard to fiddle around with or was it reliable?
+
+**Speaker 1** _[24:27]_
+
+reliable? It's actually, I was surprised, it's not that hard, like the LLM really understands the instructions that you're providing, so if you, and especially if you give some examples, then it's easier for the LLM to understand which function needs to be called, especially if you give examples, but that's not the hardest part, I would say.
+
+**Speaker 2** _[24:52]_
+
+And so did you try a lot of different models? What is your experience regarding the different models that you can use for the LLM part?
+
+**Speaker 1** _[25:02]_
+
+Not really, I haven't tried that many, but the good thing with this one is that it is a fine-tuned version of Mistral, and the way it was fine-tuned is using what is called a chat ML, which is like a format for, it's like a format of building the prompts in a a way that you have different specific tags, let's say, to let the LLM know which part of the text is actually an instruction or which part is an example of what you have to provide, and more like trying to guide or direct the LLM to specific parts in the text that you're passing, something like that. So that's why I was using that one.
+
+**Speaker 2** _[25:56]_
+
+If you look back at your project, what was the hardest part and what was the most fun part?
+
+**Speaker 1** _[26:06]_
+
+Okay, one of the hardest maybe is that at some point you keep asking things and it might get confused with previous questions. So sometimes it works because, for example, it has already the information that it needs from before, so that's fine. But sometimes it gets somehow confused or it's difficult sometimes also to understand why it came to that conclusion or something like that. So it's not really trustworthy, let's say. And the most fun is when you actually see that, for example, you ask how much the price has changed the last three days, and it gives you a number, and then you check manually, you compute the difference, and it's like, wow, it's actually computing the difference of the three different prices. So it's an extra operation that it was not coded, It was not part of the function that you tell LLN that is available. It's just reading the data and saying, okay, I have to compute the difference between this day and this day. Compute it and then provide you the answer. So that was fun, let's say.
+
+**Speaker 2** _[27:17]_
+
+Okay, maybe you want to have that fun as well and try that out. Thanks a lot Javier. It was really great having you
+
+**Speaker 1** _[27:18]_
+
+Okay.
+
+---
+transcript_status: auto
+---
+transcript_language: en

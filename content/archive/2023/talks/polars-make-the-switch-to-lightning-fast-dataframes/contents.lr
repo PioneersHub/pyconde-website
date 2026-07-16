@@ -1,0 +1,162 @@
+title: Polars - make the switch to lightning-fast dataframes
+---
+description: In this talk, we will report on our experiences switching from Pandas to Polars in a real-world ML project. Polars is a new high-performance dataframe…
+---
+created: 2022-12-12
+---
+code: S79HEH
+---
+slug: polars-make-the-switch-to-lightning-fast-dataframes
+---
+speaker_names: Thomas Bierhance
+---
+speakers:
+
+
+
+### Thomas Bierhance
+
+Thomas passion has been working with data since 25 years: from small databases for SMEs to large distributed systems for international enterprises and intelligent systems using machine learning. He graduated from the KIT in Karlsruhe, Germany and trained his first neural network while studying at UPC, Barcelona, Spain in 2002. Today he leads the Data Science & AI practice of BettercallPaul in Stuttgart and supports his customers and teams on their journey to generate added value from data.
+---
+abstract:
+
+
+In this talk, we will report on our experiences switching from Pandas to Polars in a real-world ML project. Polars is a new high-performance dataframe library for Python based on Apache Arrow and written in Rust. We will compare the performance of polars with the popular pandas library, and show how polars can provide significant speed improvements for data manipulation and analysis tasks. We will also discuss the unique features of polars, such as its ability to handle large datasets that do not fit into memory, and how it feels in practice to make the switch from Pandas. This talk is aimed at data scientists, analysts, and anyone interested in fast and efficient data processing in Python.
+---
+full_description:
+
+
+The pandas library is one of the most widely used tools for working with data in the Python ecosystem. However, pandas can be slow for medium and larger datasets, and many users have been looking for faster alternatives. In this talk, we introduce the new polars library, a high-performance dataframe library for Python based on Apache Arrow and written in Rust. We will report on our experiences switching from Pandas to Polars in a real-world ML project.
+
+We will compare the performance of polars with pandas using various use-cases, and show how polars can provide significant speed improvements for common data manipulation and analysis tasks. Due to its speed it can even be an alternative for cases where people normally use distributed systems like Spark. For example, we will demonstrate how polars can process large datasets with minimal overhead, and how its massive use of parallelization can provide an additional speed boost.
+
+We will also discuss how polars compares to other popular options like DuckDB and cuDF.
+
+This talk is aimed at data scientists, analysts, and anyone interested in fast and efficient data processing in Python. Whether you are a pandas user looking for a faster alternative, or a Spark user interested in a simpler alternative, this talk will provide valuable insights and practical examples.
+---
+room:
+---
+day: Monday
+---
+slot_date: 2023-04-17
+---
+start_time: 15:45
+---
+end_time: 16:15
+---
+slot_id:
+---
+track: Data Handling
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 2521
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/S79HEH.png
+---
+youtube_id: CtkMzCIXOWk
+---
+video_link: https://www.youtube.com/watch?v=CtkMzCIXOWk
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT29M49S
+---
+video_thumbnail: https://i.ytimg.com/vi/CtkMzCIXOWk/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Thank you very much. I'm really thrilled to be here at PyCon or PyData, I'm not sure, and introduce you how we made the switch to Polars, a lightning-fast data frame library. And for those of you who already listened to Nico's talk before, there will be quite some redundancies, But I hope you can benefit from my perspective as well. And it will be a little bit different than we talked before. So I will try to cover things a little bit differently. So how come I speak today about Polars to you? It was around the end of 2021, I think, that I first heard of Polars. And I'm not sure if I can say it here, but I think it's an inclusive place. So let me confess, my first data science language love was R. And I really love dplyr and tidyverse. And when I tried polars, I felt right at home because I never got warm with pandas. So I guess it's a bit quite the opposite of Nico when he titled race by pandas. So for me, I was raised with dplyr. So, the opportunity to try it in a real project that arose in May last year, so a year ago, when we started a new project, and it was actually a time series project, so we had the question before, so I can say yes, it works for time series. It works quite well. We do this project at Better Call Paul, it's my employer, where we solve complex business problems with custom software, data science, and machine learning for our clients. So let me introduce the team for the machine learning part of the project. So first there's Tobias, he's a senior software engineer with Better Call Paul since about two and a half years, and he was already experienced with Pandas and Python 2. And then there's Dennis, recently graduated, he works as a software engineer at Better Call Paul, and he had some experience with Pandas and Python, but I think it was one of his first customer projects. And finally me, I'm leading the data science and machine learning practice for BetterCore4. So when we started the project, how did that go? So I showed Tobias my experiments that I did with polars, and he loved it straight away. And he was really keen to do the project with polars instead of pandas. But to be honest, I was hesitating. I thought, nah, it's too new, and we don't have enough experience with it, and I was afraid that it might end up as a big burden for the project. But at the end, what convinced me was kind of a luxury situation, and that was our part of the project was not that critical for the final solution delivery. And I said, yeah, let's do it, and let's give Polars a try, and close my eyes, and I hope that everything will work. So of course, everyone who talks about Polars talks about speed, and performance, and how fast it is. And we will say later how fast it is for us, but my primary motivation was actually different. It was the simplicity of the API. And performance really came second. So what I really like about the API is that it is built around a simple, consistent grammar. And most of our feature engineering in the project builds upon these seven verbs that get most jobs done. And those of you who know Spark might find some parallels, and there are also parallels with pandas and what do you have so we have this select to narrow down we have with columns to create or assign columns you can filter you can join or merge for pandas you can do the group by an aggregation stuff and of course you can sort the data frame so how does that work in practice let's get that into practice so what we're doing is we're reading two files sales transactions and articles and then we will try to calculate the monthly best-selling products of the year 2019 just for the sake of the example here so we would start with the sales transactions we would create two columns one for the year one for the month and then we would filter on the year to only have data for 2019 and then we would join the articles to get the product code because that's not in the transaction data and then we would group by the product code and the month and some the pricing information to get the total sales and then this is something magical that we use quite a lot in the project and Nico told us about it before it's like an internal group buy so here we're filtering on the rows that have the maximum sales when you look at the month. And so this would give you a nice list with the month and the product code with the maximum sales and you can sort it by month and you're done. So as you can see this almost looks like a SQL statement. And indeed the polar style of doing things is much more declarative than the imperative style many users in Pandas prefer. And another thing you might have noticed is that I did not talk about indexes. And I know a lot of people love Pandas indexes, and they're certainly a powerful feature, but they are a source of confusion and can be really difficult in long transformation pipelines, and I don't get them. So I find myself constantly fighting against the indexing system, I constantly do reset index and group bias index folds because I don't get how you do this multi-index filtering and how you remember on which position your column you want to filter on is. So in Polars it's different, there is no index. So how does that go? On the project, I guess we have written thousands of queries, and I'm not looking back. I don't miss these indexes at all. So another great feature are the expressions, and we have seen some of these expressions. What are the expressions? Expressions are used in Polars to formulate how values should be calculated. This could be something simple like column A plus column B, or it could be splice that string by comma and return the last value of the array that would be created, and we saw them in action with this overstatement and max was also an expression. And I think I could give a complete talk about expressions, but we have to keep it brief today. So let me talk about how you can use it to do custom composable expressions. And I will give you a concrete example from our project that proved to be really useful. So our project is about time series and we have a lot of monthly data. And with monthly data you have a trade-off. So calculating with normal dates is a really pain because you have these things like every Every month has a different count of days and you have leap years and leap seconds and all kinds of nasty things that make calculating the duration between two dates really complicated. And with monthly data, you don't need that complexity because you can ignore the days and you can ignore the seconds and it gets a really easy computation. But dates are nevertheless useful because we know what they mean. Because if you only would have numbers, that would become a sum in the exploratory part because you want to know is this the data for August 2008 and not this is the date number, I don't know, 50237, so that would not be useful. So what did we do? So we wrote a function that takes a date or an expression, so it might be a string or an expression, and it returns another expression, and what it does is you can forget about this get call expression that is only some syntactic sugar, and it would take the year and multiply it with 12, and then add the month and subject one. And what this does is exactly this stuff, you get a number and you can compare these two numbers and two months are exactly one number away from each other. So if you want to calculate the difference between two months, in months between two dates, you can use this expression function that we declared before and create a new expression month div that takes two dates, the start date and the end date, and you simply subtract the two expressions. And this can be used in your query. So to get the average product months when some items were sold, so how old was the product, you would simply take the sales, join the articles, group by product code, and then And you can use this month diff function straight away, and you can calculate the mean on it, and you can put the alias, so you see the expression is composable. And this month diff and this as year month function, you can put that in a utility library that you can use internally, that you can share between projects, and you can pi test it with unit tests and it just works fantastically. Another powerful feature of Polars is called the lazy evaluation and as I already showed you Polars looks a lot like these declarative SQL queries and a lot of performance can be gained by exploiting this declarative nature. And this is done by optimizing the query before executing it. So how does that work? So on the left-hand side, you can see standard query that will be executed eagerly. So Palazzo will read the complete file, and then it will count the numbers for each group, and then it will calculate the mean of these counts. So there's no optimization happening, and this kind of mean, there are algorithms that would be able to calculate that online. So it's not necessary to calculate the counts first and then do the mean. You could do that online. So the first option that can be done is what I call eager loading lazy query. So you would load the data. You would do this for data that fits into your memory and that you want to reuse as well. So, you do the loading once, and then you can call lazy on any data frame, which will hold the eager execution, so every statement after that will only build up your query, and your query is not executed before you call collect. So once you call collect, the query will be executed. option is to do lazy loading in query so you do not load the file into memory you just say I will want to use that file this is being done by using scan instead of read and the rest is as always so at the end you call collect and you would do this if your file does not fit into memory or if you do not use it that much, so loading the whole file would not be necessary and would be too much overhead. Now performance, how does this translate to performance? There are prominent benchmarks, We saw some of them by H2O or TPC-H, and that would be normally shown here. But I want really to encourage you, do not trust these numbers, and do not give too much importance to these numbers. Do not give too much importance to the numbers I will show, because that will be different for your use case and for your data, and it always depends. But be reminded, these standard benchmarks, they are simple queries, and the maintainers of these libraries spend a lot of time to optimize for the queries, and they put a lot of effort to have that small bar in the benchmark. So in your project, it might be different. So I brought you a statement that is a little bit representative of what we do in our project, But I had to reduce it because normally the queries are really big and would not fit on the slides, but it's kind of representative. So this simple query for this example spans 32 million sales transactions, 100,000 articles, 47,000 products, and it's determining when a product was sold first. So in which week and on which day. So I ran this on my ordinary laptop, this machine right here, 8 core laptop, 16 gigabytes of RAM. I need to upgrade. And how does this look like? So I plotted a little bit the CPU usage for you. So this is what the Pulas code looks like. You see all the eight cores are used and goes quite boom. With Pandas it's a bit different. Takes much longer and you see it mainly uses one core and this core is switching, so it's not fixing the core. It switches between the cores, which is not quite nice. So how does this translate into timings? For this particular query, we found Polar to be five times faster compared to Pandas. On a side note, from our experience, you should really take care before switching to the PyArrow backend. It was almost two times slower for this query, and I think it's connected with this group buy, so I think they have to work on the group buy, but I'm not sure. Maybe people here know better. So you might wonder why the lazy evaluation is not working as good as it should. Well actually it's because I cheated. So this query would not run on my laptop because this article contains a lot of strings and my laptop froze with all of the libraries. So what I did, I limited the columns manually that would be loaded from the file, and this is exactly the optimization that the lazy polars would do. So this is why we don't see any performance gain here. So how does this look like when you switch a machine? So I did that, we have an old server, an on-premise machine that has some cores and quite a bit of RAM, and we normally use that for big optimization problems, and how does that go? So first, Pandas. You see that 67, number 67? That's the green one. It will be done, let's wait. time. Yes, it's done. So, this is Pandas. This is Polar's ego. Oh, the done was a little bit too early. That is not synchronized. So, you see, it uses all cores, and then I think that is the collecting phase when only a few cores are working. Might be an artifact. I I don't know. And so in lazy mode, it's crazy fast. Just blinks. So blink, blink, and it's done. So in this example, you can see a 10 times performance gain and that matches our experience. So for many workloads that we use, we get a five to 10 times performance gain. But you have to note two things here. So again, your experience might be different. You really have to try this at home. And second, the query execution, if you paid attention on this one, is only 10% faster than on my laptop. So 70 cores, admittedly old server, so the cores are not really fast. But you have to watch out when you choose your cores. And also there was this question about how many cores does it use. You can limit that. It is an environment variable, so you should pay attention to that when you choose your numbers and your machines. So, as you have seen, the LASIK execution can be really beneficial, and one of the great features of POLAS is that it even makes it possible to process data that does not fit into your machine's RAM. So, to activate this out-of-core processing, it is really simple. you just say streaming equals true when you collect and this will activate a whole different line of execution and you can even process things that do not fit where the result does not fit into your memory so this would be the sync pocket but I have to warn you this features in alpha and to be honest I I really would not recommend using it. We tried it. It did not work really well. I got all kinds of strange errors and hangs. So sit tight and watch what they are doing. Maybe this will become more stable. My experience is you should not rely on this right now. So if it works for you, it's good, but you have to take care. So you might ask how much time we spent learning all this new stuff because it was new for us. Well, it was not that much. I think we were quite productive after two or three weeks, and a lot of things we were touching was not really that much connected to Pular. So when I did reviews of the code, the classic things like don't use a loop here, vectorize the operation, or don't use apply function, use the native capabilities. So things we would have in a standard pendless project as well. So I think all of this is more about do you know how to structure your data and how to create a query and not so much about the syntax. Because there's a really good community. And that was really helpful. And although Polars is still not that established, you rarely have to wait more than a day to get an answer. So there's this Discord community that is really active, and you can ask your questions on Stack Overflow, and you can even announce your Stack Overflow question on the Discord channel, and people will respond right away. However, sometimes your issue does not get solved on Stack Overflow because it is a bug or it's a feature that is missing. So, how did that go? Well, we did that project for a year and we had four bugs. I think we have another bug, but that is not tracked yet. We're still figuring out if it's a bug or not. and these were fixed really quick two bugs were fixed on the next day this third bug was really difficult was a strange race condition where you had to execute the query a thousand times and five times of thousands would fail and the other other 995 tries would be good but they fixed that as well. And we had two feature requests that were also really fast to be implemented, and we have one thing open that is debatable. So I think it's a bug, or at least it's a valid feature request. Richie thinks differently, he thinks it works as it should. So the project is really active. How active is it? You can see the numbers here. They're doing a release almost every week, so it's quite insane. We not pin our versions in our build pipeline. I think we only had three build breaks because of new versions, and that were easy fixes. So backwards compatibility and release speed work really well for us. A thing that I'm worried about is that green bar over there. So these are the commits of Richie Vink, the creator and the super main maintainer of this library. So while this library is really great, and I'm so thankful for him that he created it, it's also a little bit, I don't know, it's a lot of dependency on a single person. So I hope that other maintainers will join the project, and if you are into Rust and Apache error, you might consider this, because it's a really great project. So alternatives. I really love Polars, but of course, apart from Pendless, there are other alternatives. So just a few words before we have to finish this. So of course, there's Apache Spark, which we use a lot in one of our biggest data science projects. Actually, this server you saw is for debugging big loads that we put on Apache Spark. But the overhead can be a hassle. you do not need that for everyday projects. Another option is QDF, which also has insane speeds, but it runs on GPU. If you would buy a server that has the 640 GB in GPU memory, I do not know, maybe the graphic cards would cost you $100,000, I think, only the graphic cards. So, this can be costly. And the new star is DuckDB. Honestly, I don't get it that much because you have to write SQL queries with DuckDB, and I don't like these big strings in my code. It reminds me a little bit of the 90s when I first wrote PL SQL statements on Oracle databases. So our choice, what is it? To sum it up, so for single compute workloads, we would use Polars any day. For distributed workloads, we choose Apache Spark, but what matters most is the team at hand and your knowledge and your IT landscape and your operations and customer preferences. So I can't stress this enough, personal preferences do not count. Your team, your customer, your landscape, your requirements is what matters most. So should you make the switch? I hope I encouraged you to at least evaluate if Polar should be inside your toolbox. Thanks a lot for your attention. If you want to know more about me or better called Pol, this is where you can find us. and I'm happy to take your questions.
+
+**Speaker 2** _[26:16]_
+
+Thank You Thomas, so there are a lot of questions very active audience So the first question is is there something like a query explainer in polos?
+
+**Speaker 1** _[26:25]_
+
+Yes, there is. I'm not sure what it is called. You can simply call showGraph or something and you will get an execution tree. You have to install GraphViz to make it work, but there it is, yes.
+
+**Speaker 2** _[26:39]_
+
+Would you choose would you choose one default data frame library as a team or would you use both? interchangeably and acute a cost of more difficult handovers fragmentation
+
+**Speaker 1** _[26:50]_
+
+Oh, you really have to decide that with your team in mind. So depends a lot on your team. Do you like switching? What do people prefer? So I think it's quite easy to switch, but check with your team.
+
+**Speaker 2** _[27:07]_
+
+A speedup from pandas at 20 seconds using one core to polars eager at 8 seconds using 72 cores seems a surprisingly small speedup. Yes. Those long queries function look like they are easy to write but hard to read. How did you document them?
+
+**Speaker 1** _[27:29]_
+
+Well, so I think it's a lot easier to read than a lot of standard pandas code. And I think you just have to get used to these things. So my team is really used to read these queries. I think with experience you just manage it. It's not so much about documenting. So I think it's really hard to document that stuff. Of course, it helps if you have the right variable names and you make clear what your intent is, but at the end, sometimes you just have to go through the statement and execute it part by part to see what it's doing.
+
+**Speaker 2** _[28:08]_
+
+Polar seems quite similar to PySpark. What's the difference and when to use one or the other?
+
+**Speaker 1** _[28:14]_
+
+So if you need distributed workload, use PySpark. If you don't, use Polos. That would be my simple solution. If you're on one machine, Polos can do the job. If one machine is not enough and you can't scale the one machine, then use PySpark.
+
+**Speaker 2** _[28:32]_
+
+Long queries are hard to debug test. How did you solve this using polars?
+
+**Speaker 1** _[28:37]_
+
+So as I said, so there's no magic for that, which is simply copy the statement and we execute it part by part and see what it's doing.
+
+**Speaker 2** _[28:48]_
+
+What's the benefit over DuckDB Postgres?
+
+**Speaker 1** _[28:53]_
+
+Well, it's more than a SQL engine. So you remember these things like the expressions where you can compose expressions and make a library of expressions? I don't see that happening with SQL statements.
+
+**Speaker 2** _[29:10]_
+
+Okay, I think we have time for one more question How much does using custom transformation functions affect performance and lazy evaluation?
+
+**Speaker 1** _[29:19]_
+
+It does not, because it's native, so this is the really cool thing, because these custom functions, they are not executed like Python functions, they are translated to the native capabilities of Polar, and so there's no penalty for using this.
+
+**Speaker 2** _[29:38]_
+
+Okay. Thank you Thomas. Thank you
+
+**Speaker 1** _[29:39]_
+
+Thank you. Thanks a lot.
+
+---
+transcript_status: auto
+---
+transcript_language: en

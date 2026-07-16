@@ -1,0 +1,151 @@
+title: What do a tree and the human brain have in common-a not so serious introduction to digital pathology
+---
+description: While trees and human brains don't share that many properties regarding their domain, the analysis of the height of a tree and cancer in human brains…
+---
+created: 2024-12-20
+---
+code: MJD7TG
+---
+slug: what-do-a-tree-and-the-human-brain-have-in-common-a-not-so-serious-introduction-to-digital-pathology
+---
+speaker_names: Daniel Hieber
+---
+speakers:
+
+
+
+### Daniel Hieber
+
+_About — in the speaker's own words_
+
+Hi, I'm Daniel, a PhD student in digital neuropathology at Julius-Maximilians-University Würzburg and a research associate at the University Hospital Augsburg as well as Neu-Ulm University of Applied Sciences. My work focuses on applying computer vision techniques to automate analysis processes in the pathological departments and provide physicians with the tools to conduct machine learning on their own.
+---
+abstract:
+
+
+While trees and human brains don't share that many properties regarding their domain, the analysis of the height of a tree and cancer in human brains does.
+This talk provides a not-so-serious introduction to the domain of computer vision for pathological use cases. 
+Besides a general introduction to (digital) pathology and the technical similarities between satellite images (GeoTIFs) and pathological images (Whole-Slide Images), we will take a look at computer vision for medical tasks using Python.
+Whether you have never done image processing in Python, are an expert (ready to share some tricks with me), or are just curious to see pictures of a human brain, this talk is for you.
+Warning: this talk contains quite abstract pink-ish pictures of human tissue (and trees^^). If you are unsure this is something you are comfortable with (have a friend), do a quick search for "HE-stained whole-slide image".
+---
+full_description:
+
+
+Inspired by last year's talk about the height of a tree [🌳 The taller the tree, the harder the fall. Determining tree height from space using Deep Learning and very high resolution satellite imagery 🛰️] and the strong similarities between optical high resolution satellite images and pathological images, this talk will give a not-so-serious introduction to a quite serious topic: Python for digital pathology.
+The main content is:
+- "Cancer detection"
+- An introduction to (digital) pathology (know your domain)
+- The similarities between a tree and your brain (technically speaking, there are a lot)
+- A shallow view of ML-based and conventional computer vision in Python with some practical use cases
+- Why we can steal (nearly) everything from radiology and get away with it
+- What potential pitfalls could be
+- How you can start doing medical computer vision on your own
+
+Warning: this talk contains quite abstract pink-ish pictures of human tissue (and trees^^). If you are unsure this is something you are comfortable with (have a friend), do a quick search for "HE-stained whole-slide image".
+---
+room:
+---
+day: Friday
+---
+slot_date: 2025-04-25
+---
+start_time: 14:40
+---
+end_time: 15:10
+---
+slot_id:
+---
+track: Computer Vision (incl. Generative AI CV)
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 5091
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: None
+---
+supporting_material_url: https://github.com/DanielHieber/PyCon25-Python-for-Patho
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/MJD7TG.png
+---
+youtube_id: OjVfonKKJ-A
+---
+video_link: https://www.youtube.com/watch?v=OjVfonKKJ-A
+---
+video_published_at:
+---
+video_duration_iso:
+---
+video_thumbnail: https://i.ytimg.com/vi/OjVfonKKJ-A/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:08]_
+
+A little disclaimer in the beginning, I had terrible time management, therefore the talk shifted a bit from the focus of the proposal to the real talk. It will mostly be a quite graphical introduction to the domain of pathology and a little bit less technical. However, I hope I also included some technical stuff for you guys. Basically, the title slide tells everything there is to say, and the pictures show it. We see nice trees on the satellite image, we could even see some brain tissue on this image if there wasn't a roof on the pathological department. To make it easier, as the satellite view of brain images isn't that good, I also included an image of a tree and human brain tissue at the bottom of the slide under a microscope. As I wanted to do this a little bit interactive, maybe first of all, who am I actually? I'm a computer scientist who took a really, really wrong turn and who is now doing his PhD in digital pathology. It sounds strange. I had a dermatology project recently and now I'm really happy that I'm in pathology. So let's delve into this. First of all, a little question for you all. Maybe the guys who spent some attention in biology will now finally thrive and get this right. What is the tree? What is the human brain? Everyone in favor of this left part being a tree, please raise your hands. At least two guys. Everybody in favor of this being the tree image, please raise your hands. And the majority, as so often, is right once again. The brain actually looks quite clibberish without real structure, while with plant-based cells you have these really hard outlines and structure inside. As we, of course, in pathology don't differentiate between tree and brain, as we hope we always get brain tissue, we have a way more pressing matter to decide which one is cancer. Everyone in favor of the first image being a cancer, please raise your hands. They actually count as cancer. The second one, shrimps are also cancer. The last one, everybody's liking dogs here, so no cancer. Of course, this would be quite easy if I could spend all my time doing this stuff and I would really like to look at images of cute dogs, but I look at such things the whole day. This is maybe very hard to decide on this image. Let's zoom in a little bit. Anybody here with the opinion that we can see cancer tissue on this slide or is it just your normal human brain. This little ball, it's actually one of the many problems in pathology, it's just an artifact. But to be fair, it's the right area. Everything in the top right corner is cancerous tissue and the bottom is how your brain should look like. At this point maybe a little disclaimer, no medical advice given in this talk. Please consult a real doctor and please don't stain your brain with chemical tissue if you don't know what you're doing. First of all, I had this talk open for everybody, so is anybody here with no experience in computer vision or machine learning? Very few guys, but we will make it very, very quick, so I can really say it was for everybody. This problem is way more funny in German, because we have Bildverarbeitung and Bildbearbeitung. In English it's a little bit more clear with editing and processing. I was one of the guys who thought Bildverarbeitung is Bildbearbeitung, so I always thought computer vision would be image editing. But what I'm actually doing is having no clue what I do and hope that it works. Just very quickly, machine learning is a little subset of artificial intelligence where we We don't have to have a clue what is happening because the machine is doing the work for us. And with deep learning, it's even better because we don't even have to know what's the very important part of our data. We put it in, we simply throw it all in and hope it works. And for the last part, we have some larger areas in computer vision. We have classification where we basically just throw a simple label on our image. In this case, the brain tissue shows the tumor Cleoplastoma somewhere in it, so we call the whole image Cleoplastoma. In the B case, we mark the large areas where real tumor is, so we have one center here, one here, one here. This is an object detection-based approach. Then we go into the semantic segmentation approach where we just label every pixel with either our class we care about or something else. And then we also have instant segmentation, which differentiates between different objects we have. Is this really important for today? Definitely not, but I told everybody you will learn something about computer vision, so done. The more interesting thing maybe is what is actually pathology, because that's an area where very, very many wrong opinions are going around, and the first one being the patients. The default patient in pathology is looking like this, not like this. Pathology is primarily for living people, but we simply only work with the tissue and not the patient itself. So it's like computer scientists in many ways, we are sitting in the basement, we only look at data and we don't interact with other human beings. I felt really welcome when I first met to the pathology department. And the strange guys who actually interact with the patients are the surgeons, they are really cool, therefore they have to wear glasses, and they somehow find it funny to extract tissue from your body, so they take some little part of your brain out, which actually looks like greyish, clipperish tissue nobody really knows about. Then there's somebody really motivated, staining it with chemicals, so-called hematoxylin and eosin staining. One fact right there, hematoxylin is actually extracted from trees, so our brain only looks like our brain because we color it with tree tissue. And in conventional pathology we are already done here, some guy now takes this tissue and looks at it under the microscope. As we don't really care about conventional pathology because it's boring, we are doing digital pathology and therefore we simply make a photo of our tissue. Everybody now being surprised, actually the first digital pathology approaches were based on a camera being mounted on a microscope, and this was digital pathology, and then somebody looks at it on a computer instead of a microscope. Computational pathology introduces yet another step. We don't look at the tissue ourselves, we throw it into some computer and hope something meaningful comes out. We are still waiting for this as we don't use it in any meaningful way, but it's enough to get me funded and fed. This is oversimplified, definitely does everybody in the room now know that we are working with living patients and not dead patients? I also hope yes, so goal achieved. Before we look at trees, we have to sadly look at radiology as they are way, way, way more advanced in radiology than in pathology, but I brought a large amount of good reasons why we aren't stupid but radiologists are actually just lazy people with the easier task. The first one is we have enormous images while radiologists work with tiny images and the most obvious one, we actually have color while they only work with grayscale. To illustrate this point a little bit, in pathology we work with so-called whole slide images which range in this case with a very very tiny whole-site image 50 by 40,000 pixels and the larger one are actually 100 by 100,000 pixels. If you multiply this by the three color channels you get around 5.5 billion input parameters for your machine learning model while radiologists only have their 100 to 1000 pixel images and only grayscale information. If you have looked at the tissue of the brain earlier it was quite a lot of anarchy. The anarchy sadly doesn't end in the tissue. The anarchy also extends to the file formats. We don't have any standards. Basically everybody is using their own format. Every vendor of microscope software of course has their own proprietary standard. While in radiology we by now have a standard they have to use following laws and pathology is just please don't talk about it and the biggest problem is most likely the physical first approach so in pathology of course we have this tissue we stain it we cut it very very tiny so it breaks easily there are faults in there we introduce a bunch of artifacts only because it's physical while in radiology we basically directly process the signal to some digital format. And in pathology, the anatomy is a large pitfall. For example, you have this thing called hippocampus in your brain. It looks like a tumor highway to me, but in general, it isn't harmful. It should be there. But to machine learning models, they also think it's just tumor. So in radiology, as you can see here, we have very, very clear anatomy, you can see the spine, you can see the kidneys and so on. In pathology you see a purplish blob. As talked about, why can we still steal from radiology? We simply separate our large image in tiny parts and these tiny parts are no larger than in radiology so we simply throw all the algorithms on our images radiologists do. It's quite nice if you reach this goal. Taking a look at it, it also looks quite more comprehensible in this way. But if you now think what is full HD in this case, and even 4K, you see there's an enormous amount of data in each single image we work with. How can we actually work with it? This was six months of my master thesis because nobody told me. These things are saved as pyramidal tiled TIFFs or should be saved in a pyramidal structure. So there are basically not one version of this image, but there are multiple versions at different resolutions. They also are tiled in different tiles and you only get the tiles at the closest resolution you really require. So it's extremely performant to work with these images as soon as you realize there are whole slide images and you can work with them. But nobody came for the boring radiology or pathology part. We want to talk about brains versus trees. As always, I lied in my title. We are only talking about scans of brains and trees in satellite images. So we already explored all the parts of brains. Let's talk about trees and why they are a better fit to pathology than radiology images. start with, satellite images are also quite enormous. Satellite images use color. A little disclaimer, we talk about optical satellite images. I know there are many, many different kinds with way more data than any pathologist could dream about, but just talking about optical data, we also have color. I'm not sure if we have any real standards in satellite imaging, because every time I try to understand it, I'm quite confused by the many different options so I just claim it's anarchy as well. To be fair they are also digital from the start more or less but at least they also use some optical method to get the images and I have no clue if there's any anatomy outside of the human body but it feels like we are way closer aligned. Taking a look at the best examples for this probably I know not a satellite image, but I didn't find any beautiful satellite image. What we can see in here is a lot of fog or a cloud in our image. And if you look at the pathology domain, the contrast isn't that good. But right here you can see a dark, not focused area, which is actually a little bit of dust on the pathological slide. They look quite similar to me. If we continue, you can see it a little bit with the contrast. This image has a better saturation than this one, simply because it was another satellite making the image. And if you go into pathology, we have exactly the same problems. If another person is applying the staining to the image, it looks different. If you use a different scanner, it looks different. So we have many, many common problems in this area we have to tackle. There are, of course, further other facts. For example, if you take a look at Google Maps, you can see this line where the satellite images were taken by day and then when it's getting later in day it gets darker. We have the same in pathology with scanners not doing their work even though they cost multiple tens of thousands of euros but still a different topic. So the most important part maybe of this presentation is how does machine learning help us then to tackle those issues in pathology and the simple answer is initially it doesn't. Machine learning as a solution first approach is one of the biggest problem in academia I feel like and we really don't need it. So for example we have this pretty nice whole slide image here which is rescaled to fit and the first thing we want to do is realize do we have to process all of it. And as we can clearly see we have white areas down here and at the side that's just the background of our physical object so we don't care about it. The easiest way is to just apply a color histogram, see our threshold values, we have this really, really large spike in the end here where the whitish background is, of course it isn't really white because we are in an imperfect world, and then we can just apply a thresholding map and we can in general reduce the area we have to analyze with machine learning by at least one third of the whole image. So without using any machine learning, we already solved one third of our task. As I still wanted to do anything practically, I prepared this very, very tiny example, which basically just reads in some images and generates this nice histogram, this radiology image. You can see it's way more confused than pathology, but to be honest, actually there is a quite clear syntax which pixel range relates to which object in radiology, so we could do way more with thresholding in radiology. Then we have this little example where we simply read in our image. To be fair, it doesn't matter which framework you use to read in your image, they all work. Maybe I should switch to OpenCV, but I'm lazy and started with Pillow. If you use radiology, we have to invert our image as the background of course switches from white to black and the whole magic is this simple line where we just have an array function checking, okay, are we larger or lower than our threshold, done. I loaded this radiology image because I wanted to show how simple it actually is and how good it works. So we can extremely good see the spine of the person, we can see both kidneys, we can see this little artifact, I have absolutely no clue what those three points are, but I'm in neurosurgery and not in radiology of the lower abdomen, so this is fine I guess. And maybe a little thing, we also included these morphological operations here which are basically just there to make our image more pretty, we can of course simply remove them without any problem, it looks like a mess and even with such simple things we can already increase our image or the quality of our image by quite a lot without even touching machine learning in the slightest. Of course, we are talking about pathology, so this will definitely take forever now. 3.5 seconds to get a histogram of your data and to be honest, you only get the histogram once if you even get it and don't just do educated guess working as I always do. But of course the histogram is the easy part, generating the tissue mask will of course take way longer. And while I talk about way longer, I have to admit I just used numpy arrays as you have seen without any optimisation, so this is the most simple approach you can do and it took me not even 7 seconds to generate the whole tissue mask for my image. This part takes by far the longest and we are done with a nice tissue mask for our whole slide image in not even 10 seconds total processing time without touching machine learning. Just as a little reminder to maybe sometimes choose the simple path instead of the hard one. But to be fair, the conventional computer vision part doesn't always work. Sometimes we have to do machine learning. As a little example, and once again to rant about radiologists, this is a brain tumor and radiology, you simply have to use a region growing algorithm, click on the tumor itself and done. You can also use watershed algorithms to do it fully automatically. I tried the same with my tumor and my trees, didn't work out really well. And this is the area where we really need machine learning based, or in this case, CNN based machine learning models to actually segment our tumours. At this case, it's sadly a little bit hard to include a demo of this, as we don't have five hours to wait for a training process, however, a maybe more interesting question is how easy is it for you to do this on your own? And the question is surprisingly extremely easy, because while we don't have standardised images, we have standardized tools. We have, for example, AugMedi, which is a classification framework for medical images where you can achieve your goals with really, really few lines of code. For example, we just started a quick side project last week where we wanted to do some classification of growth cells in tumors, and it took us 250 lines of code to finish this process with an F1 score 10% higher than the competitor, and of these 250 lines of code, 57 were machine learning code, 63 were comments. So it's a really low code approach, Moni is basically the same for segmentation, so if you are more in the segmentation area, because it's way cooler than classification, Moni is your go-to, and if you're even more lazy and you don't want to do the work yourself, May I introduce auto machine learning to you? And the very, very sad thing in medical machine learning is human computer scientists are way worse than auto machine learning. With NNUnit or DeepFlash 2, we basically only have to prepare the data set, we give it to the machine learning with a simple command line call. DeepFlash doesn't even allow a command line tool, we get a GUI and a Jupyter notebook because we are too stupid to use the command line and the training is executed for us without any effort at all. And sadly it's executed way better than with our own engineered models. This is a friend you can see in many, many publications using NNUnit is better than implementing a unit model yourself. So there is basically no real step or learning curve. You can simply apply a model to your data and you're done. Maybe quickly talk about the pitfalls as most people here knew machine learning. Anybody here thinks accuracy is a good metric for anything? All right, I skipped this one, but actually scientists believe accuracy is the best metric for everything and we only report accuracy for our models. Because 98% accuracy is really, really good, but if you look at this example where we have a tiny bit of tumour in the machine learning model and the machine learning model tells us there's no tumour at all, we still get an absurdly high accuracy because all the not tumour pixels are of course right. If you use a meaningful metric like intersection over union, I'm a fanboy, or maybe F1 score if you're not that cool, you also get a really really representative zero percent score which is way better. The largest problem is as medical machine learning is mostly academic. We tend to go for the over complex machine learning solution for everything, which is a really bad approach. And as physicians always come with, hey, can't we use a machine learning model? And most computer scientists are, yeah, sure, go for it. We have way too many models. Why we could simply use simple conventional computer vision approaches. For example, we have this strange graph here. We can basically ignore, we put in some images, we get the tumor in the image, we apply it and then we do simply thresholding in the end. This is actually used in research projects currently to determine which killer cells to insert into your body to fight cancer. Machine learning is only the tumor detection. You don't need machine learning for even more complex tasks and once again we talk about we insert killer cells into your body based on some simple thresholding algorithms because they simply work. By far the biggest problem is JPEG and Photoshop. Physicians don't really like to label their data, so they do it in Photoshop and save it as JPEG, so this is an original label image with all this color pollution in the borders, so you have to do the reprocessing of your images. And of course, nobody in academia likes to do the data engineering part and everybody just wants to over-engineer machine learning models. I talked a lot about machine learning and such and medical data and everybody of you most likely will now tell me, okay, but we don't have medical data. Absolutely no problem. There is public medical data ready for you to use. For example, we have the Panda data set, which is a completely labeled data set with segmentation masks and classification masks. We have the chameleon challenge, which mostly focuses on classification. And of course, you can just go to your next university hospital and ask them, hey, do you have a cool machine learning project for me? They will all say yes, and most will say we can't do it due to data protection laws. But it works, trust me. So as my time runs out, I hope you learned at least something today. If you want to see my very, very awesome code example up close, there's the GitHub link where I also included some frameworks if you really want to get started in this area. As mentioned before, it's not really that hard. The data I used for the examples is in there and that's everything. Thank you very much.
+
+**Speaker 2** _[24:46]_
+
+Right in time, and right before the talk, he said the accuracy of his prediction will be 20 seconds for the time of the talk, and it was indeed 20 seconds. Thanks again for the interesting talk, and now we're heading to the Q&A session. First question. Does the fact that stain color depends on who did it, and maybe which hospital did it, introduce bias? and sorry it is a little bit small uh can the model use it as a shortcut for prediction
+
+**Speaker 1** _[25:20]_
+
+Actually, it introduces a heavy bias and as we are quite lazy and pathologists don't talk to each other, we have many, many problems and models which only work on their own data and if you apply it to new data, it doesn't work at all. And you can even classify the hospital out of a multicentric data set just by the staining if you want to do it. We have some stain normalization algorithms as computer vision, of course, has color normalization algorithm so we can at least reduce the problem but it's a really large problem if you don't even try to handle it at all because you can actually classify hospitals just by the staining of your slide.
+
+**Speaker 2** _[26:01]_
+
+Pathology deals with enormous images. Does scaling them down to reasonable size lose so much data they become useless or can you perform analysis of them?
+
+**Speaker 1** _[26:16]_
+
+Very, very funny thing, I asked myself the same thing like a year ago and I actually finally started a project exploring this because nobody in pathology cares. Everybody's working on maximum resolution with color information and there's zero empirical evidence that we need it. So I tried it recently, I submitted the paper and the answer is sometimes. I only tried it on two datasets with one model approach and you couldn't really say that it's always helpful to have the large image and you have the color information. So downscaling is an option. Downscaling isn't always an option, but it's definitely an area academia has heavily ignored for the last couple of years.
+
+**Speaker 2** _[27:02]_
+
+Why can't you turn the image into grayscale image and then use it for your model?
+
+**Speaker 1** _[27:07]_
+
+basically just mentioned I also tried gray scaling sometimes the results are comparable sometimes they are even better the model is of course faster but only by around a third but sadly most of the time the results are actually worse with gray scaling
+
+**Speaker 2** _[27:26]_
+
+What are issues that are not solved by AutoML?
+
+**Speaker 1** _[27:32]_
+
+the data pre-processing, it's quite simply exactly that. That's the reason why I think more physicians should actively engage with AutoML themselves because the data processing part is the part of the physicians. I can only tell them so much but in the end the data is provided by them and as soon as you have created your data set you can apply the auto machine learning code to it and it runs without any problem. With deepflash it's even enough to just generate a test train and validation folder and have your masks and images in them and it works unit is a bit more complex, but The pre-processing part definitely isn't handled at all
+
+**Speaker 2** _[28:14]_
+
+And maybe a last question from myself, actually. It's a very interesting question about the colors and grayscale, actually, and I would like to continue in that way. Does images with colors show any spectral evolution so you can somehow distinguish something from spectrum, from these different colors or not?
+
+**Speaker 1** _[28:36]_
+
+That's not really a thing I have to look into till now, I have to admit. So it could be, but as mentioned before, we basically have very little clue and we just use this one approach with max resolution and color because everybody does it. So there's definitely area for further research in this regard.
+
+**Speaker 2** _[28:58]_
+
+Okay, thanks and we are running on time. Let's thanks with a huge applause the speaker again
+---
+transcript_status: auto
+---
+transcript_language: en

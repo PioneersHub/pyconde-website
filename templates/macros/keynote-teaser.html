@@ -1,0 +1,67 @@
+{#
+  Keynote reveal teaser
+  ────────────────────
+  Band on the active homepage showing only the keynotes that have
+  been revealed so far. Each reveal is a databag flip (`revealed:
+  true`) + rebuild; the keynote page stays the durable asset and the
+  source of truth for speaker details + Person JSON-LD.
+
+  Usage:
+    {% from "macros/keynote-teaser.html" import render_keynote_teaser %}
+    {{ render_keynote_teaser(bag('keynotes')) }}
+
+  Databag schema (keynotes.yaml):
+    keynotes:
+      - page: /keynote-<name>/
+        reveal_date: "2027-02-11"
+        revealed: true|false
+
+  Self-hides when no entry has revealed: true (or none resolve).
+#}
+
+{% macro render_keynote_teaser(data, section_label='Keynote speakers') %}
+
+{% if data and data.keynotes %}
+
+{%- set revealed = [] -%}
+{%- for k in data.keynotes if k.revealed -%}
+  {%- set t = site.get(k.page) -%}
+  {%- if t -%}{%- set _ = revealed.append((k, t)) -%}{%- endif -%}
+{%- endfor -%}
+
+{% if revealed|length %}
+
+<section class="keynote-teaser" aria-label="{{ section_label }}">
+  <div class="content">
+    <h2 class="keynote-teaser__title">Keynote speakers</h2>
+    <div class="keynote-teaser__grid">
+      {% for k, t in revealed %}
+      <a href="{{ t|url }}" class="keynote-teaser__card">
+        {% if t.speaker_image %}
+        <img src="{{ ('/static/media/keynotes/' ~ t.speaker_image)|url }}"
+             alt="{{ t.speaker_name }}"
+             class="keynote-teaser__image"
+             loading="lazy"
+             decoding="async">
+        {% endif %}
+        <div class="keynote-teaser__info">
+          <p class="keynote-teaser__name">{{ t.speaker_name }}</p>
+          {% if t.speaker_role %}
+          <p class="keynote-teaser__role">{{ t.speaker_role|striptags|truncate(120) }}</p>
+          {% endif %}
+          <p class="keynote-teaser__talk">{{ t.title }}</p>
+          {% if k.reveal_date %}
+          <p class="keynote-teaser__date">Announced {{ k.reveal_date }}</p>
+          {% endif %}
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endif %}
+
+{% endif %}
+
+{% endmacro %}

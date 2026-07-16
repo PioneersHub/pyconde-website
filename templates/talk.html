@@ -1,61 +1,317 @@
 {% extends "layout.html" %}
+{% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
+{% from "macros/related-talks.html" import related_panel %}
+{% from "macros/funnel-cta.html" import render_funnel_cta %}
+{% from "macros/newsletter-inline.html" import render_newsletter_inline %}
 
-{% block title %}
-{{ this.title }}
+{% block title %}{{ this.title }}{% endblock %}
+
+{% block og_type %}event{% endblock %}
+
+{# Top-level set statements are global across blocks. #}
+{%- set branding = bag('branding') -%}
+{%- set host = branding['canonical_host'] -%}
+{%- set speaker_list = this.speaker_names.split(',') if this.speaker_names else [] -%}
+{%- set has_recording = this.youtube_id and not this.do_not_record -%}
+{%- set is_archive = this.url_path.startswith('/archive/') -%}
+{%- set archive_year = (this.url_path.split('/')[2] if is_archive else site.config.PROJECT.year|string) -%}
+{%- set super_event_id = (host ~ '/archive/' ~ archive_year ~ '/#event-' ~ archive_year) if is_archive else (host ~ '/#event-' ~ site.config.PROJECT.year|string) -%}
+{%- set event_status = 'EventCompleted' if is_archive else 'EventScheduled' -%}
+{%- set speakers_root = '/archive/' ~ archive_year ~ '/speakers' if is_archive else '/speakers' -%}
+{%- set talks_root = '/archive/' ~ archive_year ~ '/talks' if is_archive else '/talks' -%}
+{# Resolve the speakers who actually presented this talk. We iterate the
+   edition's speaker index and pick the ones whose `talks` list includes
+   this talk's slug. Since the migration to slug-canonical URLs,
+   speakers reference talks by slug (= talk folder name = this._id),
+   not by Pretalx code. #}
+{%- set speakers_index = site.get(speakers_root) -%}
+{%- set my_speakers = [] -%}
+{%- set this_ref = this._id -%}
+{%- if speakers_index -%}
+  {%- for sp in speakers_index.children -%}
+    {%- if this_ref in (sp.talks or []) or this.code in (sp.talks or []) -%}
+      {%- set _ = my_speakers.append(sp) -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{% block structured_data %}
+<script type="application/ld+json">
+[
+{
+  "@context": "https://schema.org",
+  "@type": "Event",
+  "@id": "{{ host }}{{ this.url_path }}#event",
+  "name": {{ this.title|tojson }},
+  "description": {{ (this.abstract or '')|striptags|truncate(300)|tojson }},
+  "url": "{{ host }}{{ this.url_path }}",
+  "image": "{{ host }}{{ this.social_card_image }}",
+  "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+  "eventStatus": "https://schema.org/{{ event_status }}",
+  "inLanguage": "en",
+  {%- set tz = branding['dates']['tz_offset'] or '+02:00' -%}
+  {%- macro iso(date, time) -%}
+    {%- if date and time -%}{{ date }}T{{ time }}{% if time|length == 5 %}:00{% endif %}{{ tz }}
+    {%- elif date -%}{{ date }}
+    {%- endif -%}
+  {%- endmacro -%}
+  {%- if this.slot_date %}
+  "startDate": "{{ iso(this.slot_date, this.start_time)|trim }}",
+  {%- if this.end_time %}
+  "endDate": "{{ iso(this.slot_date, this.end_time)|trim }}",
+  {%- endif %}
+  {%- endif %}
+  "superEvent": { "@id": "{{ super_event_id }}" },
+  "location": {
+    "@type": "Place",
+    "name": "{{ branding['location']['venue'] }}",
+    {%- if this.room and this.room != 'None' %}
+    "containedInPlace": { "@type": "Place", "name": {{ this.room|tojson }} },
+    {%- endif %}
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "{{ branding['location']['city'] }}",
+      "addressCountry": "{{ branding['location']['country'] }}"
+    }
+  },
+  "organizer": { "@id": "{{ host }}/#organization" },
+  "performer": [
+    {%- if my_speakers -%}
+      {%- for sp in my_speakers -%}
+      { "@id": "{{ host }}{{ sp|url }}#person" }{{ "," if not loop.last }}
+      {%- endfor -%}
+    {%- else -%}
+      {%- for name in speaker_list -%}
+      { "@type": "Person", "name": {{ name.strip()|tojson }} }{{ "," if not loop.last }}
+      {%- endfor -%}
+    {%- endif -%}
+  ]
+  {%- if this.track %},
+  "about": {{ this.track|tojson }}
+  {%- endif %}
+  {%- if this.python_skill or this.domain_expertise %},
+  "audience": {
+    "@type": "Audience",
+    "audienceType": "Developers, Data Practitioners",
+    "name": "Python skill: {{ this.python_skill or '—' }} · Domain expertise: {{ this.domain_expertise or '—' }}"
+  }
+  {%- endif %}
+  {%- if has_recording %},
+  "recordedIn": { "@id": "{{ host }}{{ this.url_path }}#video" },
+  "workFeatured": { "@id": "{{ host }}{{ this.url_path }}#video" }
+  {%- endif %}
+  {%- set has_transcript = this.transcript and not this.do_not_record -%}
+  {%- if has_transcript %},
+  "subjectOf": { "@id": "{{ host }}{{ this.url_path }}#transcript" }
+  {%- endif -%}
+  {%- set crumb_trail = [] -%}
+  {%- if is_archive -%}
+    {%- set _ = crumb_trail.append(('/archive/', 'Archive')) -%}
+    {%- set _ = crumb_trail.append(('/archive/' ~ archive_year ~ '/', archive_year)) -%}
+    {%- set _ = crumb_trail.append(('/archive/' ~ archive_year ~ '/talks/', 'Talks')) -%}
+  {%- else -%}
+    {%- set _ = crumb_trail.append(('/talks/', 'Talks')) -%}
+  {%- endif -%}
+  {%- set _ = crumb_trail.append((this.url_path, this.title)) -%}
+}
+{%- if has_recording %},
+{
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  "@id": "{{ host }}{{ this.url_path }}#video",
+  "name": {{ this.title|tojson }},
+  "description": {{ (this.abstract or '')|striptags|truncate(300)|tojson }},
+  "thumbnailUrl": "{{ this.video_thumbnail or ('https://i.ytimg.com/vi/' ~ this.youtube_id ~ '/maxresdefault.jpg') }}",
+  "contentUrl": "{{ this.video_link or ('https://www.youtube.com/watch?v=' ~ this.youtube_id) }}",
+  "embedUrl": "https://www.youtube-nocookie.com/embed/{{ this.youtube_id }}",
+  {%- if this.video_published_at %}
+  "uploadDate": "{{ this.video_published_at }}",
+  {%- endif %}
+  {%- if this.video_duration_iso %}
+  "duration": "{{ this.video_duration_iso }}",
+  {%- endif %}
+  "publisher": { "@id": "{{ host }}/#organization" },
+  "isPartOf": { "@id": "{{ host }}{{ this.url_path }}#event" },
+  "inLanguage": "{{ this.transcript_language or 'en' }}"
+  {%- if has_transcript %},
+  "transcript": "{{ host }}{{ this.url_path }}#transcript"
+  {%- endif %}
+}
+{%- endif %}
+]
+</script>
+{{ breadcrumb_jsonld(crumb_trail) }}
 {% endblock %}
 
 {% block body %}
 
-<div class="subsite">
-  <div class="subsite-title">
-    <section class="content">
-      <h2 class="talk-title">
-        {{ this.title }}
-        {% if this.is_keynote %}
-          <span class="keynote-label">Keynote</span>
-        {% endif %}
-      </h2>
-      <h3 class="talk-subtitle">
-        {{ this.speaker_names }}
-      </h3>
-      <div class="talk-info-container">
-        <div class="track-container">
-          <span class="track">{{ this.track }}</span>
-        </div>
-        {% if this.python_skill or this.domain_expertise %}
-        <div class="python-skill-container">
-          <span class="python-skill-label talk-info-label">Python Skill</span>
-          <span class="levels">{{ this.python_skill }}</span>
-        </div>
-        <div class="domain-expertise">
-          <span class="domain-expertise-label talk-info-label">Domain Expertise</span>
-          <span class="levels">{{ this.domain_expertise }}</span>
-        </div>
-        {% endif %}
-      </div>
-    </section>
-  </div>
-</div>
+{%- set visible_trail = [] -%}
+{%- if is_archive -%}
+  {%- set _ = visible_trail.append(('/archive/', 'Archive')) -%}
+  {%- set _ = visible_trail.append(('/archive/' ~ archive_year ~ '/', archive_year)) -%}
+  {%- set _ = visible_trail.append(('/archive/' ~ archive_year ~ '/talks/', 'Talks')) -%}
+{%- else -%}
+  {%- set _ = visible_trail.append(('/talks/', 'Talks')) -%}
+{%- endif -%}
+{%- set _ = visible_trail.append((none, this.title)) -%}
+{{ breadcrumb(visible_trail) }}
 
-<section class="subsite talk">
+{% if is_archive %}
+<aside class="archive-banner" role="note" aria-label="Archived talk" data-pagefind-ignore>
   <div class="content">
-      <div class="details">
-          {{ this.day }} {{ this.start_time }}
-          {% if this.room %}
-          in {{ this.room}}
+    <strong>Archive</strong> — this talk is from the
+    <a href="/archive/{{ archive_year }}/">{{ archive_year }} edition</a>.
+    See the <a href="/talks/">current programme</a> for the upcoming conference.
+  </div>
+</aside>
+{% endif %}
+
+{%- set year_label = archive_year or site.config.PROJECT.year|string -%}
+{%- set format_label = 'keynote' if this.is_keynote else 'talk' -%}
+<article class="talk-article" data-pagefind-body>
+  {# Pagefind meta + filters. Each filter is a separate hidden element because
+     duplicate attributes on a single tag get collapsed by the HTML parser. #}
+  <meta data-pagefind-meta="kind" content="Talk">
+  <meta data-pagefind-meta="title" content="{{ this.title }}">
+  <meta data-pagefind-meta="speakers" content="{{ this.speaker_names or '' }}">
+  {%- if this.track %}
+  <meta data-pagefind-meta="track" content="{{ this.track }}">
+  {%- endif %}
+  <meta data-pagefind-meta="year" content="{{ year_label }}">
+  <meta data-pagefind-meta="image[src]" content="{{ this.social_card_image }}">
+  <span data-pagefind-filter="year:{{ year_label }}" hidden></span>
+  <span data-pagefind-filter="kind:Talk" hidden></span>
+  <span data-pagefind-filter="format:{{ format_label }}" hidden></span>
+  {%- if this.track %}
+  <span data-pagefind-filter="track:{{ this.track }}" hidden></span>
+  {%- endif %}
+  <span data-pagefind-filter="recording:{{ 'yes' if (this.youtube_id and not this.do_not_record) else 'no' }}" hidden></span>
+  <span data-pagefind-filter="transcript:{{ 'yes' if (this.transcript and not this.do_not_record) else 'no' }}" hidden></span>
+  {%- if this.python_skill %}
+  <span data-pagefind-filter="python_skill:{{ this.python_skill }}" hidden></span>
+  {%- endif %}
+  {%- if this.domain_expertise %}
+  <span data-pagefind-filter="domain_expertise:{{ this.domain_expertise }}" hidden></span>
+  {%- endif %}
+  <header class="subsite">
+    <div class="subsite-title">
+      <section class="content">
+        <h1 class="talk-title">
+          {{ this.title }}
+          {% if this.is_keynote %}
+            <span class="keynote-label">Keynote</span>
           {% endif %}
-      </div>
+        </h1>
+        <p class="talk-subtitle">
+          {%- if my_speakers -%}
+            {%- for sp in my_speakers -%}
+              <a href="{{ sp|url }}" rel="author">{{ sp.name }}</a>{{ ', ' if not loop.last }}
+            {%- endfor -%}
+          {%- else -%}
+            {{ this.speaker_names }}
+          {%- endif -%}
+        </p>
+        <div class="talk-info-container">
+          <div class="track-container">
+            <span class="track">{{ this.track }}</span>
+          </div>
+          {% if this.python_skill or this.domain_expertise %}
+          <div class="python-skill-container">
+            <span class="python-skill-label talk-info-label">Python Skill</span>
+            <span class="levels">{{ this.python_skill }}</span>
+          </div>
+          <div class="domain-expertise">
+            <span class="domain-expertise-label talk-info-label">Domain Expertise</span>
+            <span class="levels">{{ this.domain_expertise }}</span>
+          </div>
+          {% endif %}
+        </div>
+      </section>
+    </div>
+  </header>
+
+  {% if this.youtube_id and not this.do_not_record %}
+  <section class="talk-recording">
+    <div class="content">
+      <figure>
+        <iframe
+          src="https://www.youtube-nocookie.com/embed/{{ this.youtube_id }}"
+          title="Recording: {{ this.title }}"
+          loading="lazy"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allow="accelerometer; clipboard-write; encrypted-media; picture-in-picture; web-share"
+          allowfullscreen></iframe>
+        <figcaption>Session recording on YouTube</figcaption>
+      </figure>
+    </div>
+  </section>
+  {% elif this.video_link and not this.do_not_record %}
+  {# Externally-hosted recording (the 2016 edition's videos are served by
+     LMU Munich, not YouTube, so there is no embeddable player). Surface a
+     clear outbound link to the recording instead of a video embed. #}
+  <section class="talk-recording talk-recording--external">
+    <div class="content">
+      <a class="talk-recording__external-link" href="{{ this.video_link }}"
+         target="_blank" rel="noopener">▶ Watch the session recording ↗</a>
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="subsite talk">
+    <div class="content">
+      <p class="details">
+        {% if this.start_time %}
+          <time datetime="{{ this.slot_date }}{% if this.start_time %}T{{ this.start_time }}{% endif %}">
+            {{ this.day }}{% if this.slot_date %}, {{ this.slot_date }}{% endif %}
+            {{ this.start_time }}{% if this.end_time %}–{{ this.end_time }}{% endif %}
+          </time>
+        {% endif %}
+        {% if this.room %}
+          · in {{ this.room }}
+        {% endif %}
+      </p>
 
       <div class="description">
-          {{ this.full_description }}
+        {{ this.full_description|shift_headings }}
       </div>
 
       <div class="authors">
         {{ this.speakers }}
       </div>
 
-      <img src="{{this.social_card_image}}" alt="">
-  </div>
-</section>
+      {% if this.transcript and not this.do_not_record %}
+      <section id="transcript" class="talk-transcript" aria-labelledby="transcript-heading">
+        <details class="talk-transcript__details">
+          <summary class="talk-transcript__summary">
+            <span id="transcript-heading">Transcript</span>
+            {% if this.transcript_status and this.transcript_status != 'none' %}
+            <span class="talk-transcript__status">({{ this.transcript_status }})</span>
+            {% endif %}
+          </summary>
+          <p class="talk-transcript__note">
+            Auto-generated from the recording. Speaker labels (<em>Speaker 1</em>, <em>Speaker 2</em>) reflect diarization, not identity. Timestamps refer to the recording.
+          </p>
+          <div class="talk-transcript__body">
+            {{ this.transcript }}
+          </div>
+        </details>
+      </section>
+      {% endif %}
+
+      <img src="{{ this.social_card_image }}"
+           alt="Social card for talk: {{ this.title }}"
+           loading="lazy"
+           decoding="async"
+           width="1200"
+           height="630">
+    </div>
+  </section>
+</article>
+
+{{ related_panel(this, my_speakers, talks_root, speakers_root, archive_year if is_archive else '') }}
+
+{{ render_funnel_cta(bag('site_state')) }}
+
+{{ render_newsletter_inline(bag('frontpage/sections/newsletter')) }}
 
 {% endblock %}

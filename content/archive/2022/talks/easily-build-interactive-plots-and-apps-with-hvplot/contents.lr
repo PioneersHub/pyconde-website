@@ -1,0 +1,406 @@
+title: Easily build interactive plots and apps with hvPlot
+---
+description: Do you use the `.plot()` API of pandas or xarray? Do you ever wish it was easier for you or your collaborators to try out different combinations of the…
+---
+created: 2022-01-16
+---
+code: 38HQZ3
+---
+slug: easily-build-interactive-plots-and-apps-with-hvplot
+---
+speaker_names: Philipp Rüdiger, Maxime Liquet
+---
+speakers:
+
+
+
+### Philipp Rüdiger
+
+
+
+### Maxime Liquet
+
+Software Engineer at Anaconda, maintaining and improving the open-source data viz libraries of the HoloViz ecosystem. Previously a civil engineer specialized in flood risk assessment, making flood maps with hydraulic simulation software.
+---
+abstract:
+
+
+Do you use the `.plot()` API of pandas or xarray? Do you ever wish it was easier for you or your collaborators to try out different combinations of the parameters in your data-processing pipeline? This tutorial will introduce you to [hvPlot](https://hvplot.holoviz.org/), a library that:
+* supercharges the `.plot` API with extra capabilities like interactive plots, rendering of very large datasets, and simple composition and linking of plots, and
+* makes it really easy to build interactive web applications, whether to make data exploration easier for yourself or for sharing your results with others, by simply replacing arguments in your method calls with widgets.
+---
+full_description:
+
+
+If you have done data analysis with Pandas before, then you have likely encountered the pandas `.plot()` API that renders static images using Matplotlib. The pandas `.plot` API has emerged as a de-facto standard for high-level plotting APIs in Python, and is now supported by many different libraries (xarray, pandas bokeh, cufflinks, etc.) that use various underlying plotting engines to provide additional power and flexibility. Learning this API allows you to access capabilities provided by a wide variety of underlying tools, with relatively little additional effort.
+
+In the first part of this tutorial we'll explore what is possible with the default `.plot()` API and demonstrate the additional capabilities provided by [hvPlot](https://hvplot.holoviz.org/), a Python library that is part of the [HoloViz](https://holoviz.org/) ecosystem and built on top of powerful data visualization libraries like [HoloViews](https://holoviews.org/), [GeoViews](http://geoviews.org/), [Datashader](https://datashader.org/), [Panel](https://panel.holoviz.org/), and [Bokeh](https://docs.bokeh.org/). You will see how easy it is to:
+
+* create interactive plots that help you understand your data fully,
+* render large datasets faithfully to show both trends and outliers,
+* obtain small multiples and widget selectors for exploring complex data,
+* compose and link plots to show relationships.
+
+In a data pipeline - a series of processing steps - each step can potentially accept multiple parameters. For instance, you may want to evaluate the impact of aggregating your data based on the mean or median of some column or dimension, or to select by individual values of some variable. In the end, the set of possible parameter values to explore can be quite large, even for a rather simple pipeline. This is when turning your pipeline into a web app can provide a huge benefit over a more traditional, cumbersome, and manual method of exploring data by editing Python code. A web app offers a clean, code-free view of the output, with parameters driven directly by buttons and sliders manipulated by the end user.
+
+In the second part of this tutorial, we’ll introduce the new `.interactive()` API of hvPlot that makes it trivial to turn data pipelines from PyData APIs you already use (pandas, xarray, Dask, cuDF, etc.) into web apps. This will include:
+
+* an introduction to the concept of data pipelines,
+* a brief introduction to Panel (a Python library for iteratively building polished web apps) which provides the widgets that can be used to replace arguments in a pipeline (e.g. a slider for a number) and components that can be used to display the output of a pipeline (e.g. tables, plots, BI indicators, etc.),
+* an explanation of how `.interactive()` works and replays your pipeline whenever a widget value changes, without you having to learn how to write and debug complex code with callbacks, and
+* the iterative process of creating a polished web app from a typical data pipeline, whether from a Jupyter Notebook or your favorite editor.
+
+**Instructions**
+
+We will cover the first part of a larger tutorial (that is about 4 hours long) that you can find at [holoviz.org](https://holoviz.org/tutorial/index.html). The instructions to install the datasets and dependencies required to run the tutorial can be found on the [Setup page](https://holoviz.org/tutorial/Setup.html).
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: Visualization
+---
+tags:
+---
+submission_type: tutorial
+---
+submission_type_label: Tutorial
+---
+submission_type_id: 1703
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: some
+---
+domain_expertise: some
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/38HQZ3.png
+---
+youtube_id: xlFMLQKZi3I
+---
+video_link: https://www.youtube.com/watch?v=xlFMLQKZi3I
+---
+video_published_at: 2022-05-06
+---
+video_duration_iso: PT1H26M17S
+---
+video_thumbnail: https://i.ytimg.com/vi/xlFMLQKZi3I/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+It's great to have you all here. We'll be splitting this tutorial in half, so Maxime, we'll start. First of all, we're going to set up the environment for all of you guys. So we handed out Post-it notes. If anyone doesn't have any, please raise your hand. Those are to indicate whether you've already installed your environment. So if you're struggling to install, please put up the red sticker. One of us will come around and help you and potentially set you up with an environment. Yeah, thanks so much. Maxime will take it away, and I'll take over halfway through.
+
+**Speaker 2** _[00:39]_
+
+Hi everyone, so I'm Maxim. I'm working for Anaconda. I'm a software engineer there. Today we're going to talk about HVplot, which is a plotting library and that gives you a lot of power. We'll start so with this setup, so I don't know if you can get the screen. So this like the simplest instructions for you to get set up. You have this tiny URL Link that is by data HV plot 2022 to get to this document where you can find how to Install the environment and data sets you will need to run the notebooks from this tutorial This uses anaconda project. It's it's not it's not the purpose of this tutorial, but it's a super nice Package that allows you to declare your dependencies the data you depend on and to package that in a very nice way There is also a way to install the dependencies with PIP. I recommend you download this zip file over there. It's about 150 megs, so it might take a while, but it's going to be fine. And then you will find instructions on how to install the dependencies. In the README there is a requirements file. We also provide a binder link, but binder is super limited in resources these days, so it's very likely it's not going to work, but, yeah, if you don't manage to install anything with content and pip, you can try this. And if really you can't do anything, actually, this whole tutorial or this tutorial can be found on this website, holoviz.org. So the same notebooks we will run are already there executed, just you won't get all the interactivity. I'm going to let you keep working on your setup and I'm going to do the introduction to this tutorial. I think when you think your setup, like you have installed the dependencies and everything, you should try to run this notebook, the 00 underscore setup. If you can run it without any warning, without any issue, then you're good to go for the rest of the tutorial. Oh, sorry, yes, definitely. So it's by data hvplot 2022 at tinyurl.com. Yes, definitely. So when you're set up, if you can put this green post-it on the back of your laptop so so that I can have an overview of who's ready to go. Thanks, excellent idea. So for the online audience, you have this document you can access at this tiny URL. And it gives you instructions about how to install the dependencies and the data sets and how to obtain the notebooks that we are going to run.
+
+**Speaker 1** _[04:36]_
+
+that we are going to run.
+
+**Speaker 2** _[04:37]_
+
+We can set you up on our system. With conda. If you don't have conda installed, you can install mini conda first. And you can also install the tutorial and the dependencies by first downloading this zip file and then extracting it. And you have more instructions in the readme how to install the dependencies with pip. You can also try your luck with binder. It's pretty unlikely it's going to work, because it has limited resources these days, but you can still give it a try. Remind everyone to put the green up. Yes, and when you're ready, everyone. Oh, I see a lot more greens. That's nice. Don't forget to put a green post-it on the back of your screen. Nice. Yeah, so I will get started. And anyway, the beginning is quite a lot of talking, so you still have time to get set up before we actually run the examples. Yeah, but just to remind you, if you think you're ready, run this notebook, the setup notebook that is in the examples in the tutorial folder. If it runs fine, you're good to go for the remaining part of this tutorial. I'm going to zoom in because I think it's really small, right? Is it fine in the background, screen size? Looks fine, OK. So yeah, welcome to this. One bigger? OK, thanks. So welcome to this tutorial. This is the Holovis-HVplot tutorial. So Holovis is a set of tools. It's also a group of people who's been working on these tools for open source tools for many years, I think about 10 years. They are dedicated to data visualization. And they really are meant to help you in your data analysis workflow, getting data, exploring this data, testing a hypothesis on your data by visualizing it. Then when you're fine with your analysis and you want to generate figures to share them with your colleagues and your boss, you may also want to be able to deploy your plots and your small dashboards to your colleagues so that they can interact with the data if they have more questions. And we also want each stage in this process to be customizable and that you can improve over time. So that's where the name Holovis comes from. From Holo, that means like whole, entire, complete. So doesn't Python already cover all of these stages? Well, sure it does because it's been there for about 30 years now. This is a view of the visualization landscape of Python. It's I think even a condensed view. So it's a lot of different technologies and a lot of different packages. So you see some famous ones like Matplotlib over there. There are packages and technologies that are built on top of JavaScript. other on top of D3 or Vega. Why are there so many tools? Because they were solving different kind of problems. So some sort of like they allow you to get very quickly to like in a one-liner to simple nice plots. But then you can't really customize that much. Some are like Matplotlib, I think, for example, are very good at creating plots that you can print, So it's very good for research, for publication. Some others are good for interactivity in the Jupyter notebook, like these examples. But then they can be kind of weak or not super performance when you want to use them in batch processes. So for instance, overnight, you want to create tons of figures of your data. Some are good for deployed servers. So you can embed them in a website, but they don't work so well maybe in Jupyter. And as a data analyst, data scientist, you want to be able to work in your notebook and then to just deploy the exact same thing on the server. And finally, some are good at small data set, but suddenly you get a lot more data and it's just going to break or be very, very slow and not performant. So Holovis is trying to tackle all of these sort of weaknesses by providing an ecosystem that has all these capabilities, part of it at least, so Holovis is meant to work very well in a web browser, so in a Jupyter notebook and also on deployed servers. You just write Python scripts, you don't write JavaScript or front end. All the activity, all the interactivity works the same in Jupyter as long as on the server. And one thing, the philosophy of HoloVis is shortcut, no dead hands. it means that you will be able to get pretty quick to a point where you're satisfied, like a plot that you wanted, but then you always want to customize it a little bit more. Or your boss or colleague says, oh, maybe you should do that. Sometimes you'll get stuck there with a tool. You go, okay, I can't do anything more with this tool. With Holovis and some of these packages, you can always just go a little bit further and customize things more. So, yes, as much as possible, Holovis tries to use the API that you know, and this is really going to be about HVplot. So you see, like, Holovis is this suite of tools. It's a small ecosystem. They all work very well together. I'm going to focus today on HVplot, but there are other ones that will be mentioned in this tutorial. HVPlot really is the entry point to the whole ecosystem. It is based, so I'll talk a little bit more about HVPlot later. Panel is a library with which you write Python code and you can create dashboards that you can deploy. So basically you can create like some small websites just writing Python code. So no JavaScript, CSS, HTML. HoloViews is what powers H3Plot mostly, so it's a way to interact, it's a way to create objects that in a notebook will display themselves as plots, like curves or points or polygons. It's really a way to wrap your data with some options and some operations that later displays themselves. GeoViews is an extension of HoloViews, so you can map geographical data and display geographical data. DataShader, which we will talk about, is a way to plot really a lot of data, so Jean-Luc gave a talk yesterday in the afternoon. If you missed it, you can watch it in a few days or weeks on YouTube. PowerRAM is a way to declare, so PowerRAM is really maybe the library, part of all these libraries that is less dedicated to visualization, but it's also very cool when you write some algorithms or to declare your interface when you write some API. It's typed parameters, so you declare a parameter that is a string and then your users, if they use a parameter that is not a string, get an error automatically. It's also more than that, but this is already very useful. So Holovis has decided to, it builds on the Python visualization landscape, and it has decided to build around Matplotlib, so it supports Matplotlib. It also builds on Plotly, so you are all available to use Plotly, and Bokeh. And there's also support for some other libraries, but it is less. It's really around this main three. So this is what this diagram shows here. And so in this tutorial, so what you actually got by installing the tutorial, you have a full long like four hours tutorial. So today we'll focus on the first part of it that is really dedicated to HV plots. If you have time or if you feel like it, you can keep going and doing the tutorial and you will learn more about panel and hollow views and how to use these tools in a more advanced way. The tutorial will use earthquake data sets and so we will analyze this data and we will create small dashboards to explore it. And we'll focus on the first part on HVplot.plot. So if you have used pandas before, you may have used the .plot API, so the .plot method to create plots. So it's sort of like flat API with a lot of parameters like read CSV. Instead of doing .plot, you can do .hvplot, and most of the API is just the same, so you can use the same parameters that you would use for Pandas API, except that it extends it and you get more power. We also have .interactive, with which, like, you bring interactivity and the ability to build some pipeline that you can control with widgets, and you will see with example it's easier to explain with an example and we will not talk in this tutorial so much about panel but it will be mentioned a few times. I encourage you now to run the tutorial with me, the notebooks, and there are a few small examples so I will give you time when we come to them so that So you can run them and just play around with the data. So I already mentioned the plandas.plot method. And HVplot builds on top of this API, but it's not the only one. You have also XRA. You have Pandas Bokeh. So you have now a collection of tools that have built on top of this API and that is very common to a lot of users. And I think it's very easy to enter in this world and just to create quickly some plots. So yeah, we'll start by running the tutorial. So we will use Pandas to read some data, some Parquet files. But just so that you know, we could have used like Dask. We could have used QDF to use your GPU resources. HV plots allows that, so you can create plots from Dask data frames if you want to, for instance. So I'm just gonna read in the data. If you have any problem while running this thing, just let me know. So we have a data set of about two million points. So we have earthquake events, So they have a timestamp, and they have a lot of different properties, their magnitude, their depth. We also have their location, so longitude, latitude. For this tutorial, we will just create a small data frame with just a fraction of the data, because two million points for some tools is too much, they can't really handle that. So you will see later that with H3plot, you can handle as many points as you want. And we will switch between these two data frames in this notebook. So first we show what does the traditional dot plot method of pandas do. So you call it with dot plot dot scatter here in this case, so we're creating a scatter plot with the longitude as the X axis and the latitude as the Y axis. a small example here that you can try. Changing the inline here with widgets and see what you get. I encourage you to try that. You will see that you get actually a way to interact with this plot. You can zoom in on your plot. You can pan. So this is already quite nice. get some interactivity. You can't really know what the data associated with one given point, but it's still a little bit better than the pure static plot if you want to do some exploration. Now we'll switch to using HVplot directly. So to use HVplot, you just need to import it this way, hreplot.pandas, and instead of calling .plot, we will call .hreplot. So what you get is actually a bokeh plot, so I didn't know how much of you were aware of this library, but it's a Python library that I think was started quite a long time ago at Anaconda, and it allows you to interact so much more, it's not a static plot, it's a plot with which you can interact, so you can pan, you can zoom in with this, you have a set of tools on the right, so you can zoom in with your scroll wheel, if you zoom in on axis, you can actually just change things with respect to this axis, and you also have the possibility to hover data points, and so by default with this data set, how we've configured it, you don't get super useful information, just the latitude and the longitude, but we can customise that to get, for instance, the magnitude. So you see already you get You get with just like a single import, hvplot.pandas, you get a tool that's pretty useful when you want to explore your data and more than a static plot. So there's something that's noted in the comment here is that this plot suffers from what is called over plotting. So even though this is the small data frame and we don't have that much data, we can't really see the density. We can't really see the density of all this, of the earthquakes. We can't really say anything because we just have too many points and we haven't really tried to do anything to try to see that density better. What you would do really, the first thing you would do, and you can try this out, this this is the exercise, is you would change the transparency of each point. So you may try with 10 per cent or 20 per cent or 50 per cent. By trying with 10 per cent, you get something a little bit better. You see that this is you can see this is more dense over here. You can start to see the shape of mountains. That's a little bit better. Another way, something else you could have done, instead of creating a scatter plot, you could have created a hex bin. So by plotting hexagons, and in each hexagon, the color of each hexagon represents the density, so the number of earthquakes that were in this area. So I don't know if it's better, just another way to represent the data, you're exploring it. But we'll see better ways to explore this data set. So with a flat API like the one like .plot, usually you have a lot of options, yeah? So it's not super easy to find all the options you are able to pass to this API. So there is a utility, hvplot.help, and you pass the string of the kind of plot you want, so for instance, scatter, and when you try that, you'll see you get a pretty large output with all the parameters you can pass. So there are different kinds of parameters, there are generic parameters, there are data shader, now we're not using data shader, there are geographic options, and at the very end, You will see these style options. These style options are the ones that are passed to the plotting library, the backend, that is Bokeh. So when we used alpha, but we could have used all of these other options to parameterize how we want our plot to look like. This utility here accepts some parameters, so if you don't want to see everything, all of that, you can just select, like, okay, I just want to see the normal parameters and the style parameters. Okay, so we saw that the plot we just created suffered over-plotting, we just had too many plots. So we will use data shader now to circumvent this problem. And what data shader does is that it will create an image, instead of plotting all the points, it will create an image and in each pixel there will be by default the count, so the number of points you would have had. Just to get this data shader plot you need to specify rasterize is true. There are options to say how the colour mapping is spread but we will use the default options, the option that is the most suited for the default case when you start the first look you have at your data set. So that's a much different plot, right? So you don't get points anymore, you get an image. Well, you can see, really, it's way better. You can see the density. You can still zoom in and out. And the image is very computed every time you zoom in and out. And hover, you can also hover over these plots. And you get, in each pixel, so it's really adapted to your screen, each pixel, the count of earthquakes. So, yeah, I encourage you to play around with this kind of plot because it's very nice. But
+
+**Speaker 3** _[25:20]_
+
+Can I repeat the question in the microphone just for the online audience?
+
+**Speaker 2** _[25:24]_
+
+Yes.
+
+**Speaker 3** _[25:25]_
+
+Can you please repeat your question so I can repeat?
+
+**Speaker 2** _[25:28]_
+
+Can you repeat your question, please?
+
+**Speaker 3** _[25:33]_
+
+A question is is there an easy way to zoom in and out because this does not seem easy Okay, it is easy but
+
+**Speaker 2** _[25:47]_
+
+I'm just I'm just using the touchpad not using any
+
+**Speaker 3** _[25:53]_
+
+Yeah, the touchpad may not always work for every
+
+**Speaker 2** _[25:55]_
+
+And you also need to select the wheel zoom tool on the right. That's the way. That's the way. Okay. So this plot, actually, we were still using the small data frame. But we will now use the full data set. And you'll see you get very quickly. So we have over 2 million points in the data set. It works very well. You would have tried to plot, to make a scatterplot of all these points, probably your browser would have crashed because it's too many. A matplotlib plot would have been fine, it would have taken maybe a little bit longer. So yes, so as I said already, but it's fair to repeat it again. So we use pandas now as our entry point, but we could have used Dask, X-Array. There's also support for streams. Streams is to support streaming data intake. There is like a library that offers data catalogs, and so you can have an H-replot interface to that. Geo pandas, if you're used to geo data. also network X for graphs. There's a small exercise. So if you could try that, select the subset of the data. So for instance, only the magnitudes that are greater than five and plot them with a different color map. So with another CMAP parameter. I'm just going to give you one minute to try that. From the big data and you can use rasterize equals true.
+
+**Speaker 3** _[27:54]_
+
+So repeating the question for the online audience subset from the small subset or a subset from this big data set
+
+**Speaker 2** _[28:00]_
+
+big data set. Yes, thank you.
+
+**Speaker 3** _[28:01]_
+
+Thank you. This was the answer to that. Yes So think while we're waiting we've had another question here as well Okay, it's on Slido
+
+**Speaker 1** _[28:17]_
+
+Is it possible to set the color, the legend, to something that looks a bit nicer?
+
+**Speaker 2** _[28:22]_
+
+a bit nicer because you have a lot of, like to.
+
+**Speaker 1** _[28:25]_
+
+but like to have like integers on the colors.
+
+**Speaker 2** _[28:28]_
+
+Uh, into just here? Yeah.
+
+**Speaker 1** _[28:31]_
+
+Oh
+
+**Speaker 2** _[28:33]_
+
+That's scary.
+
+**Speaker 1** _[28:34]_
+
+Thank you.
+
+**Speaker 2** _[28:37]_
+
+This color map is actually, it's computed, it depends on your data. So I don't think with this option you can't set the color map itself. You can change the way you compute the color map. So you can use log. Here you get something you're more used to. But you get a little bit less information, yeah? And you also have the option to have linear, but linear here is not going to be useful at all because the density is really in some tiny clusters of the whole data. Okay so this is the solution to the small exercise. You can pass a lot of different values to see map, color maps that are supported by matplotlib, bokeh, and also another package that is part of Holovis that is called colorset. Next onto statistical plots. So .plot, like .hvplot, not only supports scatter plots but also you can have like histograms and other kind of statistical plots. So what we will do first is that we will... What are we going to do here? We're just going to clean up our data set to remove NANDs, and then we will plot a histogram with a dot plot, the dot plot API of, oh, I'm gonna remove that. With the dot plot API of, oh, yes? It's also the same for you that the legend disappeared when you changed the column map? The legend? The question was,
+
+**Speaker 3** _[30:44]_
+
+Was it also the same for you that the legend disappears when you change the color map?
+
+**Speaker 2** _[30:45]_
+
+is it? Do you mean here there's no legend? Yeah, you don't have a scale. Yeah, yeah, yeah. Yes, you don't have a scale.
+
+**Speaker 3** _[30:57]_
+
+You don't have a scale anymore.
+
+**Speaker 2** _[30:58]_
+
+anymore it is because it I have used the data shade option if I use rust rice oh it doesn't come back okay no messed up what did I do wrong here
+
+**Speaker 3** _[31:13]_
+
+If you remove the column, it will show again. Okay.
+
+**Speaker 1** _[31:16]_
+
+Okay, that does indeed sound like a bug. You can explicitly set color bar equals true.
+
+**Speaker 2** _[31:21]_
+
+Did that
+
+**Speaker 3** _[31:26]_
+
+Someone is saying color bar doesn't make any sense if you have one color
+
+**Speaker 2** _[31:31]_
+
+It does make sense because it's not just one color. It's like a color map of red. So it does make a little sense. Yeah, so thanks for the question and back to the histogram. So just to show you the support that edgplot has to histograms, you also get, so you still get a bokeh plot, so interactive. You can hover and you know how many points you have in each bin. So this is again very useful compared to a static plot. So the small exercise here, if you could create a kernel density estimate plot of magnitude Instead of a histogram
+
+**Speaker 3** _[32:26]_
+
+It's maybe a quick reminder to everyone in a few minutes. We're going to have a questions round and also for the online audience if you have any questions or comments, please put them in slido and We'll take questions from there and then from the live audience Approximately five to ten minutes from now
+
+**Speaker 2** _[32:51]_
+
+So to get a kernel density estimate plot you just have to call hreplot.kde By specifying that you want it to be with respect to the magnitude It's an estimate of the probability density function Okay, and the last Part of this tutorial is going to tackle categorical plots So we will, in this dataset, add some categories with respect to the depth of the earthquakes. We'll use this simple table to define them between shallow, intermediate, and deep. We are just going to do some pandas foo to create these categories and create a new column, insert a new column in our data frame. I can show you what that looks like. So we have now a new column called depth class with shallow, intermediate, and deep earthquakes. And we will create a histogram by saying that we want to see a difference with respect to the depth class with the by parameter. we get here is an overlay of different histograms. Quick trick is that you can click in the legend to deactivate partly the plots so that you can see better those that are underneath. You could start to dig more into your data set and try to see what's going on at, like, magnitude. You still have hover that is working and you can get hover from multiple histograms in the overlay. Small exercise. Add in the previous call subplots equal true to see what's what's going on. And width set to 300 pixels. So with this simple change, instead of getting an overlay, you get a composition of three different histograms, and they actually happen to be linked, so if you zoom in on one particular axis on one plot, it will also zoom in on the other plots, and same for pan, their axes are linked automatically. And okay, so now we've got like an overlay of three different plots. We've got a composition of three plots, but maybe what you would want is just one plot and the ability to switch between the plots, and this is what we call grouping. You activate grouping by using the group by parameter and giving it the name of one of columns so you'll see I'll try to get this maybe yeah that's better so by automatically what you get by using group by is you get your plot so here it's by very close, but you also get a small widget that allows you to select your group category, and by changing the value you select with this widget, you get the ability to explore your data set and see the differences. To keep going, like, analyzing further our data set, instead of just classifying by depth, we could classify by magnitude, so we are going to define some magnitude class and associate them a name like minor, light, moderate, strong, and we will create a heat map out of this, because now we have data set with two different categories, so we have two different columns with two categories, and so we can pass these two categories like a heat map and each bin here, each sort of cell will have the count of earthquake events. So we can see that in this data set we appear to have like where we have the highest density is like light magnitude earthquakes and shallow. So this is the end of this first part of the tutorial. That was an introduction for you to HVplot. I hope you get the feeling that just by doing one import and calling HVplot instead of .plot, you really get a tool with Bokeh and with the possibilities of HVplot and Data Shader that is really super powerful. And you don't have to learn a lot of different APIs. This is quite flat. And you have to remember just a few parameters or find them in the documentation. So I think we get to the question time. So if you have questions now, please do so.
+
+**Speaker 3** _[38:47]_
+
+And there are questions online so we'll take those first and then we can around the audience So so one question has already been answered. Can you please share the github link? These are on discord in room a5 a6 The next question is there a standard way to combine you were h3 geospatial index and HV plot?
+
+**Speaker 2** _[39:11]_
+
+Could you repeat the question? I just didn't get it. Is there a stop?
+
+**Speaker 3** _[39:13]_
+
+Is there a standard way to combine H3 geospatial index? I do not know what that is.
+
+**Speaker 2** _[39:19]_
+
+I don't know what that is.
+
+**Speaker 3** _[39:20]_
+
+And HB thought you were like.
+
+**Speaker 2** _[39:22]_
+
+Yeah, I think, yeah.
+
+**Speaker 3** _[39:24]_
+
+company, or the German word.
+
+**Speaker 2** _[39:26]_
+
+Yeah, I think Uber gets you, like, hex plots. Yeah.
+
+**Speaker 3** _[39:31]_
+
+experts experts
+
+**Speaker 2** _[39:38]_
+
+I think that's an index in 15 different resolutions to create hexagons over all of the Earth.
+
+**Speaker 1** _[39:46]_
+
+MR.
+
+**Speaker 2** _[39:47]_
+
+Map to a latitude longitude, which is very nice for aggregating stuff. Yeah, but plotting hex codes is usually shitty
+
+**Speaker 1** _[39:47]_
+
+And then it's
+
+**Speaker 2** _[39:53]_
+
+So I was wondering if there's something already. Yeah We have no interface with any package from uber to X I don't remember than the h3 I think it's the name of this package and now we have no interface to that and we just create exploits like out of the box from bouquet Hi. Hi. Is there a way for HD plot to work outside Jupiter notebook? Yes. So, um, you can actually save your plots. So there is like you can do a triplet of that save on the object that is returned by each call. And so that's a way to have a static file. But, um, we also have a library that's called panel. and panel is a dashboarding library with which you can just like deploy and and create a like dashboards and age HV plots objects. Uh, you can embed them very well in this sort of a dashboard. Okay. Hello. Yeah, so I'm getting an error every time I'm importing HV plot. it is asking me to install a git I say cancel but every time I do I even call something to plot it it opens this window and says you should install git and and I say cancel
+
+**Speaker 1** _[41:28]_
+
+So I have to every time take
+
+**Speaker 2** _[41:29]_
+
+say canton and then it runs okay you shouldn't do that that's very strange so
+
+**Speaker 1** _[41:34]_
+
+Okay.
+
+**Speaker 2** _[41:35]_
+
+We'll have a look, okay?
+
+**Speaker 3** _[41:37]_
+
+Is there a link maybe in the Discord where you can file bug reports?
+
+**Speaker 1** _[41:42]_
+
+Absolutely, so there is it it's just hollow on github you can find hollow biz slash HP plot and file cup bug reports there
+
+**Speaker 2** _[41:53]_
+
+Okay, the second part.
+
+**Speaker 1** _[41:56]_
+
+Hi, everyone. I will take over from here. We are going to move on to the next notebook. If you are running on our Anaconda cluster, ideally you shut down the previous notebook when you move on to the next one just to limit resource usage a little bit. That's a general advice anyway. So far we have created simple plots, but usually you want to combine different layers in your plots, right? You might have a scatter plot, and you might have highlights, certain bits. And so you want to have a way to combine those together or create layouts of multiple plots. And that's what we're going to be looking at next. So again, we're going to load our data set here. I hope you can see that. Is that size? I might go one larger. All right. So we've loaded our data set again. We're going to import HVplug pandas. And now we're going to do some weekly resampling of this data to generate us a weekly plot of earthquakes. Quite nice. We get all the interactivity we're used to. In fact, Bokeh has nice daytime axis resolution so that when we zoom in, we get more information about dates. And that's all nice. But what actually magically all these plots just appear? And how does that actually work? Well, Jupyter has this idea of representation. And this visual wrapper basically appears if you put an object at the end of a line. And so if I kind of suppress the output, put a semicolon here, we don't get any output. And then if we use the print function, we actually get a different view of this. And this is a textual representation of what this object is. In this particular case, this line plot is a so-called hollow views curve element. What does that tell us? Well, it gives us a little bit of information. It tells us this is a plot of earthquake counts over time, which is nice. But what does that affordance actually give us? It's an object. Nice enough. You're familiar with figures. But why is that a nice thing? Well, these objects, you've got a variable on this object, and you can compose these objects together. So if I do a similar resampling of kind of now do weekly mean magnitudes, I now have two different objects. And I can compose those together in some form. So I have this plot of weekly counts. I have this plot of weekly means. I could compose those using the multiply operator. And the multiply operator basically means stack them on top of each other. In this particular case, it doesn't really make sense. So really what we want to do is compose them into a layout. So that's what we can do with this plus operator instead. And that gives us a layout of these two components. In this case, basically, it fills a number of columns. And using this .calls call here, we can set, say, how many columns of this do I want? So I can do two columns, but it's a bit too wide. So in this case, I do one column. And now I have these two plots composed together into one. Okay, that's pretty nice. If you're coming from Memplotlib, you're used to creating subplots, and this provides an easy way of composing these plots together and quickly generating layouts or composing multiple plots together. Another nice thing we can do is adding a third dimension to our plots. Scatterplot has two dimensions, it has the X and the Y, but you might want to actually colour by some dimension or you want to scale the size of the points by some dimension. And HVplot also makes that very easy, just like in the map.lib interface, you can set the C argument, colour, to a particular dimension of your data. here. We can now colour our points by the magnitude and see some patterns here, for example, in the Pacific region, you have these really intense earthquakes, and similarly here. And always, this will, all HP plots basically return you a Hall-of-Ease object and give you a bit of information about kind of what we're actually plotting. So here we're We're plotting a scatter plot of longitude against latitude, where the colour is scaled by the magnitude. Printing is always a good way to actually understand what is this thing I'm plotting after the fact. And next, yeah, so we've now created one thing that we have to think about a little bit, which you usually maybe don't think about so deeply. You're creating a scatterplot, you've got an X, you've got a Y. Which one depends on which other one, right? Really a scatterplot usually plots some variable against some other variable, while here really we're plotting physical locations. And so HoloViews makes this distinction between dependent variables and independent variables. And scatter, kind of, this doesn't make sense, why is longitude on its own here, and latitude grouped with the magnitude? HVplot makes this, HVplot and Hall of Views make this distinction of dependent and independent variables, and here, so if we say we want to plot longitude and latitude, we really should be expressing those as points rather than scatter, rather than a scatterplot. And that's just conceptually cleaner, because now we're expressing that magnitude is a variable of the longitude and latitude in some sense, rather than plotting them against each other. Other things we can add, we've added a colour. Other things we can add, for example, we can scale by size, but we can also reveal more information about our data by adding these hover columns. We have a bunch of columns in our data frame, we want to add more context, more information into this plot, but we don't want to visually vary too many variables, so we add them to the hover information, and now when we hover over this, we get not just the longitude and latitude and the magnitude, But we also get the place and the time of this earthquake, right? So we can really drill down into this and get all the information we want. And that's a huge benefit of this interactive plotting mechanism rather than having something like where it's static and you can't really just get an image that you're dealing with. I think we are running a little bit slow on time, so I'm going to skip this exercise and just keep running here. The other thing, the whole way through here, we've plotted these geographic locations. But it's really hard to get a physical context for where these things actually are. So HVPlot helpfully includes various TAL sources. So these come from HoloViews or are defined in HoloViews. And so here is a TAL source of Esri satellite imagery. And we can use that and now use the multiply operator to compose these tiles together with our plot. And now we can actually get an understanding of where are these points actually on this map. Before, you could kind of guess based on if you knew a little bit about where earthquake regions were. But here now, we can actually get physical context and see, well, this is the Pacific. This is just off New Zealand, for example. There's a ton of earthquakes. So that's quite nice. And we don't actually, so here we've kind of shown you that, yes, we make this composition of these two elements, right? But in actual fact, HBplot helpfully provides you a tiles argument, which lets you kind of add geographic tiles very easily without having to do the composition. Another thing we've already talked about so far, we've worked entirely with tabular data, pandas in particular. But HBplot has support for a wide range of data libraries. And if you're not familiar with X-ray, it's kind of the pandas for raster data, graded data, sometimes referred to as basically images. And so we can easily, we're just going to clean up this data a little bit. This, in particular, refers to this data set here that we've already downloaded and are loading now, our population densities. So we want to provide context, right? So earthquakes, yes, it's interesting. It's an interesting data set. But really, the real world impact is what we're interested in. And so we're now wanting to combine this density information with the earthquake information. We can, again, use this rasterize argument, which kind of helpfully, this is a huge image, right? This is kind of 4,000 by 8,000 pixels. Dumping that into your browser as just an array is, I think, tens of megabytes. And so this rasterize argument, just like in the previous scatter case, it regrids the data depending on our zoom level. So if I zoom in further, we get more and more detail until we're down to the resolution of the actual underlying image. And so in this way, we can get a ton of information about this data just by using this rasterized argument. All right, and as a final step, we're going to put this all together. So we have our rasterized population estimate, density estimate. We've got our scatter points with our hover information, scaled by color. And we're going to now overlay those two and get a plot of some of the most severe earthquakes and how they relate to the population density in that region. And so this gives us a lot of context, a lot of information. And it's really quite easy. We've just a couple lines of code. We've loaded these two data sets. We plotted it. We re-gridded it using data shader. And then we can easily compose it using this multiply operator. So this is a super nice and quick way to generate compositional plots. And this leads us into the core philosophy. We want to make low-level things easy. We can choose precisely where to go. But in the end, we provide a high-level API. But in the end, you can still drill down where you need to go. You can customize every little bit of it. And if you drill down further into this, really, underlying this are just bokeh plots. So if you really need to customize every single detail about your labels, you can still drill down into the actual bokeh representation of this, and then tweak every little thing about your plot. So if I import HoloViews here as HV, what we get back is just a bulky figure. And similarly, actually, we've just added support to kind of plotting with Mapplotlib and with Plotly into HVplot, such that using this simple representation, these few lines, we can generate a plot and then still customize it in very, very detailed ways. And that's always been our philosophy in all of our packages. Yeah, sorry, I've been running a little bit fast. We don't have a ton of time. I'm going to quickly do a demo of kind of a very powerful feature in HVPlot. And then we're going to get back on track and kind of go through the last little bit, which was the promise of this tutorial, which is to build little actual data apps using HVPlot and some of the tools around it. So I'm just going to run through this notebook very quickly. And then, yeah, we'll go to the next one and get some more information. So one really nice feature is the composition is a really powerful feature that we get out of the fact that HVPlot is based on HoloViews. The other nice feature is that we can kind of compose things, but then we can also use operations that are defined in HoloViews to drill down further. So there's this link selections operation in HoloViews where we can compose two plots, tell HoloViews these should be linked, and then I can select on one plot and see that selection reflected on the other plot. And so this really very complex and nuanced relationships in your data can be teased out this way. And again, it's really just a line of code. HoloViews does all the hard work of finding these dimensions are linked between these two plots, and then figures all of that out. And so this works for most plot types. Here, for example, we've again got our geographic plot with a slightly different tile source. And we've overlaid a histogram of the depths of the earthquakes. And so I can now kind of tease out where. I can ask questions of this data. I can say, where are earthquakes which are very deep in the earth? And so I can select here on this histogram to say, I only want earthquakes to show up which are at a depth of 500 plus, or whatever. And immediately, this is reflected in the geographic plot. And again, just a single line, right? We just have our plots. We tell it these are linked, and it figures that out, and then links them for us. Underneath, this is basically expressed as a so-called selection expression. So if we can look at the selection expression here, basically we've made the selection here, this is now expressed as this expression where depths are greater than 520 metres, I guess, and less than 673 metres, and then we could, using this filter method, we can apply that to our data set to actually, OK, I've made some selection. I now want to work with that subset of data that I've actually selected. So that's pretty nice. That's just something I wanted to show you real quick, just showing you the power. We've seen composition is easy, building these plots is easy, but you really get a lot more power even then. And this works with a huge range of plot types, including on these really large data sets, millions or billions of data points that you're plotting with Data Shader as well. All right, now let's get back on track. This is, I think, probably the last notebook we're going to get to. There's quite a lot more content in this tutorial, and I encourage you afterwards, if you're interested, to keep running through it. We get into building actual applications and so on. But for now, I'm going to take you through this Interactive Pipelines notebook, which is going to introduce you to some very powerful, easy APIs to build some apps. OK, so the first thing we're going to do is import Panel. Panel is a dashboard library we've been building, which makes it really easy to prototype interactive components in a notebook and then deploy that separately. So I'm going to show you some affordances that that provides. And then we're going to dive into this HVPlot Interactive API to dig into what we can actually practically do with that very easily. So Panel objects, again, just render themselves. In a notebook here, we get this widget that reflects. The current value is reflected into Python. If I set it from Python, it's also reflected into the front end. To demonstrate that this isn't tied to Jupyter in any way, I'm quickly going to basically launch a separate. This show call here creates a running server, which you could run entirely separately from Jupyter and serves this as a separate application. And so if you wanted to deploy this, you could easily deploy this. Obviously, a single widget isn't something you would want to deploy. But some of the apps that we're going to see and build now might be something you want to share. So if you play around, you can see if we change the value of the slider and then rerun this cell, you'll see it'll be reflected in Python. We're going to, again, run our imports, load our data, kind of pre-process our data a little bit just to get it in a nicer format for working with. We're just going to select the columns we're interested in. We're going to kind of select just data that falls within kind of nice geographical limits. We kind of ignore kind of polar and earthquakes in the polar regions just to have a slightly nicer data set. And now comes the magic part. By importing hvplot.pandas, we've added this second accessor. The hvplot accessor is the plotting entry point. This is the entry point for building data pipelines, data apps, very easily from Pandas DataFrames. So this interactive call here basically returns a new object, which is now an interactive object. So if I check the type of this, this is now an interactive object. It wraps the DataFrame. But now we can do really quite fun and interactive things with this thing. So previously, we created this magnitude slider. And now we can do some expressions, such as we're going to filter this data frame with the slider. And this is just standard Pandas syntax. If you've used Pandas before, this is something you're going to be familiar with. And we're going to say, for all magnitudes, filter this data frame and give me just the magnitudes that are greater than the value of this current slider. And so as I drag the slider now, we can see this DataFrame updates. So we've built a data app in a single line of very idiomatic Python, in fact, Pandas code. This is using the exact APIs that you're familiar with. And this interactive API works not just with Pandas, but with all the other libraries that we were talking about before, Dask, X-Ray, and so on. So using the APIs you already know, You can now build data apps in your browser, link your selections to your data frame or to your plots. And so now we have used the standard.plot API again, create a histogram plot. And as I drag the slider, we see this plot now update. And so super interactive, super easy, and using just the APIs that you already know. So here, we've now swapped out our MapFolute plot for this AGB plot. And yeah, we can build this little application very, very easily. So other things we can do is filter by dates, for example. So here, we have this date range slider in panel. We're basically going to set the start and end to the minimum and the maximum date in our data set. And now we can kind of look at that. So this is start date, the end date. And this thing has two parameters called value start and value end, which, as you might imagine, is the current start and end value of this date range slider. So as I change that, we see that update. And now, again, we can do arbitrarily complex expressions on our data set with these widgets. The new thing here is that really what we're working with is not the widgets themselves, but actually parameters on this widget. And so underneath this magicness of selecting with a widget lies the fact that actually these widgets have parameters. These parameters, in this case, are called value start and value end. And that's how things are actually filtered. Whenever the parameter changes, it notifies Interactive that the parameter value has changed and that the plot should be updated in response. And so now we kind of have this complex expression where we can filter both by magnitude and by a time range. I can drag that around, and we can built this interactive app pretty easily. So now let's try, you guys have a go at it, do a quick exercise where we filter by the minimum magnitude, but in this case, actually use the dot param value accessor to filter instead of the widget itself. It's a really important understanding. In panel, in particular, everything is a parameter. And so you can link everything to everything else. So understanding that the parameter is what links the thing is very important. So we don't have any solutions here. So I'm just going to work through this myself as well. So we start with our DFI, which is the interactive data set. We say DFI.mag is greater than, thank you, is greater than magslider param.value. And this is basically, underneath it all, And it's equivalent to just doing this filtering. OK. The other nice thing is that we're building pipelines here. We don't have to stop. We've built our filter data frame, but we don't need to stop there. We can create other things. We can do further analyses. We can chain our pipeline or analysis into further analyses. And so we've kind of stored this interactive pipeline as this filtered variable. And now we can create some plots from it. So we're going to kind of create a plot of the HVplot magnitude. Using HVplot, create histograms of the magnitudes and depth. And then we can, as you see, it automatically kind of displays the sliders that are in this pipeline such that when I drag, we now update both of these plots, because HVplot can track that these are inputs to our pipeline, and so we're going to expose those as widgets for you. So pretty cool. Just in a few lines again, we've built this interactive application that filters this data. The other thing, so this is all very centric on filtering, really HBplot. So I'm going to go off script a little bit here. Really, any method can be made interactive in this way. So I might do kind of a rolling mean, rolling, and have a window here, window parameter, right? So widgets.inslider, start and 10, call it window, and now I can kind of use that as an argument to any function that you might be used to when you're working with pandas. So in this case, I guess that I should have used something like resample, oh, it doesn't like that. Sorry about that. We should have used, of course, weekly, I should have used a selector like weekly or biweekly. So I could create a select widget here to say basically one day, one week. And now I could do HVplot. Plot to magnitude again. Okay. So we can kind of create any interactive pipeline that we want, and Interactive will interpret any widget or parameter as an interactive thing to bind to this pipeline. All right, so as a last step, we're going to kind of create this interactive map. So again, we subset our data beforehand to give us a more manageable data set to work with, and now we create an interactive pipeline from the subset, again, filtering by date, filtering by the magnitude, and then feeding that into this geographic plot. And just the same, we can now kind of see that should not be flickering, have to look at that. We can create this interactive plot that updates. We filter down to a single data point there. We might just select magnitudes above 6.5 and see the strongest earthquakes. So I hope you can see that you can build really, really complex applications very, very easily using this approach. One thing that we haven't covered so far is so far, whenever we displayed this pipeline, these widgets appeared automatically. But in actual fact, when you're building an actual application and you want to make it look pretty, you don't want your widgets right above your plot. You want to lay them out nicely and so on, which is something that the panel library can do for you. And if you follow the tutorial a little bit further, We'll show you how that works. And so to do that, you kind of need to understand that when we display it, it kind of terminates the pipeline. It says, now we're rendering this thing, and we're going to display the layout of this entire thing. But there's a number of terminating methods, which basically turn these objects into the objects that are actually rendered underneath it all. And so one thing we can do, for example, is terminate this pipeline into HoloViews objects. So if I call .holoviews, we get HoloViews objects, which you're familiar with from the previous composing plots section, which then allows us to layer on top other things, such as the link selections that we saw before. So now I can build a pipeline that is filters or pre-aggregates your data or does any other Pandas operation, terminate it into a Holovis plot, and then apply link selections such that we can now have this interactive pipeline where I can filter my data. So we're going to unfilter, include some more data again. We're going to select the subset. And all of this combines to give you all the power that's available in the HoloVis ecosystem. So as you can see, it's still linked to these widgets. It's still linked through these link selections. And that's really quite powerful. So the main terminating methods are these widgets. So you can get access to the widgets yourself. You can get access to the HoloViews objects. So you can do things like link selections. But you can also kind of terminate and say, actually, I want, from this filtered subrange, I want the whole layout. And this is now a layout of the data and the widgets. And if we print that, this is actually a panel object. Panel, again, is this dashboarding library we've been developing. And you can see here, it explains exactly, This is a layout, a row containing a column of our widgets, and our, in this case, just the view of the data. How are we doing on time? 12 minutes, 30 seconds. ALAN SEALES- 12 minutes. I do want to leave a little bit of time for questions at the end. But yeah, I hope you kind of got an idea of the power that this API provides, right? You don't need to relearn new APIs to build your interactive applications. You just use the APIs that you're already familiar with. You sprinkle in this interactive call. And then the pipeline works just the same like a Pandas pipeline. Pandas method chaining works, except now you can provide parameters or widgets as the inputs. So I'll quickly demo, since we do have a few minutes, I'll quickly run through where we can go with this towards, I may actually, instead of going kind of off field and introducing another concept, I'll dig in a little bit more some other things you can do with interactive. So you're going to have to watch me live code a few things. So far, we've only seen in these interactive pipelines the ability to link widgets or parameters directly with our interactive pipeline. But what would happen if you want to transform your widget inputs before you feed it into this interactive pipeline? And so maybe I want the title of this plot here to reflect the current magnitude selection and the current date selection. And so if I wanted to basically set the title parameter of this thing, how do I now do this? Well, there's a solution. InPanel provides something called a bind function. And we'll see how that works in a second. Over here, we're going to create a little function that formats our title for us. So we've got the magnitude. We've got our dates, which is the start date and the end date of our filter. We're now going to create a little f string to say, earthquakes with magnitude greater than mag and between dates 0 and dates 1. So if I were to call, if I now call this function, I could do, I've got my mag slider value. I've got my date sub range value. I didn't re-execute this. Let me undo that. So yeah, in this way, we can kind of format our title. But now, how do I pass this into this interactive pipeline? Well, this is where pn.bind comes in. Pn.bind basically means bind these arguments to this function. And so in that way, we can kind of express complex things about these values that we're putting in. And so now we're going to bind to this title function the magnitude slider and the date sub-range slider. And so whenever either of these sliders changes, Panel.bind will tell the interactive function here to call this method again and update the title. So in this way, we now have a title which is linked to the magnitude or not. Demo effect here, apparently. Oh, this is probably not the correct. I give it the wrong slider, so we want max up range. And now whenever I change the magnitude, not just does the plot update, but also it calls this function with these two values and recomputes the title. So in this way, we can kind of create any arbitrary inputs, dynamic inputs, to any function, which is quite nice. Sorry, what did you change? Sorry, OK, previously, just a second ago, the question was, what did I just change? I'd made a slight mistake before. We have multiple magnitude sliders here. We have the date sub-range and the magnitude sub-range. I'd passed in max slider, which is a slider we used somewhere above in the notebook. So I just fixed it. OK, cool. And so what we can do again here is now we've built this little application using Panel. And if you follow the tutorial, we can now deploy this as a nice little application entirely separately. You can put this on your server and kind of share your interactive results with other users, maybe not even technical users who don't know, how do I run this notebook? How do I work with Jupyter? You can share your data science insights directly with users. Panel also has nice things such as templates where you can create a little application around it. Earthquake, let's call this the Earthquake Data Explorer. I'll assign this to a variable. I'll say append our geo.layout to it. And then let's show that instead. And now we don't just have, we get a nice little template around it. We can do further things, such as kind of, well, actually, I don't want my widgets to be in the place they are. I want to place them in the sidebar, Geo.widgets, and Geo.panel. Oh, I should probably have, yeah, that's, sorry. Should have re-executed that. And now we have this, we've basically created a nice little templated application. It has features such as kind of resizing and all of that in just a few lines of code, right? Again, we've just created our little template, added our widgets to the sidebar, added our plot to the main area, and created a dashboard that you can share with anyone. I think I'll call it a day here. I do encourage you to follow through. The next sections will take you through some of the basics of using Panel, combining HVPlot, Panel, and HoloViews in powerful ways, and then finally take you to building full dashboards. Yes, absolutely. Sorry about that.
+
+**Speaker 3** _[79:59]_
+
+The question was, go back to the DMPL command, please. Yes. Okay, so I guess we have a question round now then. Sounds great. A few questions from online. Some of them were already answered on Discord. So let's start with the ones which haven't been answered yet. Okay. What is the status of HoloWiz compatibility with other IDEs? for instance, VS Code Interactive Mode, Spyder, PyCharm, etc.
+
+**Speaker 1** _[80:31]_
+
+That's a very good point. So generally, we love notebooks. All our documentation is centered around notebooks. We work well in, so VS Code also has notebook integration. It works in there. But if you do not like to work in notebooks, for whatever reason, there's very valid reasons not to like notebooks, you can use Panel to kind of have a auto-reload function where you just script on one screen and see the result reflected in the browser on another screen. And that's a perfectly valid way of working. We may have to kind of improve the documentation around that a little bit. If you look at, there's a nice little blog post for the last panel release, which kind of walks through that a little bit. I think auto-reload is in here, yes. Oh, no it's not. So sorry about that. But there is the functionality, You start a server, you point it to a particular script, and then it automatically refreshes whenever you save the script. So that's a perfectly valid and nice way of working with this stack.
+
+**Speaker 3** _[81:42]_
+
+Okay, so I quickly go through some of the questions that were answered on this card very quickly. Can I put another image in the background instead of the map? The answer is yes, HoloView underlying, so use the multiplication dunder, see HoloWay or HoloView overlays. Next question, I deliver most of my plots using PySimpleGUI, do you know if these plots will show there? The answer was probably, but you haven't tried yet. and it can be used a tree plot with Jupiter lab the answer is yes and if you have any problems then I think you can ask either on the official channels or on this board any questions from the audience or anything you would like to add to these questions I just read out
+
+**Speaker 1** _[82:27]_
+
+I just read out before. No, those were great questions. Thank you.
+
+**Speaker 2** _[82:36]_
+
+Another question about compatibility, how does HBplot work with Streamlit?
+
+**Speaker 1** _[82:41]_
+
+With Streamlit, so I think Streamlit does have support for embedding.
+
+**Speaker 2** _[82:46]_
+
+Embedding. Bokeh plots.
+
+**Speaker 1** _[82:47]_
+
+Bokeh plots.
+
+**Speaker 2** _[82:48]_
+
+Bokeh plots.
+
+**Speaker 1** _[82:48]_
+
+Bokeh plots, that's correct. So in the end, it's just a Bokeh plot. I showed you that command earlier, right? If you import HoloViews and then render to a Bokeh plot, that should work directly. We do need to talk a little bit more with the Streamlit devs. Unfortunately, Streamlit does not have the same kind of bi-directional communication that Panel, for example, and the Bokeh server provide. And so a lot of the interactive features of kind of dragging sliders, the interactive selections on plots, that kind of stuff won't work.
+
+**Speaker 2** _[83:21]_
+
+When you said you can share now
+
+**Speaker 1** _[83:23]_
+
+Now your plots with some
+
+**Speaker 2** _[83:24]_
+
+your plots with somebody else and they can interact with that. Do you mean you have to first deploy it somewhere and then...
+
+**Speaker 1** _[83:29]_
+
+So there's a few options there. The standard way would be to basically stand up a server. It's integrated in panel. So you basically just run panel serve and point it to the notebook. And then that deploys it as an application, or you can move it to a script. There's alternatives. So if it's a fairly simple app, there is an option to embed all the states into the application itself. So I can try it here. So by calling this embed function on this panel object, it goes through and pre-records the state as I drag these sliders. I don't think it actually supports. It doesn't support all the sliders. And so now this could be shared as a static HTML file. I have also been exploring, so if you've heard today, there was a talk about Jupyter Lite, which is a version of Jupyter that runs entirely in browser. I've been exploring the ability to actually run panel applications in Pyodide, which is what Jupyter Lite is built on. So you will very soon be able to kind of deploy panel applications entirely as browser-based applications.
+
+**Speaker 3** _[84:52]_
+
+So one more quick question
+
+**Speaker 1** _[84:54]_
+
+Can it be two? Only one. OK. The HV plot supports streaming data with the stream. Are there some limitation or restriction which developers should be aware of? ALEXIS MOUSSINE- In general, it works quite well. There is various examples, I hope, on the HV plot documentation of using the streams library. If you kind of need more control, you kind of do have to drop down to the HoloViews API, which makes it possible to have so-called streams themselves. So you can create a, for example, a pipe, which is just some data. And then you can pipe that into your plot. So in this case, I could, I don't know, put my data frame in here, create a curve that is fed by the stream. So there is good support for it. If you find issues, please report them. But yeah, at the starting point, I would recommend playing with the streams library and just seeing how far that gets you.
+
+**Speaker 3** _[86:05]_
+
+All right. Thank you very much. Thank you for presenting. Let's thank our speakers again.
+
+---
+transcript_status: auto
+---
+transcript_language: en

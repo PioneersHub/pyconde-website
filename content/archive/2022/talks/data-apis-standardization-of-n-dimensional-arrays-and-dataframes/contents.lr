@@ -1,0 +1,183 @@
+title: Data Apis: Standardization of N-dimensional arrays and dataframes
+---
+description: We would like to introduce the consortium of Data APIs, where we will be presenting our motivation, objectives and progress of the standardization process…
+---
+created: 2021-12-21
+---
+code: BMFVFG
+---
+slug: data-apis-standardization-of-n-dimensional-arrays-and-dataframes
+---
+speaker_names: Stephannie Jimenez Gacha
+---
+speakers:
+
+
+
+### Stephannie Jimenez Gacha
+
+_About — in the speaker's own words_
+
+Hello there! 
+
+My name is Stephannie Jimenez and I'm a software developer currently working at Quansight. I enjoy working in open source projects and have a soft spot for pets.
+---
+abstract:
+
+
+We would like to introduce the consortium of Data APIs, where we will be presenting our motivation, objectives and progress of the standardization process after one year of activity. We will dive into a small history lesson of the current state of the Python data and scientific ecosystem and understand the current fragmentation of the APIs. Then, we will start discussing the efforts of standardization for N-dimensional arrays and dataframes. Finally. we will talk about the roadmap for the next year.
+---
+full_description:
+
+
+Over the past decade, we’ve witnessed increased fragmentation within the Python data ecosystem. This fragmentation largely stems from the increased popularity of data science, numerical computation, and deep learning and the proliferation of new libraries intended to serve those needs. While the growth of new libraries and frameworks has contributed to significant innovation within the ecosystem, the resulting fragmentation has a cost, as users and downstream library maintainers cannot readily interoperate among the various libraries and must frequently develop programs which only target a single library. The Python Data APIs consortium aims to address this problem by standardizing the fundamental data structures of arrays and dataframes and an associated set of common APIs for working with those data structures, thus facilitating interchange and interoperation. During 2021, we were able to achieve the following objectives:
+ 
+Define a standardization methodology.
+Develop the tooling necessary to support the standardization methodology.
+Publish an array API standard RFC.
+Publish a dataframe interchange protocol RFC.
+Finalize 2021.0x API standards after community review.
+ 
+For more information, consult the formal text of the respective specifications:
+ 
+Array API: https://data-apis.org/array-api/latest/ 
+Dataframe interchange protocol: https://data-apis.org/dataframe-protocol/latest/index.html
+---
+room:
+---
+day:
+---
+slot_date:
+---
+start_time:
+---
+end_time:
+---
+slot_id:
+---
+track: PyData & Scientific Libraries Stack
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 1702
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: some
+---
+domain_expertise: some
+---
+supporting_material_url: https://data-apis.org/
+---
+slides_link: https://docs.google.com/presentation/d/1CzSo0iQvmC8pNoR9BbL87SWOMklAJ67FOsWVK7ydJLM/edit?usp=sharing
+---
+social_card_image: /static/media/social/talks/BMFVFG.png
+---
+youtube_id: __EkpdeVGY4
+---
+video_link: https://www.youtube.com/watch?v=__EkpdeVGY4
+---
+video_published_at: 2022-05-06
+---
+video_duration_iso: PT26M33S
+---
+video_thumbnail: https://i.ytimg.com/vi/__EkpdeVGY4/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Okay, so welcome everyone. Thank you for being here. I hope you can at least see part of my face because I'm really short and I wasn't expecting everything to be covering me. So, well, today we'll be talking about the Data APIs, which is a consortium that's working on the standardization of n-dimensional arrays and data frames. So let's dive into that. First of all, I want to talk a little bit about the current Python data ecosystem. So basically, as you may know, or maybe you'll be working on some part of this ecosystem, we have these main four branches that we can say. The first one is data science, where we basically just talk about how to manipulate and do data analysis. We have deep learning where we want to train models and develop them and also deploy them. We have the computation side that is all of y'all that do applications and want to tackle really hard problems. We also have visualisation that are all those interactive graphs, reports and all the things that we are now seeing. So I want to talk a little bit about the history of how we managed to be here and how we have the current ecosystem that we have. So for those that don't have the dates clear, Python was born in 1991. So it was just a programming language, it wasn't designed for numerical computing, and one thought that we were going to be this big after all. Then in 1995, we had the first library that had arrays and they let you manage and do computations and do scientific computing. And thanks to this library numeric, we have the current typing in Python for indexing because that wasn't on the Python, like on the original Python language. On 2003, we get a new library that's called NumArray, that the idea was to have a more flexible data structure that you could do like faster computations in larger arrays because that was a lacking point for numeric. It was like really, really slow when you started to do big problems. But then, you know, like we had that fight during those years because then a lot of people were using numeric and other ones were using Numerate and they weren't compatible at all. So the problem arose, you know, like how do I manage to send my code if it is not compatible with the other tool that my client or my colleagues need? So NumPy was born as a solution for that. So they basically what they did was unify both numeric and numerate as a single package and they just fixed that fragmentation that was at the time. And then really far in 2008, we saw the first version of Pandas that was basically a solution for the quantitative analysis for tabular data that we have nowadays. So this is where we are now. We are now having and facing the same problems that we were seeing in the earlier 2000s, and it's basically that we have so many arrays and so many data frames libraries that are not interoperable, they are not, like, they don't talk the same language. If you start working on your project or your library that's on, I don't know, TensorFlow, then you cannot change easily to PyTorch, and that's a really huge overhead, and that's That's something that we want to tackle and want to change. We want all of these guys to be able to talk to each other, and for end users and also downstream libraries to be able to manage and use all the great tools that we are working on right now. So that's how the consortium was starting to flow. So in this little diagram, I have that like in the previous slide, I was showing you all the base of the arrays and data frames that we have right now, but we have so much more than that because we also have a lot of downstream libraries that are using those libraries to create more functionality, and then on top of that, we have more libraries that are just doing like more user-friendly APIs or more direct solutions for certain problems. So in this example, I'm just showing you all the libraries that we currently have for managing images, and as you can see, we have one for NumPy, another one for KubePy, another one for Dask, another one for JAX, and all of them are different, and they offer different like functionalities, functions, methods, and then on top of that, we have all the Python packages that maybe you are developing or that maybe your client is depending on. So what we want to do is just to break this and everything be able to talk about each other. And it is a really long shot, and it is a really difficult problem, because there's a lot of people involved. So the main two objectives of the consortium right now are to develop an array specification and a data frame specification. During the first year, because we've been working now for a little longer than one year, but I'm presenting you right now at what point we were on January of this year, and basically what we want is that we wanted to define an interchange protocol for arrays, meaning that I can change from numpy to whatever other library you may want, and also have the same in data frames, and additionally in the part of the array, like portion, have that like a version one API specification, so then you will have the functions and methods, constants that will help you, like, with the current, like, function, like, the standard functions to call, like, to give them a name, but, basically, these are the two parts that we've been working on, and I want to, like, mention that we are not working, like, we have a part of the team that's dedicated on the array side of things, and another part of the team that's working on the data frame, because both of them are really different. So the first year progress for the consortium, we started to work on August of 2020. That was the public announcement of the consortium, and that was where the meeting started. In those meetings, we have a lot of people that are involved in all the projects, so We have maintainers from NumPy, KubePy, X-Array, and the DataFrame side we also have all the major ones, and I take this space also to note that if you are developing an array or a DataFrame library, and you want to be involved, then you just have to send us a message, and then we can arrange that. Then we had the first version of the array API on 11 of 2020, which was pretty fast, you may think, and that is because the array side of things are really developed, like you have seen that we have a lot of history with arrays, and it was fairly easy because all the arrays have like the same structure, and like more or less the same functions, They may not work the same, and they may have small variations in what they are returning and what are the arguments that they have, but the majority of the functions were the same, so that makes the work really easy, if you want to say easy. In February of 2021, NEP 47 was published, and it was the first discussion about the adoption of the API in NumPy, and this was really a milestone, and it is super important because a lot of libraries of our race were trying to match whatever NumPy was doing, so this is really useful because then people are, you know, if they follow NumPy and we get NumPy to get the API implemented, then everyone will follow easily. So that was a huge milestone. Then on August of 2021, we have the request for comments for the DataFrames, so basically I'm going to speak a little bit more in detail about this in a minute, but it was the announcement for the interchange protocol for DataFrames and also the adoption in bugs and QDF of the array side of things. And finally, in September of 2021, we had the experimental module in NumPy and QPy, which was, like, it was a fairly easy transition, as you can see, because a lot of things were already implemented. They just needed to match a little bit of, like, they had to do, like, really little changes to their, like, actual APIs. And more than that is that we also are working on tools that will help not just, like, create these APIs, but also to maintain them, and to, like, for YouTube users, also downstream libraries to know where all the libraries are at, so the first thing that we have is the API comparison, so basically we developed a tool that is able to go and compare all the APIs in multiple array and data frame libraries and just match what is different. It could be the name of the function, it could be an argument of the function, the return types, all that you think that will be different. We were measuring that with that tool. We also developed a Python record API which basically what that was doing was to register the consumer usage on a target Python module, so, for instance, I will get Geopandas and then I will run all the tests for that module, and then I will see in which parts they are using the arrays for data frames, and which functions in particular they are using, and that is helping us a lot, because then we are knowing what people are using, there's a lot of functions that maybe people are not using that heavily, and then we can understand why that's happening and if they are important to the final goal or not. So that's on that part. And finally, we have one of the most important tools that is the test suite, which is the one that measures the specification compliance of a target library with the standard API. So the idea is if you have your array or data library, then you will be able to run the tests against the API standard, and then you will know how compliant your tool is. So let's dive into a little bit of the array part of things. So the actual state is that we already have a defined object, which is an array, and we have 11 data type support. We have four numerical constants, and we are using an interchange protocol that enables to change the device. So it will not matter if you are using a GPU, a TPU, or a CPU. And the biggest portion of the work is on the functions. So basically, right now, we have more than 125 functions that enable you to manipulate, to do comparison, to do element-wise functions, statistics, and linear algebra, and those are all standard, and the idea is for all the libraries to get to this point where they have a place in their, maybe it could be the module, like in a submodule or something, or a new namespace where they can create this state where they will be compliant. So if you want to dive and really see what's under the array specification, I invite you to go to the data APIs.org and go to the array API. It is really easy. You type array API and data APIs, then it will be the first link that you see on Google. And if you have, like, we have all the specification for all the functions, we're defining all the documentation in NumPy. We also have the repository that has all the function handles, so then you will be able just to fill whatever you need on that. And also in our GitHub account we have the issue tracker if you are interested in seeing why we're making some decisions, to see all the resources, and also if you have any comment or any, like, question or thing that we could get better on, then we would like to hear it on our issue tracker in the array API. The future work for the array API involves four major parts, which are adoption, extension, compliance, and outreach. So the first one is adoption. We now have like preliminary version of the array specification, and now we want to accelerate that adoption. adoption. The idea is to increase the libraries that are compliant with this, and this will not just enable the base libraries of the arrays to be compliant, but also to all the tools that are using those libraries to be interoperable among each other, which will be really cool if you have, I don't know, like, for instance, a plotting library, and then you could, like, receive multiple types of arrays on there, and then it will not matter if it's a NumPy array or a Dask array, and everything will work. The second part is the compliance. So we are working really hard for the completion of the library-independent test suite. That's right now in beta, but we hope that next year that will be, like, complete, and all the libraries could just run their library-independent test suite, and we can also show it on our web page, like, you know, those things for web development where you say, like, oh, this tool is compliant with this web browser, the idea is that we want to have that for every library of arrays. Then we have the extension. This array API is more like a living organism, it is not static, it is constantly evolving and it's constantly adding new functionality, modifying some things, so basically what we want to do as well this following year is to add these new functions in the API, like complex number support, FFT support, or even a deep learning module, and finally we want to do more outreach because a lot of people are not aware of this work that's been happening like for this past two years, so what we're doing right now is doing a lot of community outreach to involve more libraries and more projects to know that this is happening, and if you are a maintainer of any library and you want to be involved, it is really easy. So that's enough for arrays, and now I'm going to talk a little bit about the interchange protocol for data frames, and the first question that I have is what is a data frame? So that question was like the first one that you may need for standardising the dataframes and when you start to think about it, it is really hard to define what is a dataframe because it depends on the library you're working on. So for instance, Ibis just works dataframes as tables, while Pandas has a more complex structure, with columns, series, indexing, even multi-indexing, so it is really hard, like if we were starting to think about how can I interoperate between those two libraries, it is really hard because the concept of what is a data frame changes really, like, greatly. So the first thing that we started to do was to create the minimal representation of data frames, so the idea is to create the minimum things that I need to have a data frame that will be useful, and also the important thing is that this will allow a zero copy data interchange among all the data frame libraries. So the characteristics of this minimal data frame are basically that the data frame can be chunked, so a column may not be contiguous in memory, that happens like as in Dask, that the column is a 1D array with a data type and has missing data support, and finally that we have unique column names, so we don't have two columns that have the same name. And this is a work in progress because data frames are, like, fairly new. There's like Pandas released the version one, like, I think it's not a year since they launched their first version, like the 1.0. And it is, like, really flexible, and so we are, like, we are having a lot of discussions on how to manage this data frame standardisation, just because in the base, all of the definitions for a data frame are so different and are so complex, because we are at the end reading with tabular data that we don't know how it is. We don't know if it has strings, we don't know if it has numbers, we don't know what type of numbers they have, so it is really tricky and that's just like the surface of it because then we also have all the indexing and everything starts to be really complex. So the same, like if you want to read a little more about DataFrame, like DataFrame part of things, we have the DataFrame web page and we also have a repository specifically for DataFrame, so if you have any requests for comment or, you know, like, any things that you want to see in there or see all the, like, discussions that are happening, then you can go directly to the GitHub page. So the next steps for our construction work involves developing an expression for the array API standard which will include complex D types, more linear algebra, and more APIs. So we are currently working a lot of complex D types so then we can add an FFT module and more things that are associated with that, and that will help a lot with downstream libraries libraries that have that use really heavily, so then we can also start to measure how easy is to start having this array part of things working, and we can start to see that interchange among libraries, and also with downstream libraries and everything. On the data frame part of things, we want this year to have at the end a developer-focused API, so we want to define like go more than defining that interchange protocol, and once that's done, then we can move on to how we develop that API with the like minimal things that all the data frame libraries are using. Basically the consortium just wants long-term stability, and we want to break that fragmentation that we have currently on our Python data ecosystem. And yeah, basically I think this is really important because it touches a lot of things that are in the base of a lot of things that are built on Python and specific on scientific Python. So it is really useful. So thank you very much. Here is my email and my Twitter handle. If you have any questions, I will be really happy to answer you.
+
+**Speaker 2** _[22:14]_
+
+All right, we have a few questions on Slido. Number one, how does Apache Arrow fit into this specification?
+
+**Speaker 1** _[22:24]_
+
+Apache Arrow is part of the consortium right now. We have a couple of containers on the meetings. They are working really hard to see how they can fit in, but a lot of the decisions that have been written on the documentation for the array specification are taking into account all those libraries that are not built like NumPy.
+
+**Speaker 2** _[22:52]_
+
+Another question from Slido, has this performance impact?
+
+**Speaker 1** _[22:57]_
+
+some decisions will have some performance impact. Because, yeah, a lot of decisions of base for a lot of array libraries specifically, and also data frame libraries, they did it because of performance, but not all of the libraries have the infrastructure to match those things. So we will be losing a little bit of performance just to make room for interoperability.
+
+**Speaker 2** _[23:29]_
+
+And third question. Apart from a common standard and representation, is there any effort to ensure that the new API standard will also allow for computational improvements as well?
+
+**Speaker 1** _[23:41]_
+
+We have to see that. We hope to like this year especially on the right side of things there are a little bit more mature. We hope to start seeing more implementations done and then we will be able to measure the impact on downstream libraries and other like end users on how they're using and how performant it is so that's something that we we will have to see how it evolves.
+
+**Speaker 2** _[24:09]_
+
+Okay, another question just came in Why do you have a hard distinction between arrays and data frames aren't data frames just two-dimensional arrays with unique column names
+
+**Speaker 1** _[24:24]_
+
+So it depends on the, like, that's why the question about what is a data frame is so broad. Because basically we have so many, like, definitions of what a data frame is. Some say that it is just an SQL-like table. Others say it is a lot of arrays, like one-dimensional arrays with a colon name. And then we have, like, in reality, it is more than that. It is a little bit more complex at that, because we normally have an index, and then people will be doing weird things with that index, and in the case of pandas, we'll be doing weird things with multi-index. So that's another level of complexity, and that's why data frames are a little bit trickier than arrays.
+
+**Speaker 2** _[25:15]_
+
+Okay, so no more questions on Slido. Anybody from the audience would like to ask a question?
+
+**Speaker 1** _[25:26]_
+
+I think there are some cases...
+
+**Speaker 2** _[25:27]_
+
+some cases when you still want your index and column names to be a part of
+
+**Speaker 1** _[25:32]_
+
+to be a part of your logic but your data doesn't necessarily
+
+**Speaker 2** _[25:34]_
+
+doesn't necessarily mean that your columns
+
+**Speaker 1** _[25:36]_
+
+your columns are just one tier race
+
+**Speaker 2** _[25:37]_
+
+1D arrays, but maybe 2D arrays.
+
+**Speaker 1** _[25:39]_
+
+the array 7
+
+**Speaker 2** _[25:40]_
+
+Is there a plan support for this?
+
+**Speaker 1** _[25:44]_
+
+Those are the hard questions that we're trying to solve right now because there's a lot of end uses that are different, that are not like a 1D array with a unique column name. So that's what's making it really hard, but we are definitely working into a solution that will fit everyone, which is really hard because all the needs in data frames are really broad.
+
+**Speaker 2** _[26:15]_
+
+anybody else and I think we're done please a round of applause for Stephanie
+
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -1,0 +1,145 @@
+title: What are you yield from?
+---
+description: Many developers avoid using generators. For example, many well-known python libraries use lists instead of generators. The generators themselves are…
+---
+created: 2023-01-04
+---
+code: ENQBPJ
+---
+slug: what-are-you-yield-from
+---
+speaker_names: Maxim Danilov
+---
+speakers:
+
+
+
+### Maxim Danilov
+
+more than 24 years in development start with RISC assembler grows to python/Django/VueJs through C, VB, PHP, Jquery
+---
+abstract:
+
+
+Many developers avoid using generators. For example, many well-known python libraries use lists instead of generators. The generators themselves are slower than normal list loops, but their use in code greatly increases the speed of the application. Let’s discover why.
+---
+full_description:
+
+
+Many developers, avoid to use the generators in regular python code:
+
+It is hard to debug,
+it is not easy to profile,
+it is not obviously to refactor.
+it requires to use special algorithms.
+In this talk i speak about generator pipelines, one-line-generators, builtin-generators, custom generators with yield and yield from.
+I will show how to use generators and why we should use them. Also, we learn about situations where we can’t use generators and how to change our thinking to avoid such situations in the future. I give some hints and examples - how big python frameworks use lists instead of generators and therefore lose performance. At the end we can see how builtin zip function works in other world, where developers always use generators in own code.
+
+Let see what we can yield from this talk…
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2023-04-19
+---
+start_time: 11:50
+---
+end_time: 12:20
+---
+slot_id:
+---
+track: Python Language
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 2521
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Intermediate
+---
+domain_expertise: Intermediate
+---
+supporting_material_url: https://bitbucket.org/danilovmy/pycon2023
+---
+slides_link: https://bitbucket.org/danilovmy/pycon2023/
+---
+social_card_image: /static/media/social/talks/ENQBPJ.png
+---
+youtube_id: vO9U-2_q6K8
+---
+video_link: https://www.youtube.com/watch?v=vO9U-2_q6K8
+---
+video_published_at: 2023-06-18
+---
+video_duration_iso: PT30M31S
+---
+video_thumbnail: https://i.ytimg.com/vi/vO9U-2_q6K8/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Hello, everybody. My name is Maxim Danilov, and today I want to speak about generators, Python generators, in our ordinary life. I don't want to speak about data, oops, I already tell about it, and only generator and our ordinary Python code in our life. Who I am? I have around 24 years experience in software development, I worked 10 years with assembly and last nine years I worked with Python, and in between I have learned many other languages like PHP, and others. All examples from my talk you can find in the repository, or in this repository you can find also examples from my other talks. At first I want to say thank you for my team who support me, Anastasia then created design form of whole my presentation, Pavel Pelikin check all my crazy idea and it's my important critic, and Martin Achenreiner is intern in our company, he tested all my ideas with Python. And also I should to say thank you for two films who support me on conferences, Agila group as a game changer on the Europe Union in camping industry. And this created a solution for restricted products. This is not too easy to work with that. And we have in our stack Delphi, Python, React, Vue, these technologies. We use it. And right now, the problem which I want to solve with this talk, problem is list and tables. This is most useless and overrated data collection in Python. Why I think so? They require time and memory to create data before to use it. They require time to iterate or to achieve data. And they help the developers to be lazy and not care about their own code. And we can solve it with Python generators. Generator in our regular life, generator is promised iterations in future, not more. Of course, we have context switching, we have stop, we can stop and wait on yield, we have own locals, et cetera, but in regular life, without, I think, await syntaxes, important is generator promised iteration for you in future. And don't read it in the declaration time. Of course, must read information from Dave Beasley from 2009. Curious course of coroutines and concurrency. You can find it. You should check it if you write Python code. It's important. And each generator based on iteration. The introduction of this concept in Python was on PEP 234. And there was also either function. This is really interesting. Before was already an introduction about iterations in PEP 2012. But it was too ready for Python community on this idea was rejected. Okay. Right now we have iter function, we have iterable interface. What means iter function? We can call this function with two attributes, first attribute is callable, second attribute is sentinel, if result of callable equal to sentinel, either throws stop iteration, otherwise either returns as a result of for call of callable. And if I know this, I can create infinity iterator. Infinity iterator calls int, int created as always 0, and the 0 is not equal 1. We can iterate it infinity times. After that, we can create infinity generator. generator for a moment in Infinity, catch the moment and do something. This construction is better than Infinity generators from either tools, and this construction helps you stay in the moment. And I like it, and here I see the biggest important difference in loops. What I mean, for example, I take standard construction from a connection pool, we have here infinity loop with while statement. While statement, check one closer, which always true. And after that, while loop made one step. And what happens in for loop in this time? We can use infinity for loop, but there, we don't have any closer. On the background, Python calls next always. And this is too big difference. In for loop, we don't have any closer for next step. In while loop, we always check this closer. And after that, I go away from while loop, I use always for loop, also infinity loop. And we can also create stoppable infinity. If infinity iterator can call one function, I can make something which made result from this function like sentinel and I can throw stop iteration. And I can throw stop iteration outside from loop and I can throw stop iteration inside of my loop. It is important for our regular life, I'll show it later, and it's also important to know stop it loop can reach else block. Of course, regular generator have already close function, but right now this example with either function. And also, somebody can tell me, Max, you forgot about break statement. I don't forget about break statement. But break statement break my loop. I can go to end of last of break loop. I go away from this loop. It's important. Break iteration and stop iteration is two different things. And somebody always forget about it. Example. This example from Django code, I have many talks about Django on different conferences, and this function worked with many objects from database. In this function, we have parent loop and we have child loop. What we want to do here, we want ghost truth child loop, and if something happens, we want to break parent loop. How made developer from this code? They created statement flag. If some shit happens, they change the value from this flag, and it's really something happens. At the end of the loop, we can break our parent loop iteration. In reality, it all can be simple. I show it on the next slide. But for our regular life, at first, we should know a little bit more about generators. And the yield statement was presented in PEP 255. It's really interesting to read all this declaration. But sometimes you can find really strange things there. Okay. Yield. Why we need yield in this case? For example, request library cookies.pi. This function we can call on every request. What we do in this function? In this function, we create one list. After that, we add some elements in list. And after that, we go through the new created list. Of course, we can create simply generator, which don't create a list, which generated for us some values. And after that, a result of this generator we can use in the next iteration. And this is really important. Generator we can use only in iteration. If I use it somewhere else, it simply not works. And what I want to make better in this request cookies.pi. At first, I can avoid list declaration. At second, I can avoid append some value in this list. And at least I want to avoid second pass through this list. And it seems a little bit shorter on the right side, but it's really subjective. If you use black, for example, you don't care about short code. And okay. What I want to achieve. I want to achieve improvements of memory usage, and I want to think this works faster. And right now is important question for you. Faster? Sammy, it's really faster or not if I use generator in my life? Who thinks that the generator is faster than the loop-truth list? Okay. Who knows what the loop-truth list is faster than generators? Yeah. for you on this talk, I made, I calculate the speed from this example. From this example. And answer is, it can be faster, but not always fast. Sometimes it's faster. My experience, If we have in list more than four elements, and not more than 10,000 elements, generator is faster if we iterate this list more than one time. I don't know why we have a peak performance if we have around 100 elements in list. Maybe generator faster around two times faster than list, but after some value, generator is not too fast. If somebody knows answer why it's so, or probably it depends on my computer, I don't know. But please, you can help me to decide why it's so. Okay. Right now, we know probably Generator can be faster, but not always. And if you have in list only one element, forget about Generator. You don't need it. But if you have only one element in list, you don't need a list. Okay. The next important part of our Python is PEP 289. Generator expressions. Like the list comprehension or dictionary comprehension, Generator expressions can help us to write short code which can work faster. For example, a code from PyDantic library, and here you can see on the block, on this This block, GeneratorExpressions, do exactly the same what was right in Pydantic. I don't know why a developer from Pydantic wants to write more code than enough. But GeneratorExpressions do exactly the same. Code is shorter. help to avoid us variable redefinition on the line 5 and 9, and the generator expression can help us to decrease complexity, this part of code. And I have already talked on the last PyCon about Python code complexity. I know this is really subjective. For somebody work with Generator expressions, it's easy, and for somebody, example on the left side is really more readable, funny, and easy to work with it. I know what I know. I know what I know. It's easier and faster to develop. Okay. We know about Generator expressions, And right now we go to generator close. I take the example from above, from start, and here you can see I throw away the flag declaration, and I simply call the stop iterations from parent loop. Of course, I should add the line, I should declare generator for parent loop. It's easy, it's simple. You can find many libraries there. You can use this technique to create readable and shorter code for your library. Okay. The last element which we should know is yield from. Field from is easy, it helps us to work with iterable objects, and this is example from Django country admin. I have serious talks about Django country admin on many Django cons. This is example we create read-only fields in form, and if user is not super user, one One field we want to add as a read-only field. And how it works? On the line 3, we create some list. On the line 5, we add to this list some value, and we return it. With yield from, I can simply yield from super call, and after that, I can additional yield the next value. Code is shorter, and it works. But problem is, if this result from this function, we use more time, it not works. We should check other libraries in our code. Profit is short, clear, fast. I don't know. Probably it's faster. Okay. By the way, yield from in PEP 392 was presented a weight which we can use instead yield from, Probably this topic for my next talk. And right now example from my life. Let's see on zip implementation in Python. This implementation can help us transform matrix. This implementation with new pep works better. And from Python. And what is the problem there? Of course, I don't like the tuple conversion on the end. At second, I don't like a sentinel declaration in this code. And I simply don't like boot and zip in Python. My colleagues ask, what? And I can answer. I can answer, try to see, for this code, I can create only with one liner generator. And I can avoid tuple. This is a big problem in our really code. And it was my better zip. I go through iterators, and I made yield, it works, it perfectly works, but it's still not enough. I want my own zip with Bladejack and generators. My colleague. My colleague thinks I'm not right. And finally, I created this line. This is only one line works like zip in Python, but without tuple, and all peps which I already say, all peps you can find there, and important it, there you can, before here you can find also close, not close, generator stop iteration, but right now the last, the final version don't contain it, but it works, really, it works in our project, I'm happy, but pep 479. Change stop iteration handling inside generator. And it was implemented in Python 3.5, and it not works right now. The author from this pep was Chris and Guida. I have some discussion with Chris, and Chris offered me to use this ugly and disgusting construction in my yield. I still don't agree, and Chris offered me to open discussion on Python forum, and, yeah, of course, I want to do it. I'm not agree with this PEP. Okay, PEP 479, break our rules, how we work with generator, and I think this PEP is wrong. Funny, yeah? Okay. Don't forget for our regular life, we can use Dave Beasley idea, generator pipelines. For example, this example from Starlet, in config.pi we read file, and if I meet every time declaration of dictionary, I understand somewhere I can use generator pipeline. I mean. All what happens in the parent loop, I can use like a generator. At first, I should declare a generator. This generator reads every line in our config. At second, I transform a readable string, and at the end, I return dictionary. It works, I don't know, faster or not, but for me, and for my team, this horror is a rule. We should use a generator in our work. Okay. You can ask me, why should we use this all in our regular life? My answer is because generators live only once. And they live short. And it helps us to avoid repetitive loops, it helps to rethink architecture, and it helps avoid data creating if we don't need this data. For example, it can be early stopping, and it can be exception, and we really don't need this data, but at least it's already created. Why? I don't know. Some Some words about debugging generators, and we can wrap our generator output data from our generator in other generator, and we can print every item from generator, or we can lock every item in generator. At second, we can use either two T. This created for us the brother from our generator. iter generator, and we can use more iter tools by this help us to check some elements in our generator. And some for loop statistics from ordinary life. Fast API. My love. Really. Last API contains only 70 loops and around 40 yields. It means more than 50% loops use generator iteration. Pydantic is not a well-written library. And they contain around 500 loops and only 100 yield. It means around 25% loops use generator. Django Country Padmin, this is library which I like, only 11% of generators. But what is the correspondence or jungle rest framework? One percent and two percent. For me, it's only characteristic how un-quality code lays in these libraries. Okay, strange. Many people speak about black, clean code, hexagonal architecture, but they don't care about data processing in code. It's strange for me. I don't want to criticise, but I offer sometimes check your project on for loop statistic and think about it. Thank you for your attention. You can see example in my repository. And my next talk about generator you can find in Italy in next month. Thank you.
+
+**Speaker 2** _[26:32]_
+
+Thanks to all of you for listening to this great lecture. We spoke earlier. You said you have to speak for 30 minutes. He broke it down to just answer your questions. You are typing in on Slido. I have just two at the moment, so please.
+
+**Speaker 1** _[26:47]_
+
+Write them
+
+**Speaker 2** _[26:48]_
+
+Write them please down at Slido so I can read them out.
+
+**Speaker 1** _[26:53]_
+
+Okay, I will come.
+
+**Speaker 2** _[26:58]_
+
+I will come fast, but please try to type them down at Slido.
+
+**Speaker 1** _[27:04]_
+
+There's a limit on the... So well done on the presentation. But I wanted to say, I think you missed one of the biggest advantages of generators in your presentation, and that's if you use a pipeline, you can execute them concurrently. And that, even at short, even if the iterator is short, it's still faster than loops. Do you have any experience or suggestions on pipelining libraries that you can use maybe of course this part of generators should be came in the next talk at first first important thing if you write our code with generators we can transform with code in async await syntaxes in only in five minutes or okay In one day, full code can work asynchronously. This is important thing why we write synchronous code with generators. We can transform this code in asynchronous in one click. That's why I like generators. I can transform it. But, of course, in this talk, I don't say about it.
+
+**Speaker 2** _[28:30]_
+
+Next question is is less lines of code really better code
+
+**Speaker 1** _[28:35]_
+
+Nine nine less lines. It's not really better code For me if I can write low lines, I understand how works my My code for example, yeah, probably I can be effective of course if I add commenter if I add Gaps between lines. I have many lines of course
+
+**Speaker 2** _[29:07]_
+
+Do you think you lose in readability what you gain in performance or conciseness by using generators?
+
+**Speaker 1** _[29:15]_
+
+The problem is I don't lose readability. I can write my one-liner or generator with normal code. I try to compress code for presentation, but, of course, I write my code so if somebody reads it, he can read it. And yeah, we can after see example how I write generator. One liner with many lines, it's funny and really readable. What I lose, the complexity from whole code grows. I know about it.
+
+**Speaker 2** _[30:07]_
+
+Okay, that was the last question, because the time is up. But please, if you have any more questions, write them down at Slido. I talked with Maxim. He will answer them in the Discord channel for the room B09. Thank you.
+
+---
+transcript_status: auto
+---
+transcript_language: en

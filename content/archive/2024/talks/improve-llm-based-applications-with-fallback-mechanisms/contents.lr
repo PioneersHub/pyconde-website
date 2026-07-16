@@ -1,0 +1,269 @@
+title: Improve LLM-based Applications with Fallback Mechanisms
+---
+description: While RAG addresses the common LLM pitfalls, challenges like handling out-of-domain queries still persist. Learn the significance of fallback mechanisms…
+---
+created: 2023-12-22
+---
+code: QCNXLW
+---
+slug: improve-llm-based-applications-with-fallback-mechanisms
+---
+speaker_names: Bilge Yücel
+---
+speakers:
+
+
+
+### Bilge Yücel
+
+Bilge is a Developer Advocate at deepset, working with Haystack, an open source LLM framework. With over two years of experience as a Software Engineer, she developed a strong interest in NLP and pursued a master's degree in Artificial Intelligence at KU Leuven with a focus on NLP. Now, she enjoys working with Haystack and helping the community build LLM applications.  ✨ 🥑
+Let's connect if you'd like to talk about how fast the AI field is: [Twitter](https://twitter.com/bilgeycl), [Linkedin](https://www.linkedin.com/in/bilge-yucel/)
+---
+abstract:
+
+
+While RAG addresses the common LLM pitfalls, challenges like handling out-of-domain queries still persist. Learn the significance of fallback mechanisms to tackle these issues gracefully, incorporating strategies like web searches and alternative data sources to improve the user experience of your system. In this session, we’ll discover various fallback techniques and practical implementation using Haystack, empowering you to develop resilient LLM-based systems for diverse scenarios without human intervention.
+---
+full_description:
+
+
+Large Language Model (LLM)-based systems have demonstrated remarkable advancements in various natural language processing (NLP) tasks, particularly through the Retrieval Augmented Generation (RAG) approach. This approach addresses some of the pitfalls associated with LLMs, such as hallucination or issues related to the recentness of its training data. However, RAG systems may encounter other challenges in real-world scenarios, including handling out-of-domain queries (e.g., requesting medical advice from a finance app), struggling to generate meaningful answers from retrieved data, or failing to provide any answer at all. To address these situations effectively, it is necessary to implement a fallback mechanism capable of gracefully handling such scenarios. 🧗
+
+This fallback mechanism can incorporate alternative strategies, such as conducting a web search with the same query to retrieve more up-to-date information or utilizing alternative information sources (such as Slack, Notion, Google Drive, etc.) to gather more relevant data and generate a satisfactory or comprehensive response. However, the question arises: how can we determine if the response is inadequate? 🤔
+
+During this session, we will explore various fallback mechanism techniques and ensure that our system can assess the adequacy of a response and improve it if necessary without human intervention. On the practical side, we will use the open source LLM framework Haystack to implement end-to-end RAG systems. By the end of this talk, you will have learned to select the appropriate fallback method for your use case, enabling you to develop more dependable and versatile LLM-based systems and implement them effectively using Haystack. 💪
+---
+room:
+---
+day: Wednesday
+---
+slot_date: 2024-04-24
+---
+start_time: 11:40
+---
+end_time: 12:10
+---
+slot_id:
+---
+track: Generative AI
+---
+tags:
+---
+submission_type: talk_short
+---
+submission_type_label: Talk
+---
+submission_type_id: 3578
+---
+is_keynote: no
+---
+do_not_record: no
+---
+streaming_consent: no
+---
+already_recorded: no
+---
+python_skill: Novice
+---
+domain_expertise: Novice
+---
+supporting_material_url:
+---
+slides_link:
+---
+social_card_image: /static/media/social/talks/QCNXLW.png
+---
+youtube_id: 3A9fDBrklP4
+---
+video_link: https://www.youtube.com/watch?v=3A9fDBrklP4
+---
+video_published_at: 2024-06-23
+---
+video_duration_iso: PT28M30S
+---
+video_thumbnail: https://i.ytimg.com/vi/3A9fDBrklP4/maxresdefault.jpg
+---
+recording_available: yes
+---
+transcript:
+
+**Speaker 1** _[00:05]_
+
+Thank you for coming to this session and also welcome online friends. Today we are going to talk about how to improve LLM-based applications with fallback mechanisms. So let's start. First about me, my name is Bilge. I work as a developer relations engineer at Deepset. My work mainly goes around our open source LLM framework, Haystack. I am coming from Istanbul, Turkey. I live in Istanbul. and fun fact about me I love Latin music and dances. So I am on social media if you are on Twitter or X and if you have a LinkedIn account you can follow me and let's connect there. Here's today's agenda first I'll explain you what Retrieval Augmented Generation is then I'll make a brief introduction to Haystack. By using Haystack we'll implement some fallback mechanisms to our LLM application and in the end I will be answering your questions. So let's start. But sorry for that I have a little bit of cold so I will be having some stops between slides. Give it a read. How many of you has used this tool before? The tool that you're seeing on the screen. Cool. How many of you has at least seen this but haven't used it before. Okay, apparently everybody who saw that used it before. So this is a very famous application that has an LLM running behind. LLMs are really cool, they can do very cool stuff, but they don't know about Taylor Swift's latest album, so they can be a disappointing sometimes. Just for your information, the Tortured Poets department album is a new album of Taylor Swift that was released last Friday, so it's okay if you don't know about it. But we came up with a solution to this sort of problem, and the solution is called retrieval augmented generation, and what we do with this method is basically instead of just providing the query to our LLM, we provide some instructions, some context, and then the query, and with This type of prompt, our LLM, will become capable of answering the question. So if I were to ask the same question to my LLM using the same example, I will be first saying that please answer the following query, giving the documents. Then I will be providing some relevant documents in the blue, and then I will be asking the same question. Then our LLM would be capable of understanding and generating the answer. this is Taylor Swift's latest album, and it will be also giving some more information about that. Cool, right? Taylor approves that. That's great. But how do we build such a system? This is where Haystack comes into play. Yeah. Haystack is an open source framework for building production-ready LLM applications. It lets you quickly try out the latest AI models while being very flexible and easy to use. It has two main building blocks, components and pipelines. Components are the smallest units. They can do one thing, but they can do very well. And by connecting components to each other, we form the pipelines. But the pipelines in Haystack is a directed cyclic graph. So it means that you can have loops in the pipelines, you can have branches, and you can even merge those branches. So they are very customizable and very flexible. And Haystack comes with a lot of components that supports you along the way as you build your LLM application. But if you think that your use case is a very custom thing, you can build your own custom component and plug into your pipeline. So you don't need to worry about having support for everything. And if you understood the idea behind Haystack pipelines, let's see how we can build a rack system with Haystack. This is the overview of a rack pipeline implemented with Haystack. This is a very minimal example, but you can, of course, customize it as you want. Let's go over it together. First component that you would put into your pipeline is usually an embedder. and as the name states it's a component that generates the query embedding and we have a large selection of support here we have hugging face mistral models gina azure and if you want to host your own embedding model you can also use olama lama cpp or vllm with haystack next step is a retriever i just let's assume that you already have your own data in your document store and And your document store can be one of the ones that are listed above. What we do is we get the query embedding. Receiver sends it to the document store and gets the relevant data from your database. And the next step is the prompt builder. This component takes the relevant documents and the query and renders the prompt for you. And the generator takes that prompt and sends it to your generative model or your LLM. And again, we have a large selection of model support here. You can use any closed source models, or if you want to host your own model, you can again do that with all LAMA, LAMA CPP, et cetera. And then, of course, in the end, hopefully, you'll get an answer. And this is the code that you would need to write for a rack pipeline like this. First, I initialize a retriever. Then I initialize my text embedder. But I think the most important thing that you need to focus here is the prompt template. We are using Jinja syntax in our prompt template. So it means that you can have for loops. You can have if clauses. And this ability helps you even further customize your prompts. And we pass that prompt template to our prompt builder. And then as an LLM, I chose here the OpenAI generator with GPT 3.5. But yeah, it can be any model that you support or that you want to use in your pipeline. And OK, the components are here. Let's now add them to our pipeline. OK, one by one, we add our components to our pipeline. And as the second step, we connect them to each other. As I said, it's a directed graph, so we need to define which edge goes to which component. And then I run my pipeline with the query. And in return, I get an answer. So congratulations. You have built your first RAG application. Your system now can get the relevant data from your document store and generate the answers based on the relevant documents. But what if you ask a question that doesn't have an answer in your document store, such as, when is Taylor Swift's next concert? In this case, what you usually get is you get an answer that's nice, like LLMs are capable of understanding that the information is not found in the given documents. But that's the most they can do. And it's not usually the best way to show your users that you don't know the answer. And when this is the case, what would you do? You will implement a fallback mechanism. And these fallback mechanisms can act as your safety net and prevent your application to return no results in a more systematic way. All right, so this is an example of a fallback in a pipeline. So here, what you can do as a first step is to connect a conditional router to your rack pipeline. And this conditional router is a component that routes your data through different paths down the pipeline by evaluating the conditions that you specify. So here what conditional router does is it checks the response coming from the LLM and detects if it's an answer, like if the answer is found in the relevant documents, then it returns that to the user. But if it thinks that the answer is not found in the given documents, then it directs your query to web. But to be able to work with this type of pipeline, there are some configurations that we make in our rack pipeline. So let's see what we need to change there. So remember the prompt template that I showed you before. It was basically an instruction, context, and the query. But if you want to have a fallback pipeline, we need to have one more instruction in our prompt which is we need to say our LLM to return no answer if the answer is not contained within the given documents this is important because as I said like LLMs can understand that the answer is not found but if they just put it in a human-like way it's very hard for us to detect that answer is not found in the reply so after adding this instruction to our template to our templates we assume that our LLM will return no answer instead of saying like I don't know the answer and at this step the conditional router can okay maybe let me put it that way and condition the router you can define at least one condition or even more if you want to. So in the routes array you see there are two dictionaries. The first dictionary that we have is the first condition and in the condition key you see that no answer in replies. It means that if the LLM returns no answer as a reply, we'll output the query and we will direct the data to output name go to web search. And as the second condition is basically the else of this if clause. It basically checks the other ways. And if the answer is found in the replies, it says, OK, everything is fine. I can return the answer coming from the LLM as the answer to my users. So this is now the new version of our pipeline. The three dots on the left represents the rack pipeline that we have. Then we connected our conditioner router. that can detect whether it should return the reply as an answer or not, and if it detects that we should make a web search, it sends the query to our server web search component. This is a component that can accept the query and uses that query to make a web search like we do with Google. And then it returns some relevant information received from web. And And the rest is basically like a rack pipeline. We have the relevant documents. We have the query. Our prompt builder can, again, generate the prompt. And the generator will hopefully generate the answer. So in an example like this, we can expect that when we ask when is Taylor Swift's next concert is, we can easily get the answer coming from the web with the very latest information. But this is actually not the only way to implement a system like that. So you don't have to fall back to web search. You can also use other type of sources, such as like Notion, Google Drive, or your Slack. And if you found this interesting, we have a tutorial that explains this step by step and helps you as you build your pipeline with fallback mechanisms. And I have a lot of time, so it means that I will be able to answer more questions. But we have a meetup tomorrow if you find LLMs and GenAI interesting. And if you'd like to build your own LLM application, you might be interested in this meetup as well. So it's at 6 p.m. We'd like to see you all there. And here are some materials that I used in this presentation. We have a calendar on Luma. So if you would like to know about the events that we host in person or online, we put all of them there. We have a Twitter account and we have a YouTube channel for Haystack. So there will be a lot of materials there. As I said, Haystack is an open source LLM framework, so it has a GitHub repo. Go and check that out and give it a try. Haystack website is the QR code in the middle, and we also have a Discord community with more than 2,000 members. We talk about LLMs and AI in general there, so make sure you're also joined. And if you want to find me on social media, here are my social media accounts. I guess that's it. If you have questions, I can answer them now.
+
+**Speaker 2** _[14:11]_
+
+Thank you for your talk. I do have two questions specifically about Haystack. All right. One of it is how, I will put them both together, how does the Haystack compare to Longchain and why should prefer it? And the other one, does Haystack support Asyncio to enroll system through?
+
+**Speaker 1** _[14:35]_
+
+Okay, first I'll answer the first question. I am a very advanced Haystack user, to be honest with you, but I am not a very advanced LinkedIn user. So probably it wouldn't be very fair for me to compare these both frameworks because I think Haystack is cool. But if I need to make a very good answer here, I think Haystack is more modular. So if you want to build something custom, Haystack is there for you. If you want to have a very flexible pipeline, Haystack is there. So maybe I can go back quickly here. Sorry, yeah. So basically, the components, I think they are small. So you need to do a lot of stuff when you are building your RAC pipeline, but it's clear. So if you want to customize this pipeline even further, you know what you want to do. I think this is my answer to this, but if they want to have a chat afterwards, I am happy to give more examples for Langchain. And for Async.io, the thing I can say is we are working on the Async support. Actually, we are going to host an office hour on our Discord channel, so I can go back to here. Yeah, if you join our Discord community, There will be a discussion about that next week on Discord. Make sure that you join if you want to know how you can build async pipelines and how we can support async IEO with Haystack.
+
+**Speaker 2** _[16:16]_
+
+And how does the fallback exactly retrieve the answer from the internet? How do you exactly get the context from the 1,000 plus search results?
+
+**Speaker 1** _[16:26]_
+
+Can you repeat the last part of the question?
+
+**Speaker 2** _[16:28]_
+
+How do you get the context from the thousand plus search results?
+
+**Speaker 1** _[16:33]_
+
+Okay, so the component that we have, yeah, so for the web search is using an API behind, so you can select how many results that you want to retrieve. And probably if you go to Google search, like if you are making a Google search, you're just taking a look at the first 10 results, right? You're not like going to the 100th page and try to find the relevant information there. So, but there are some metrics, like there are some parameters that you can use as you retrieve data. And it's very similar to web search like I can make this comparison
+
+**Speaker 2** _[17:08]_
+
+Why don't you use LLM's functions calling to solve this problem? Which problem? Anyone who asked the questions want to formulate better?
+
+**Speaker 1** _[17:26]_
+
+Yeah, you can use function calling within some LLMs to create functions that could solve a problem like searching on the web for you. Yeah, you would have two functions for that, right? So one for you to check your data and one to check web. Yeah, that could be an option. I think there would be nothing problematic about that. But one thing that might not be working is not every LLM supports function calling. So if you want to use an open source model that you host yourself that doesn't have this capability, this is a limitation. But, yeah, that's a valid point. Okay, thank you.
+
+**Speaker 2** _[18:13]_
+
+Why not to have to use a chain of thought mechanism in start to decide if it needs to use web info, DB data or other tools to answer instead of adding an if case?
+
+**Speaker 1** _[18:27]_
+
+if I got this question correctly it's again like idea of an agent and again yeah this is not this is an other alternative solution but again yet are not all LLMs can have this agent behavior yeah you can try to prompt them and the chain of thoughts but some LLMs can only say that I cannot find the answer they are not very capable of having that agent agentic behavior so So this would be, again, the limitation here. If you want to have maybe a smaller model, maybe you're hosting an open source one, so this will not work. But yeah, if you want to use GPT 3.5 or GPT 4, yeah, that will work, definitely.
+
+**Speaker 2** _[19:13]_
+
+How would you deal with deciding when to use a reg and when it's not necessary like an example? It gives a chatbot that user asked to summarize the last message or is that a brag needed?
+
+**Speaker 1** _[19:27]_
+
+To summarize the last message, the idea behind retrieval augmented generation is as a name sends, you retrieve some data and then you augment it to your prompt to generate something. But if you want to do a summarization task for one document or the documents that you know, then you don't need to do retrievals. What you just need to do is to put that into your prompt and generate the answer. So I wouldn't say that you wouldn't need a retrieval augmented generation for that, but you would need to inject the documents to your prompt. So that would be not the best use case for RAC.
+
+**Speaker 2** _[20:09]_
+
+This haystack has an SDK for Vertex AI.
+
+**Speaker 1** _[20:13]_
+
+Yes, I think I have the, I thought I put the logo here, okay, yeah, it says Gemini, but yeah, we have support for Vertex AI models, so we have that support in Haystack.
+
+**Speaker 2** _[20:31]_
+
+How can you measure how reliable is to let the LLM decide whether the answer is not in the context?
+
+**Speaker 1** _[20:42]_
+
+good question yeah we have model-based evaluation frameworks evaluators in haystack that could be one way to check that but I haven't checked like I didn't have any I didn't make any evaluation here at least at least for this example so I cannot come up with the exact numbers but yeah it would be an an interesting thing to test with the model-based evaluators in Nangstack.
+
+**Speaker 2** _[21:14]_
+
+Ordered in web search, what other fallback mechanisms are supported?
+
+**Speaker 1** _[21:21]_
+
+Could you repeat that, sorry?
+
+**Speaker 2** _[21:23]_
+
+Other than web search, which other fallback mechanisms are supported?
+
+**Speaker 1** _[21:27]_
+
+So if I go back here, this is basically, this can be anything that you build here, actually. Like, let me think another fallback mechanism. You can, oh, maybe what you can do is especially if you are, let's say that you want to generate a structured output. So you want to extract a structured output with your LLM, but your LLM isn't doing it very well. So what would you do? I have extra slides, so maybe I can show you that. So let's imagine that your generator is not capable of extracting in the right way. And what you would do is to have an output validator that checks if it's working for you, if the generated output is working for you or not. And what would you do in that case is if the output validator says that no, this is not in the right format, try that again, you send the invalid replies and the error message back to the prompt builder. And prompt builder tries that again with the generator and with the new prompt, of course. So this is an alternative fallback mechanism. And it is possible with the looping mechanism that we have in Haystack Pipelines. So you can also give it a try. But this is very use case specific. Like, they can write me on Discord about their use case for fallback mechanisms. and we can try to come up with the solution with ASAC.
+
+**Speaker 2** _[22:59]_
+
+I have another question about the prompt. Does Haystack help dealing with prompts with too many tokens?
+
+**Speaker 1** _[23:06]_
+
+With too many tokens, like cut off, like basically, I don't understand this question exactly, but can you read that again?
+
+**Speaker 2** _[23:16]_
+
+I deleted.
+
+**Speaker 1** _[23:22]_
+
+Okay, so we don't have that because the prompt builder doesn't know which model you are using, actually. So it cannot decide whether it should stop the prompt there. But, yeah, you should keep an eye on that and try to add only the relevant context by staying in the context limit. Yeah.
+
+**Speaker 2** _[23:46]_
+
+How can you avoid the infinite loop when you're...
+
+**Speaker 1** _[23:51]_
+
+Yeah, we have them. Yeah when you're looping. Yeah, we the pipelines has the maximum Loop limit. I don't know about the exact parameter name But you can set that like you can say like make the loop maximum five times then like then stop doing that Otherwise like it's gonna eat all of your GPU CPU or like your network. So Yeah, we have that mechanism
+
+**Speaker 2** _[24:17]_
+
+How would you deal with multiple documents that many contradict each other's paths in? REG would presumably just yell the first answer that occurs during search?
+
+**Speaker 1** _[24:30]_
+
+This is a very LLM-specific question, and it also depends on the order of the documents that you provide in the prompt. So if your LLM is a good one, let's say, it can understand that, okay, I found two contradicting answers in the provided documents, maybe, like, this is my opinion, but I'm not sure, But if your LLM is not maybe very that good, then it will say, it will output the first thing that you found. So this is a very LLM-specific question. And it also depends mainly on your prompt, like how you prompt, how you use your prompt. If you say that, oh, there might be some contradicting opinions, and when that's the case, do that or do this. So this, yeah, this is very prompt engineering-related question.
+
+**Speaker 2** _[25:24]_
+
+Can you use the conditional routing to build a multi-index reg?
+
+**Speaker 1** _[25:30]_
+
+What index, right?
+
+**Speaker 2** _[25:31]_
+
+Mooty, moaty, pose, moaty.
+
+**Speaker 1** _[25:35]_
+
+I don't know that word.
+
+**Speaker 2** _[25:38]_
+
+SEVRO, SEVRO index.
+
+**Speaker 1** _[25:40]_
+
+Oh, okay, for multiple file types, right?
+
+**Speaker 2** _[25:46]_
+
+Index reg means multiple file.
+
+**Speaker 1** _[25:48]_
+
+So you want to index to different indexes, or do you want to get data from different indexes? Like which way? So you use the LLM first to basically select which index, and then you use the conditional routing to go to basically do a RAG. Yes. Yeah, you would need to change your pipeline a little bit for that. So first, what you would do is to get the query, then the prompt builder, then the generator and then generator can decide, like, okay, I need to go to Notion for this or I need to go to the Elasticsearch index for this. And then your conditional router can help you direct the data to which branch you want to. And then you would be doing the retrieval and then the generation again. But yeah, that's possible, definitely.
+
+**Speaker 2** _[26:41]_
+
+Is there any support for automatic building relevant queries to document store slash GraphDB?
+
+**Speaker 1** _[26:49]_
+
+Could you repeat that question, sorry?
+
+**Speaker 2** _[26:50]_
+
+Is there any support for automatic building relevant queries to document store or GraphDB?
+
+**Speaker 1** _[26:58]_
+
+or like automatically generating queries. I don't know about that use case. Maybe I got this question wrong, but we can have a discussion right after this, so I'm happy to check that out. It seems like interesting.
+
+**Speaker 2** _[27:35]_
+
+Last question because gosh, this is harder than a test and what are the ban? Where was it? Is it possible to control the overall duration of the pipeline?
+
+**Speaker 1** _[27:46]_
+
+Oh, we have tracing for that, if you want to. And we have tracing and monitoring support for that. Of course, it's not something that you would do Haystack, but by using the other tools. So, yeah, I would say that it's possible. Yeah, but you would need to... I think that the tool name... Okay, this is not my exact area, so I don't remember the tools. But if you check the Haystack documentation, you'll see how we have a section for that that you can find the tool integrations for this type of monitoring and tracing.
+
+**Speaker 2** _[28:21]_
+
+Thank you very much. So let's follow the discussion and the score during the hallways.
+
+---
+transcript_status: auto
+---
+transcript_language: en

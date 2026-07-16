@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+{% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
+
+{% block title %}{{ this.title }}{% endblock %}
+
+{%- set is_archive = this.url_path.startswith('/archive/') -%}
+{%- set archive_year = this.year or '' -%}
+{%- set talks_root = ('/archive/' ~ archive_year ~ '/talks') if is_archive else '/talks' -%}
+{%- set branding = bag('branding') -%}
+{%- set host = branding['canonical_host'] -%}
+
+{% block structured_data %}
+{{ super() }}
+{%- set crumb_trail = [] -%}
+{%- if is_archive -%}
+  {%- set _ = crumb_trail.append(('/archive/', 'Archive')) -%}
+  {%- set _ = crumb_trail.append(('/archive/' ~ archive_year ~ '/', archive_year)) -%}
+  {%- set _ = crumb_trail.append((this.url_path, 'Tracks')) -%}
+{%- else -%}
+  {%- set _ = crumb_trail.append((this.url_path, 'Tracks')) -%}
+{%- endif -%}
+{{ breadcrumb_jsonld(crumb_trail) }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "@id": "{{ host }}{{ this.url_path }}#tracks",
+  "url": "{{ host }}{{ this.url_path }}",
+  "name": {{ this.title|tojson }},
+  "isPartOf": { "@id": "{{ host }}/#website" },
+  "hasPart": [
+    {%- for track in this.children -%}
+    { "@type": "WebPage", "url": "{{ host }}{{ track|url }}", "name": {{ track.name|tojson }} }{{ "," if not loop.last }}
+    {%- endfor -%}
+  ]
+}
+</script>
+{% endblock %}
+
+{% block body %}
+{%- set visible_trail = [] -%}
+{%- if is_archive -%}
+  {%- set _ = visible_trail.append(('/archive/', 'Archive')) -%}
+  {%- set _ = visible_trail.append(('/archive/' ~ archive_year ~ '/', archive_year)) -%}
+  {%- set _ = visible_trail.append((none, 'Tracks')) -%}
+{%- else -%}
+  {%- set _ = visible_trail.append((none, 'Tracks')) -%}
+{%- endif -%}
+{{ breadcrumb(visible_trail) }}
+
+<div class="subsite">
+  <div class="subsite-title">
+    <section class="content">
+      <h1>{{ this.title }}</h1>
+      <p class="tracks-intro">
+        {%- if is_archive -%}
+        Browse {{ this.children|list|length }} tracks from the {{ archive_year }} edition.
+        Pick one to see every talk that ran in that track.
+        {%- else -%}
+        Browse the {{ this.children|list|length }} tracks of the current programme.
+        {%- endif -%}
+      </p>
+    </section>
+  </div>
+</div>
+
+<section class="subsite">
+  <div class="content">
+    <ul class="tracks-grid">
+      {%- for track in this.children|sort(attribute='name') %}
+      <li class="tracks-grid__item">
+        <a href="{{ track|url }}" class="tracks-grid__card">
+          <span class="tracks-grid__name">{{ track.name }}</span>
+          <span class="tracks-grid__count">{{ track.talk_count }} talk{{ '' if track.talk_count == 1 else 's' }}</span>
+        </a>
+      </li>
+      {%- endfor %}
+    </ul>
+  </div>
+</section>
+{% endblock %}
