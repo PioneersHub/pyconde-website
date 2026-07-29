@@ -46,7 +46,8 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: eu-central-1
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_S3_REGION }}
         # Deploy scope derives from databags/selective_build.yaml — the same
         # list the selective-build plugin excludes from current builds, so
         # build scope and deploy scope cannot drift apart. The include args
@@ -57,7 +58,7 @@ jobs:
         run: |
           set -f
           INCLUDES=$(python utils/selective_build_sync_args.py)
-          aws s3 sync site "s3://pyconde-26" --no-progress \
+          aws s3 sync site "s3://${AWS_S3_BUCKET}" --no-progress \
             --exclude '*' $INCLUDES
 
       - name: Sync full site to S3
@@ -65,7 +66,7 @@ jobs:
         uses: jakejarvis/s3-sync-action@master
         env:
           SOURCE_DIR: site
-          AWS_S3_BUCKET: 'pyconde-26'
-          AWS_REGION: 'eu-central-1'
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_REGION: ${{ secrets.AWS_S3_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

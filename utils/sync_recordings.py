@@ -4,8 +4,17 @@ Walks the per-edition YouTube playlists configured in
 `databags/recordings.yaml`, matches videos to Pretalx talks by
 hashtag in the description (e.g. "#LPUC9T"), and writes back the
 youtube_id / video_link / video_published_at / video_duration_iso /
-video_thumbnail / recording_available fields into each talk's
-`content/talks/{code}/contents.lr`.
+video_thumbnail / recording_available fields into each talk.
+
+Where a talk lives: the current edition is at `content/talks/{slug}/`
+and every other edition at `content/archive/{year}/talks/{slug}/`.
+Folders are named by *slug*, not by Pretalx code — the code-named
+sibling is a `_model: redirect` 301 stub written by
+`migrate_pretalx_slugs.py`. Talks are therefore resolved through
+`lektor_lr.build_code_index()`, which reads each talk's `code:` field
+and skips redirects. Writing to a code-named folder would silently
+destroy a redirect and publish a duplicate talk page; see the module
+docstring of `utils/lektor_lr.py` for the full account.
 
 Modes:
 * `--mode api`         (default): use YouTube Data API v3 via
@@ -13,7 +22,9 @@ Modes:
                        recordings.yaml still wins.
 * `--mode override`    skip the API entirely; only apply explicit
                        overrides from recordings.yaml. Useful before
-                       the API key is provisioned.
+                       the API key is provisioned. Note that this
+                       leaves video_published_at and video_duration_iso
+                       empty — those two come only from the API.
 
 Respects do_not_record: a talk where the .lr file has
 `do_not_record: yes` is left untouched (no video fields written).
@@ -29,19 +40,18 @@ import argparse
 import json
 import os
 import re
-import sys
 import time
 import urllib.parse
 from pathlib import Path
 from typing import Any, Iterable
 
 import httpx
+import lektor_lr
 import yaml
 from dotenv import load_dotenv
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 RECORDINGS_CONFIG = REPO_ROOT / "databags" / "recordings.yaml"
-PRETALX_CONFIG = REPO_ROOT / "databags" / "pretalx.yaml"
 YOUTUBE_API = "https://www.googleapis.com/youtube/v3"
 REQUEST_DELAY_S = 0.4  # ~2.5 req/s — safely under YouTube's default
 MAX_PER_PAGE = 50
@@ -213,12 +223,7 @@ def build_code_to_video_map(cfg: dict, year: str, api_key: str | None) -> dict[s
         # carry a Pretalx hashtag — match the video title against the
         # importer's talks.json. Same-edition only; no cross-year matching.
         if unmatched_videos:
-            current_year = ""
-            pretalx_path = REPO_ROOT / "databags" / "pretalx.yaml"
-            if pretalx_path.exists():
-                pcfg = yaml.safe_load(pretalx_path.read_text())
-                current_year = str(pcfg.get("events", {}).get("current", {}).get("year", ""))
-            pretalx_titles = load_pretalx_titles(year, current_year)
+            pretalx_titles = load_pretalx_titles(year, lektor_lr.current_year())
             matched_codes = {c for c, _, _ in seen_videos}
             fuzzy_hits = 0
             for video in unmatched_videos:
@@ -304,109 +309,69 @@ VIDEO_FIELDS = (
 )
 
 
-def read_lr_blocks(path: Path) -> list[tuple[str, str]]:
-    """Parse a Lektor `contents.lr` file into [(key, value), ...] preserving order."""
-    raw = path.read_text(encoding="utf-8")
-    chunks = raw.split("\n---\n")
-    blocks: list[tuple[str, str]] = []
-    for chunk in chunks:
-        if not chunk.strip():
-            continue
-        # First line is "key:" (possibly with inline value); rest is value.
-        head, _, tail = chunk.partition("\n")
-        if ":" in head:
-            key, _, inline = head.partition(":")
-            value = inline.strip()
-            if tail:
-                value = (value + ("\n" if value else "") + tail).rstrip("\n")
-            blocks.append((key.strip(), value))
-    return blocks
-
-
-def write_lr_blocks(path: Path, blocks: list[tuple[str, str]]) -> None:
-    parts = []
-    for key, value in blocks:
-        if value and "\n" in value:
-            parts.append(f"{key}:\n\n{value}")
-        else:
-            parts.append(f"{key}: {value}" if value else f"{key}:")
-    path.write_text("\n---\n".join(parts) + "\n", encoding="utf-8")
-
-
-def talks_dir_for_year(year: str) -> Path:
-    """Resolve where talks for the given year live in the content tree.
-
-    Mirrors utils/talks.py.talks_dir_for: current edition at /talks/,
-    historical editions under /archive/{year}/talks/.
-    """
-    current_year = ""
-    if PRETALX_CONFIG.exists():
-        with PRETALX_CONFIG.open(encoding="utf-8") as f:
-            cfg = yaml.safe_load(f) or {}
-        current_year = str(cfg.get("events", {}).get("current", {}).get("year", ""))
-    if year == current_year:
-        return REPO_ROOT / "content" / "talks"
-    return REPO_ROOT / "content" / "archive" / year / "talks"
-
-
-def apply_to_talk_file(code: str, video: dict, year: str, dry_run: bool = False) -> str:
+def apply_to_talk_file(talk_dir: Path, video: dict, dry_run: bool = False) -> str:
     """Write the discovered video fields into the talk's contents.lr.
 
-    Skips and returns 'skip' if the talk is marked do_not_record.
-    Returns 'updated' on successful write, 'unchanged' if values matched,
-    'missing' if the talk dir does not exist.
-    """
-    talks_dir = talks_dir_for_year(year)
-    lr_path = talks_dir / code / "contents.lr"
-    if not lr_path.exists():
-        return "missing"
-    blocks = read_lr_blocks(lr_path)
-    block_map = {k: v for k, v in blocks}
+    `talk_dir` comes from `lektor_lr.build_code_index()`, so it is always a
+    canonical slug folder and never a redirect stub.
 
-    if (block_map.get("do_not_record", "no").strip().lower() in {"yes", "true", "1"}):
+    Skips and returns 'skip' if the talk is marked do_not_record.
+    Returns 'updated' on successful write, 'unchanged' if values matched.
+    """
+    lr_path = talk_dir / "contents.lr"
+    text, fields = lektor_lr.read_lr(lr_path)
+
+    # Two guards that must never fire. The first would mean the code index
+    # handed back a redirect stub; the second that the parser could not
+    # reproduce the file, so a write could lose content it did not understand.
+    # Either way, abort loudly rather than write something unverifiable.
+    if lektor_lr.is_redirect(fields):
+        raise SystemExit(f"Refusing to write: {lr_path} is a redirect stub.")
+    if not lektor_lr.round_trip_ok(text, fields):
+        raise SystemExit(f"Refusing to write: {lr_path} does not round-trip.")
+
+    if (lektor_lr.field_value(fields, "do_not_record", "no") or "no").strip().lower() in {
+        "yes",
+        "true",
+        "1",
+    }:
         return "skip"
 
-    new_values = {
-        "youtube_id": video.get("youtube_id", ""),
-        "video_link": video.get("video_link", ""),
-        "video_published_at": video.get("video_published_at", ""),
-        "video_duration_iso": video.get("video_duration_iso", ""),
-        "video_thumbnail": video.get("video_thumbnail", ""),
-        "recording_available": "yes" if video.get("youtube_id") else "no",
-    }
+    # Built in the canonical field order used by every other edition, since
+    # dict order determines where newly-added fields are appended.
+    youtube_id = video.get("youtube_id", "")
+    new_values = {"youtube_id": youtube_id}
 
-    if all(block_map.get(k, "") == v for k, v in new_values.items()):
+    # Never blank an existing video_link. The 2016 edition's recordings are
+    # hosted by LMU Munich and have a video_link but no youtube_id; an empty
+    # incoming value must not wipe the only link those talks have.
+    incoming_link = video.get("video_link", "")
+    if incoming_link or not lektor_lr.field_value(fields, "video_link"):
+        new_values["video_link"] = incoming_link
+
+    new_values.update(
+        {
+            "video_published_at": video.get("video_published_at", ""),
+            "video_duration_iso": video.get("video_duration_iso", ""),
+            "video_thumbnail": video.get("video_thumbnail", ""),
+            "recording_available": "yes" if youtube_id else "no",
+        }
+    )
+
+    if all(lektor_lr.field_value(fields, k, "") == v for k, v in new_values.items()):
         return "unchanged"
 
     if dry_run:
         return "would-update"
 
-    new_blocks: list[tuple[str, str]] = []
-    seen_keys = set()
-    for k, v in blocks:
-        if k in new_values:
-            new_blocks.append((k, new_values[k]))
-            seen_keys.add(k)
-        else:
-            new_blocks.append((k, v))
-    for k, v in new_values.items():
-        if k not in seen_keys:
-            new_blocks.append((k, v))
-
-    write_lr_blocks(lr_path, new_blocks)
+    lektor_lr.upsert_fields(fields, new_values)
+    lektor_lr.write_lr(lr_path, fields)
     return "updated"
 
 
 def resolve_year(args_year: str | None) -> str:
-    if args_year:
-        return args_year
-    # Fall back to events.current from databags/pretalx.yaml.
-    pretalx_path = REPO_ROOT / "databags" / "pretalx.yaml"
-    if pretalx_path.exists():
-        with pretalx_path.open(encoding="utf-8") as f:
-            pcfg = yaml.safe_load(f) or {}
-        return str(pcfg.get("events", {}).get("current", {}).get("year", ""))
-    return ""
+    """Explicit --year wins; otherwise fall back to events.current."""
+    return args_year or lektor_lr.current_year()
 
 
 def main() -> None:
@@ -459,12 +424,24 @@ def main() -> None:
             return
         code_map = filtered
 
+    talks_dir = lektor_lr.talks_dir_for_year(year)
+    code_index = lektor_lr.build_code_index(talks_dir)
+    print(f"Indexed {len(code_index)} talks by Pretalx code under {talks_dir}.")
+
     counts: dict[str, int] = {"updated": 0, "unchanged": 0, "skip": 0, "missing": 0, "would-update": 0}
     for code, video in sorted(code_map.items()):
-        result = apply_to_talk_file(code, video, year, dry_run=args.dry_run)
+        talk_dir = code_index.get(code)
+        if talk_dir is None:
+            counts["missing"] += 1
+            print(f"  {code}: missing  (no talk with this code under {talks_dir})")
+            continue
+        result = apply_to_talk_file(talk_dir, video, dry_run=args.dry_run)
         counts[result] = counts.get(result, 0) + 1
-        if result in {"updated", "would-update", "skip", "missing"}:
-            print(f"  {code}: {result}  {video.get('youtube_id','')}")
+        if result in {"updated", "would-update", "skip"}:
+            # Print the resolved path: it is the only way a --dry-run can
+            # prove which file a real run would write.
+            rel = talk_dir.relative_to(REPO_ROOT)
+            print(f"  {code}: {result}  {video.get('youtube_id','')}  -> {rel}/contents.lr")
 
     print(json.dumps(counts, indent=2))
 

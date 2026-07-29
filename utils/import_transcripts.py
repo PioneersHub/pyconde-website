@@ -24,8 +24,9 @@ import re
 import sys
 from pathlib import Path
 
+import lektor_lr
+
 REPO = Path(__file__).resolve().parent.parent
-TALKS_ROOT = REPO / "content" / "archive" / "2025" / "talks"
 DEFAULT_SRC = Path.home() / "Documents" / "Claude" / "2025-transcripts"
 
 # Pretalx codes are 6 chars, [A-Z0-9]. Source folders come in shapes like
@@ -58,75 +59,6 @@ def clean_transcript(raw: str) -> str:
     return body.rstrip() + "\n"
 
 
-def parse_lr(text: str) -> list[tuple[str, str]]:
-    """Lektor .lr parser: returns list of (field_name, value) preserving order.
-
-    Lektor convention: a multi-line field is written as "name:\\n\\n<body>";
-    we strip the single leading blank line so the serializer can add it back
-    without doubling.
-    """
-    fields: list[tuple[str, str]] = []
-    current_name: str | None = None
-    current_buf: list[str] = []
-    inline_value_present = False
-    for line in text.split("\n"):
-        if line == "---":
-            if current_name is not None:
-                value = "\n".join(current_buf).rstrip("\n")
-                # If the field is multi-line (no inline value), strip one
-                # leading blank line that is part of the Lektor separator.
-                if not inline_value_present and value.startswith("\n"):
-                    value = value[1:]
-                fields.append((current_name, value))
-            current_name = None
-            current_buf = []
-            inline_value_present = False
-            continue
-        if current_name is None:
-            m = re.match(r"^([a-zA-Z_][a-zA-Z0-9_]*):\s?(.*)$", line)
-            if not m:
-                continue
-            current_name = m.group(1)
-            rest = m.group(2)
-            if rest:
-                inline_value_present = True
-                current_buf = [rest]
-            else:
-                inline_value_present = False
-                current_buf = []
-        else:
-            current_buf.append(line)
-    if current_name is not None:
-        value = "\n".join(current_buf).rstrip("\n")
-        if not inline_value_present and value.startswith("\n"):
-            value = value[1:]
-        fields.append((current_name, value))
-    return fields
-
-
-def serialize_lr(fields: list[tuple[str, str]]) -> str:
-    out: list[str] = []
-    for i, (name, value) in enumerate(fields):
-        if i > 0:
-            out.append("---")
-        if "\n" in value:
-            out.append(f"{name}:")
-            out.append("")
-            out.append(value)
-        else:
-            out.append(f"{name}: {value}" if value else f"{name}:")
-    return "\n".join(out) + "\n"
-
-
-def upsert_field(fields: list[tuple[str, str]], name: str, value: str) -> list[tuple[str, str]]:
-    for i, (n, _) in enumerate(fields):
-        if n == name:
-            fields[i] = (name, value)
-            return fields
-    fields.append((name, value))
-    return fields
-
-
 def import_one(talk_dir: Path, transcript_md: Path, status: str, language: str, dry_run: bool) -> None:
     contents = talk_dir / "contents.lr"
     if not contents.exists():
@@ -138,12 +70,23 @@ def import_one(talk_dir: Path, transcript_md: Path, status: str, language: str, 
         print(f"  skip: empty body for {talk_dir.name}", file=sys.stderr)
         return
 
-    fields = parse_lr(contents.read_text(encoding="utf-8"))
-    fields = upsert_field(fields, "transcript", body)
-    fields = upsert_field(fields, "transcript_status", status)
-    fields = upsert_field(fields, "transcript_language", language)
+    text, fields = lektor_lr.read_lr(contents)
+    if not lektor_lr.round_trip_ok(text, fields):
+        raise SystemExit(f"Refusing to write: {contents} does not round-trip.")
 
-    new_text = serialize_lr(fields)
+    lektor_lr.upsert_fields(
+        fields,
+        {
+            # Trailing newlines are stripped so the field ends exactly where
+            # the `---` separator begins — the shape already on disk, which
+            # keeps a re-import diff-free.
+            "transcript": body.rstrip("\n"),
+            "transcript_status": status,
+            "transcript_language": language,
+        },
+    )
+
+    new_text = lektor_lr.serialize_lr(fields)
     if dry_run:
         print(f"  would update {contents} (+transcript {len(body)} chars)")
         return
@@ -159,10 +102,8 @@ def main() -> int:
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
-    if args.year == "current":
-        talks_root = REPO / "content" / "talks"
-    else:
-        talks_root = REPO / "content" / "archive" / args.year / "talks"
+    year = lektor_lr.current_year() if args.year == "current" else args.year
+    talks_root = lektor_lr.talks_dir_for_year(year)
     if not talks_root.is_dir():
         print(f"talks root not found: {talks_root}", file=sys.stderr)
         return 2
@@ -170,27 +111,10 @@ def main() -> int:
         print(f"source not found: {args.src}", file=sys.stderr)
         return 2
 
-    # Build a CODE -> talk-folder lookup by reading each talk's `code:`
-    # field. After the slug migration the folder name no longer equals the
-    # code, so a name-based lookup would miss every talk. Redirect siblings
-    # (named by code) get skipped because they have _model: redirect.
-    code_to_folder: dict[str, Path] = {}
-    for p in talks_root.iterdir():
-        if not p.is_dir():
-            continue
-        lr = p / "contents.lr"
-        if not lr.exists():
-            continue
-        text = lr.read_text(encoding="utf-8", errors="ignore")
-        if "_model: redirect" in text:
-            continue
-        # Find the `code:` line
-        for line in text.split("\n"):
-            if line.startswith("code:"):
-                val = line.split(":", 1)[1].strip()
-                if val:
-                    code_to_folder[val] = p
-                break
+    # CODE -> talk-folder lookup. After the slug migration the folder name is
+    # the slug, so a name-based lookup would land on the redirect stub rather
+    # than the talk. See utils/lektor_lr.py.
+    code_to_folder = lektor_lr.build_code_index(talks_root)
 
     imported = 0
     skipped_no_md = 0
