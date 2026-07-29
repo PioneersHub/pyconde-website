@@ -3004,6 +3004,133 @@ main:focus { outline: none; }
   text-decoration: underline;
 }
 
+/* The newest completed edition, still being promoted — see
+   databags/site_state.yaml -> featured_edition. Same shape as the archive
+   banner, brand accent instead of the sepia "this is old" tone. */
+.archive-banner--featured {
+  background: #eefbfd;
+  border-bottom-color: var(--blue, #00c8e1);
+  color: #10333a;
+}
+.archive-banner--featured strong,
+.archive-banner--featured a {
+  color: #06707f;
+}
+
+/* ── Talk list search + facet filter ───────────────────────────────────
+   Injected by static/js/talks-filter.js; the markup does not exist without
+   JS, so none of this affects the no-JS rendering of the list. */
+/* `.subsite .content` (main.css) sets color:white for text on the dark
+   bands. The talk list sits on a white section, so the filter UI has to
+   win that rule — hence the matching-specificity selector. Everything
+   inside inherits, including the currentColor borders on the pills. */
+.subsite .content.talk-filters {
+  padding-top: var(--space-md, 1.5rem);
+  padding-bottom: var(--space-md, 1.5rem);
+  color: #1a1a1a;
+}
+.talk-filters__search {
+  margin-bottom: 1rem;
+}
+.talk-filters__search-label {
+  display: block;
+  margin-bottom: 0.3em;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.talk-filters__search-input {
+  width: 100%;
+  max-width: 28rem;
+  padding: 0.55rem 0.75rem;
+  border: 2px solid currentColor;
+  border-radius: 4px;
+  font: inherit;
+  background: #fff;
+  color: #1a1a1a;
+}
+.filter-group {
+  margin-bottom: 0.75rem;
+}
+.filter-group-label {
+  display: block;
+  margin-bottom: 0.3em;
+}
+.filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35em;
+}
+.filter-option {
+  padding: 0.2rem 0.6rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.filter-option:hover,
+.filter-option:focus-visible {
+  background: rgba(0, 0, 0, 0.08);
+}
+.filter-option.active {
+  background: #1a1a1a;
+  color: #fff;
+  border-color: #1a1a1a;
+}
+.filter-count {
+  display: block;
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.filter-clear {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+/* Recording / slides / repo links on a talk page. These stay useful long
+   after the slot time stops mattering, so they sit above the abstract.
+   The selector must out-specify `.subsite .content ul` (0,0,2,1), which
+   would otherwise re-apply bullets and left padding. */
+.subsite .content ul.talk-resources {
+  list-style: none;
+  padding-left: 0;
+  margin: 0 0 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+}
+.talk-resources__link {
+  font-weight: 600;
+}
+
+/* Marks the featured year in the edition list on /archive/. */
+.archive-edition__flag {
+  display: inline-block;
+  margin-left: 0.6rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: var(--blue, #00c8e1);
+  color: #06282e;
+  font-size: 0.7em;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  vertical-align: middle;
+}
+
 .archive-editions {
   list-style: none;
   padding: 0;

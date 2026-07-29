@@ -2,6 +2,7 @@
 {% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
 {% from "macros/funnel-cta.html" import render_funnel_cta %}
 {% from "macros/newsletter-inline.html" import render_newsletter_inline %}
+{% from "macros/edition-context.html" import edition_notice %}
 
 {% block title %}{{ this.name }}{% endblock %}
 
@@ -87,14 +88,7 @@
 {%- endif -%}
 {%- set _ = visible_trail.append((none, this.name)) -%}
 {{ breadcrumb(visible_trail) }}
-{% if is_archive %}
-<aside class="archive-banner" role="note" aria-label="Archived speaker" data-pagefind-ignore>
-  <div class="content">
-    <strong>Archive</strong> — speaker profile from the
-    <a href="/archive/{{ archive_year }}/">{{ archive_year }} edition</a>.
-  </div>
-</aside>
-{% endif %}
+{{ edition_notice(archive_year if is_archive else '', 'speaker') }}
 
 {%- set year_label = archive_year or site.config.PROJECT.year|string -%}
 <article class="speaker-article" data-pagefind-body>

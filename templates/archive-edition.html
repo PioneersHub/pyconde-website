@@ -1,8 +1,13 @@
 {% extends "layout.html" %}
 {% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
+{% from "macros/edition-context.html" import edition_notice %}
 {% from "macros/funnel-cta.html" import render_funnel_cta %}
 
-{% block title %}{{ this.title }} (Archive){% endblock %}
+{# The featured edition is still promoted as the latest one, so it does not
+   carry the "(Archive)" suffix. `is_featured_edition` comes from layout.html. #}
+{% block title %}{{ this.title }}{% if not is_featured_edition %} (Archive){% endif %}{% endblock %}
+{# The title is the edition name; a suffix would repeat it. #}
+{% block title_suffix %}{% endblock %}
 
 {% block og_type %}website{% endblock %}
 
@@ -36,7 +41,9 @@
     "startDate": "{{ this.date_from }}",
     "endDate": "{{ this.date_to or this.date_from }}",
     "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
-    "eventStatus": "https://schema.org/EventScheduled",
+    {#- Every edition under /archive/ has taken place. talk.html has always
+        emitted EventCompleted for its talks; this page contradicted it. -#}
+    "eventStatus": "https://schema.org/EventCompleted",
     "inLanguage": "en",
     "url": "{{ host }}{{ this.url_path }}",
     "location": {
@@ -58,12 +65,7 @@
 
 {% block body %}
 {{ breadcrumb([('/archive/', 'Archive'), (none, this.year|string)]) }}
-<aside class="archive-banner" role="note" aria-label="Archived edition">
-  <div class="content">
-    <strong>Archive</strong> — this page documents the {{ this.year }} edition of PyCon DE &amp; PyData.
-    See the <a href="/">current edition</a> for the upcoming conference.
-  </div>
-</aside>
+{{ edition_notice(this.year, 'edition', linked=false) }}
 
 <article class="archive-edition-article">
   <header class="subsite">
@@ -83,9 +85,13 @@
 
   <section class="subsite">
     <div class="content">
-      <nav class="archive-edition__subnav" aria-label="Archived edition sections">
+      {%- set tracks_node = site.get(this.url_path ~ 'tracks') -%}
+      <nav class="archive-edition__subnav" aria-label="Edition sections">
         <a href="{{ this.url_path }}talks/" class="archive-edition__subnav-link">Talks{% if this.talk_count %} <span class="archive-edition__subnav-count">({{ this.talk_count }})</span>{% endif %}</a>
         <a href="{{ this.url_path }}speakers/" class="archive-edition__subnav-link">Speakers</a>
+        {%- if tracks_node and tracks_node.children|list %}
+        <a href="{{ this.url_path }}tracks/" class="archive-edition__subnav-link">Tracks <span class="archive-edition__subnav-count">({{ tracks_node.children|list|length }})</span></a>
+        {%- endif %}
       </nav>
       {{ this.body|shift_headings }}
     </div>

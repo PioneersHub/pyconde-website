@@ -5,6 +5,22 @@
 {%- set page_description = this.description or branding['default_description'][page_lang] or branding['default_description']['en'] -%}
 {%- set is_noindex = this.url_path in seo['noindex_paths'] -%}
 
+{#- Edition context, derived once here so every child template gets it —
+    including inside {% block title %}, which a per-template {% set %}
+    could not reach. `page_edition_year` is the /archive/{year}/ segment
+    ('' for current-edition pages and for /archive/ itself).
+    `is_featured_edition` is true only for the edition named in
+    databags/site_state.yaml -> featured_edition.year: the most recent
+    completed edition, still promoted as the latest one rather than as
+    archive. Clear that key to make it render as a plain archive year. -#}
+{%- set _url_parts = this.url_path.split('/') -%}
+{%- set page_edition_year = _url_parts[2] if (this.url_path.startswith('/archive/') and _url_parts|length > 3) else '' -%}
+{%- set featured_edition = (bag('site_state') or {}).get('featured_edition') or {} -%}
+{%- set featured_year = (featured_edition.get('year') or '')|string -%}
+{%- set is_featured_edition = page_edition_year != '' and page_edition_year == featured_year -%}
+{%- set _archive_suffix = (branding.get('archive_title_suffix') or {}).get(page_lang, '') -%}
+{%- set title_suffix_text = _archive_suffix|replace('{year}', page_edition_year) if (page_edition_year and _archive_suffix) else branding['title_suffix'][page_lang] -%}
+
 {% if this.full_landing_page %}
 <html lang="{% block html_lang %}en{% endblock %}" class="full-landing-page">
 {% else %}
@@ -16,7 +32,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ '/static/css/main.css'|url }}">
   <link rel="stylesheet" href="{{ '/static/css/custom.css'|url }}">
-  <title>{% block title %}{% endblock %}{% block title_suffix %}{{ branding['title_suffix'][page_lang] }}{% endblock %}</title>
+  <title>{% block title %}{% endblock %}{% block title_suffix %}{{ title_suffix_text }}{% endblock %}</title>
 
   <link rel="canonical" href="{{ branding['canonical_host'] }}{{ this.url_path }}">
   {% if is_noindex %}<meta name="robots" content="noindex, nofollow">{% endif %}

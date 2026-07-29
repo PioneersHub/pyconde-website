@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
+{% from "macros/edition-context.html" import edition_notice %}
 {% from "macros/related-talks.html" import related_panel %}
 {% from "macros/funnel-cta.html" import render_funnel_cta %}
 {% from "macros/newsletter-inline.html" import render_newsletter_inline %}
@@ -156,15 +157,7 @@
 {%- set _ = visible_trail.append((none, this.title)) -%}
 {{ breadcrumb(visible_trail) }}
 
-{% if is_archive %}
-<aside class="archive-banner" role="note" aria-label="Archived talk" data-pagefind-ignore>
-  <div class="content">
-    <strong>Archive</strong> — this talk is from the
-    <a href="/archive/{{ archive_year }}/">{{ archive_year }} edition</a>.
-    See the <a href="/talks/">current programme</a> for the upcoming conference.
-  </div>
-</aside>
-{% endif %}
+{{ edition_notice(archive_year if is_archive else '', 'talk') }}
 
 {%- set year_label = archive_year or site.config.PROJECT.year|string -%}
 {%- set format_label = 'keynote' if this.is_keynote else 'talk' -%}
@@ -259,17 +252,43 @@
 
   <section class="subsite talk">
     <div class="content">
+      {#- Room and clock time matter only while an edition is upcoming. Every
+          edition under /archive/ is over, so the slot line is dropped there
+          entirely; the JSON-LD above keeps startDate/endDate and the room as
+          the factual record of when and where the talk happened. -#}
+      {% if not is_archive and this.start_time %}
       <p class="details">
-        {% if this.start_time %}
-          <time datetime="{{ this.slot_date }}{% if this.start_time %}T{{ this.start_time }}{% endif %}">
-            {{ this.day }}{% if this.slot_date %}, {{ this.slot_date }}{% endif %}
-            {{ this.start_time }}{% if this.end_time %}–{{ this.end_time }}{% endif %}
-          </time>
-        {% endif %}
+        <time datetime="{{ this.slot_date }}T{{ this.start_time }}">
+          {{ this.day }}{% if this.slot_date %}, {{ this.slot_date }}{% endif %}
+          {{ this.start_time }}{% if this.end_time %}–{{ this.end_time }}{% endif %}
+        </time>
         {% if this.room %}
           · in {{ this.room }}
         {% endif %}
       </p>
+      {% endif %}
+
+      {#- What stays useful after the conference: the recording, the slides
+          and the speaker's repo. The two link fields are `type = url` but
+          hold free text, so `first_url` extracts a usable href and yields
+          nothing when there isn't one — see the filter's docstring. -#}
+      {%- set slides_url = this.slides_link|first_url -%}
+      {%- set material_url = this.supporting_material_url|first_url -%}
+      {%- set watch_url = this.video_link or (('https://www.youtube.com/watch?v=' ~ this.youtube_id) if this.youtube_id else '') -%}
+      {%- set has_watch = watch_url and not this.do_not_record -%}
+      {% if has_watch or slides_url or material_url %}
+      <ul class="talk-resources">
+        {% if has_watch %}
+        <li><a class="talk-resources__link" href="{{ watch_url }}" target="_blank" rel="noopener">▶ Watch on YouTube ↗</a></li>
+        {% endif %}
+        {% if slides_url %}
+        <li><a class="talk-resources__link" href="{{ slides_url }}" target="_blank" rel="noopener">Slides ↗</a></li>
+        {% endif %}
+        {% if material_url %}
+        <li><a class="talk-resources__link" href="{{ material_url }}" target="_blank" rel="noopener">Supporting material ↗</a></li>
+        {% endif %}
+      </ul>
+      {% endif %}
 
       <div class="description">
         {{ this.full_description|shift_headings }}

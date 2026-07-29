@@ -1,7 +1,11 @@
 {% extends "layout.html" %}
 {% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
+{% from "macros/edition-context.html" import edition_notice %}
 
 {% block title %}{{ this.title }}{% endblock %}
+{#- This index title already names the edition, so the archive title
+    suffix from layout.html would repeat it. -#}
+{% block title_suffix %}{{ '' if page_edition_year else title_suffix_text }}{% endblock %}
 
 {%- set branding = bag('branding') -%}
 {%- set host = branding['canonical_host'] -%}
@@ -51,14 +55,7 @@
   {%- set _ = visible_trail.append((none, 'Speakers')) -%}
 {%- endif -%}
 {{ breadcrumb(visible_trail) }}
-{% if is_archive %}
-<aside class="archive-banner" role="note" aria-label="Archived edition">
-  <div class="content">
-    <strong>Archive</strong> — speakers of the
-    <a href="/archive/{{ archive_year }}/">{{ archive_year }} edition</a>.
-  </div>
-</aside>
-{% endif %}
+{{ edition_notice(archive_year if is_archive else '', 'speakers') }}
 
 {%- set is_current_speakers = this.url_path == '/speakers/' -%}
 

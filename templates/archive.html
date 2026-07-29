@@ -26,7 +26,11 @@
       {%- for edition in this.children|sort(attribute='year', reverse=true) %}
       <li>
         <a href="{{ edition|url }}" class="archive-edition-card">
-          <h2 class="archive-edition__title">{{ edition.title }}</h2>
+          <h2 class="archive-edition__title">{{ edition.title }}
+            {%- if (edition.year|string) == featured_year %}
+            <span class="archive-edition__flag">{{ featured_edition.get('badge') or 'Latest edition' }}</span>
+            {%- endif %}
+          </h2>
           {%- if edition.date_from %}
           <p class="archive-edition__dates">
             <time datetime="{{ edition.date_from }}">{{ edition.date_from }}</time>

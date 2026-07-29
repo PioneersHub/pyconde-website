@@ -1,7 +1,11 @@
 {% extends "layout.html" %}
 {% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
+{% from "macros/edition-context.html" import edition_notice %}
 
 {% block title %}{{ this.title }}{% endblock %}
+{#- This index title already names the edition, so the archive title
+    suffix from layout.html would repeat it. -#}
+{% block title_suffix %}{{ '' if page_edition_year else title_suffix_text }}{% endblock %}
 
 {%- set is_archive = this.url_path.startswith('/archive/') -%}
 {%- set archive_year = (this.url_path.split('/')[2] if is_archive else '') -%}
@@ -64,6 +68,7 @@
   {%- set _ = visible_trail.append((none, 'Talks')) -%}
 {%- endif -%}
 {{ breadcrumb(visible_trail) }}
+{{ edition_notice(archive_year, 'talks') }}
 
 <div class="subsite">
   <div class="subsite-title">
@@ -75,14 +80,34 @@
         <a href="/archive/">Browse the talk archive (2016–2026)</a>.
       </p>
       {% endif %}
+      {#- The in-page filter below covers this edition's titles, speakers and
+          abstracts. Transcripts and other editions need the Pagefind index. -#}
+      <p class="talks-search-pointer">
+        Searching for a phrase inside a talk?
+        <a href="/search/{% if archive_year %}?year={{ archive_year }}{% endif %}">Search every talk and transcript</a>.
+      </p>
     </section>
   </div>
 </div>
 
 <section class="subsite">
+    {#- Populated by static/js/talks-filter.js. Empty in the HTML on purpose:
+        the list below renders complete without JS, and the controls are an
+        enhancement. data-pagefind-ignore keeps the facet labels out of
+        search excerpts. -#}
+    <div class="content talk-filters" id="talk-filters" data-pagefind-ignore></div>
     <ul class="talks">
         {% for talk in this.children if talk['_model'] != 'redirect' %}
-        <li>
+        {#- data-search is precomputed rather than read from the rendered text,
+            which would also pick up the "Python Skill" / "Domain Expertise"
+            labels and make every talk match a search for "python". -#}
+        <li data-track="{{ talk['track'] }}"
+            data-format="{{ talk['submission_type_label'] }}"
+            data-python-skill="{{ talk['python_skill'] }}"
+            data-domain-expertise="{{ talk['domain_expertise'] }}"
+            data-recording="{{ 'yes' if (talk['youtube_id'] and not talk['do_not_record']) else 'no' }}"
+            data-transcript="{{ 'yes' if (talk['transcript'] and not talk['do_not_record']) else 'no' }}"
+            data-search="{{ ((talk['title'] ~ ' ' ~ (talk['speaker_names'] or '') ~ ' ' ~ (talk['abstract'] or ''))|striptags|lower) }}">
             <a href="{{ talk|url }}" class="content talk">
                 <h2 class="talk-title">
                     {{ talk['title'] }}
@@ -91,6 +116,9 @@
                   {% endif %}
                   {% if talk['youtube_id'] and not talk['do_not_record'] %}
                     <span class="recording-badge" title="Recording available on YouTube">▶ Recording</span>
+                  {% endif %}
+                  {% if talk['transcript'] and not talk['do_not_record'] %}
+                    <span class="recording-badge" title="Full transcript available">📝 Transcript</span>
                   {% endif %}
                 </h2>
                 <p class="talk-speakers">
@@ -115,5 +143,7 @@
         {% endfor %}
     </ul>
 </section>
+
+<script src="{{ '/static/js/talks-filter.js'|url }}" defer></script>
 
 {% endblock %}

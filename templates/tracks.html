@@ -1,7 +1,11 @@
 {% extends "layout.html" %}
 {% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
+{% from "macros/edition-context.html" import edition_notice %}
 
 {% block title %}{{ this.title }}{% endblock %}
+{#- This index title already names the edition, so the archive title
+    suffix from layout.html would repeat it. -#}
+{% block title_suffix %}{{ '' if page_edition_year else title_suffix_text }}{% endblock %}
 
 {%- set is_archive = this.url_path.startswith('/archive/') -%}
 {%- set archive_year = this.year or '' -%}
@@ -47,6 +51,7 @@
   {%- set _ = visible_trail.append((none, 'Tracks')) -%}
 {%- endif -%}
 {{ breadcrumb(visible_trail) }}
+{{ edition_notice(archive_year, 'tracks') }}
 
 <div class="subsite">
   <div class="subsite-title">

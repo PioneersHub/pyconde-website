@@ -1,0 +1,64 @@
+{#
+  Edition context band
+  ────────────────────
+  One band per page for content belonging to a specific edition. Three
+  states:
+
+    - current edition (archive_year empty)  → nothing
+    - featured edition                      → "latest edition" band
+    - any other past edition                → "Archive" band
+
+  The featured edition is the newest completed one, named in
+  databags/site_state.yaml → featured_edition.year. It lives at the same
+  permanent /archive/{year}/ URLs as every other past edition; only the
+  framing differs, for as long as it is still being promoted.
+
+  `kind` picks the sentence: talk | talks | speaker | speakers | track |
+  tracks | edition. Unknown kinds fall back to a generic line.
+
+  The archive copy stays here rather than in YAML on purpose: it is
+  boilerplate that never changes per cycle. Only the featured-state copy —
+  which does change every cycle — lives in the databag.
+
+  Usage:
+    {% from "macros/edition-context.html" import edition_notice %}
+    {{ edition_notice(archive_year, 'talk') }}
+#}
+
+{#- `linked=false` suppresses the "Explore the {year} edition" CTA. Pass it
+    from the edition landing page itself, where the link would point at the
+    page you are already reading. It is a parameter rather than a check on
+    `this.url_path` because an imported macro has no template context. -#}
+{% macro edition_notice(archive_year, kind='page', linked=true) %}
+{%- set fe = (bag('site_state') or {}).get('featured_edition') or {} -%}
+{%- set fy = (fe.get('year') or '')|string -%}
+{%- set year = archive_year|string -%}
+{%- if not year -%}
+{%- elif year == fy -%}
+<aside class="archive-banner archive-banner--featured" role="note" aria-label="Latest edition" data-pagefind-ignore>
+  <div class="content">
+    <strong>{{ fe.get('badge') or 'Latest edition' }}</strong>
+    {%- if fe.get('note') %} — {{ fe['note'] }}{% endif %}
+    {%- if linked %}
+    <a href="/archive/{{ year }}/">Explore the {{ year }} edition</a>.
+    {%- endif %}
+  </div>
+</aside>
+{%- else -%}
+<aside class="archive-banner" role="note" aria-label="Archived {{ kind }}" data-pagefind-ignore>
+  <div class="content">
+    <strong>Archive</strong> —
+    {%- if kind == 'talk' %} this talk is from the <a href="/archive/{{ year }}/">{{ year }} edition</a>.
+      See the <a href="/talks/">current programme</a> for the upcoming conference.
+    {%- elif kind == 'talks' %} talks of the <a href="/archive/{{ year }}/">{{ year }} edition</a>.
+    {%- elif kind == 'speaker' %} speaker profile from the <a href="/archive/{{ year }}/">{{ year }} edition</a>.
+    {%- elif kind == 'speakers' %} speakers of the <a href="/archive/{{ year }}/">{{ year }} edition</a>.
+    {%- elif kind == 'track' or kind == 'tracks' %} tracks of the <a href="/archive/{{ year }}/">{{ year }} edition</a>.
+    {%- elif kind == 'edition' %} this page documents the {{ year }} edition of PyCon DE &amp; PyData.
+      See the <a href="/">current edition</a> for the upcoming conference.
+    {%- else %} content from the <a href="/archive/{{ year }}/">{{ year }} edition</a>.
+    {%- endif %}
+  </div>
+</aside>
+{%- endif -%}
+{% endmacro %}

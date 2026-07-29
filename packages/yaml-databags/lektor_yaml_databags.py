@@ -222,6 +222,37 @@ def markdown_inline(text: str) -> str:
     return text
 
 
+_URL_IN_TEXT_RE = re.compile(r'https?://[^\s)\]<>"\']+')
+_BARE_HOST_RE = re.compile(r'^[\w-]+(?:\.[\w-]+)+(?:/\S*)?$')
+
+
+def first_url(value: object) -> str:
+    """Salvage one usable href from a free-text `url` field.
+
+    `slides_link` and `supporting_material_url` are declared `type = url` in
+    models/talk.ini, but Pretalx collects them as free text and speakers
+    oblige: markdown links (`[Repository](https://github.com/…)`), prose with
+    a URL buried in it, bare hosts without a scheme, several URLs joined by
+    `|`. Rendering those raw produces broken same-origin links, so extract
+    the first real URL and drop anything unusable.
+
+    Excluding `)` and `]` from the match is what unwraps the markdown form.
+    `social_url(kind='homepage')` is not a substitute — it would emit
+    `https://[Repository](https://…` for exactly that shape.
+    """
+    if not value:
+        return ''
+    text = str(value).strip()
+    if not text or text in {'-', 'n/a', 'N/A', 'none', 'None'}:
+        return ''
+    m = _URL_IN_TEXT_RE.search(text)
+    if m:
+        return m.group(0).rstrip('.,;:')
+    if _BARE_HOST_RE.match(text):
+        return f'https://{text}'
+    return ''
+
+
 def paragraphize(text: str) -> str:
     """Convert text with blank lines into proper HTML paragraphs.
 
@@ -331,6 +362,9 @@ class YAMLDatabagPlugin(Plugin):
         # "@hendorf", "https://twitter.com/hendorf") in speaker contents.lr.
         self.env.jinja_env.filters['social_url'] = social_url
         self.env.jinja_env.filters['social_label'] = social_label
+        # Extract a usable href from the free-text slides / supporting-material
+        # fields on talk pages, which are `type = url` but hold prose.
+        self.env.jinja_env.filters['first_url'] = first_url
 
         # Call the databag setup
         self._setup_databags()
