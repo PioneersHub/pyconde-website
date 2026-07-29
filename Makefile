@@ -7,10 +7,16 @@ else
 endif
 
 # Build scope — see plans/selective-builds.md and packages/selective-build/.
-#   current (default): current edition only, fast; what production deploys use.
+#   current:           current edition only, fast; what production deploys use.
 #   archive:           full render; the archive workflow syncs only archive scope.
-#   full:              full render + Pagefind index.
-BUILD_MODE ?= current
+#   full (default):    full render + Pagefind index.
+#
+# Default is `full` so a local `make build` / `make serve` renders the
+# archive — `current` excludes /archive entirely, which silently hides
+# every past edition from anyone building locally. CI is unaffected:
+# main.yml and development.yml pass BUILD_MODE=current explicitly, and
+# archive-build.yml passes its dispatch input.
+BUILD_MODE ?= full
 
 ifeq ($(BUILD_MODE),full)
 build: redirects routing tracks topic-hubs lektor-build pagefind
