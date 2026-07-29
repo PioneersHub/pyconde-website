@@ -13,12 +13,12 @@ endif
 BUILD_MODE ?= current
 
 ifeq ($(BUILD_MODE),full)
-build: redirects tracks topic-hubs lektor-build pagefind
+build: redirects routing tracks topic-hubs lektor-build pagefind
 # Only full builds prune: current renders a subset of the site and must not
 # delete previously built archive artifacts from site/.
 PRUNE_FLAG =
 else
-build: redirects tracks topic-hubs lektor-build
+build: redirects routing tracks topic-hubs lektor-build
 PRUNE_FLAG = --no-prune
 endif
 
@@ -45,6 +45,13 @@ tracks:
 topic-hubs:
 	@echo "Regenerating cross-edition topic-hub pages..."
 	$(RUN) python utils/generate_topic_hubs.py
+
+# Prefix rewrites for the hosting layer (e.g. /latest/ -> /archive/2026/).
+# Generated on every build so the emitted config can never drift from
+# databags/routing.yaml, but only *applied* by routing-config.yml.
+routing:
+	@echo "Regenerating hosting redirect config..."
+	$(RUN) python utils/generate_routing_config.py
 
 clean-plugin-cache:
 	@echo "Clearing plugin and Lektor caches..."

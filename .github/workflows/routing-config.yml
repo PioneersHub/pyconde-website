@@ -1,0 +1,68 @@
+name: Apply hosting redirect config (on demand)
+
+# Applies the prefix rewrites in databags/routing.yaml to the S3 bucket's
+# website configuration — the /latest/ alias and anything added beside it.
+# See databags/routing.yaml and utils/generate_routing_config.py.
+#
+# Deliberately NOT part of the deploy workflows. `put-bucket-website` replaces
+# the entire website configuration, and the routing rules change once or twice
+# a year, so running it on every push is all risk and no benefit. It is also
+# the only workflow needing s3:PutBucketWebsite.
+#
+# Caveat worth knowing before the first run: S3 routing rules only fire on the
+# bucket's *website* endpoint (bucket.s3-website.<region>.amazonaws.com). If a
+# CDN sits in front using the REST endpoint (bucket.s3.<region>.amazonaws.com)
+# as its origin, these rules never run and the alias needs an edge function
+# instead. Check the distribution's origin domain first.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Generate and print the configuration without applying it."
+        type: boolean
+        default: true
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setting up python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: '.python-version'
+          cache: 'pip'
+      - run: pip install pyyaml
+
+      - name: Apply routing configuration
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_S3_REGION }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          # Read the bucket's current configuration so IndexDocument and
+          # ErrorDocument survive the replace. A bucket with no website
+          # configuration yet returns an error, hence the fallback.
+          aws s3api get-bucket-website --bucket "$AWS_S3_BUCKET" > current.json 2>/dev/null \
+            || echo '{}' > current.json
+          echo "Current configuration:"; cat current.json
+
+          python utils/generate_routing_config.py --merge current.json
+          echo "New configuration:"; cat site-config/s3-website-routing.json
+
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "Dry run — not applying. Re-run with dry_run=false to apply."
+            exit 0
+          fi
+
+          aws s3api put-bucket-website --bucket "$AWS_S3_BUCKET" \
+            --website-configuration "file://site-config/s3-website-routing.json"
+          echo "Applied. Verifying:"
+          aws s3api get-bucket-website --bucket "$AWS_S3_BUCKET"
