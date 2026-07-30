@@ -128,3 +128,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/7ZJJlj0i_TM/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+IoT data quality monitoring in PySpark addresses the challenge of "garbage in, garbage out," particularly when dealing with diverse software versions and unstable connectivity from thousands of global devices. The primary problem is that data quality is often a moving target; hardware manufacturers transitioning to digital services must manage legacy devices and varying data schemas, making it impossible to ensure perfect data at the point of ingestion.
+
+The implemented approach utilizes a reactive monitoring strategy, detecting deviations post-transformation rather than blocking data during ingestion. After evaluating frameworks like Great Expectations and Soda, DQX was selected for its lightweight nature, open-source license for Databricks, and support for a YAML-based domain-specific language. This allows non-Python experts to define rules for completeness, plausibility, uniqueness, and consistency. The framework supports both built-in checks and custom Python functions, such as a monotonically increasing check for operation hour counters using PySpark lag functions. To handle scale, the system leverages the Databricks Change Data Feed to process daily increments of terabyte-scale tables.
+
+Key takeaways include the technical benefit of using LLMs to generate initial YAML check proposals and the organizational necessity of shifting data ownership to the producers. By aggregating DQX error arrays into interpretable Power BI dashboards, the team created a feedback loop that identifies software bugs in specific device versions. This process transforms abstract "data quality" into concrete metrics, enabling data engineers to provide evidence-based bug reports to embedded software teams for permanent resolution.

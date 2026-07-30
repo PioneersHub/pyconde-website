@@ -123,3 +123,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/DonT6K6eiOI/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+HEAT is an open-source Python library designed to scale scientific data analysis from local workstations to high-performance computing (HPC) systems. It addresses the memory and compute limitations of NumPy, which is restricted to shared-memory parallelization on CPUs. By mirroring the NumPy API, HEAT allows users to develop code on a laptop and deploy it on large-scale clusters, such as the Jupyter system with 6,000 compute nodes, without significant code modification.
+
+The library introduces the DND (distributed n-dimensional) array, which distributes data along a single axis across multiple MPI ranks. Under the hood, HEAT leverages PyTorch for local tensor operations and device acceleration, supporting CPUs and GPUs (including NVIDIA and Apple MPS), while using MPI4Py for inter-node communication. A key technical advantage of HEAT is its implementation of complex linear algebra functions that are difficult to parallelize, such as QR factorization, distributed Singular Value Decomposition (SVD), and Dynamic Mode Decomposition (DMD).
+
+Performance benchmarks demonstrate that HEAT provides significant speedups over serial NumPy and scikit-learn baselines, particularly for large matrices where GPU acceleration is utilized. In weak scaling tests, HEAT maintains a flat memory footprint per compute node, whereas alternatives like Dask show increasing memory consumption as the number of nodes grows. This memory efficiency enables the processing of datasets that exceed the memory capacity of a single GPU or node. The library effectively combines shared-memory parallelization via PyTorch with distributed-memory parallelization via MPI to maximize HPC resource utilization.

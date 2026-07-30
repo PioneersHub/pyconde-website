@@ -133,3 +133,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/FNyheMv6Vt4/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+E-commerce cataloging requires classifying millions of product offers into thousands of categories across multiple languages in real time. High-throughput systems must process peak loads of approximately 80,000 offers per second. While traditional Support Vector Machines (SVM) provide high cost-efficiency and low latency, they lack the contextual understanding and adaptability of transformer-based models. The primary challenge in transitioning to deep learning is balancing classification accuracy with strict operational cost constraints and inference speed.
+
+The technical approach centers on a student-teacher knowledge distillation framework. A large, high-performance teacher model, such as E5-base, is trained using cross-entropy loss to create a sophisticated embedding space. A smaller student model, MiniLM-L12, is then trained to mimic the teacher's embeddings using an L2 loss in addition to the standard cross-entropy loss. This allows the student model to maintain the inference speed of a small architecture while achieving the accuracy of a much larger one. To optimize performance, the system employs bfloat16 quantization and a curated data sampling strategy that transforms long-tail distributions into uniform distributions for training, while matching real-world distributions for evaluation.
+
+Deployment is optimized using AWS Inferentia chips, which offer a better balance of throughput and cost than standard GPUs for small models. The pipeline utilizes a specialized compilation process where models are JIT-compiled for the Neuron runtime with a batch size of one to minimize latency. This architecture resulted in a 30% increase in classification performance over the legacy SVM system with only an 18% increase in operational costs.

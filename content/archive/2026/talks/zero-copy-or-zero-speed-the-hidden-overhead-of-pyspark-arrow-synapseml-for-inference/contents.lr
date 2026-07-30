@@ -96,3 +96,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/Ijd9NwP5skI/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Scaling machine learning inference to 6 billion daily predictions using an Ensemble LightGBM model requires overcoming the performance bottleneck created by the Python-JVM boundary in PySpark. In standard PySpark User Defined Functions (UDFs), data is serialized via pickle and sent row-by-row through sockets, resulting in hundreds of millions of boundary crossings and underutilizing the C++ engine of LightGBM. While Apache Arrow aims to provide zero-copy data sharing, in PySpark it still involves CPU-intensive format conversion from Tungsten rows and socket-based data movement.
+
+To optimize throughput, four execution methods were evaluated. Standard UDFs served as the baseline. Pandas UDFs improved performance by vectorizing batches, reducing boundary crossings from 400 million to approximately 4,000. Mapping Pandas further increased speed by introducing a stateful iterator, allowing the model to load once per partition rather than once per batch. SynapseML provided the highest throughput by executing the model natively on the JVM, eliminating the Python boundary, the Global Interpreter Lock (GIL), and serialization overhead entirely.
+
+Benchmarks on a 20-node cluster demonstrated a 9x total performance improvement moving from standard UDFs to SynapseML, reducing total runtime from seven hours to four minutes. For maximum throughput, SynapseML is the most efficient choice, though it lacks the flexibility for complex custom Python transformations. Mapping Pandas is recommended for workloads requiring custom logic, as it offers a 4x speedup over the baseline. Additionally, tuning the spark.sql.execution.arrow.maxRecordsPerBatch parameter to a "Goldilocks zone" of 50,000 to 200,000 records prevents both networking overhead and out-of-memory errors.

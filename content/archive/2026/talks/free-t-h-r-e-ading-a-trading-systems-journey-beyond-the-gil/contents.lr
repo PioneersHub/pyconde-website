@@ -123,3 +123,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/p3VQih2R4rc/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Algorithmic trading systems are ideal for testing Python's free-threading capabilities because they are latency-sensitive, combine I/O and CPU-bound tasks, and require strict sequential processing of market data. The primary problem addressed is the limitation of the Global Interpreter Lock (GIL), which forces tasks to process one by one, potentially causing bottlenecks in CPU-intensive pipelines where data updates and signal evaluations must occur concurrently.
+
+The experimental approach compared an asynchronous implementation using asyncio against a free-threaded implementation in Python 3.13/3.14. The architecture utilized a three-stage pipeline: a receiver, a market data processor, and a signal evaluator, communicating via a thread-safe 0MQ pop-up socket. To simulate realistic CPU workloads and prevent Python from releasing the GIL during sleep calls, a custom workload runner was used. Benchmarks measured end-to-end latency, throughput, and the number of skipped evaluations across varying processing times, specifically targeting a tick rate of 200 messages per second.
+
+Key findings indicate that while asyncio performs adequately for low-latency tasks, it fails when CPU-bound work reaches a boundary condition—such as 5 milliseconds of processing time—causing queues to build up and latency to spike. In contrast, the free-threaded version maintained uniform latency and processed more tick updates by allowing the processor and evaluator to overlap. The results showed a latency improvement of approximately 150% at the tail end compared to asyncio. The transition from async to threading was described as mechanical, replacing asyncio queues and events with standard threading equivalents and managing shared mutable state through lock-free snapshots or threading locks.

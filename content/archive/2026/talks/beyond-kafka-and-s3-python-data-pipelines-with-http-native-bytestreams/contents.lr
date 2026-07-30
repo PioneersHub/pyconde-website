@@ -120,3 +120,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/ViPZmGc28Ow/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Cross-organizational data sharing often incurs high alignment costs due to differing infrastructure, technology stacks, and compliance regimes. Traditional solutions like message brokers (e.g., Kafka) require significant infrastructure coupling and specific protocols, while S3-based transfers often rely on one-way push/pull models. REST APIs frequently blend transport layers with data models, creating rigid dependencies. To address these challenges, the ZebraStream protocol adapts the Unix named pipe model to HTTP, treating data as opaque byte streams rather than discrete, size-restricted messages.
+
+The approach utilizes a stateless relay that connects HTTP PUT (upload) and GET (download) requests in real time. To solve the timing and synchronization issues inherent in HTTP, the protocol employs a rendezvous system via a Connect API. A long-poll mechanism ensures both the producer and consumer are present before dispatching them to the data API for streaming. This architecture shifts the coordination model from a static architectural decision to a runtime decision, allowing the system to function as either a push or pull pipeline depending on which party connects first.
+
+In Python, the implementation provides a file-like interface inheriting from the IO base class. This allows the stream to be passed directly into standard functions, such as Pandas read_csv or LogGuru sinks, without modifying the underlying business logic. The protocol supports end-to-end encryption using an adapted AGE-H algorithm, ensuring that the relay provider cannot access sensitive data. Key technical benefits include the elimination of VPNs or open ports, the ability to handle arbitrary data sizes, and the propagation of exceptions between peers to ensure data integrity.

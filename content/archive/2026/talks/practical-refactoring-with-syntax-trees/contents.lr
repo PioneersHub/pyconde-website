@@ -113,3 +113,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/ocOwCO56Eik/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Automated refactoring involves transforming source code by representing it as data. While regular expressions suffice for simple changes, complex refactoring requires syntax trees. An Abstract Syntax Tree (AST), provided by Python's standard `ast` module, represents language constructs as a tree of Python objects. However, ASTs discard formatting, comments, and parentheses, making them unsuitable for writing changes back to disk without losing code style.
+
+Concrete Syntax Trees (CSTs) address this by preserving whitespace, comments, and decorative parentheses, allowing for "round-tripping" where code can be parsed, modified, and unparsed back to its original formatting. The `libcst` library enables this process through a transformer model using `visit` methods for top-down traversal and `leave` methods to return modified nodes. For example, renaming PyTest fixtures involves visiting `FunctionDefinition` nodes to identify those with a `@pytest.fixture` decorator, collecting the names to be changed, and then using a `leave_Name` method to replace those identifiers throughout the codebase.
+
+Practical implementation of these "code mods" requires a rigorous workflow: starting with a clean Git working tree, running the transformation, and applying separate formatting tools like `black` or `ruff` to handle whitespace. While basic CST transformers may struggle with local variable shadowing or cross-file dependencies, `libcst` provides metadata APIs and scope providers to resolve these issues. Compared to AI-driven refactoring, syntax tree scripts are deterministic and easier to rebase, making them more reliable for large-scale, repetitive changes in professional codebases.

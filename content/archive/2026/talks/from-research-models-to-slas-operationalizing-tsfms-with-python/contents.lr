@@ -123,3 +123,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/PKDYUHX5hJw/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Operationalizing Time Series Foundation Models (TSFMs) involves transitioning from research-based models to production-ready APIs that meet enterprise service level agreements. The primary challenge in time series forecasting is the traditional requirement for extensive data collection, domain-specific model development, and constant retraining for every new use case. To solve this, a unified API wrapper was developed to encapsulate multiple foundation models, allowing users to perform zero-shot inference, fine-tuning, and real-time predictions without managing the underlying backend infrastructure.
+
+The architecture utilizes Azure Web Apps to host individual model endpoints, all managed through Azure API Management (APIM) to provide a single gateway for authentication via OAuth 2.0, rate limiting, and access control. The platform integrates four specific models: Chronos, LagLama, and TimesFM (open source), and GTT (a proprietary Siemens model trained on industrial IoT data). This abstraction allows users to switch models by simply changing a parameter in the JSON payload. Beyond direct API access, the system is exposed through a front-end application, a Model Context Protocol (MCP) server for natural language interaction with AI agents, and custom plugins.
+
+Key takeaways include the versatility of TSFMs for tasks beyond forecasting, such as anomaly detection using confidence intervals, time series classification, and historical data imputation via embeddings. Benchmarks indicate that foundation models generally offer faster execution times and higher accuracy than classical ML benchmarks like auto-ARIMA, particularly in zero-shot scenarios. While zero-shot inference provides a rapid baseline, fine-tuning remains essential for optimizing performance in domain-specific industrial contexts.

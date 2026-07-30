@@ -92,3 +92,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/t0ZWNh-UXDs/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Searching through a threat repository containing one trillion records requires a high-throughput pipeline capable of aggregating data from hundreds of microservices. The primary challenge involves handling a flood of partial updates and duplicate file hashes, which can cause significant latency and system instability in search platforms like Apache Solr. An initial architecture using ClickHouse for daily aggregation resulted in a 36-hour data delay, which was unacceptable for users requiring real-time insights.
+
+The current solution utilizes ScyllaDB as a high-performance key-value store to maintain the source of truth, where records are stored using a primary key composed of the file hash and feature type. When updates occur, file hashes are published to Kafka topics. A Python-based consumer service fetches the complete data set for each hash from ScyllaDB to build a comprehensive document for Solr. To prevent Solr from being overwhelmed by redundant updates, a custom deduplication buffer was implemented using a Python dictionary to track file hashes across batches. This buffer employs a Time-to-Live (TTL) mechanism and an eviction callback; data is only processed and sent to Solr when a hash is evicted from the buffer, ensuring that only the final state of a file is indexed.
+
+To maintain system stability, the service limits the number of messages processed per iteration to prevent Kafka health-check timeouts during backlog clearing. Additionally, a secondary deduplication layer manages Solr commits and re-indexing across daily collections to avoid heap exhaustion and cluster failure. This architecture reduced update latency from 36 hours to under five minutes and decreased the ingestion volume from 100,000 messages per second to fewer than 2,000.

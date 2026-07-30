@@ -98,3 +98,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/K7Hl3vXB5wA/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Space weather, driven by solar activity such as flares and coronal mass ejections, disrupts the ionosphere and causes plasma density fluctuations known as Large-Scale Traveling Ionospheric Disturbances (LSTIDs). These disturbances bend and delay radio signals, leading to significant positioning and timing errors in Global Navigation Satellite Systems (GNSS) like GPS and Galileo. Such events pose systemic risks to critical infrastructure, with potential socio-economic damages estimated at 15 billion euros for a single extreme event in Europe.
+
+To mitigate these risks, an early warning system was developed to predict the onset of LSTIDs over the European sector within a three-hour window. The problem is framed as a multivariate time series binary classification task using a dataset of 1,600 manually labeled events spanning nine years. The model utilizes physical drivers as inputs, including ionospheric status, geomagnetic currents, solar wind proxies, and solar cycle data such as sunspot counts. Feature engineering involves moving averages, exponential moving averages, and lagged features covering up to six hours of historical data.
+
+The technical stack employs CatBoost for gradient boosting on symmetric decision trees, Optuna for hyperparameter optimization, and MLflow for experiment tracking. To ensure the system is trustworthy and explainable, SHAP (SHapley Additive exPlanations) is used to decompose predictions into feature contributions, allowing domain experts to validate the model's physical reasoning. To handle uncertainty, the system implements conformal prediction, a post-hoc statistical framework that transforms point predictions into mathematically guaranteed prediction intervals. This allows users to choose between three operating modes—high precision, high sensitivity, or balanced—depending on whether the cost of false positives or false negatives is higher for their specific application.

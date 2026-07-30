@@ -109,3 +109,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/vZdMN82NMTQ/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+LLM agents often suffer from silent degradation, where the model continues to provide confident responses despite a shift in the underlying data distribution. This problem is particularly acute in non-deterministic systems where ground truth labels are unavailable for real-time validation, rendering traditional accuracy metrics useless. In a customer support ticket routing scenario, for example, the launch of a new product can introduce new vocabulary and shift the meaning of existing terms, leading the agent to misclassify ticket priority while reporting zero system errors.
+
+To detect this drift without relying on manual labeling, a multi-signal evaluation framework is used. This approach monitors six distinct metrics: Shannon entropy (calculated using all available class probabilities to measure internal uncertainty), fallback rates (acting as a canary signal), vocabulary drift (measuring the distance of current word vectors from a stable centroid), human disagreement (tracking when users override agent decisions), LLM-as-a-judge (using a model like Claude Haiku to verify if the agent's reasoning is faithful to the input), and trajectory (assessing the logical flow from input to outcome).
+
+The key takeaway is the implementation of a tiered action plan based on the number of triggering signals. A single alert, such as an increased fallback rate, suggests observation. Two or more signals indicate a need for investigation. When multiple signals across different layers—internal confidence, external human feedback, and logical verification—trigger simultaneously, it provides a high-confidence indicator that the agent's prompt or model requires updating. This "nervous system" approach allows operators to identify and fix silent failures before they impact business operations.

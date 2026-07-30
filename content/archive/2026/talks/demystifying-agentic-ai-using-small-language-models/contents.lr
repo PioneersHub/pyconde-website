@@ -107,3 +107,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/IWZe-Ti2T70/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Agentic AI relies on the ability of a language model to function as a decisioning engine. This process involves a reasoning loop where a prompt is decomposed into a plan, which then triggers the execution of various tools—such as API calls or database queries—until a final answer token is emitted. While large language models (LLMs) traditionally powered these workflows, they are often computationally expensive and contain vast amounts of irrelevant data that do not contribute to the specific reasoning required for agentic tasks.
+
+Small Language Models (SLMs), defined as models with 10 to 30 billion parameters that fit within the 16 to 32 gigabytes of RAM found in consumer devices, offer a more economical and private alternative. Research indicates that SLMs are sufficiently powerful for the four critical requirements of agentic workflows: breaking tasks into subtasks, tool calling, generating glue code, and following guardrails. For example, the open-source Salesforce xLAM-2 model, a 32-billion parameter model created via supervised fine-tuning on synthetic function-calling datasets, demonstrates accuracy comparable to much larger proprietary models on the Berkeley function calling leaderboard.
+
+A practical implementation for local experimentation involves using the 4-bit quantization of xLAM-2 running on a Lama CPP inference server, which leverages Apple Silicon GPUs. This setup can be integrated with the LangChain framework to define business rules rather than rigid directed acyclic graphs (DAGs). To prevent hallucinations and ensure data integrity, agents can be connected to an Apache Iceberg Lakehouse, providing a scalable, single source of truth for business data. This architecture allows developers to deploy Python-native agents that can autonomously decide whether to retrieve cached data from a database or fetch live information from external APIs.

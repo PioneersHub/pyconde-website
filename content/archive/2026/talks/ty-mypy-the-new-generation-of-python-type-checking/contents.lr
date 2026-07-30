@@ -89,3 +89,13 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/_HJ1K6DA-cY/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Ty is a high-performance Python type checker developed by Astral, designed to address the performance bottlenecks and ergonomic issues associated with MyPy. While MyPy remains the industry standard, it often suffers from slow feedback loops, noisy error messages, and a complex configuration process involving nearly 100 options. Ty aims to replace these pain points by providing a faster, more intuitive experience integrated directly into the development workflow.
+
+The tool is implemented in Rust and utilizes the Salsa framework to enable demand-driven computations and efficient cache invalidations. This architecture allows Ty to perform significantly faster than MyPy; in benchmarks on the MyPy repository, Ty completed checks in 700 milliseconds compared to MyPy's 21 seconds. Additionally, Ty includes a built-in Language Server Protocol (LSP) implementation, providing immediate IDE feedback, smart imports, and detailed error diagnostics that reference function definitions and types across files.
+
+Technically, Ty diverges from MyPy by distinguishing between Any and unknown types, which supports the dynamic gradual guarantee—the principle that removing type annotations should not introduce new errors. It also implements set intersection types, allowing the checker to infer not only what an object is, but also what it is not. However, Ty currently lacks a plugin system, meaning it cannot handle the dynamic type coercion used by frameworks like Pydantic or SQLAlchemy.
+
+For adoption, Ty is recommended for greenfield projects or as a local development tool to provide instant feedback, while MyPy is suggested for CI pipelines to ensure strict correctness.

@@ -137,3 +137,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/VT2G-UV5MdI/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Differential privacy (DP) addresses the failure of traditional data anonymization techniques, such as k-anonymity, cell suppression, and the removal of personally identifiable information (PII). These methods often fail against linkage attacks, where attackers combine anonymized datasets with auxiliary public data to re-identify individuals, or membership inference attacks, which determine if a specific record exists within a sensitive dataset. The database reconstruction theorem further demonstrates that releasing too many aggregate statistics can allow an attacker to mathematically reconstruct the original microdata.
+
+The approach taken to mitigate these risks is to treat privacy as a tunable mathematical bound rather than a binary state. By adding calibrated random noise—such as Gaussian noise—to query results, DP masks the contribution of any single individual. The amount of noise required depends on the sensitivity of the query; for example, a simple count has a sensitivity of one, while a histogram's sensitivity is measured by the L2 norm. This process creates a trade-off between privacy and utility: higher noise levels increase privacy by overlapping the probability distributions of datasets with and without a specific individual, but they decrease the accuracy of the resulting statistics.
+
+Using the OpenDP library, which is implemented in Rust and provides a Python package, these concepts are applied to a healthcare dataset of hospital discharges. A membership inference attack on raw aggregate tables can identify approximately 30% of a sensitive cohort with a 10% false positive rate. Implementing DP via OpenDP prevents this by enforcing a privacy budget ($\mu$), which limits the total amount of information leakage across all queries. Once the budget is exhausted, the system blocks further releases to maintain the proven privacy guarantee.

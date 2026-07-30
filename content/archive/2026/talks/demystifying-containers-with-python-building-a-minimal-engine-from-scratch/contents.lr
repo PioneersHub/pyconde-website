@@ -80,3 +80,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/Yzo40hvli9g/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Containers are isolated processes that share the host system kernel rather than running on a separate guest OS like virtual machines. This isolation is achieved through Linux namespaces, which wrap global system resources into abstractions. Key namespaces include PID for isolating process IDs, UTS for hostnames, and mount for isolating file system mounts. To implement a container, the unshare command creates these namespaces, and the proc file system is remounted within the new mount namespace to ensure that process monitoring tools like ps only show processes internal to the container.
+
+To provide a dedicated root file system, containers use images—packaged binaries and libraries from specific distributions, such as Alpine Linux. The chroot command changes the apparent root directory to the image path. To prevent multiple containers from modifying the same image, OverlayFS is used to combine a read-only lower directory (the image) with a writable upper directory. This creates a merged view where changes are stored in the upper layer, leaving the original image intact.
+
+Resource exhaustion is managed via control groups (cgroups), which limit CPU, memory, and the maximum number of processes. Cgroups are managed through a pseudo file system (cgroupfs) by writing limits to specific files and adding process IDs to the cgroup.procs file. For security, user namespaces can map a non-root host user to UID 0 inside the container, ensuring that any process escaping the container lacks root privileges on the host. These components—namespaces, chroot, OverlayFS, and cgroups—can be orchestrated using Python to build a minimal container engine without external dependencies.

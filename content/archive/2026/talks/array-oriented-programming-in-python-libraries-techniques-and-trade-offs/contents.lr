@@ -139,3 +139,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/zgIj2oCFF1M/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Array-oriented programming in Python shifts the focus from individual element manipulation to operations on entire data structures. This paradigm addresses the performance bottlenecks of the Python interpreter by offloading heavy computations to pre-compiled C or C++ libraries. While imperative programming relies on explicit loops and functional programming uses mapping functions, array-oriented programming utilizes implicit loops through vectorization, which aligns with hardware-level SIMD (Single Instruction, Multiple Data) operations common in CPUs and GPUs.
+
+Key tools for this approach include NumPy, JAX, and Numba. NumPy provides the foundational array object and vectorized operations, though it often creates costly intermediate arrays in memory for complex expressions. To mitigate this, NumExpr fuses operations to reduce memory overhead, while Numba uses LLVM to compile Python bytecode into machine code, allowing imperative loops to run at C-like speeds. JAX further optimizes this process by tracing functions to create an intermediate representation (HLO), which is then compiled via XLA (Accelerated Linear Algebra) for efficient execution on CPUs, GPUs, or TPUs.
+
+A primary trade-off in array-oriented programming is the handling of conditional logic. Standard Python if-statements cannot be applied to arrays because the truth value of multiple elements is ambiguous. This is resolved using boolean masking—applying a filter of true/false values to update only specific elements. In many cases, it is computationally faster to perform redundant calculations on all elements than to manage the memory overhead of masking. For datasets exceeding available RAM, libraries like Dask extend these capabilities by implementing chunking and parallelized computation graphs.

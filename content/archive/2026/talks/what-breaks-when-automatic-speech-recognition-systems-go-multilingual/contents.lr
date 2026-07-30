@@ -85,3 +85,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/8GCnHJDoXRk/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Multilingual Automatic Speech Recognition (ASR) systems face significant challenges regarding linguistic variance, acoustic features, and data integrity. A primary problem is data leakage, where training and testing sets overlap, leading to models that overfit to specific speaker identities rather than learning general language patterns. This is particularly acute in multilingual contexts where a single speaker may appear in multiple language datasets, causing the model to memorize the speaker's unique pitch and cadence rather than the linguistic content.
+
+To address these issues, a robust ASR pipeline must implement speaker-disjoint splits, ensuring no single speaker exists in both the training and validation sets. The technical approach involves a modular architecture using the decorator design pattern, where each language is assigned a specific pre-processor and normalizer. This separation of concerns allows new languages to be added as functions without disrupting validated pipelines. To handle code-mixed audio—where speakers switch languages mid-sentence—the system utilizes Voice Activity Detection (VAD) for silence trimming and a loanword cache to manage context switching.
+
+Key takeaways include the use of specific acoustic metrics to detect deepfake audio; synthetic voices often exhibit lower jitter and shimmer variance, appearing unnaturally smooth compared to human speech. Evaluation relies on Word Error Rate (WER) and Character Error Rate (CER), though the analysis shows that CER can remain high even when semantic meaning is preserved, necessitating loanword normalization to reduce error deviations. Ultimately, a successful multilingual ASR system requires a combination of speaker-disjoint data management, language-specific configurations, and human-in-the-loop validation to prevent hallucination and overfitting.

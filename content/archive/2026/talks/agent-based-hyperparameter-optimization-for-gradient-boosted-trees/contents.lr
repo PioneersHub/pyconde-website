@@ -104,3 +104,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/O6Zp5J56FCI/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Hyperparameter optimization for Gradient Boosted Trees, such as LightGBM and XGBoost, typically requires tuning 14 to 19 parameters. While frameworks like Optuna use Bayesian optimization to navigate this search space, they often require hundreds of iterations to move from exploration to exploitation. When model training times are long, this iterative process becomes computationally expensive and time-consuming for human operators to monitor and adjust.
+
+The proposed approach integrates Large Language Models (LLMs) into the decision loop using the Model Context Protocol (MCP) and a structured "skills" framework. In this architecture, MCP acts as a toolset—providing the LLM with specific capabilities to fetch campaign status, summarize rounds, and review history—while skills provide domain-specific recipes and step-by-step instructions in markdown format. Instead of running a single massive batch of 200 trials, the process is split into multiple smaller rounds. After each round, the LLM analyzes the results against the provided domain knowledge and official documentation to decide whether to continue the current path, discard specific hyperparameters, or shift the search region.
+
+Testing on four public scikit-learn datasets demonstrated that this agent-driven framework consistently achieves competitive performance compared to standard tuning. The system functions as a guardrailed loop where the LLM proposes actions that are executed via a predefined CLI, ensuring the agent cannot perform unauthorized operations. This pattern is extensible to other computationally intensive decision loops, such as deep learning training, infrastructure scaling, and A/B test management.

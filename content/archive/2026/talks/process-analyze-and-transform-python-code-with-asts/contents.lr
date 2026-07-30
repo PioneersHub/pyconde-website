@@ -90,3 +90,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/f9ZWG9PT9pQ/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Abstract Syntax Trees (ASTs) represent the structure of Python source code as a tree of language constructs, such as modules, classes, and functions. In the Python compilation process, the parser creates an AST as an intermediary step before compiling source code into bytecode. This structure allows tools like Ruff, Black, MyPy, and Bandit to analyze, lint, and format code by treating the program as a hierarchical data structure rather than raw text.
+
+The Python standard library provides the `ast` module to programmatically interact with these trees. The `ast.parse()` function converts syntactically correct source code into an AST rooted at a module node. Developers can inspect these structures using `ast.dump()` or traverse them using `ast.iter_fields()` and `ast.iter_child_nodes()`. For deeper analysis, the module offers three primary traversal methods: `ast.walk()`, which visits nodes in no specific order; `ast.NodeVisitor`, which implements a depth-first traversal for observing nodes; and `ast.NodeTransformer`, which allows for the modification of the tree.
+
+Practical applications include building linters to detect anti-patterns, such as bare `except` blocks or missing docstrings. By subclassing `NodeVisitor`, a tool can flag generic exceptions by inspecting `Raise` and `ExceptHandler` nodes. To transform code, `NodeTransformer` can replace a `try-except-pass` block with a `contextlib.suppress` context manager. Because modified nodes lack positional metadata, `ast.fix_missing_locations()` must be called before the tree is compiled back into a code object via `compile()` or converted back to source code using `ast.unparse()`.

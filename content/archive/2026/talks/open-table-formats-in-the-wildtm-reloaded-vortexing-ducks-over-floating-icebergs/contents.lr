@@ -118,3 +118,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/qujnorOvVA4/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Apache Iceberg addresses the limitations of Hive and Parquet by providing a table abstraction over cloud object storage. While Hive relies on partition-level metadata, Iceberg tracks metadata at the file level using a hierarchical structure of manifest files, manifest lists, and snapshots. This architecture enables schema and partition evolution as metadata-only operations, avoiding expensive data rewrites, and ensures atomicity through a catalog layer that manages pointers to the current metadata JSON file.
+
+Despite its strengths in batch workloads, Iceberg faces challenges with streaming and AI applications. High latency arises from multiple round trips to cloud object storage to resolve metadata before accessing data. Furthermore, Apache Parquet's block compression and encoding schemes, such as hybrid run-length and bit-packing, hinder random access and point lookups because the data must be decoded sequentially. To mitigate these issues, Iceberg V3 introduces row IDs and sequence numbers to improve Change Data Capture (CDC) and incremental processing.
+
+Emerging technologies offer alternative approaches to these bottlenecks. Vortex replaces block compression with adaptive, type-specific encodings like BETABLOX and supports zero-copy memory-mapped reads, claiming 100x faster random access than Parquet. Duck Lake shifts metadata management from cloud object storage to transactional databases like PostgreSQL, utilizing data inlining for small updates to reduce write amplification. The Iceberg community is currently integrating these concepts through a new file API and the Iceberg REST API, which moves complexity from the client to the catalog layer to improve performance and interoperability.

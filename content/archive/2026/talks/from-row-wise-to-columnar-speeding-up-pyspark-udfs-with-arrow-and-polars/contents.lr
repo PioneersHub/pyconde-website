@@ -94,3 +94,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/Jho624IrxpM/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+PySpark User Defined Functions (UDFs) often introduce significant performance bottlenecks due to serialization overhead and row-by-row execution. Standard Spark UDFs rely on Pickle for serialization, requiring data to be converted to bytes, passed from the Java Virtual Machine (JVM) to a Python worker, and deserialized into Python objects. This process is CPU-bound and inefficient. While Pandas UDFs improve this by using Apache Arrow for columnar serialization and executing in batches, they still suffer from high memory usage due to the conversion between Arrow and Pandas formats, and they are limited by the single-threaded nature of Pandas.
+
+To resolve these bottlenecks, a columnar approach using Apache Arrow and Polars is employed. Apache Arrow provides a zero-copy in-memory format that allows both the JVM and Python processes to share the same memory space, eliminating the copy-and-convert bottleneck. This columnar layout also improves CPU cache locality by reducing cache misses. Polars, a DataFrame library written in Rust, further enhances performance by providing a multi-threaded query engine and native Arrow interoperability. Using `mapInArrow` or Arrow UDFs with Polars allows data to remain in columnar format throughout the computation, utilizing C++ or Rust kernels instead of Python loops.
+
+Benchmarks demonstrate that when computations are lightweight, such as string normalization, the choice of transport (Arrow vs. Pickle) and the use of Polars significantly reduce execution time. However, when the computation is heavy—such as HTML cleaning with Lexbor or complex string similarity—the overhead of data transport becomes negligible compared to the processing time. In these cases, the primary performance gain comes from replacing Python loops with native code. For example, implementing a string similarity task using Polars' native Rust-based operations resulted in a 2.2x performance increase over traditional Python-based UDFs.

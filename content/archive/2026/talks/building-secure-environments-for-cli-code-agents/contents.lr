@@ -82,3 +82,13 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/RhInXekhqNc/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Running CLI code agents directly on a host machine introduces significant security risks, including accidental data exfiltration, destructive file system operations, and the installation of malicious packages. Because these agents operate with the user's full permissions, a "lethal trifecta" occurs when an agent has access to private data, external network connectivity, and processes untrusted content.
+
+To mitigate these risks, the VibePod framework implements an isolation pattern using Docker containers to sandbox the agent's runtime. This approach restricts the agent's scope by mounting only specific project workspaces and using a deny list to prevent access to root and home directories. VibePod utilizes a Python-based CLI, built with Typer and PlatformDeers, to manage these containers across different operating systems.
+
+Observability is achieved through a man-in-the-middle (MITM) proxy that intercepts all HTTP and WebSocket traffic between the agent and the LLM provider. This traffic is logged into a local SQLite database, which is then visualized via a Dataset dashboard. This system allows users to monitor raw prompts, track response times, and analyze token consumption—including input, output, and cache tokens—by aggregating data directly from the raw HTTP responses.
+
+While containerization reduces the attack surface, it does not eliminate risks such as prompt injection or data exposure via misconfigured mounts. Effective security requires combining these technical isolations with the principle of least privilege and consistent human review of agent actions.

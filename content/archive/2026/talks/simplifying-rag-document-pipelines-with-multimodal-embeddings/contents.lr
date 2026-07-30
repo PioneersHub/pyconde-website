@@ -104,3 +104,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/CiPqCzqWvro/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Retrieval Augmented Generation (RAG) pipelines often struggle with PDF documents because these files are display-oriented rather than data-oriented. Traditional ingestion pipelines rely on a lossy transformation process involving layout detection, Optical Character Recognition (OCR), and text extraction to convert PDFs into text chunks. This approach frequently fails to maintain reading order in multi-column layouts, misaligns financial tables, and ignores purely visual data like charts and infographics. Furthermore, high-end OCR solutions, such as Amazon Textract, can be expensive, costing up to 65 euros per 1,000 pages.
+
+A more efficient approach replaces text-based deconstruction with multimodal embeddings. Instead of extracting text, PDF pages are rendered as images and embedded directly into a vector database. This method preserves all visual information and layout structures. Available models for this approach include proprietary APIs like Cohere Embed 4, Gemini Embedding 2, and Voyage Multimodal 3.5—the latter of which utilizes Matryoshka representative learning to allow vector truncation (e.g., to 256 dimensions) with minimal quality loss. Open-source alternatives include Nomic Embed Multimodal 7b and JINA Embedding V4.
+
+Benchmarking using the PDF Association dataset and GPT-4o for ground-truth question generation demonstrates that multimodal embeddings often outperform traditional OCR pipelines. In tests measuring recall at K and mean rank, models like Cohere Embed 4 and JINA V4 showed superior retrieval quality compared to a baseline of Azure Document Intelligence paired with text-embedding-3-small. While this approach requires a multimodal LLM during the generation phase to perform on-the-fly OCR of the retrieved images, it significantly reduces ingestion complexity, lowers processing costs, and increases throughput.

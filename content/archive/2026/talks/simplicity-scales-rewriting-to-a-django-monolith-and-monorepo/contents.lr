@@ -87,3 +87,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/5n0KnmVw52A/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+A legacy system characterized by a fragmented microservice architecture, unclear ownership, and high infrastructure costs created a poor developer experience and slow release cycles. The system suffered from custom solutions that increased maintenance burdens and a complex deployment process that hindered the ability to fix bugs or release new versions quickly. To resolve these issues, the engineering team executed a complete rewrite, shifting from a process-centric to a data-centric design.
+
+The technical approach centered on migrating to a Django-based monolith and a multi-language monorepo. The backend utilizes Django and the Django REST Framework, following the Hacksoft style guide to separate business logic into selectors for read operations and services for write operations. Asynchronous tasks are handled by Celery with a Redis backend. To optimize the developer experience, the team implemented a local environment where the entire application runs on a single machine using the just command runner, with utility components like Postgres and Celery containerized in Docker. High-compute dependencies, such as Large Language Models (LLMs), are hosted in AWS Bedrock, while authentication is handled via dedicated sandbox environments to mirror production.
+
+The monorepo structure organizes the React frontend and Python backend by language, using UV workspaces to manage dependencies for each deployable unit. This setup enables the automatic generation of TypeScript types from an OpenAPI schema, ensuring type safety between the frontend and backend. Measured results show that this transition reduced the number of repositories from 28 to two and transformed the release process from a multi-hour manual effort into a single button click. Analysis of GitHub metrics indicates an increase in the average number of reviewers per pull request and a doubling of the percentage of feature-focused PRs relative to bug fixes.

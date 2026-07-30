@@ -93,3 +93,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/nlTn6-kyyFI/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Small Language Models (SLMs), typically defined as models with under 4 billion parameters, offer significant advantages over Large Language Models (LLMs) regarding latency, energy costs, and data privacy. Because SLMs can be deployed locally, they allow organizations to freeze model versions to ensure pipeline stability and keep sensitive data off external servers. While SLMs excel at classification, routing, and structured information extraction, they often struggle with complex tool calling—the process of selecting a function and providing correct arguments based on a user request—due to a tendency to omit arguments or select incorrect functions.
+
+To improve tool calling performance, a knowledge distillation approach is used where a teacher LLM generates synthetic training data for a student SLM. The pipeline involves providing the teacher model with task descriptions, constraints, and a small set of real examples to generate a synthetic dataset of 1,000 to 10,000 examples. To ensure data quality, the pipeline filters out malformed JSON, removes hallucinated tools, and uses ROUGE comparisons to eliminate duplicate examples. The student model is then fine-tuned using supervised fine-tuning with Low-Rank Adaptation (LoRA) over a few epochs.
+
+Experimental results using the Qwen 0.6B model demonstrate that this method can move a model from under 50% accuracy to near-perfect accuracy on simple tool-calling tasks. Key challenges in this process include ensuring full coverage of all available functions and parameters, varying user phrasing to increase robustness, and managing the complexity of multi-turn conversations. In multi-turn scenarios, the model must maintain accuracy across long sequences, as a single error in a chain of five calls can render the entire workflow incorrect.

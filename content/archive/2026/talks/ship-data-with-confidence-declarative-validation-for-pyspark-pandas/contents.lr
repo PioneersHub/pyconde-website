@@ -84,3 +84,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/YG_GXTubZVY/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Data validation in PySpark and Pandas pipelines often suffers from silent failures, such as NaN errors, unexpected null values, or duplicate rows resulting from joins. While existing tools like Great Expectations, Pandera, and Soda provide robust validation and observability, they can introduce significant overhead in terms of configuration, build times, and Docker image size, especially when only a fraction of their feature set is required.
+
+DataFrame Expectations is a lightweight Python library designed to provide declarative validation that fails fast when data does not meet predefined criteria. It relies on three primary dependencies—Pandas, Pydantic, and Tabulate—while treating PySpark as an optional dependency to avoid version conflicts in environments like Databricks. The library uses a DataFrameExpectationSuite class to define expectations, which are then compiled into an immutable runner. This runner can validate both Pandas and PySpark data frames using the same set of rules, ensuring consistency across different data processing stages.
+
+The architecture utilizes a registry system and a decorator-based approach to dynamically map expectation functions to their respective implementation classes. To handle different environments, the library supports tag-based filtering, allowing users to apply specific validation subsets for unit tests versus production pipelines. For PySpark, the library implements validations using filter functions to identify violating rows; if the count of these rows exceeds zero, the runner records the violation. Upon completion, the library provides a detailed exception containing a snapshot of the failing rows to facilitate debugging.

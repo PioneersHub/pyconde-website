@@ -94,3 +94,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/z1RqFPujec4/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+CNC machining of aerospace engine parts, such as turbine shafts and cases, faces productivity challenges due to strict qualification processes, high-cost specialized machinery, and a diverse range of legacy NC controllers. Because these parts are subject to rigorous safety documentation for up to 40 years, production must follow a strict lot-size-one philosophy, ensuring only the specific NC program version for a single serial number is present on the machine at any given time.
+
+To address these constraints, a custom Production Execution System (PES) was developed to act as a universal SCADA system. The PES orchestrates communication between the ERP system, the machine tool, and the operator. The backend is built with Python using AsyncIO for asynchronous task management, while the frontend uses JavaScript. Communication is handled via WebSockets to provide real-time updates without polling and MQTT for telemetry and machine commands. To standardize across different hardware generations, the system utilizes OPC UA for new "greenfield" machines and a Siemens-based gateway that translates legacy "brownfield" controller data into MQTT.
+
+The PES enables unmanned production by decoupling the operator from the machine work cycle through automated part changing. If a process is interrupted—for example, by a tool break—the system automatically bypasses the stalled part and loads the next available operation for a different part to keep the machine running. On a horizontal turning machine with five stations, this approach eliminated idle time gaps, resulting in a productivity increase equivalent to 1.2 million USD in additional parts per year.

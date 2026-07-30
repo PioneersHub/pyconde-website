@@ -99,3 +99,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/7YmaBitI4aY/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Training large-scale AI models requires processing terabytes of data across distributed workers. A proprietary file format using GZIP blocks and JSON dictionaries previously caused severe memory bottlenecks because the table of contents grew to several gigabytes, and reading individual rows required full block decompression and deserialization. While migrating to Apache Parquet and PyArrow improved latency and runtime for basic operations, PyArrow introduced significant memory overhead and apparent leaks during row iteration and data repartitioning, which hindered the ability to scale workloads on instances with limited RAM.
+
+To resolve these memory issues, a custom Python library called disco-parquet was developed using Rust. The implementation leverages the arrow-rs crate for low-level Parquet and Arrow IO and PyO3 for Python bindings. This approach enables zero-copy data transfer between Rust and Python. By utilizing Rust's ownership model and strict memory management, the library significantly reduced the RAM footprint during row iteration and eliminated memory leaks during write operations. Although PyArrow maintains higher throughput due to multi-threaded pre-fetching and parallel decoding, the Rust-based library allows for higher worker density by prioritizing minimal memory consumption over raw speed.
+
+Beyond the custom library, the technical stack incorporates Polars for fast data manipulation, DataFusion as a query engine, and Daft for distributed computing. For multimodal workloads requiring O(1) random row access and in-place updates—capabilities lacking in Parquet—the focus has shifted toward the Lance file format. Lance utilizes multiple metadata pointer layers to identify specific byte spans for rows, reducing random access time from hundreds of milliseconds in Parquet to approximately 5 to 10 milliseconds.

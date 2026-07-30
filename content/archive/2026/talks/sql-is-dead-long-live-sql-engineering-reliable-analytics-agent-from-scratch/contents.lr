@@ -105,3 +105,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/XvsrRUqyTpg/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Reliable analytics agents can be engineered by combining an in-process analytical database with a structured agentic loop and semantic context. Using DuckDB as the core engine allows agents to execute SQL queries locally in memory, providing the fast feedback loops necessary for Large Language Models (LLMs) to iterate on query generation without the latency of client-server architectures.
+
+The basic approach involves a "while" loop where an LLM generates a SQL statement, executes it via a Python tool, and analyzes the result. To move beyond simple query generation and handle real-world data ambiguity, semantic context is integrated through two primary methods: skill files (Markdown documents containing business logic and KPI definitions used as system prompts) and database comments (metadata attached directly to table columns). These additions reduce the number of tool calls required for a correct answer and enable smaller, more efficient models to perform as well as larger ones.
+
+For deterministic results on critical metrics, the architecture incorporates specific tools using Pydantic AI. While the agent remains flexible for exploratory questions, deterministic tools ensure that complex KPIs are calculated using a fixed, verified logic. To scale and distribute these capabilities, the Model Context Protocol (MCP) is used to decouple the agent's logic from the tool implementation. By hosting tools on an MCP server, agents can dynamically discover and utilize a standardized set of functions, allowing for a clean separation of concerns between the agent's identity and the organization's analytical tools.

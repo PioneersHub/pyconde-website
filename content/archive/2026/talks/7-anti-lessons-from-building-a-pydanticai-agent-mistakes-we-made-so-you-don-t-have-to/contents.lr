@@ -101,3 +101,13 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/MTyO3W7MYTs/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Building an AI agent for compliance intelligence in the life sciences industry requires balancing autonomy with strict regulatory oversight. Initial attempts using a multi-agent architecture—featuring a supervisor agent routing requests to specialized compliance, document, and user agents—resulted in high latency, memory loss during handoffs, and excessive code complexity. To resolve these issues, the system was transitioned to a single-agent architecture using PydanticAI, which reduced overhead and simplified debugging.
+
+To prevent context bloat caused by having too many specialized Python functions, the system shifted from a large library of individual tools to a spec-driven approach. By utilizing OpenAPI specifications, the agent dynamically discovers and executes API operations. This abstraction allows the agent to filter irrelevant data via field projections, ensuring the message history remains concise. Complex workflows were moved out of deterministic code and into markdown-based capability files. This allows business experts to define processes without writing code and enables the agent to perform progressive disclosure, loading specific workflow steps only when needed.
+
+To maintain reliability, the agent employs a simple to-do list mechanism with write and update tools. The system nudges the agent to stay on track by returning the next pending task directly in the tool's output. For safety and legal compliance with the EU AI Act and ISO 40001, a human-in-the-loop system is implemented. The agent automatically requests approval for non-idempotent operations (non-GET requests) unless explicitly exempted in the API spec.
+
+Testing shifted from traditional unit and integration tests to a systematic evaluation framework using Pydantic AI Evals. This approach employs three evaluator types: deterministic checks for human-in-the-loop triggers, accuracy evaluators for specific facts, and LLM-as-a-judge for probabilistic quality assessments.

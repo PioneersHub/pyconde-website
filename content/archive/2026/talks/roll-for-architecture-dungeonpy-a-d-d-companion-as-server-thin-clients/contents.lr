@@ -145,3 +145,13 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/FuGsgWy_6-4/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+DungeonPy is a distributed system designed to facilitate remote Dungeons & Dragons sessions by separating the game state from the user interface. The architecture employs an authoritarian server model to manage a canonical world state, preventing race conditions and ensuring strict access control. The server processes client intents—such as character movement—validating them before broadcasting the resulting state changes back to all connected thin clients.
+
+The technical implementation utilizes Python, with PySimpleGUI for the initiative tracker and Pygame for the interactive battle map. Communication between these components and the server occurs via TCP messages. To maintain thread safety and prevent GUI corruption, the system avoids direct widget updates from background threads, instead funneling all socket messages through an asyncio-based queue system on the main loop.
+
+State management is handled through Python data classes, which are serialized to JSON for save games and snapshots. To synchronize clients, the server transmits small, targeted event messages for immediate changes and periodic full-state snapshots to correct any drift. A key feature is the projection function, a pure function that filters the world state based on character permissions. This ensures players only receive data for explored areas or visible creatures, effectively separating player knowledge from character knowledge.
+
+Testing is divided into three categories: unit tests for pure state transitions, simulation tests for the WebSocket protocol, and manual playtesting for visual rendering. The system prioritizes a control update policy for players to ensure consistency, while the Dungeon Master utilizes optimistic updates for a more responsive experience.

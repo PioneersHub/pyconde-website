@@ -110,3 +110,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/z38zHsLnBVk/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Generating non-biased synthetic datasets for sensitive domains, such as the legal sector, addresses the challenge of strict privacy regulations like GDPR and the EU AI Act, which often prohibit the use of real-world data for training. A primary problem with relying solely on Large Language Models (LLMs) for data generation is the tendency of these models to produce high-probability outputs, leading to demographic bias, distribution collapse, and the potential leakage of real-world training data.
+
+To mitigate these issues, a template-based generation approach is more effective than free-form prompting. In this method, the LLM is used only to create sentence templates with placeholders (e.g., [PER] for person, [LOC] for location) rather than generating complete, annotated examples. This decouples the linguistic structure from the actual data values, ensuring higher consistency in labeling and reproducibility. The pipeline consists of two parallel steps: generating these templates and creating balanced entity lists. These lists are curated to ensure a normal distribution across demographics, such as a 50-50 gender split for names or a fair representation of various legal fields like labor and family law. A Python script then randomly substitutes placeholders with entities from the balanced lists, maintaining precise annotation indices without requiring manual re-labeling.
+
+Key takeaways include the necessity of a strict task definition—defining exactly what constitutes a label and its negative space—and the implementation of a validation phase. Validation involves rule-based scripts to check for class imbalance, empty entities, and lexical heuristics to ensure legal vocabulary accuracy. While synthetic data is highly effective for classification, named entity recognition, and relation extraction, it remains a complement to real-world data rather than a total replacement.

@@ -106,3 +106,13 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/21AaYamSn4Q/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Large-scale serverless applications often suffer from operational overhead when split into numerous small functions. In high-frequency data analysis environments, such as air conditioning operational monitoring, this fragmentation leads to excessive cold starts, duplicated dependencies, and increased bundle sizes. These issues can result in API Gateway timeouts and slower overall system performance when multiple functions must be invoked sequentially.
+
+The Lambdalith approach addresses these problems by consolidating multiple endpoints and business logic into a single AWS Lambda function. Initial implementation utilized FastAPI combined with the Lambda Web Adapter to handle routing and validation. Performance benchmarks showed that while a single request may be slower due to a larger initial bundle, sequential requests are significantly faster. For a sequence of six endpoints, the Lambdalith approach reduced latency from six seconds to three seconds by eliminating repeated cold starts. Additionally, deployment times were reduced from 115 seconds to 62 milliseconds for initial deployments using AWS CDK.
+
+To ensure operational sustainability, AWS Lambda Powertools for Python was integrated to provide unified logging, tracing, and metrics via decorators. The library also simplified parameter retrieval from AWS SSM and Secrets Manager using TTL-based caching and enabled the function to handle non-HTTP events, such as those from EventBridge or SQS, natively.
+
+The architecture achieves end-to-end type safety by using Pydantic models to define schemas, which are then exported as OpenAPI specifications. Tools like OpenApi-TypeScript (OBL) generate TypeScript client code and type definitions for the frontend. Furthermore, SchemaSynthesis is used for property-based integration testing, automatically generating test cases from the schema to verify API correctness and edge-case compliance within the CI/CD pipeline.

@@ -118,3 +118,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/lwTfY3Eh1dw/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Embedding data science into IoT devices is achievable using MicroPython and specialized libraries to overcome the memory and processing constraints of microcontrollers. A primary challenge is implementing machine learning on hardware with limited RAM—often around 1 MB—which precludes the use of standard libraries like scikit-learn or Keras. To solve this, emlearn converts scikit-learn or Keras models into efficient C implementations that can be deployed as .mpy files, allowing for local activity recognition using accelerometer data.
+
+For a standalone smartwatch prototype using an ESP32-based device with 16 MB of flash and 16 MB of RAM, a local-first data architecture is required to store multiple days of sensor data. This is implemented via a time-series data lake using Apache Hive-style partitioning, which organizes data by day, hour, and minute. This structure allows the device to retain high-resolution raw data for short periods while keeping processed machine learning predictions for longer durations. Performance tests show read speeds between 100 KB/s and 250 KB/s, which is sufficient for querying a full day of data in approximately 10 seconds.
+
+The system manages concurrent tasks—sensor readout, ML inference, data storage, and web serving—using the asyncio library. To prevent data loss from sensor buffer overflows, tasks are kept under 100 ms, and the MicroDot web server is used to stream data in chunks. The user interface is served directly from the device using Preact and a minimal version of Plotly (250 KB). While the system supports external integration via HTTP or MQTT, implementing strict timeouts is necessary to prevent network latency from blocking the single-core processor.

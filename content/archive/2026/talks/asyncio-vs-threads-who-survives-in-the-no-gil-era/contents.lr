@@ -110,3 +110,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/IN8Uvtz-eDo/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Python concurrency for I/O-bound tasks traditionally involves a choice between multi-threading and AsyncIO. Multi-threading utilizes OS-level threads that are serialized by the Global Interpreter Lock (GIL), while AsyncIO uses a single-threaded event loop to manage coroutines. The primary advantage of AsyncIO is resource efficiency; a coroutine requires approximately 4 KB of memory compared to the 4 MB required by a thread, allowing AsyncIO to handle over 10,000 parallel requests more effectively than threading. However, AsyncIO introduces higher cognitive load because a single missing await keyword can stall the entire application. Furthermore, many asynchronous libraries, such as Motor or iofiles, are merely wrappers around thread pools, offering no real architectural advantage.
+
+The release of no-GIL Python (starting with version 3.14) changes the trade-off by allowing multi-threaded code to execute CPU-bound tasks in parallel across multiple cores. While AsyncIO remains superior for high-concurrency I/O, threading becomes the preferred choice for CPU-heavy workloads, such as data science and machine learning. In web services, where CPU-bound tasks like Pydantic serialization typically account for 20% of execution time, no-GIL threading can provide significant speedups without requiring a full codebase rewrite.
+
+Benchmarks indicate that for under 1,000 requests per second, performance differences between the two approaches are negligible. However, as the ratio of CPU-bound work increases—for example, when moving from MongoDB to Redis—the performance gains from no-GIL threading become more pronounced. The long-term evolution of the language points toward virtual threads, which aim to combine the resource efficiency of AsyncIO with the parallel execution capabilities of no-GIL threading.

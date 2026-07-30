@@ -97,3 +97,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/cReCcT1qUqg/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Securing AI agentic systems requires shifting from a reliance on natural language instructions to the implementation of rigorous software engineering constraints. A primary vulnerability in current AI deployments is the tendency to grant agents broad administrative permissions and then use prompt-based "denied lists" to restrict behavior. Because large language models are probabilistic and cannot be guaranteed to follow negative constraints 100% of the time, this approach creates significant security risks, such as agents accidentally deleting entire email inboxes or file directories.
+
+To mitigate these risks, developers should implement Role-Based Access Control (RBAC) for the tools an agent can access. This involves creating restricted profiles that prioritize "allowed lists" over "denied lists," ensuring agents have read and write permissions but lack the ability to delete or truncate data. By limiting the agent's scope to specific folders or API endpoints, the potential impact of a model error or a rogue action is contained within a secure sandbox.
+
+Another critical threat is the "token grenade," where malicious actors use encrypted emojis or specific characters to expand a small input into millions of tokens, causing system crashes or exorbitant costs. To prevent this, systems must implement input and output validation. This includes counting tokens before they are passed to the model, setting per-user token budgets, and verifying responses for personally identifiable information (PII) or bias. Combining RBAC for tool usage with strict token verification addresses the majority of the OWASP Top 10 security issues for AI systems, including privileged misuse and context poisoning.

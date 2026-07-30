@@ -78,3 +78,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/XAys0o8gDJo/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Investment strategies often suffer from misleading performance metrics due to implicit assumptions and data manipulation. A common pitfall is the omission of extreme negative observations or the use of non-linear scaling to mask volatility, which creates an illusion of stability and growth. Furthermore, the "replication crisis" in financial research highlights how opaque code and hidden parameter choices make it difficult to validate results published in high-impact journals.
+
+The Tidy Finance approach addresses these issues by prioritizing explicit assumptions and "tidy" code. Rather than relying on high-level libraries that hide internal calculations, this method implements optimization functions by hand using standard Python packages like SciPy. This transparency allows for the precise definition of inputs, such as the choice between arithmetic and logarithmic means for expected returns ($\mu$) and the application of shrinkage techniques to handle the curse of dimensionality in variance-covariance matrices ($\Sigma$). The approach explicitly models constraints, such as long-only positions (positive weights) and transaction costs, the latter of which is implemented as a quadratic penalty term to account for market impact.
+
+A critical technical takeaway is the prevention of look-ahead bias. By implementing a strict one-step-ahead forecast using a rolling window (e.g., 120 months), the methodology ensures a clear separation between estimation data and evaluation data. Failing to shift the evaluation period by one interval can lead to artificially inflated returns. By focusing on the input side—explicitly defining window lengths, risk aversion ($\gamma$), and trading cost parameters ($\beta$)—investors can avoid overfitting and create more robust, reproducible backtests.

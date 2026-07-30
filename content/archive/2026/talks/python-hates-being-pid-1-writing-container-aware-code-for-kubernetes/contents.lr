@@ -113,3 +113,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/ASO6-HaDXeY/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Python processes running as PID 1 in Kubernetes containers often fail to respond to SIGTERM signals because the Linux kernel treats PID 1 as a special init process that ignores signals unless a specific handler is defined. This results in a ten-second delay during container shutdown, after which the kernel issues a SIGKILL, causing abrupt termination. This lack of graceful shutdown prevents the application from closing database connections, flushing caches, or cleaning up resources, which can lead to exhausted connection pools in RDBMS. Additionally, Python as PID 1 fails to reap orphaned child processes, leading to the accumulation of zombie processes that consume finite Process IDs (PIDs) and can eventually crash the host or make the system impossible to debug.
+
+To resolve these issues, developers can use init binaries like TINI or dumb-init to act as PID 1, which properly forward signals and reap zombies. However, writing container-aware code remains essential. This includes implementing custom signal handlers for SIGTERM and using the wait system call to manage subprocesses. 
+
+Resource management is further complicated by Cgroups, which restrict CPU and memory. Python's os.cpu_count() reports the host's total cores rather than the container's quota, leading to over-provisioning of workers. This causes CPU throttling via the Completely Fair Scheduler (CFS), where processes are paused once they exhaust their quota within a 100ms period. To mitigate this, applications can read `/sys/fs/cgroup/cpu.max` to calculate the actual quota and scale worker pools accordingly. For memory, reading `/sys/fs/cgroup/memory.max` and `memory.current` allows an application to monitor memory pressure and trigger manual cache clearing to avoid the immediate termination caused by an Out-Of-Memory (OOM) kill (Exit Code 137).

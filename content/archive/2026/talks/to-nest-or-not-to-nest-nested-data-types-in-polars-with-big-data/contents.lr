@@ -85,3 +85,13 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/9gWjqjHEM8g/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Polars provides nested data types, specifically lists and arrays, to store multiple values per row. While lists allow variable lengths, arrays require fixed lengths. These types are often used to express cardinality explicitly or to maintain a relational structure that avoids repeating observation data across multiple rows.
+
+To evaluate the efficiency of these structures, a benchmark was conducted using simulated limit order book data consisting of 9,000 observations with 5,000 levels of bids and asks. Five different schemas were compared: no nesting (flat), flat arrays, nested arrays, flat lists, and nested lists. The dataset, totaling approximately 43 million rows in the flat format, was stored using the Z-standard compression algorithm.
+
+The results indicate that no nesting is the most efficient approach for both storage and query performance. Flat formats resulted in the lowest storage overhead, whereas nested types increased file sizes and created more pronounced peaks in storage usage. In terms of execution speed, the no-nesting schema performed approximately twice as fast as the nested alternatives. Nested lists showed the worst performance, particularly during sophisticated queries involving filtering and aggregation.
+
+The analysis concludes that while nested types offer a more intuitive relational structure, they introduce significant storage overhead and result in more complex, less readable query syntax. Despite the need for more frequent group-by operations and joins, flat data structures provide superior performance in Polars. For high-performance requirements with large datasets, avoiding nesting is recommended.

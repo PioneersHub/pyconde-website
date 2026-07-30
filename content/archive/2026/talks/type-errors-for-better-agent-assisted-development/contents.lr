@@ -76,3 +76,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/OYJiM5RQm-c/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+AI coding agents often struggle with validation, frequently missing call sites during refactors or introducing runtime errors by ignoring optional types. While linting is fast and automated tests are thorough, type checking provides an optimal balance of speed and bug-detection capability, making it an ideal signal for agentic loops. Pyrefly, a high-performance type checker and language server written in Rust, addresses these issues by providing fast type inference and diagnostics for Python code.
+
+To integrate type checking into agent workflows, three primary methods are used: skills, hooks, and the Language Server Protocol (LSP). Skills are defined in markdown files that describe when and how to run the `pyrefly check` command; however, agents may not use them consistently without explicit instructions in a configuration file like `agents.md`. Hooks provide stricter enforcement by triggering checks automatically during specific agent events, such as the "stop" event. Command hooks execute specific shell commands, while agent hooks provide a subjective prompt directing the agent to verify type correctness.
+
+While Pyrefly functions as an LSP, using it via the protocol is less efficient for agents than command-line interfaces due to higher token costs, complex synchronization of diagnostics, and increased context overhead. For onboarding existing projects, the `pyrefly suppress` command allows developers to silence pre-existing errors, ensuring that agents only encounter and fix new type errors. This approach shifts error detection to the left, allowing agents to validate their own changes before they reach production.

@@ -111,3 +111,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/XUesgXAIzpc/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Web-based coding platforms often face security risks when executing user-submitted code on a server and consistency issues when users rely on varying local Python installations. To address these challenges, a client-side execution environment was developed using Pyodide, a Python-to-WebAssembly interpreter. This approach eliminates the need for a backend server for code execution, as the Python environment runs directly within the user's browser.
+
+The platform is built using the HoloViz Panel ecosystem, utilizing its integrated code editor component—a wrapper around the ACE editor—to capture user input as strings. These strings are executed using Python's built-in exec function. To ensure security and educational constraints, the exec function is restricted by overwriting the globals and locals parameters, allowing the platform to disable specific built-in functions or the import mechanism. Code output is captured via redirect_stdout to compare actual results against predefined test cases. User progress is persisted using the browser's local storage.
+
+To provide pedagogical support, the platform integrates the Google Gemini API. The system sends a prompt containing the task description, expected outputs, and the specific error or failure result to the AI, which then returns targeted hints rather than direct solutions. Testing is conducted using the Playwright PyTest plugin for UI tests and standard PyTest for unit tests. To optimize performance and avoid repeated 30-to-60 second Pyodide load times during page transitions, the architecture is implemented as a single-page application.

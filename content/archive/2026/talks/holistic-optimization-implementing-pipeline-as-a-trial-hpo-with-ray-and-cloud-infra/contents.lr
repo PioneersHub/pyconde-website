@@ -101,3 +101,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/J0U3h9sYAE8/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Local optimization in machine learning occurs when a specific model is tuned for its own output rather than the performance of the entire downstream system. This often leads to failures during A/B testing because improvements in one component can negatively impact subsequent steps in the pipeline. To solve this, a "Pipeline-as-a-Trial" approach for hyperparameter optimization (HPO) was implemented, treating the entire end-to-end pipeline as the objective function for tuning.
+
+The technical implementation utilizes Ray, specifically the Ray Tune library and its HyperOpt search model, to manage the search space and trigger trials. Instead of tuning a single model, the trainable component is a customizable function that builds and executes a full pipeline. This pipeline consists of multiple steps, such as short-horizon and long-horizon forecasting models, an assembler, and a post-processor. The system uses a config-based approach where data scientists define the model classes and parameters in a configuration file, which is then translated into a directed acyclic graph (DAG) for execution.
+
+Three proof-of-concept (POC) infrastructures were evaluated for scalability: AWS SageMaker, Databricks, and a custom Ray cluster on EC2 instances. SageMaker utilized SageMaker Pipelines to orchestrate training jobs, while Databricks employed Workflows for similar DAG management. The EC2 approach used Metaflow to define the pipeline structure within a Ray cluster. While Databricks provided superior UI and traceability and EC2 offered maximum configurability, SageMaker was selected for production due to existing data scientist familiarity and integration with the AWS ecosystem.

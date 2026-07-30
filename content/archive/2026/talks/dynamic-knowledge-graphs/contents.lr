@@ -97,3 +97,13 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/tDy8UzEO2cg/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Dynamic knowledge graphs address the fragmentation of information across disconnected knowledge sources, such as Jira tickets, Git repositories, and API documentation. While vector stores provide fast similarity searches, they lack global connectivity and struggle with conflicting entries. Conversely, existing graph-based RAG (Retrieval-Augmented Generation) frameworks are often static, slow to build, and lose traceability to source documents due to community aggregation.
+
+The proposed approach utilizes a property graph implemented in FalkorDB to maintain a dynamic, traceable structure. The schema consists of four node types: document nodes, entity nodes, fact nodes, and relationship nodes. Document nodes serve as anchors, storing content hashes and metadata to enable the removal of outdated information. To ensure traceability, every entity, fact, and relationship is linked back to its originating document node via "supported by" edges.
+
+Data insertion employs LLMs with structured output (Pydantic classes) to extract entities, facts, and relationships. To maintain a connected graph, the system uses a three-tier merging strategy: exact string matching, Jaro-Winkler distance for name variations, and semantic embedding comparisons for abbreviations or conceptual matches. Deletion is handled through a cascading process where removing a document node triggers the removal of any facts, entities, or relationships that no longer have a supporting path to any remaining document.
+
+For inference, an agentic system uses tools to perform keyword searches, embedding queries, and neighborhood exploration. The system currently processes documents in approximately 45 seconds. Future optimizations include using fine-tuned small language models (SLMs) for on-premise extraction and implementing paragraph-based caching to reduce redundant computations for minor document edits.

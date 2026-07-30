@@ -122,3 +122,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/qzmEAwsbZzQ/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Traditional web service architectures often rely on a stateless model where business logic is separated from data. In this pattern, every request requires fetching the object state from a database or cache, processing it, and discarding the state upon completion. This approach creates significant performance bottlenecks, specifically regarding database connection congestion and the overhead of repeated serialization and HTTP parsing. While tools like Redis, Kafka, and Kubernetes manage these issues at scale, they increase infrastructure complexity and do not eliminate the fundamental inefficiency of throwing away state after every request.
+
+The proposed solution is a stateful cluster architecture using virtual actors. Instead of stateless request handlers, business logic resides within a cluster of interconnected nodes where object instances persist in memory. This model treats a distributed system like a local program, allowing developers to call methods on objects regardless of whether they are local or remote, typically using an asynchronous await pattern. The architecture relies on three core abstractions: a membership provider to manage node availability, a storage provider to abstract persistence across various databases, and a streaming provider for event-driven communication.
+
+Key takeaways include the elimination of external business object caching, as state is native to the object instances. This reduces latency and simplifies the programming model for both small and web-scale applications. Implementations such as Microsoft Orleans, Ray, and Akka demonstrate this capability, allowing for high availability where object instances can be seamlessly migrated between nodes during restarts. This approach does not replace microservices but rather provides a more efficient way to implement them, shifting the focus from stateless REST APIs to stateful, distributed object-oriented programming.

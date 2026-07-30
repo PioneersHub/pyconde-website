@@ -93,3 +93,13 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/RnMbwqJQcFE/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Pytest is a mature Python testing framework that provides advanced tools for managing complex test suites, focusing on strictness, parameterization, and efficient resource management. To ensure high reliability, the framework allows users to treat warnings as errors via the `filter_warnings` option in `pytest.ini` or `pyproject.toml`. Pytest 9 introduces a `strict = true` configuration, which enforces stricter validation of configuration options, markers, and xfail behaviors.
+
+The framework utilizes marks to categorize tests and attach metadata. While `pytest.mark.skip` and `pytest.mark.xfail` handle known issues or missing dependencies, `pytest.mark.parametrize` allows a single test function to run against multiple data sets. For complex data, using Python data classes within parameterization improves readability and type safety. Pytest 9 also introduces subtests, which allow independent assertions within a single test case, though standard parameterization is generally preferred for better collection-time visibility.
+
+Fixtures manage test dependencies and state. To optimize performance, caching scopes—such as `module`, `class`, or `session`—prevent expensive setup operations from repeating. To maintain test isolation while using cached fixtures, a common pattern is to use a primary cached fixture for the expensive object and a secondary function-scoped fixture to reset the object's state between tests. The `request` fixture enables introspection, allowing fixtures to dynamically adjust their behavior based on markers applied to the calling test.
+
+For debugging and execution, Pytest offers command-line flags to refine output, such as `--tb=short` or `--tb=line` for concise tracebacks. Execution can be optimized using flags like `--lf` (run last failed tests first) or `--stepwise`, which stops at the first failure to facilitate incremental fixing. For floating-point comparisons, `pytest.approx` handles precision issues by allowing a defined tolerance.

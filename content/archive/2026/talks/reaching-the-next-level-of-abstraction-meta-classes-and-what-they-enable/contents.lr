@@ -84,3 +84,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/IeQAARsJiWc/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Metaprogramming involves writing code that controls other code rather than manipulating data. In Python, this is possible because classes, functions, and instances are all treated as objects that can be modified at runtime. While higher-order functions can create or manipulate other functions, metaclasses provide a higher level of abstraction by controlling the actual creation of class objects.
+
+A metaclass is defined by inheriting from the type class and implementing the __new__ method. This allows a developer to intercept the process between the definition of a class body and the creation of the final class object. By manipulating the name, bases, and attributes passed to type.__new__, a metaclass can inject new methods, enforce constraints, or modify the class structure at definition time. For example, the inspect module can be used within a metaclass to perform reflection on function signatures, enabling the automatic application of runtime type-checking decorators to all methods in a class. Another application is the creation of custom syntactic sugar, such as automatically converting class fields into read-only properties by generating hidden underscored variables and corresponding getter methods.
+
+Despite their power, metaclasses are often overkill for standard application development. Simpler alternatives include data classes for reducing boilerplate, class decorators for modifying single classes, and the __init_subclass__ method for functionality that must be inherited by all subclasses. Metaclasses remain essential for library authors and complex frameworks, as seen in the Python standard library's implementation of enums and Abstract Base Classes (ABC), where they are used to prevent the instantiation of classes with abstract methods or to enable class-level iteration.

@@ -80,3 +80,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/RZK9iBGd9rY/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Establishing a DevOps culture in a non-software manufacturing environment requires a phased transition from zero infrastructure to a hardened, automated pipeline. The initial challenge involves moving from a state with no version control or deployment tools to a functional environment capable of shipping internal and customer-facing applications rapidly. The first phase focuses on survival by implementing a self-hosted GitLab instance for version control and utilizing managed Kubernetes to avoid the overhead of cluster management. Early deployments prioritize speed over perfection, using basic Dockerfiles and simple Kubernetes YAML configurations to establish a working prototype.
+
+The second phase introduces automation to ensure code quality and reliability as the engineering team grows. This includes implementing pre-commit hooks for linting and formatting with Ruff, and evolving Dockerfiles into production-grade, smaller images to reduce attack surfaces. To eliminate code duplication in CI/CD pipelines, raw Kubernetes YAML is replaced with Helm charts. Testing is integrated into the pipeline to ensure that automated tests provide more value than manual checks.
+
+The final phase focuses on hardening the infrastructure. Liveness and readiness probes are implemented in Kubernetes to reduce downtime and enable self-healing. Network policies are applied to enforce segmentation, preventing unauthorized communication between services, such as blocking direct frontend access to databases. Observability is achieved through a stack consisting of Prometheus for metrics, Grafana for visualization, and Glitchtip for error tracking. To maintain security and efficiency, the environment utilizes distroless containers and the UV package manager.

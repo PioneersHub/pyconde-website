@@ -95,3 +95,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/W4rjcvSzB1A/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Article-level demand forecasting at scale involves predicting sales for hundreds of thousands of items across multiple markets, resulting in approximately 10 billion records daily. The primary challenge is the disparity in sales velocity; absolute metrics like Mean Absolute Error (MAE) or Root Mean Square Error (RMSE) overweight high-selling articles, while naive relative metrics, such as Mean Absolute Percentage Error (MAPE), fall into a scaling trap. In this trap, fluctuations in the aggregate error metric often reflect changes in the assortment mixture—the ratio of high-sellers to low-sellers—rather than actual changes in model performance.
+
+To resolve this, a benchmarking approach using Poisson-based simulations is employed. By generating a perfect probabilistic forecast—where the mean of the Poisson distribution is the actual observed value—a theoretical lower bound for the error is established. This is paired with a naive upper bound, such as repeating the previous day's sales. By anchoring the actual model error between these two bounds, it becomes possible to determine if a model is truly improving or if the error is simply shifting due to seasonal changes in the product mix.
+
+Key takeaways include the danger of overfitting to a single aggregate metric, which can introduce bias toward high-selling items and degrade overall accuracy. To mitigate this, a multi-metric evaluation strategy is used, combining demand error with bias measures and Gross Merchandise Volume (GMV) error. These calibrated metrics are then translated into a traffic-light system for stakeholders, allowing for market-specific diagnostics where a high error in a low-volume market may be acceptable, while a lower error in a high-volume market triggers an investigation.

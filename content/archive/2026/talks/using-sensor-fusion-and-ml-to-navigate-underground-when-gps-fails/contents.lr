@@ -92,3 +92,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/uyrlnwzsW1U/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Underground navigation is challenging because GPS signals cannot penetrate subway tunnels, leaving smartphones to rely on imprecise cell tower mapping or Wi-Fi scanning with accuracy radii often exceeding one kilometer. To solve this, a system was developed that estimates location by fusing motion sensor data, train schedules, and sparse device locations. The core logic treats the problem as a sequence of events: by detecting when a train moves and stops, the system can count stations traveled from a known starting point.
+
+The technical approach utilizes a two-stage machine learning pipeline. First, a Convolutional Neural Network (CNN) is trained on millions of unlabeled user trips using a pretext task to classify general motion modes (stationary, walking, or automotive) based on accelerometer and gyrometer data. Second, transfer learning is applied to a smaller, high-quality dataset of 300 manually annotated trips to refine a binary classifier that specifically identifies "moving metro" states. This model is converted to TensorFlow Lite and deployed on-device via Core ML for iOS and Android to ensure functionality during network outages.
+
+A mixer module integrates the binary motion predictions with offline train schedules and any available high-accuracy device locations to resolve edge cases, such as trains stopping between platforms. The system achieves approximately 90% accuracy, with predictions typically within one station of the true location. To manage uncertainty, the user interface employs warning banners and asymmetric confidence intervals, acknowledging a bias toward late rather than early predictions. The entire training pipeline is managed using Vertex AI to handle complex dependency graphs and parallel testing.

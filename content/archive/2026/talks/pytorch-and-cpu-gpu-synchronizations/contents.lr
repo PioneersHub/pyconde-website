@@ -84,3 +84,13 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/dKZxUcuOb8A/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+PyTorch executes GPU operations asynchronously, allowing the CPU to schedule tasks and run ahead of the GPU. Performance degradation occurs during CPU-GPU synchronization, which happens when the CPU must block and wait for data to return from the GPU to make a decision or allocate memory. This creates "bubbles" of inactivity on both the CPU and GPU, reducing overall hardware utilization.
+
+Common triggers for synchronization include calling .item(), .cpu(), or printing tensors, as well as using GPU tensors within conditional if-else branching. More subtle synchronizations arise from operations that result in dynamic shapes, where the output size depends on the tensor data. Examples include boolean indexing, slicing with a GPU-resident integer, torch.non_zero(), and torch.unique(). Because the CPU manages memory allocation, it must synchronize to determine the output shape before the GPU can proceed.
+
+To mitigate these issues, developers can reduce the frequency of synchronization—such as printing loss every 100 iterations instead of every one—or use padding to maintain static shapes. Some PyTorch APIs, such as torch.repeat_interleave(), provide optional parameters to specify the output size, bypassing the need for synchronization.
+
+Profiling tools like NVIDIA Nsight Systems can visualize these delays as CUDA stream synchronize calls. For automated detection, PyTorch offers an experimental debug mode via torch.cuda.set_synchronize_debug_mode(), which can be set to warning or error. This allows for the creation of unit tests using decorators that fail if a function triggers a GPU synchronization, ensuring production code remains efficient.

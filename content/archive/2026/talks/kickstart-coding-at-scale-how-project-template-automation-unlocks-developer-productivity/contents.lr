@@ -94,3 +94,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/HATspzsbLwk/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Project template automation streamlines the bootstrapping and maintenance of software repositories at scale. By using Copier instead of Cookiecutter, developers can generate projects from templates while saving the specific configuration answers in a local file. This allows for an intelligent update mechanism: when a template evolves, Copier performs a three-way Git merge between the current project state, the original generated state, and the new template version. This process ensures that updates to CI pipelines, Docker build processes, and PyTest workflows are propagated across repositories without overwriting local customizations.
+
+To maintain template quality, a GitHub Actions workflow automatically generates multiple project variants based on different input parameters. These variants are pushed to internal branches where the generated CI pipelines are executed; the template's own CI only passes if all generated project variants also pass. For large-scale deployment, a GitHub bot named QuantRanger automatically opens pull requests every month to update repositories to the latest template version. To minimize merge conflicts, custom scripts handle pinned third-party action versions, and MergeGraph is used as a Git merge driver to resolve conflicts in files like PixieToml based on the language's Abstract Syntax Tree (AST).
+
+Migrations for security tools, such as the sysmore linter for GitHub Actions, are handled independently of version updates. This is achieved by adding a template question with a default value of false, rolling out the template, and then using a separate bot to flip the value to true via automated pull requests. Progress is monitored via a Streamlit dashboard tracking template versions and migration adoption across approximately 190 repositories. This approach provides a paved road for developers, offering standardized tooling while allowing them to deviate from the template as needed.

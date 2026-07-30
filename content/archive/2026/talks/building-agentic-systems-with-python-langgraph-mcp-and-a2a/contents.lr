@@ -126,3 +126,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/Apo7lxzHN60/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Agentic systems can be constructed using a hub-and-spoke architecture to automate complex business processes, such as identifying and scoring companies for mergers and acquisitions. This approach utilizes a coordinator agent to delegate tasks to specialized agents responsible for data retrieval, scoring, and outreach. To ensure the system remains flexible and loosely coupled, the architecture separates the conversational interface, built with FastAPI and Nginx, from the underlying agent logic and data storage, which employs SQLite for structured data and Redis for real-time status propagation to the user interface.
+
+The system integrates the Model Context Protocol (MCP) to expose specific tools—such as web scrapers and API connectors—to agents, allowing them to fetch dynamic data from sources like LinkedIn, partner websites, and Perplexity. To prevent context window saturation and agent confusion, tools are limited to approximately ten per agent. While autonomous ReAct patterns are useful, the system employs LangGraph to implement structured workflows. This ensures that critical data retrieval steps occur in parallel and are completed before the agent processes the final result, avoiding the reliability issues associated with over-prompting.
+
+Agent-to-agent (A2A) communication allows the coordinator to interact with specialized agents via URIs, facilitating a scalable ecosystem where new capabilities can be added without rewriting the core logic. To maintain data integrity, a dedicated check agent validates outputs for hallucinations or outliers, such as unrealistic revenue-to-employee ratios. Final system reliability is ensured through AI-generated test suites and human evaluation of the response quality.

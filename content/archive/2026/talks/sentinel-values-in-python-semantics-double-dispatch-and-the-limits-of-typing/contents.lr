@@ -97,3 +97,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/AjrxxGJNBQY/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Python's `None` keyword is frequently used to represent missing values, defaults, or errors, but this versatility creates ambiguity when `None` is also a valid value within a specific domain. For example, in a cache dictionary, `None` cannot distinguish between a missing key and a key explicitly mapped to `None`. Sentinel values solve this by providing a unique object outside the valid domain to signal a specific state. Built-in examples include the `Ellipsis` object used in NumPy for slicing and the `NotImplemented` sentinel used in double dispatch to signal that a binary operation should be attempted by the other operand.
+
+Implementing custom sentinels using `missing = object()` is a common pattern in the Python standard library, but it introduces three primary issues: uninformative string representations in stack traces, failure to maintain identity after pickling or serialization, and a lack of support for type narrowing in static analysis tools like Pyright. While `TypeGuard` functions can assist with narrowing, a more robust approach involves using a `Literal` combined with an `Enum`. By defining a sentinel as a member of an `Enum` and assigning its type as a `Literal`, developers can achieve precise type narrowing and ensure the sentinel remains a singleton after serialization.
+
+PEP 661 proposed introducing first-class sentinel objects to the language to resolve these inconsistencies, though the proposal remains deferred due to the significant interpreter changes required. Currently, the `typing_extensions` library provides an experimental `sentinel` implementation. Until such features are standardized, the `Literal` Enum pattern is the most effective method for creating type-safe, serializable sentinels.

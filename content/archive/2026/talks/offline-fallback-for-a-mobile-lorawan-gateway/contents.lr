@@ -131,3 +131,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/3v23_1w6a4o/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+LoRaWAN networks typically rely on a cloud-based network server for decryption and data decoding, creating a critical dependency on internet connectivity. In disaster scenarios, such as flooding, the loss of mobile network infrastructure renders remote sensors—including water level and temperature monitors—invisible to the end user, despite the sensors and gateways remaining operational.
+
+To address this, a hybrid offline fallback system was developed using a Raspberry Pi acting as a LoRaWAN gateway. Under normal conditions, the device functions as a standard gateway for The Things Network (TTN). To enable offline capabilities, a custom Python-based multiplexer intercepts raw data frames from the LoRa packet forwarder. These frames are routed both to the public network server and to a local message collector. The system utilizes a local SQLite database to store session keys (Application Session Keys and Network Session Keys) previously retrieved from the TTN API. This allows the gateway to decrypt and decode messages locally when the cloud connection is severed.
+
+Because most LoRaWAN decoders are written in JavaScript, the architecture incorporates a Node.js HTTP service using the Express framework. This service encapsulates the JavaScript decoders, allowing the Python backend to send decrypted payloads to specific endpoints for final data conversion. The processed data is then served via a FastAPI interface on port 8080. This approach ensures that as long as the gateway has power and the session keys were synchronized prior to the outage, sensor data remains accessible to local users regardless of internet availability.

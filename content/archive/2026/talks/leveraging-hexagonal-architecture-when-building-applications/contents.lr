@@ -91,3 +91,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/8Swb3fqSSo8/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Hexagonal architecture, also known as ports and adapters, is a software design pattern used to isolate core business logic from external technologies such as databases and APIs. This separation ensures that the application core remains independent of the infrastructure, allowing developers to update or replace external tools without modifying the underlying business rules. The architecture is structured into three primary layers: the domain, which contains business models; ports, which are interfaces defining the required contracts; and adapters, which provide the concrete implementations for those contracts.
+
+In Python, ports are typically implemented using abstract base classes to enforce dependency inversion. This ensures that high-level modules depend on abstractions rather than low-level implementation details. For example, an application might define an InstallationRepository port with a create function. A SQL adapter implementing this port would contain SQLAlchemy code, while a NoSQL adapter would use PyMongo. Because the application core interacts only with the port, switching from SQL to NoSQL requires creating a new adapter without altering the business logic.
+
+The approach improves maintainability and testability by allowing business logic and adapters to be tested in isolation. It also facilitates parallel development, as different team members can implement separate adapters once the ports are defined. While the pattern introduces more boilerplate code and requires more upfront design time, it enhances the effectiveness of AI-assisted programming. Large Language Models can more efficiently generate standard adapter code when the intricate domain logic is clearly decoupled from the mundane infrastructure tasks.

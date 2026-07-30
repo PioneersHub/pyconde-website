@@ -125,3 +125,13 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/9lExGn-JLFg/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Marketing Mix Modeling (MMM) often faces the challenge of insufficient data for specific regions, where the number of available data points is equal to or less than the number of coefficients required for prediction. This data scarcity leads to high uncertainty and unreliable coefficients, particularly in smaller markets. To address this, hierarchical Bayesian modeling is used to implement partial pooling, which allows models for data-poor regions to borrow statistical strength from data-rich regions.
+
+The approach utilizes PyMC for probabilistic programming and the Hypothesis library for property-based testing of transformation functions. To reflect real-world consumer behavior, the model incorporates ad stock functions to account for the delayed effect of advertising and saturation functions (such as the Hill function) to model the plateauing of returns as spend increases. Testing ensures these functions remain bounded between zero and one to prevent unrealistic simulations.
+
+Three modeling strategies are compared: pooled (all regions combined), unpooled (separate models per region), and hierarchical (partial pooling). While pooled models ignore regional variance and unpooled models fail in data-sparse regions, the hierarchical model uses a group mean and a deviation parameter to balance these extremes. To improve sampler efficiency and avoid restrictive distributions, a non-centered parameterization is applied.
+
+Key takeaways include the importance of calibration and uncertainty intervals over simple metrics like RMSE or R-squared. Hierarchical models are most effective when regions share domain similarities, such as shared culture or audience demographics. However, they fail if regional behaviors are too divergent or if data is uniformly sparse across all groups.

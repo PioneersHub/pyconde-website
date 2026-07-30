@@ -76,3 +76,13 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/Fj7KlGEcS8Q/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Free-threaded Python addresses the limitations of the Global Interpreter Lock (GIL), a mechanism that historically restricted CPython to executing one thread at a time per process. While the GIL simplified memory management and ensured thread safety for internal data structures, it prevented true parallelism on multi-core processors, forcing developers to rely on the multiprocessing module or binary extensions written in C or Rust to achieve CPU-bound performance gains.
+
+Introduced as an experimental build in Python 3.13 via PEP 703, free-threaded Python removes the GIL to allow multiple threads to execute Python bytecode simultaneously. This transition involves significant changes to the C API and the garbage collector; specifically, object creation and deletion are now optimized for thread-local operations, while shared objects require more complex cleanup. To maintain stability, the interpreter can automatically re-enable the GIL if a loaded dependency is not marked as thread-safe.
+
+The transition to a free-threaded default is a multi-phase process. Currently, in phase 2 (Python 3.14), the build is no longer experimental and is available for production use. Phase 3 will eventually make free-threading the default. However, ecosystem readiness remains a challenge, with only about half of the most popular libraries currently providing compatible "free-threaded wheels" (identified by the "t" suffix, such as cp314t).
+
+Performance gains vary based on the workload. In a tested CPU-bound scenario involving heavy calculations across five threads, a standard build took 3.73 seconds due to thread juggling, while the free-threaded build reduced this to 1.62 seconds. This demonstrates that while multi-threading introduces orchestration overhead and requires manual locking to prevent race conditions, it significantly improves execution speed for parallelizable CPU-bound tasks.

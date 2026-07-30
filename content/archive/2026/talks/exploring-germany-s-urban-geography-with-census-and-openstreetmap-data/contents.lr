@@ -94,3 +94,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/1LEXE8H0BaE/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Urban geography examines the physical, social, and economic aspects of city life, specifically focusing on the equitable distribution of resources and infrastructure. A primary challenge in this field is the fragmentation of data across various formats and sources, which complicates spatial analysis and the identification of systematic disadvantages in resource accessibility.
+
+To address this, a research pipeline was developed to analyze medical emergency facility accessibility across Germany. The technical foundation relies on a PostgreSQL database with the PostGIS extension. Census 2022 data, available at 100-meter resolutions, was imported using a custom Python command-line tool, census2pgsql. To supplement this, OpenStreetMap data was integrated via pgosmflex, a wrapper for osm2pgsql that organizes amenities, buildings, and points of interest into structured tables. While OpenStreetMap provided a baseline of 823 hospitals, validation against the official Versichernis der Krankenhäuser dataset revealed a higher count of 1,113 facilities and introduced critical "levels of care" (1, 2, and 3) for a more nuanced analysis.
+
+The analysis utilized the Open Route Service to calculate network distance and travel time in seconds, moving beyond simple straight-line distance. A Python CLI program, EMSDE, coordinated the nearest-neighbor searches in PostGIS and queried the routing service to generate travel cost tables. Results indicated that while nearly 100% of the population is within 60 minutes of a hospital, coverage drops at the 15-minute threshold, with a noticeable variance between age groups. Specifically, the 18–29 age cohort showed higher accessibility (71.3%) compared to those 65 and older (64.8%), likely due to higher concentrations of university clinics in urban centers. Visualizations created with MapLibre and Tippecanoe further revealed regional disparities, showing that eastern German states are more disadvantaged regarding access to level 2 and 3 hospitals.

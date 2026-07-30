@@ -106,3 +106,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/1_r3GqS7GK8/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+In-browser machine learning leverages WebAssembly (Wasm) and WebGPU to execute code and models on the client side, reducing server costs and improving user privacy. WebAssembly provides a binary instruction format that allows near-native execution speeds in all major browsers. Because Wasm lacks a standard library for system-level tasks, toolchains like Emscripten are used to compile C/C++ code into Wasm, providing necessary runtime layers and virtual file systems.
+
+Python integration in the browser is primarily achieved through Pyodide, a port of CPython to WebAssembly. Pyodide allows the installation of pure Python packages via micropip and provides pre-compiled builds for libraries with native extensions, such as NumPy and Pandas, through the Pyodide package index. For developers seeking higher-level abstractions, PyScript enables Python logic to be embedded directly in HTML. Alternatively, MicroPython can be used for faster startup times and smaller bundle sizes (under 300 KB), though it supports fewer features and packages than CPython.
+
+Model inference is handled separately from the Python interpreter to avoid overhead and enable GPU acceleration. WebGPU allows for general-purpose compute, moving beyond the graphical limitations of WebGL. The ONNX Runtime Web serves as a universal adapter, executing models converted to the ONNX format on both CPUs and GPUs. For large language models (LLMs), WebLLM provides GPU-accelerated inference, while vLlama enables the execution of GGUF-format models on the CPU via Llama.cpp. While Wasm is currently limited to 32-bit addressing (capping RAM at 4 GB), these tools collectively enable the deployment of models up to 3 billion parameters directly in the browser.

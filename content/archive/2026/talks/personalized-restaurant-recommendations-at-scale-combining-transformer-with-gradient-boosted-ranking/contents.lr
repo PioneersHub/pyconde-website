@@ -94,3 +94,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/FbjpwHLaNb4/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+The Universal Venue Ranker (UVR) addresses the challenge of personalizing restaurant and retail recommendations at scale while balancing the tension between recurring user behavior and the need for discovery. Previous systems relied on separate models for different domains, such as an MLP-based collaborative filtering model for restaurants and a CatBoost-based ranker for retail. To reduce infrastructure complexity and improve user retention through better exploration, these were unified into a single hybrid architecture.
+
+The UVR employs a two-stage approach combining a Transformer-based predictor with a Gradient-Boosted Decision Tree (GBDT) ranker. The first stage uses an encoder-only Transformer, similar to BERT4REC, to process sequences of user purchases. This model incorporates embeddings for venues, timestamps, and user locations (mapped to hexagons) to generate a user representation. The Transformer predicts the next likely purchase, producing logits for all available venues. These logits serve as a primary feature for the second stage: a CatBoost ranker. The ranker integrates these Transformer scores with additional contextual features, including venue popularity, cuisine affinity, delivery time, and a custom feature measuring a user's historical appetite for variety.
+
+To optimize for discovery, the system uses Mean Reciprocal Rank (MRR) as a proxy for conversion rates, specifically tracking MRR for new versus recurring purchases. The model manages the exploration-exploitation trade-off by adjusting sample weights—assigning higher value to new purchases—and tuning the negative sampling ratio to prevent overconfidence in popular, recurring venues. Deployment across 30 countries resulted in a global conversion rate uplift and a substantial increase in new venue trials.

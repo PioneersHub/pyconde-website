@@ -136,3 +136,13 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/XlbwXkjTPdk/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Forecasting instability occurs when retraining a model on new data causes the long-term forecast to shift dramatically, even if the overall accuracy improves. This vertical instability disrupts business planning and erodes trust in the model. To quantify this, the Mean Absolute Relative Difference (MRD) is used to measure the bias between overlapping forecast periods across different revisions.
+
+A stress test of various models on real-world e-commerce sales data reveals a trade-off between accuracy and stability. Simple statistical models and Generalized Additive Models (GAM) tend to be more stable, with MRD often below 0.1, though they may lack precision. In contrast, complex models like XGBoost, LightGBM, N-BEATS, and foundational models such as Chronos and TimeGPT often achieve higher accuracy (lower WMAP) but exhibit significant instability, with MRD frequently ranging between 0.2 and 0.4.
+
+Three post-processing techniques can mitigate this instability. Reconciliation stabilizers use a top-down approach, scaling granular product forecasts to a more stable high-level shop or category forecast. Assembling stabilizers use simple averaging across multiple models; this generally improves stability but can be compromised if a single unstable model is included in the ensemble. Origin assembling, or full interpolation, mixes the current week's forecast with previous revisions using a weighted average (e.g., 80% current, 20% previous). This method frequently provides a win-win result, improving both accuracy and stability.
+
+The findings suggest that simpler models are often preferable for sparse data or when long-term stability is critical. When using ensembles, preselecting stable models is essential to prevent outliers from spoiling the aggregate forecast.

@@ -88,3 +88,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/fJ78j1cdlwE/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+The project addresses the challenge of developing an autonomous AI agent to play a turn-based strategy game on a hexagonal grid. The game involves capturing territory, managing income, upgrading unit strength levels, and constructing buildings like farms and towers to secure borders. The primary technical difficulty lies in the complexity of the game rules and the vast state-action space associated with hexagonal movement and placement.
+
+The approach involves rebuilding the game logic in Python using offset coordinates to represent the hexagonal map as a 2D array. To facilitate machine learning, a Gymnasium environment was implemented to provide the agent with observations, action masks, and rewards. The observation state consists of multiple Boolean channels representing territories, units, buildings, trees, and gravestones, with normalized values for income and money. The output layer manages approximately 4,000 theoretical actions, though typically only 100 are valid per turn. The architecture utilizes a Convolutional Neural Network (CNN) to process the map channels, paired with an actor-critic model to balance action selection and evaluation. Training was monitored using MLflow.
+
+Key takeaways highlight the difficulty of reward shaping and state complexity. The agent was tested using sparse rewards (final win/loss), dense rewards (intermediate gains), and a hybrid approach. While the model showed some success on smaller maps, it struggled on larger maps, occasionally performing worse than random play. Furthermore, training the agent against itself led to infinite loops of indecision, demonstrating that scaling down the environment and carefully tuning reward functions are critical for convergence in complex strategy games.

@@ -88,3 +88,11 @@ video_duration_iso:
 video_thumbnail: https://i.ytimg.com/vi/xGadHTaIZ8I/maxresdefault.jpg
 ---
 recording_available: yes
+---
+recap:
+
+Synchronous task execution in Django applications can lead to poor user experiences and system instability. When a web request triggers a slow or unreliable process, such as sending an email via an external SMTP server, the application remains blocked until the process completes or times out. If the external service fails, the user receives an error page, and the data associated with the task may be lost.
+
+Django-Q2 addresses this by providing a multiprocessing task queue that separates the request-response cycle from background processing. Using a producer-broker-worker architecture, the Django application acts as the producer, adding tasks to a broker—which can be the existing Django database (ORM), Redis, MongoDB, or Amazon SQS—where they are stored until a worker process, initiated via the `python manage.py qcluster` command, executes them. This approach ensures that users receive instant confirmation pages regardless of the background task's status.
+
+Key technical capabilities include a built-in admin panel for monitoring task status and resubmitting failed jobs, and native scheduling for cron jobs without requiring external providers. To handle varying workloads, Django-Q2 supports horizontal scaling through multiple worker replicas and workload separation via named queues. By defining an `alt cluster` in the configuration, developers can route long-running tasks to a specific queue with extended timeouts, preventing them from blocking shorter, high-priority tasks. While not intended for millions of tasks per minute, Django-Q2 minimizes infrastructure overhead by leveraging existing database systems, making it a lightweight alternative to Celery.
