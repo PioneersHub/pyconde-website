@@ -274,16 +274,6 @@
       </ul>
       {% endif %}
 
-      {#- The files and links attached to the Pretalx submission itself —
-          where most speakers actually put their deck, rather than in the
-          two free-text answers above. Markdown, so each entry keeps the
-          speaker's own description as its link text; the chip styling and
-          the ↗ come from CSS. -#}
-      {% if this.resources %}
-      <div class="talk-resources talk-resources--files">
-        {{ this.resources }}
-      </div>
-      {% endif %}
 
       {#- The body is the recap of what the talk actually covered, where one
           exists; the speaker's original proposal moves into the collapsible
@@ -330,9 +320,38 @@
         {%- elif talk_track -%}
         This session took place in track {{ talk_track }}.
         {%- else -%}
-        This session was classified {{ levels|join(' / ') }} by the speaker.
+        This session was classified suitable for {{ levels|join(' / ') }} by the speaker.
         {%- endif -%}
       </p>
+      {% endif %}
+
+      {#- What the speaker attached to the submission itself — where most
+          decks actually live, rather than in the two free-text answers
+          further up. Files hosted on Pretalx carry a locally rendered
+          preview of their first page (utils/generate_resource_thumbs.py);
+          external links, which cannot be previewed without a browser, show
+          a typed badge instead. The row scrolls sideways rather than
+          wrapping, so the block keeps one aside's height. -#}
+      {%- set resources = this.resources|resource_items %}
+      {% if resources %}
+      <ul class="talk-previews">
+        {%- for item in resources %}
+        <li class="talk-previews__item">
+          <a class="talk-preview" href="{{ item.url }}" target="_blank" rel="noopener">
+            {%- if item.preview %}
+            <img class="talk-preview__thumb" src="{{ item.preview }}"
+                 alt="First page of {{ item.label }}" loading="lazy" decoding="async">
+            {%- else %}
+            <span class="talk-preview__badge" aria-hidden="true">{{ item.kind }}</span>
+            {%- endif %}
+            <span class="talk-preview__text">
+              <span class="talk-preview__label">{{ item.label }}</span>
+              <span class="talk-preview__host">{{ item.host }} ↗</span>
+            </span>
+          </a>
+        </li>
+        {%- endfor %}
+      </ul>
       {% endif %}
 
       {#- The proposal and the transcript are the two secondary blocks on the

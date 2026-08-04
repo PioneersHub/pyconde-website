@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import re
 from collections import OrderedDict
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import TYPE_CHECKING, Any
+from urllib.parse import unquote, urlsplit
 
 import yaml
 from lektor.context import get_ctx
@@ -253,6 +254,48 @@ def first_url(value: object) -> str:
     return ''
 
 
+# Longest suffix still read as a file type (".pages"); past that a dotted
+# path segment is part of the URL, not an extension.
+_MAX_FILE_SUFFIX = 5
+
+
+def resource_items(lines: object) -> list:
+    """Parse a talk's `resources` field into dicts the card row can render.
+
+    Each line is ``label | url`` with an optional third segment holding a
+    locally generated preview image — the format is defined in
+    models/talk.ini and written by utils/import_resources.py and
+    utils/generate_resource_thumbs.py.
+
+    Returns one dict per usable line with `label`, `url`, `preview`, `host`
+    (for the card subtitle) and `kind` (the badge shown when there is no
+    preview: the file extension, or "LINK" for anything without one).
+    Lines without a URL are dropped — a card with nothing to open is
+    just noise.
+    """
+    items = []
+    for raw in lines or []:
+        parts = [p.strip() for p in str(raw).split('|')]
+        parts += [''] * (3 - len(parts))
+        label, url, preview = parts[0], parts[1], parts[2]
+        if not url:
+            continue
+        path = urlsplit(url)
+        host = path.netloc.removeprefix('www.')
+        # A suffix is a file type only when it reads like one: arxiv.org
+        # /abs/2510.04226 ends in ".04226" and is a page, not a download.
+        suffix = PurePosixPath(unquote(path.path)).suffix.lstrip('.').upper()
+        is_file_type = suffix.isalpha() and len(suffix) <= _MAX_FILE_SUFFIX
+        items.append({
+            'label': label or host or url,
+            'url': url,
+            'preview': preview,
+            'host': host,
+            'kind': suffix if is_file_type else 'LINK',
+        })
+    return items
+
+
 def paragraphize(text: str) -> str:
     """Convert text with blank lines into proper HTML paragraphs.
 
@@ -365,6 +408,9 @@ class YAMLDatabagPlugin(Plugin):
         # Extract a usable href from the free-text slides / supporting-material
         # fields on talk pages, which are `type = url` but hold prose.
         self.env.jinja_env.filters['first_url'] = first_url
+        # Parse the `label | url | preview` lines of a talk's resources field
+        # into the dicts the preview-card row renders.
+        self.env.jinja_env.filters['resource_items'] = resource_items
 
         # Call the databag setup
         self._setup_databags()
