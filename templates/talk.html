@@ -274,6 +274,17 @@
       </ul>
       {% endif %}
 
+      {#- The files and links attached to the Pretalx submission itself —
+          where most speakers actually put their deck, rather than in the
+          two free-text answers above. Markdown, so each entry keeps the
+          speaker's own description as its link text; the chip styling and
+          the ↗ come from CSS. -#}
+      {% if this.resources %}
+      <div class="talk-resources talk-resources--files">
+        {{ this.resources }}
+      </div>
+      {% endif %}
+
       {#- The body is the recap of what the talk actually covered, where one
           exists; the speaker's original proposal moves into the collapsible
           below it. Editions without recaps (2016–2025) keep rendering the
@@ -315,7 +326,7 @@
       {% if talk_track or levels %}
       <p class="talk-classification">
         {%- if talk_track and levels -%}
-        This session took place in track {{ talk_track }} and was classified {{ levels|join(' / ') }} by the speaker.
+        This session took place in track {{ talk_track }} and was classified suitable for {{ levels|join(' / ') }} by the speaker.
         {%- elif talk_track -%}
         This session took place in track {{ talk_track }}.
         {%- else -%}
@@ -374,10 +385,12 @@
   </section>
 </article>
 
+{#- The newsletter ask comes while the talk is still the thing on screen;
+    the related panel is where attention goes to wander next. -#}
+{{ render_newsletter_inline(bag('frontpage/sections/newsletter')) }}
+
 {{ related_panel(this, my_speakers, talks_root, speakers_root, archive_year if is_archive else '') }}
 
 {{ render_funnel_cta(bag('site_state')) }}
-
-{{ render_newsletter_inline(bag('frontpage/sections/newsletter')) }}
 
 {% endblock %}

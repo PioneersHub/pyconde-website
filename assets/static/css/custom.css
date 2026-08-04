@@ -3116,6 +3116,31 @@ main:focus { outline: none; }
 .talk-resources__link {
   font-weight: 600;
 }
+/* Pretalx attachments arrive as a markdown list, so the chip row is the
+   <ul> mistune emits — same shape as the hand-built one above it, so the
+   two read as a single group of links. */
+.subsite .content .talk-resources--files ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0 0 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+}
+.subsite .content .talk-resources--files li {
+  margin-bottom: 0;
+}
+.talk-resources--files a {
+  font-weight: 600;
+}
+.talk-resources--files a::after {
+  content: " ↗";
+}
+/* When both rows are present they belong together, so the first one
+   gives up its bottom margin. */
+.subsite .content ul.talk-resources:has(+ .talk-resources--files) {
+  margin-bottom: 0.5rem;
+}
 
 /* Marks the featured year in the edition list on /archive/. */
 .archive-edition__flag {
