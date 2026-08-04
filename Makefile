@@ -95,3 +95,53 @@ publish-video-batch:
 		exit 2; \
 	fi
 	$(RUN) python utils/publish_video_batch.py --year $(YEAR) --batch $(BATCH)
+
+# ── Cloudflare Pages ─────────────────────────────────────────────
+# Two commands, per docs/deployment-cloudflare.md:
+#
+#   make publish            production deploy → https://pycon.de
+#                           Always from main with a clean tree;
+#                           fails fast otherwise.
+#
+#   make deploy             preview deploy → *.pyconde-website.pages.dev
+#   make deploy BRANCH=x    Uses the current git branch as the preview
+#                           name (main is remapped to main-preview so a
+#                           preview can never become the production
+#                           deployment). Wrangler prints the preview
+#                           URL; the branch alias is
+#                           https://<branch>.pyconde-website.pages.dev
+#
+# Both build BUILD_MODE=full and deploy the staged dist/ tree —
+# never site/ directly (25 MiB per-file limit, .lektor build state).
+CF_PROJECT = pyconde-website
+WRANGLER = npx wrangler@latest
+
+# Stage site/ → dist/ for Pages: hardlinks (no 300 MB copy), minus
+# Lektor build state, the >25 MiB media-kit zips and .DS_Store noise.
+cloudflare-dist:
+	rm -rf dist
+	cp -Rl site dist
+	rm -rf dist/.lektor
+	rm -f  dist/static/mediakit/*.zip
+	find dist -name '.DS_Store' -delete
+
+publish:
+	@if [ "$$(git branch --show-current)" != "main" ]; then \
+		echo "publish: must run from main (current branch: $$(git branch --show-current))"; \
+		exit 1; \
+	fi
+	@if [ -n "$$(git status --porcelain -uno)" ]; then \
+		echo "publish: uncommitted changes — commit or stash first"; \
+		exit 1; \
+	fi
+	$(MAKE) build BUILD_MODE=full
+	$(MAKE) cloudflare-dist
+	$(WRANGLER) pages deploy dist --project-name=$(CF_PROJECT) --branch=main
+
+BRANCH ?= $(shell git branch --show-current)
+deploy:
+	$(MAKE) build BUILD_MODE=full
+	$(MAKE) cloudflare-dist
+	$(WRANGLER) pages deploy dist --project-name=$(CF_PROJECT) \
+		--branch=$(if $(filter main,$(BRANCH)),main-preview,$(BRANCH)) \
+		--commit-dirty=true
