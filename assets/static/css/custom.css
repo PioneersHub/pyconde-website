@@ -2001,7 +2001,7 @@ section.subsite.team .content {
 }
 
 /* ── Consistent link styling in content areas ───────────── */
-.subsite .content a:not(.button):not(.slide-cta):not(.blog-card):not(.talk):not(.archive-edition__subnav-link) {
+.subsite .content a:not(.button):not(.slide-cta):not(.blog-card):not(.talk):not(.edition-tabs__tab) {
     color: var(--blue);
     text-decoration: underline;
     text-decoration-thickness: 1px;
@@ -2009,7 +2009,7 @@ section.subsite.team .content {
     transition: color 0.15s ease;
 }
 
-.subsite .content a:not(.archive-edition__subnav-link):hover {
+.subsite .content a:not(.edition-tabs__tab):hover {
     color: var(--text-primary);
 }
 
@@ -4009,8 +4009,11 @@ a.past-editions__row:hover .past-editions__location {
   padding-right: 0.5rem;
 }
 
-/* ── Archive edition sub-nav (Talks / Speakers) ────────────────────── */
-.archive-edition__subnav {
+/* ── Edition tabs (Sessions / Speakers / Tracks) ───────────────────── */
+/* One switcher for every per-edition index. The current tab is a <span>,
+   not a link, so it never picks up the generic content-link styling and
+   cannot be clicked back to itself. */
+.edition-tabs {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem 1rem;
@@ -4018,25 +4021,29 @@ a.past-editions__row:hover .past-editions__location {
   padding-bottom: 1rem;
   border-bottom: 2px solid var(--neutral-200);
 }
-.archive-edition__subnav a.archive-edition__subnav-link {
+.edition-tabs .edition-tabs__tab {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   padding: 0.45rem 1rem;
-  background: var(--blue, #00c8e1);
+  background: var(--blue, #3778be);
   color: #fff;
   text-decoration: none;
   font-weight: 600;
   font-size: 0.95rem;
   line-height: 1.2;
 }
-.archive-edition__subnav a.archive-edition__subnav-link:hover,
-.archive-edition__subnav a.archive-edition__subnav-link:focus {
+.edition-tabs a.edition-tabs__tab:hover,
+.edition-tabs a.edition-tabs__tab:focus {
   background: var(--text-primary, #111);
   color: #fff;
   filter: none;
 }
-.archive-edition__subnav-count {
+.edition-tabs .edition-tabs__tab--current {
+  background: var(--text-primary, #111);
+  cursor: default;
+}
+.edition-tabs__count {
   font-weight: 500;
   opacity: 0.85;
   font-size: 0.85rem;
@@ -4119,14 +4126,14 @@ a.past-editions__row:hover .past-editions__location {
    later declaration wins on source order; an extra `.subsite-title`
    class would also win on its own, but we keep the symmetric form
    to make the intent obvious. */
-.subsite .subsite-title .content a:not(.button):not(.slide-cta):not(.blog-card):not(.talk):not(.archive-edition__subnav-link),
+.subsite .subsite-title .content a:not(.button):not(.slide-cta):not(.blog-card):not(.talk):not(.edition-tabs__tab),
 .subsite-title .content a {
   color: #fff;
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
 }
-.subsite .subsite-title .content a:not(.archive-edition__subnav-link):hover,
+.subsite .subsite-title .content a:not(.edition-tabs__tab):hover,
 .subsite-title .content a:hover,
 .subsite-title .content a:focus {
   color: var(--yellow, #ffc34d);
@@ -4358,6 +4365,17 @@ a.past-editions__row:hover .past-editions__location {
    from the section fields, not the page background. */
 body.front-page {
     background-color: var(--white);
+}
+
+/* Homepage content column: ~85% of the viewport (a common container
+   ratio), capped at 1536px for ultra-wide screens. Other pages keep
+   the 960px reading column; below 1024px the default responsive
+   widths (93%/83%) stay in charge, so mobile is unaffected. */
+@media (min-width: 1024px) {
+    body.front-page main .content {
+        width: 85%;
+        max-width: 1536px;
+    }
 }
 
 /* Blog card brand fallback — python on a blue colour field (§05). */
