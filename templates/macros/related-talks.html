@@ -1,10 +1,15 @@
 {#-
   Related-talks panel rendered at the bottom of a talk page.
 
-  Sections (rendered only if non-empty):
-    1. More by this speaker   — other talks by any of this talk's speakers (same edition first, then archive)
-    2. Same track             — other talks in the same edition with the same track
-    3. Also in this edition   — sibling talks (deterministic order)
+  Sections, in the order they render (each only if non-empty):
+    1. Same track             — other talks in the same edition with the same track
+    2. Also in this edition   — sibling talks (deterministic order)
+    3. More by this speaker   — other talks by any of this talk's speakers
+
+  Selection runs in a different order than display: the speaker's other
+  talks are claimed first, then same-track, then the rest. That keeps the
+  most specific relationship from being swallowed by a broader group, so
+  no talk appears twice in the panel.
 
   Every group shows at most 3 entries: the panel is a tail, not a second
   programme page, and the three groups stay balanced against each other.
@@ -73,26 +78,6 @@
     <div class="content">
       <h2 id="related-heading" class="related-talks__heading">Related talks</h2>
 
-      {%- if by_speaker %}
-      <div class="related-talks__group">
-        <h3 class="related-talks__subheading">More by
-          {%- if my_speakers|length == 1 %} {{ my_speakers[0].name }}
-          {%- else %} these speakers
-          {%- endif -%}
-        </h3>
-        <ul class="related-talks__list">
-          {%- for t in by_speaker %}
-          <li class="related-talks__item">
-            <a href="{{ t|url }}">
-              <span class="related-talks__title">{{ t.title }}</span>
-              {%- if t.track %}<span class="related-talks__track">{{ t.track }}</span>{% endif -%}
-            </a>
-          </li>
-          {%- endfor %}
-        </ul>
-      </div>
-      {%- endif %}
-
       {%- if same_track %}
       <div class="related-talks__group">
         <h3 class="related-talks__subheading">Same track: {{ talk.track }}</h3>
@@ -118,6 +103,26 @@
         </h3>
         <ul class="related-talks__list">
           {%- for t in also_in %}
+          <li class="related-talks__item">
+            <a href="{{ t|url }}">
+              <span class="related-talks__title">{{ t.title }}</span>
+              {%- if t.track %}<span class="related-talks__track">{{ t.track }}</span>{% endif -%}
+            </a>
+          </li>
+          {%- endfor %}
+        </ul>
+      </div>
+      {%- endif %}
+
+      {%- if by_speaker %}
+      <div class="related-talks__group">
+        <h3 class="related-talks__subheading">More by
+          {%- if my_speakers|length == 1 %} {{ my_speakers[0].name }}
+          {%- else %} these speakers
+          {%- endif -%}
+        </h3>
+        <ul class="related-talks__list">
+          {%- for t in by_speaker %}
           <li class="related-talks__item">
             <a href="{{ t|url }}">
               <span class="related-talks__title">{{ t.title }}</span>
