@@ -4221,10 +4221,22 @@ a.past-editions__row:hover .past-editions__location {
 .carousel--fits .carousel-controls {
   display: none;
 }
-/* Horizontal drags belong to the shelf; vertical ones still scroll. */
+/* Horizontal drags belong to the shelf; vertical ones still scroll. The
+   cards are links around images, so the browser's own drag has to be shut
+   off or it swallows the pointer stream before the carousel sees it. */
 .carousel--videos .carousel-viewport {
   touch-action: pan-y;
   cursor: grab;
+}
+.carousel--videos .carousel-slide a,
+.carousel--videos .carousel-slide img {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+/* An arrow at the end of a shelf that does not wrap. */
+.carousel-btn[disabled] {
+  opacity: 0.35;
+  cursor: default;
 }
 .carousel--videos.is-dragging .carousel-viewport {
   cursor: grabbing;

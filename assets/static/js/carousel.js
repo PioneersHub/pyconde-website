@@ -58,19 +58,24 @@
   // ── Visible count (mode-aware) ──
 
   /*
-   * How many slides are on screen. A carousel may declare it in CSS as
-   * --carousel-visible, in which case that value wins at every breakpoint:
-   * the slide width is `calc(100% / var(--carousel-visible))`, so reading
-   * the same property here is what keeps the translate maths and the
-   * layout from ever disagreeing. Carousels that do not set it keep the
-   * original 3-on-desktop / 1-on-mobile behaviour.
+   * How many slides are on screen. Measured from the rendered slides
+   * rather than taken from a constant or a CSS variable: the layout is the
+   * authority, so the translate maths cannot disagree with what the reader
+   * sees — not at an unexpected breakpoint, and not when a stale
+   * stylesheet is paired with a fresh script. Falls back to the original
+   * 3-on-desktop / 1-on-mobile only when nothing can be measured (before
+   * layout, or a display:none carousel).
    */
   Carousel.prototype._visibleCount = function () {
     if (this.mode === 'spotlight') return 1;
-    var declared = parseInt(
-      window.getComputedStyle(this.el).getPropertyValue('--carousel-visible'), 10
-    );
-    if (declared > 0) return declared;
+    var viewport = this.el.querySelector('.carousel-viewport');
+    if (viewport && this.slides.length) {
+      var frame = viewport.getBoundingClientRect().width;
+      var slide = this.slides[0].getBoundingClientRect().width;
+      if (frame > 0 && slide > 0) {
+        return Math.max(1, Math.min(this.slides.length, Math.round(frame / slide)));
+      }
+    }
     return window.innerWidth > BREAKPOINT ? DESKTOP_VISIBLE : MOBILE_VISIBLE;
   };
 
@@ -148,16 +153,28 @@
 
   // ── Navigation ──
 
+  Carousel.prototype._wraps = function () {
+    return this.el.getAttribute('data-carousel-wrap') !== 'false';
+  };
+
   Carousel.prototype.next = function () {
     var max = this._maxPosition();
-    this.current = this.current >= max ? 0 : this.current + 1;
+    if (this.current >= max) {
+      this.current = this._wraps() ? 0 : max;
+    } else {
+      this.current += 1;
+    }
     this._update();
     this._resetTimer();
   };
 
   Carousel.prototype.prev = function () {
     var max = this._maxPosition();
-    this.current = this.current <= 0 ? max : this.current - 1;
+    if (this.current <= 0) {
+      this.current = this._wraps() ? max : 0;
+    } else {
+      this.current -= 1;
+    }
     this._update();
     this._resetTimer();
   };
@@ -230,25 +247,43 @@
   Carousel.prototype._initDrag = function () {
     var self = this;
     var viewport = this.el.querySelector('.carousel-viewport') || this.el;
-    var startX = 0, dx = 0, dragging = false, width = 1;
+    var startX = 0, dx = 0, pressed = false, dragging = false, width = 1;
 
     if (!window.PointerEvent) return;
+
+    // Cards are links wrapping images. Without this the browser starts its
+    // own drag of the link, which cancels the pointer stream mid-gesture.
+    viewport.addEventListener('dragstart', function (e) { e.preventDefault(); });
 
     viewport.addEventListener('pointerdown', function (e) {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
       if (self._maxPosition() === 0) return;
-      dragging = true;
+      pressed = true;
+      dragging = false;
       startX = e.clientX;
       dx = 0;
       width = viewport.getBoundingClientRect().width || 1;
-      self.handOver();
-      if (self.track) self.track.style.transition = 'none';
-      self.el.classList.add('is-dragging');
     });
 
     viewport.addEventListener('pointermove', function (e) {
-      if (!dragging) return;
+      if (!pressed) return;
       dx = e.clientX - startX;
+
+      // The gesture only becomes a drag once it has actually moved. Nothing
+      // is cancelled before then, so a press that turns out to be a click
+      // still opens the card underneath.
+      if (!dragging) {
+        if (Math.abs(dx) < 4) return;
+        dragging = true;
+        self.handOver();
+        if (self.track) self.track.style.transition = 'none';
+        self.el.classList.add('is-dragging');
+        if (viewport.setPointerCapture) {
+          try { viewport.setPointerCapture(e.pointerId); } catch (err) { /* not capturable */ }
+        }
+      }
+
+      e.preventDefault();
       if (self.mode === 'multi' && self.track) {
         var base = (self.current * 100) / self._visibleCount();
         self.track.style.transform =
@@ -257,6 +292,8 @@
     });
 
     function release() {
+      if (!pressed) return;
+      pressed = false;
       if (!dragging) return;
       dragging = false;
       self.el.classList.remove('is-dragging');
@@ -277,7 +314,7 @@
     viewport.addEventListener('pointercancel', release);
     viewport.addEventListener('pointerleave', release);
 
-    // A drag that ends on a card must not also follow its link.
+    // The click that ends a drag must not also follow the card's link.
     viewport.addEventListener('click', function (e) {
       if (Math.abs(dx) > 5) {
         e.preventDefault();
@@ -297,6 +334,21 @@
     }
     this._updateDots();
     this._updateStatus();
+    this._updateArrows();
+  };
+
+  /* On a shelf that does not wrap, an end-stop arrow is inert — mark it. */
+  Carousel.prototype._updateArrows = function () {
+    if (this._wraps()) return;
+    var max = this._maxPosition();
+    if (this.prevBtn) {
+      this.prevBtn.disabled = this.current <= 0;
+      this.prevBtn.setAttribute('aria-disabled', this.current <= 0 ? 'true' : 'false');
+    }
+    if (this.nextBtn) {
+      this.nextBtn.disabled = this.current >= max;
+      this.nextBtn.setAttribute('aria-disabled', this.current >= max ? 'true' : 'false');
+    }
   };
 
   /** Spotlight: toggle .active class, opacity crossfade */
