@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
 {% from "macros/edition-context.html" import edition_notice %}
+{% from "macros/edition-tabs.html" import edition_tabs %}
 
 {% block title %}{{ this.title }}{% endblock %}
 {#- This index title already names the edition, so the archive title
@@ -71,6 +72,7 @@
 
 <section class="subsite">
   <div class="content">
+    {{ edition_tabs(page_edition_year, 'tracks') }}
     <ul class="tracks-grid">
       {%- for track in this.children|sort(attribute='name') %}
       <li class="tracks-grid__item">

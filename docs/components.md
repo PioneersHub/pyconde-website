@@ -227,3 +227,58 @@ Three helper macros for rendering team member profiles.
 | `render_team_member_socials(member)` | Member dict | Renders icons for website, LinkedIn, GitHub, Bluesky, Mastodon, Twitter |
 
 **Databag:** `team.yaml` (provides `team_images` base path and `default_image`).
+
+---
+
+## Session List — `macros/session-list.html`
+
+The programme of one edition: the filter bar, the rows, and the `ItemList` that
+describes them. Rendered by `templates/talks.html` (the edition being planned)
+and `templates/archive-edition.html` (an edition that has happened), so the row
+markup exists in one place.
+
+**Usage:**
+
+```jinja2
+{% from "macros/session-list.html" import session_list, session_list_jsonld %}
+
+{%- set talks_node = site.get(this.url_path ~ 'talks') -%}
+{{ session_list_jsonld(talks_node, this.url_path, this.title) }}
+<section class="subsite">{{ session_list(talks_node) }}</section>
+```
+
+| Macro | Parameters | Description |
+|-------|------------|-------------|
+| `session_list(talks_node)` | The `talks` record | Filter container, AI-provenance note, rows, and the filter script |
+| `session_list_jsonld(talks_node, page_url, list_name)` | Record, embedding page's URL, list title | `ItemList` at `{page_url}#sessions`, each item referencing the talk's `#event` |
+
+Both take the `talks` **record**, not `this` — an archive edition page resolves it
+with `site.get(this.url_path ~ 'talks')`. `page_url` is separate on purpose: the
+`ItemList` must describe the page it is embedded in, not the record the rows came
+from. Callers must wrap the output in `<section class="subsite">`; the filter bar
+is styled as `.subsite .content.talk-filters`. Pretalx-code redirect stubs are
+filtered out inside the macros.
+
+---
+
+## Edition Tabs — `macros/edition-tabs.html`
+
+Sessions / Speakers / Tracks switcher for the per-edition index pages.
+
+**Usage:**
+
+```jinja2
+{% from "macros/edition-tabs.html" import edition_tabs %}
+{{ edition_tabs(page_edition_year, 'sessions') }}
+```
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `year` | *(required)* | Edition year, or `''` for the edition being planned. Pass `page_edition_year` from `layout.html`, not a template-local `archive_year` |
+| `current` | *(required)* | `sessions` \| `speakers` \| `tracks` — rendered as a `<span aria-current="page">` rather than a link |
+
+Sessions points at `/archive/{year}/` for a past edition (the edition page *is*
+the session list) and at `/talks/` for the current one. Counts come from the
+records, so they cannot drift from a cached field. The Tracks tab is omitted when
+an edition has no tracks (2016–2018), and the whole bar hides itself until an
+edition has sessions or speakers.

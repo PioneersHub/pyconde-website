@@ -6,8 +6,10 @@ Every prior edition lives under `/archive/{year}/`. The structure mirrors the cu
 
 ```text
 /archive/                                            # edition index
-/archive/{year}/                                     # one edition (Event JSON-LD, EventCompleted)
-/archive/{year}/talks/                               # talk list for that edition
+/archive/{year}/                                     # one edition: the session list itself
+                                                     #   (Event JSON-LD EventCompleted + ItemList)
+/archive/{year}/talks/                               # forwards to /archive/{year}/
+                                                     #   (templates/talks-index-redirect.html)
 /archive/{year}/talks/{slug}/                        # one talk (canonical)
 /archive/{year}/talks/{CODE}/                        # 301 redirect → slug URL (HTML meta-refresh + canonical)
 /archive/{year}/speakers/                            # speaker list

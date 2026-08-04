@@ -6,7 +6,7 @@
  * here, so with JS disabled the page is still the full, readable programme.
  *
  * Filtering is pure DOM work over the already-rendered <li> elements — no
- * index, no fetch. That matters because /archive/{year}/talks/ is built in
+ * index, no fetch. That matters because /archive/{year}/ is built in
  * the archive build while the Pagefind index only regenerates on a full
  * build, so this must not depend on Pagefind being fresh. For full-text
  * search across abstracts and transcripts the page links out to /search/.

@@ -1,0 +1,67 @@
+{#-
+  Sessions / Speakers / Tracks switcher for one edition.
+
+  `year` is the edition's year, or '' for the edition being planned. Pass
+  `page_edition_year` from layout.html rather than a template-local
+  `archive_year`: speakers.html defaults its own to PROJECT.year on the
+  current-edition page, which would point the tabs at an /archive/ year
+  that does not exist.
+
+  `current` is 'sessions' | 'speakers' | 'tracks'. The current tab renders
+  as a <span>, not a link — a tab that navigates to the page you are
+  already on is a round trip to nowhere, and it keeps the marker out of
+  every `.subsite .content a` rule automatically.
+
+  Counts come from the records themselves, not from the hand-maintained
+  `talk_count` field, so they cannot drift.
+
+  Usage:
+    {% from "macros/edition-tabs.html" import edition_tabs %}
+    {{ edition_tabs(page_edition_year, 'sessions') }}
+-#}
+
+{%- macro edition_tabs(year, current) -%}
+  {%- set base = ('/archive/' ~ year ~ '/') if year else '/' -%}
+  {#- The archive edition page *is* its session list; the edition being
+      planned still keeps its list at /talks/. -#}
+  {%- set sessions_url = base if year else '/talks/' -%}
+
+  {%- set talks_node = site.get(base ~ 'talks') -%}
+  {%- set speakers_node = site.get(base ~ 'speakers') -%}
+  {%- set tracks_node = site.get(base ~ 'tracks') -%}
+
+  {%- set sessions = [] -%}
+  {%- if talks_node -%}
+    {%- for t in talks_node.children -%}
+      {%- if t['_model'] != 'redirect' -%}{%- set _ = sessions.append(t) -%}{%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+  {%- set speaker_count = (speakers_node.children|list|length) if speakers_node else 0 -%}
+  {%- set track_count = (tracks_node.children|list|length) if tracks_node else 0 -%}
+
+  {#- Before a programme is published there is nothing to switch between:
+      an edition with no sessions and no speakers would show a bar of empty
+      pages. It appears by itself once the import lands. -#}
+  {%- if sessions or speaker_count -%}
+  <nav class="edition-tabs" aria-label="Edition sections">
+    {%- if current == 'sessions' %}
+    <span class="edition-tabs__tab edition-tabs__tab--current" aria-current="page">Sessions{% if sessions %} <span class="edition-tabs__count">({{ sessions|length }})</span>{% endif %}</span>
+    {%- else %}
+    <a href="{{ sessions_url }}" class="edition-tabs__tab">Sessions{% if sessions %} <span class="edition-tabs__count">({{ sessions|length }})</span>{% endif %}</a>
+    {%- endif %}
+
+    {%- if current == 'speakers' %}
+    <span class="edition-tabs__tab edition-tabs__tab--current" aria-current="page">Speakers{% if speaker_count %} <span class="edition-tabs__count">({{ speaker_count }})</span>{% endif %}</span>
+    {%- elif speakers_node %}
+    <a href="{{ base }}speakers/" class="edition-tabs__tab">Speakers{% if speaker_count %} <span class="edition-tabs__count">({{ speaker_count }})</span>{% endif %}</a>
+    {%- endif %}
+
+    {#- 2016–2018 have no tracks folder at all. -#}
+    {%- if current == 'tracks' %}
+    <span class="edition-tabs__tab edition-tabs__tab--current" aria-current="page">Tracks{% if track_count %} <span class="edition-tabs__count">({{ track_count }})</span>{% endif %}</span>
+    {%- elif track_count %}
+    <a href="{{ base }}tracks/" class="edition-tabs__tab">Tracks <span class="edition-tabs__count">({{ track_count }})</span></a>
+    {%- endif %}
+  </nav>
+  {%- endif -%}
+{%- endmacro -%}
