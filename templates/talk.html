@@ -260,23 +260,6 @@
       </p>
       {% endif %}
 
-      {#- What stays useful after the conference: the slides and the speaker's
-          repo. No "Watch on YouTube" link — the embed above already offers
-          that through its own controls. Both fields are `type = url` but hold
-          free text, so `first_url` extracts a usable href and yields nothing
-          when there isn't one — see the filter's docstring. -#}
-      {%- set slides_url = this.slides_link|first_url -%}
-      {%- set material_url = this.supporting_material_url|first_url -%}
-      {% if slides_url or material_url %}
-      <ul class="talk-resources">
-        {% if slides_url %}
-        <li><a class="talk-resources__link" href="{{ slides_url }}" target="_blank" rel="noopener">Slides ↗</a></li>
-        {% endif %}
-        {% if material_url %}
-        <li><a class="talk-resources__link" href="{{ material_url }}" target="_blank" rel="noopener">Supporting material ↗</a></li>
-        {% endif %}
-      </ul>
-      {% endif %}
 
 
       {#- The body is the recap of what the talk actually covered, where one
@@ -336,7 +319,18 @@
           external links, which cannot be previewed without a browser, show
           a typed badge instead. The row scrolls sideways rather than
           wrapping, so the block keeps one aside's height. -#}
-      {%- set resources = this.resources|resource_items %}
+      {#- Three sources, one row. The submission's attachments come first
+          because they carry a preview; the two free-text answers follow as
+          plain cards. Both of those are `type = url` but hold prose, so
+          `first_url` extracts a usable href and yields nothing when there
+          isn't one — see the filter's docstring. A link given as both an
+          attachment and an answer is de-duplicated by resource_items. -#}
+      {%- set answers = [] -%}
+      {%- set slides_url = this.slides_link|first_url -%}
+      {%- set material_url = this.supporting_material_url|first_url -%}
+      {%- if slides_url %}{% set _ = answers.append('Slides | ' ~ slides_url) %}{% endif -%}
+      {%- if material_url %}{% set _ = answers.append('Supporting material | ' ~ material_url) %}{% endif -%}
+      {%- set resources = ((this.resources|list) + answers)|resource_items %}
       {% if resources %}
       <ul class="talk-previews">
         {%- for item in resources %}

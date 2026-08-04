@@ -274,12 +274,14 @@ def resource_items(lines: object) -> list:
     just noise.
     """
     items = []
+    seen = set()
     for raw in lines or []:
         parts = [p.strip() for p in str(raw).split('|')]
         parts += [''] * (3 - len(parts))
         label, url, preview = parts[0], parts[1], parts[2]
-        if not url:
+        if not url or url in seen:
             continue
+        seen.add(url)
         path = urlsplit(url)
         host = path.netloc.removeprefix('www.')
         # A suffix is a file type only when it reads like one: arxiv.org
