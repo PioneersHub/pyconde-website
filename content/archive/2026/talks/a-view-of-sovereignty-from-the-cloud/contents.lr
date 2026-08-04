@@ -80,3 +80,197 @@ Digital sovereignty is the capacity to act independently regarding computing inf
 The hardware layer consists of complex chip ecosystems. Modern cloud servers utilize high-core-count CPUs and GPUs, such as the NVIDIA Hopper generation, which employ chiplet designs to increase transistor density. Manufacturing these semiconductors depends on Extreme Ultraviolet (EUV) lithography technology from ASML. Networking is the final component, utilizing high-capacity switches—such as 64-port, 800-gigabit switches providing 51.2 terabits per second—and optical transport equipment from vendors like Nokia and Adva.
 
 European digital sovereignty is hindered by a heavy reliance on US providers, with 83% of large enterprise cloud spending flowing to US companies. Although 50% of hyperscaler technology acquisitions originate from European intellectual property, the physical production and control remain centralized. Achieving independence requires shifting away from hyperscaler lock-in toward local providers like OVH or Scaleway, utilizing open-source software such as Linux or OpenBSD, and investing in local technical talent to ensure knowledge transfer and operational autonomy.
+---
+transcript:
+
+**Speaker 1** _[00:01]_
+
+Good morning, everyone. Good morning. Okay. How did you like the conference so far? Whoo! Thank you. Thank you. So, we're getting to, unfortunately, the last day of the conference. And when we think about who to invite for keynotes, we also think which are missing gaps and also topics we should have spot on because we probably depend on it more than than we do and what would software be without hardware and of course our minds we most of us work in software we we are focused on software um so but uh every time i had a question about hardware that how does it work can you little give me like insights also like about future developments and what's going on aaron was always somebody to reach out to and say hey just give me like a high level oversight for my software engineer's mind and it was always like really insightful how important also having an to know what what the hardware does like to have like an easy at least like an idea of it and of course in the whole debate on being sovereign being owning and being able to run your own hardware is more essential than ever. So I'm super happy to introduce Aaron Glenn to his keynote. Please welcome Aaron.
+
+**Speaker 2** _[01:41]_
+
+Thank you for the introduction, I appreciate that. This was my introduction to computing, a beige box with disk drives, expansion bays, and I.O. slots placed purposefully at the center of a large desk, paired with relatively small color screen and a relatively loud physical keyboard. The mouse worked off an actual ball on the inside that you had to clean every so often for smooth operation. It's a rare moment in time when the prevalent marketing term met the honest definition. Personal computing had everything one could need right there in front of them for their journey right there in front of them, physically in front of them. The software library of disks, the data on the hard drive located inside the personal computer they carefully selected, purchased, unpacked, connected, and powered on. computing made reasoning about the idea of sovereignty fairly straightforward. The advent of the Internet and subsequently cloud computing took the abstractions and governance of personal computing out of personal spaces and centralized them in massive computing warehouses, better known as data centers. Hi, my name is Aaron Glenn, and I'm one of the engineers who participated in building and connecting some of those very data centers over the past 20 years or so of the Internet age. In that time, I had the immense pleasure and privilege of organizing and leading the first optical networking team, bringing fiber optic, terrestrial fiber optic, and broadband connectivity to the near 6 million inhabitants of Somaliland. No, I was not supposed to be up on top of the data center on a transmission tower. This is a candid photo of me up there. me first, wear a harness. Twenty years ago is kind of a long time. Given the wide range of experience and ages in this audience, I'd like to divide up the last 50 years or so into a few eras. Collectively, computing has evolved and transitioned from the post-mainframe personal computing era to the Internet age, marked by the digitization of commerce. The ubiquity of connectivity and the ever-increasing capacity and equally decreasing cost led to the concentration of computing power at immense scale into what we call now clouds. These clouds have grown by many multiples in both absolute size and density into powering the age of what we now call generative or artificial intelligence. But at the advent of the cloud, many, some of the most experienced and self-styled gray folk, decried its very existence. There is no cloud, they said, just someone else's computer. I know this for a fact because I was there before my own gray. I'd like to ask, what does sovereignty mean when the computer is someone else's? And in that framing, I'll try to leverage my experience to broadly answer two questions. How does someone else build my cloud computer, and what is my cloud computer made of? Throughout, I invite you to keep this definition of sovereignty front of mind when thinking of the phrases sovereign cloud or digital sovereignty. Sovereignty, the capacity to act independently. The someone else in someone else's computer is actually, in my opinion, a sleight of hand. It takes many, many someone else's to make that someone else's computer the cloud. Before any cloud can be formed, a location must be found. After all, the area icons and serverless marketing materials we've been subjected to, every Docker container, an Ansible playbook runs somewhere on a physical device. And when planning to concentrate very, very many powerful devices in one location, one must choose a location with care. When choosing a data center location, early cloud developers took into account generally two factors, the distance to people who wanted to connect, and if there was fiber laid in the ground nearby. Take note here of a photo as it changes over the next two slides. Ignore that existing building. That's just the Zalando fulfillment center. Today, the median hyperscaler equipment rack draws 10 to 15 kilowatts. For reference, the average house pulls 5 to 10 kilowatts. Comparing that to enterprise equipment racks from a decade prior, that's two to four times the amount of electricity. The latest liquid-cooled frontier training models, that equipment rack is 10 times greater still, 150 kilowatt hours. Here we see the beginnings of a campus with its first phase power transformers and second phase building foundation put in place. And this is the completed 40,000 square foot Vantage Data Center's Berlin 1 campus here in Germany. It was built in the beginning of 2021 and was only recently just finished full capacity of 56 megawatts and 40,000 square meters of space. A second campus with 32 megawatts is already underway. To concentrate such powerful servers in one location, not only sufficient space, but sufficient power sources required. When 10 to 20 times the power density in a hyperscaler or cloud data center is required, the first and foremost concern is everything power. How much is available, at what price, and most importantly today, when? Even armed with a suitable land and a generous and inexpensive power source, that data center project may be five years away from even beginning. Large amounts of power need large amounts of power infrastructure. The aptly named large power transformers are the very first piece of highly specialized equipment in turning on a cloud or hyperscale data center. There are less than 10 manufacturers worldwide and less than 30 plants in the globe. There are six located here in Europe, and you may be pleasantly unsurprised to know that three of them are here in Germany. How much that helps, I can't say, as the wait time to connect a large power transformer if you have one here in Europe can extend up to a decade long in some areas, like Amsterdam. This is an aerial view of one Microsoft modular hyperscale data center, highlighted here in the green and orange are the generators and massive power transformers that are located outside. The buildings themselves are large data halls. These house the equipment racks and halls of servers. These facilities are built modularly so that when more capacity is needed, they expand by building additional identical data halls. To distribute the massive amount of power to hundreds and thousands of devices inside each data hall, a considerable amount of technology is required beyond just woven strands of copper. the generators and massive transformers are layers of transfer switches, batteries, distribution panels to each data hall and row of racks. Each of these pieces of power distribution equipment contain a multitude of digital sensors and processors, both for functionality and telemetry. The Intelligent Power Distribution Unit, or PDU, is simply a fancier version of the power strip we all get at MediaMonk. Every power strip in a cloud or hyperscale data center is equipped with hundreds of digital processors and microcontroller units, which are there to meter and monitor the electrical supply. In a hyperscaler data center, many thousands of chips are needed simply to power chips. Inside these cloud data centers, you'll find many types of processors doing computing. The most popular in a data center by far today is the GPU, or the graphics processing unit. The first machine-learning-specific GPU with tensor cores in it arrived back in 2017 with the NVIDIA Volta. Within three years, that architecture was completely obsolete, supplanted by the next one, Ampere, which fit twice as many transistors in the same amount of size. Despite being two generations old, that Ampere generation is still widely available through NeoClouds and non-hyperscaler offerings today. after again fitting nearly twice as many transistors in the next Hopper generation, one can see the new chip revolution demonstrated through a chip twice the physical size and almost two and a half times the number of transistors. That same regression is how our humble CPU from the PC era has grown to the hundred core, many core cloud servers of CPUs today. Arranging multiple smaller chips, both next to each other and stacked above, chiplets come together to create a much larger and capable processor. The CPU of today is actually many physical CPUs and memory interconnected and packaged together. In contrast to the CPU and expansion cards of the personal computing era, the virtual CPU offered in today's cloud containers and virtual machines is often a timeshare of a slice of a thread on a core in a CPU with hundreds of other cores and twice as many threads in it. Whether generic or specialized, all chips require an ecosystem of logic designers, wafer manufacturers, and associated tooling. And here, Europe has a number of participants. Shown here from one of the Eurostack white papers, the 10% share of global production and processing that Europe contributes has remained unchanged since the PC era. This prompted the Europeans Chips Act, passed in 2022, which aims to shift this by doubling European chip production by 2030. Any discussion of chips would be remiss without highlighting the Netherlands-based company ASML and their EUV, or Extreme Ultraviolet Lithography Technology. EUV technology is critical in the manufacturing of the latest semiconductor chips. US technology export policies have dictated who ASML can do business with, adding a layer of complexity to discussions of European sovereignty. With the campus selected, the power connected, the rack situated in the many rows and data halls, the chips have been etched, packaged, and placed, but you don't have a cloud just yet. The final piece to building a cloud is connecting it. This is my personal specialty, packet and optical networking specifically. Connecting servers and storage and GPUs requires more chips still. To connect them with sufficient capacity and resiliency requires many pieces of equipment. While there are many network topologies and designs, nearly all major ones share symmetry and a tree-like structure. One of my favorite visualizations of data center connectivity is here, populized by Facebook and Meta. Each dot, generically, is a switch. And this is an example of a 64-port, 800-gigabit data center switch. That's a total of 51.2 terabits per second of total capacity, more than the entirety of residential Internet traffic if you combine Ireland and Finland together. There are many hundreds of these switches in every data hall or pod, connecting both servers, accelerators, and other switches. And inside each of them is a variety of chips. Each data center switch contains a full-fledged server of various horsepower inside, running control and management plane software. This drives a specialized networking switching chip, or ASIC, that is in turn run by a base management card, or BMC. Commercially there are a handful of network switching chip vendors, such as Broadcom, Nvidia, Cisco, Huawei. The highest bandwidth switching platforms are where tens or hundreds of terabits of traffic are processed, and those switching chips must be paired with equally sophisticated re-timer or serialized and deserialized chips. Those chips are developed by even more specialized firms still, such as AlphaWave Semi and Credo. Hyperscalers, like Google and Amazon, have acquired and developed their own customized network switching chips, designed for their specific storage and virtualization tech stacks. Others, such as Meta and Microsoft, have developed their own network software on top of the commercially available switching chips. These are available as open source on GitHub, and you can read more about them under the name FBOS for Meta and Sonic for Microsoft Azure. The switches and data halls are connected together by optical equipment measured in hundreds or thousands of strands of fiber. And for longer, intra-metropolitan distances and backbones, those are usually measured in a handful of strands. But each strand carries tens of individual channels that are measured in 400 or 800 gigabits. In some cases, even 1.2 terabits per second. That's equivalent to 24,000 YouTube streams at 4K at the same time. This requires a high precision and specialized engineering, which shows up in chip design. European companies like Nokia and Adva maintain approximately 20% share of the global optical transport equipment market. The largest supplier outside of China is a US company named Ciena. The cloud is someone else's computer, and that computer is made up of many other computers. Those computers are made of many other chips. You need many chips and many different chips to make a cloud. Succeeding at this without the outside or undue influence of other interests is as challenging as it is worthwhile and important an exercise. It is essential for the unity of Europe. I'd like to close with two statistics and a final thought. I was born and raised in the United States, and I immigrated to Europe over a decade ago. Let me plainly and authoritatively say the stories of US technology companies doing it bigger, better and faster than Europe are just that, stories. 50% of technology acquisitions by hyperscalers come from Europe. Stories are powerful. And as the world around us changes and re-enrages in ways unfamiliar to many, the conveniences and costs of previous eras need to be reconsidered and widely discussed. Annual purchases of cloud software services by EU businesses are estimated to be equivalent to 1.5% of European GDP. This translates to 83% of European large enterprise spending going to US providers. We are presented with many technological choices every day in our professional and personal lives. After spending the time to inform yourself further, I implore you to make those choices going forward with purpose and intent. Every technology choice is political. Choose your values every time. Thank you.
+
+**Speaker 1** _[18:10]_
+
+Thank you so much for the great keynote. Now, time for questions. You still can go to talks.pycon.de and ask even more questions. How do you see Python and its community aiding in digital serenity?
+
+**Speaker 2** _[18:35]_
+
+You know, the next time it's really easy to deploy something on AWS or Azure, take a look at OVH or Scaleway. See if you really need all of those different features or all of those different things. If you need to run it in the cloud in the first place, try to figure out if something isn't as complicated or microservice-y as it might be at first glance. See if you can't run it locally.
+
+**Speaker 1** _[19:04]_
+
+Next question is, do you think running your own infrastructure might be the sexiest job of the 21st century?
+
+**Speaker 2** _[19:13]_
+
+Well, I'm a gray beard, so it was sexy before the 21st century. I think it's important, whether it's sexy or not, that everyone, a Python developer, anyone that uses technology in a professional capacity, to have a physical understanding. We've gotten very far, abstractions have taken us very far, but it has given us a distance from what's actually being done. in order to get closer to that, one great way is to join the Feminist AI LAN party and come see the GPUs and the network in person and get inspired to run your own stuff. You don't need to spend 50,000 euros on four MacBook Pros or whatever people are doing these days. That's not required to run your own infrastructure. But yeah, I would say it's sexy, if that's how we're calling it, sure.
+
+**Speaker 1** _[20:04]_
+
+sure yeah let's phrase it press around now um why doesn't europe have competitive big cloud providers because 83
+
+**Speaker 2** _[20:11]_
+
+Because 83% of all the money is going to the U.S. I think that was on the slide. The numbers don't lie. I'm an engineer at heart.
+
+**Speaker 1** _[20:22]_
+
+Okay, that was quick.
+
+**Speaker 2** _[20:23]_
+
+Simple.
+
+**Speaker 1** _[20:25]_
+
+Simple, yeah. Will memory prices go down again? I think we probably need more context to the question.
+
+**Speaker 2** _[20:36]_
+
+Sure, yeah, so memory prices have more than quadrupled recently, I think, since about October and November.
+
+**Speaker 1** _[20:36]_
+
+Sure, yeah.
+
+**Speaker 2** _[20:44]_
+
+This is my personal opinion here. Sam Altman, or as I like to call him, Scam Altman.
+
+**Speaker 1** _[20:51]_
+
+Ha, ha, ha!
+
+**Speaker 2** _[20:52]_
+
+I didn't come up with that. No need to clap. He's written a memorandum of understanding to the two major providers. It's a cartel. Memory, DRAM specifically, is organized economically much like a cartel would be. In fact, in the 90s, in the PC era, they got sued by the United States government. Anyway, Sam Altman went in and said, I will take 40% of everything you make, and then went to the other half of the cartel and said, I'll also take 40% of what you make, not telling both of them. And then all of a sudden, everyone woke up, and 40% of the memory was taken by Scam Altman. Now, I personally don't believe that he'll actually be able to pay for 40% of all the world's memory. and as we're already seeing, prices are going down because I think a few people also believe that outcome. So I do believe they will go down because they went up for a silly reason.
+
+**Speaker 1** _[21:56]_
+
+Regarding the 50% of US tech acquisitions come from Europe, are these parts actually manufactured in Europe or is it just European companies doing it abroad?
+
+**Speaker 2** _[22:07]_
+
+I believe, and you can find this in the Eurostack white paper where I quoted that from, I believe that statistic is mainly from software and intellectual property, not so much chips and hardware. So one famous example is that most of Amazon's storage technology was acquired by a small Austrian startup back in 2009 or something of that effect, And that underpins, that intellectual property underpins all of their cloud storage. It's that foundational. So that 50% is where I believe refers to what we do here in tech startups and new intellectual property and software design that ends up getting acquired by hyperscalers and integrated into their tech stacks and becomes US focused.
+
+**Speaker 1** _[23:01]_
+
+Nice, that's a fun question. Do you know who coined the term the cloud and why the term was chosen? What's your view on this term? It seems tragically ironic.
+
+**Speaker 2** _[23:16]_
+
+You know, from my take being a systems administrator before it was called the cloud, I think it was ultimately aptly named because it gives elasticity. It's ephemeral. I personally used to stack database servers and web front-end servers and put CentOS DVDs in them and install them. And when we needed another web front-end server, I would unpack another server and put the CentOS DVD inside of it. That's not. The cloud gave elasticity. Is it an outdated term? Maybe. But ephemeral computing kind of looks like a cloud.
+
+**Speaker 1** _[23:56]_
+
+I think we have multiple strange names. I don't know. Okay, yeah. I think that's a really important question because if you remember the map Aaron showed, where data centers are, what strategies can African developers or governments adopt to improve digital sovereignty while still relying on global cloud providers?
+
+**Speaker 2** _[24:23]_
+
+I can answer that best with my direct experience when I was in Somaliland I ended up having to put it not politically I had to fight to train hire and build a local team specifically for technologists or technology enterprises in in Africa based on the African content. I think the most effective and important thing anyone can do is fight, fight, fight for local talent, hiring them, building them up, training them. It's very easy for both American, European, and Asian vendors to come in and effectively capture infrastructure by not transferring knowledge, by not hiring local engineers, by not training them, and having a constant cycle of foreigners come in and manage critical infrastructure. I experienced that directly in Somaliland with multiple vendors, Alcatel-Lucent being one of them. And yeah, it's toxic, it's bad, it's bad for everyone, but specifically technologists and technology on the African continent. Support local.
+
+**Speaker 1** _[25:44]_
+
+Many questions flying in.
+
+**Speaker 2** _[25:46]_
+
+I'm happy to answer them.
+
+**Speaker 1** _[25:47]_
+
+I'm happy.
+
+**Speaker 2** _[25:48]_
+
+I love talking to Shroff.
+
+**Speaker 1** _[25:48]_
+
+All right, just checking in. Yeah, they just fly in. It's really awesome. What are reliable Europe-based alternatives for cloud services? Will these be able to compete against US and Chinese giants in the near future?
+
+**Speaker 2** _[26:04]_
+
+Well, that depends on what you mean by compete. I would argue that a lot of the tech stack and services provided by the common hyperscalers are not things you actually need. I think the existing ones, I'll use OVH and Scaleway because they're front of mind and easy to remember, but there are quite a bit more, may not have the managed NAT gateways or I can't even think of all the different AWS services, But you don't need them, ultimately. Very, very few of you need them. And the reliability in services is effectively the same. The equipment and the SREs are all equally as good.
+
+**Speaker 1** _[26:48]_
+
+So actually, you're saying that the underlying infrastructure is way simpler and basically it's most of AWS's software as a service or other services, they just wrap. And if you want to independent, you certainly.
+
+**Speaker 2** _[27:04]_
+
+Certainly, certainly.
+
+**Speaker 1** _[27:04]_
+
+I mean, we have backend software and we probably can do that our own and better.
+
+**Speaker 2** _[27:08]_
+
+Yeah, exactly. The advantage of scale doesn't really apply. You can get the amount of computing power and the number of different locations in Europe or in the world from a lot of different providers. So the argument then becomes, why am I choosing these hyperscalers over folks that have equivalent computing capabilities? Am I choosing it for their software stack? Am I choosing it for their billing? Am I choosing it because everybody else is choosing it? Am I choosing it because that's what the how-to said to do? You don't want to discount those kinds of things. When documentation says spin this up on AWS, what do people do? They spin it up on AWS. Does that mean you couldn't spin it up on Scaleway? Does that mean you couldn't deploy it on a few VMs on OVH? You probably could. Choose to.
+
+**Speaker 1** _[28:04]_
+
+This is not 100% data center related, but to your technical expertise in hardware. How would you convince enterprise stakeholders to move away from hyperscalers with all its great features out of the box towards to perhaps a more elementary server in cloud? And I would probably add to that, because I've seen it as well, probably move back on site, on premises, because you don't necessarily need everything in the cloud, right? because it brings it adds a lot of complexity also in governance data privacy so i would blend that
+
+**Speaker 2** _[28:41]_
+
+Absolutely. There's a lot of different frameworks that you can use that can help you decide on that kind of stuff. So the question of how to speak to management after 25 years of trying to make engineering arguments to management, I feel I have a little bit of experience. And on this question specifically, I would go to anyone that is involved in risk or legal and I would inform them of the International Justice Court and how they're dealing with Microsoft turning off their Office 365. It's not going very well. And if you're just one Trump tweet away from disconnecting Microsoft to your enterprise because somebody woke up on the wrong side of the bed, I'm not a chief risk officer, I'm certainly not a lawyer, but there's probably a conversation to be had there. And if it hasn't happened yet, maybe now's the time. So that's how I would talk to management.
+
+**Speaker 1** _[29:52]_
+
+Is energy the bottleneck of the next few years?
+
+**Speaker 2** _[29:57]_
+
+It depends on where you sit if you want a sustainable future and don't believe in burning up a bunch of fossil fuels or gas.
+
+**Speaker 1** _[30:05]_
+
+I can add it, it's a local person.
+
+**Speaker 2** _[30:08]_
+
+Ah, okay. Yeah. No, I personally don't think energy will be a bottleneck. I think a lot of what requires 150 kilowatts per rack, as I mentioned, in all of this liquid cool is an immense amount of inefficiency. You'll see this with some of the researchers in the ML and AI space finding more efficiencies, finding better ways to utilize both memory and network bandwidth and things of that nature. I think over the next five to ten years we'll be able to do exponentially more with effectively the same amount of power. I don't think that will be a bottleneck.
+
+**Speaker 1** _[30:49]_
+
+What's the role of open source as a narrative and technological choice to achieve sovereignty?
+
+**Speaker 2** _[31:00]_
+
+That's a big question. I think it's integral. I'm not much of a Linux fan. I'm an OpenBSD fan, if you know what that is. But Linux and-
+
+**Speaker 1** _[31:11]_
+
+Can you...
+
+**Speaker 2** _[31:12]_
+
+It's an operating system. It's an alternative open-source Unix-based operating. It's a very niche thing, and that makes me not a fan of Linux for a bunch of nerd reasons that I won't go into, but for open-source, things like Linux where you have effectively trillions of euro dollars of investment, untold amounts, hundreds of millions of person hours invested around this communal understanding. That is the most powerful way to not be painted into a corner. If you want to act independently, then the idea of a communally understood and maintained piece of software, whether that ends up being a tech stack or a web server or whatever, is a critical component of sovereignty and independence. I don't think a vision of sovereignty can be built on only closed source or closed software.
+
+**Speaker 1** _[32:21]_
+
+Also, local context, what are we missing to build similar good cloud platforms? Good engineers, incentives for good engineers, political reasons.
+
+**Speaker 2** _[32:33]_
+
+We need better stories. We just need better stories. We need to stop saying the story of, oh, well, but AWS has this and it's bigger and it's trillion dollars this. We just, you need to tell better stories. Technologically, politically, however you would like to categorize it, I firmly and very passionately believe that the narrative needs to change. Amongst us, the technologists. I'm not waiting for politicians in parliament to suddenly understand how a cloud is made or a chip is etched. I don't necessarily even expect most of this room to understand how a chip is etched, but it would be kind of cool. But I'm not waiting for the politicians. I'm not waiting for other ones. We need to change the story, both in what we tell ourselves and others and how we carry ourselves and how we act. And that's just as simple as, where do I run this Ansible playbook? How do I follow this how-to? If it defaults to AWS, AWS, maybe I run it somewhere else. Maybe I run it locally. Maybe I take the time to dump the commands into Gemini or Claude and convert them to Proxmox, a local VM stack that you can run on an old machine. That's worthwhile. Take that time. Don't wait for Macron or Mertz to come up with something. Do it yourself, and then tell your friends.
+
+**Speaker 1** _[33:59]_
+
+I also want to add from the conference side, we're also working hard to get this perspective out there and change the narrative, claim the open source narrative also to make what we do in the excellence we bring to the table to the site's level. So also like full aligned. So you're now part of the crowd to make this happen and bring your peers in, your friends, and just tell them if you want a servant, if you have one more sovereignty, yes, this is the way to go and not just follow the other narrative. Yeah, I think this was awesome. Sorry. Thank you. Thank you.
+
+**Speaker 2** _[34:40]_
+
+Thank you very much. Thank you for the questions. Thank you for your time. I appreciate it. Thank you.
+
+**Speaker 1** _[34:44]_
+
+Thank you so much. So, on the other note, so let's now coffee break. I think you should, if you're in Harvard and you want to hack and have fun and discuss, Catherine's over there. Feminist LAN party is happening, rest of the day. Huh? Aaron will be at the LAN party. We also have an open-source business panel I'm doing in the afternoon. And fun fact, you just heard Scalable. The former CEO of Scalable actually is going to be part of that as well. So enjoy the day. See you later.
+---
+transcript_status: auto
+---
+transcript_language: en

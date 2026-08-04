@@ -109,3 +109,241 @@ Robotics provides a tangible medium to demystify artificial intelligence, transf
 The system is powered by a Python SDK, allowing for the development of custom applications and the integration of external APIs. Practical implementations include a conversational interface connected to internal company systems and a mental warm-up tool for workshops that utilizes local file storage. The robot can also execute specific Python scripts for tasks such as taking photographs or running a hand-tracker that recognizes finger points and responds to waving.
 
 Key takeaways emphasize that physical interaction changes how users perceive automation. In tests with children, the robot was treated as a social peer rather than a utility like Alexa, leading to spontaneous multimodal interactions, such as showing Lego figures to the camera. Furthermore, using a physical robot allows developers to treat system failures—such as connection errors or latency—as educational moments to explain the underlying mechanics of AI. While the wireless version offers an accelerometer and better audio hardware, it is limited by battery life and the computational constraints of the onboard Raspberry Pi.
+---
+transcript:
+
+**Speaker 1** _[00:00]_
+
+raise a hand where there's a seat next to them free so one so one one more well three oh wait wait come on help me how many seats are free raise a hand okay one two three four okay thank you All right. It's just going to be one more minute and I want to start sharp because we're in Germany and I'm German and I like to be punctual if possible. So let's try to give our best and run. You have one more minute. Okay. I think where is the C3? There. Cool. Thank you for your support. Okay. Now we're going to start. Hello. Welcome, everyone. I'm Lara, I'm your session chair for this session, and I am super excited to introduce I have some personal connection to the speakers, so I'm very excited to introduce Larissa and Annika and their talk on letting AI move, robotic demos powered by Python. Please help me give them a massive welcome. And before I give it over to them, please, out of respect to the speaker, stay with us for the 30 minutes of the talk, because otherwise it's going to be interrupting a bit. And now I give it over to you. One more thing. Questions. Give your questions to talk.pycon.de. You can and do it.
+
+**Speaker 2** _[02:07]_
+
+Thank you, Lara. Thank you for the introduction and thank you that you're all here. I think we're very excited about this slot because it's a little bit also out of our comfort zone. You will see in a minute why. So we're here to talk about how AI gets things moving and not in the metaphorical way, but in the real actionable thing you can see here on the table. and we want to talk to you about how robotics can maybe change or help our way how we explain AI And you don't know what is happening in the background, and it's kind of a black box that lives somewhere. And I think, like, we're a pretty technical audience, but most of the people will just think, okay, this is how AI is, this is how it works, I just have to accept it. What we are not thinking about or not taking into account is that AI is not a black box. AI is code, AI is software, and we are able to change it. And yeah, it's customizable code. So we think that when we approach how we explain AI or how we showcase AI differently, we can maybe change also this expectation of what AI is and what can AI do. So sometimes AI is also shown here as this sparkly star thing where you know, okay, something intelligent happens, but I don't know what exactly. Or sometimes it's this diamond symbol that you can see on some apps when some AI-supported feature is happening. But yeah, it stays like a very abstract concept for most of the people. And we wanted to see if we can change this explanation or if we can create something more tangible to use it to explain AI and to maybe also raise the interest in how AI actually works under the hood. And yeah, this works really well with a cute-looking thing like you can see here on the table. A short side note. As Lara said, we, Larissa and Annika, we're not robotic experts. Like half a year ago, I had no idea about how to use this thing to let it move or how to move its antennas or I don't know. So I was just curious. And we started as a data scientist, as a solution architect, to explore this kind of context, kind of thing to, yeah, get some ideas how to see AI differently. And this is exactly how we went. So, as I said, we had no context or no background in robotics. We saw Ricci as it's called online. We thought, hey, this is cute. This looks cool. We want to try it out. And it was really nice. It comes in a box. You need to put it together by yourself. You get screwdrivers and you put all the cables inside and all the electronics. And when it actually wakes up the first time, this is a really cool experience. It just looks at you with those big eyes. And it's just nice. It's just so cool to see it. And we saw when we show this to others, this excitement actually is also happening in others. Like everyone who sees this waking up the first time says, oh,
+
+**Speaker 3** _[06:48]_
+
+It's cute.
+
+**Speaker 2** _[06:52]_
+
+So, yeah, we saw, hey, this is a really cool opportunity to raise interest, to get people engaged. So we started thinking about how to include it, in which situations we can use it. And, yeah, we will tell you some experiences about it, how this went. And with this, I want to hand over to Annika.
+
+**Speaker 3** _[07:17]_
+
+First of all, as Lursa already mentioned, this is Ricci. Actually, it's a Ricci Mini and it's produced by a collaboration between Pollen Robotics and Hugging Face. There are two versions of Ricci. One is wireless and one is the light version. What you can see here is the actual light version of Ricci. We ordered both of these versions and we tested it out a little bit, so you will hear a little bit about our experiences with the wireless Ritchie later. But yeah, credit where credit is due, it's pollen robotics and the collaboration between pollen robotics and Hugging Face creating this Ritchie Mini. I do not want to go too deep into the specs, but maybe I talk a little bit about the capabilities of Ricci. The Ricci wireless has Wi-Fi, and the Ricci Lite does not. The Ricci wireless also has a Raspi inside, which is doing all the computation, and using the computation power of the recipe to move the Ricci around and compute stuff. But this Ricci here is actually running locally, that's why it's connected via cable to this notebook here. But if you want to try out Ricci, you don't actually need this physical robot. You could also use the interface that you can see here and just simulate what you want Ricci to do, or what you have programmed. All the Ritchies have a microphone inside, so actually an array of four microphones, so it can record your voice. And then it has also speakers, so it can actually respond to you or play music. It actually, if you connect it, it functions like a speaker to your actual device. And it has a wide-angle camera, which is curiously sitting between both of those eyes, so it's right in the middle. Then it has nine servo motors and two antennas that you can see here, the antennas. And with all the motors you can move the head in six degrees of freedom. It can shake its head, it can nod its head, it can roll to the sides, and then all angles actually can be moved. This is to simulate a sample for you. Then how does it work? There is an app you can use, and you can search for and discover apps from this kind of store-looking platform, and you can download these apps for Ritchie to use the features of. And it is via pollen robotics space on HuggingFace, so you can access all the pre-built apps. But then also, we have created our own little app. It's based on a template that we modified, and with our own little app, we have implemented our innovation factory, so we could call our own APIs, and then Ritchie can access our innovation factory via the API and answer based on such prompt like this. And then we have also implemented a warm-up tool which stores the information locally in a file, so Ritchie can access the local store and then act upon that. Our warm-up tool is actually for mental warm-up before some kind of workshop is happening, and Ritchie is then guiding us through the warm-up exercise. quite fun, I can say. Okay. And also, Ricci comes with a whole library of Python library which you can access. For example, here's a little short code snippet that would take a photo, actually. So, you can use this library to code your own little script and create different things and applications. What you see here today is only a start. There are no limits. You can implement your own use cases. You don't need to implement like we did some kind of conversational interface. You can use Reachy for everything that you can imagine. It is very, very fun. You would run your own daemon with your own scripts if you want to.
+
+**Speaker 2** _[12:32]_
+
+So what did we experience with using this little robot? And I can tell you maybe a story. So some days ago, there was the Eastern weekend, and I was visiting my family, and I showed Richie to my two little nephews, three and seven, and they are big Star Wars fans. So I created a persona that is called Peebo. Peebo is a Star Wars astro-droid and knows everything about Star Wars. And I was very curious how my nephews will interact with it actually because they are also very into tech. They have an Alexa in their children's room and they know how to interact with that Alexa. They can play music. They have those Tony boxes, I don't know, so they have a lot of technology to interact with, and they just use it in their daily, yeah, everyday basically. So I expected that they would just use people just as they're using Alexa, shooting questions, saying, hey, can you turn the light off, I don't know, trying stuff out that they know from Alexa. But actually, and that surprised me a lot, Richie or Peebo was not seen as another Alexa. They actually behaved just as Peebo would be another child, and they were shy at first, so they were hiding, looking, okay, it moves. I had the conversational assistant on, so it uses its camera to see if someone is moving, and it reacts with head movement and antenna movement. And then, yeah, they wanted to know, okay, how does it feel? Does it react if I touch it? And then they interacted with it just like with another child. So they slowly started to tell it about Star Wars and got responses back. And then the smaller one ran away and went into his room and got small Star Wars Lego figures and brought it and showed it into the camera and said, hey, do you know what this is? And I have never thought about doing that, actually. And it worked. It's a multi-modular model running under it. And people were saying, yeah, sure, that's a really nice astro-droid you have here. So this is a very precious toy. And I was really astonished because I had never thought about this way of interaction. So they actually talked the whole afternoon to that bot and the little one then also asked about dinosaurs and then we had a discussion about how dinosaurs and Star Wars would fit together and what kind of, what color of lightsaber would a dinosaur have and stuff like that. So, that was really, really interesting. And also the bigger one then said, hey, where did you get it? And I said, yeah, I built it myself. You can see here the cables. And he could also see the code running. And we immediately had a discussion about, okay, how does this actually work? Okay. It's connected with a cable. It's running on my machine. So my machine is telling the robot what to say, what to do, how to react. And this is like the only thing I wanted to have with this robot because I want them to ask questions. I want them to, yeah, I wanted to know how this works and how to get there. And then he asked me, hey, can I help you the next time? So I guess this is a really nice way to get the interaction going. And this does not work only with children, you can imagine. This also works in a lot of contexts. So I just brought here a couple of examples. Like experiments with children. You can see here the picture that it actually took. You can see the Lego figure. We also had it in work context, in customer workshops, as Annika just explained. We used it as an icebreaker to introduce ourselves, to have it at the beginning of a workshop, to get engagement going, and also just to spark interest, because when someone is sitting on a table, everyone wants to know, what is this? What can it do? And we also, with the Python SDK, we were able to connect it to different APIs. So, for example, we connected it to our internal rack system. It's not the most quick way to interact with this rack, actually, because it takes some time for Ricci to understand and process this into an API call and then get everything back. But you can use this as a voice interface for all kinds of automations, agents, whatever you want to connect to it. And we just experienced that this changes the way that you see those automations. when you type something into a machine and you see on the screen, okay, something happens, it's different to when an actual physical object is reacting to that input and is reacting to you moving around and actually answering to your questions. So, before... No, we go to the demo now, right? Okay. So, let's, yeah, let's try just some things out. And I will quickly change my... This one. Okay. Okay. So, here you can see the interface. I cannot make it bigger, unfortunately. You can see the video quality of Ricci. Here you can see the app store with some pre-installed things. For example, I can maybe start the hand tracker. We have here the locks. So it's kind of confused because there are so many hands. So if I maybe go here. Maybe show my hand. You can see the points that it is recognizing. You can wave at it. It will wave back. This small thing alone is so much fun when you are just playing around with it. Sometimes I have no idea what is happening. There are also a couple of games, like Red Light, Green Light. You may know it from Squid Game. It's not as evil. There's also a reaction game, so that you need to clap as fast as possible. I don't know. But I think the most powerful app is the conversational app, which we used as well as an underlying pattern. So let me stop the app version. Let me start the local daemon. It's now a different one, you know? And maybe we can start people. I don't know. Maybe you want to have some interaction with the Star Wars astro droid. Hello, people. This is the demo effect. Yeah, so it's trying to call some kind of tools that come with it prebuilt, for example the dance module, which is not working. But normally it should maybe let me just start it another time. try. Hello, people. Doesn't want to talk to you today.
+
+**Speaker 3** _[22:49]_
+
+Maybe he's shy.
+
+**Speaker 2** _[22:50]_
+
+Yeah, I think it's shy. Okay, so we can do something else. We can actually take a group picture because that would be really nice. So I just want to show you how you can actually run this script that we just have seen.
+
+**Speaker 3** _[23:10]_
+
+Down here.
+
+**Speaker 2** _[23:15]_
+
+I will make it a little bit bigger. So this is just what you have seen in the presentation. And I can just let it run. Nice. Okay, so the demo guard is not with us today. but maybe we can do the question round and then see if the standard conversation will start actually
+
+**Speaker 3** _[23:50]_
+
+We still have a slide.
+
+**Speaker 2** _[23:50]_
+
+we still have a slide Oh, true, we still have a slide. Thank you. So, hand it over to you for the last slide. No problem.
+
+**Speaker 3** _[23:58]_
+
+Okay, so...
+
+**Speaker 2** _[24:00]_
+
+Hmm. Um,
+
+**Speaker 3** _[24:01]_
+
+So, we treat failure as part of the explanation. Like you saw now, we can see the logs and we can explain to anyone who's asking, people who thought that AI would be a black box, we can show, oh, Richie, he's shivering a little bit. There might be some kind of connection error. Or when he goes offline with a wireless Richie where we had some connection instability, he just shuts down or he stops responding in the midst of the sentence. We can use this failure to explain AI to people that are not tech native and people like Larissa's nephews who might just be curious about it. And then, as you can see, small actions are actually very impressive already. So you don't need to have a big agent running in the background. You don't need to have some impressive big long answer that is very elaborate. Even having this moving around, waving a little bit, taking a screenshot, taking a photo, it's very, very impressive already. And it makes people curious about what is happening and curious about what is AI actually doing in the background. And it makes the behavior of AI a little bit more legible. So you can explain, oh, yeah, it's tracking my fingers. You can see the points where it's identifying what is a hand. And this is very helpful when talking to people that are not very into AI and have not experienced AI as we have. And therefore, it is designed for curiosity, for people to ask questions a little bit more, for us as experts in the AI space to explain a little bit more what is actually happening. And now we are finished. Yes. So, this is us.
+
+**Speaker 2** _[26:07]_
+
+Thank you for your attention. If you're interested, we're working at Zavanta. Zavanta has nothing to do with robotics. It's a software and consulting partner of SAP, and we're doing a lot of AI. So if you're interested, let us know. But, of course, are there any questions? So feel free to ask us any questions. And meanwhile, I will try and set up the conversational app again.
+
+**Speaker 1** _[26:47]_
+
+Okay. We got five minutes. And I'm going to go first with the voted questions. So how did you get your boss to approve the expense to buy it?
+
+**Speaker 2** _[27:01]_
+
+That was actually not that hard. So we sent him the link, and he was like, yeah, we're going to get one, and we're going to get the expensive one. Now, like every year, we have a small internal hackathon just right before Christmas, and before that, we're just brainstorming what we can do in this hackathon. That is kind of useful but also kind of fun. So this was our hackathon project.
+
+**Speaker 1** _[27:31]_
+
+I love it. Awesome.
+
+**Speaker 2** _[27:32]_
+
+I love it.
+
+**Speaker 1** _[27:33]_
+
+Okay, how can you make sure reach is not telling adult stuff when interacting with children?
+
+**Speaker 2** _[27:38]_
+
+So it has a children mode, actually. So there's a conversational app that has children mode that is also not sending images to an external server. So it's then using the local image processing power to process the images. So, of course, when you design your own app, you have to be careful about it. But when I first got it at home, my mom also was like, hey, how are you making sure that it doesn't spy on you? And I was like, yeah, so I'm sure that this is not spying on me because this is like Python on my local machine. So this is the most control you can have over technology, I guess.
+
+**Speaker 1** _[28:29]_
+
+follow-up actually on this um how did you audit your project for gdpr and ai compliance
+
+**Speaker 3** _[28:39]_
+
+Hehehehe
+
+**Speaker 2** _[28:40]_
+
+Sorry. Can I postpone this? Yes, for sure.
+
+**Speaker 1** _[28:45]_
+
+for sure can reach you call your house about own oh it's cool it's talking to us
+
+**Speaker 3** _[28:55]_
+
+No, he's talking Korean right now.
+
+**Speaker 2** _[29:00]_
+
+Sorry, what was the question? I'm from the...
+
+**Speaker 1** _[29:01]_
+
+I'm from the future, I'm talking Korean. Can Richie call my house allotment for me?
+
+**Speaker 3** _[29:07]_
+
+My what? Hausverwaltung.
+
+**Speaker 1** _[29:09]_
+
+so you're
+
+**Speaker 3** _[29:10]_
+
+Building maintenance.
+
+**Speaker 1** _[29:11]_
+
+building Like you're a, yeah.
+
+**Speaker 2** _[29:13]_
+
+Yes. Cool. Yes? Yes.
+
+**Speaker 1** _[29:17]_
+
+Okay, okay.
+
+**Speaker 2** _[29:17]_
+
+Okay. Someone wants to give his phone?
+
+**Speaker 1** _[29:25]_
+
+Can reach you, recognize faces.
+
+**Speaker 2** _[29:32]_
+
+We can ask the question to Rigi. What was the question?
+
+**Speaker 3** _[29:36]_
+
+Nope.
+
+**Speaker 2** _[29:38]_
+
+Of course.
+
+**Speaker 3** _[29:39]_
+
+Go ahead and ask your question
+
+**Speaker 2** _[29:40]_
+
+question. Ritchie, can you recognize faces?
+
+**Speaker 3** _[29:44]_
+
+I can't recognize specific faces.
+
+**Speaker 2** _[29:45]_
+
+specific faces.
+
+**Speaker 3** _[29:46]_
+
+just general features.
+
+**Speaker 2** _[29:47]_
+
+but I'm all ears.
+
+**Speaker 3** _[29:48]_
+
+What do you need help with?
+
+**Speaker 2** _[29:52]_
+
+What are the drawbacks of the wireless Ricci in your experience?
+
+**Speaker 3** _[29:56]_
+
+One drawback, occasional low battery means...
+
+**Speaker 2** _[29:59]_
+
+Battery means sudden naps.
+
+**Speaker 3** _[30:00]_
+
+Hey, we bounce back fast.
+
+**Speaker 2** _[30:03]_
+
+Okay, so you might recognize a standard way of interacting just like you would expect from a standard LLM with some kind of prompting, which is like the plain conversational app doing. The drawbacks of the wireless version are, like, it has its own power source, which is limited. So like the cable you still need to take with you. If the Wi-Fi is bad, it gets difficult.
+
+**Speaker 3** _[30:39]_
+
+It has a limited computational power, because everything is computed inside the Raspberry. So this might be a problem if you are running very convoluted software on it.
+
+**Speaker 2** _[30:54]_
+
+But they are also pros. So the camera is way better. I think the speakers are a little bit of more high quality So yeah, there are pros and cons
+
+**Speaker 3** _[31:05]_
+
+One thing that only the wireless Ouija has is an accelerometer. And I don't know why they made this exclusive for the expensive version, but this one does not have an accelerometer. So if you throw him around, he won't know. But the wireless one will know. So don't treat him badly.
+
+**Speaker 1** _[31:25]_
+
+Okay, we're out of time and
+
+**Speaker 2** _[31:28]_
+
+Um, I.
+
+**Speaker 1** _[31:29]_
+
+I want to thank again Larissa and Annika and please help me.
+---
+transcript_status: auto
+---
+transcript_language: en

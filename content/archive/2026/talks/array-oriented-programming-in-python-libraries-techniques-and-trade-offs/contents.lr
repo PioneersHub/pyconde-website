@@ -147,3 +147,285 @@ Array-oriented programming in Python shifts the focus from individual element ma
 Key tools for this approach include NumPy, JAX, and Numba. NumPy provides the foundational array object and vectorized operations, though it often creates costly intermediate arrays in memory for complex expressions. To mitigate this, NumExpr fuses operations to reduce memory overhead, while Numba uses LLVM to compile Python bytecode into machine code, allowing imperative loops to run at C-like speeds. JAX further optimizes this process by tracing functions to create an intermediate representation (HLO), which is then compiled via XLA (Accelerated Linear Algebra) for efficient execution on CPUs, GPUs, or TPUs.
 
 A primary trade-off in array-oriented programming is the handling of conditional logic. Standard Python if-statements cannot be applied to arrays because the truth value of multiple elements is ambiguous. This is resolved using boolean masking—applying a filter of true/false values to update only specific elements. In many cases, it is computationally faster to perform redundant calculations on all elements than to manage the memory overhead of masking. For datasets exceeding available RAM, libraries like Dask extend these capabilities by implementing chunking and parallelized computation graphs.
+---
+transcript:
+
+**Speaker 1** _[00:08]_
+
+tutorial session this afternoon. I'll be your session chair. We have today Yasun Kromidas who is a PhD candidate at Rice University studying particle physics but he's also very active in the scientific computing community with Python and he will be talking about array oriented programming in Python libraries techniques and trade-offs. We plan to keep this interactive so you can ask your questions at talks.picon.de and I'll read them out or me and the volunteer Giancarlo we have mics so you can ask a question on the mic just raise your hand
+
+**Speaker 2** _[00:49]_
+
+All right. Welcome, everybody. Thank you for being here.
+
+**Speaker 3** _[00:53]_
+
+I'm
+
+**Speaker 2** _[01:09]_
+
+This is the schedule on the PyCon DE website, and here I have a material, a link to the GitHub repo, and it's also at the bottom as part of the material. And if you click on it, you'll go on this repository. This repository has a lot more material. We will not cover all of it. There is an outline in the README. I hope to get down to part, and be done with part three at least. We'll see about four and five, depending on the time, because it's a pretty crowded room. But regarding the setup, it's pretty simple. If you have Pixie installed, if you're a Pixie fan, or you can install it by just a curl command, you can just clone the repo, and you can run Pixie run start, and this will just create an environment for you, and run a JupyterLab session. At the same time, I have virtualenv and cond instructions, but they contain more steps. There's also this launch binder link, where you can click on it, and you will head over to Binder, and this basically builds and runs the repo as a Docker container, and you get the same thing on the browser. You'll see that I instantly get a Jupyter lab session. For me, for the sake of performance, I will just run it locally, so I will just go back, and I have the repository cloned even on my machine, so I will zoom this thing in, and I will just run pixie run start. I already have the environment, so it doesn't need to build, And I actually want to open this in another browser to be more clean. So I want to open it up here. OK. All right, so try to go through the setup as I speak, because there will be some puzzles and some exercises for you to do. But we'll get started with part one. So go into part one lecture. Let me see if I can do presentation mode. And I guess I can zoom in a little bit. And I hope that's visible. You also have the extra screens at the back. But yeah, let's get started. So as you may know, there's different programming paradigms, and they are rough classifications of styles of programming, and I've named here a few. So there's structured programming, you use if statements, for, while statements, basically it's for control flow, and nearly all languages have that. Procedural programming, you define sub-programs called functions, and again, nearly all languages have that. And then you get into object-oriented programming. Not all languages have that, and you treat all things as objects, and they can be modified by methods and so on. Python, Java, and C++ have this. And there's more. There's actor-based programming. Imperative programming is something pretty common. Functional programming is a very different paradigm in languages like Lisp and strict functional programming in languages like Haskell There's also reactive programming where relationship between variables are kept so you modify a variable and all the related variables are modified as well Declarative programming for languages like HTML and CSS mostly like for markup things and sequel
+
+**Speaker 3** _[04:23]_
+
+Um...
+
+**Speaker 2** _[04:27]_
+
+most programming today is structured, procedural, object-oriented, and imperative. And we can look at the difference very easily, even in Python, between imperative and functional. I will just import numpy. I just want to use it in this case as a container in the form of a vector, let's say. And you can have, you can do, let's say you want to take the the square of every element in the array. And you can kind of do that imperatively. You can have your input data, and you can create a vector, or an array in this case, an umpire array for the output that just starts as zeros. And then you can iterate over all the input, over all the elements in the input, square them, and set them to the corresponding position in the output. And that's a imperative programming style. You can do the same functionally in Python, where you will have a square function that describes what it's meant to do on one element, and then you map that function across all elements, and then you create the output array using from it. So you can achieve the same result. And Python has a built-in syntax for some functional operations without making the functions explicit. So for example, list comprehensions are a type of that. So you do not make the function explicit, but it is a form of functional programming you use list comprehensions and dictionary comprehensions okay array oriented programming um why do we need to talk for about array oriented programming first of all so array oriented programming uh basically the reason we talk about it is because uh it's uh how big it is in data science and dealing with data in python and it's a very distinct paradigm and the way it basically works is that if you want to have something very performant in Python, you basically are not very allowed. You're not allowed to do it in Python. It will be the performance of Python kills you. So most code today, whether it is machine learning, data analysis, all things like that, they kind of have two layers. You do the lightweight metadata bookkeeping in Python, so you have your arrays as Python objects, and you express what you want to do with them in Python, but all the heavy computation is offloaded into some pre-compiled library that hopefully someone else has written for you. And the way it is in Python is that it works like this, basically, as a paradigm in the beginning, is you have this array, and you say, I want to square my array. And there is an implicit for loop there. So what NumPy will do is it will say, aha, I want to square that array. I need to loop on every element of the array over every element of the array, square it, and output it somewhere. And in this case, we save the output to a variable called outputData. So there's some distinct differences that I've listed here with respect to functional programming. In functional programming, the functions describe what the function is meant to do on individual elements. In array-oriented programming, that's not the case. You describe what you want to do on the whole array. and array-oriented programming sometimes encourages in-place operations. NumPy can do that, but there are exceptions, like JAX doesn't have in-place mutation. And in functional programming, that's either not encouraged or forbidden. And array-oriented programming emphasizes changes in the distribution of data, while functional programming emphasizes changes in components of a data structure. Let's look at a larger example. I'm a physicist, so we'll use a physics example. It doesn't matter what it does. But what I want to have here is I will have a system of the sun and two planets. And I want to calculate the gravitational forces between them. It doesn't matter how that's done or what you want to look for is the style. So if you look at the imperative programming style, it works like this. I will loop over all the elements in the input and I want to take all the possible pairs of planets Of course, I don't want to calculate the force of a planet with itself because that force is infinite So I will have this if statement if I is not equal to J and then I calculate the forces I calculate the displacement I calculate the forces and then I in the total force I just like some plus equal the force of another object and then I return the total forces So this would be an example of how to do this imperative In functional, actually this is very complicated to express in Python, in functional I can import things from iter tools and func tools and I can express everything as a function. I can have a negate function that takes the negative, I can have a subtract function, I can have an add to add two vectors, I can have a function take the magnitude of a vector and so on. And I have sub functions and then I call them eventually and I will create this function. Let's look at the array-oriented programming. The array-oriented programming, on first look, it's much, much smaller, right? It's a little bit more complicated to express. So, for example, to do all the possible pairs, I have to use this weird function called try-up indices in Python. This gets me the indices of all the possible pairs. But once you get your logic around the dimensionality, this function is smaller. Number one, it's smaller. Number two, all three of these functions produce the same results when I run them, obviously. Otherwise, I would have made a mistake. And what one can do is you can see we can just run them. Let's hope this works. So I can create an animation of the Sun-Earth-Moon system. And I can let it play. So this is what this solution gives me. And this is how it basically works. I can have a three-body problem, and I can get this animation in my .
+
+**Speaker 3** _[10:49]_
+
+Um, and
+
+**Speaker 2** _[11:02]_
+
+and all the functions give the same results.
+
+**Speaker 3** _[11:21]_
+
+Um...
+
+**Speaker 2** _[11:23]_
+
+imperative forces about 250 milliseconds per iteration. Functional forces is much, much slower. This is a horrible idea to do in Python for this case. Let's look at the array forces. The array forces is much, much faster. So it was shorter to write and much, much faster to execute. OK, so why is that?
+
+**Speaker 3** _[11:59]_
+
+Um, but the...
+
+**Speaker 2** _[12:01]_
+
+The other thing is, what do these bytecode instructions do? So the functional and array forces have the same number of bytecode instructions, but the bytecode instruction may be in the functional forces are doing Python things, while the array forces may be calling to that C library, NumPy, and do the computation there. So this is how it typically works. I can have this, and if you look at this, I can make a function that just returns an x plus x, and I can run it on a big NumPy array, 1 billion. And I can look at the bytecode of that. The bytecode is very, very simple. Bytecode, basically, if you look at the Python bytecode, well, this just says, like, load x and x again, and just binary add them together. And this binary operation will call into NumPy, And NumPy knows how to do this addition fast. And you could see a reoriented programming as a workaround for Python being a slow language.
+
+**Speaker 3** _[13:04]_
+
+Um, and...
+
+**Speaker 2** _[13:05]_
+
+And it's more general than that, though. It's equivalent to vectorization at the hardware level. And if you're programming in GPUs, in any language, you need to be thinking in arrays. Because arrays can do, sorry, GPUs can do compare and branch operations really well, but they can do vectorized adds and multiplies very, very well, for example. So you need to be thinking about that. Here's a little bit of history of array-oriented languages. and libraries, basically, not only language. So history starts within the 60s with APL. And today, we have the modern ecosystem where NumPy came up here in modern libraries, and now JAX uses XLA. MATLAB is also reoriented.
+
+**Speaker 3** _[13:51]_
+
+Um...
+
+**Speaker 2** _[13:56]_
+
+consideration to take is about data frames so if we try to think about which is the most idiomatic pandas if you ever use pandas so the second the first one would be the array oriented one in pandas the second one would be the functional one and well the third one is
+
+**Speaker 3** _[14:18]_
+
+but you
+
+**Speaker 2** _[14:19]_
+
+you would iterate over the data frame. But if you're a person who thinks like in these query languages, maybe the second one is more idiomatic to you. To me, this one is more idiomatic. But that's like, to me, that's
+
+**Speaker 3** _[14:33]_
+
+Um...
+
+**Speaker 2** _[14:38]_
+
+The best way to think in arrays is by actually solving problems. So we'll start doing just that. I will have a few puzzles here, okay, and let's get started with those. So I will get started and I will have this array. And this array basically looks, if I draw it, it looks like this. It's like two layers on top of each other, and each one of those layers is three rows and five columns. So the array looks like this. And I can write a slice in NumPy to select the elements that I have colored here. So I can do it like this. I can say I want both layers, and I want all the rows then skipping the first one, and all the columns skipping the first one. So that will get me this. Or I can select these elements. And that's the puzzle, is to write a slice, it will not be long, it's like maybe a minute or something, maybe a little bit more, to write a slice to select these elements, and I have the solution down below, I don't want to scroll through that, but yeah, let's do like one to two minutes about this. The job is to write a slice that selects the colored elements in this picture, the blue ones at the top. Oh by the way any questions you can just raise your hand any any of these would be that fast without numpy or is the numpy like really integral like extremely important for this array based program there are many other array library. So you could do the same with jacks. Eager jacks would be a little bit slower than NumPy, but compiled jacks would be faster than NumPy. PyTorch, there's many array libraries out there. Even the TensorFlow tensor can kind of do that. Yeah, so there's many, many array-oriented libraries. Basically, anything that has a tensor object is an array library. Well, the pure Python, if you're talking about the array module, that doesn't offer you all that. You can't say array plus one in the array module. So it's a storage container.
+
+**Speaker 3** _[17:33]_
+
+I will
+
+**Speaker 2** _[17:36]_
+
+relatively simple problem.
+
+**Speaker 3** _[17:38]_
+
+Um, so...
+
+**Speaker 2** _[17:40]_
+
+The solution is this, okay, so you can, it's actually like, there's two ways to do it, you can keep the first dimension, or you can drop it. So you can do that, so you can say, I want from zero to one, while leaving one out in the first axis, so that drops the second layer. And then you wanna say, I want all the rows, because I want all the blue from top to bottom, And I want from 2 to the end, skipping the first 2, in the last dimension. That will get you this. And if you look at the shape of that, it kept the first dimension. So it's 1 by 3 by 3. What you can also do is you can say, I actually only want the 0.
+
+**Speaker 3** _[18:28]_
+
+Um, and.
+
+**Speaker 2** _[18:31]_
+
+It produces the same thing, but its shape is 3 by 3. So it dropped the first dimension. It kept only the inner 2. These are different answers. Both are fine. So we'll move on to NumPy puzzle 2, and I will show the hint even. So the task here is to compute the size of the spaces between consecutive elements in the following array. So you have this array 1.1, 2.2, 3.3 So what's the space between the consecutive elements? We can easily see that it's 1.1 The job is to do it in an array oriented way And I will give you the hint You can think about it this way If I take my array And I subtract it from it And I subtract itself I get all zeros But what if I Thank you.
+
+**Speaker 3** _[19:27]_
+
+not get
+
+**Speaker 2** _[19:33]_
+
+and subtract from that the array from the beginning.
+
+**Speaker 3** _[19:43]_
+
+Uh...
+
+**Speaker 2** _[19:45]_
+
+Two minutes, maybe. Thank you. Thank you. Thank you. Thank you. Okay, I need more time, or no? Okay, good. All right, so let's move on to the solution. The solution is this. It's very simple. This slice skips the first element, so it's from index one all the way to the end. And then this one skips the last element because slicing in Python is to the one before. So you go to the one before minus one. So it skips the last element here. If you do that, you get that. And there's a utility numpy because you don't need to think about that. Numpy has npdiff. So you can call that. You can get exactly the same thing. All right. following this in a very, very similar manner I have this parametric curve here parametrized from 0 to 2 pi with respect to t I can plot this curve it looks like this it's a Lissajoux curve
+
+**Speaker 3** _[23:27]_
+
+Um, and the
+
+**Speaker 2** _[23:31]_
+
+The length of this curve using array oriented programming So the way you want to do that, of course is that this curve is from points So you want to take all of this small segments the rule to compute its length is the Pythagorean theorem So you kind of you want to do that for each one of those segments
+
+**Speaker 3** _[23:51]_
+
+Um, that's true.
+
+**Speaker 2** _[23:54]_
+
+to four minutes, maybe? Three to four minutes for this one. So you want to calculate all these points, all the delta r's.
+
+**Speaker 3** _[27:30]_
+
+Um...
+
+**Speaker 2** _[27:36]_
+
+Let's move on to the solution about this problem. It's a pretty simple one. You need to use exactly what we did right above. You need to do exactly this trick to get all the x differences. You need to do exactly the same trick to get all the y differences, and then you need to square them, square each, add the square root on the outside to calculate the delta r's, So this would be an array of all the delta r's, and then you need to sum them together. And this is the solution. You just get a single scalar out. The length is 21. And by the way, this and this can be replaced with a numpy diff each. So you can do that too. All right. A little bit harder problem. So we'll spend a little bit more time on that. So this is a picture. It's a picture of my experiment, well, when it was being built.
+
+**Speaker 3** _[28:31]_
+
+um
+
+**Speaker 2** _[28:32]_
+
+Thank you.
+
+**Speaker 3** _[28:32]_
+
+but
+
+**Speaker 2** _[28:33]_
+
+It's in the data folder and the shape of this picture It's 1920 by 2560 and times 3 for the color because it's RGB They're all Unsigned integer of 8 bits 8 bits each you in 8 is that in numpy? so the task is To scale this image down down sample the image by a factor of 64 on both sides So the strategy for that Would be to do something like this So your strategy should be To reshape the array. There's an umpire reshape for that or dot reshape on the array and the dimension of 1920 becomes 1920 into church division by 64 and And the dimension of 2560 becomes that. And then you want to take the mean across all that. You want to get the mean color. You want to get the mean pixel value, let's say. So you want to kind of do that. So your array starts with a shape like this. You want to transform the array to a shape like this. And then you want to reduce those dimensions by taking the mean across 64 here and across 64 here. So your final array should have a safe shape like this and you can use Reshapes and you can use also because then I will turn them to the floating point d-type you can then use as type As type and you intake to view it back as an unsigned integer. So this is the job Five minutes at least. Yeah five minutes. I Think the solution should be
+
+**Speaker 3** _[35:03]_
+
+a little bit for the
+
+**Speaker 2** _[35:04]_
+
+bit for the sake of time. The solution, well, there's three almost or very, very equal solutions that get you the same result. They're very, very close. So the simple one to do is to do this. So you take inside your image and you reshape it according to exactly the shape that we set. And then you take the mean along axis three, which will be the new axis that is created. And then you take the mean along axis one, which will be the other new axis that was created so you can do that or if you can do the same and you use negative axis numbers it's extremely identical axis go backwards start from minus one in the last and they go inwards you can do that or as the third option is to use keep dims equals true that's a that's a argument of numpy reductions like mean to keep the axis number from changing and only remove the length one dimensions afterwards so this would be like what we did at the beginning where we had two layers we could either drop that layer or keep the other layer so this would keep the dimension but it would be of size one dimension and while normally numpy mean will drop the dimension completely so you can do that and then you eventually you can do keep teams the axis will not change and then you can finally reshape it eventually to drop it finally all these are equivalent by the way and I want to convert the type to to unassign the integer one byte, and I can look at that, and it's a downsampled picture. It's the same picture, just downsampled. Okay, the final puzzle, this is some data from the file format is from my experiment, but it doesn't matter, is we can look at this file, we can get some raw bytes, we get a byte stream from somewhere, we get some bytes. And we have this, and we can view those bytes, If we look at even that, it's just some bytes. It's pretty big. Yeah. Oops. Yeah. And I can interpret those bytes using NP from buffer function as an unsigned integer 8, and I can tell it its size. It doesn't matter how I came up with it. So this should be a 3,131 floating point values. but if i view it as a float you'll see that the numbers are weird and that's the re the reason for that is that this file format is big endian so the most significant bit is uh is the other way around to normal computers nowadays there are there are old machines like the ipms 390x that are big endian but they're pretty old machines um one way to do that is you can view it with numpy with the wrong endianness, you can view it as big endian, and the numbers are now fine. So this means this is the byte order, so it's been big endian, and this is little endian, so this doesn't change anything. This does, and F4 means float32 in NumPy. So, to fix the endianness, what you need to do is you need to reverse the order of bytes in groups of four. So you want to take every four bytes and you want to reverse them. And that's possible with a reshape and the slice only. And I'll show you where that came up recently. It's actually good timing. But you can do that. And NumPy also has a byte swap function, dot byte swap on an array, but you don't want to use that in this case. So yeah, let's do another five minutes for this problem or four minutes or 55. But yeah, that's the task. Let me show you this. Thank you. Thank you. Thank you. Thank you. Thank you. Thank you. Thank you. Okay. I will go to the solution for this. so this is the solution it's pretty simple well what you want to do is you want to reshape the array and let's actually view it step by step to see the shapes you want to do this so the original array had this much has this shape you can use dot reshape let's say minus one on this axis and four and the shape of that will be it will extract every four elements into an extra dimension so this has 31 31 by 4 and you want to reverse that dimension so i want to keep everything in the first dimension i want to keep everything here and with this slice trick i want to reverse the order in that dimension and then i do again so the shape of this is the same i copy it over here i do dot shape it's the same but the order of the order of those four elements has changed it's now reversed and I can do another reshape to flatten it out reshape minus one means flatten it out and if I do this and I view it now so the actual array is in you in date so if I view it as float 32 you'll see that now the numbers are correct and it's it's way more efficient I did this byte swap now it's efficient NumPy doesn't have to work with big-end D&D types. Where does this come up with? Why do I care about this? I actually had to care about this very recently, and I want to show you. Actually, I wanted ByteSwap to work on multiple libraries. I wanted ByteSwap to work on NumPy, JAX, and KubePy. And... One sec. I'm going to search for it. Come on. Not as open. Let me see if I can find it. Yes. So I asked this question on JAX. I asked, why don't JAX arrays implement byte swap? And I said that I can have byte swap in a very, very similar way. So you'll see that I do this view. I flatten it. And then I reshape it depending on how many bytes I have. So this would be four here. Then I do the reversal, and then I do exactly the same thing. And I also, because it's not flat, I have to form it back to the original shape. The answer was that there's no particular reason. And Jake, who's Jack's maintainer, told me that it would be, the actual implementation would be like this version, but it can use lower level things. And if you look at the actual implementation that Jake did very, very quickly, if you look at the changes here, it's almost the same, but it uses a lower level primitive. So it uses this big cast convert type instead of a view. And it uses this LAX rev to reverse the bytes. So this is like lower level primitives that JAX has. But this is one case where I had to care about this very, very recently. okay any questions here before we move on to part two which will be about the limitations of our area programming no okay oh and by the way uh there is for a much larger tutorial that would be like four hours there's a pretty fun project in part one which is to implement conway's game of life using an array oriented way so you'll have to calculate all the live members into an update into the world using array-oriented, so you will not for-loop over all the elements of the world. Okay, now we move on to part two, and we look at the limitations of array-oriented programming. We've seen the advantages, how it's easy and expressive and how you can express things, but let's consider the disadvantages. So we'll have a formula here, a function, which is just a quadratic formula. And this function, the way it's expressed, you can see that it doesn't really care about what the input is. It can be numbers, or it can be arrays of equal dimensionality. And all these operations, like additions, multiplications, and so on, will be done in an element-wise fashion. I can create some big arrays here, five million each. And I can do an imperative quadratic formula. So I will loop over all the elements, and I will calculate the quadratic formula. And I will time it. If I time that thing, we'll see that it's pretty slow. It takes about one and a half second per iteration. Now let's time the quadratic formula with NumPy much, much faster, 28 milliseconds. And now I have imported a library here called NumExpert. And I can tell NumExpert to evaluate this. I have to pass it as a string. But I can say I want to evaluate this expression using the numexpr Do you think this is going to be faster slower or equal to numpy? Just show of hands who thinks it's gonna be faster Show of hands who thinks it's gonna be slower Okay, more slower more people say slower than numpy, okay It's much faster than numpy The slowest run is because it has to compile this expression is slower. But yeah, let's try to write it again Okay, it's faster than numpy And why is that? What's the problem with array-oriented programming or with libraries like NumPy? The problem is that each operation creates a new output. So when you have two arrays, A plus B, you add them together, NumPy says, hmm, I need to create new memory. It asks your system allocator, it calls malloc, your Python allocator, and it requests new memory to store the output. then it does the addition it stores that it stores that on the new on the memory requested then you multiply the array by something it does the same again so every operation in numpy creates new arrays so we have a problem of intermediate arrays numexpr is able to fuse that one out and says hmm I don't need all these intermediate arrays I don't need to do four times a store that in a temporary, then multiply by c. Numper says I can do
+
+**Speaker 3** _[49:52]_
+
+Ah
+
+**Speaker 2** _[50:03]_
+
+What NumPy is doing is almost like this internally. So negates b, stores it in a temporary, takes the square of b, puts it in temporary, and so on. So that's what NumPy is doing, or almost that internally. If you time it with the previous one, you'll see that NumPy can do a little bit smarter things. But it's the same order of magnitude. It's really close. Like this one where I explicitly had all the temporary Python objects in Python code it's almost the same so right so numExpo on the other hand turns something turns the expression to something that can be quick
+
+**Speaker 3** _[50:46]_
+
+Um...
+
+**Speaker 2** _[50:52]_
+
+go even further. Has any of you, show of hands, who has used Numba before in the room? Okay, a few people, right? So you can actually compile that expression. There's a decorator using Numba. Numba is a compiler for the Python language. It compiles Python bytecode. It looks at the bytecode on the first run, tries to compile that using LLVM, and then it replaces the function without compiled code, basically. So this decorator, on the first call, it will look at the bytecode, compile it, and then it calls that. It doesn't call Python anymore. So we can do that. And if we time it, we'll see that this is much, much faster. Or we can compile it about JAX, and we'll hear more about JAX in the next part. So JAX can do that. It's basically the same expression. I just I can use Jack's NumPy instead of NumPy. And I use the app JIT decorator to compile it. And I can time that. I have to use block until ready here, because Jack does asynchronous dispatch. So if I don't use that, I will only be measuring the time to do the dispatch, but I'll actually compute it. Jack's is on par with NumPy, or really close, even faster than NumPy. Well, it's mostly faster than NumPy, I will say. If we make a scorecard of some numbers, like these were run some time ago in another system, it can look something like this. Jack's now has gotten, obviously, much better. So this is not true anymore here. We saw it was faster. But it looks like that. And the exact result depends on many things, whether you compile with fast math. Numba can do fast math. There's different compiler optimizations that can be or cannot be enabled. But the idea is, usually, that the general pattern is NumPy, it's orders of magnitude faster than pure Python. And then these compile libraries, like NumPy and Jack, Jack is actually down here. I should update this, it's a bit wrong, are faster than NumPy. And they can be, depending on what they do, they can be much, much faster than NumPy. Let's talk about expressions, expressiveness, things you can't do. so suppose the scipy library doesn't exist and i want to the log of the gamma function scipy has this so i can just reach out and it's efficient i will go and read it off like a book like numerical recipes and i will find that this is the algorithm translated from fortran to python and this is the algorithm you'll see here it has a fixed size loop it's over the over some coefficients and that's the algorithm to compute the log of gamma function and i can compare that i can compare that with against scipy's implementation and i can see it's exactly the same right and if i look at the difference pretty small difference compared to scipy so my implementation is correct okay but this function you'll see that it doesn't matter if you run over single element so here in this case i run it over element by element but i can also run it over the whole array there's nothing inside the function that says that it can't run over arrays the loop is over a fixed number of coefficients it does a global update there is no if condition there is nothing like all these operations can be run over arrays element wise as the same way they can can be run over elements. But let's look at the bad function. So if I want to come there, what is this, the regularized incomplete gamma, I think, yeah? So you'll see that the algorithm here is different. So the algorithm here says, do this 100 times. But if this condition is true, then return. okay otherwise it did not converge all right so we can evaluate with with Python scalars it turns out like this expression I can evaluate with right but that's a single element so this is like it says like if this Delta is small enough of a single element, return early. Can evaluate it in the works, element by element, right? I have this, I do this list comprehension here. And I can look that it's, scipy has this, it's correct. But let's try to evaluate with an array. x is now the whole array. We can't do that. NumPy rightfully says the truth value of an array was more than one element is ambiguous. That's true because delta and these things here are now arrays. So what does an if statement mean in an array? If what, if the whole array, if any element, if all the elements, so that's ambiguous. That's why NumPy has NP all or NP any to check the true.
+
+**Speaker 3** _[56:05]_
+
+Um...
+
+**Speaker 2** _[56:08]_
+
+issue in a reoriented programming mainly one is to remove the if statement and needlessly compute compute more like go all the way to 100 i don't care if an element has converged keep doing this iteration and you'll see that it's now evaluatable number one and number two it's correct pretty close side by or you can do the more complicated thing You can keep track of the ones that have converged And not needlessly update those You can do these like end equal updates You can keep track using array oriented Using a mask of which ones have converged And which ones have not This is also correct This will get you the number So this is like the array oriented way of writing the if statement Basically Because you have a mask over all the elements And tells you which ones you need to update And which ones are not with trues and falses. But which one do you think is going to be faster? Which one do you think is going to be faster? Do you think that the one that we're doing this masking is going to be... Who thinks that this one is going to be faster, the one that we're doing the masking? Okay. And who thinks that the other one is going to be faster, the one that we do we needlessly go to 100? Okay. So let's run it. Yeah. the one where we keep going all the way to 100 without caring is faster because all these extra operations in numpy have need to create new memory to create new arrays you need to do more operations so it's slower so it's very often more efficient in array oriented programming to just keep going without checking and if you've done any machine learning you probably have seen this kind of loop so the machine learning model has like many parameters like let's say it may be like a few if maybe like a simple feed forward network but no one ever checks has this weight converged no you always update you say i want to do this for any box you remove it you remove it from the optimization process is a hyper parameter and you keep going 100 times even if a weight is at the local minimum, it will be stuck here. It will not move by the minimization algorithm. But you keep going. And this is like the algorithm. OK. Any questions here? And we'll go to part three afterwards. Either I'm doing a good job explaining or a very bad job. OK. Right. Let's move on to part three. So part three, we'll talk about how we overcome the problem of part two. We talked in part two that there's all these intermediate arrays, NumPy has to request memory, all these temporary things, yeah, what to do with it. Okay, so let's look at JIT compilation a little bit. And we will consider the quadratic formula again for just because it's a continuation. It's a NumPy quadratic formula. We've timed it. We saw that on my laptop it takes about this time. Okay. We can, number one, compile this quadratic formula with NumPy. You can use the NumPy JIT decorator, or ngDistrictor means that NumPy is not allowed to fall back into Python. So ng means that everything needs to be compilable in this expression. If you use JIT with Python mode on, NumPy can fall back into calling the Python interpreter if there's something that it can't compile. It can't be slow, of course, right? And JIT is strict. It's equivalent to JIT, no Python equals true. And it means that everything needs to be compilable. So all the number needs to be able to infer all the data types and everything to compile that into a machine code. What different pattern you notice here? If you notice here, when we wrote this number JITed function, we switched to writing it from array oriented code, we wrote imperative code. So we looped over the elements, we wrote C-like or C++-like code, let's say, in Python, and we let Numba do the job to compile it. So let's look at that. Okay. The first one is slower because it has to compile the first time, because it's going to run in python and compile it but the second one is faster you'll see that numpy took about 27 number here takes about six to seven milliseconds to do this one compiled and let's look at the jax case well the jax case the formula is exactly identical in jax we write array oriented code you can time it we do it once it's slow it's it's a little bit slow because Jackson's to compile now it's super fast so the the but Jack's much faster though the question is why well it's very hard I found it it's very hard to make Jack's not use multiple threads so Jack's implicitly like multi-threads operations too and you can do this in numpy in number two you can use parallel true during the JIT compilation. If you time it again, you'll see now it's on par with JAX. So if you let Numba use multiple threads, it's going to reach JAX speed for this problem. And the thing is that one thing you notice is whether you write array-oriented or imperative code. In Python, you write imperative code. You write these loops over the elements. In NumPy, you write imperative code and you compile it, and it's fast. In array libraries, like NumPy, Awkward Array, or JAX, you write vectorized code, and JAX, because it has the ability to compile too, it's going to be faster than those. OK. And let's talk a bit about, very briefly, how does the JIT compilation even work in JAX. So the first step is JAX traces through the function with no real data, it only tracks shapes and d-types across the function, and it emits an intermediate representation that calls JAX-PR. You'll see, if you read through this, it looks very much like our pedantic quadratic formula. The integer power, y equals two, b, so you can see the mapping between these two. Then what JAX does is it lowers it to something, to another intermediate representation called stable HLO. That also looks like a bit, like our pedantic quadratic formula, but more complicated. And then it compiles that. Lower.compile, and then I can call the compiled program. And it works. So that's all the steps Jux does inside when you have a legit decorator on top of a function. Now, let's talk about a bit of the limitations of both. So the limitations of number. Well, I will try to put a dictionary here in my function. Whoopsie. Yeah, Numba tells me I can't compile that in no Python mode because the dictionary doesn't have known types. So you don't know what the values or the keys can be. It can be of any type. Numba internally has a Numba type dict, so you can tell Numba that these will be the data types, so then it can compile it. But that's like one limitation of Numba. Numba and I think there is a For more information here will number work for my code. It's a in the box of number Tells you whether it's a use case good use case or not limitations of Jacks So because we're writing a reoriented code. We talked about These if statements and why they can't work very well in a reoriented code But what about this? I'm using any so this is a number So I have here, if any of the elements of the array are greater than 3, sum them, sum all the elements of the array, otherwise do the product. JAX also can compile that. Attempted Boolean conversion of traced array with shape bool. The problem here is that because during tracing you don't know the date of the array, you only know shapes and dtypes, And then you don't know what array you're going to call this function with so JAX doesn't know Do I compile this branch or do I compile this branch? It doesn't know It's you you're in Jackson in general You're not allowed to have operations that depend on the contents of the data in machine learning That's fine because all the machine learning models. There's nothing that has to do with the contents of the data inside the model It's like do the
+
+**Speaker 3** _[65:23]_
+
+Um...
+
+**Speaker 2** _[65:32]_
+
+They may, at some point, have this for only the CPU, but they don't want to have this. I think it's not even possible, maybe, for the GPU. But this operation, of course, I don't know the shape. I don't know how many elements are going to be larger than 3. So I don't know what the shape of this operation is going to be. I always need to know the shapes and D types. So this one is another thing JAX can do. Array boolean, this must be complete, concrete. Impure functions are also very, very dangerous with JAX. Because here, I have this, doSum equals false. End number, actually. And then I compile this. If doSum, do the summation or do the product. Whoops. I said doSum equals true here, but the function does not care. It's already compiled. So number does not look into these variables. It has compiled on the first call, it has compiled it here, and now it says, oh, here's the machine code for that function, so every time you call that function, call that C code. It doesn't matter if I change something. So don't do impure functions. I always have pure functions. Same for JAX. Same, exact same problem, okay. And if you look at actually, because I don't know how to do this in Numba, maybe it's possible. If I look at it in JAX, you will see that JAX actually compiled the product. If you look at here, if you look at the traced program, you'll see that, well, doSum was false, so JAX actually compiled the product. So every time you call it, it will do the product. It doesn't matter if you said doSum equals true. Okay? I don't poverty.
+
+**Speaker 3** _[67:26]_
+
+Um, but
+
+**Speaker 2** _[67:32]_
+
+I think NVIDIA has multiple domain-specific languages in a way to compile for GPUs. And JAX on GPUs, this is the funnest part, is that you don't care at all in JAX. It just automatically dispatch. So the symbolic operations of the intermediate representation will just dispatch to GPU kernels if your input is on GPU, and will dispatch to CPU kernels if your input is on CPU. So with JAX or other libraries like that, I mean, PyTorch or everything else, PyTorch, Torch Compile, for example, and things like that, the same code works on GPU and CPU. You just need to change the device input. Sorry, the location of your...
+
+**Speaker 3** _[68:16]_
+
+Any questions?
+
+**Speaker 2** _[68:24]_
+
+let's see I have 20 minutes I guess all right so I will say that I will not spend time here it's a short tutorial to look on the project but there is a you can try to do this at home the job is to jit compile this function but I want to point to the solution there's a wonderful write up here again if we look at very very briefly the solutions you will see that in the JAX case it's array oriented code and in the Numba case it's Python code that Numba was able to compile and I can even use fast math equals true which is equivalent to I should have fast math and see what's possible.
+
+**Speaker 3** _[69:10]_
+
+But
+
+**Speaker 2** _[69:16]_
+
+there was this discussion why is jack so fast uh it's a jack's discussion it's a pretty long discussion and it came from this plot basically uh and this is how the landscape roughly looks regarding this again is that python is going to be slow numpy array oriented it's a lot of inter all representations of the same problem so it's this mandelbrot set on different accelerators so this is c plus plus imperative binded with pi by 11. scython number imperative number vectorize jacks array oriented coupai arrays number for gpus and then coupai with a custom kernel imperative for picks per pixel number cuda and jacks are oriented with git compiled and this is roughly how it looks so the best cpu is about here all of them are uh faster than uh all of them are faster than of course python the cpu is faster than even numpy basically so if you write your custom code and you compile it with number or c plus plus and you bind it with pi by 11 it's probably going to be faster than numpy um but you don't get the beauty of writing numpy let's say you have to write your own c plus plus loops or whatever and the gpu is obviously much faster in the end right because gpus are very very much built for these types of
+
+**Speaker 3** _[70:41]_
+
+Ah.
+
+**Speaker 2** _[70:49]_
+
+Instead of part four given the time. I think it's more important to show part five I Just curious how many of you would say are like data scientists or working with big data or Okay, so there's a few. Okay, right. So I want to mention a bit about Tools you may want to reach out for in large data sets so everything we've been we've done here is my data fits in my RAM like my arrays okay I have I can have my computer like 128 gigs of RAM but that's not big data right okay and so real actual I can have this array which is only like 800 megabytes now but real scientific and industrial data sets are gigabytes or terabytes of data and we need strategies for chunking the array splitting it up because no one has a machine without much RAM
+
+**Speaker 3** _[71:47]_
+
+Um, we,
+
+**Speaker 2** _[71:48]_
+
+We need to maybe compress. And often data are, we want to label dimensions. I see here an X-ray sticker. You may want to have labeled dimensions. Maybe like the index number five doesn't mean anything. Maybe that index means Wednesday of that year, of that month, something. So you want the labeling too. Okay. So the first library I want to mention, this will be just mentioning like just what things exist and what things you may want to reach out for. They're all like array oriented libraries or array libraries. So there's dask and specifically dask array. So dask array is a chunked and parallel arrays. So a dask array, I can look at it here. It doesn't have it. It doesn't hold any actual data It's this array. I know its shape and dtype. I know its size. I know the chunk size and and I know the D type here and you can do operations as if it was numpy it has a numpy API, a numpy like API and the result is here another array okay I took the square and I reduced the dimension so it's gonna look like this so this has these types of the shapes and this is the size of the chunks and this is not computed so this is actually a computational graph I can even view it if I do result of visualize please graph this work okay thank you yeah I can visualize this so this is what Dask does internally it it does it creates a graph of operations to be done in a chunked manner and eventually I to actually get the result I need to call compute and this can run on a lot of things that is distributed so it can run on my local CPU I can use multi-threading it can use multi-processing or it can be like a distributed cluster with like a thousand
+
+**Speaker 3** _[73:54]_
+
+Um...
+
+**Speaker 2** _[73:55]_
+
+Let's I want to try to climb it this big array in front of these small problems of mine.
+
+**Speaker 3** _[74:09]_
+
+Um...
+
+**Speaker 2** _[74:10]_
+
+This chunking and the fact that it can do parallel work using threads, it makes it faster than NumPy in this case. So there's another library I want to mention. There's ZAR. ZAR is more like, or at least to me, an array storage format designed for large data sets. And it's also a chunked, it also provides a chunked multi-dimensional array. That array can live on disk or it can live on your memory too. So I can open here a ZAR storage, I can put in my temp directory, and And I can I can first open it that I can set all of its elements to my big array And if I look at the info, I'll see here. That's an array. It has little end units float 64 that shape That chunk shape it has some specific compressors It's a compressed array on disk has this number of bytes It's not read-only so I can write into it and this array now just like lives here It doesn't have anything if I look into it. Oh, it's something it doesn't have any data and Tsar basically uses indexing to evaluate. So this one means I want these elements and This and Tsar will not grab the whole array. It knows the mapping of these chunks to disk So it will only grab and decompress the chunks that's needed and fetch your array So you can imagine how that fits into big data models And it also works together well with the Dask, so you can open up a ZAR storage as a Dask array from ZAR, and you can do the same thing. You can square it, and you can do the mean, and you can compute it. There's BLOSC2. BLOSC2 is a very, very high performance compression library designed for numerical data, and it's It's often used as a compression code inside the Czar, but it also has its own array container. And basically what the Czar people have found is that often, sometimes, decompressing is cheaper than going through the CPU to fetch all the memory beginning around.
+
+**Speaker 3** _[76:29]_
+
+Um...
+
+**Speaker 2** _[76:33]_
+
+create some random integers, I can do BLOSC2 as array. All of those have an array API compatible thing so the operations look either are identical to NumPy the API or very very similar to NumPy. So it's very very intuitive to switch from one library to another how to use it. And this is what
+
+**Speaker 3** _[76:49]_
+
+um, uh,
+
+**Speaker 2** _[76:51]_
+
+Zar shows me if I can look at the array doesn't tell me anything But I can look at a lot of these things, right? I can look at the number of bytes It's 400 megabytes. It's 84 megabytes compressed. That's the compression ratio And you can do you can sum it for example And you'll see that in this case of my machine. It's a little it's a little faster than This is not I'm pretty sure right The numpy Zara also has a lazy expression engine. I'm not very I'm not a big user for result from for sorry I'm lost to I'm just Mentioning it mainly it also has laziness and it does all these in a chunk manner, too So this expression is not evaluated on the spot. It's a lazy expression. You need to call compute to actually evaluate it and Then I think the last thing that I have and in the end is x-ray so x-ray offers is a adds names and coordinates for a dimensions so instead of remembering basically what the axis zero and axis one means you may have long longitude and latitude if you're working with like weather data it's very common in earth sciences oceanography and things like that climate science yeah so you can do that again you can have an array you can call its dimensions time latitude and longitude and you can have the coordinates to be this so this is at this latitude this of this longitude and this coordinate is time so I can have actually like date times here and actually it has a very nice HTML representation x-ray so you can do things here you can click things so yeah And you want to say, I want to select from this array called temperature, I want to select where the time was nearest to this. That has a lot of meaning for a scientist dealing with these types of data. And you can do that. Or you want the mean over, well, what, axis zero, one, ten million, I don't know. But time, time has a meaning for a scientist. And of course, you can plot that. It just looks like that. It's just random data. This is the average over time in latitude and longitude. And the last thing I want to mention is how they all fit together. Is that BLOSC2 compresses the chunks of numerical data. ZARC organizes compressed data into an array on disk format. Dask reads those and processes all those chunks in parallel. It works well with ZAR and so on. And X-ray wraps the result with labeled dimensions of coordinates. So the X-ray people are big users of Dask, so X-ray can technically eat any array API compatible array library, so it doesn't care if it's a NumPy array or a Dask array, as long as they're both array API compatible. So I can chunk, I can use this operation to get a X-ray data array that is backed by Dask, as you can see here. And I can resample it, I can compute that, and then when I compute it, it actually goes down to NumPy and evaluates to a NumPy array. And the last thing I want to mention here is that the main takeaway is that you can scale array-oriented programming to datasets much larger than your RAM without changing the way you think. The same slicing, broadcasting, all these rules you learn with NumPy, they work across all these tools. And the array-related programming, I'm just mentioning these, extends to GPU programming. So there's CU-Py, which is a NumPy-compatible array library for GPUs. Rapids is a stack of GPU-accelerated libraries like CU-DF instead of Pandas. CU-Pynumeric is a drop-in replacement for NumPy that runs on CPU's end on multi-GPU nodes. NumBa CUDA is to write kernels. GPUs, JAX, PyTorch, even though it's a machine learning framework, it's actually also an array library. The TorchTensor is an array library. It doesn't have the same API as NumPy, but it's an array library. And there's more things, so you can CUDA Python exposes CUDA runtime and bindings to Python, and NVIDIA CUDA core compute libraries also have Python bindings for GPU accelerated parallel algorithms so and the last sentence is that a reoriented thinking is the common thread and whether you're scaling up to GPU or scaling up to Dask or you're using NumPy on your laptop the programming model stays the same so very often you can have code that works across all of these and you just want to change like your library or maybe your other container
+
+**Speaker 1** _[81:58]_
+
+questions I'm checking the online part and there are no questions so if you guys want to speak up get the mic over to you okay that seems like there's not much questions but you can always ask your questions in the discard and Yasan will be answering that so let's thank Yasan again for a wonderful tutorial.
+---
+transcript_status: auto
+---
+transcript_language: en

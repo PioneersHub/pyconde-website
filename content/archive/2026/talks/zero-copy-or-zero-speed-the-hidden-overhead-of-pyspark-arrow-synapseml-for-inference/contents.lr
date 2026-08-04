@@ -104,3 +104,229 @@ Scaling machine learning inference to 6 billion daily predictions using an Ensem
 To optimize throughput, four execution methods were evaluated. Standard UDFs served as the baseline. Pandas UDFs improved performance by vectorizing batches, reducing boundary crossings from 400 million to approximately 4,000. Mapping Pandas further increased speed by introducing a stateful iterator, allowing the model to load once per partition rather than once per batch. SynapseML provided the highest throughput by executing the model natively on the JVM, eliminating the Python boundary, the Global Interpreter Lock (GIL), and serialization overhead entirely.
 
 Benchmarks on a 20-node cluster demonstrated a 9x total performance improvement moving from standard UDFs to SynapseML, reducing total runtime from seven hours to four minutes. For maximum throughput, SynapseML is the most efficient choice, though it lacks the flexibility for complex custom Python transformations. Mapping Pandas is recommended for workloads requiring custom logic, as it offers a 4x speedup over the baseline. Additionally, tuning the spark.sql.execution.arrow.maxRecordsPerBatch parameter to a "Goldilocks zone" of 50,000 to 200,000 records prevents both networking overhead and out-of-memory errors.
+---
+transcript:
+
+**Speaker 1** _[00:13]_
+
+very last session in this room. May me remind you to ask questions through talks.picon.de so I can handle them by the end and all that. So today we welcome Peter Iliyevsky. He's gonna tell us about zero copy or zero speed the hidden overhead of bus park arrow and snapshot ml for inference so let's welcome him
+
+**Speaker 2** _[01:01]_
+
+everyone to this last session, so let's begin. So I'm Peter, I'm a senior software engineer at Zalando. I've been working there for the last three years. If you already don't know Zalando, Zalando is like the largest fashion, online fashion store in Europe. We sell over 2 million articles to over 61 million active customers over 25 countries across Europe. So some numbers, our GMV or gross merchandise value is around 17 billion, so we are a pretty large scale company. But today we are not here to talk about fashion, we are here to talk about what happens behind the scenes or how our computational infrastructure looks like and that's providing one of our most critical systems. So in our department we embarked on a quest and our quest is to optimize the discount across all of those 200 million articles. So our scope is actually to optimize the discounts for each article for multiple markets. So we start this quest by forecasting demand and if you have attended any of the previous talks so we forecast around 6 billion predictions for every single article every single day so today we are going to cover the quest of how we have achieved this massive scale and in which places we have found performance boost so we can we can run at the scale but first a bit of introduction about the core program problem so we are forecasting demand as I said so in order to better understand what this means is that if we see this article we basically want to answer the following question is so what would the demand be if we discount for example tissue by 20% in Germany and in the end we would produce graph this where we have various discount levels from 0 to 70% with of course we would expect that as as we have higher discounts the demand would increase so when you take this into consideration we have a lot of 5% increments we have a lot of articles across 25 markets it arounds around 6 billion predictions per day. Don't do the math, it's not correct because there are a lot of things underneath the hood. But the question here we are trying to answer is how do we scale this to run every day cost-effectively? So we decided to find our weapon of choice and our weapon of choice is our Ensemble Lite GPM model where we have hundreds of input features and we output around 6 billion predictions. So because in Zalando most of our data processing happens in Spark on Databricks, we wanted to explore the idea. So since we use Spark for data processing, let's try to figure out if we can use the same framework to run our ML inference models. So the question that we were trying to answer is how can we Spark to scale our model inference efficiently. But before we try to answer this question, I would like to cover some basics. There was also another interesting talk that covered Pandas UDS earlier in this session, but now I'm going to cover it more of a high level. So first let's explain the Python-JVM boundary. So basically, what is the problem that we're are trying to face. So we have Spark on one hand, which is a JVM base, so it runs on Java or Scala, but our applied scientists built our models in Python. So we have a bottleneck, right? So in order to use Python on Spark, we need to cross these boundaries. So what happens is basically every single time we need to make a prediction, the data needs to go from the Spark worker, it needs to be serialized, sent to the Python process, make the inference, serialize it back, and send it back to the Spark worker. Of course, this is done through sockets, and the serialization is usually done through pickle. Of course, This is a very slow and slow process and when you scale it to 6 billion predictions, it really doesn't scale very well. So what we want to solve is basically how can we eliminate this boundary of Python slash Java communication. So we enter Apache Arrow. So Arrow has been around for almost 10 years, and if you haven't been using it, you should please have a look. Start using it. So basically what arrow does is it's it's a new
+
+**Speaker 3** _[06:23]_
+
+a tool that
+
+**Speaker 2** _[06:25]_
+
+this is the format between which different languages can communicate in. So it can create this standard data format, so we can create the data in Java and we can just pass the same pointers to the Python consumer and the Python can just read the raw data without needing to serialize, without needing to deserialize or to move the bytes between the two processes. Some pro tip for you, so PyArrow is enabled by default on Spark clusters since Spark 3.5. So if you're using maybe another Spark version, you should maybe enable this configuration. But the promise of Arrow is that it allows zero copy, which is true, but that's not really the case in the Spark use case. So what really happens in PySpark with this zero coffee? So we have three phases. The first phase is the format conversion. So the JVM
+
+**Speaker 3** _[07:32]_
+
+translate
+
+**Speaker 2** _[07:33]_
+
+translate the Spark tungsten rows into aero format. So this might cause us a lot of CPU cycles, memory allocation. Then Spark actually still communicates to the
+
+**Speaker 3** _[07:45]_
+
+workers.
+
+**Speaker 2** _[07:48]_
+
+The data still needs to move from JVM to Python through sockets. This means that you still need to
+
+**Speaker 3** _[07:55]_
+
+the
+
+**Speaker 2** _[07:57]_
+
+you still need to invoke the kernel to copy the data, pass it through the socket, and write it to another process. So it's not really zero copy, as it says. And finally, if you're using Pandas, then the data still needs to be translated into Pandas, into a new memory space. So basically, there is still a lot of overhead. Of course, it's not all bad. It's still a huge improvement, because you get a lot of these error batches that we call that you can optimize the serialization but the reality is that calling it zero copy it's not really not really true so let's see how we can actually cross this boundary so our journey actually consists of four methods that we are going to explore. So first, we start with the standard Python UDF, which is actually executing Python functions row by row. Then we will move on to the Pandas UDFs, which is an improvement. It vectorizes the Pandas batches. Then we move on to the mapping Pandas, which is again a vectorized batches, but it also allows us to have a stateful iterator. And finally, we look at SynapseML, which is a JVM native framework, which completely removes this Python-JVM boundary altogether. So on a go through this journey, we are trying to answer, OK, so where can we gain this performance? Can we remove the function call overhead? Can we maybe play around with the batching? Or maybe we can reuse the state of the workers. Or maybe we can even eliminate Python altogether. So let's try to find out. So standard UDF is normally the first start for everybody who would like to run their Python code on Spark. So it's comfortable, it's familiar, and it's very slow. So this is where most people start. Of course, the code looks very clean, like all you need to do to run a Pandas UDF is just to add the wrapper on top of your Python function, call it, and that's it. It looks like a production code, but in reality it's very slow. So what actually happens underneath the hood? So whenever error batches arrive to the Python worker, Python still needs to process these batches row by row. So the cost, when we talk about the boundary crossings, for our use case it's still like over 400 million boundary crossings that need to happen between Java and Python. And that's not one problem. So the other problem is, as I said before, we are using light GBM models. And light GBM is basically a C++ engine that's built for large matrices. And by sending it row by row data, we are just using 15 rows at a time. And basically, it's like having a Formula One and it's stuck in first gear. not utilizing the full potential of the library. So while it's most convenient, it also provides you with the most overhead. And this is basically our baseline. From here we can see how we can improve further. Next we have the Pandas UDF, which is like our first real upgrade. So with the Pandas UDF, we can start batching our rows into Spark batches, and Arrow here can kick in and it can pack these batches into pandas data frames. So our function here when we see predict batch it will actually receive the whole batch and then we can utilize the C++ engine of the light GBM to do the vectorized matrix multiplications. And this is exactly what it was designed for so we already can have some performance boost.
+
+**Speaker 3** _[12:02]_
+
+So,
+
+**Speaker 2** _[12:06]_
+
+it means that we reduce the number of boundary crossings by a lot so from 400 millions here we can have about 4,000 4,000 crossings which is the number of batches that would be sent from the JVM to the Python workers and the data path here looks something like this so the JVM will write the pandas error
+
+**Speaker 3** _[12:33]_
+
+then it
+
+**Speaker 2** _[12:34]_
+
+then it will be sent to the Python worker, Python worker will wrap the pointer, and then C++ will read it. So it's much more faster. But there is one more problem with this approach. And because we are using machine learning models, it means that you need to have your machine learning model loaded onto the worker itself. So on the other hand, pendless UDFs are inherently stateless. So you need to somehow figure out a way to manage the state. one native way how you can do this is of course like if you use this has attribute method you can basically have some custom logic to cache the model on your worker and that way you can load the model it's it's a hacking way but it can work it's like applying a bit of attack tape too
+
+**Speaker 3** _[13:26]_
+
+Um...
+
+**Speaker 2** _[13:30]_
+
+batch groups, it means that we have to reload the model even if it's cached sometimes.
+
+**Speaker 3** _[13:36]_
+
+on
+
+**Speaker 2** _[13:38]_
+
+And this is seconds of just loading the model which are very, very important to us. So we wanted to go a bit further and we explored the mapping pandas. Mapping pandas is a Spark operation that solves our statelessness problem by introducing a stateful iterator. So basically we can have a stateful iterator once per partition and then the model is loaded only once per partition and once we load the model, then all of the other batches that come into that partition will reuse the same model. So because we can now repartition the data to, right now we have chosen 200 partitions but you can choose whatever you need for your workloads, basically this means that we would have at most 200 model loads for our
+
+**Speaker 3** _[14:32]_
+
+Of course, it's important to mention here, even though we have this impression
+
+**Speaker 2** _[14:41]_
+
+is still Python, so we still have the cross-boundary communication, we still need to cross the data through the socket, we need to interact with the global interpreter log, and we have a lot of OS-level switches. So while we reduce the serialization text, we still don't eliminate it entirely. So this is where our SynapseML comes into play. So SynapseML is a noob, previously it was SparkML, since then it has been taken by Microsoft, so Microsoft is currently the operators of this library, and basically it is a wrapper around many machine learning models and it allows you to run your machine learning models natively on Spark. So now instead of optimising our boundary crossing, we can skip it entirely, so no more pickling no more arrow or global interpreter locks so because because we are using Java we can still use the Java native internal format it means that whenever below the model we load it once per worker or once per executor and then the JVM will just pass the worker to the C++
+
+**Speaker 3** _[15:59]_
+
+uh, no,
+
+**Speaker 2** _[16:03]_
+
+contact switching, and we basically draw
+
+**Speaker 3** _[16:07]_
+
+the
+
+**Speaker 2** _[16:08]_
+
+the communication to nanoseconds because everything is done natively in Java.
+
+**Speaker 3** _[16:13]_
+
+So,
+
+**Speaker 2** _[16:16]_
+
+Python just becomes an architect, so Python still builds the execution of your Spark query on the driver and then sends it to the worker to execute it. But the heavy lifting, now everything is done purely on JVM. Of course, you cannot have your cake and eat it. This also comes with problems. The biggest problem is flexibility. So if your custom Python logic, like if If your model has some complex transformations, let's say like mid inference, you need to transform the data or something, then using SynapseML becomes a problem because you still need to figure out a way how you can translate your custom Python logic into Java. So you cannot just reuse the same model because you still have custom logic and basically here we have a problem. So it's not very flexible. But if you just have row inference, then SynapseML might be the job for you. Now let's try to look at some benchmark results. So we have used for our benchmark a 20-node cluster that predicts around 1.3 billion predictions per second, per run, sorry. And let's see how we can do, how did we make the speedup. So first, between standard and pendent CDFs, we can see that we dropped from 200 to almost 50-100
+
+**Speaker 3** _[17:52]_
+
+prediction
+
+**Speaker 2** _[17:53]_
+
+per second, so we have around double the increase. Why? Just because we introduced the vectorization with arrow, so we eliminate this row by row. Then from pandas UDF to mapping pandas, again we see another almost two times the speedup, and this is mainly due to the stateful iterator, so we removed the the deserialization task of the models, so we get a nice increase here as well. And finally, from map impenders, when we move to the synapse ML, of course we eliminate Python entirely, so it is expected that we see around 2.5 increase better. So if you compare it from the beginning all the way to the end, we end up with around nine times the improvement of just using a different setup over the baseline. So when we explode these predictions to our production workload, basically for standard UDF, we would have around seven hours of runtime, while for this Synapse ML, we bring it down to four minutes. So we use the same cluster, the same model, same everything, the same data, we only change how we execute the model on Spark. So it's a massive increase. So maybe which path should you take? Because we explore different options. So for maximum throughput, if you need, you can all of course use SynapseML. It's natively supported.
+
+**Speaker 3** _[19:30]_
+
+Ah
+
+**Speaker 2** _[19:35]_
+
+some deep learning models. You can also, if your model can support an ONNX runtime, it can also run ONNX models. And of course, for our use case, it also supports slide GBM. It's definitely the fastest route if you want to have production performance, but if you have some extra logic, as I said, it may not be the right path for you. That's why we have mapping pandas, which is my recommendation for ultimate flexibility, flexibility because it will deliver you four times the speed for custom Python logic and it is very suitable if you have complex model during inference. Right now, this is the approach that we are currently using in Zalando. Then we have of course Pandas UDFs. Pandas UDFs are still very useful for quick prototyping and and then we have standard UDLs which of course you cannot see here because I don't really recommend them. They are very good for notebooks but please don't bring them to production. Before we wrap this up I would also like to talk to you about the Goldilocks zone. So basically
+
+**Speaker 3** _[20:44]_
+
+Amen.
+
+**Speaker 2** _[20:47]_
+
+we have this maximum record per batch parameter. And I think this is a very important lever for tuning your Spark performance.
+
+**Speaker 3** _[20:57]_
+
+or
+
+**Speaker 2** _[20:59]_
+
+and pandas operations because there we utilize the arrow underneath the hood so by playing around with the batch size you can basically gain a lot of performance. So if you choose this value as too small you might get something like this on the first picture where there is a lot of communication overhead between the JVM and Python and you lose a lot of performance just on networking. On the other hand, if you set this to too large, then you might run into out-of-memory problems because you might get massive memory spikes and if you don't have enough RAM, you might start using the swept memory and then basically your work will be just stuck in...
+
+**Speaker 3** _[21:54]_
+
+uh,
+
+**Speaker 2** _[21:55]_
+
+The sweet spot is this for our use case was around 200 to 100 to 200,000
+
+**Speaker 3** _[21:55]_
+
+the,
+
+**Speaker 2** _[22:02]_
+
+Batches and it's like the Goldilocks of it. It's not too hot not too cold. It's just just right So there are four key takeaways that I would like you to take home from this presentation So the first one is please always use arrow for your Spark workloads Even if you if you don't if you haven't done so already already. If you want to gain four times the improvement, please switch to mapping pandas and you should tune the maximum record batch parameter. Like for us, as I said, the sweet spot is between 50,000 to 200,000, but depending on your cluster size and workload, this optimization parameter can vary. And finally, like the last thing is technical with this hardware. we saw that we can achieve around nine times the improvement using the same hardware just by switching how we process the data this is equivalent like going from 20 nodes to 180 nodes but we get this for free so if you manage to make this optimizations your finance team will be very happy because you have saved them a lot of money so thank you everybody
+
+**Speaker 1** _[23:27]_
+
+Thank you so much Yes, we have some questions here first You mentioned mapping pandas have to try mapping arrow Method as well if so what?
+
+**Speaker 2** _[23:45]_
+
+We did not try mapping narrow, to be honest, and yes, so mainly why we focused on mapping pandas was because our current models work with pandas matrices, so we were only trying to explore the execution methods over an already existing model framework or already existing production model. So we were trying to optimize for this. Of course, there are many different rounds you can take like like this, but we unfortunately have not explored this. I expect from a previous discussion that we would gain around similar
+
+**Speaker 3** _[24:30]_
+
+It's more or less
+
+**Speaker 2** _[24:32]_
+
+should result to the same performance, depends on what your underlying data processing would look like on your Python function.
+
+**Speaker 1** _[24:49]_
+
+SNAP-set ML for both training and inference? What if inference data is not as big as training data? Would you recommend following two different approaches for training versus inference?
+
+**Speaker 2** _[25:07]_
+
+and this is exactly what we are doing. We are still evaluating and exploring Synapse ML while it brings this performance boost, as I said. For us, it's not a very good use case because we have a complex inference model based on the light GBM trees. So we cannot really port this functionality easily to Synapse ML without needing to rewrite the code, of course. And we are trying to avoid this. So, basically, if you can export your model to run in any different platform, natively, then you can do the inference in Python or in one worker node, and then you can run the inference in SynapseML on multiple nodes, which is the case that we have actually covered.
+
+**Speaker 1** _[25:56]_
+
+Thank you Okay, how are data scientists Again how data scientists are dealing with this amount of data for experimenting? It seems like an engineering problem. So I'm curious. How are you handling this in experiment?
+
+**Speaker 2** _[26:30]_
+
+and our setup allows us to
+
+**Speaker 3** _[26:33]_
+
+for
+
+**Speaker 2** _[26:33]_
+
+for our applied scientists to run experiments on the full set of data. So because the runtime of our end-to-end processes take around 30 minutes, this is still very very efficient for us and we can allow to run multiple experiments. Of course, we are always looking for ways to improve and reduce this runtime as we see here. But in the end we use the same infrastructure for experiments as we use it in a production setting.
+
+**Speaker 1** _[27:12]_
+
+Have you considered using Scala?
+
+**Speaker 2** _[27:19]_
+
+Yes, but our applied scientists are not happy.
+
+**Speaker 1** _[27:27]_
+
+Did you also try?
+
+**Speaker 2** _[27:36]_
+
+the problem of with three models like the three models still require
+
+**Speaker 3** _[27:41]_
+
+the
+
+**Speaker 2** _[27:44]_
+
+at a single time. Of course, there are new algorithms that can improve, that can distribute this workflow during the training process, but analysis needs to be done and we need to explore whether using this new distributed approach will be more performant for us over the current approach. So for us, the safe choice right now is to train the data on a single time.
+
+**Speaker 1** _[28:16]_
+
+Thank you. So it seems there are no more questions here. Somebody? No? Okay, then we thank you for the speak.
+---
+transcript_status: auto
+---
+transcript_language: en

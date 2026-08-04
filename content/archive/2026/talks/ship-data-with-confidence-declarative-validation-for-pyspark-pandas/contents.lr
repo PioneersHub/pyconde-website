@@ -92,3 +92,161 @@ Data validation in PySpark and Pandas pipelines often suffers from silent failur
 DataFrame Expectations is a lightweight Python library designed to provide declarative validation that fails fast when data does not meet predefined criteria. It relies on three primary dependencies—Pandas, Pydantic, and Tabulate—while treating PySpark as an optional dependency to avoid version conflicts in environments like Databricks. The library uses a DataFrameExpectationSuite class to define expectations, which are then compiled into an immutable runner. This runner can validate both Pandas and PySpark data frames using the same set of rules, ensuring consistency across different data processing stages.
 
 The architecture utilizes a registry system and a decorator-based approach to dynamically map expectation functions to their respective implementation classes. To handle different environments, the library supports tag-based filtering, allowing users to apply specific validation subsets for unit tests versus production pipelines. For PySpark, the library implements validations using filter functions to identify violating rows; if the count of these rows exceeds zero, the runner records the violation. Upon completion, the library provides a detailed exception containing a snapshot of the failing rows to facilitate debugging.
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+Good morning, everyone. Once again, my name is Irena. I'll be the moderator for today's session. And just a few information, which you already probably know, but as a reminder, we will have three topics today. After the end of the presentations, we will go through the questions that will be written in the web page of the talks. So please log in there and post your questions there and also just sit and enjoy the talks. So first of all, let us welcome our first speaker, Ryan Secura. He is a data scientist and get your guide in Berlin. And his topic for today is SHIP data with confidence, declarative validation for PySpark and Pandas. Let us give Ryan a warm welcome.
+
+**Speaker 2** _[01:07]_
+
+Thanks a lot for attending this talk. I'm a Data Scientist at GetYourGuide, and part of my job is a team, and I own and ship a lot of data products. I'm here to share the library I worked on last year to make this process more reliable. So I'll begin with defining the problem that I'm trying to solve. I'll briefly talk about some of the solutions that exist in this space. I'll give you some context on our use case and why I had to develop this library, give you a brief description of all the features that this library offers. And finally, we go through the architecture. Hopefully, I get some useful suggestions after the talk on how to improve it. So let's start with the problem. So in most data processing jobs, you read the information from one or more sources, you apply some transformations on it, and then you send it to production. It could be other external tables, dashboards, et cetera. And on most days, things go as expected. There are no problems. But then sometimes things go wrong, and that's when you realize the impact your work has at the organization. And over time, you have interesting anecdotes to share with your grandchildren. So yeah, why does this happen? Even though your code works in terms of processing data frames, there can be a lot of errors that go unnoticed. Some examples are like NAN errors, like when your underlying data changes, which can lead to divide by 0 or square root of a negative number and so on, or when you're trying to cast a non-numeric string to a numeric and so on. And then you may have null values, like missing rows or duplicates that might happen as a result of joins because of the underlying data. And by the time you find out there's something wrong, it can be often too late. And the data has already reached production, so recovery can be a nightmare. But don't lose hope, because we can learn a thing or two from how reliable software is shipped in production. So you have these common practices, like unit tests that help you validate your core logic, check if everything works as expected. Then you have asserts that help you find if your system reaches an invalid state. And the side effect of this is that you also know something more about why your system failed. You also have type hints and type checks to help find inconsistencies early on. And these concepts translate well into data validation as well. So you could use unit test to test your output data frame. You could use asserts to iterate over all the rows and find if there is something invalid. Also apply asserts on aggregations on the data frames, like sum, count, et cetera. And then you could apply schema validation to find missing columns or change in the data types of the columns and so on. So these are not new problems. And there are already reliable solutions that you could use. And depending on where you want to add tests or validations, you have solutions with different complexity. So at a very function level, like with smaller data frames, you have solutions like Pandera. Then as you move further, you have solutions like Great Expectations. Great Expectations and Soda also offer observability in terms of errors. Then when you're working on a larger scale, like processing billions of rows, you have solutions from cloud providers like AWS or Databricks. And then at a platform level, like where data engineers manage the warehouse. You have more complex solutions at the platform level, like Monte Carlo. In these solutions, you also have automated tests, like drift detection, anomaly detection. Also, you have data lineage, freshness, et cetera, that they offer by default. And most of these solutions that I'm going to, the problem that I'm trying to solve is more in the function and the pipeline level. We'll focus on these in the upcoming slides. And each product or tool solves a different problem. Each of them has their own strengths and weaknesses. And depending on your use case, you live with the compromises. So here's a brief comparison. I won't spend much time on it. And as a disclaimer, like this library, These libraries are excellent tools. So don't cancel your contracts or cancel your subscriptions. But I would like you to try DataFrame Expectations and let me know your experience using it. So what is this library about? It's a lightweight library that's designed for one thing. It lets you easily define expectations on your DataFrames, And it fails fast when the expectations are not met. So I'll explain our journey at Get Your Guide and why I had to build a solution. We had very simple requirements. We wanted to validate PySpark and Panda data frames, both in production and in end-to-end tests. Preferably, we wanted minimal configurations required for the tool so that our MLOps team didn't have an additional overhead. And we didn't want to restructure the code just for the test so that people working don't see it as an afterthought. And we wanted the process to be frictionless. So the solution we had in place was great expectations. This was incorporated before I joined Get Your Guide. The reason for this was that it offers a large gallery of expectations for the most common scenarios. And by expectations, I mean data validation tests. It had good documentation for most expectations. And what I really liked about it was the reporting. So on failure, you knew exactly which validations failed. And it also gave you a snapshot of the rows where the error was happening. So debugging became an easy problem to solve. But there were also some limitations with this library. So we were using it mainly for the validation, but there was another cloud data observability solution that they offered, which meant that the configuration itself was much more complex. So our MLOps team had to do additional configuration for checkpointing, reporting, et cetera, which was an additional overhead. Because of the transient dependencies, the build times were slower. And also, the Docker images, like the size, kept growing. The learning we got out of it was that we are putting in 100% effort to maintain this tool or to integrate this tool, but we were only using it for 20% of what it was designed for. So our needs didn't match the tool, But we had a good experience using it, so I took the best parts out of it and implemented a lightweight replacement. It's called DataFrame Expectations. Clearly, I didn't put a lot of thought into naming this library. And why build yet another data validation library? So it was originally planned internally. We had clear requirements in mind that were not met. Some of them were easy set up. We preferred to have a dependency we could just import, wanted it to be lightweight so that the CI is faster. It could use it in unit tests as well. Wanted it to be easy to understand and declare the expectation so the review process is simple, maintenance of this test so updation becomes easier. We wanted it to be versatile so that you could use it in notebooks, unit tests, end-to-end tests, et cetera, even the production pipelines. And we wanted it to work well with Pandas and PySpark data frames. So I'll go through each of these and how I try to solve them. So the library is implemented as a Python library, so installation by default becomes simple. Just need a single instruction to install. And it's also equally easy to uninstall it. So there are three code dependencies, like just Pandas, Pydantic, and Tabulate, so fairly lightweight. It all runs locally. There's no external integration required. And PySpark is an optional dependency because if you're working with Databricks, you already have it installed, like a custom version that you don't want to override. In terms of readability, I tried to keep the structure very compact. It's a declarative style of adding expectations. So you import a single class, which is the DataFrame Expectation Suite. And you add simple expectations that are easy to understand one by one. And basically, once you've built a complex suite by combining these simple expectations, you use the suite.build to get an immutable runner. And this runner can validate both Pandas and PySpark data frames. So you don't need to define the tests multiple times like for different data frames. The output is also equally readable, so you understand exactly which expectation is not met, and you also get a snapshot of the rows where the expectations were violated. It also helps you debugging. So in terms of versatility, because this is a Python dependency, you could add it in your the notebooks, unit tests, et cetera. As I added use case, like if you have multiple functions that need the same validations, I also added like a decorator-based validation. As a benefit, what it does is you also know exactly which functions are validated when you review them. One last feature was like there might be use cases where you don't want to run all the tests all the time. So I also added tag-based filtering. And what this does is, essentially, when you declare the expectations, you also define all the tags that specify the context under which these expectations need to run. And at the runtime, like when you build your runner, you specify the tags that you want to apply as filters. For example, like in your unit test, you might be working on a smaller subset of data. And you might only want to check if your output has a minimum of 100 rows. But when you're actually running it on production, you might want to check if it has 10,000 rows and so on. So you can provide this context, and the runner picks up the subset of tests, and it applies it. So that's most of the features. we look at how this library works under the hood. So the first part is how the expectations are defined and registered. Most of you who use this library won't have to deal with this. But if you're interested, so it starts with an abstract class called DataFrameExpectations. You implement your expectation by extending this and specifically implementing the ValidatePandas in the Validate PySpark class. What you need to do next is add a factory method, which returns an instance of this expectation. And to keep things decentralized, you use the register expectation decorator, which the register later used to identify all the expectations and add it to its dictionary. So when you're actually authoring your own test suite, the registry serves as a lookup for it. And the test suite, basically when you call one of these expectation functions, like expect minimum rows, it actually dynamically calls this function, in the sense that it calls the get attribute function with this function name, it searches the registry if it exists over there. The registry returns the factory method, which the suite uses to create an instance of this expectation class. And then it adds it to its list. The reason for doing this is that when I was authoring expectations, I had to manually add each function like this. And at some point, the code would be difficult to manage. So I switched to this dynamic approach. And for type-ahead search, I generate the stub files using a script. So you don't have to know exactly which functions exist. The type-ahead search helps you find them. Finally, once you've defined all your test suites, You need to basically build the runner by calling the build function. And during this step is when you supply the tags. And on initialization, the runner basically filters through all the expectations and only selects the tag that need to be executed during this context. And the final step is when you actually run your expectations using the runner, and you pass the data frame. During this step, basically, the runner iterates through each of these expectations. It validates them one by one. It checks if there are any violations, and it keeps a record of them. And at the end, if there are any failures, you get an exception with all the details. I know it's a lot to take in. So here's a more compressed version of the architecture. So you begin with an expectation, which is registered in the registry, because unmelding is important. And then you use your suite, which refers to the registry basically as a lookup to build the test suite. Once this is done, you generate a runner using the build method. And finally, the runner validates the data frame. And then you get an exception if there are any failures. So if you think I piqued your interest, if you found this talk interesting, please give this library a try. I look forward to your experience using it. And I'm also open to feedback on how I can improve it. So I'll give you a minute to take a photo or scan the QR code. That's it. Thanks a lot for your time.
+
+**Speaker 1** _[18:47]_
+
+Thanks a lot, Ryan. This was a very interesting and useful journey that you shared with us. I think it's one of the struggles we all have when working with large data. I will now check the questions and read out some. If you have more questions, feel free to post them in the talks.pycon.de. One question that we have is the following. Can you define, code your own expectations or just choose from predefined ones?
+
+**Speaker 2** _[19:18]_
+
+so right now the way it's designed is it it's from the predefined ones but I do want to make it possible to define your own expectations and add them
+
+**Speaker 1** _[19:36]_
+
+We have a second question. Why support pandas and not pollars?
+
+**Speaker 2** _[19:43]_
+
+It was based, so the thing is, like, we worked, like, this was an internal project for our team, and at the time, we were only using these two, but it could easily be extended to other data types as well. So we have these abstract classes called Validate Pandas and Validate PySpark, and the way it's designed is, like, in future, you could add support for others as well.
+
+**Speaker 1** _[20:10]_
+
+Very good. Let me check if there are new ones. Can you... Oh, no. Sorry, this is red. Actually, it was the same one. Is it also planned to support polar? So I think definitely you should put it as a priority. Yeah, sure. Can you make more than just simple validations? Is there a possibility to do more complex validations with regular expressions or lambdas? after the validation took place.
+
+**Speaker 2** _[20:42]_
+
+So there are two kinds of validations that I have right now. One is very simple that go row by row and then basically find any rows where there's an invalid output. The second is like aggregation-based expectations, which is a two-step process. So you do some aggregations and then you apply your checks on the aggregations. So I can see adding more complex. Depending on the use case, it could be applied. So the function itself, like the validate pandas and PySpark, is pretty generic intentionally. I would recommend giving it a try. And if there are any problems or hurdles with it, we could restructure it.
+
+**Speaker 1** _[21:37]_
+
+Sounds good, and we have one more question. Have you looked at point blank? From posit dev. So if so, what does data frame expectation make it different?
+
+**Speaker 2** _[21:49]_
+
+I haven't unfortunately seen Point Black yet.
+
+**Speaker 1** _[21:55]_
+
+I think you are able to look at the questions yourself after the talk, so you can check the link. Okay, I'll refresh again to see if we have more questions. I'm going to go to the next one. How is logging and error handling implemented?
+
+**Speaker 2** _[22:17]_
+
+So right now you receive an exception, which you can also toggle. Like if you only want to make it optional, you receive either a success or a failure message. I plan to add callbacks so that if you want to integrate it with Datadog or emails or Slack, it should be possible.
+
+**Speaker 1** _[22:39]_
+
+Okay, and how is the performance?
+
+**Speaker 2** _[22:43]_
+
+So at the end, it runs basically like PySpark or Panda function. So it depends on the environment you're running in. So there's nothing I can comment on the performance itself. It depends on the...
+
+**Speaker 1** _[23:02]_
+
+Okay, and do you want to comment again? There's two questions about comparing to Pandera or comparing to Pydantic.
+
+**Speaker 2** _[23:10]_
+
+So Pydantic, if I'm correct, it validates the classes itself. So the main goal for us was anyone who's not familiar with the data frame should be able to add validation. So it's like a single line check. Maybe the other tools might be more versatile in that direction where it's easier to define complex tests, but then maintenance becomes a problem. So this could work alongside these tools.
+
+**Speaker 1** _[23:48]_
+
+Thank you, we have more questions How do you check PI spark dataframes at the moment and is this done with PI spark functions Maybe you can show some code from the library how this is done I'm afraid we will not have time to show the code because there are many other questions But I think maybe you can just give an answer
+
+**Speaker 2** _[24:08]_
+
+So, at the end, like, this is an open source library. You can find it easily. Basically, what I do is PySpark functions that find the error. So, if you want to find, if your expectation is the value is greater than or equal to zero, then basically the function I use is a filter on the data frame which says find all the negative values. So, it's basically a filter on the data frame. And if the count is greater than zero, you know there are violations over there.
+
+**Speaker 1** _[24:44]_
+
+And another question is about the output. Is the output still readable if many expectations are not met?
+
+**Speaker 2** _[24:52]_
+
+Yeah, so at the moment, it's still text-based, so we don't write it somewhere. I want to be able to generate an HTML or JSON output, or give people the flexibility to define how they want to generate these reports.
+
+**Speaker 1** _[25:16]_
+
+I think this is then related to another question. That is, did I understand correctly that your pipeline failed and data is not pushed to production when some expectation is not met?
+
+**Speaker 2** _[25:31]_
+
+Yeah, exactly. So this is basically when you're reading or when you're exporting the data, the idea is that you fail as early as possible.
+
+**Speaker 1** _[25:31]_
+
+Yeah.
+
+**Speaker 2** _[25:46]_
+
+Sometimes like compute can also like when you're applying complex transformations, you might also want to apply these validations early on. But in general, the idea is to make sure you're checking the setup before you export this course to other downstream tasks.
+
+**Speaker 1** _[26:07]_
+
+Okay, thank you, and one question about the maturity. So how mature is your library? Is it actively developed?
+
+**Speaker 2** _[26:15]_
+
+I've only spent the last six to eight months on it, so it's still in early phases. There is a longer journey ahead, I'd say, for development.
+
+**Speaker 1** _[26:29]_
+
+Okay, very good. The alarm was just that we still have time for some questions because you finished a bit earlier And it's great because we do have more
+
+**Speaker 2** _[26:37]_
+
+So if you are ready. No, I don't mind.
+
+**Speaker 1** _[26:40]_
+
+I think it's a great sign because people I think have a feeling hands-on ready to start.
+
+**Speaker 2** _[26:44]_
+
+Getting a lot of useful feedback as well.
+
+**Speaker 1** _[26:47]_
+
+And now one question that I was also wondering is like where to place this validation, where to place in CI or during code execution?
+
+**Speaker 2** _[26:58]_
+
+So, as I said, like, this validation, like, it's very versatile. So, basically, the way I use it, we use separate ones in end-to-end tests where we call the scripts and also check the output. But I also add it in a lot of functions, like the transformation functions in production. So, it's up to you. Like, you don't need to modify your code significantly. for it. And even removing or cleaning up these expectations is relatively easy.
+
+**Speaker 1** _[27:35]_
+
+Very good. How is logging and error handling implemented?
+
+**Speaker 2** _[27:42]_
+
+Yeah, as I said before, like, by default, so you need to set up your logger, like, all the outputs are in general, like, written to a logger, and you have the flexibility to write it to a file, etc. In terms of error handling, by default, it returns an exception if there's a failure, but if you prefer not to have that, it also returns either failure or a success message. that then you can process and decide how you want to proceed with it.
+
+**Speaker 1** _[28:18]_
+
+Very good. Thank you. And another question related to this is, why did you decide to collect all issues over failing fast after the first violation?
+
+**Speaker 2** _[28:29]_
+
+So the way it works is it doesn't fail after the first validation like it iterates through all of them. So it iterates through all of them and it tells you exactly which subset failed so it doesn't skip on the checks.
+
+**Speaker 1** _[28:51]_
+
+I guess this is nice if you need to fix more things at once, so then you save some time on that. Okay. I think we have answered all the questions. I am going to refresh again. There were a lot, so I hope I didn't miss any. If there is, let me know. Otherwise, I thank you again. It was a very informative, very exciting job that you presented. and topic and library and yeah hope to see some next versions in the next years coming
+
+**Speaker 2** _[29:26]_
+
+year is coming thanks for the feedback
+---
+transcript_status: auto
+---
+transcript_language: en

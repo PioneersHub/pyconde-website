@@ -84,3 +84,161 @@ Applied Natural Language Processing (NLP) often faces a tension between LLM maxi
 The Explosion Large Language Framework (ELF) is designed to facilitate this transition by integrating NLP expertise into coding assistants like Claude Code or Codex. ELF provides workflow modules for project planning, data work, and model evaluation, effectively acting as a virtual NLP engineer. To handle the operational complexity of training and data transformation, ELF utilizes a user-hosted infrastructure, such as a Kubernetes cluster, which ensures sensitive data remains on local servers while allowing the agent to execute tasks, run scripts, and manage autonomous agents.
 
 Key takeaways include the importance of programmable interfaces that allow humans and agents to collaborate on equal footing using the same CLIs and APIs. By shifting the LLM's role from a runtime classifier to a development tool, developers can distill complex tasks into specialized models. This methodology prioritizes iterative project work over the creation of a single artifact, ensuring that humans remain in control of the decision-making process while leveraging agents to eliminate the operational friction of the NLP lifecycle.
+---
+transcript:
+
+**Speaker 1** _[00:00]_
+
+platformtalks.pycon.de, please use those, please use and rate the questions. And now I will introduce our amazing speaker which is clearly a role model for the whole NLP scene. So she is Ines, she is the CEO from Explosion and also like one of the commentators of Spacey and she will present today like one of her new talks, Wipe NLP for applied NLP. So there you go.
+
+**Speaker 2** _[00:37]_
+
+Thank you. Before we get started, a little bit quickly about myself. You might know me from my work on spaCy, which is an open source library for industrial strength natural language processing in Python. Over the years, we really always put a lot of work into kind of the boring stuff of maintaining software libraries, like backwards compatibility. This had a really nice side effect more recently, which is that LLMs are actually surprisingly good at writing spaCy code, both coding assistants and even general models like ChatGPT, and we also develop Prodigy which is a modern scriptable annotation tool for machine learning developers, and it's also fully scriptable in Python, and today I'll talk about some of the more recent stuff we've been working on, and it's pretty cutting edge, it's the first time I'm talking about it. So, yeah, I hope it's interesting and relevant. So, coding assistants have really transformed the way we develop software. I used to do a show of hands, like who regularly uses coding assistants, but I don't think we even have to do this because it's probably everyone. And nowadays, not only can they implement code for the given tools, they're also able to really pick the right tools. You don't even have to, you know, tell it which library you want to use, it can pick that for you, and you're able to end-to-end solve a business problem. Like, for example, this one, you need to analyse company reports, here are the files, create a table of total spending on different types of IT services, and the model can write a programme for that. And now you might be thinking, why are we even making it write code? Are models getting better and better, and can't we just have the model solve this problem directly. And sure, that's definitely possible, but I think we're still trying to figure out how to really harness the power of LLMs, and a lot of this really comes down to how they work. You can have an example like this. This is especially confronting. You can prompt it to reverse these strings, and as you might know, this is actually something that models are surprisingly bad at, even nowadays, because of how they work, they don't have direct access to the character representations, so every time you ask it to reverse the strings, it actually has to redo it, and you only find out if it's right after you get the result, and you can see, okay, it made a mistake here or not. So instead, a much more elegant approach, obviously, is to transform the prompt into a program. You have one function, you can rerun it, and it doesn't need the LLM at runtime, and it will very confidently and also very reliably reverse the strings for you. And that's also true for more complex tasks like listing all company names in a text, for example. While you can definitely ask the model to do that, you can also ask it to write a script to extract company names from text using a library like spaCy, for example. And that also means we only need to use the large generative model once to create the script, not each time at runtime. So we're still very much exploring and experimenting with the best way to integrate LLMs. And there are different visions. A common one is kind of what I call LLM maximalism, one model to rule them all and to do everything. And that's so good that it's all we need and can solve any problem. And it's also kind of a big vision and big future that we have been sold about AI. So instead of traditional software, the LLM becomes the system. But is that really the best workflow. I believe there is a different and much better way to approach this and looking at it. Instead of using LLMs as the system, we can use LLMs to build the system. And this means that even seemingly complex tasks that need custom machine learning components can be solved by using an LLM to build the system for us. For example, instead of using the model at runtime to sort documents into categories, we can use it during development to build us a classifier and train a model to do this task. And now the question is, well, why are we not doing more of this? Like, why are we not really building more classifiers? And why is it so tempting to just use the LLM as the system? And I think one reason is the problem is that, like, a lot of these workflows are kind of operationally annoying. It's lots of steps. And if you do NLP right, you really have to focus on the processing, pre-processing, post-processing, model training, data work, annotation, analysis, and you know all of these steps and you know that you should be doing them, but it's very complex, you might need a GPU, it's annoying so you kind of don't do it and that leads to often project failures and things not working out so well. And finally, even more importantly, you also need the expertise and that's the kind of stuff you don't learn in university. It's really something you only learn by doing these projects and by doing this for a couple of years and having these kinds of problems and solving them. And, yeah, that's something that, you know, is very difficult to achieve. And Applied NLP specifically, it's project work and a process. You're breaking down larger business problems into components that you train. It's not an artifact. It's decisions you need to make along the way. And that's pretty much, you know, kind of the software 1.0 thing, like, you know, just building traditional software, that's something that coding agents are pretty good at, or at least, you know, kind of good at, depending on what you're doing, and that's really where you produce a software artifact. But there's also software 2.0, which is code plus data, and that's much more difficult than if you've ever tried to get a coding model to actually look at your data and engage with your data. You might have noticed that It really tries to avoid that at all costs. It does not want to engage with your data, and it makes sense. The model is explicitly trained to produce code, to produce heuristics, and not really be used as like a data workhorse, but that inherently makes working with software 2.0 with coding assistants really difficult. So how can we make this easier and bring agentic workflows to software 2.0? This is really something we've been thinking about a lot, and it's really been at the core of kind of what we've been doing at Explosion for the past 10 years. Like, how can we make NLP easier? And this led to something that is a new tool that we've been calling ELF, which is short for Explosion Large Language Framework. The name kind of stuck. It started out as a working title. And this is the first time I'm ever really showing this. So it's pretty new, and it's pretty cutting edge. But if you want, you can already check out the beta documentation, and there's also a wait list you can sign up for if you're interested. And early on, it became very clear that whatever we're building here, the best way to do this is we need to integrate it into a coding assistant and coding agent like Cloud Code or Codex. It really has to work from within, and we wanted to give the agent the tools and the skills to really solve NLP problems and incorporate also a lot of the knowledge that we've accumulated over the years and our distilled expertise that normally we would be providing as consultants, for example, into the model and into the coding assistant. So basically, really a virtual NLP engineer that you can bounce ideas off, and that can really include all the best practices and also help you break down a business problem all the way to a production NLP and machine learning system. So the first step is usually, as you can see here, you describe the project you're working on, and then you can work on breaking it down into actionable steps. And another thing we've been working on in this central component are really these workflow modules for the different parts of the machine learning and NLP life cycle. So for example, the project planning, you start with a business problem. I need to extract this from company reports. And how do I go about it? Which components do I need? What type of NLP, is this even? Do I need machine learning? Do I not need machine learning? There's also the data work. You need to define a label scheme that works well. You need to define which components you're annotating, set up the interfaces. And then, of course, since we have an annotation tool that we develop, we really wanted to make the agent good at using that and good at using the API and also good at implementing custom workflows, which it couldn't do so well out of the box. and there's also in applied use cases, there's a big use case for non-machine learning workflows, do I even need to train a model, can I solve it with a rule-based system which is of course always more reliable and you can develop that interactively, you can train models, you want to see how is my model performing do I need more data, why is my model not learning which is kind of one of the central problems that you often have and And finally, also, this general question answering, we've tried to distill everything we have in content from the past ten years into a knowledge base, so the types of advice questions, the model can actually make use of that and is pretty good at answering these questions. And under the hood, these are skills that we've developed and actually once ELF is out of beta, we also will be open sourcing them, so you can easily take them and add them to to your coding assistant, like Cloud Code. If you're familiar with skills, you know they're like these markdown files that you just put in, and they'll make your coding agent proficient at solving NLP problems. One problem we have is that if you're doing that sort of vibe NLP, you need to run lots of stuff. That's always at the core of it, and that's kind of a problem. You don't really have that when you're just vibe coding. That's mostly maybe a few bash commands, and then you're writing code. But here, we need to do a ton of stuff, training, optimisation, we need to analyse things, evaluation, data transformation, pre-processing, testing, annotation, we need to set up annotation tasks, we need to maybe annotate with humans, automate annotations, have agents do the work for us, and then there's of course all the domain-specific stuff, like scripts you've written and other fully custom stuff that you want to do as part of the project. And the problem here is everything is kind of connected, like you kind of want to maybe run these things in parallel, or one depends on the other. So as I said, like operationally really annoying. And you might also want to use a GPU if you have that for training, and a CPU for other things. Often, another thing that complicates it, your data might be sensitive, you can't send it to an API, it needs to stay on your servers. And of course, a lot of the things are fully custom and really specific to what you're doing, and it all needs to come together. So how do we really solve that? That was a big issue that we were facing, and the answer really is, well, infrastructure. So for example, a Kubernetes cluster. And the nice thing about coding agencies these days is that they can actually pretty reliably help you set up infrastructure, which previously really needed specific DevOps expertise, and And that made it really difficult, but nowadays this is actually doable even for developers who have never really had to deal with clusters before. And that means that the cluster that does the stuff can be hosted entirely by you, by the user, either on a local workstation or in your cloud account, and it contains all the code and data that you need. And we've kind of divided the processes into three categories. One is tasks that are really annotation tasks that start the server, then scripts, actions that are pretty much anything that just runs a thing and exits, like training a pipeline, and finally agents that are autonomous and can be assigned to tasks to just create data if you assign them. And when looking at data development best practices, there are a lot of best practices that we kind of know we need. We need to split up the work, break it down into smaller tasks, pilot annotations, annotate with some overlap, orchestrate this, but we're back at the operationally annoying thing. Of course, you kind of don't do any of that, and that leads to project failures. And also auto-annotation really only works if your task is well-defined, which kind of goes back to the project development part. And it actually, what we found is it really changes things a lot if you're in the same system and on equal footing with your agents. So you're doing your own annotations and review, and you're working alongside the LLM rather than just with an LLM in the loop. So this idea of agents, that really made a huge difference. And we've also found that, like, this collaboration of humans with agents, that was one of the most important aspects to make this idea of agentic software 2.0 work. If you've used, for example, our annotation tool Prodigy before, you might be familiar with the concept of recipes, these Python functions that orchestrate the workflows from annotation to training and so on. And they're automatically turned into a CLI that you or the agent can run. And Elf even takes this one step further and auto-generates a form for them so the user can fill them in. And essentially, it allows you to really script the SaaS application, get all the benefits of having software as a service run for you, while also being able to script it. And with, again, agentic software development, there might be people saying, well, coding is kind of now free, right? So does developer productivity even matter anymore? And do we really care if the developer API is good and what the interface is like? And I actually believe it's kind of the opposite. I think scriptable and programmable interfaces are now becoming a lot more important than ever, not less, because that is going to be the collaboration point where the agents and the humans meet. And that's why having a programmable interface, I think, is really key and is also something that's much more easy to manage because you have a coding agent that can write the code for you and you don't have to do it all from scratch. and I think this also highlights another really important thing and takeaway that we found which is that the app and developer API they really need to speak the same language and most if you're looking at developer productivity tools these days most of them kind of have these integrated chat assistants now and actually a lot of them are pretty bad and they really add this kind of sense of the and shitification of the internet. And that's really something that we really wanted to avoid. Like having a chat makes sense, but how can we actually make this good and make this work? And one analogy here is you can kind of think of it like a central system, a computer or human machine hybrid. And usually as humans, we like to think that we are the head and the horse is like the rest of the body. But it's kind of easy in a lot of these workflows to end up in a situation where the computer tells you what to do, you then go away and implement it, click some buttons, buttons report back, and in that case, you kind of have the horse's head and the human ass. And that's actually, I think, why a lot of these workflows really feel so bad and feel so enchitified. And to avoid this, we really need to make sure that there is a good shared interface. It uses the same CLIs and APIs that the humans use and the agents, and the tasks can be easily handed off back and forth. Like, for example, this is also something I think the Cloud app introduced, handing off between an in-app chat and a terminal and a local coding agent that actually lets you write stuff on your machine. And now, in general, if we're thinking about software 2.0 again and what we'll need in the future, there is this pretty dumb take that in the future, we don't even need software anymore. Maybe you've heard of this. AI will just write the bytecode, and that's it. And I obviously don't think that's the case. I think we will still need software, and we need to actually participate in building the software because we need to make decisions along the way. We want to be in the driver's seat, and we kind of want to be the head, not the backside. And this process of creation is expressive and you can't expect to know up front what you want, so it really is an iterative process and you want to be there and building. And we also still need to make machine learning systems. There are a lot of use cases where machine learning is very useful and is the right way to build the functionality we need. We just need to make the right thing easy and avoid the annoying complexity that kind of currently keeps us from doing things the right way. We want to make the right thing easy and we also still want to build classifiers. There are a lot of big advantages to that and instead of using an LLM at runtime as a classifier, we can use them to create classifiers. And because Software 2.0 is such an iterative process and really project work rather than just creating an artifact, we also want to enable the collaboration between humans and agents and give humans the most efficient interfaces to do this. So I think we'll definitely still need interfaces for humans, and they need to be good. So what can we take away from this all? I think it's been obvious that LLMs and generative AI models are really powerful, but it's been a bit less obvious how to use them and use that power properly. And I believe one of the best ways actually to do this is to use LLMs to build the system rather than simply as the system. And apps and developer APIs and agents really need to speak the same language. You need to be the one driving, not the machine. And finally, the argument for using LLMs as the classifiers and why it's so tempting and so practical is that it was the easiest thing to do. But I think going forward, we can be a lot more ambitious than that. And we can aim for really the best possible result in terms of speed, accuracy, usability, data privacy, and so on. And if we aim for the best result, the goal should be, how can we make this best result easier? And that's kind of what motivates us all, and that's what we've been working on. So, yeah, feel free, if this is something you're interested in, feel free to check it out. The website has more details and a wait list, and I'll also be around next door in the Feminist AI Lounge and can show you some things in practice, and we can hack around and try out some prompts. And, yeah, thanks. Thank you.
+
+**Speaker 1** _[19:50]_
+
+Also from my side, thank you for this amazing talk. And you really should check out the Feminist AI Lounge. It's one of the best parts of the conference. And Ines co-organized it. So also applause for her community work. She's also a role model for...
+
+**Speaker 2** _[20:02]_
+
+Wonderful community. Thanks.
+
+**Speaker 1** _[20:06]_
+
+We have enough time for questions. The first question I ask you will have two separate questions. The first question will be, when we have NLP, why do we need published libraries? And the second question of those, can we use the model to create the functionality we need for the moment.
+
+**Speaker 2** _[20:25]_
+
+So what was the first question sorry when
+
+**Speaker 1** _[20:26]_
+
+So when we have NLP, why do we need published libraries? So like the second question, can we create like the functionality? Like I guess with LLMs.
+
+**Speaker 2** _[20:37]_
+
+Like, use it to write stuff. I'm not sure I'm fully understanding the question, but I'm sorry. But I think, yeah, I'm really not sure. So, I mean, we can definitely, I think, as I showed as well, like, we can use DLLM to create the software for us. And then we have a system, you know, we need software because the software can just run independently. And during production, we only have the software that's often maybe even deterministic that we control, that runs on our servers, that's accurate, fast, fully data private. And so we have the software and we use the LLM during development time to help us build the software, kind of like vibe coding, just vibe NLP.
+
+**Speaker 1** _[21:23]_
+
+I think this was the kind of...
+
+**Speaker 2** _[21:23]_
+
+the kind of case of the question.
+
+**Speaker 1** _[21:24]_
+
+Yeah. Sorry, also a long question. Which kind of tax classification problems would you tackle with SPACI and which one with NLLM?
+
+**Speaker 2** _[21:34]_
+
+Okay. I mean, it depends. I do think, you know, spaCy and other libraries that implement text classification, text classification luckily actually works pretty well. And I think what I would be doing in general is use the LLM to create data for it, because that's usually the bottleneck. If you have enough data, you can use any library that supports text classification, even a bag of words model or something old school, even that can work pretty well. So So I would use an LLM to create enough training data and then use, for example, Spacey on that data and train a model, and then I have a model that does exactly the one thing. I also often say, like, oh, if you're worried about AI models going rogue and nuking us all or that kind of stuff, I think you should also be interested in this sort of approach because you have a model and that predicts a category, that predicts one or two. And so even if you tell it, like, hey, nuke the world or something, it will predict too. And it can't even, can't really do any of that. So I think that's also a big advantage.
+
+**Speaker 1** _[22:38]_
+
+also based on the classification problem use case can categories be so complex and needed needs reasoning such that LLMs are the better choice for classifications
+
+**Speaker 2** _[22:49]_
+
+Instead of spicy. Yeah, so I think, I mean, naively, yes, like often a lot of the problems people have, they can end up conceptually complex and often then people have the experience that, hey, the system doesn't work very well. And usually, yes, I think there are definitely use cases or prototypes where, yeah, just having the LLM and not training anything can work. But I do think if you're at a point where the prediction feels so complex or is so impossible to do with the data you have, usually that actually indicates that you should take a step back and change the way you approach the problem in the first place. Like often people try to do a very one-to-one translation of their business problem to what they're annotating and what they're training. And that's often not really the case. I actually have a recent blog post where I show some examples of how to reframe the problem and get to the same result but in a much more predictable and reliable way with a lot fewer resources. So I think that's always where I would go first. Yeah.
+
+**Speaker 1** _[23:52]_
+
+Is this workflow with ALF also useful when you're doing syntactic data generation?
+
+**Speaker 2** _[23:52]_
+
+I understand. I mean, in theory, it's something we haven't really tested a lot, but I do think one thing I envision is having, for example, a module as well that can help create data for different use cases. And I think that could definitely be very useful because often you have use cases where you start off and have nothing. Like right now, we have been focusing on the information extraction parts where you sort of have a lot of data and want to get something out of it. But I think it's a very natural fit to have a module in there that interactively helps you generate data.
+
+**Speaker 1** _[24:31]_
+
+Okay, thank you. The next question is about guidance. My task is to categorize anonymous customer ticket data so should I use a LLM and embedding LMM or let Claude build me a classifier in the first place? So where should I start?
+
+**Speaker 2** _[24:49]_
+
+should I start? Yeah, so I think actually that's a good use case where, yeah, I think if you have a workflow where you can have Claude help you build a classifier, I think that's great. And especially this sort of use case, you might end up with a relatively straightforward label scheme and you could really, you know, get a lot of gains out of this. And actually we had a, I think we recently published, recently, we published a case study, if you're interested in this, by GitLab and they're also doing support tickets. And they're also using an approach, a very interesting approach where they train a model, factor out all this business-specific logic, have that as a separate component, so they really have this very reliable system to process millions of support tickets and get changing, actionable insights on it. I think this would be a prime example of using a workflow like that, and I would be very curious to see what elf will suggest
+
+**Speaker 1** _[25:41]_
+
+Super nice. So will ALF be providing Python API to integrate some of its functionality into custom workflows?
+
+**Speaker 2** _[25:50]_
+
+Yeah, I mean, it's Python.
+
+**Speaker 1** _[25:50]_
+
+Yes.
+
+**Speaker 2** _[25:53]_
+
+We've actually built even a lot of tools, built like their CLIs in Node or in JavaScript these days, but actually it's all Python. Our stack is in Python, so you'll be able to use it in Python.
+
+**Speaker 1** _[26:05]_
+
+Python is awesome, yes. Did you test it off on other AI coding systems like GitHub Copilot?
+
+**Speaker 2** _[26:13]_
+
+Not yet, so it's definitely something that's kind of on the roadmap, and I think it should
+
+**Speaker 1** _[26:13]_
+
+Not yet.
+
+**Speaker 2** _[26:18]_
+
+work with all models and all coding assistants that support skills right now, and I think I've definitely heard, also if you do sign up for the wait list, I think we have one question in there that asks like, hey, which coding assistant are you using so we can get a better idea? I know Copilot, a lot of people who are on the Microsoft stack, even if they're sort of stuck with Copilot at work, and so we definitely want to support that. I think Codex as well, maybe OpenCode, we used that at Feminist AI the other day, and I thought, oh, that's actually, that's pretty important to support as well, but yeah, that's coming.
+
+**Speaker 1** _[26:51]_
+
+Back to the spicy question. Cloud Code was doing frustration detection with Regex. Do you think a classifier perhaps of spicy would be a better choice?
+
+**Speaker 2** _[27:02]_
+
+be a better choice? I think it could be. And actually, this is a good example of what I meant earlier. If you're working with a coding model, it really tries to, it does not want to annotate. You can't make it annotate without adding extra skills. It really refuses to look at the data, and it will always try to find a heuristic. No matter what you ask it to do, it'll be like, here's a regex. And you're like, no, no, look at the data and annotate the data. It's like, oh, how about this regex? And I know it makes sense why it's tuned like that. You don't If you're asking Cloud Code, like, hey, analyze these reports and calculate the median, whatever, you don't want it to come back and say 45, like you want it to write a script. And that's why it is like that. But, yeah, I think Cloud Code is very biased there, so it will always try to go for the heuristics, when actually, in a lot of cases, the classifier would be better.
+
+**Speaker 1** _[27:52]_
+
+Makes sense. So how do you test a co-pilot skill when it's in production?
+
+**Speaker 2** _[27:53]_
+
+Mike?
+
+**Speaker 1** _[27:57]_
+
+So that's also another question with this. Do you have automated tests around agent harness? So like how to test the production like in skill and do you have like an agent harness?
+
+**Speaker 2** _[28:07]_
+
+Yeah, so I mean, it depends on what production means in this case, like if it means like sort of the data development or the development process, because ultimately what we're building are developer tools. So they really mostly, you know, they cover the development lifecycle. And then at the end of it, hopefully you have a model out of it that you can deploy to production. So I think that's mostly the use case. If you mean production as in, you know, working with the tool, I think if that, you know, that's definitely all stuff you can implement. I mean, it's all in Python. Like, we haven't really gone super deep on, like, all possible agent workflows we can implement. But, you know, you'll be running the cluster. You'll be uploading Python to it. And so everything you can do in Python, you should be able to do in this workflow.
+
+**Speaker 1** _[28:53]_
+
+Super. Now again an ELF question. Can ELF help to distill LNMs into small language models? Yeah.
+
+**Speaker 2** _[29:00]_
+
+And that's kind of one of the core things, especially not even distillation in the very technical sense where, okay, you just have a generative model, and then you kind of try to make it smaller, but also distillation in the sense of distilling like a specific task, like a text classification task, entity recognition, relation extraction task that previously you asked the LLM to do, and then you turn it into a specific classifier. And I'm using classifier here to mean, like, pretty much any small specific model that only does one specific thing. So I think that's kind of, I would even say, one of the core use cases. And then at the end, you end up with something that you control. And I think that's the ultimate success of the whole workflow.
+
+**Speaker 1** _[29:40]_
+
+the whole workflow. Super. We want the ultimate success. This was the last question. Perfect. Thank you for your answers.
+
+**Speaker 2** _[29:46]_
+
+Thanks.
+
+**Speaker 1** _[29:46]_
+
+Thanks.
+
+**Speaker 2** _[29:47]_
+
+And also, I have stickers. If you're interested, I also have stickers, of course. I have new Vibe NLP stickers, so even if you have all of our stickers already...
+---
+transcript_status: auto
+---
+transcript_language: en

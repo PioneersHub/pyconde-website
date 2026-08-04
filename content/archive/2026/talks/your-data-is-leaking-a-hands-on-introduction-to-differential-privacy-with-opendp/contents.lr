@@ -145,3 +145,489 @@ Differential privacy (DP) addresses the failure of traditional data anonymizatio
 The approach taken to mitigate these risks is to treat privacy as a tunable mathematical bound rather than a binary state. By adding calibrated random noise—such as Gaussian noise—to query results, DP masks the contribution of any single individual. The amount of noise required depends on the sensitivity of the query; for example, a simple count has a sensitivity of one, while a histogram's sensitivity is measured by the L2 norm. This process creates a trade-off between privacy and utility: higher noise levels increase privacy by overlapping the probability distributions of datasets with and without a specific individual, but they decrease the accuracy of the resulting statistics.
 
 Using the OpenDP library, which is implemented in Rust and provides a Python package, these concepts are applied to a healthcare dataset of hospital discharges. A membership inference attack on raw aggregate tables can identify approximately 30% of a sensitive cohort with a 10% false positive rate. Implementing DP via OpenDP prevents this by enforcing a privacy budget ($\mu$), which limits the total amount of information leakage across all queries. Once the budget is exhausted, the system blocks further releases to maintain the proven privacy guarantee.
+---
+transcript:
+
+**Speaker 1** _[00:06]_
+
+come to this session. I need to kindly ask you to put your phones on silent mode. Thank you in advance. It's my pleasure to introduce our speakers, Shlomi and Marcel, and they will be presenting their talk titled, Your Data is Leaking, a hands-on introduction to differential privacy with OpenDP and if you have any questions during the talk please raise your hand and we will hand over the microphone
+
+**Speaker 2** _[00:58]_
+
+Yeah, thank you so much. Good morning. It's nice to see everyone You're all set up right with the laptops in front of you. We will be hands-on and we will share Notebook link later on so that you can all follow All right, your data is leaking There's our science perfect and And before we get started, we wanted to briefly introduce us, ask a couple of questions about you and then give a quick overview of what's going to happen.
+
+**Speaker 3** _[01:43]_
+
+a researcher at the Weizenbaum Institute in Berlin. I'm mostly working on how to make responsible AI and AI governance deployable, so which technical tools, policy tools, which
+
+**Speaker 2** _[02:06]_
+
+Institute for Employment Research in Nuremberg and LMU in Munich. And I mainly work on privacy preserving AI and synthetic data and collaborated with the US Census Bureau and the German Statistical Agency before. And Tudor is also on there. He unfortunately can't be here today. He is in his last weeks of prepping to defend his PhD, deep, but he is also a part of the team here and also contributed to everything you see today. But all the mistakes remain our own. All right. We have three questions for you to get you all started in the morning. The first, I want to see hands or not, like if If you haven't, have you heard of differential privacy before reading our tutorial description? If you have, please raise your hands. Nice. That's, I don't know, 75%-ish. Have you worked with or on differential privacy before? Nice. And then, for everyone else, have you ever used an iOS or Android keyboard? So that's, I hope, like it should be everyone. And it seems to be a silly question, but actually that means you have interacted with differential privacy in ways you didn't even know.
+
+**Speaker 4** _[03:49]_
+
+Um, so
+
+**Speaker 2** _[03:50]_
+
+So in iOS, the emoji suggestions you get
+
+**Speaker 4** _[04:02]_
+
+Um
+
+**Speaker 2** _[04:07]_
+
+and also I think word prediction is done using differential privacy in the background. So differential privacy is something that came from theoretical computer science but now is really in the mainstream. We interact with it every day even if we don't really know that we are. So what will we do in the next, like we aim for...
+
+**Speaker 4** _[04:35]_
+
+Let's see.
+
+**Speaker 2** _[04:36]_
+
+So that we don't have also
+
+**Speaker 4** _[04:41]_
+
+Um, and
+
+**Speaker 2** _[04:42]_
+
+And also up front, because this is a tutorial, please just feel free to ask questions any time. So you can go through the link you've seen before. That would be for the end if you have bigger questions. But in between, if you want to clarify something, just raise your hand and then someone will come to you with the microphone. and then please wait for the microphone to ask the question so that people on the stream can also follow what's going on here in the room. So what will we do today? So first we want to convince you that there is a privacy problem and we should care about it. Then briefly introduce differential privacy. First really briefly on the slides, but then also a little bit more intuition in the notebook. Then do an actual data analysis on real data that is released with OpenDP. And then also have a little outlook because this is only a prime.
+
+**Speaker 4** _[05:52]_
+
+Um...
+
+**Speaker 2** _[05:53]_
+
+what else you could do or what resources you could use to learn more and to maybe even build your own.
+
+**Speaker 4** _[06:08]_
+
+um, and
+
+**Speaker 2** _[06:11]_
+
+Being German makes this even more complicated because Datenschutz, mostly in the German debate, captures a security angle.
+
+**Speaker 4** _[06:25]_
+
+Um, so...
+
+**Speaker 2** _[06:28]_
+
+privacy and for example telegram or chat apps like then people often think about encryption like that the message that you send between or Shlomi and I when we send our messages this morning that no one in the middle could read them
+
+**Speaker 4** _[06:45]_
+
+Um, and...
+
+**Speaker 2** _[06:50]_
+
+mainly like a security aspect, but then there's also other aspects, like you can think of it as like consent, like if you ever participated in a study, for example, me as a researcher would ask you, oh, are you okay if we use the data to analyze your voting behavior or your commuting patterns in the morning? And that of course also happens on your tech devices, right? Like, apps ask you, is it okay if I collect your location, if I get access to your camera, to your mic?
+
+**Speaker 4** _[07:27]_
+
+to your contact list.
+
+**Speaker 2** _[07:31]_
+
+So, like, that's, like, that you can consent to share data with someone, but then there's also the, like, statistical aspect of privacy. So if I do a study as a scientist and collect data on many people, even if they consented, typically there is something like the disclaimer that says, oh, and we will make sure that your data is not identifiable. your data will be anonymous especially if you think about commuting patterns or voting behavior that can be sensitive information that you would not want to be leaked and that's where I guess we come in today that's where it can get really tricky because what does not identifiable actually mean and often in the context of datenschutz that just means You strip off names, any identifiers, and then you're good to go. I think the problem that we introduced today, and then also the solution, shows that that might not be enough, actually. Because we can remove personal identifiable information, but then there might still be enough to
+
+**Speaker 4** _[08:56]_
+
+like that data to something else and we can still identify someone so like a very
+
+**Speaker 2** _[09:04]_
+
+nice example with the
+
+**Speaker 4** _[09:06]_
+
+the person
+
+**Speaker 2** _[09:08]_
+
+I saw some smiling and laughing and nodding in the audience already. I think everyone here can identify that person even though we masked what most people think of as personal identifiable information, the facial features here. And we could have even gone further. Probably even if we added another mask on top of the hands, we probably still could have done that. um and that's
+
+**Speaker 4** _[09:41]_
+
+but
+
+**Speaker 2** _[09:50]_
+
+records in the US, by Sydney Sweeney in 2000, or I guess she did the attack even earlier than that, where she showed like even if all the personal identifiable information is removed from a data set, so what we usually consider as personal identifiable information,
+
+**Speaker 4** _[10:14]_
+
+Um...
+
+**Speaker 2** _[10:15]_
+
+there was still something that in Germany would have been considered as personal identifiable information, that she could match a lot of people exactly on zip code, birth date, and their sex. And to really show that this is a big problem, she then singled out, identified the medical records of the Massachusetts governor back then, and could show all the recent medical history of the governor by linking it to voting records. Because in the voting records, there was the name and address. It's really crazy that that's all available in the U.S., but it is. And then she could link that to the medical data from the insurances and find someone and potentially expose them. and that's like even more problematic if you think of like genomic studies and the biosciences where like any gene sequence could potentially be personal identifiable information especially with people voluntarily uploading all their gene data into ancestry.com or like other websites. That's one thing that's also talked about in the GDPR, like the singling out. Then there is another set.
+
+**Speaker 4** _[11:55]_
+
+Um, two things.
+
+**Speaker 2** _[11:56]_
+
+two similar data sources,
+
+**Speaker 4** _[11:58]_
+
+Um...
+
+**Speaker 2** _[11:59]_
+
+like in this case it was rating data from Netflix that they released in a public competition, like a Kaggle-like competition to get a better rating system for Netflix, and they were like, oh, but we didn't attach any.
+
+**Speaker 4** _[12:14]_
+
+researchers
+
+**Speaker 2** _[12:16]_
+
+publicly available IMDP.com data and found like that there was a subset of people who rated similar things on both then they could connect them and then like from there like you could really do a lot of things and from the ratings if you think about for example political documentaries or even some movies with like a political stance, they could even infer stuff like political ideology or religious views just from rating data in something that Netflix thought was de-identified. Then another big class of attacks is, and that's one that we will see later as well, or like in some way, is that There is, in theoretical computer science, this thing called database reconstruction theorem that means that given enough released information about any data set, you could or you will, the more and more information is released, you will be able to more accurately reconstruct the exact database. And that's exactly a problem that the US Census had, like that.
+
+**Speaker 4** _[13:40]_
+
+Amen.
+
+**Speaker 2** _[13:41]_
+
+They release millions and millions of tables with hundreds of millions of counts about the American population. And with a smart solver, you could then almost perfectly reconstruct the underlying microdata that the Census Bureau cannot actually publish. They are prohibited by law or that they can publish information that is linkable to any individual. But like this reconstruction attack showed like, oh, like that's actually a big problem. Like that they, with the then current technology couldn't really do that. Then there's also a class that's called membership inference. For example, on machine learning models, like there's nice examples from large language models where if prompted right, some of the earlier GPT models would release memorized text that definitely contained personal identifiable information, or like there's even also text with credit card numbers and stuff that's memorized, and if you found the right query, you could find
+
+**Speaker 4** _[15:07]_
+
+recognition
+
+**Speaker 2** _[15:09]_
+
+and it was like a tag on model weights of like an image like a face recognition model and only given the model weights they were able to reconstruct um faces and like identifiable features from those faces as well like yeah i guess um i don't know who that is but um you could definitely say like that person was in the training data here so how do we then even define privacy and like the first and naive approach would be okay privacy should mean no one should be able to learn anything about any individual from any release like my data like my rights and no one should learn anything but like that is unfortunately too
+
+**Speaker 4** _[16:08]_
+
+because
+
+**Speaker 2** _[16:10]_
+
+Because if we do science, or if we learn things about the world, and learn something like smoking causes cancer, then learning that smokers get cancer, or are more likely to get cancer, teaches us something about every smoker out there, even if they didn't participate in an initial study, even if their data was never collected. If I just observe that you smoke outside, in front of the door, I would learn some potentially sensitive information about you, but just observing you even though like you were never part of the study that identified that causal link. So therefore, any workable definition for us should distinguish between what is fine and what is not fine. And what's generally considered as fine is, especially from a scientific context, It's learning about a population, learning general patterns, robust, generalizable patterns. It should be fine, but learning anything...
+
+**Speaker 4** _[17:19]_
+
+should
+
+**Speaker 2** _[17:25]_
+
+Is like what we tried to show you today Then there's some traditional defenses. You might have heard of some like cell suppression, bucketing, noise injection, k-anonymity and They were like when they first came out they were all reasonable and they're intuitive but in practice they actually fail because they make Assumptions about the attackers like they basically start from or tune their defenses to what an attacker could potentially do today however that assumption might be really really naive because as we have seen with the linkage attacks and the singling out attacks that everything could potentially be an identifier like how do we even make that decision what is identifiable information and what not if everything could be an identifier auxiliary data is unbounded and I think
+
+**Speaker 4** _[18:29]_
+
+and
+
+**Speaker 2** _[18:32]_
+
+also large language models can help anyone to come up with their own new attacks that maybe they couldn't have
+
+**Speaker 4** _[18:41]_
+
+So
+
+**Speaker 2** _[18:51]_
+
+more principled, and one idea that's really where the theoretical computer science came in is, okay, we should think of a worst case, one with unlimited background knowledge and unlimited compute, like a theoretical attacker that might never exist, but we can define what that looks like, and then bound what any such attacker could learn about any specific individual.
+
+**Speaker 4** _[19:21]_
+
+and
+
+**Speaker 2** _[19:24]_
+
+conceptually what the French are.
+
+**Speaker 4** _[19:26]_
+
+Um, and...
+
+**Speaker 2** _[19:30]_
+
+So it's really coming from this formal crypto background, really thinking about what could happen in the worst case, and therefore we can bound privacy risk in the presence. And there's actually two goals of differential privacy. So privacy is in the name, and that's definitely what we want to achieve. But it's also, it's a tunable knob. It's not like one thing. a mathematical definition for a measure of privacy and we can tune that knob and ideally we want to preserve utility and protect privacy and we hope to convince you today that it's really about the two because naively we could protect everyone's privacy by just never releasing any data.
+
+**Speaker 4** _[20:21]_
+
+Um, or if we
+
+**Speaker 2** _[20:24]_
+
+by just releasing all the data about everyone all the time. So like that's the spectrum where like in between we wouldn't like to work and we would like to have like this tunable map there. Very brief intro into differential privacy here. So like the definition that you saw earlier that was not feasible, restated in like what VP can achieve. You will not be affected adversely or otherwise by allowing your data to be used in any study or analysis, no matter what other studies, data sets, or information sources are available. You will see that later again. So you will be able to think about it more as well. By now there is a lot of DP in the wild. So expanding like government data releases, like the U.S. Census Bureau released their 2020 census with differential privacy. The Israeli Ministry of Health, thanks to Shlomi, released their live birth registry with differential privacy. And there's also a
+
+**Speaker 4** _[21:39]_
+
+Um, like,
+
+**Speaker 2** _[21:42]_
+
+releases their user stats and with differential privacy and then there's all those big tech implementations of it as well You have seen OpenDP in the title of the tutorial today and OpenDP is Yeah, software library like a open community based open source project to get differential privacy right, like to get verifiable, trusted implementations of differential privacy that also comes with a Python package, but there's also other, I think there's R package as well and all the libraries mainly written in Rust, so it's not a pure Python project, but that's how we at Python can work with differential privacy. And I think that the main point here really is that we shouldn't tinker and roll our own implementations of differential privacy because a lot of different things can go wrong and therefore we should just rely on a trusted and vetted library. Like there's very particular issues that I would've never thought of, like floating point noise that could leak bits and, like, very nerdy.
+
+**Speaker 4** _[23:14]_
+
+Do you want?
+
+**Speaker 2** _[23:15]_
+
+You will find two versions of the same notebook. The first will take you to a colab where you can just, if you have a Google account, run it right in there. And if you don't like Google for any reasons that we totally could understand, there's also a Google-free binder version. And you can of course also download
+
+**Speaker 3** _[23:50]_
+
+So the color version is just nicer and faster the UX but both would work so we'll give you a moment to just copy the URL Are we all set Yes Yeah, so we've created a fun case study that will kind of cover both kind of privacy risk and attacks around that I think it's a very realistic kind of scenario, example, work with real data. We are going to attack, and we are going to try to defend with differential privacy and also kind of reason about different trade-offs. So the story we're going to have is a state health department. They run the opiate treatment program for 1,500 people. And they really want to support research and accountability, and they're going to create a dashboard about this program. They're going to release different aggregated statistics, like different histograms so people can see the relationship between cost and so forth, demographic and similar stuff like that. This is very common, researchers many times doing stuff like that. And I think there is this kind of common perception that, oh I just released aggregated statistic you know the privacy is protected I think we're seeing that over and over again both in industry research and so forth and we're going to focus on specific privacy risk will give you later kind of different resources to read about different privacy attacks risk will focus about membership inference what is so interesting about about this specific dashboard or data set, that for this 50, if I can say that this specific person was part of this cohort, then I can say how he or she or they were part of this opiate treatment. The fact that you are a member of this specific data set is already private information. You can imagine, for example, if this was about people with HIV, for example, people that go treatment for HIV, the fact that you are part of this data set is already a private, if you can learn about that, that's a privacy leakage. And this specific issue called membership inference, okay? I infer that someone is part of this data set. So you can run the first cell doing some installation, as you can see we install OpenDP and other things. Import everything. You can do run all or you can just follow with me. So let's first talk about the data itself we're going to work with. We're going to work on a real world data, actually released by the New York state. It's called Sparks. It's actually really wild. It's a data set of all hospital discharges in all New York state. It's very detailed data sets, like 30 something columns. For the demo, we chose only, I think, seven or eight columns. And we use it as I think from 2024. There are two million inpatient stays during this year. And the columns we have here is like age group, gender, race, health service area. It just means in which region of New York State you were treated. What was the primary payer, whether it's like private health insurance paid by the person, Medicare, Medicaid, and so forth, the length of stay in the hospital, this is about hospitalization, the total charges of the treatment, and what's called disposition group, it's mean whether the patient was discharged to a home, to a nursing house, and so forth, okay? So if you really scroll down, you can have kind of a few example of these records in these data sets. For simplicity, we are having here everything categorical data, but it's not necessary. And we're going to assume that what the health department want to release is just for simplicity, five three-way cross-tribulation. What does it mean? It means that the dashboard is going to, you know, we can imagine visualization, whatever. Basically, you know, for each of, OK, for just table that for each age group, each payment topology, each disposition group, how many people from the 1,500 cohort are going to have each one of the values. So just to be very concrete, so this is two of the published table, for each age group, to each payment topology, for disposition group, how many people are matched having these specific values. Okay, so we are just going to release five tables, Each one, five histogram, each one of three columns. Okay, so far so good? Cool. And we see the tables here. Cool, and it looks up. So in this function, compute dashboard, we just run through all the tables and calculate this dashboard. We are using Polars and not Pandas. So Polars is kind of scaled up version of Pandas. Pandas is being lazy. When I run a command, like running a call to a method and so forth, the aggregated statistic is not calculated at the moment, only when I'm asking it to be calculated. It's good for optimization. We'll see later OpenDP is using Polars, and there is a reason for that, but you can really think about we just use Pandas here. Okay, so this is the data set, and let's start to talk about membership inference as privacy risk. So we need to set the stage. So basically membership inference. I'm asking a simple question. I have to release Aggregated statistics. I have these five tables and I have a record of a person Let's say, you know, I know this person and I like I can I just I can check their documents and so forth I have just another data set like the insurance have this data set or something like that And I have a full record of person and I know all the values for all of the eight columns. And my question is, whether given the aggregated statistics that are public, released by the state, can I infer whether this person was part of this dataset or not? Okay, so you can really think about it as kind of a binary classification problem. I have something released, and I'm trying to answer whether this specific record was inside, that's one label, or outside of this data set. And kind of the threat model we're going to have in mind, like as you can see, really a dope kind of attack or security perspective, is let's, for a moment, we can drop this, but just for simplicity, imagine that the State Department is going to release two dashboards. One dashboard is for the opiate treatment group, and one over all the population, about the two million people. You know, reasonable, not kind of far-fetched, reasonable. And in both dashboards, we have the same aggregate statistic, the same five tables, and we know the target person, and we just have access to these two dashboards. We don't have other private insurance company dashboards. We just know these things. I'm not going to go into details, but we implemented your attack. If you go to the appendix, you can read more details about that. But basically, what our attack is going to do is try to answer about the following question. If I have this individual record, whether the dashboard of the cohort was overfitting to this record or not, we try to kind of measure whether it's very likely that the person is inside the cohort compared to the general population. Kind of the general population is the baseline, and we try to understand whether this specific individual was more probable to be part of the cohort compared to the general population. And we're going to kind of have very strong signal and be convinced that the person is part of the cohort if the ratio is very high. Meaning it's more probable it was part of the cohort compared to the general population. I did it very intuitive, very simplistic, I know. but again you don't have time for that happy to answer questions later and unpack that but basically what we get for each individual we get an overfit score okay we get a score a number and I can actually plot these numbers and that's what we see here so let's let's unpack okay so here I have the scores you know it's grinding for minus 4 to a 6 we have the density okay do we have kind of histogram here. So the blue are members. These are people that are in the opiate treatment cohort, okay? And non-members is a sample of random people from the population, okay? So what we see, that four members, I mean, we see that their two distribution are kind of with a shift with each other, and we have higher values for the members, okay? So for example, if I'm looking on very high values, the one here, if you got four and above, I'm quite convinced that you were part of the data set, because I got a score. It's a binary classification problem. I got the score, and if the score is very high, it's probably, we see that most of the scores that are very high are blue, meaning they are part of the data sets, sorry, of the cohort data So we can actually play with that a bit and here we said we can put different thresholds So let me show you so if I put a threshold really high, let's put it in three So that's me Here, let's put it here. So what we see here we see here true positive rate what it's mean 3.5 percent of members are Correctly flagged so if I put a target and I got it's to be with score above three okay if this person is actually a member I have three point percent I like I will be sorry if I got a score above three right then that's going to catch three point five percent of the members okay from the people are truly members now the false positive rate right this is going to measure the orange one in that case just very if I'm going like I'm going to be wrong on the non members on very small proportion of people again that's a binary classification problem in that in that regard and we can play with that but I think the most important aspect to notice it just members are getting higher score okay so if I'm getting high if I got much more higher score that's mean that this is a strong signal that someone is member of the data set and that's quite big in the sense of that we are really constructor here an attack that given a record given this public information of the dashboard we can figure this out that someone was part of the opioid treatment which is which is quite I mean it's a big thing you just think just release a great statistic just a few tables and it's going to work and what we show you right now for many aggregate statistics you are going to see different dashboard in the world if the membership of this dashboard is sensitive here is a method how you can for example run it and And people execute this attack on real-world attacks. The same ID, by the way, works on machine learning models and LLMs, for example. It can be used to know whether a specific text was used in a training of LLM. Okay, think for example if you had clinical notes and you'd fine-tune an LLM on medical data, if you have part of these clinical notes, you can learn whether this person was part of the training data or not. But the same principle applies in both cases. So actually, again, for what we can actually... So as you can see here, the moment I move the threshold for different values of threshold, I'm getting different true positive rate and false positive rate. Again, true positive rate is like, what is the percentage of members that I'm going to catch correctly? Because they are true, they are inside. And false positive rate is what is percentage of non-members, the general population, that I'm going to wrongly say they are inside, okay? So it's two type of, one is correct, one is error. One of the cohort, and one is about the general population. And you can imagine that there is kind of trade-off here, as you can see here, as I move it here, right? So if I want to catch more members, I'm going to make more mistakes on non-members. It's natural. So actually, we can draw or we can capture this relationship with something we call, if you've ever seen binary classification, you've probably seen that, ROC. I now, of course, don't remember the abbreviation. That doesn't matter. and we basically draw the the trade-off between the true positive rate this is mean the percentage of members we catch correctly we signal correctly and false positive rate is the proportion of non-members that we're going to make mistake so it's mean that if we are going to try to flag more members correctly we are going to make more mistakes about non-members it just trade of usually what we care about is this region it's meaning we really care about as I showed you before about really high threshold where we are really kind of really sure because usually the records of getting really high score there are somehow unique there are somehow non-standard in the general population right they have some attribute that are kind of on the boundary or far from the stand or the normal it's called standard general population so usually we care about this specific region when we think about privacy violation so here we see the numbers doesn't matter just one general statement about this example we run here an empirical attack it doesn't mean that this is the true measure of risk or the ultimate measure of risk or risk in the state that could be that someone will come up with a bet this attack is by no mean optimal okay it doesn't mean it's the strongest so this is just a lower bound of the risk in that regard and one might say that for example if we look on the 10% false positive rate in that case again relatively high threshold it's mean that Therefore, 28, almost 30%, 28% of the members, I could identify that they were part of the data. And that is really huge, right, for, if a record is inside of the data, someone is part of this cohort, almost 30% they could identify and say, oh, you were part of this data, which is a huge violation of privacy by this number, by any mean. There are more types of attack that we are not going to cover right now. I will just mention two. One is reconstruction attack, and this is given the aggregate statistic, can I reconstruct the original data set? This is way more stronger. It's not like whether someone was part or not. It's whether I can reconstruct the data sets. What's happened with the U.S. Census? It's, for example, if you give me a trained machine learning model, can I reconstruct the training data? And people demonstrate it's actually possible in many cases. Another aspect is what's called attribute inference. And in that case, for example, I don't have the full record of someone. For example, I don't know how much they paid for insurance. And what I try to learn is, like, I know they are part of the training data. Can I learn the missing value in their data? I have just part, you know, maybe know their gender, the date of birth, and so forth, some demographics. Can I learn some attribute because they were part of the data? And you can really think about that as kind of a spectrum, like membership inferences in one side. We just want to learn one bit, one piece of information, whether someone was part of the data or not. And the other, full other side, we want to reconstruct, we want to build the full record. Okay. So let's switch gears and let's talk about differential privacy. So differential privacy is what it's trying, we've seen what is membership inference. And differential privacy is a framework that tries to balance how well an attacker might succeed in this attack. We're going to try to impose a limit that we can prove, it's mathematical proof, that attacker cannot break this limit. So really the right way to think about ADP is a measure. We try to measure the privacy leakage in releasing aggregate statistics, the privacy leakage in training a machine learning model, the privacy leakage, in creating interactive systems that people interact with and research data. So it's not a single method or specific algorithms, there are many methods, many algorithms that satisfy differential privacy, it's just a measure. And really the promise of DP and this quote from Cynthia is the fact that you are part of a data set, either LLM training data set, this cohort data set, the fact that you are part of the data set, that's not going to have a negative impact on you. Whether you are inside or not inside, it won't matter. And the gist of differential privacy is we want to mask the contribution of an individual in the result. Whether my data, for example, was part of the cohort and used to cover the dashboard, whether I was part of it or not, the dashboard itself won't change much. It will change very little. And differential privacy is really measuring what is the impact of a single individual on the output. What is the impact of my text on the final LLM? That's what we try to limit, to bound. So let's see an example of how exactly we are going to do that. So let's say the dashboard is going to publish one number, right? We just want to release one number. How many patients in the cohort are 70 or older? Okay? Let's take Alice. Alice who is 70 plus is in the cohort. So whether Alice is in the cohort or not, what's going to be the difference in the count? One, right? Because if Alice is inside, let's say it's X, and if she's not inside, it's X minus one. So the impact of Alice on this count is only one, difference of one. So the idea of TP, kind of a repeating idea, is before we publish this count, we're going to add random noise. We're going to jitter it. How much we are going to jitter it exactly in the scale to mask the contribution of Alice. So we're going to add random noise to this count, give and take with variance of one. We want to mask the contribution of Alice. So if I have, for example, I don't know. For example, if we have 1,500 people, adding a noise of variance of one is very little. You know, okay, the count will be either, I don't know, 700 or 702, 700. For many decisions, the amount of noise we need to add is meaningless, like in terms of what we want to do with that. But by adding this noise, we're going to protect the privacy of Alice. So, for example, here, you know, we can, for example, add Gaussian noise, a normal distribution. so the blue is Alice in the cohort, so the count is, okay, 493, and if Alice is not, it's 492. So what we are going to do, we add, doesn't matter, in both cases, if she was there or not, we'll add a noise, right? And if I give you a number, for example, if I give you the number 491, because we added a noise, it is still probable, because we add the noise, it's still probable under the blue and still probable under the red. So if you see the result, 491, you don't know whether Alice was there or not because there is high probability that it was from the blue or from the red and so forth, right? If you get the 494, the same story. You don't know, could be Alice there or not. So you mask the contribution of Alice by adding noise. okay and the idea is like if we add very little noise so the curves are going to be i think i can do that yeah if i add very little noise so there is almost no overlap so i don't get much privacy but my result will be much more accurate so there is a trade-off here less noise less privacy more accurate result if i add way more noise i'm really kind of the two distribution overlap quite well. So a lot of privacy, but the error might be substantially bigger. And this is a trade-off of life. This is like, it's a fact. Doesn't matter if you use DP or not. More distortion, more noise, usually more privacy and less utility. I think we'll skip for a moment on the, I will say a few more about threat model. You can read it later. Basically, the threat model of differential privacy is about an extremely strong attacker. I won't go into the detail, but we really assume that this attacker is about computation. It has access to a lot of data. It can actually access all the cohort data except Alice. We just don't know whether Alice is inside or not. But again, we won't go into that right now. So one quantity which is extremely important is the sensitivity, like a very core concept is to try to understand what is the impact of a single person. So we work with count, right? So how many people are age 70 plus? So if I replace Alice with someone else, with Bob, I don't know what is the records of Bob, At most, the count is going to change by one. No matter what. Think about the worst case possible. It will change by one. For example, to sum, the total length of stay across all patients, right? So let's assume that the sum is between 0 and 365. If I change one patient, replace one patient with another, what is the maximum change? The range, 365, right? So, in that case, I need to add noise in the scale of 365 to mask the contribution of a single individual. If we take a histogram, so I think I have an example here. If I have an histogram here, this is the count, and I replace one person, Alice, with Bob, So basically, if I replace one person in the data set, the worst thing I can do is move someone from one bin to another, right? Just moving one person from under which cell, which group is going to be counted, right? So here we have the before and after, and because histogram is a vector, we just need to take the L2 norms here. They take everything square, sum, and take the square root. It's just a measure of a length of size of vector. If you don't know what is norm L2, it doesn't matter. So in that case, the sensitivity of a histogram is square root of two. So we need to add noise in the scale of this number. Okay, this is the gist of kind of the blueprint of how to build DP mechanism, DP release. So we really talk only on a single mechanism. There are many more. Mechanism is just an algorithm, release algorithm that implements or follow differential privacy. We're just touching the Gaussian mechanism, meaning adding normal or Gaussian noise. And the privacy guarantee, the way we parameter, the way we measure privacy is delta divided by sigma. the sensitivity of the query divided by the noise, the scale of the noise of the normal distribution, the standard deviation. So we actually already seen that because we played with sigma, but you can think for specific query, delta is fixed, for example, count is going to be one, histogram square root of two, and so square root of two, of two. And if we add more noise, meaning less privacy, sorry, if we add more noise, mean more privacy, this number is going down. So mu, lower mu mean less privacy leakage. If we add less noise, more accurate, this number goes up, more privacy, less privacy protection, more privacy leakage. And the right way to think of, and it will give you visualization how to think about this mu recall that in membership inference our goal is to distinguish between two situation whether someone inside of the data and whether it's not on the data and mu is going to control our hard issues and we are going to use a specific definition of differential privacy called F differential privacy FTP and what FTP is basically saying that recall this plot we had before, it's just going to say any attacker, the strongest attacker you can imagine, we're going to bound its success. For example, if we look on the green here, if we choose mu equal 1 FTP, we just know, we just kind of, if we're going to release the data with the right scale of noise that get us mu equal 1, no matter what, we can prove it. This is the maximum ability of an attacker. The green area you're seeing before. No matter what, this is the maximum possible attacker can achieve. If we take much lower value, for example 0.4, we get this blue. So if, for example, we'd release the dashboard with new equals 0.4, we're going to limit the attacker substantially, again, compared to the red we had before. And this is mathematical, this is like fact, right? It's nothing empirical, not experiment, we know that's the way it works. So let's actually do it, so if we move the next cell, so here we have a code, so here Here we actually implement it without OpenDP. We just add the noise with NumPy. I think there is a comment at the end why you should never do that. We'll talk about that. But how does it look for a single histogram? For each age group, these are the true values in the data. We add random noise, as you can see here. We add from the normal distribution, so we get float numbers. And we got these noisy values over here, right? So this is going to be the histogram at the end. This is really annoying because it's weird to think about histogram as float number, right? It counts. How it counts, what does it mean? So what we can do, for example, is round all these numbers here, and this is called post-processing. After we release the data with the noise, whatever we do with the result, in this case the noisy count, it's still going to be under differential privacy protection. doesn't matter which post-processing, the math shows us this still has the same privacy protection. So we can round it here and we get this count as well, okay? So it's okay to do whatever process we want to do with that. Just a very quick, important thing, do not implement ever your own DP by yourself, as ourselves that implement GDP is really really out of technical details you always want to use well-established packages there is a list here some of them but yeah but this is extremely important just for the sake
+
+**Speaker 2** _[55:16]_
+
+to look at the other side. So we covered the privacy side for now, and now the other side is the utility side, right? We've seen that the counts will change. And with the Mew, we can influence how much they change. And that's mainly a privacy decision. Maybe we have to satisfy some guarantee that, I don't know, the CEO of the hospital said. But we also want to know how well can we actually work with the data. So let's first actually release that whole dashboard that we looked at before using the OpenDP library. And again, it's very close to how you would define queries in Polars. And to release a table, you have to do these three things. Like you have to create a context, or you have to say, what is the privacy unit? So is it a role in like my data set or like could one privacy unit potentially have more roles? For example, in the LLM training example, maybe one person contributes more than just one text. So like the privacy unit could be different than just like a row or like a single data set. So you have to think about that. The budget, like how much privacy budget can be spent? So that's, like, how should we split up that new across all channels that we want to release, and how do we want to split it? And what's important, and we will see that in the very end, is that once we run out of the budget, we can't release anything else. Because then, like, that's the upper limit of what we were willing to leak to the public or to the consumers of the dashboard. And if we run out of that, like, like we just shouldn't do any more computations because anything that we additionally add would go over that. Then we specify what we want to compute and then we do the release and execute the query and that's really what Shobi hinted at earlier. OpenDP under the hood makes sure that everything is correct before doing the release and that's where the poolless logic really helps because we don't even touch the data until we are sure that it is safe to do, and then only the final result will come. Okay, then we have to do some conversion here because the internal DP definition in the OpenDP library is slightly different than the MewDP that we saw. We first define our privacy budget and what we want to do, then we build the queries for our dashboard, and then we can, in the end, release the dashboard. And we also told the computation graph, basically, that we want to round the, we want to get the integer. So that's then what we get, and we can already see that there is a difference between the true and the noisy counts. Of course, if you're doing actually private data analysis, it depends who you trust. Maybe you actually never get to see the true counts, So like that's really just more like a really a toy example that we can see the difference. But sometimes you have to work in a regime where you never get to see the difference.
+
+**Speaker 4** _[59:07]_
+
+because they're so small.
+
+**Speaker 2** _[59:16]_
+
+So like now, like if we spent all our budget already here, if you would now try to do it again, like the same queries, just say, okay, I want to do it again, OpenDP, and that's also really nice, will just tell you, like, no, sorry, like you ran out of queries, like you cannot do that again. Okay, so then we just wrap that, and then release the whole dashboard that we talked about in the beginning. And let's see how good we actually are.
+
+**Speaker 4** _[59:57]_
+
+Ah
+
+**Speaker 2** _[60:03]_
+
+so we see that is the privacy parameter mu set to 0.4 so that's a good like a tight budget
+
+**Speaker 4** _[60:11]_
+
+Um, and
+
+**Speaker 2** _[60:13]_
+
+we plot the true count on the x-axis so that's what we would have released if we just could release the data in the raw and on the y-axis we get the noisy counts like those rounded noisy numbers and of course we can see that they are not the same or like since we add zero-centered noise to each of the counts, like, they correlate quite well, right? Like, on each count, we add the zero-centered noise, symmetric zero-centered noise, so, like, that's exactly what we would expect. And I think where things get a little more interesting is down here in that corner, where we can have, like, those phantom counts of things that were actually zero, but because we add noise and then clamp, back to zero because we don't want negative numbers so those yellows were actual zeros that got a count later on and like this wouldn't be a problem if we would be comfortable with negative counts if we would be comfortable to work with negative counts then the like that would just be unbiased still but because we clamp up to zero like this this bias is like any inference you would want to make on the aggregate here obviously because we get those and you can of course also get false zeros right like if you add negative noise to a small count it could go negative or it could get zero and then we get like those red ones here and what now the privacy parameter is is really influencing is basically how scattered, like the, yeah, what's the one with the, at the end, how scattered like the band will be, like how wide the band of those will be. And that's what we can think of like as utility, right? the closer to like the diagonal we are the higher the utility like the closer we get to the true counts um and the further away the the more in utility we might um lose here um so like here is what we like do to post process it could also post process those phantom um like those uh yeah those phantom counts and like say like we want to clip everything below some number to like have at least some like let's say 10 here in each cell because that's what maybe stakeholders care about because when you release a table where there's just one it might look identifiable to someone on the outside even though it's not because it's a noisy account we know that but someone else might be worried um and so that's just post-processing that you could do and not break the guarantee so now the question is does doing that actually stop the attack help us to prevent what we wanted to do in the beginning um so like that was our baseline um or two baselines the uh it was the random guess on on the diagonal and our no DP dashboards that we attacked.
+
+**Speaker 4** _[63:47]_
+
+Um, and...
+
+**Speaker 2** _[63:48]_
+
+And now if we run the attack on the dashboard that was released with differential privacy here, we can first of all see that those two histograms are overlapping quite more than what we saw before. There's no clear separation visible here. And now if we also add the ROC curves here, ROC curves here, first we get the theoretical bound, like that's the mathematical theoretical bound and the blue dotted line here, where we know like no attacker can ever go beyond that. And then like our empirical attack on the release dashboard, on one release dashboard, like we just did with the noisy counts, is even below that. And then again, it's more evidence for that, Like, this is not the strongest attack. Like, there might be stronger attacks out there that we don't.
+
+**Speaker 4** _[64:47]_
+
+Um, and
+
+**Speaker 2** _[64:48]_
+
+And I think that there will be a gap in practice between empirical privacy measures and theoretical privacy measures. That also means if someone comes up to you and says, oh, I have very good empirical privacy, however they measure it, maybe using an attack.
+
+**Speaker 4** _[65:06]_
+
+Um, right.
+
+**Speaker 2** _[65:08]_
+
+like I wouldn't trust
+
+**Speaker 4** _[65:10]_
+
+because you could
+
+**Speaker 2** _[65:12]_
+
+different attack that might achieve a better classification accuracy, for example. So now the privacy utility trade-off, we can do this with different levels of the privacy parameters, so the green one now is less protective, we allow more, get higher utility, but we also allow more leakage and in theory like that should be like that's allowing quite a bit like even better than our first empirical attack but what's interesting in practice and I think that's also like an open research field right now is that even adding like that noise that is with like a smaller variance like prevents quite like empirically prevents this attack quite well already like in the attack success there's not that much of a difference between the 0.4 and the 1 here
+
+**Speaker 4** _[66:20]_
+
+where
+
+**Speaker 2** _[66:22]_
+
+whereas, in theory, they could be quite far apart. And that's, yeah, I think one of the big research questions in the community right now is like, because that is a worst-case definition, what are actually values that still give us meaningful protections in applied settings, even though they might look very big in the theoretical domain. And that's exactly what I hinted at earlier, is that does not only affect our success probability, but that also affects how close to the diagram.
+
+**Speaker 4** _[67:12]_
+
+and
+
+**Speaker 2** _[67:13]_
+
+Right, that's like one aspect of utility you could care about but utility usually is very Domain specific or like even application specific of like what you actually want to do with the data downstream
+
+**Speaker 4** _[67:26]_
+
+and
+
+**Speaker 2** _[67:35]_
+
+on the released dashboard, then the success probability of the machine learning model or classification model could be a utility metric and the effect of the noise would not be as clear cut as here probably, like it would be some complex relationship there. relationship there. So here just again to see that our defense against the attack worked. So without differential privacy we had like the ceiling for the AOC here would have been I wonder if it would have been in the diagram or like...
+
+**Speaker 4** _[68:19]_
+
+However,
+
+**Speaker 2** _[68:21]_
+
+Of course, we have seen that empirical one was quite lower. And you can compare these across the different regimes and see that adding more noise will protect the data better against this attack. So histograms are very fundamental in statistics. And also, I think a lot of things that we want to release as data scientists, like histograms, are very fundamental. However, it's not the only thing that we want to work with. So OpenDP actually supports also other statistical queries, like, for example, means, averages, medians, sums. or like not anything you can think of but like there is most of the fundamental statistical estimators are
+
+**Speaker 4** _[69:15]_
+
+Um...
+
+**Speaker 2** _[69:20]_
+
+and intervention.
+
+**Speaker 4** _[69:23]_
+
+or
+
+**Speaker 2** _[69:25]_
+
+like what you can not do with noise, for example, is to release
+
+**Speaker 4** _[69:31]_
+
+Um...
+
+**Speaker 2** _[69:34]_
+
+because that would definitely leak something about your data, but there is also a mechanism to release noisy versions of a min and a max that work a little bit different than what we've seen so far. Right, like, then we have a part down here where you can play around yourself when you take this notebook with you out of this tutorial today. And then we like it's basically trading off like what happens if I increase that privacy parameter, like how does that influence the band in our utility investigation and what happens to the attack success rates. Let me just switch back over to the slides to round it off here. like that was a really basic introduction and like there's lots more exciting things that are happening so where if you're really hooked now like where can you
+
+**Speaker 4** _[70:42]_
+
+Go for it.
+
+**Speaker 2** _[70:45]_
+
+First of all, we have seen that aggregates leak, or can leak, even if we only release counts that is not a defense. We can actually bound the leak by using mathematical, theoretical definitions to how much noise to add and get a principle trade-off between privacy and utility. OpenDP takes care of a safe implementation for us. we don't have to worry about like noise calibration running out of budget and like things like that. But from our experience, the real world intent implementation requires a lot more thought than just writing a Python script. And a lot of those are like actual social decisions and social decision problems. So how do we even set a privacy budget? Like, what is an acceptable privacy budget that we might want to use in our analysis? Are we sure that we got the sensitivity calculation right for, like, those simple statistics that's set? And, like, you can find the papers and look it up. But if you think of, like, an LLM, like, how do you even calculate the sensitivity of one document on the output of the LLM? Like, that's a tricky question. or like even for simpler machine learning models like tree-based models like how do we even calculate the sensitivity of changing like a worst case change in one input record on like the tree that you get in the end like that those are tricky things to figure out and like they're not all figured out yet um and like there's like
+
+**Speaker 4** _[72:33]_
+
+Um, and
+
+**Speaker 2** _[72:35]_
+
+And then also, like, which DP algorithm should I choose for my problem? For example, for seemingly simple things like linear regression, there is, like, a whole library of different DP mechanisms to choose from. And, like, they all make different tradeoffs. And then you have to, like, figure out, like, how and which to choose. What's really cool is that we can go beyond that, right?
+
+**Speaker 4** _[73:03]_
+
+for
+
+**Speaker 2** _[73:05]_
+
+there's like this cool mechanism or like yeah it's like an algorithm based on simpler mechanisms but there is differentiary private stochastic gradient descent and the idea is really like that if we clip gradients in during training like that we can actually figure out like how much any individual record could like affect the gradient in the worst case then add noise proportional to like how much that could change and then just run like our std with additional noise and that works quite well with the difference that like you have to set the privacy budget up front and that means you cannot run it forever like you might want to do it with or like you might want to run it until convergence in a non-private setting and in the private setting you would just have to stop training whenever you run out of budget like that can sometimes lead to bad like final
+
+**Speaker 4** _[74:16]_
+
+Um...
+
+**Speaker 2** _[74:26]_
+
+uppercase into PyTorch, but it's also trusted and vetted.
+
+**Speaker 4** _[74:30]_
+
+Um, pre-
+
+**Speaker 2** _[74:32]_
+
+private machine learning library, the same for intensive flow privacy, there's JAX privacy. And you can also like piggyback on OpenDP and make an like DPSTD using the OpenDP library. And there is DPLLM weights out there as well, that's the vault Gemma model by Google, they actually trained end-to-end LLM with differential privacy and released the weights to Hugging Phase. So if you want to tinker with that, you will also find that out there. There's some trade-offs that are a little bit different of the trade-offs you make in standard data. Then there is one area that was hyped for a while, like synthetic data and synthetic data with differential privacy, where the hype was mainly around that vanilla synthetic data might sound like a good idea for privacy protection, because the gut-feeling, heuristic argument was like, because I'm not releasing actual records, I should be fine. Where's the problem? I can't, that's not an actual person, however, that can be attacked in exactly the same ways that we described today. Like if we think of like vanilla synthetic data as just many, many aggregate statistics about a database, like all the same attacks apply to that and we could, again, figure out if someone was in the training set for the synthetic data or not or we could even reconstruct the synthetic data from those released synthetic data sets. However, there is ways to make differentially private synthetic data And that can be useful in cases where you want to share something that looks like tabular data, but usually if you know exactly what you want to do, releasing the differentially private analysis directly is the better idea. And that's not a free lunch, like the synthetic data only ever, and that's even true for vanilla synthetic data too, only can preserve what
+
+**Speaker 4** _[76:54]_
+
+generators
+
+**Speaker 2** _[76:56]_
+
+If we didn't think of it beforehand, it won't be in the output, and the downstream accuracy heavily depends on what you actually care about. Some links to resources, like the opendp.org website has, I think, everything you need to get started.
+
+**Speaker 4** _[77:16]_
+
+They also
+
+**Speaker 2** _[77:18]_
+
+of all their mechanisms if you want to dive into the math and they are also a great community that they have a slack channel and community meetings like that if you want to be a part of that you'll find all the information there there is an overview of deployments on there as well then there's some books and like a a blog from a colleague and friend that we really like on anything.
+
+**Speaker 4** _[77:57]_
+
+and
+
+**Speaker 2** _[78:01]_
+
+a European perspective, which is often quite different than the American perspective. With that, thank you all very much for...
+
+**Speaker 1** _[78:20]_
+
+insightful presentation I will read out the questions you know there are a couple of them first one is it okay to publish the exact DP method is used or are giving away useful information to the attacker put differently is knowledge of the DP methods part of the
+
+**Speaker 3** _[78:47]_
+
+So like in cryptography, that's perspective, the security or the privacy or the protection is not set by whether the algorithm that we're using is public or not. Actually, under the DP framework, it's assumed this is complete. I can share the code. Actually, I want to share the code because I want to let the public or different stakeholders to be able to verify the implementation. All this assumption is like everything, all this information is completely public. What cannot be released is, for example, if you use random, like the random noise, the random you sample. You cannot release of the true count, but the randomness itself, this, and this was another aspect why to use a package, if you're coming from security, to generate high quality secure random is extremely hard task. And many of these packages take care about that. So if the randomness is being exposed, that's kind of almost as releasing the true counts. but all the algorithm and all of that and i would and like i do think that for a counter
+
+**Speaker 1** _[79:57]_
+
+Next question. If you apply differential privacy to the data we release, but someone else relies on that data, for example, for research, couldn't that lead to incorrect results for the people using our data?
+
+**Speaker 2** _[80:14]_
+
+So yes, there is a risk of coming to different conclusions than what you would have done with the original data. However, there is really interesting and strong links to robust statistics. So there could be also, or there's the argument out there, that anything that you learn only on the true data but not on the private version of the data isn't a real scientific finding anyway because it is too dependent on your input data. It's basically you're overfitting to the original data. And if you have a strong signal in there, like smoking causes cancer and enough participants, it shouldn't matter how noisy or it will matter on the exact p-values you get and how certain you are about the result. result, but signal that prevails in the noisy version of your analysis.
+
+**Speaker 3** _[81:23]_
+
+another point is like what I mentioned before the privacy utility trade-off it's nothing about DP it's a fact of life if I care about utility exact analysis usually it means that it will be pruned to privacy attacks right if they release the true comments that time was very successful if I care just about privacy I can very easily get zero utility I don't release the data don't make it public don't do this study what DP allows us is to make multiple decision on the curve of the privacy of utility by tuning this what we call the mute or privacy budget it's like people use these terms uh by controlling the amount of noise noise we can make informed decision and trade if these two values that are both important right making wrong decision in public policy could lead to really bad consequences but we do we need to understand there is kind of risk in privacy and dp allow us to manage the trade-off between these two values
+
+**Speaker 1** _[82:30]_
+
+Next question. When thinking about the privacy of our own data across different data sets, wouldn't we then theoretically have to take into account all data sets that contain parts of our data? Does that mean that the separate differential privacy in these data sets gets kind of irrelevant when looking at them all together instead of...
+
+**Speaker 3** _[82:55]_
+
+Yeah, whoever, like you're asking all of these questions are on spot, so all of these are really, really good questions. I think it's really tricky to reason about all the data we have everywhere. It's a hard problem with DP and not without DP. I think where we got here is like trying to think about more concrete and thinking about threat model, whether going to have an adversary having access to all of that and what they can do I will just say that the gap you were seeing between our true attack with DP, the blue line and the blue dotted line with the theoretical guarantees many times when we assume DP we get I'll say it back when we try to run empirical attack in a realistic settings because DPI assume very strong adversaries have access to all the data except you etc etc our current empirical attacks or at least the evidence we have of what is possible empirically are far from what the theoretical guarantees so even if we use We have many releases using DPE, and we look on the total budget, the total value of mu in that context. In many sense, it seems that it still will be meaningful if we consider the empirical or what we can do. But the original question is like, it's a good question. But again, I would say that this is a play for anything. It's a general statement about privacy.
+
+**Speaker 1** _[84:42]_
+
+Thank you. Next question. Let's read this. How this is a replacement for SQL alchemy? If so, implementation of pydantic models to these schemas might be straightforward.
+
+**Speaker 3** _[84:58]_
+
+What was the first part?
+
+**Speaker 1** _[85:00]_
+
+this a replacement for a sickle alchemist.
+
+**Speaker 3** _[85:06]_
+
+Yeah, well, I think that it's it's our token out there is nothing about Whether you use this database or actually in Google Cloud You can add with DP and you can get Sql queries with differentially privacy and you configure that Both open DP and panda so it's like just kind of architecture the two different layers DPS the layer that when you actually run the query and you want to pass it to the user or to a system then you add the noise or the extra
+
+**Speaker 1** _[85:41]_
+
+Yes, thank you. Next question. Do you have some practical tips how to tune the trade-off between privacy?
+
+**Speaker 3** _[85:51]_
+
+So yeah, that's that's a good good question. So basically here is So if you is very low I mean below zero point two five you can read it in open DP documentation the theoretical guarantee is so strong that for any practical reason we can say It's a cure and I know that in some big tech companies They do have this kind of you can release something or use something with DP with very low value of me And you still get utility there are settings that it happens like this is like Theoretically we have proof that say that even the practical attack are limited. It just work fine the number makes sense When we go to higher value, I think the best Practices right now are something like two very proper threat modeling reason very carefully about adversaries, try to implement attacks by yourself, like the kind of the empirical investigation we did, right? Like for different values of mu, we try concrete attacker with a caveat. The attacker we did in the notebook is by no means I worked very hard to squeeze the most powerful attack under the threat model, like there is a lot to improve there. but actually that was the census we're doing so in 2010 they have old release method that in swapping remove doesn't matter no DP and they could attack it and re-identify substantial portion of the US population right based on their census and their release statistics so they use this attack and they when they were building their DP algorithm they were thinking well they didn't use mu But like which you value to have the equivalent of me you in their setup They were running attacks and it's helping to understand. Okay, if we can re-identify 5% of the people 10% of the people 20% of the people so they use the attack to reason about the privacy risk in a more concrete way because new is really Abstract, right? But if you can say oh I can re-identify this of this amount This is risk management we can do and then they going back to the previous previous point They were reasoning for each value of mu, what was the empirical privacy risk compared to the utility for the quality of the release, right? Which kind of different researchers, other agencies in the government, when they want to make a conclusion, what is the amount of error we introduce and what is the accuracy of the result? So they kind of really, for different values of mu's, they will be able to reason about these two dimensions and make their informed decision how to choose their mu in an empirical way.
+
+**Speaker 1** _[88:51]_
+
+besides adding noise to the database that are equally as strong and efficient.
+
+**Speaker 2** _[89:01]_
+
+Differential privacy always depends on random noise in some way. Randomness, yes. Or randomness, right? There is mechanisms that don't add Gaussian noise, but do a random selection, but for this class of formal privacy guarantees, you will always...
+
+**Speaker 3** _[89:26]_
+
+I mean if you put randomness need all the time because the randomness like that Uncertainty you introduced the result. That's the actually privacy protection We need to be uncertain whether someone was there or not, right? But the question whether you add noise like an additive noise like we did to to account and so forth It's less it's more property of the query if I want to do numeric thing like some counts, etc the right thing is to is to add noise. If, for example,
+---
+transcript_status: auto
+---
+transcript_language: en

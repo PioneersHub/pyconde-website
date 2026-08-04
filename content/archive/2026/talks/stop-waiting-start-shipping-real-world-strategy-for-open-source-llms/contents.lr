@@ -102,3 +102,517 @@ The deployment of open-source Large Language Models (LLMs) focuses on moving bey
 The primary challenge in scaling AI-generated code is the risk of creating unmaintainable "code slop" and the resulting burden on senior engineers for review. To mitigate this, the recommended approach is a hybrid model: using agents not to replace developers, but to improve existing code, identify flaws, and automate tedious "busy work" such as writing bash scripts for experiment orchestration or generating data plots. This allows human experts to focus on high-level creativity and hypothesis testing.
 
 For organizations seeking sovereignty and cost-efficiency, the strategy involves leveraging open-source tools like vLLM and SGLang for serving, and using Python for basic fine-tuning. The trade-off between proprietary and local models centers on privacy, latency, and cost. Local models are preferred for sensitive data and real-time applications, while proprietary models are used for complex tasks where maximum performance outweighs privacy concerns. Ultimately, the most effective implementation relies on domain experts who possess the intuition to nudge models toward specific, high-quality outputs.
+---
+transcript:
+
+**Speaker 1** _[00:00]_
+
+Okay, good afternoon, guys. We will now hear a fireside chat with Sebastian Raschke and Alexander Hendorf. And if you have any questions, you can ask them in talks.pycon.de. So, let's start. I will hand over to you.
+
+**Speaker 2** _[00:15]_
+
+Thanks a lot for the introduction. Yeah, welcome back. Welcome back, Sebastian. Amazing keynote this morning. Thank you so much.
+
+**Speaker 1** _[00:24]_
+
+Thank you for inviting me and thanks everyone for showing up and making it through the keynote. I know it was pretty technical, but I hope it was something useful to learn about.
+
+**Speaker 2** _[00:37]_
+
+Yeah, you seem to like the conference a bit, right? Yeah, it's really cool. We were so glad to have you here. And also to cast some topics or to bring more light into the general discussion in Germany for developers, for engineers, but also for the general public because there are some misconceptions. I think we can bring light in. So just like as a start for the warm-up, like in the last month, what was the thing that surprised you the most, that you didn't expect?
+
+**Speaker 1** _[01:19]_
+
+I think, you know, there is always something interesting happening every week in the AI area. So I wouldn't say there was like a particular thing. I think what is actually surprising is how many people, like in the maybe last one to two months, jumped onto code assistance, like, you know, like Codex, Claude Code. It's like a surprise because it, well, it's been around for a long time, but now I think it's right now the time where really it became almost like mainstream and then of course maybe one, two months back OpenClaw that, you know, January, February like the OpenClaw movement pretty big, yeah. Something that wasn't on anyone's radar, I think.
+
+**Speaker 2** _[02:02]_
+
+Yes, the open claw was.
+
+**Speaker 1** _[02:03]_
+
+claw was
+
+**Speaker 2** _[02:04]_
+
+quite a surprise because things are even moving faster sometimes even as an expert you read it in a newspaper yes and for my take was OpenClaw was like something people had tried before a year ago every time I tried that it didn't really work as promised but OpenClaw did things better indeed so yes if you talk to people at a conference a lot of people use agents to code as code assistants any idea about what are the limits which limits should you be aware of because in a way it's magic happen but if you try to build something more complex with agents my experience is yes they can also destroy the whole thing into something unmaintainable
+
+**Speaker 1** _[02:51]_
+
+Yeah, I agree with you that it's like use it with care. And to be honest, I have a love-hate relationship with AI. I kind of love working on it, but I also kind of really like doing things myself. I've been programming for 15, maybe 20 years, 15 years in Python and also some C++ and, of course, PyTorch and everything. And I do still like doing things myself because then, I don't know, I find it more satisfying if you actually, you know, you know what you're doing and have a good understanding of, or let's say you see what's going on rather than having thousands of lines of code and you don't have time to go through it. It's just like, you know, thrown on you. I think, though, it is, I would say it comes down to how you take advantage of agents. For example, you don't always, I mean, the popular use case is someone prompts an agent to generate some program for you. But it doesn't have to be like that. You can also, for example, I have a good friend at a startup. He has a startup that is entirely, he's a programmer, but he entirely used prompting, cloud code, to build his company, basically. I don't want to say which company it is because I don't know if he wants it to be public. But it is possible for a small team to just build something that would maybe take two years, 30 people, two years. that is possible, but it doesn't have to be that. So, for example, if you are a bigger company, you maybe don't even want anything coded automatically because it's like a risk cybersecurity-wise. But what you could do is you could still take advantage of agents by making your existing code better, right? So you don't have to just use it to generate code. You can also say, okay, here's my code base. Can you find any flaws? Do you see anything that might break on the load? Or is there anything that you suggest doing better? And I think that's...
+
+**Speaker 2** _[04:47]_
+
+yeah so from the mindset I also like what's my conclusion agents are great but you have to keep them on a short leash and the the other learning is also if you work with agents still the task how to break a problem into the smallest piece is still the very core of the art of programming or programming assistant or like web coding whatever yeah so do you expect any dramatic improvements and the harnesses or is it like okay this is like the magic they just like you have like multi-agent system you built this harness they do a lot of magic but if you look for example like cloud code what cloud code does it's very similar what human developers do oh i write a piece of code, I let it run. Oh, it fails, so I have to debug. And of course, it's way faster than a human doing that. Do you just expect major steps, or are we already, okay, this is a basic idea brought to light, implemented, and we are probably at a plateau yet, or...?
+
+**Speaker 1** _[05:55]_
+
+or any thoughts? Yeah, it's a good question. It's hard to say because we have been saying the same things for LLMs every year and there's still no plateau in that sense. I mean, there's always a better LLM. I think right now, for sure, there is going to be improvement because people right now, like the last few months, just started fine-tuning LLMs in the context of the harnesses. Before, it was more like the LLM was pre-trained, fine-tuned, post-trained on code, but then it was just thrown into that harness. Now there's another stage where you kind of fine-tune it to do particularly well in the harness, because each harness is different. And I think that will also still take maybe a year or two of really steep progress. And I think, was it last week, Mythos, the new cloud model was announced. And apparently, according to benchmarks, It's the model that's a huge leap. I think it has, like, if you look at the Artificial Intelligence Index, I think most models have around 55, a score of 55. Let's say 55, 54, 53. And this one has, like, a jump to, I don't know, 70 or something. So it's going to be a huge jump. It's not available to the general public because they say it's too dangerous. So who knows how good it really is? But there are still these major leaps happening. So I think we have not plateaued yet. And so.
+
+**Speaker 2** _[07:19]_
+
+So would it be like for like, if I had to explain it to my grandmother, so you basically say large language model, there won't be like the one savior model that solves all the problems that you probably have some harnesses or interfaces to that. You rather go, okay, you go rather go use cases, you build the harness and also like, okay, let's build the right large language model for that.
+
+**Speaker 1** _[07:46]_
+
+And I think a good example is, I was just thinking about it, you probably used Cursor
+
+**Speaker 2** _[07:47]_
+
+Yeah.
+
+**Speaker 1** _[07:54]_
+
+at some point, it's like this coding agent essentially, and they have their own model, I think it's called Composer, and they had a recent update that was really good, I think it's Composer 3, and it's much better than the previous models and other LLMs, but it turned out it's, I think it was Kimi K2.5, so it's like an open source model, a Chinese open source model that they post-trained, but you could see just this post-training how much I mean compared to the base model how much better it was and I think that's the thing like it's there's no general model that is going to do well in all the harnesses you have to kind of take it and even post-train it more to get the most out of it makes sense
+
+**Speaker 2** _[08:33]_
+
+So it was like, we have to let go of an idea. Winner takes it all, which is very often in
+
+**Speaker 1** _[08:33]_
+
+It's not soulful.
+
+**Speaker 2** _[08:42]_
+
+media when, who will win the big race? Anthropic, open AI, whatever. It was like, this is not going to happen. Not expected.
+
+**Speaker 1** _[08:50]_
+
+So I think the only thing is if maybe other companies run out of money. But I think people, so I think what's quite unique about the AI development is that people who work on, I mean, most of the training recipes nowadays are proprietary at Google OpenAI and Cloud. And so we don't have like open access to what the secret sauce is. But people rotate quite a lot. they leave one company, they join another company. And I think this way you still have this kind of exchange of ideas through changing basic literary jobs. It doesn't necessarily mean that people go to a new job and write down, okay, these are the secrets that my previous job's company did. But it's more almost like an implicit bias. You know what works well. And then when you are training the model at a new company, you are kind of picking the things you know that work, right? And so I think what I'm trying to say is all the companies, they are kind of like even in terms of the techniques it's more about i think access to compute and money to train these models essentially yeah because
+
+**Speaker 2** _[09:59]_
+
+Yeah, because you mentioned this morning in your keynote that there's less information in papers published. And I would argue, if people ask why AI now at that speed, I said, yeah, one big part was open source software, access to the software, but also open access to research papers in natural language processing, which has actually stopped, I think, since JetGTP was published. Google published, I think, more, they stopped.
+
+**Speaker 1** _[10:32]_
+
+I want to also clarify I didn't mean to say there is less information out there so I think there are more AI papers than ever like every day on Archive I used to be an Archive moderator back then we had to screen through the machine learning papers just to see if there are any spurious submissions or something that shouldn't be there. It was automated but we still had to double check and it was like 100, 200 papers when I started and that was like 2018 and I did it until 2021 and then it was already like 200 or 300 papers, almost doubled. And I think now it's like 500 papers a day. Wow. A day. 500 papers a day. Yes, AI papers and machine learning papers. And there are a lot of ideas being shared, but I think that's like what I was trying to say is that the difference between a research technique and something that is the end-to-end production LLM. So in my talk, I mentioned this less detail. So this is about the models, like the cutting-edge models that are published. Because I think, yes, just otherwise the scope would be infinite. When I look at papers, I'm maybe a bit unfair there towards like smaller models, but I usually look really only at the big models because then I know, okay, this model works. Whatever they did, that has worked out. And so, but then there's less information about those models. And if you're lucky, you can find smaller papers that explore the idea. But it's always not quite clear if you try something on the small model whether that scales to the big model as well So that's always the tricky part. So this in general less information about these big models available. So that's sorry. That was my
+
+**Speaker 2** _[12:10]_
+
+Yeah, it's important, because there's so many models, and there's only very few people. You could wake at 4 o'clock in the morning and they could tell you all about it. Yeah, but also, let's get to the models, because very often in the general news is, oh, yeah, that's like the Chinese models, and they are winning now, because you look at benchmarks. And of course, there's a lot of really clever and intelligent stuff they do, and it basically very often is put into a narrative. This is like, again, a winner takes it all, either US models or Chinese models. And I think we should also shed some light on that, because from what I take is the whole ecosystem has changed a lot since Deep Seek or Lama released by accident, leaked or not accident, I don't know. And of course this changes the ecosystem a lot, but you, like in a recent podcast you said like there's good reasons also to release open source models because to train the next generation of developers, how should they learn if everything is closed? I think this was like something I've never heard heard before. I think this is, can you elaborate a little bit more? Like, hey, why is basically open sourcing models up to a certain extent also a necessity even for the big players?
+
+**Speaker 1** _[13:46]_
+
+Yeah, I think so the question is really like if you are a big company like Google and you have your Gemini model or if you're OpenAI and you have your ChatGPT model, why should you also open source models, right? And they do have Gemma on the Google side or GPT-OSS on the OpenAI side. So why are they doing it? Well, one reason could be, you know, being nice marketing purposes. But I think the other one is, I mean, it has to do also something to do with being nice to the community. But then I think it's really important to have them out there for people to work with them, on them, develop things, understand them, and being even able to post-train them. Because these companies, they are hiring people at some point. And if you hire people who never, you know, worked on an LLM because there's no LLM you can work on if it's all proprietary, well, you have to train them from scratch. And this way, well, if people have the chance to work on LLMs, they can build cool things and then they get hired at the companies, for example. It's like an educational.
+
+**Speaker 2** _[14:47]_
+
+yeah or external
+
+**Speaker 1** _[14:47]_
+
+Yeah, or externalize. Supporting the education.
+
+**Speaker 2** _[14:49]_
+
+externalised bootcamp in a way as well,
+
+**Speaker 1** _[14:49]_
+
+Yeah, externalize.
+
+**Speaker 2** _[14:51]_
+
+but also sharing. It's not black and white. It might benefit more. So if very often it's said, yeah, Europe should have like an old model and we need to train up like in like catching up a race. And I think pretty much everyone agrees we cannot really win the race for multiple reasons. Also, we don't lack the intelligence and the people and the education, but like maybe hardware and a lot of other skills so and is it also like the right move a catch up first uh and or should we or is there another way this is where i want to lead to is there another way and better strategy to just see there's a lot of good stuff out there open source you can fine-tune it um to catch up to build things like not catch up like to win the race but to say no We can still bring a lot of value and find our own model for Germany and Europe by taking what is just out there and what would be the ingredients for that. It's not just like a model. You don't upload a model to the cloud and then magic happens. There's many other factors and talent you need there.
+
+**Speaker 1** _[16:04]_
+
+there yeah yeah i think so there are i think also different contexts so there like you said there are some people where a lot of companies you don't really need to train your own model and i honestly 99.9 percent of companies don't need to train their own model from scratch because they would be very expensive redundant and just like a gigantic waste of money and time for the company that they could use for other things um but i think it's also at the same time still useful let's say in Europe to have at least maybe someone doing that so that in case all the models become proprietary or that you have like a team that would know how to do also a model that can be then used so you're not dependent on certain companies that is like a bit more I guess diversified in terms of like competition is good for business too in that sense in that case for for the whole the whole world in the sense that it is pushing each other forward, building better models essentially. The same with anything like cars, anything. If you only have one or two car brands, they would be probably very stale in terms of innovation.
+
+**Speaker 2** _[17:18]_
+
+Yeah, of course, like healthy competition always.
+
+**Speaker 1** _[17:22]_
+
+But for most companies, they don't need to build their own car. They can buy cars or rent cars. And I think for most companies, I would say it makes sense to just use what's out there. But then it depends what requirements you have in terms of what compute you have. If you have enough compute, you can run your own local models.
+
+**Speaker 2** _[17:43]_
+
+Yes, one thing is compute.
+
+**Speaker 1** _[17:44]_
+
+You need, of course, people who know a little bit about it. I think if you use proprietary LLMs, it's really possible, like, you don't really need to know that much about LLMs. You could treat it as a black box. But if you work with open source models, it is usually a good idea to have some idea of
+
+**Speaker 2** _[18:04]_
+
+What would be the skill set? What should you know if I use an open source model as an engineer?
+
+**Speaker 1** _[18:04]_
+
+what it is. engineer? I would say most of it is still in Python. Python is the layer to access them for the model hub and to try basic things like basic fine-tuning. On the serving side, it is more specialized tools, SGLang, VLLM, these tools. But they can be learned relatively quickly based on just the documentation. A lot of them have an open AI-like API. So you You basically have the model on your computer, but it doesn't mean you have to write low-level code. You write API code. And I think the skill is, honestly, the most important skill is experience. So I'm saying that because there is a lot of tricks and pitfalls, or not pitfalls, but there's, in LLMs, there is a lot you can, you can make a lot of performance progress by, let's say, just modifying your prompt, managing your prompt. And that's the secret behind why agents work so well. What they have is they have the whole context, the repo context, the prompt cache, the conversation history, but you can't have it all in there because it would be too large. They like managing that.
+
+**Speaker 2** _[19:20]_
+
+You can basically say they have all the magic words they need to say, like a prompt. You have like a multiple set of magic that works well, and spells, spells, not prompts, work well, and that, and yeah, engineers actually to operate.
+
+**Speaker 1** _[19:34]_
+
+operate and so with experience I wanted to say I think the best so it's I don't I don't mean it as a gatekeeping way I mean it more like I think getting going today rather than tomorrow you know like just working on it and then through working on it you will kind of get a feeling for things so it's more like a feeling for things no it's not a technical
+
+**Speaker 2** _[19:54]_
+
+When I did like Coursera times with machine learning, deep learning, there was one course that made us code gradient descent, and of course you see the slides, the math, you somehow get it, but the feeling, I got, yeah, I actually coded that, and now I have a better feeling with back propagation, everything. It was, yeah, you just get like this gut feeling and you understand. It's like magical. Yeah, it's like you understand the underlying magic better, and you develop some gut feeling. And I think, yeah, actually, yes, you can basically take your book and learn from scratch to get this experience as well, to get a little bit more gut feeling.
+
+**Speaker 1** _[20:39]_
+
+gut feeling. It's like an entry point also, I think. Like what you said with gradient descent, it's also, you build the basic version to build an understanding, and then you know, okay, I have to, you know, you have to normalize your data, and you know why. And then also, you have, you want it zero-centered versus just min-maxed.
+
+**Speaker 2** _[20:59]_
+
+Yeah, you run into all the problems you see from the outside. I mean, also like different, I once had a problem with different, just like character sets. I mean, everything, a lot of material is just like English and then you have Eastern European language and you have like a lot of more characters there, which, and how do you normalize that and all these questions and how do you train on that?
+
+**Speaker 1** _[21:24]_
+
+But if I may follow up on that, but it doesn't mean you have to always do it from scratch. It's like you do You build this intuition and then you use let's say Adam and PyTorch, but then you appreciate Adam more because you know You have like the base Vanilla and then there are flavors. There is RMS prop. There's Adam there is lots of other types of optimization algorithms based on that, which you can learn more quickly by having this foundation. And in the same sense with LLMs from Scratch, my book, for example, it's like the base model, simple techniques, but then all the other techniques, they branch out from that. And you don't have to implement everything with Scratch, but it's like giving you the foundation.
+
+**Speaker 2** _[22:07]_
+
+I think intuition is a really good term, to build intuition, I think, I couldn't describe it better. Yeah, so I see there's a potential what you need intuition to build experience and intuition. So there's another issue, and do we expect agent solution for that? For example, the New York Times titled Code Overload. Code Overload is people in the financial industry in New York City got so they jumped from 25,000 lines of code to 250,000 lines of code and if you know a little bit about the financial industry is regulated so somebody has to really approve that and not just like go into production. And they are now desperately looking for senior engineers to review. I also reached out to people who work with PyTest, because very often if you have agents write tests, it's pretty shallow tests. And also, can we expect that agents use the whole testing, code review thing? Or is there just like a frontier we don't see yet because it just needs different ingredients and input and probably human input? Like it's an open question.
+
+**Speaker 1** _[23:31]_
+
+Yeah, I think, I mean, we call them agents and everything, but they are still not very, I guess, I don't know what the right way to describe it is, but they don't have their own agency, maybe. You still have to tell them what to do, right? And I think it can be really good, but you have to be really specific, you know, about the test you want. You can't just say, well, write tests and it will do all the tests. You have to maybe narrow it down a bit. And for that, yeah, I think you need the experts. I think also what's cool about LLMs and agents is as a, let's say, a beginner who don't even, like people who don't even code, they can do or build something that is pretty impressive that's impossible to build otherwise. But then I think you even get more out of it if you're an expert. Like, because then you know, you have like, you know what's good and bad, and then you can direct more specifically, nudge it in a certain direction. And you said something with 20 to 200,000 nights. That's like a trend factor of 200.
+
+**Speaker 2** _[24:31]_
+
+Yeah, like factor of 10.
+
+**Speaker 1** _[24:33]_
+
+At the same time, I think an expert, you need more reviewers to review that, but then also an expert can't, I think reviewing is easier and faster than writing it, to be honest. So I think, well, it is still, I guess, a challenge because you have to review it. Like you said, it's a regulated industry. So, well, but then you, so you could also use the LLMs basically for other purposes. You have your existing tests and you could say, instead of starting from scratch, you can say, well, what am I missing? here and it gives you pointers and then you do it one by one instead of you know instead of just generating it and looking at it you can do it more incrementally and I think that's like maybe the saner way to approach it instead of going from 0 to 100 you find some middle ground to make your work easier not to just fully automate it and my opinion that's all how I like to use LLM's best is basically by like not creating more or anything but what what you're creating, making it better.
+
+**Speaker 2** _[25:31]_
+
+It's like breaking it into smaller bits again.
+
+**Speaker 1** _[25:33]_
+
+Yeah, or finding mistakes, like having another, let's say, set of eyes, I mean, figurative speaking, but having another thing, let's say an AI, look at it and telling you what's maybe not good, where there are mistakes, and you can decide whether you want to improve them or if they're legit or not, but making your work better rather than replacing it, that's how I prefer to use these things, to be honest.
+
+**Speaker 2** _[25:59]_
+
+Yeah, so it was like every, like if you talk to, if like you get like very often management perspectives are like, yeah, we can just like automate all of it. We eventually will know, we know coders, we can just like prompt everything. And then, and I think this is a perspective we as a community and engineers really need to work on. So now there's like different perspectives. Of course, you can save a lot of time on boring stuff as well. Like, you have capacity for other things. But on the other hand, you probably, because there's also, I'm not really sure if that's the right way to say it. I think it's the Jansons paradox, which says, if something gets cheaper, it's going to be used more. Most software coding is cheaper than ever, right? So it's going to be used more. And also, and it's like the first question from the crowd, actually, it's, I'm just reading it. Everyone's talking about agentic AI transforming software engineering. But folks, oh, folks at Zalando report that the real revolution is happening in data science and automated research. Right inside production pipelines. Sebastian, you sit exactly at the intersection of ML research and tooling. And the question is, how are agentic systems changing the way we do research? And are we ready for a world where machines don't just write code, but autonomously test hypothesis?
+
+**Speaker 1** _[27:35]_
+
+Yeah, it's a good question. There are already efforts. Okay, let's start there. Maybe my own experience, how I experienced it is, so for my LLMs from scratch book, there was no AI that could really write code, so it's all from scratch. For the second book, I started working on it like one and a half years ago, and most of the code, pretty much everything is written by myself because I wanted to have it in a certain way because when you use AI, it's very verbose and it's a lot and you could maybe kind of nudge it to a certain way, but it's almost more work if you already know what to do. Well, no offense, but when I was a professor, I had research students and it was a lot of fun working with research students, but sometimes it was, when there was like an important deadline, it was actually sometimes easier to just do it yourself. so
+
+**Speaker 2** _[28:32]_
+
+Yeah, I mean, there is, of course, like the people. I mean, as a student or as a pupil, and I would not excuse myself, you sometimes try to get through because you have other priorities in your young life. Like, you know, and so it's also AI slop in a way in research.
+
+**Speaker 1** _[28:50]_
+
+And so I wouldn't say...
+
+**Speaker 2** _[28:52]_
+
+So I wouldn't say... Similar to actually code review in the financial industry, you have like a lot of more output and who are the people who are still like in charge or have to sign off on it and it's it's building. Actually we also saw if you like like cycling Adrian from scikit-learn he also gave a talk said yeah thanks for like the vibe coded scikit-learn pull requests but actually we don't have the capacity and they don't really contribute.
+
+**Speaker 1** _[29:20]_
+
+I also don't want to say any work was bad or anything. It's more about I think sometimes there are things you want to in a very specific way where it's more work to kind of like write it down or communicate it than to actually do it. It's like the way they're doing becomes simpler than the explaining. And where I want to go with this is so in that sense for that maybe the AI was not useful in the production in that sense, but I used it a lot then to expand the experiments because what I wanted to is of course not only have code that works, but I also want to have good settings and good examples. And there are things that are just tedious where I know I want to run these experiments and I have a GPU where I could run them. It's on a different machine, but then you have to write a bash script and I want it in a way when one experiment is finished, it writes the other one, and oh, it would be convenient to have a plot also, oh, maybe I want the table synced to my main computer so I can look at it and I don't have to micromanage it. And while I used coding agents to set all that up or run these experiments, I was very specific. I knew which parameters, evaluate the results in a sense, like from the log file, pull out the results and make a plot and everything. And so this hybrid approach was actually great. And I know also people who do use it now for research because coming back to the question, it was like how people use AI for research. And I think, well, one could be to come up with new hypotheses. I don't think it makes sense to fully automate it yet. So you want to still be the person, like the creativity.
+
+**Speaker 2** _[31:01]_
+
+creativity. What is it like just thinking is it something which is very human or is it just something we just have to let go of the idea we are the only ones that can come up with a hypothesis. I think that's one of very core questions for large language models.
+
+**Speaker 1** _[31:16]_
+
+There's a thing when I was also a student back then, there was something called graduate student dissent. Yeah, correct. Where we had to do the tedious work, right, like the hyper-remembering. And this is actually something we can automate now, which is great. So the students can also actually now have more time to do the creative work instead of doing graduate student dissent, right? So it's, in that sense, it's actually a blessing to have these. Okay.
+
+**Speaker 2** _[31:44]_
+
+So a different perspective than two people sometimes maybe in the industry who say We don't have jobs for juniors now. You just need seniors They want of course like people who code and help seniors
+
+**Speaker 1** _[32:01]_
+
+Yeah, I mean, you can see it as maybe a problem where it takes away from things. But I do think it's more, you can also flip it and say, well, the students now actually get to do science instead of doing busy work, right?
+
+**Speaker 2** _[32:15]_
+
+Yeah, it's a very, I think, I'm surprised because we see things that work like on a
+
+**Speaker 1** _[32:15]_
+
+Yeah.
+
+**Speaker 2** _[32:21]_
+
+job market or enterprises. In research, we have a very different angle because yeah, the petty work can be automated finally and students have more time to be creative. Thank, very great. So let me just double check. Yeah, this is a question we got in this morning. How important do you think is it to understand these large language model architecture details for the average AI engineer who never trains a large language model from scratch and rarely fine-tunes one?
+
+**Speaker 1** _[32:57]_
+
+Uh-huh. I do think it's still, so how important the understanding of architecture is, I do think it's still, I mean, not everyone has to understand the details, but I do think it's like, even if you don't work on the architecture, it's fun, and actually it's quite rewarding also. You mentioned like two minutes ago scikit-learn, right? And one could use scikit-learn just through the API. You never need to know any machine learning. It's like input, output. I think most people who use scikit-learn at some point learned, like you mentioned, gradient descent, basic support vector machines, random forest. You don't have to, but I think it's rewarding. You know what you're working with, and then the work also becomes more enjoyable.
+
+**Speaker 2** _[33:41]_
+
+You can build an intuition, experience angle, so basically experience and building intuition is might be still like a human part, like...
+
+**Speaker 1** _[33:54]_
+
+That's just like and for the architectures. There's also I mean there was a lot of focus on the KV cache but there are other things were like just like a Overview is really useful. For example looking at some architectures some if you look at quen versus llama. Yeah Llama 3 back then it's more like a wider architectures fewer layers and Quen 3 same size model is has more layers but shallow sorry narrower and And it makes a difference because you can get maybe better performance with more layers, but it will also be a bit slower because if you have more layers, sequential processing it takes longer. And these are little decisions in production where there are some applications where really you want speed and maybe you have more memory bandwidth, you can have wider architectures. And it's something where this basic understanding of architectures can make a difference in production also like where maybe you are just using the api but there's usually you want to optimize something so like performance and maybe yeah
+
+**Speaker 2** _[34:53]_
+
+Yeah, also understand why is the output there, just like as a basic understanding. So let me just like sort questions. So another question that came in from the audience was models profit much from having data to be trained on and to get often updated. This makes the models very large and very large providers more attractive. However, the disadvantage is that no one really knows what's with the data happens and people are still cautious to enter sensitive data. This makes local and open source models really attractive. So we have data protection or privacy angle here. However, it has the disadvantage regarding smaller data and no or no rare improvements. What do you think about this trade-off and how will the future solutions look like?
+
+**Speaker 1** _[35:55]_
+
+Yeah, this is the trade-off between local privacy-based solutions and then the global – sorry, the proprietary solutions where we don't – I mean, it's similar to almost like using Google Drive, just say – I mean, let's say Microsoft OneDrive versus having your own server or email server even, right? And so it's like –
+
+**Speaker 2** _[36:22]_
+
+Nextcloud in Germany, you can run it.
+
+**Speaker 1** _[36:22]_
+
+We'll be right back. I mean, at one point I had, what is it called, like a Synology with my own Dropbox kind of client. And so you can take it also, like, it's not a question that is only specific to LLMs. It's also with search engines, right? But I think with LLMs, it's particularly a problem or, like, comes up more often because, I mean, I don't want to accuse anyone, but I think AI companies, I mean, they live from the data in a sense, or they live off of the data. they need the data for the models and they are maybe more likely to connect or collect the data and if we use LLMs for everything they might have access to everything we ever put in there and so I think that is the difference between that and maybe just like emails where they only have access to emails but now LLMs they can connect the dots more almost because it's baked in, it's an AI so that makes local models more attractive but for certain things but then well I think at some point Well, it's the same, you can build everything yourself on your own computer, but how far do you get? You have to make trade-offs. You have to say, okay, well, I'm fine to give up some of my, you know, privacy, I guess, for a return that is maybe better performance. But that needs to be decided based on the application and the use case. The other thing is also local models are faster because you don't, I mean, it depends, but if you have the right hardware and you run something on device that is small, it can be lower latency than something that goes through servers and internet. Recent example, my mother and my wife, she speaks only English. My mother, her English is not very good, and they're trying to use the AirPods with a live translation. And that's like, I think, a local model. It's very fast. it's not
+
+**Speaker 2** _[38:13]_
+
+It runs actually on the iPhone, but it's local.
+
+**Speaker 1** _[38:13]_
+
+yeah it's right
+
+**Speaker 2** _[38:16]_
+
+I would argue that it's local, yes.
+
+**Speaker 1** _[38:17]_
+
+And it's not as good as the bigger, let's say if I would put it through ChatGPT, but it is live. It's like almost live. It's like a two-second delay or something like that. So there are use cases where it's even independent of privacy. It's just like a good solution to have local models in a sense. And then also OpenClaw is a good case because a lot of people, they run OpenClaw, and it gets very expensive if you use the API. And at some point, if you're using it 24-7, it might make sense to buy some GPUs and run it on the GPU basically. You are limited in terms of the size, but a lot of people I know, they find that the QN 3.5 27B model is already pretty good for most use cases where it's like free.
+
+**Speaker 2** _[39:01]_
+
+free I can totally watch for that it works on a local machine I use it actually like to for a vision model locally because the vision model is for my use case good enough and so no need to have put this into any API and burn tokens which I can just have locally so yeah so I think let's stay with like small the next question is do you see another emerge of people fine-tuning smart large language models like a year ago or a year or two ago? Or have we moved on to all, to use all generic large language models for use most use cases?
+
+**Speaker 1** _[39:41]_
+
+That's a good question. I think a little bit of both. So I think fine tuning is not as popular as it used to be for really like individuals, smaller companies where you can do more with both proprietary and overweight models by just managing the context. The difference is really nowadays the context is so big and with optimizations that it is affordable to do it. Back in the day, it was just too expensive to give a lot of examples and instructions in the prompt, so you wanted to fine-tune. It's still often if you do something repeatedly over many weeks or months, it might make sense to fine-tune, but I would first build off of an open-weight model or proprietary model, see what the performance is, and then fine-tune to see if it is even making it better. But it wouldn't be the first choice. But then there are other examples. We talked earlier about Composer for like Cursor. And this is a fine-tuned model where it's just much better, right? But then the regular Kimi K2.5 in that same environment. So it does 100% still make sense to fine-tune. So it makes sense for that company to fine-tune that model, but it wouldn't make sense, let's say, for me or for you as the end user to fine-tune your own coding model. Because that would be the trade-off. There would not be a good bang for the buck in terms of the cost and the return.
+
+**Speaker 2** _[41:06]_
+
+Okay, next question. That's an interesting one. I'm a manager at a reasonable-sized company. Interesting phrasing. I'm sorry for that. I'm a manager at a reasonable-sized company. I have the means and the budget. I want to push sovereignty and save costs, but also be very productive in the next 12 months and deliver. What's the best strategy for me? once
+
+**Speaker 1** _[41:38]_
+
+I wish I could give a good answer, but it depends on...
+
+**Speaker 2** _[41:40]_
+
+Just like I have some ideas of course.
+
+**Speaker 1** _[41:42]_
+
+Yeah, but it depends also what what the company is doing, right? Like So, yeah if it's it could be a bank it could be a car industry it could be a pharmaceutical company so I know that's
+
+**Speaker 2** _[41:55]_
+
+Oh, let's put it down, now I can't really decode the email, let's put it, I'm a text based company, let's say governance, let's say with the paperwork, because every company has paperwork.
+
+**Speaker 1** _[42:14]_
+
+Oh, yeah. I see. I mean, there's a lot of stuff you can do with LLMs from reviewing to summarizing to organizing. Actually, one thing I do is, like, it's kind of like busy work, but so I do keep notes for a lot of things over many years. And I kept them always in Markdown because I like to back them up in GitHub. I think it's also very popular now, this type of knowledge base, but I have many years of...
+
+**Speaker 2** _[42:43]_
+
+So basically, we can markdown. I use that as well. We can say, okay, data and data quality in, let's say, some structured way. So actually organizing. We also had in the opening session from the program committee, there was this word cloud. And the most important word now was data. And this has changed. And you see there's a lot of AI and still data goes more and more in the the middle and it's also input data for training data and I mean I was think like like data is the thing that is one of the most important bits but also like the most unpopular one because nobody like many people don't understand the field so yeah we have a good data but who should I hire if I if I want to say I want to build it from I want I have all the means and build it from scratch this is how I read it what would we need to hire actually I or to call
+
+**Speaker 1** _[43:44]_
+
+I would say there are, honestly, a lot of people out there who can do really cool work with LMS. You don't even need to look that far, because if you're curious, it is relatively easy to get going. It comes back to what I mentioned earlier with the experience. I think you don't need to have a special education degree or whatever. It's like if you work with these systems for a few weeks or a few months, you develop this kind of feeling of what works and what doesn't and a person like that is I think perfect because you want someone who wants to try something you know like there is something at the company like some data or some problem and you want someone who is willing to try things out you know like within reasonable boundaries but it can be something simple like you know finding mistakes in a report or what I also like to do is like quality assurance, like, hey, I wrote this, I have all the figures there, did I duplicate other figure numbers, if I have 35 figures in there?
+
+**Speaker 2** _[44:47]_
+
+So that's basically a domain expert as well. Yeah. I need to...
+
+**Speaker 1** _[44:52]_
+
+Oh, yeah, the domain expert.
+
+**Speaker 2** _[44:52]_
+
+Oh, yeah, the domain... I need domain experts to basically, again, we have intuition, gut feeling, like, hey, does this make sense?
+
+**Speaker 1** _[44:53]_
+
+I need domain. Yeah, right.
+
+**Speaker 2** _[45:01]_
+
+Yeah, right. Which is very similar to what we have seen in machine learning models already earlier days.
+
+**Speaker 1** _[45:02]_
+
+Like, someone... Yeah, a domain expert who is willing to, like, delegate the boring stuff, I would say.
+
+**Speaker 2** _[45:22]_
+
+Okay, I think this is a really quick answer quick questions I don't really understand it. I just read it TurboQuant did Google rip off raw bit queue here? What's your take?
+
+**Speaker 1** _[45:35]_
+
+That's a good question. I don't want to accuse anyone of anything here because the thing is with research also there's so much out there where sometimes you by accident I guess not intentionally do something similar. I honestly am not an expert in quantization algorithms, so I know they kind of implemented something where you could have gone a bit further than it would have been the same as the Revit algorithm. But, yeah, I think it's also interesting that it is popular this year compared to last year. It somehow got, there's something that happened where I think that a new.
+
+**Speaker 2** _[46:13]_
+
+I mean also like research is not, there's also hype in research topics and sometimes really, I have the impression, sometimes useful stuff is just forgotten because there's just like another hype that's stronger.
+
+**Speaker 1** _[46:25]_
+
+Another example of something like that I remember was last year. I don't know why so many people worked on it. Maybe it was like low-hanging fruit, but there was like reinforcement learning for pre-training. And within one month, there were like three papers on reinforcement for pre-training, and they were all very similar. But they all worked on it independently. And people might, I remember people were like telling, hey, you did the same thing as XYZ. Can you please explain how it was different? But it almost came across as an accusation where I feel like maybe I was, well, like that a bit too when I was working on papers and someone else did something. But now I see it a bit differently as an end user. I think it's cool because you see multiple people doing the same thing. And if it works in all these cases, it is kind of like reinforcing that this is a good idea. It's almost like reinforcement.
+
+**Speaker 2** _[47:17]_
+
+Reinforcement for reinforcement, in that case.
+
+**Speaker 1** _[47:19]_
+
+It's independent validation that it's actually not a bad idea.
+
+**Speaker 2** _[47:23]_
+
+Next question is, Sebastian, you're a bit of a large language model historian. I think this is like a new term that I just created here. Thank you. Are you going to identify families and strains like it's done for viruses? You could also do discordant trees.
+
+**Speaker 1** _[47:45]_
+
+trees
+
+**Speaker 2** _[47:46]_
+
+Okay, is there like an interconnect family trees there's something also like to understand a bit better
+
+**Speaker 1** _[47:54]_
+
+Do you think one could come up with an evolutionary type of tree where you have maybe different families, like the llama-likes, the gwen-likes, maybe deep-seek? Yeah, I think you could technically do that. It's actually maybe something I should add to the LLM gallery, like a tree where you have one architecture that originated from there and then it branches and how they kind of sometimes exchange ideas. But, yeah, I think it's just interesting that they are still very similar, but there are some distinct ideas also. Yeah, yeah.
+
+**Speaker 2** _[48:36]_
+
+How do you see the role of knowledge graphs to add robust grounding to large language models? Do you think this is a promising direction or is persisting knowledge in these graphs too far labor-intensive?
+
+**Speaker 1** _[48:53]_
+
+wish I had a good answer. I have not worked on any specific implementation where I don't want to say anything I don't have experience with but I wanted to say one follow up so I mentioned earlier fine tuning there is also retrieval augmented generation and I think just context work is taking a lot of use cases where the first thing you could try is literally without anything. Just put it into the context. But it's always then a good way to compare. It's like your baseline. You make your baseline and then you can try out retrieval augmented generation fine tuning, maybe work on knowledge graphs and see if it gets you further. But there's something to be said for just keeping it simple because MCP, for example, like the protocol, it is actually very popular. It makes a lot of sense, but nowadays most people don't use it. Most people just have like the CLI, like they give instructions. So I have a friend, he works at a company that does, it's actually quite cool, so digression, but you give the LLM examples of things you want and you don't want. So let's say you want to make a nicer figure. He had like a, there's a Tufti test where designing nice figures. You give it, I don't know, 20 bad figures and 20 good ones, and it will figure out what the difference is and make like a data-driven learning. Like the model learns from the data, the LLM, what to look for, and then it gives you an endpoint, an API endpoint, and then you can apply it to new figures. You could technically, I think he has MCP support for that, that you can plug that into your own whatever. But it's actually, what I did is I just gave it the API and said, hey, here's this tool. It accepts some parameters. Here's the help menu. Here are some figures. Make them nicer, based on these criteria. And the model figured out how to use the CLI. You don't need an MCP for that. The models these days are pretty robust, learning from documentation, basically.
+
+**Speaker 2** _[51:11]_
+
+Yeah, so like a CLI only gives you certain paths you can follow. I mean, you have like chain commands, instructions, attributes, parameters, and it's structured. And it's also like what I experience very often. And I think this is also something that really helps improving working and programming and integrating with AI is follow the standard, normalize well. For example, every time you ask, like, a REST API, which just follows the standard, blunt language models are pretty good to figure out what you want without reading all that. Sorry, I always thought that documentation important, but it was quite boring as well. And to wrap your head around, and, of course, this frees resources for other solutions. Yes. So, yeah. Yeah, and I'd also like to remember many things. I think it's a really good help. Like, yeah, just I totally admit I'd rather push this to push this thing than to say to say, like, although, you know, like what to do with Git command line, you cannot say I just push it to origin and a new branch called whatever.
+
+**Speaker 1** _[52:20]_
+
+Well, I think, again, it helps to be an expert, so it's easy to recognize if it's trying to do something that doesn't make sense. So I think you get more out of it if you are familiar with it. But then, coming back to the experience, you develop a feeling of what you can ask an LLM to do and what not to ask.
+
+**Speaker 2** _[52:40]_
+
+So your example was like, okay, this is in and this is the result. It reminded me a bit like reinforcement learning with computer games. And you said, yeah, you could maximize the outcome for Super Mario, but it did not really understand the rules still. And this is what basically alarmed me a bit when you gave that example from, hey, input and figure it out yourself. Yeah, it was basically the same. It's very comparable test sets, different technologies, but there was no deep understanding of it. It was just like, yeah, I do this, I jump there. It was just optimizing try and error. Isn't that also a huge risk? You see, yeah, it works most cases until you hit something new and it's because we lack a logical structure and a procedure is just like, in a way, also like a try and error. Or is this just comparing apples to bananas, because it's large language models. It's very different. We cannot really compare that to these Super Mario, PlayStation, or Nintendo.
+
+**Speaker 1** _[53:52]_
+
+examples? Yeah, I think
+
+**Speaker 2** _[53:54]_
+
+Technologies are different, of course, yeah.
+
+**Speaker 1** _[53:58]_
+
+This comes back to the experience where there are things I would not trust an LLM with, and some are... Like example? Well, I wouldn't trust it if I would do anything from scratch without giving guidance. Because some problems are way too open-ended. Honestly, I still don't give LLMs access to my computer, and to Git. I just keep it a bit simpler. For example, a bit more free is my website because I learned at some point HTML and CSS. That was like 20 years ago. I built the website from scratch, but I have not really done much of web development in the last 10 years. I have done minor updates.
+
+**Speaker 2** _[54:46]_
+
+It's public anyway, right? I mean, why worry, right?
+
+**Speaker 1** _[54:46]_
+
+Public Yeah, but what I would do there is, for example, when LLMs became really capable, I had a lot of CSS files. And because I'm a very bad web developer, I had a lot of redundant configurations for the headers and just the formatting. And I said to the LLM, well, can you just minimize everything? Like remove redundancy, clean that up, and it did something for 20 minutes. It came back with a much smaller CSS file, but I could look at it. I could look at the website, okay, it looks still the same. Or there were some things broken, you can tell it. Do you have...
+
+**Speaker 2** _[55:23]_
+
+you do you have an intuition like why did it take 20 minutes and how was the process behind like figuring that out?
+
+**Speaker 1** _[55:31]_
+
+I think it was also, it's a bit hard because I used Codex and they don't show you the thinking trace, but I think it was also, it asked me in between also to run, I used Jekyll, like Jekyll build to build the website and then I was looking at the results. It was doing all that too. So it was just iterating, building it, looking at it, refining. But it was in the end, I think there were some issues with it, but I could say what the issue was and it fixed it. but it worked but it's a feel I could see that it worked you know like where it's a relatively simple website I wouldn't have the same trust if I work at the bank and say well redesign my banks app for the lock-in something like that I would really not do so what I'm trying to say is like I do it for like tedious work that I guess is relatively safe
+
+**Speaker 2** _[56:23]_
+
+No, I couldn't agree more, like sandboxing it and how to sandbox and still giving it the right information and data, I think that's something that requires also some skill and organization. Yeah, so I think we have time, I think we have until, let me just browse through, there's many questions, sorry, I need some time.
+
+**Speaker 1** _[56:53]_
+
+Can we take questions from the audience?
+
+**Speaker 2** _[56:53]_
+
+can we take the audience here? No, we do all because I'm full recording, that's why we changed that. We also have the questions now connected to the talks for later. Let's take this one. With Europe's constant current constraints in the AI stack, like constraints on compute, deployment, regulation, and energy costs, where would you put the next euro in an open weight coding system today? Into the base model and its architecture into agentic post-training or into the harness systems around the model.
+
+**Speaker 1** _[57:29]_
+
+I think it would be the post-training and the harness. The pre-training, there are currently a lot of good open-weight models out there where it would be really hard to do anything better. So one European company that is pretty popular is Mistral AI. And so looking, so that's coming back to the architectures, looking at the architecture design, it is essentially they took, So for Mistral Large 3, they took DeepSeq version 3. It's the same architecture and pre-trained it. But it's better, but I don't think it's, I mean, right now it ranks 74 in the LLM arena. Last week I saw a tweet about that. And 24, I think, in the AI index. I think it's called Artificial Intelligence Index. I like that one because they run benchmarks independently. So what they do is, instead of taking the numbers from the papers, they run it themselves, and so it's like a fairer comparison. And so rank 24 is not bad, but it's also, you know, it's not state-of-the-art in that sense. So I think it's very expensive if you were a company to also do something like that, where you could technically get a head start by using an existent one. The downside is, well, I think a lot of people don't like to use for example, Chinese or American models because it's good to have something that is developed locally but also different views, for example.
+
+**Speaker 2** _[59:07]_
+
+Yeah, so like, I mean, of course, every model is biased.
+
+**Speaker 1** _[59:09]_
+
+Yeah, right.
+
+**Speaker 2** _[59:09]_
+
+Yeah, right. So, of course, I think it's not hard to figure out where, like, Chinese models are properly biased or something like Tiananmen or so.
+
+**Speaker 1** _[59:10]_
+
+So...
+
+**Speaker 2** _[59:19]_
+
+I've seen also there's research. Yeah, you can even undo that. So I think there was a research paper that said, yeah, we have made deep seek. Tell us about Tiananmen.
+
+**Speaker 1** _[59:30]_
+
+Yeah, so you could technically do that for the pre-trainer, continued pre-training to just take a base model and then shape it in a certain way. But also a lot of applications, they don't really even intersect with problems like that. If you have a coding agent, well, it doesn't really matter what the political views of the base element are. So if you're just caring about coding, like the pure code, that's then where you would focus more on the agent harness.
+
+**Speaker 2** _[60:01]_
+
+Yeah, actually it's more like, hey, let's be pragmatic and not try to like, hey, this is the pure model on soft solos. We just need to know, you need to know your tools, the tools of your trade and also like what they are good at or not good at. So let's wrap it up. Final question. If you could give the audience only one advice, what would that be? And take your time, we're not in a rush.
+
+**Speaker 1** _[60:32]_
+
+I would say really trying things out versus just almost like instead of just debating or thinking about it too hard, I would just really try it out. Something like OpenClaw. You can slice it in many different ways. Should I use it? Is it secure and everything? But you could also, let's say on some spare old laptop you have in the basement, just install it in a very limited way. important in there, and you of course shouldn't give it access to your computer, but just playing around with it, something like that, you know, like just trying things out, and the same for should I use open source or not, it's a bigger question, but I think the first step is to just run it on a given problem, like small model, medium model, big model, just trying it out and see how far it gets you, like more, I guess, trying things out, It's kind of, I have also a hard time with it because I come from academia where usually you want to think it out, plan it out first before you do something. And it's kind of like a different way of thinking now. It's more like doing and then analyzing later, I guess. But I think that's the way because things move so fast. If you plan something very thoroughly, it is probably irrelevant tomorrow. So it's like you have to move with the...
+
+**Speaker 2** _[61:54]_
+
+with the current. And waiting is also not an option. I think this is the difficult situation we're in. We cannot just like sit it out and say okay everyone settle for that because you will be totally lost.
+
+**Speaker 1** _[62:03]_
+
+Yeah, maybe the advice is like you just said, waiting is not an option.
+
+**Speaker 2** _[62:07]_
+
+Yeah, waiting is not an option.
+
+**Speaker 1** _[62:07]_
+
+Yeah, waiting.
+
+**Speaker 2** _[62:09]_
+
+Okay, try things out to get things done. Thanks a lot for being around again, Sebastian. It was great to talk to you. We have the book signing at four, so time to grab a coffee. Thanks.
+
+**Speaker 1** _[62:23]_
+
+Thanks everyone for attending.
+---
+transcript_status: auto
+---
+transcript_language: en

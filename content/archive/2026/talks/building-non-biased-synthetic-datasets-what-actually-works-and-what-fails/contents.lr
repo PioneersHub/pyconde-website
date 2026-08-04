@@ -118,3 +118,189 @@ Generating non-biased synthetic datasets for sensitive domains, such as the lega
 To mitigate these issues, a template-based generation approach is more effective than free-form prompting. In this method, the LLM is used only to create sentence templates with placeholders (e.g., [PER] for person, [LOC] for location) rather than generating complete, annotated examples. This decouples the linguistic structure from the actual data values, ensuring higher consistency in labeling and reproducibility. The pipeline consists of two parallel steps: generating these templates and creating balanced entity lists. These lists are curated to ensure a normal distribution across demographics, such as a 50-50 gender split for names or a fair representation of various legal fields like labor and family law. A Python script then randomly substitutes placeholders with entities from the balanced lists, maintaining precise annotation indices without requiring manual re-labeling.
 
 Key takeaways include the necessity of a strict task definition—defining exactly what constitutes a label and its negative space—and the implementation of a validation phase. Validation involves rule-based scripts to check for class imbalance, empty entities, and lexical heuristics to ensure legal vocabulary accuracy. While synthetic data is highly effective for classification, named entity recognition, and relation extraction, it remains a complement to real-world data rather than a total replacement.
+---
+transcript:
+
+**Speaker 1** _[00:02]_
+
+All right, welcome to this next session, the next talk, and we have another exciting talk. Actually, it kind of fits in with what we just heard, so if you've been here for the last one, this kind of is a good follow-up, and it's going to be about building non-biased synthetic data sets, what actually works and what fails.
+
+**Speaker 2** _[00:22]_
+
+works and what fails.
+
+**Speaker 1** _[00:23]_
+
+So please give a warm welcome to Shivanuri.
+
+**Speaker 2** _[00:34]_
+
+Well, good afternoon. I hope you have enjoyed so far the PyCon conference, and you keep enjoying it, plus my talk. So I will be talking about building a non-biased synthetic data set and what worked and what failed. I am Sheeva Banassaz Nouri, as our dear session Chair Sepp. I work at Western Aacher Solutions, and I'm a data scientist there. I work on applied machine learning, which means that I work on NLP tasks, I work on computer vision tasks, and we work mostly on legal domain in our job. It means that we are really focused on working with judges, lawyers, the legal sector, and notaries. I'm also a co-chapter lead for Berlin for Women in AI, so if anyone's interested, come talk to me later. Okay, so before diving really technical into the talk, I'm going to tell you the story of how I came up with this topic. I have been working for Western Acher for a while, and we had really cool applications, we had some use cases for information extraction within our text data, and I thought, well, I'm also doing my master's, let's make a really cool thesis topic out of it and extract this information. What happened was that I started my research, I started looking for data, I started looking for models, and I kind of hit a wall. Because legal data is very sensitive. It's under the regulations of GDPR, exactly like health domain, and you're not really allowed to store this data just anywhere. You're not allowed to use this data just anyhow, and there are so many regulations that apply to you. So, what I said was, well, no problem. I'm just going to create my own data. We have LLMs, we have ChatGPT, and out of that, I will build my model. Well, that was also not the easiest thing to do, hence this topic and this presentation. I'm going to tell you all my experience, what happened to me, what I did, what failed, and what worked for me. So, in, oh, we missed two icons. Alright. I'm going to tell you what synthetic data really means, then I'm going to tell you how crucial the task definition is, what are generation strategies, and what does a pipeline look like for generation, and then lessons and limits. So what is synthetic data? Real data is what we have seen all the time. data is collected from real observations. It's from real humans, real actions, and collected from real world. They are like data sets like the squad from Stanford or wiki annotations that are named anti-recognition data sets with over 200 languages. Let me change to laser? Yeah, that's not going good. Okay. And synthetic data is data that is generated using a model. It can be a large language model. It can be a small model. Doesn't matter. But it needs to be generated. There are also some example data sets on hiding face. They are like cosmopedia or the small talk, which are I think they are question pairs or instruction that are generated all by mixed role model. Okay, but there are some myths going on with synthetic data. The first one. The first one is that synthetic data is automatically complying with privacy issues, that there are no privacy issues going on with it. But as we know and as we expect sometimes from language models is that they should remember some real data. So if you are asking the language model to create some data for you, there is the possibility that it will produce something real. So there might be some privacy-preserving data that they were not allowed to use and has been generated for you and is now existing within your data set. The second myth is that it benchmarks well, so it must be good, but if you apply it to real-world data, you might face problems. You might actually face issues that there might be data that you haven't seen, or your data has been so imbalanced that it's not going to generalize well to the unseen data from the real world. The third miss is that, hey, okay, the third one is that if you just generate more data, you're going to be fine. You're going to fill in the gaps. But generating more data has so many constraints. You have to be so careful what is your data set missing and what you need to be generating. And the last one is that LLM is going to produce balanced outputs by default. This is also a myth, and that's because LLM is going to give you the most likely output from its own distribution. But you want to have a full distribution on your own, so if you're always getting the high probability output from your LLM, you're never going to hit this range of distribution that you expect to see within your data. Other than the myths going on, there are also some real world failure modes. The first one is that you might see some hidden bias within your data. The hidden bias comes from the same thing that I just explained, that LLMs taking always the high probability data is going to cause demographic bias. It's going to cause uncorrelated features within your text data, and you might also get distribution collapse because all the distribution is going to come from the high probability. So you will never see the low probability features within your distribution. Label leakage also happens based on the fact that I told you that if LLMs remember a sentence from real data that they have been trained on, you will get label leakage and you will get benchmark overfitting. So let's now get an explanation about really what is synthetic data. What are the properties that we are looking for within this data? The first thing is that they have to be artificially generated. They cannot be copied. They need to be created by models. They cannot have any direct link to any real observation or any real individuals or events. They need to be controllable and reproducible, which you will see later within the pipeline that I will show you. The second property is that they need to preserve the statistical structure of the data that exists in the real world, or the data that you expect to see in the real world. So this is really important. It needs to mimic the patterns in the data. It needs to mimic the number of, the ratio of the labels that are going to happen within your data. And this all comes from an extensive study that you must do before starting to do your first prompt. The third one, and kind of one of the most important ones, is that it needs to be privacy compliant. It cannot be copied, never. You have to be sure that you are complying with the regulations. In Germany, we have GDPR. In the EU, we have the EU AI Act. They all have very certain restrictions which also are to preserve our own privacy. So based on them, you can see what type of data you can include, what kind of resources you can include, and be safe to share them with other team members. So we come to a really crucial part of our speech, task definition. Task definition is super important. You really need to first be clear with yourself what you're going to produce, what you expect the LLM to produce. Make sure that all your colleagues, all your teammates are on the same page with you. And if there is any ambiguity for you, there's going to be ambiguity for the whole data set. The labels need to be defined. The structure of your output needs to be defined. You should define what are the constraints, what should be included, and what should not be included. So you also need to define your negative space. Let's go over this with an example. For example, I want to define person names within my text data. A person name, I can just say, well, LLM should be smart enough to know what a person is. But you need to define it, because at the end, you're going to annotate it. You're going to say exactly from which index to which index it's going to be this person name. going to say, for example, that my person name can also include aliases and titles. For example, if there's a doctor or a minister or a missus in front of my name, I'm going to include it in my data. Or, for example, if there is a role, if there is, like, defendant beklagte in my data, it's not a person name. It's a role, and I'm not going to include it. And as more strict as you are within your annotation guideline, the more quality you're going to have within your data set. All right. So we have two different generation strategies. You can just go ahead, put in your instructions, put in your annotation guideline, put in all of the things that you expect from your data set, put in one prompt, and expect the data set to be created. There are going to be many problems. This comes from experience. Well, back then, I think I was using GPT-4.0 because it was the latest. And I'm talking like it was 15 years ago, but just two years has passed, I think. Mostly. Even one. And, yeah. So, I started with just single prompts. I started with zero shot, then I started with one shot prompts, but they all gave me a lot of headache. What happened here? So I asked the LLM, I asked ChatGPT to produce some data for me in JSON format. And it was okay. Sometimes it would do, sometimes it would mix the language, sometimes it would go from from German to English, English to German. Sometimes I would say, hey, you know, my relation name is located at, but it would change the casing. It would go from capital L to lowercase L. It would sometimes even make it German. And sometimes the JSON form wasn't right. And the worst thing was that sometimes it would produce new labels. I didn't want them. I was like, well, you're really generous, but this is not exactly included in my dataset. Maybe next time. Yeah. So there have been many problems I had with one-shot prompts. Maybe today the current models would do better, but at least my experience with GPT-4.0 was that it was still not strong enough to produce a coherent and consistent labeling within my data. So, we drop this, and we go to template-based generation. In template-based generation, I decided let's ask LLM the least possible. I'm not asking LLM to do the whole thing at once for me. Let's just ask the LLM to create the template. So, I'm going to ask it to just come up with some sentences that could be, could have a relation in them. That could be, like, that could have the relation of located at in them. And just put the entities in them without an actual entity. For example, for location, just put LOC. For a person, just put PER. And that's all I want. This way, the amount of work that LLM needed to do, the amount of prediction and consistency that LLM needed to do was lower. So the labeling came better, the consistency of the label became better, and by doing this, my work was actually reproducible, and I could control a lot more than I could before. I'm going to go into details a little bit further. Another thing was that by doing that, I could still scale it also better. I could replace some entities within my work. And it was also easier to debug and audit. I could really see how well the templates are. I could take something out, and I could use a template more than once. So, now I go to details, how I make the pipeline. But what's more crucial first? Defining the task. My task was relation extraction. In relation extraction, I needed to classify the semantic relation between two entities, one head, one tail. The relation could be could have entities within them. These entities could be person, organization, they could be lawyers, judges, laws, monetary amount, date, city, country, anything. And the relations that I wanted were a fine to be paid, a lawsuit filed against someone, accused of, located at, and occurred on an event. For example, Frau Schneider wurde von Kanzler Meyer vertreten. This means that Mrs. Schneider was represented by Dr. Amaya. The output that I had was just OK. The purpose of this task is to find this example, to find this sentence, find what is the relation that contains is contained within the sentence and what are the entities that are connected within this location. So what are the head and tail and what is the relation here? So three different outputs are expected. So here is the pipeline architecture for this task, for example. This is from the Papel novel synthetic data set for a few shot legal relation extraction in German, which is actually the product of my work at the end. And we have two steps in the beginning. These two steps happen in parallel. First is the generation of the templates with placeholders, what I told you about. It's when we have the sentences, but instead of having real entities within them, we have just placeholder. These are the entities that I showed you before. And other than that, we also have entity lists generated for each of those entities, a fairly long one, because we are going to substitute them later here within this template. These entity lists need to have a normal distribution from different aspects that you can define within your data set. For example, if a person, you would like to have a 50-50 distribution of men and women names within your data set. If you want location, you want a wide variety of demographic locations normally distributed within your data set. If you have law, you want to have a fair distribution within legal law, within labor law, family law, traffic law. You want to include them all. The next step is that all these entities are going to be substituted randomly from our entity list. When we do this, we produce a real data set. We already had the annotations. So if you write a fairly simple Python code, you can replace them. And you can still keep all the indices within your data set. so you don't need to annotate it manually again. And you get a nice, clean data set that you can, again, like with a simple script, just turn it into any format that you want. So what we did here was that we controlled the bias within our construction. We kind of control it before even it was generated. What we did was that we created really balanced entity lists. Our entity list is super important. This is, for example, just for relation extraction task. We can also extend this to classification, to name recognition, label sequencing, and some other NLP tasks. We also randomized the substitution. By randomizing it, we ensure that all of our templates are being used, all of our entity lists are being used, and the distribution is also how we expect it to be. We are going to avoid demographic collapse by this by explicitly tracking the demographic slots and protecting all the groups and making sure that they all appear within our data set. And by doing this, we are also kind of decoupling the labeling process, it means that by decoupling the two parts of our synthetic data generation pipeline, we are gaining more control over the whole generation process and we are applying more consistency to the whole process here. So let's go over prompt design. This is actually a summarized version of my prompt because the main one was quite large. I didn't want to bore you with all the details. So for my prompt, I said that, yeah, I would like to write a formal German legal sentence using entity placeholders, like person, organization, court, city, all these things, and I would like to have a JSON output. Here I also had included a few example outputs, what I expect to get from the LLM, so that it has a few shots at least. I also explicitly set what I expect to see from each relation, what is their meaning, and what are the possible head and tails, because each relation can have, for example, four different entities as head and two different entities as tail, like we see here. For example, for a located ad, it can be an organization, company, or court, which is located at a city or a country. And when you define all of this in detail, also not maybe too detailed because it's going to also forget the first part, you can then say what kind of tone you want, what kind of style you want, how long should be the sentences, how complex you want it to be, and start prompting. You can create it as an agent, you can create it as my GPT, for example, or a skill in your cloud, whichever you are most happy with, or you can just write a script and use a smaller model, which is also really recommended, and just call some APIs or do it locally. Another important thing that was here was that in each chat, I would usually not go over creating maybe 30 or 40 examples at once. Because as longer as the the chat would go, it would kind of forget the first instructions. It would start forgetting the exact kind of JSON structure that I wanted. It would start hallucinating and not the hallucinations that we want, the hallucinations that we don't want, starting creating some labels or forgetting the right labeling there. And I also tried to create only one relation within each sentence here, which also simplified the task a lot. Another thing was that at some points I also asked to create more complex sentences to include more words or to have at least 30 tokens or 50 tokens within each sentence. Another thing was that you should also explicitly say, for example, to include more entities than you want to see in your relation. For example, to include four entities so that your model is also seeing examples that are a little bit out of the normal, like really vanilla relation in one sentence. And then you will also get like the, usually JSON outputs were the most, were easiest using the GPT at least, and they could still hold the structure, but if you don't have to, you can also totally forget about the JSON and say just line one this, line one that, and line two that. Because when the GPTs and LLMs are also focusing on generating a right JSON, they are also putting some amount of prediction of what could come next in a JSON sequence. They are not really focusing on what's the prediction on coming next in a legal text only. So this is also kind of maybe decreasing a little bit of the quality within the data generation. So here are some of the examples that I created using the prompts that I had. Of course, here it's not the JSON sample because I wanted it to be more readable. The first thing was that a person is permanently located at this city. And they haven't been successful with the registration. And you can see that the GPT could really correctly tell me all the indices from the head and tail entity here, and tell me which one is head and which one is tail. So these were also really important, because the annotation process within your data generation is very pricey and very time consuming. And people take months and years just creating a really clean data set. So if you can get your GPT, can get your LLM to create a clean annotated data, that's really a big thing. But even though we have been so careful creating our data set, it's still really important to validate what's happened within them. You need to validate the structure of the sentences that you had. You need to validate that they fit within the length. They have a minimum or maximum length that you had within your annotation guideline. You need to make sure that there are no entities or relations that are empty, that are misplaced, or they just don't exist within the data, because it also happens a lot. You also need to make sure that the labels are consistent within your data set that has been generated. You need to check with a really simple rule-based script. You can do all of this. You can also check again for the distribution sanity within your data set. It means that you can check for a class collapse. You can check for your class imbalance. And the really good thing about the pipeline here is that whatever lacks within your data set, you can just create it easily going back to your pipeline. And you can just instruct it as you want within your prompt. You don't need to change anything in your agent. You just need to write in your prompt what's lacking, and you will find it. And you can add it to your data set. Another one is the lexical heuristics. So you need to flag anything that's out of the, maybe, legal vocabulary. Maybe here, like, legal expert would be best if they could go through the whole data set. This would be a really high-quality validation then. And even though it's a little bit hard, it's really recommended to do so. Also, diversity check. We really wanted to make sure within our pipeline generation that our diversity is high enough, that the distribution that we have created is as expected in the real data. But it's still recommended to check this again, make sure that you have applied all the measures, you can have applied all the distribution that you wanted, both within the labels and within the entities. So, and again, you can go back within your pipeline and just add more so that you have a balanced data set. So another thing here is that where do we want to use this synthetic data? As much as I am a fan of using synthetic data and it has worked really well for me, I would not recommend using it everywhere. If you have an underrepresented group, if you have some edge cases, if you are really restricted by regulations, if you are restricted by privacy regulations and you cannot really access any data? Yes, synthetic data can be the answer to your problems. But if you can access real-world data, synthetic data is still not the same quality as you would see in real data. And, of course, it's also a great tool to augment what you still have. You can still, if you have some real data, you can add this as like pre-knowledge or fine-tune your small language model and start creating the data that really represents your real data and just make it more and make it more balanced. So we said where to use it, now for what NLP task to use it. If you have an NLP task that is kind of open-ended for generation, if you have kind of implicit meanings or like open-ended summaries, synthetic data is not going to be the best and easiest way to generate, at least this pipeline is not going to be the easiest way to generate this synthetic data. But for classification tasks, for sequence labeling, for named entity recognition, relation extraction, or text to SQL, or even QA pairing, you can really nicely adapt the pipeline that we defined here and have your own synthetic data generation pipeline to be in control of what you're putting in your data set to be in control of what you're going to feed to your model because the data that exists in real world is already imbalanced it's already not representing all forms of our society all forms of people that we are really seeing maybe Maybe the collector has been flawed. You can add all these things that are imbalanced and fix them using synthetic datasets. So, all I want to tell you here is that, first of all, don't take synthetic data for granted. Synthetic data is not by default safe. It's not always privacy-proof. It can include leaked labels, and you must be very careful how you generate it and how to use it because you might get fined by some laws because you are not complying with very strict German rules. And you need to define your task before you get to your first prompt. The task definition is super important, and it might take a lot of time actually coming up with your guideline, but it's totally worth it. Then we saw that template-based generation beats the free-form generation because of the many flaws that we could fix with template generation. And then we saw how pipelines can be really great tools for the synthetic data generation and how we can parallelly use lists and templates within each other. And at the end, just know that synthetic data is complement to your datasets and you have to be super careful creating it and to use it with cautious. I want to thank you all for giving me so much of your time. I hope you have taken away something good from this talk with you. And I am open to your questions.
+
+**Speaker 1** _[34:50]_
+
+Thank you so much, Shiva, for your insights, and we have a bunch of questions in the room. So I'm going to start with the first one, and that is, if you compile a list of biases you would like to correct, isn't this list biased too?
+
+**Speaker 2** _[35:05]_
+
+Well, it depends how you're looking at this. I mean, when I see a bias, when I see that there aren't many female CEO names included within a text, and I want to find these labels within my text, and my model is more likely to find a male name and label it as a CEO than it's going to find a female name as a then yes, I am correcting this bias and I'm not adding it.
+
+**Speaker 1** _[35:36]_
+
+And the next question that got a bunch of legs. How did you create thin-cellic data capturing the whole distribution using LLMs?
+
+**Speaker 2** _[35:45]_
+
+Well, I mean, this is a good question. So you need to study real data. If you have access to real data, it's really good to study it. But you might not be able to use this data for training. This is the case where you can actually see what's the distribution within this data and try to mimic this in your synthetic one.
+
+**Speaker 1** _[36:08]_
+
+All right, so the next question Why not prompt the LLM to create a Python script to generate the data instead of letting it create data directly or templates?
+
+**Speaker 2** _[36:20]_
+
+If you can, go ahead and share it with me. Why not?
+
+**Speaker 1** _[36:27]_
+
+Okay.
+
+**Speaker 2** _[36:28]_
+
+and
+
+**Speaker 1** _[36:29]_
+
+How did you create synthetic data with an LLM if the data is highly sensible or did you do that locally?
+
+**Speaker 2** _[36:39]_
+
+Well, you are, I mean, this is a good question, so how does the LLMs know what's the structure of this data? Well, they might have already been trained on some sensitive data. That's why I have been super careful not to get LLM to reveal any of the sensitive data to me. But among the first attempts that I had using LLMs, I used to give some anonymized dataset to it and ask it to capture the structure and capture what kind of forms they have and try to mimic them. But this was also not the best for me.
+
+**Speaker 1** _[37:24]_
+
+Okay, well, so our next question is, in the prompt design, you have multiple relation types in the system prompt while asking for only one specific relation in the user prompt. Could this have negative effects, for example, generating the wrong relation, or is there a special reasoning behind it?
+
+**Speaker 2** _[37:44]_
+
+Well, I mean, when you're designing an agent, you are not really restricted to only adding one specific task that it can solve there. So that's also what I did. And I mean, the instruction and the prompt, they were both, I mean, small enough to fit in the context window, and I didn't have really problems as long as I was generating maybe less than 100, 150 examples per chat. So it was consistent so far.
+
+**Speaker 1** _[38:18]_
+
+And the next one we have, you have already tried with a basic entity relation model, have you tried with an ontology template where you model n personas and scenarios and the ontology covering such context, or was the head to tail logic already satisfying and following a good normal distribution?
+
+**Speaker 2** _[38:43]_
+
+to create few shot models. So I created them for really small models, so I didn't need to create a really heavy, large data set. So the prompting that I had was sufficient for my task.
+
+**Speaker 1** _[39:04]_
+
+Every time I ask about German law, I fall into a rabbit hole. There are so many rules. With things like the GDPR, how are LLMs so good at legal explanations? Are they trained on synthetic data?
+
+**Speaker 2** _[39:21]_
+
+Well, I'm not going to answer this one. I'm not going to accuse them of having read something that they shouldn't have. So let's pass this one.
+
+**Speaker 1** _[39:33]_
+
+Okay, and then we have a, let's see, we have more. How would you exactly measure the quality of this synthetic data in a quantitative way?
+
+**Speaker 2** _[39:49]_
+
+In a quantitative way, you have the number of labels that you have included, you have the number of entities you have used, and you have the variety of entities you have used. For example, I told you about the different relations that they can contain various head and tail entities. So you need to also take into account that you are taking all combination of the entities as head and tail within every relation. And it's super important.
+
+**Speaker 1** _[40:20]_
+
+We're good on time, so we can continue. If you have a legal case that may not be expressed by the templates, will the system flag the case for human intervention? Yeah, do you have a flag system?
+
+**Speaker 2** _[40:42]_
+
+I'm not sure, it's not that smart.
+
+**Speaker 1** _[40:48]_
+
+Yeah.
+
+**Speaker 2** _[40:49]_
+
+Yeah.
+
+**Speaker 1** _[40:49]_
+
+Yeah.
+
+**Speaker 2** _[40:50]_
+
+Well, maybe, yeah.
+
+**Speaker 1** _[40:54]_
+
+We'll pose the question, we might rephrase it, clarify it then.
+
+**Speaker 2** _[40:58]_
+
+Yeah, maybe you rephrase it and I'll get back to you.
+
+**Speaker 1** _[40:58]_
+
+Yeah. And then we have, how do you check the distributional sanity check for underrepresented real data? For example, the German real data distribution is very limited in the real world. So how do you check the distribution sanity in cases like these?
+
+**Speaker 2** _[41:16]_
+
+So, I mean, when you don't have real data to study and extensively go through and see what's the real distribution there, you got to, like, make other studies and, like, read other papers and just come up with some sort of maybe rationalized expectation value that you expect to see, based on maybe population and, like, and there are some, like, there are a lot of anonymized legal cases available throughout the internet, they just don't have any sort of real entities within them, so that's mostly the problem.
+
+**Speaker 1** _[42:04]_
+
+So did you experiment with stating explicit examples in the system prompt?
+
+**Speaker 2** _[42:11]_
+
+Thank you.
+
+**Speaker 1** _[42:12]_
+
+So yeah, so did you experiment with stating explicit examples and the system prompt?
+
+**Speaker 2** _[42:19]_
+
+I'm not sure I know what they mean, like I did have some explicit examples that I would like to change just the relation name within them and just use them over and over. So if that's what you mean, then yes, and if not, then no. I'll just continue.
+
+**Speaker 1** _[42:43]_
+
+When would you choose to anonymize a data set by using NER to flag sensitive data versus generating synthetic data?
+
+**Speaker 2** _[42:55]_
+
+I mean, also anonymizing real data and replacing them by entity list was also one of the solutions that we came up with. But I didn't have the resources and time to go through all the documents and make sure that all the data is really anonymized. And if there are any identifiers, because you can anonymize a case and the event or the person there still can be identified based on other values, there and this could still put some liability on you. That's why we went with synthetic data.
+
+**Speaker 1** _[43:33]_
+
+So did you also create negative examples with missing or broken relations?
+
+**Speaker 2** _[43:43]_
+
+Well, I didn't put that in the instruction for the agent that I created, but, no, within my data, I included only proper labels and proper entities, but that's actually a valid thing to do, that you can also put some, well, mishaps, but they will come out of your data sets still before training in the pre-processing, so I'm not sure how well that is, but you can still add some noise. That's something that I didn't add in my data set.
+
+**Speaker 1** _[44:21]_
+
+Okay, so let me get one more question. So have you considered adding tab PFN to your pipeline at some point?
+
+**Speaker 2** _[44:31]_
+
+I don't know what that is.
+
+**Speaker 1** _[44:35]_
+
+So then, yeah. Whoever posed the question, I might approach you after this. Okay, great.
+
+**Speaker 2** _[44:39]_
+
+Okay, great.
+
+**Speaker 1** _[44:41]_
+
+Or then if I understood correctly, the data set is to be utilized to train a model that can run in a compliant setting, for example, locally and can be validated due to the high quality labels of synthetic data. But wouldn't the evaluation of this model be by.
+---
+transcript_status: auto
+---
+transcript_language: en

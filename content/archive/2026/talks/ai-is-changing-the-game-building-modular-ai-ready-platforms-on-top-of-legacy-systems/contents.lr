@@ -143,3 +143,577 @@ Large enterprises often struggle with expensive, tightly coupled legacy systems 
 The proposed solution is the implementation of a modular control layer that decouples business logic from the underlying infrastructure. This architecture utilizes stateless agents—which can be either AI-driven or traditionally programmed—that communicate via a standardized REST contract. These agents remain agnostic of the environment, while the control layer manages orchestration, security, and governance without needing to understand the specific business logic within each agent. To handle large-scale data flows without the bottlenecks of a centralized data warehouse or the slowness of JSON, the approach employs Parquet files as a common data exchange format.
 
 Key technical takeaways include the use of a control plane, such as one built with Django, to manage the registration and execution of independent jobs. By replacing monolithic orchestration with these modular workflows, organizations can swap AI models or update business logic locally rather than systemically. This separation of concerns allows for rapid deployment and continuous iteration of AI features while maintaining the auditability and stability required by regulatory standards.
+---
+transcript:
+
+**Speaker 1** _[00:06]_
+
+Hello everyone, welcome to the final talk of the evening session before the lightning talks. Before I introduce you to the topic and the speaker, a quick reminder that please post your questions on talks.pycon.de and don't ask your questions during the talk because we have online users as well. So moving on, the topic for today's session is AI is changing the game, building modular AI-ready platforms on top of legacy systems. And this talk will be given by our speaker, Werner Gothain. A quick intro about our speaker. He's an experienced software architect and risk management expert. He has 25 years of experience in developing and integrating financial systems, orchestrating complex workflows, and enabling rapid AI deployment. So without any further ado, let's get started. And please give a bigger round of applause for our speaker.
+
+**Speaker 2** _[01:23]_
+
+Thank you very much for the introduction. So, most of me is already told, but perhaps some information about me, opposite to most of you, I'm, let's say, more or less at the end of a long career, starting, as you see, with a Commodore C64 and did economics, made my PhD in applied computer science and worked in different companies in management positions. So instead of retiring, I decided to turn back to the roots and become self-employed as an enterprise architect, software developer and a consultant. and so far happy to share my experience and what I've learned.
+
+**Speaker 3** _[02:19]_
+
+And
+
+**Speaker 2** _[02:21]_
+
+What I've learned in the different types of consultancy projects I had in the past,
+
+**Speaker 3** _[02:28]_
+
+Um,
+
+**Speaker 2** _[02:29]_
+
+I came over one of the major problems in all these big enterprises. They have tons of very expensive, big, big legacy systems which are interconnected with expensive interfaces and each of these systems costs you, costs the enterprise several millions and changing something as well and building a new interface so introducing a new system is extremely expensive.
+
+**Speaker 3** _[03:00]_
+
+these
+
+**Speaker 2** _[03:01]_
+
+The structure leads actually to the situation that you have leases systems which are very slowly in change, so quarterly leases is more or less optimistic. Most of them try to prevent, to do any type of release changes because it's so expensive and so difficult.
+
+**Speaker 3** _[03:22]_
+
+And so...
+
+**Speaker 2** _[03:26]_
+
+you have only a very little amount of variance, and therefore stability is one of the most important aspects in this type of system and system architecture. They are highly regulated, they are highly audited, there are so many things you have to look at, so BCP S239 in the financial industry, DORA and more of regulations which are simply IT based
+
+**Speaker 3** _[03:57]_
+
+and
+
+**Speaker 2** _[03:59]_
+
+Everybody is thinking about AI and everybody thinks about how you can pimp up all their systems by making something with AI and actually starting with SAP to think about it and all the other companies as well.
+
+**Speaker 3** _[04:19]_
+
+but
+
+**Speaker 2** _[04:22]_
+
+enterprises like these are not made for actually doing such small experiments and AI more or less is the opposite it constantly changes you have many many variants and failure is is normal you have to iterate continuously to improve But one problem is not on this slide. The relationship between the business department and the relationship between the IT department is changing completely because on your fingertips as part of the business department, it's very, very easy to design a solution for your problem. So in the past, they have Excel and Access and all this stuff and tons of software are the sort of shadow software in each enterprise. But this becomes much, much easier and much easier for people who don't have any IT experience.
+
+**Speaker 3** _[05:27]_
+
+and therefore
+
+**Speaker 2** _[05:30]_
+
+in this context
+
+**Speaker 3** _[05:31]_
+
+um and
+
+**Speaker 2** _[05:33]_
+
+generates a big, big pressure on the IT departments because you have these big legacy systems and it's extremely difficult actually to get these type of business department problem solutions inside your existing architecture. And that's more or less the beginning of the idea what can you change actually to solve these type of problems.
+
+**Speaker 3** _[05:57]_
+
+and
+
+**Speaker 2** _[06:01]_
+
+So you just integrate one more service, you're hardwired into something, so in the end you get tight coupling.
+
+**Speaker 3** _[06:12]_
+
+tight coupling
+
+**Speaker 2** _[06:13]_
+
+coupling you have fear of change so change everything in around the system is dangerous therefore slow innovations and if you change something in some system you always have the risks that the whole environment can break down so i have been working software companies where
+
+**Speaker 3** _[06:33]_
+
+Um...
+
+**Speaker 2** _[06:34]_
+
+All these 150 developers just were waiting until the bug, somebody left, was found. And you will say, can never happen if you test properly, but all these things happen all the time, unfortunately.
+
+**Speaker 3** _[06:51]_
+
+and
+
+**Speaker 2** _[06:54]_
+
+Therefore, AI features is not good for the enterprise. It becomes more and more a structural risk.
+
+**Speaker 3** _[07:02]_
+
+Therefore,
+
+**Speaker 2** _[07:04]_
+
+the productivity of the enterprise is continuously declining because many people are thinking about how you can integrate it, but actually it's extremely difficult to make use of it. So what is my idea in this? I mean, it's a very, very simple thing. So
+
+**Speaker 3** _[07:31]_
+
+So, um...
+
+**Speaker 2** _[07:32]_
+
+If you have...
+
+**Speaker 3** _[07:33]_
+
+some
+
+**Speaker 2** _[07:36]_
+
+something like in the middle a sort of layer which controls actually the architecture you are working on.
+
+**Speaker 3** _[07:52]_
+
+so
+
+**Speaker 2** _[07:53]_
+
+The layer is responsible for orchestrating, who runs, secures, and governs and isolates. And if you want to do something new, if you have a new, let's say,
+
+**Speaker 3** _[08:06]_
+
+and
+
+**Speaker 2** _[08:07]_
+
+agent, and if you have an agent, it's not important where this agent comes from. So is it really an agent who does something like, has a fancy idea of doing something which AI enables, or is it simply an agent which was built by the help of AI, simply faster if you have regulated infrastructure it's much easier actually to do these type of regulations give them in the future something like cloud code and it will produce this type of algorithm very soon and very fast. And therefore, it's not important if these type of agents are using AI or if they are actually produced by AI. Therefore, the idea is having a control layer that controls everything, what is doing something in terms of business is, let's call it an app. Whether it's classical business logic, it's a reporting pipeline, it's an AI agent risk model.
+
+**Speaker 3** _[09:32]_
+
+It's
+
+**Speaker 2** _[09:33]_
+
+It's just an app which can be stateless, disclares inputs, outputs, no knowledge about the infrastructure and communicates via, for example, REST. So I did a MVP for this type of infrastructure. I did it with REST.
+
+**Speaker 3** _[09:51]_
+
+but
+
+**Speaker 2** _[09:52]_
+
+If you look at REST, you have the contract where you just control the agent. So the agent is controlled by some simple endpoints like starting its status, ask for the status, stop it and ask for the health or so.
+
+**Speaker 3** _[10:12]_
+
+And, but
+
+**Speaker 2** _[10:13]_
+
+But these type of agents, if you look at dispositive systems in banks, financial industries, and so on, they are typically working on more or less big data flows or pipelines. It's not that they have just a REST API where you can put the data into it. into it. Therefore, you only need the REST interface to integrate it into an orchestration layer, but to have
+
+**Speaker 3** _[10:50]_
+
+the
+
+**Speaker 2** _[10:52]_
+
+data you will need a sort of layer where you can put the data in and put the data out
+
+**Speaker 3** _[10:59]_
+
+and
+
+**Speaker 2** _[11:02]_
+
+I have some code here, but I have some pictures as well.
+
+**Speaker 3** _[11:06]_
+
+So, um...
+
+**Speaker 2** _[11:07]_
+
+If you look at an agent, the agent has some simple...
+
+**Speaker 3** _[11:13]_
+
+We'll see.
+
+**Speaker 2** _[11:15]_
+
+starting points and you have the orchid control layer which simplifies and forgets orchid ports from outside and the agent is running through the different status like pending running and completing and what is important about it is that you don't have any knowledge inside the agent about the environment which is around it. And on the other hand, ORCID, this is how I call it actually, the control layer, is not knowing anything about the business logic which happens completely inside the agent. And therefore, it's very much a matter of concern that you don't mix these type of responsibilities.
+
+**Speaker 3** _[12:11]_
+
+And
+
+**Speaker 2** _[12:19]_
+
+In the end, it's a matter of registration, so you have simply one call to do the registration.
+
+**Speaker 3** _[12:29]_
+
+And, um...
+
+**Speaker 2** _[12:31]_
+
+it's important that legacy systems which are around are not touched at all. So the difficulty which arises actually to build this type of architecture is you need a sort of data system where you can just share the data. I decided to do it was with using Parquet files, which is simply
+
+**Speaker 3** _[13:00]_
+
+a
+
+**Speaker 2** _[13:01]_
+
+sort of lingua franca actually for interacting with data.
+
+**Speaker 3** _[13:09]_
+
+but
+
+**Speaker 2** _[13:11]_
+
+This is...
+
+**Speaker 3** _[13:12]_
+
+um
+
+**Speaker 2** _[13:13]_
+
+make sense on dispositive systems but it does not make sense if you are inside let's say a classical input system so if you look at SAP systems which are usually in the area of typing in the data contracts and so on and on the other hand you have systems like risk systems, regulatory reporting system, business warehouses and so on which are more on the dispositive side where do the reports out of this data and as soon as you are in the area of reporting the data it's much easier actually to just make these type of action to be completely independent from these systems and therefore it's important to make these separation and this decoupling of systems as early as possible as soon as business logic is inside the primary systems it's becoming difficult and it becomes more and more difficult actually to do this type of separation. So the idea here is probably for most of you not completely new because it's nothing else than let's say a classical stateless rest architecture but it's important to understand that
+
+**Speaker 3** _[14:36]_
+
+that some
+
+**Speaker 2** _[14:38]_
+
+Something has been done in enterprises to change the way enterprise architectures are organized.
+
+**Speaker 3** _[14:45]_
+
+And the problem is,
+
+**Speaker 2** _[14:46]_
+
+The problem here is that classical software developers or classical software development firms are in this type of vicious circle where they have the situation that they just know that they have to change, but they cannot change their complete business model, actually, and the complete structure of the software, and therefore there is actually place for
+
+**Speaker 3** _[15:15]_
+
+So...
+
+**Speaker 2** _[15:16]_
+
+new ideas, how this type of architecture can come into companies. So, running a workflow is here, just illustrated by Daniel Koehl.
+
+**Speaker 3** _[15:32]_
+
+Um...
+
+**Speaker 2** _[15:33]_
+
+call to the running service.
+
+**Speaker 3** _[15:37]_
+
+and
+
+**Speaker 2** _[15:39]_
+
+the most important thing about the
+
+**Speaker 3** _[15:43]_
+
+the
+
+**Speaker 2** _[15:46]_
+
+The architecture here is that you can interconnect legacy systems with software which comes from other sources than the original software providers. You can integrate them in a system where all these requirements for quality, for testing, for auditability, can be handled actually with the help of a control system. You need a sort of small data management system to interact for bigger data, which is shared between different legacy systems or parts of the legacy system. And in the end,
+
+**Speaker 3** _[16:33]_
+
+And you can...
+
+**Speaker 2** _[16:38]_
+
+come to a situation where changes become local and not systemic.
+
+**Speaker 3** _[16:44]_
+
+and
+
+**Speaker 2** _[16:46]_
+
+This is let's say
+
+**Speaker 3** _[16:48]_
+
+Um...
+
+**Speaker 2** _[16:50]_
+
+easy implementable idea. I did it so here I did it with Django as a control plane.
+
+**Speaker 3** _[17:00]_
+
+I mean...
+
+**Speaker 2** _[17:01]_
+
+This is another matter of...
+
+**Speaker 3** _[17:03]_
+
+of
+
+**Speaker 2** _[17:06]_
+
+how AI influences the world of software development. Before Christmas, I thought about talking here, not really knowing what happens actually, because probably mostly young people, mostly very experienced in the Python area, and having suddenly a topic which is more, let's say, high level. so I tried to make an M4P actually to make sure that I know what I'm talking about. So as being very happy with Django as a web framework, I told Claude, which I used the first time actually, Claude Code, to do it with Django. But in the meantime, probably many people would say, why do you use Django for this, especially if you have developed it with the help of agents like Cloud Code. But on the other hand, this type of control plane must be, in some respect, controllable and usable by people who are not only people or artificial agents, must be real people to be sure that auditability and all these requirements and what happens inside an enterprise architecture are fulfilled. So therefore, it's for me, it's a difficult question if you can solve this simply by AI engines and prompt it or if you have some sort of controllable interface. Other people are saying Django is too big actually, too much code for, let's say, a small layer of software which you're needing here. And probably this is a matter of...
+
+**Speaker 3** _[19:19]_
+
+um
+
+**Speaker 2** _[19:21]_
+
+of different perspectives there are people who like it and there are people who don't like it and would they make a difference so I don't see that there is a real strong argument for or against Django actually to use this type of thing but at the end of the day Django is not the major reason how it works or not so the major thing about it is to have this type of
+
+**Speaker 3** _[19:54]_
+
+of
+
+**Speaker 2** _[19:55]_
+
+separation of concern, of decoupling, and the possibility to deploy new engines completely independent.
+
+**Speaker 3** _[20:06]_
+
+and
+
+**Speaker 2** _[20:07]_
+
+and to swap models without touching, actually, existing workflows.
+
+**Speaker 3** _[20:14]_
+
+Um, the, um...
+
+**Speaker 2** _[20:18]_
+
+A control layer between legacy and AI gives you the possibility not to hardwire AI into pipelines. You have the stateless apps with a simple REST contract instead of deep framework integrations. You have workflows.
+
+**Speaker 3** _[20:40]_
+
+Um,
+
+**Speaker 2** _[20:41]_
+
+where you can just integrate in terms of directly access graphics.
+
+**Speaker 3** _[20:41]_
+
+but,
+
+**Speaker 2** _[20:50]_
+
+You have independent jobs, so a workflow is nothing else than in the end a combination of different types of agents.
+
+**Speaker 3** _[20:59]_
+
+um,
+
+**Speaker 2** _[20:59]_
+
+monolithic orchestration replaced by these type of workflows. I mean there's many many things around starting with Airflow and Duda and what they're called. There are many possibilities actually to do these type of things and it depends probably on the size of the enterprise. So I've seen situations where Airflow projects becoming bigger and bigger.
+
+**Speaker 3** _[21:26]_
+
+But,
+
+**Speaker 2** _[21:29]_
+
+I don't know, as there are so many different approaches, there are advantages and disadvantages actually for each of these possibilities. In this case, I've done it with Django or Django 6, but in the end, it doesn't matter. You have always different infrastructures for that.
+
+**Speaker 3** _[21:55]_
+
+and
+
+**Speaker 2** _[21:57]_
+
+I took Parquet to exchange the data between different systems or inside the control layer. There are different possibilities actually as well to do this. You can start with DuckDB or simply JSON. So in my last company, we started with JSON.
+
+**Speaker 3** _[22:18]_
+
+Uh...
+
+**Speaker 2** _[22:20]_
+
+a lot of advantages actually but in the end Jason is
+
+**Speaker 3** _[22:24]_
+
+Um,
+
+**Speaker 2** _[22:25]_
+
+To use it for batch processing, it's too much text, too slow, too big, and the same purpose actually can be fulfilled with something like Parquet as well. So the intimacy of Schemata, which you have in JSON, can be built in Parquet as well.
+
+**Speaker 3** _[22:50]_
+
+and
+
+**Speaker 2** _[22:52]_
+
+In the end, it's important to have something which enables you to have not-so-strict schemata, so classical data warehouse infrastructures, which are in the middle of all this, usually fail because they try to have a common data model for everything. And so, in the end, the data warehouse is in the middle of the monolithics, and every change in the data warehouse is extremely expensive, And therefore, if you have a more distributed architecture to integrate these type of things, you need to separate it.
+
+**Speaker 3** _[23:32]_
+
+And...
+
+**Speaker 2** _[23:33]_
+
+distributed type of data modeling as well and you have always a situation where if you look at the agents they have specific needs for for the data they are working on but in the end
+
+**Speaker 3** _[23:46]_
+
+And you...
+
+**Speaker 2** _[23:47]_
+
+You don't have completely different data models for each type of agent, which are using more or less the same infrastructure. So, for example, if you're in the financial area industry, you have cash flows, you have credits, loans and things like that.
+
+**Speaker 3** _[24:05]_
+
+um
+
+**Speaker 2** _[24:08]_
+
+five agents which are working with cash flows, you can argue so each has its own requirements, so perhaps one agent has the view on cash flow this way and the other one the other way around, but in the end you're not happy about it if you have completely different models how you model cash flow in your infrastructure. So this type of compromise is necessary somewhere to keep flexibility on the one hand and to handle the chaos on the other hand in some respect. So it's not a solution for everything, but the idea in the end is keeping this independency.
+
+**Speaker 3** _[24:58]_
+
+and
+
+**Speaker 2** _[24:59]_
+
+So this is more or less what I've done, so I have a little bit of
+
+**Speaker 3** _[25:07]_
+
+of
+
+**Speaker 2** _[25:08]_
+
+code, which is actually, unfortunately, I saw still private, so I will make it public if somebody is interested how it looks like.
+
+**Speaker 3** _[25:19]_
+
+and
+
+**Speaker 2** _[25:26]_
+
+Each of you have already built such type of systems, so I assume
+
+**Speaker 3** _[25:31]_
+
+Um...
+
+**Speaker 2** _[25:32]_
+
+This is built with Django and you see here some agents which are just working inside the systems and you have um,
+
+**Speaker 3** _[25:53]_
+
+have
+
+**Speaker 2** _[25:53]_
+
+I built a credit generator, cash flow generator, liquidity.
+
+**Speaker 3** _[26:00]_
+
+um
+
+**Speaker 2** _[26:01]_
+
+liquidity aggregator report.
+
+**Speaker 3** _[26:01]_
+
+uh And so.
+
+**Speaker 2** _[26:05]_
+
+So these are building a workflow actually together, but it's not important actually to see this run Press on the button run the workflow
+
+**Speaker 3** _[26:15]_
+
+And, um...
+
+**Speaker 2** _[26:16]_
+
+see how it works. In the end, it is software which is not so difficult to implement.
+
+**Speaker 3** _[26:25]_
+
+And I think
+
+**Speaker 2** _[26:27]_
+
+I think it's worse, actually, the effort to experiment with these type of architectures because it's really an alternative for companies which are in a situation I mentioned in the beginning to change the game. And this pressure coming by AI is pressing, actually, the situation between business departments and I think departments, and therefore there must be solutions perhaps like this actually to these type of problems. So you are showing me already that I'm more or less ready, so I'm happy for some questions. Sorry, in the middle I was a little bit...
+
+**Speaker 1** _[27:23]_
+
+Thank you for the talk. Yeah, I didn't mean to pressure you, by the way. So, yeah. All right. Q&A time. First question. It seems a very long question. Seems like an abstract. Okay, I'll read it. If you decouple legacy systems in a financial institution from modern, maybe AI-driven systems and building business logic into the modern systems, then the modern systems have to fulfill all regulatory requirements as well have you experienced that release cycles become very long like four times a year even with state-of-the-art CICD approaches or do you have a good idea on how to keep the speed of change and adoption high in a financial institution Thank you.
+
+**Speaker 2** _[28:16]_
+
+So if I understand the question right, it's a matter of...
+
+**Speaker 3** _[28:21]_
+
+being
+
+**Speaker 2** _[28:23]_
+
+being confirmed to any types of regulation which are which are existing inside an organization like this and I mean this is the major advantage in the major charm but because I'm thinking about these type of things if you have an infrastructure where you fulfill all the things but
+
+**Speaker 3** _[28:44]_
+
+but
+
+**Speaker 2** _[28:45]_
+
+testability, documentation, auditability, so you have a sort of rule for your apps how they must be built.
+
+**Speaker 3** _[28:52]_
+
+built then
+
+**Speaker 2** _[28:54]_
+
+You can
+
+**Speaker 3** _[28:55]_
+
+uh, uh,
+
+**Speaker 2** _[28:57]_
+
+you can solve actually the problem of big release changes. Because if you have simple and small apps which fulfill all the requirements in this direction, you can change them without changing the rest of the system. And this is one of the major goods which gives you such a type of architecture.
+
+**Speaker 3** _[29:20]_
+
+you
+
+**Speaker 2** _[29:21]_
+
+You don't have to change the whole system to keep it alive. You can do small changes. So people who were starting with, let's say, SOAR projects, which were before West comes around, and so you had the situation that they, in the end, have one big system, which is communicated between microservices and so on as well. And you don't have any advantages in the end. If you change a big system, which is consisting of many small systems, if you cover it as, if you treat it as...
+---
+transcript_status: auto
+---
+transcript_language: en

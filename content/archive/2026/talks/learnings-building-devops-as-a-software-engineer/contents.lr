@@ -88,3 +88,113 @@ Establishing a DevOps culture in a non-software manufacturing environment requir
 The second phase introduces automation to ensure code quality and reliability as the engineering team grows. This includes implementing pre-commit hooks for linting and formatting with Ruff, and evolving Dockerfiles into production-grade, smaller images to reduce attack surfaces. To eliminate code duplication in CI/CD pipelines, raw Kubernetes YAML is replaced with Helm charts. Testing is integrated into the pipeline to ensure that automated tests provide more value than manual checks.
 
 The final phase focuses on hardening the infrastructure. Liveness and readiness probes are implemented in Kubernetes to reduce downtime and enable self-healing. Network policies are applied to enforce segmentation, preventing unauthorized communication between services, such as blocking direct frontend access to databases. Observability is achieved through a stack consisting of Prometheus for metrics, Grafana for visualization, and Glitchtip for error tracking. To maintain security and efficiency, the environment utilizes distroless containers and the UV package manager.
+---
+transcript:
+
+**Speaker 1** _[00:56]_
+
+Hello and welcome to the room titanium with the upcoming talk learnings building DevOps as a software engineer. I need you to have a warm and welcoming applause for a very nervous and very first time speaker carving.
+
+**Speaker 2** _[01:21]_
+
+Thank you. Thank you, Johannes. Yeah, I didn't expect that many people attending this talk, but never mind. It's still a pleasure to have this talk about my learnings in the last years building DevOps as a software engineer. So, yeah, first of all, who am I? I'm a traveler, a handball referee, a board game geek, and as well a Pythonista. So for understanding what the talk is about, I have to introduce one minute about what we do in our company. Our company is a small manufacturing company, so it's not a software company. that matters for the latest topics so we're building grinding machines and electrofinishing machines kind of this stuff yeah my origin story is I was hired there as a software engineer but my expectation was building cool apps, building Python ship features, whatever and what I actually found is there was no version control at all There was no deployment tools, there was no container on time, no monitoring, so no infrastructure at all. So that's me after I joined the company. So what's next? What's the company actually needed? The company actually needed several internal tools, customer-facing apps, and they needed them delivered fast because before they only had software from an external provider and they want to move faster, getting more specific things which you can interact with the machines and something like that. And they already announced some kind of features, so we need things fast. Yeah, so what I needed is infrastructure as fast as possible to ship these features. So yeah, I split my talk in three steps. Step one is survive, which means as a software developer without any version control may be kind of hard, so we need something like it. We need something like hosting things like Docker or Kubernetes. And the second stage was automating these things using CICD, using pre-commit talks. Anyways, we will get on them later on. And the third phase was we also need to harden them. And, yeah, so let's begin with phase one, survive, laying the foundation. First task, as I mentioned before, start with version control. Yeah, it sounds obvious, but it wasn't yet there. There was a lot of software before, but there was just in different versions on different machines. So, yeah, I followed this instruction. If your code isn't in Git, it doesn't exist. Because you can't manage a thing which is not in one way. So my first learning was we used a self-hosted GitLab because I have just experience with that. And that was the easiest way instead of deploying other toolings. it was needed to be self-hosted that has several other restrictions so that was the solution why we did that just put it in a docker because it doesn't need uptime 100% on day one directly so it was just me, one software, double up a day so learning number two choose wisely if you have to decide about infrastructure you have plenty of choices So only if we choose here from run time environments, we had a lot where we can host these things, Docker, Podman, Kubernetes, whatever. And why we chose what is also easy. We chose to manage Kubernetes because I'm a one-man team, so it's easier to find someone who is helping you by the hosting stuff, and you just get an easy way to deploy your things. So at the end, why we choose manage, you don't have to babysitting your application, you don't have to, yeah, you are not responsible for the infrastructure at all. So yeah, the conclusion is pick tools for what you'll need in six months, because we also needed scalability, we are an export-focused company, so yeah, we also need the GIL locations from other where because we have a lot of our customers in Asia or over overseas. You also have to pick tools which you can still use in six months and not only for now. Your competitive advantage is your product and not your cluster management skills or something like that. That's the reason why I choose to manage Kubernetes. The next learning is don't overthink it. That was my very, very first Docker file I've written. But that's not production-grade, of course. But must it be perfect at the beginning? I don't think so. The first thing is getting a prototype first, getting something to show first. It must not be released for the customers. So the first thing that came to mind is the right thing to do. That's what I've written here in the conclusion. A bad deployment pipeline that beats a perfect one that doesn't exist yet. Learning number four is the good enough deployment. That was my first Kubernetes deployment of one of our apps. And yeah, definitely it wasn't perfect. yet at all, but it was good enough to run them in the beginning. So yeah, we can improve them and we have improved them later on. So here at the beginning we don't have any health checks, we don't have any resource limits from the beginning, but it still worked. And also a thing I mentioned before is the struggling with different tooling choices. So you have the paradox of choice in DevOps. I have just mentioned some of them. There are several more, like package managers from PIP, Poetry, UV, maybe Pixie, or that kind of stuff. And yeah, my easy way was just default to what integrates in your existing stacks or experience in. So the reason why we chose GitLab CI or GitLab registry was that easy because we already used GitLab as our version controlling system. So why don't just still in that landscape and choose these things? Same for Kubernetes secrets. And the other things is mostly from your experience level. I had experience in Prometheus and Grafana, but don't in Elasticsearch or Datadog. So that's the way why I choose them. So phase two, automate, making DevOps a daily habit. Afterwards, we do things more reliable. So the first thing was pre-commit hooks. Our team is getting bigger now, so we need something to ensure the code quality overall. So what we do is using pre-commit hooks like these for linting and formatting in rough. And why this matters is we don't have any formatting discussions afterwards. And every commit has a clean status automatically. You don't have to enforce them at all. And new team members write consistent code from day one. Yeah. Right. Learning number six, evolve your Docker files. Yeah, I already mentioned that was my first Docker file at the beginning. And yeah, it's still a lot of things to do. It was big and there was CVEs everywhere and you can't host that publicly. So, yeah, until kind of production grade thing later on, I've just compromised it that we can look at here. It was much smaller and the attack surfaces have been getting less. Learning number seven, expect to iterate. As a software engineer, you're normally not the expert in DevOps from beginning on. So you have to iterate. So you also have to handle your DevOps code as code. You will iterate over a lot of times. So also handle it like code. Test it in your own branch first. Go in that pipeline and start simple in the deployment process of the deployment as well as in your code. Learning number eight. Add tests, then automate. Yeah, we just added very simple tests in the beginning and the most important part is automate them. Then a test that runs automatically is worth much more than 100 tests that someone forgets to run. So, learning number nine, also devolving in automation or kind of improve our time, which is needed to deploy application was changing from raw YAML and Kubernetes deployments to Helm charts because we have a lot easier things like variable handling and you have less code duplication. That's also the thing why we were refactoring normal code. We don't like to have code duplication, so why should we have that in our CI-CD pipelines? That's the reason why we changed from YAML to Helm charts. So phase three, Harden, growing the team, raising the bar. Learning number 10, health probes save lives. Your app must tell, yeah, what we see here is an easy liveness probe, just checking your health endpoint of your application, and a readiness probe, which checks if the database is ready or not. That helps to just roll out your software, because if your application is not ready, the Kubernetes doesn't flow your traffic into that port. And if the health endpoint is not healthy, then Kubernetes is also stopping the flow to these ports. So yeah, that's a game changer because your downtime is getting less and less. I think the most of them I already told before, sorry health probes are 10 lines of YAML that saves you countless hours of debugging and firefighting, that's not only these things because a lot of problems just kind of self-healed because the container are just restarting if the health probe is not healthy anymore So, next part is network segmentation. Also in Kubernetes, you have to think about how you handle network segmentation because in standard Kubernetes, if you don't do anything, everything can talk with everything. And this shouldn't be the behavior in Kubernetes as well if you host multiple applications in one cluster as well. So, yeah, you can just do like normal firewall rules like here that the front end, as an example, can't talk to the database. But you have to do that by yourself because it's not automatically in Kubernetes. Okay. Yeah. So network policies, the firewall rules of Kubernetes, default deny, explicitly allow for these traffic. Learning number 12, monitoring. There's three pillars of observability. One is metrics, the second one is logs, and the third one is alerts. So we just build our endpoints in our applications, and then we can grab all these files with our Prometheus and Grafana and we also do for just for troubleshooting some errors we had also Glitchtip which is just an open source fork from Sentry. You probably know. Growing the team from Zulu to Squad. so there's some pains you get if your team is growing because in the beginning I was the solo developer so yeah it's as a solo developer you can say easy things like I know what I changed but it's not that easy if you're in the team now then you can know what you changed but your colleague maybe not. So yeah, what's the reasons? What are the things we've done now is protected branches using merge requests and have these explicit branch pipeline. Also for the other things like works on my machine is always a thing you can mention but nowadays we have like CICD pipelines which validates that everything works before it's getting merged in our main branch system. Yeah, that's, I think, what I already told. Yeah, there was simple. What worked was just starting simple and iterate often. I always had the problem seeing problems, do things too complex and then redo it from the beginning. So the easiest tip I can give you is just start simple. Use the basics of all of that. Ignore all of these issues first. Just get them to work and then iterate until you solve every problem afterwards. Automate all this boring stuff because if you don't do that, you will definitely forget anything later on. So, yeah. We also used pre-commit hooks team-wide because, yeah, it makes a lot of things easier. We used Helm charts, as I mentioned before, and distroless containers, which is just a way to save space and also getting less vulnerabilities in your containers because you have less applications there. health probes and monitoring, and in our case we use UV as a path in packaging. And what didn't work? As I mentioned before, trying to build the perfect CI-CD pipeline on day one. You shouldn't start with the big bang, you should start one by one. It's just easier. Over-engineering early deployments is the same, nearly. That was the journey over our last three years, but the journey is not over, so what's next? There are several things we consider to do in the future. It's like one of these is using these renovatebots or dependabots or kind of these things, automatic checking your versions of your dependencies and duplications, which is creating automated pull requests for your dependencies. Also, yeah, do security patches for that because of these. and minor updates you can always just auto-pass them if they pass your tests so you have less pain to update your software and we have a lot of potential things in the future which we can add later on like GitOps, like Argo CD or kind of integration testing in our CI-CD or secret management in another way. So the journey never ends. The beautiful thing about building from zero is you get to choose your own adventure and that was the point of this talk. So I just do a summary at the end with the key takeaways. First is ship first, perfect later. yeah because a running bad pipeline beats a perfect planned one the second one is automate the boring stuff using things like pre-commit talks using CICD use auto-formatters and this stuff and the third point is iterate, iterate, iterate that's the thing what I also mentioned before not doing everything in a big bang just iterate over time. The fourth one is tools for tomorrow, not just for today because you have to look in the future what could be the possible traffic in the next several months. The fifth point is security is not optional. I've mentioned that very specifically because I still think a lot of companies underrating this part of issue. Lots of companies following the procedure security is important after something happens but not before so we should also get more reliable or getting more awareness in our companies as well because security is a very important thing. The sixth one is document everything. And yeah, I just added you will thank yourself later because if you're doing a lot of projects and years over years is going by, you will forget something. So you will thank you later that you have documented everything. So the last point, the seventh point, is know when to let go so you don't have to do everything by yourself. It's nice to do things by yourself. I'm just loving also all this do-it-yourself stuff, but sometimes it's just easier and faster using managed services for existing problems and reasons. Then we have some parts of our DevOps evolution over time. It took us three years from the beginning through now, so and we're going one step at a time so thank you for listening to my talk here's some links do you have any questions
+
+**Speaker 1** _[22:36]_
+
+Thank you for your talk. We already have some questions. If you want to submit your question, you can do it through the talks app at talks.pycon.de. So the first question is, when you started your job, you were surprised by the lack of infrastructure. What question should one ask in a future job interview to avoid the surprise?
+
+**Speaker 2** _[23:02]_
+
+This is a good question. I don't have an answer yet, because I'm not planning on changing my job in the next time, so I have to think about it.
+
+**Speaker 1** _[23:19]_
+
+How did you convince the management it's all necessary because it worked all the time without the new fancy stuff?
+
+**Speaker 2** _[23:27]_
+
+That's definitely a hard one because a company always looks on the budgets and on the money things. So you have to, yeah, it depends. In security things you have to make the awareness to get the budgets for these things. And in other things like automation, that's much more easier because normally the financial department only needs numbers, why it's more efficient to do this. And after how long you will get the money back. So if you just do this stuff, And yes, you can do that a lot easier in times like AI because they can just summarize you these for these financial departments. Then it's getting easier to get these done. But security is much harder because no one likes to spend money for kind of nothing. Yeah.
+
+**Speaker 1** _[24:41]_
+
+A question that puts also on this, how were you able to get the political currency to push for paid solutions like managed Kubernetes when nothing existed previously?
+
+**Speaker 2** _[24:53]_
+
+In my case, it was very easy because the deadline was we need something in, I think, two months after my first day there. So I said, we can't build something from scratch in that time. So if you really need something, we need infrastructure. And it doesn't matter that much. So that was my weapon to use.
+
+**Speaker 1** _[25:26]_
+
+So are you head of the dev team now?
+
+**Speaker 2** _[25:29]_
+
+No, I'm just an architect and a software engineer still on. I have a boss over me, but he's not a software engineer as well, so you have to explain these things fully.
+
+**Speaker 1** _[25:55]_
+
+How did you solve geolocated deployment?
+
+**Speaker 2** _[25:59]_
+
+Yeah, that's a good question, but we don't need that complicated thing. We just use CDNs for caching things, so it's faster to load pages from India or somewhere.
+
+**Speaker 1** _[26:19]_
+
+If logs aren't stored, how do you troubleshoot during production?
+
+**Speaker 2** _[26:27]_
+
+Can you repeat the question once again?
+
+**Speaker 1** _[26:28]_
+
+If locks aren't stored, how do you troubleshoot during production?
+
+**Speaker 2** _[26:29]_
+
+Yes. It's very hard if you don't have logs, you just can, if you're alive, but we had in the very beginning you have these standard logs from Docker or kind of this stuff. That's still hard because you don't see the full log trace or something like that. So later on we started with Glitchtip, which is like a sentry equivalent where you can get the full log trace and that makes it so much easier and so much less time for troubleshooting because you're just searching for a needle in a haystack.
+
+**Speaker 1** _[27:18]_
+
+Do you use LLMs to build your infrastructure? If yes, how do you review the code given that you have no DevOps?
+
+**Speaker 2** _[27:27]_
+
+Interesting question. In the beginning not, because I think there was LLMs not that present and now. But nowadays we also use LLMs to help ourselves. I already mentioned that on the Sprints day how we use LLMs. Mostly I let generate comets in separate branches, but with every commit with all changes and review all commits one by one because it's very hard to review a mess of commits at once and you can't understand what the AI has done there. So we have to review every commit in that branch and then do the pull request for the whole thing.
+
+**Speaker 1** _[28:21]_
+
+Why did you pick Kubernetes instead of VPS with a Coolify or Doc Ploy?
+
+**Speaker 2** _[28:27]_
+
+The reason is we needed a lot of applications, and some of them also needed to be high available, so that's the reason why we chose them, and that was the easiest way, because our Dean's last I'm not sure what's the English word, now just had a managed Kubernetes so that was an easy decision in this case.
+
+**Speaker 1** _[29:00]_
+
+I saw that you used self-hosted GitLab. Why did you decide against a GitHub private repo? As I think you get some more things out of the box.
+
+**Speaker 2** _[29:10]_
+
+Good question, and I don't have a good answer, because my answer is, in the beginning, it was very unlike that our stuff is published anywhere where other people can just get them. And they wanted everything in-house, that's from the management. But afterwards we get managed Kubernetes, so it's kind of not 100% explainable for me.
+
+**Speaker 1** _[29:44]_
+
+We have so much more questions, but unfortunately, we have time for only one more. If you are a one-person engineering team, given your hindsight, would you recommend using something like ECS over Kubernetes at first, or would you limit it to you in the long run?
+
+**Speaker 2** _[30:05]_
+
+I don't think how it's limiting us at the moment so I I can recommend this way at the moment I don't have any issues with it the only thing I would like to improve is our secret management in our communities because we doesn't use vault yet but yeah
+
+**Speaker 1** _[30:30]_
+
+Okay, thank you for answering all these questions. To you, thank you for all your questions. Have a nice day.
+
+**Speaker 2** _[30:37]_
+
+Thank you.
+---
+transcript_status: auto
+---
+transcript_language: en

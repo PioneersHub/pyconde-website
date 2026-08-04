@@ -84,3 +84,233 @@ Marketplace cold start occurs when new listings lack the historical data—such 
 The initial approach relied on a legacy system that provided guaranteed visibility slots for new activities to collect data. As supply grew, this created a bottleneck, necessitating a queue and a prioritization model to decide which activities entered the assessment phase. Early attempts to optimize this via supplier-level features or by filtering out low-scoring candidates yielded marginal or insignificant results. A breakthrough occurred when the system shifted from random selection to using the ranking model itself to select the best candidates for the reserved slots. This demonstrated that the model could identify promising activities even with limited signals, resulting in higher conversion rates and more activated activities.
 
 Further iterations removed the queue and prioritization model entirely, allowing all new activities to be eligible for boosting. While this caused a slight dip in short-term overall conversion due to the exploitation-exploration trade-off, the long-term value of activating more supply outweighed the immediate revenue loss. The system eventually evolved from fixed slots to flexible boosting, using a blended score—a weighted average of the ranking score and an unactivated boost factor. This removed hand-crafted constraints and allowed the machine learning model more freedom to optimize placement. The final architecture replaces fixed slots and queues with a lightweight ranking intervention that optimizes for supplier activation rather than mere throughput.
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+Today we give a warm welcome to Theodore Maynard for the talk about Solving Marketplace Gold Start a Scale with Ranking at the Paladino Room. The stage is yours.
+
+**Speaker 2** _[00:26]_
+
+Um, yeah.
+
+**Speaker 3** _[00:29]_
+
+Sorry, please come in. I think there was a bit of delay for the staff. But welcome, everyone, for this first session after the keynote. So today, I will talk about solving marketplace cold start problem at scale with ranking. But let's start by introducing myself. So my name is Theo. I'm a data science manager at GetYourGuide, a marketplace for travel experiences. And there, I'm leading the team that is responsible for the ranking of the activities the website and the app. So today I'll be talking about how we solve this cold start problem in our marketplace and especially as part of my team. So with that let's dive into the agenda. So we'll start with the problem itself, what cold start means in the context of a marketplace like ours. Then we'll look at the legacy system that we have in place. The third and probably the most important part is the talk will be around our experiment, the third part. So the three years of iteration, including the one that didn't work. And I will close with some key takeaways from this journey and things that I think can be useful to you too. The talk should be around 20 minutes, that should give us 10 minutes for questions, so looking forward to this. Great. With that, let's get started. So, cold start at GetYourGuide. First, let me give you a bit more intro of GetYourGuide. So, GetYourGuide is a two-sided marketplace. We have suppliers that list activities, and then we have travelers that book them. And so we are connecting more than 50,000 suppliers on one side with the millions of travelers across more than 200,000 activities. So at this scale, ranking becomes critical. Travelers are searching for things to do in Rome, for example. We only see a tiny fraction of what we have available in such a big city, a touristic city like Rome. And the ranking model then decides what's good to get seen and what does not. And the last one is exactly where the cold start problem begins. So, indeed, a ranking model is using past behavior. Clicks, bookings, reviews, etc. to rank activities. So, a new activity joining the platform today will have none of that. So, by default, it will get ranked low, then it will get no exposure, gets no booking, and then stay at the bottom. And this is a self-reinforcing look. Indeed, the situation is structurally unfair for these new items. Reviews make things even worse. Travelers are even less likely to click or book on activities with no reviews. So, the first bookings are actually the hardest to get, and the system works against it. This is what we mean by the cold start trap, or cold start problem. But we can break it. Once an activity gets its first booking, then the model can pick this now, and then it can show it a bit higher. Then it can get even more bookings. And starting this kind of reinforcing loop, or flywheel, is what we call in our jargon, in the company and our team is activating the activities. Once it's activated, then basically it's able to sustain organic growth in our platform. But maybe to make it a bit more practical, let's imagine you go to Berlin and you have two working souls to decide. So which one do you choose? Please, let's vote. Who wants to be the one on the left? Raise your hand. some courageous yeah who will be the one on the right a bit more expensive but pretty sure what you get so in practice that's what we mean like this is the thing this is very hard for the new activity to get this first book and maybe it's even better than the first one like in time of reviews but and it's cheaper but who will be the first one to try so with that let's uh start with let's go to our second part of status quo. So what did we have? And in here
+
+**Speaker 2** _[04:59]_
+
+All right.
+
+**Speaker 3** _[05:07]_
+
+to gather signals.
+
+**Speaker 2** _[05:09]_
+
+we give them a guarantee.
+
+**Speaker 3** _[05:14]_
+
+visibility to start collecting clicks, bookings, until the ranking model is then able to take over and rank them naturally. Pretty simple. So, like, in other words, basically, a new activity gets into assessment, and as long as we don't have enough signals, it's taking the assessment, and then we can use our normal ranking. But what happens is we see that our are supplying faster.
+
+**Speaker 2** _[05:38]_
+
+fast
+
+**Speaker 3** _[05:40]_
+
+anticipated, especially in some destinations, and the impression per location is limited. So we could not assess everything at once. So for that, we introduced a queue to limit the throughputs, to control the throughput that we put into the assessment pipeline here. But then we saw that the queue was getting longer and longer, so we then needed to have model to prioritize which activities from this big queue should need to go enter this assessment thing. And that started, like, this was our process that has come with some challenges. Specifically, a supplier will sign a deal with GetYourGuides, onboard their activities, pretty excited together, and then they have to wait a long time, even sometimes weeks, before foreseeing their first bookings. And second point, even if we were assessing as many as we could, we still have a significant share of them that did not activate, i.e., what I mean is, like, starting this virtual flywheel. And so this thing, like, we have at the end a significant share of our inventory that never received enough traction to be able to sustain their organic growth. So the process was designed, this process were designed to gather signal, not really to activate activities. And we have been solving with this for throughputs, where actually our real problem, which we'll be focusing on, is trying to
+
+**Speaker 2** _[07:19]_
+
+and how
+
+**Speaker 3** _[07:23]_
+
+experiment that we ran. With that let's go to our experiments. Now that you have a good idea of our setup and the problem, let's go through our multiple iterations. So the first one it was a bit hard, so crawling basically in a way. Our first instinct was to try to work with the existing system.
+
+**Speaker 2** _[07:51]_
+
+Indeed, most
+
+**Speaker 3** _[08:00]_
+
+we know their star rating, their reviews of their previous activities, so the hypothesis was pretty simple. If we have a strong supplier, it's more likely to have strong new activities, so we can just use this signal to prioritize it. So we just added a supplier feature to the prioritization model. So in other words, basically we tried to improve this prioritization model with supplier features but the results were kind of marginally better but not significant the main learning that we got here was that by improving this prioritization model we were not really it was not a strong lever towards improving activation so not the thing
+
+**Speaker 2** _[08:50]_
+
+system and here
+
+**Speaker 3** _[08:52]_
+
+our hypothesis was that we should focus on the most promising activity we could. And for that, what we could do is try to filter out the one that has the least promising, based on our prioritization model, so that we could spend more time on the most promising one. So, in a more flowchart way, here what we say is that we introduce this shortcut to enable to directly Not spend time on this activity with a low scoring, but then we can spend more time on these other ones and push them harder. And it worked, in a narrow sense. The activities that we did assess were indeed more likely to be booked. bookings did not really increase we are just concentrating on fewer bets and with that we start thinking and both this experiment taught us kind of the same thing like if we are trying to be trying to be smarter with the current framework has limited upside so if we want to optimize the system for activation we need to rethink the system itself sorry is it okay you are sir or is it I didn't get a question but if it's something that is unclear for everyone that prefer to answer now that
+
+**Speaker 2** _[10:37]_
+
+Um...
+
+**Speaker 3** _[10:40]_
+
+Let's go to our next experiment. So here, up to this point, basically, we were randomly selecting which activity to boost from our assessment pool. But here, what we thought about is...
+
+**Speaker 2** _[10:57]_
+
+Um...
+
+**Speaker 3** _[10:58]_
+
+pretty simple idea the ranking model model already knows which activities are more likely to convert so why not try to use it to pick the best candidate for the the slot the reserve slot that we have so that was actually not the stance from here we were not very convinced of this because we said that we need assessment because we don't have enough c node to rank new activities that's the whole point of this process so but now we are using ranking to select activity to show in assessment in a way. So that was a bit contradicting to the purpose of this whole thing. But maybe on more things, like here we improved the placement logic that we have here by now leveraging ranking to do that instead of doing pure randomization. And what turned out is that it was very positive. because to our surprise, self-ranking was still very good at figuring out what was the best activity, even if there was a very limited signal on those. So what we saw was a significant uplift on the conversion rate on this activity assessment, and we also saw an increase in the total number of activities that got a booking. So, that was our first big win on this, and with that, we started to rethink a bit more the architecture. So, the success of this made us rethink the whole flow, and do we even need a queue and a prioritization model? Indeed, what we see is that the queue and prioritization model exist to manage the limited explore the slots. But if ranking has selected the best candidate in real time, the
+
+**Speaker 2** _[12:45]_
+
+that it can
+
+**Speaker 3** _[12:49]_
+
+trying to remove it, right? So we just take out the queue, take out the prioritization, and directly all new activity directly go into this assessment, and we let ranking do its job, basically. And what we got at the end was we saw that new activity conversion went up, but the overall conversion rate dipped a bit. We were giving slots to new activities that we were not yet competitive with the establishment. This is a very classic exploitation trade-off. And here, what we did.
+
+**Speaker 2** _[13:27]_
+
+And this is actually
+
+**Speaker 3** _[13:28]_
+
+Actually, we partnered with our finance team, and we saw together, we modeled that the long-term value of starting more flywheels cancelled the short-term revenue loss that we saw. But it simplified quite a lot of process, and also improved the new supply experiences, because now the new activity directly gets eligible for more exposure, basically. So, that gave us the confidence to roll it out, and we moved to the next step. So, removing the queue now and with this ranking selection, we mainly have a ranking system, but that raises new concerns. When ranking selects every single candidate, you only ever boost the model, the one that the model thinks are good candidates, but maybe we stop learning about activities the model is unsure about. So here, the hypothesis that what we should try to introduce randomness in the selection, that would be actually valuable. So what we did is we tested some kind of hybrid approach. We still use a ranking model to score the activities, but then we use the score as a probability to select which activity to be on the results. So higher the score, more likely this activity will be selected, but there is still some randomness involved. So, in other words, we kind of reintroduce some randomization in this placement logic.
+
+**Speaker 2** _[15:06]_
+
+When running a test, we saw that actually
+
+**Speaker 3** _[15:12]_
+
+Conversion rates trended negatively. We had fewer activities receiving booking overall. So what we learned is ranking model actually didn't really need our help to diversify. So we closed this experiment early.
+
+**Speaker 2** _[15:30]_
+
+and I'll see you in the next video.
+
+**Speaker 3** _[15:35]_
+
+for new activity, but then we start stepping back and ask ourselves bigger questions. New activities are not the only ones that are stuck in this cold start trap. As I said at the start, at the beginning, we also have a significant shelf or existing apiary that had gone through the assessment, but they didn't start their flywheel. They were not activated yet. So here, what we thought about is why not to try to make all unactivated activities eligible for the boosting slots. slots. So, same mechanism, ranking select the best candidates for the slots. So, here basically to make it...
+
+**Speaker 2** _[16:12]_
+
+it's more of a
+
+**Speaker 3** _[16:14]_
+
+We instead of just considering new activities. We also will look at new activities to go through this feedback loop Here the result was pretty strong so we saw a small drop in the overall customer conversion metrics that We also saw a big big uplift in the booking purposes on this and activated activities So again, we did a trade-off between the short-term performance and the long-term benefits for the marketplace, the platform that we saw, and we did the same trade-off. We saw that the incremental value of starting this new flywheel largely outweighed the short-term cost. So, the experiment was actually the proof that the same solution could be scaled beyond new activities, but also to improve the overall platform. And with that, we have to our last experiment that we ran. So up to this point, the entire system was built around fixed slots. But that was actually a deliberate design choice. We want to have a guaranteed position, that means a guaranteed exposure. But fixed slots have a cost, right? We're always giving them the same position regardless of the context. The hypothesis here was that by having flexible boosting, we'll be more efficient by letting the system decide where the activity fit best. So for that, we use some kind of blended score. We use the weighted average between the activity ranking score that we ranked, and now we give them some kind of boost factor for being unactivated. So this unactivated activity has some help, but they do not get guaranteed exposure, so we let them more naturally compete with the rest of the activities. So, more visually, basically, here again we're trying to optimise this placement logic that we have here. And there we ran two successful experiments, one after the other, and both of them were positive, and directed a cumulative strong increase in the booking per visitors on these unactivated activities. This is now what we have. We still have things planned for the future but I think we now have a more much more mature version of the system. We have no fixed slots, no queue, no half-party rule and ranking now is doing most of the work with kind of lightweight intervention to give an activity a fair chance.
+
+**Speaker 2** _[18:55]_
+
+Uh...
+
+**Speaker 3** _[18:56]_
+
+That's where we were around three years ago and how we moved to this new system, which is now significantly more efficient but also much simpler. With that, let's move to our key takeaway. So the first one, my first key takeaway on this is our new problem, ExploreFast. So cold starts was an underexplored problem for us three years ago. So for a well-known problem where we have a clear north star, it makes sense, I think,
+
+**Speaker 2** _[19:31]_
+
+multiple times.
+
+**Speaker 3** _[19:33]_
+
+For example, when we try a new idea on our ranking model, things that have been iterating for a long time and we have a lot of experience in this and we have a clear idea where we want to go.
+
+**Speaker 2** _[19:44]_
+
+Um...
+
+**Speaker 3** _[19:47]_
+
+three, four, five times before we really rethink if this whole approach makes sense.
+
+**Speaker 2** _[19:53]_
+
+Um...
+
+**Speaker 3** _[19:54]_
+
+For this cold start, we didn't have such a north start. Every experiment was a completely different direction and every time we touched some different part of the system. So the supplier feature experiment and the low scoring removal both failed relatively quickly but what matters is actually that for each of us it gave us a bigger picture, a clearer picture of what the real problem was and especially what could be a good lever moving forward. Our second takeaway was around constraints. And this pattern really, across, that's the pattern that we saw across the experiment, and really became obvious in hindsight. So every time we tried to add a constraint, like when we remove low-scoring activities, or when we enforce randomness, the results were flat or negative. But every time we tried to remove hand-crafted constraints, or try to increase the scope of freedom of our ML model, like, for example, when we increase the...
+
+**Speaker 2** _[20:55]_
+
+when we
+
+**Speaker 3** _[20:55]_
+
+When we have more activity and make more activity eligible removing the fixed loss we got a positive result So I think how much restriction reduce the freedom of the system
+
+**Speaker 2** _[21:08]_
+
+and I'm all about
+
+**Speaker 3** _[21:09]_
+
+have them and limits the ML model's ability to optimize. So the lesson here is not to never add constraints, but actually you should treat them as hypotheses and that means you should test them. And that's one, probably the most important one. For a long time we framed this cold start as a ranking problem. We have new activities, we have no data for this activity, how can we rank it well? We could never prove that knowing the true ranking of a new, the true rank of a new activity has a measurable long-term value, but the framing that made us impossible to show progress on this. But the breakthrough came when we stopped thinking about it as a customer problem but more as a supplier problem. So how many activity already started at Flywheel? What's the incremental value of their first bookings? And these questions are much more easily answerable, and then when you get an answer, you quickly get a business case, then a clear metric you can optimize, and then team alignment followed. And that's changed how we, what we built, so we start building for optimizing for activation instead of just throughputs. And sometimes basically probably the best thing one can do is to start by reframing the question and with that that's it thank you everyone uh i just want to give a big thanks also for the the team behind especially xingting at the valley who did
+
+**Speaker 1** _[23:01]_
+
+I submit your question at talks.pipon.de and I write a question to the speaker. So, the first is, I could imagine that companies listing activities might be too moderate by being ranked low. How do you communicate your approach in such a case? Is the ranking system interpretable enough to provide recommendations on how to design a more up in listing
+
+**Speaker 3** _[23:31]_
+
+Yes, that's a general thing that we have with ranking and we provide some self-serving tools for our internal sales teams that is then able to explain and basically we're able to show some insights internally to show why it's ranking low or not and that's how we handle this situation is the ranking system to provide recommendation and how to design more appealing listing um so the second one is this is a bit of a black box in a way like any complex machine learning system and uh so what what we what we say and what is true is the best way to make your activity uh higher in the ranking is just uh make your activity more appealing which there are kind of normal uh things like you need to have a good title and we have guidelines for that you need to have a good picture and we have guidelines for that you need to have right of ability i mean if you are just a guided tour but it's only at 8 am you will not have a lot of people doing that so there is a lot of rules like that that we care about like what is a good activity and our ranking is then optimized to make the good activities go to the top basically because that's the one that sells and that's how we answer
+
+**Speaker 1** _[25:04]_
+
+Optimizing on booking numbers, our general engagement and our financial ranking.
+
+**Speaker 2** _[25:10]_
+
+All right.
+
+**Speaker 3** _[25:14]_
+
+What we are optimizing for at this point now is a composite metric, so we are not just optimizing purely for booking.
+
+**Speaker 2** _[25:23]_
+
+Um...
+
+**Speaker 3** _[25:25]_
+
+that, but in terms of fairness, we don't have any kind of
+
+**Speaker 2** _[25:31]_
+
+Um...
+
+**Speaker 3** _[25:32]_
+
+I mean, we could introduce fairness, but if we have more guided tour than entry tickets, it's not the kind of thing that we will optimize by default, whereas in some other areas it makes a lot of sense. You should be introducing fairness if you are dealing with credit score, I think that that's for us. fairness is not
+
+**Speaker 1** _[26:03]_
+
+Next one. How was the decision regarding guaranteed exposure made? In other words, what percentage of results were explorative and what percentage were explorative?
+
+**Speaker 3** _[26:16]_
+
+Good question. So this decision that was made around this exposure slots was made years before I was there and that's like basically grew against with this queue and things like that, so that's where we were three years ago. In terms of percentage, I mean we still reserve a pretty limited slot, so the number of exposure slots that we have is relatively small compared to how much is reserved for exploitation basically for the best-selling things because it would not make sense to have just new activities on the page. No one would like this. So yeah we always push more towards exploitation and have a share not not all of it small compared to the
+
+**Speaker 1** _[27:12]_
+
+Okay, next one. Your model helps bringing up new activities to customers, but the problem on one of your first slides is still not solved. For example, it still has no recommendations, likes, and might not appear as seen as solid as the other offers. Is that a problem? And if so, how to deal with it?
+
+**Speaker 3** _[27:32]_
+
+Yeah, so that's exactly the, I mean, that's still a problem, but that's how we solve this problem in a way, is like if you don't show it to nearly no one, then it's sure that no one will book it. But if you help it show by pushing it higher, you still have some people that are ready to take the chance with your product because the other one is not exactly passing by the same touch point. I mean, all new activities should have something different. They should be cheaper or should propose something that is unique. If it's exactly a copycat from an existing product, that's something that we have very low chance to compete against an existing product that is already have review and things like that. They all have something slightly different. If we give some visibility to those, we still have a few percentage of people that will take the chance, and those people basically is the one that will be able to start this flywheel, basically. We get the first booking. We see that this activity gets its first reviews, and that's how this activity gets there. That's exactly the hardest thing. There is no other way. I mean, we cannot fake review. We cannot start to show reviews just to make people book this activity. That's completely against the whole marketplace idea. But we still want to show this.
+
+**Speaker 1** _[29:13]_
+
+Just last one. How did you test the results of your experiments? How did you measure the performance of the new ranking strategy with the performance of the new ranking strategy?
+
+**Speaker 3** _[29:23]_
+
+We run A-B tests, so we split our traffic, or usually by visitors, some of the earlier experiments were also split by 2IDs, so half of the 2IDs got a special treatment, the other half got another treatment, and at the end we can compare the scores. We see how many of these tours get more booking, how many of those tours get more booking, and are we statistically significant based on the total number and do we expect that with randomness and same thing on the visitor things as we can see how this behaves
+---
+transcript_status: auto
+---
+transcript_language: en

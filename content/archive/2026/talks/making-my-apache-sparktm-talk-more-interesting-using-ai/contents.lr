@@ -91,3 +91,429 @@ Apache Spark serves as a versatile transform layer for large-scale extract, load
 A practical application of these tools involves building a visual inference pipeline to detect patterns in image data. In one implementation, a pipeline processed 62,000 images stored as Parquet files sourced from Hugging Face. By training a visual inference model and using pandas for parallel processing, the system identified specific animals and output the results as a JSON file intended for a Kafka topic.
 
 To enhance data accessibility for non-developers, the Snowflake CortexCodeCLI coding agent allows users to interact with Snowflake environments using natural language. This tool integrates with specific warehouse roles and permissions to assemble data views without requiring SQL knowledge. By analyzing datasets—such as view counts and transcripts from EuroPython, PyCon DE, and PyCon US—users can identify content trends and generate data-driven insights. This approach addresses the gap between data availability and the ability of business users to perform independent analysis.
+---
+transcript:
+
+**Speaker 1** _[00:27]_
+
+Okay, welcome everybody, good afternoon, I hope you enjoyed your lunch. This afternoon we are going to listen to a very interesting talk by Celine Horgan, who is going to talk about how she is making her Apache Spark talk more interesting with AI. The floor is yours.
+
+**Speaker 2** _[00:48]_
+
+All right. Thank you so much. So my name is Celeste Horgan, but we're going to forgive the mispronunciation. I think Celine is a beautiful name. It means moon. My name means sky. We're going to survive. This is making my Apache Spark talk more interesting using AI. There's a lot of talk to get through in half an hour, so I'm actually going to make this a little bit interactive and choose your own adventure. I'm going to ask you to vote on which direction you would like this talk to go. We can spend more time in some places. We can spend more time in others.
+
+**Speaker 3** _[01:19]_
+
+with
+
+**Speaker 2** _[01:20]_
+
+With that said, let's rock and roll. This is a weird slide that my legal team tells me to display. Look at all these words that I'm sure you're going to read. So a little bit about the agenda. I'm going to give a brief introduction to myself. We're going to talk a little bit more about what's going on here and why I'm giving this very weird talk.
+
+**Speaker 3** _[01:39]_
+
+We're going to...
+
+**Speaker 2** _[01:39]_
+
+We're going to do a bit of a talk within a talk. We're going to inception the talks, and how much time we spend on that is going to be up to you guys. And then we're going to talk about our Snowflakes coding agent, which is called CortexCodeCLI. It's in, like, super-duper early preview. And we can mess around with that and spend more time less doing that if that is what you guys desire. So my name is Celeste. I was born and raised in Canada. My mom is Filipino. My dad is British. I've lived in various parts of Europe since about 2018. I've spent the most time in Berlin, and more recently I moved to London to take the job of Snowflake.
+
+**Speaker 3** _[02:15]_
+
+Thank you.
+
+**Speaker 2** _[02:16]_
+
+I've been described as an open source true believer, which I will take as a compliment. I started doing open source in 2020, where I was actually working with the Linux Foundation as a technical writer working on the Kubernetes project. And I just sort of fell in love with the ethos. I fell in love with the people. I fell in love with conferences and giving talks. And all of that spun into being a developer advocate for a company called Ivan, which if you are in Berlin, you've maybe heard of. I did started doing that in 2022. and I've been with Snowflake since September of 2025. I could be represented by this raccoon in the lower corner with a martini glass if you so chose. So what is happening here? Why are there raccoons everywhere? Why was the talk description so scattered? First things first, you're actually in a sponsored talk and PyCon is a little bit weird in that they don't really indicate which talks are sponsored or not. But I personally don't go to sponsored talks unless I can help it, and I kind of think they're boring, so when I was asked to do this, I was in a bit of a conundrum because I was like, ugh, but I wouldn't.
+
+**Speaker 3** _[03:22]_
+
+Um, and.
+
+**Speaker 2** _[03:24]_
+
+And I really wanted to look at why is that the case, though? And I think there's three main reasons. One, it's a lack of alignment with the audience's interests, so you don't have control over the content that you're seeing, and I think that's a huge problem. It ends up being nothing but a sales pitch, and I also think that's a huge problem, I think especially at an open source conference from somebody who is an open source true believer to people who are spending their free time talking about open source things. Like, it's a bit of a problem. And there's always a feeling of being talked at than talk to. So sort of the way that I'm hoping to structure this talk is that we can kind of like create what we're interested in together.
+
+**Speaker 3** _[04:01]_
+
+Um...
+
+**Speaker 2** _[04:02]_
+
+So with that said, the next portion of this talk is the talk within a talk. This is a talk that I gave at PyData London. No, not PyData London, one of Confluence meetups. In London, probably about a month ago, it's, as you can tell, about Apache Spark pipelines. It is about adventures in raccoon detection, and we'll talk about raccoons later on. So this probably can comprise half to maybe a little more than half of this talk, if you so please. The other half of this talk, what I've done is I've pulled data on the top talks from the EuroPython YouTube channel, the PyCon DE YouTube channel, and the PyCon US YouTube channel. I've pulled those basically by view count. I've also pulled the transcripts of the top 50 talks. So we can use a little bit of data analysis interactively together, for better or for worse.
+
+**Speaker 3** _[04:58]_
+
+Um...
+
+**Speaker 2** _[04:59]_
+
+to kind of look through that data and see if there's anything interesting in the trends that we can use to make this I think it's fine talk a little bit more interesting. So there's two ways we can go here. One, we spend a little bit more time on this Apache Spark pipeline talk and we spend a little bit less time doing AI stuff. Or two, we do spend a little bit more time doing AI stuff. You can potentially embarrass me. But I'm going to have you vote. who wants to talk a little bit more in depth about Apache Spark today? Okay, okay, that's like a third of you. Who wants to potentially embarrass me with AI? Hey, there's my people, cool. So I'm gonna try, I've got a timer. I'm gonna try and hit like the 15 minute mark. It is important that you understand the talk so that we can understand how to improve it, okay? What I'm gonna cut out is actually going through like the code sample. I'll just sort of show you what the end of this pipeline is and we'll focus on the content of the talk. Capisce? Good? Cool. So talk within a talk agenda. What is Spark anyways? What is Spark good at? Let's build a data pipeline. Question mark, question mark, question mark. Profit.
+
+**Speaker 3** _[06:10]_
+
+Um
+
+**Speaker 2** _[06:11]_
+
+So, this talk was really geared at people who didn't really know what Apache Spark was, but were maybe data engineers anyways. I think Apache Spark is a really, really useful tool to know, because even if it isn't the tool you would choose now in 2026, it is such a ubiquitous tool, and it is such a sort of like Swiss Army knife of data tools that you will find it out in the wild like two out of three workplaces. So what is Apache Spark? I think it's really easy to misunderstand Apache Spark, because it depends on what part of Apache Spark you're using. I like to describe it as three raccoons in a trance coat or a Swiss army knife because it's a lot of different tools that are kind of loosely tied together that help you do data things. A lot of people use it for large-scale ETL, extract, load, transform sort of pipelines.
+
+**Speaker 3** _[06:58]_
+
+Um...
+
+**Speaker 2** _[07:00]_
+
+It has a sort of offshoot called MLlib, which is a very, like, classical machine learning inference situation, so it's non-generative. You can do a little bit of near-real-time stream processing. It pairs very nicely with Kafka for that. You can do sort of SQL-based data analysis, graph processing, a whole bunch more. There's, like, a really, really big offshoot of, like, pandas on Spark that you can do stuff with.
+
+**Speaker 3** _[07:24]_
+
+Um.
+
+**Speaker 2** _[07:25]_
+
+And they're all kind of loosely connected by the Spark engine.
+
+**Speaker 3** _[07:31]_
+
+Thank you.
+
+**Speaker 2** _[07:33]_
+
+becoming new to Spark in 2026, the thing to know is that Spark is basically a sort of transform layer of superhero. It's really, really good at processing really large amounts of data and sort of doing in-stream processing like joins on large amounts of data.
+
+**Speaker 3** _[07:48]_
+
+I don't know.
+
+**Speaker 2** _[07:49]_
+
+I would say that its biggest good quality is that it's also a relatively stable platform, both in terms of release cadence, maintenance, but also deployment. And that's why it tends to stick around and why even if you would maybe not choose it in 2026, the chances that you'll encounter it in 2026 are still pretty high.
+
+**Speaker 3** _[08:10]_
+
+Um...
+
+**Speaker 2** _[08:12]_
+
+That said, it's probably about 15 years old now and we need to sort of, especially in 2026 and especially in the world of post-generative AI, have a little think about where Spark kind of sort of sucks. It's pretty resource intensive to run. It uses a JVM, so it's, I would argue, maybe a bit more antiquated in its architecture at this point in time. MLlib, especially in the age of generative AI, is not the most useful library these days. and it really, Spark really kind of grew out of slash adjacent to Hadoop and the MapReduce projects and those are borderline irrelevant in modern data engineering. But I think the key thing to understand, Spark is an intermediary step. You never just deploy Spark. You're taking data from somewhere. You're doing something with it in Spark. You're probably joining it from data from somewhere else and then you're sending it somewhere else. It is a step in the pipeline and a lot of businesses find that it's a step that's very, very hard to replace with anything else. That said, for almost everything that Spark does, there is a more lightweight alternative available, so think about that. Very briefly, this is what the pipeline that we would be doing should do. We are taking a very, very large set of images. They're stored as Parquet files. These were found on Hugging Face, and we are looking for raccoons. So, this is just like a very classic look for a known pattern, so we need to train a visual inference model. We're also using a Hugging Face model in that regards.
+
+**Speaker 3** _[09:46]_
+
+Um...
+
+**Speaker 2** _[09:47]_
+
+Like I said, we're cutting through code time but I will very briefly kind of show you what's going on if I can tame the browser windows. Wish me luck. Come on now. This is what I get for not mirroring my display the way that the lovely guys in AV suggested I do. So this is on me, everybody. Cool. That's not working, so I'm just going to read what's happening on this screen while I mirror my display, because evidently the way that I wanted to do this did not work, and you were right, guys in the back. Thank you, and I'm sorry that I'm stubborn. So the way that...
+
+**Speaker 3** _[10:42]_
+
+Um,
+
+**Speaker 2** _[10:43]_
+
+Anyways, the way that this works, it is a very classic sort of Spark pipeline. We do a bunch of configuration. We prep the data. We then take a subset of data of images that are just raccoons, which all the images of raccoons on this presentation are. We train the model saying this is the thing you're looking for, and at the very end it It processes through about 62,000 images using pandas to actually process in parallel.
+
+**Speaker 3** _[11:07]_
+
+as well.
+
+**Speaker 2** _[11:08]_
+
+And then it spits out a file. And let me see if I can get this to behave better. Escape. Now will you let me drag and drop? No. Hmm. Well, that's going to be a problem.
+
+**Speaker 3** _[11:27]_
+
+Um...
+
+**Speaker 2** _[11:30]_
+
+And it is, in fact, a problem that I am going to need to burn a little bit of time to solve. Sorry, everybody. Mirror. Yeah, there we go. Okay. So this is the model. Like I said, we're going to zip and zoom through the model because we've got time to spare. We've got, like, 16 gigabytes of images of random animals, and I'll show you what the output ends up looking like. So it's really just a JSON file. All of these are designed to be written to a Kafka topic, and as you can tell by the fact that it's detecting Pomeranians, cats, the occasional chicken, it's a reasonably accurate pipeline, but it could use some work.
+
+**Speaker 3** _[12:11]_
+
+Okay.
+
+**Speaker 2** _[12:12]_
+
+Okay, carrying on with that because we cared more about AI.
+
+**Speaker 3** _[12:17]_
+
+Um.
+
+**Speaker 2** _[12:18]_
+
+Very briefly, again, bear in mind, this presentation was made for sort of people who are new. What is PySpark? PySpark is, of course, one of the many language-specific libraries, and I would say the key point that we care about is that PySpark functions a little bit differently than some of the other and that's if you were to implement Spark...
+
+**Speaker 3** _[12:40]_
+
+now
+
+**Speaker 2** _[12:42]_
+
+Now, the thing that I would really caution you is that the different language implementations of Spark do behave a little bit differently. The biggest one that I can think of, the biggest sort of discrepancy, is that the Scala library doesn't implement data frames. But PySpark does.
+
+**Speaker 3** _[12:58]_
+
+Um.
+
+**Speaker 2** _[13:00]_
+
+So, what is a data frame? Any time we load data into Spark, and if we had gone through the code, we would have gone through this a little bit more bit by bit. A data frame is a blob of data organized into names columns. If you've ever worked with Flink before, it's a similar idea of whenever you sort of move data into a Flink pipeline and it asks you to orchestrate them as a table, do a thing, and then it sort of spits out a temporary table. aren't real tables, but it's a table kind of for your benefit as much as anything else. Data frames are very, very similar. It's really just a way of organising data in such a way that we can perform actions against it in a sort of organised fashion. So with very, very few exceptions...
+
+**Speaker 3** _[13:42]_
+
+we
+
+**Speaker 2** _[13:43]_
+
+We load data into Spark using data frames.
+
+**Speaker 3** _[13:47]_
+
+Um, and.
+
+**Speaker 2** _[13:48]_
+
+And again, some of the other language implementations don't actually use data frames. They use sort of older constructs that Spark was using before data frames.
+
+**Speaker 3** _[13:55]_
+
+Um, and...
+
+**Speaker 2** _[13:56]_
+
+And that is something to keep in mind if you were to do a vanilla implementation of Spark today. What is an Apache Parquet file?
+
+**Speaker 3** _[14:03]_
+
+Um
+
+**Speaker 2** _[14:05]_
+
+It's an open source columnar file store for big data processing. If you don't know what any of that means, that's totally legitimate. The key word to keep in mind is the word columnar. So typically when we work with database structures, we go row by row by row, and a row might have five or six different columns. So like name, age, address, whatever. So if we wanted to look up the addresses of, say, 100 people, we'd have to go row one, give me the address in position three. Row two, position three. Row three, position three. What a kilometer data store does and why it is so, so useful for any kind of big data or any kind of analytics data is it lets us go, please go to the address column and give me rows 1 to 100. So it lets us look up things in bulk very, very quickly. Apache Parquet is just a way of sort of storing unstructured data in a sort of kind of kilometer way.
+
+**Speaker 3** _[14:56]_
+
+Spark
+
+**Speaker 2** _[14:57]_
+
+Spark works really, really well with it.
+
+**Speaker 3** _[14:59]_
+
+Thank you.
+
+**Speaker 2** _[15:02]_
+
+Pandas is a Python data analysis library. Again, we sort of use it to parallel process things as a part of this pipeline that we did not go through because we're more interested in playing with AI.
+
+**Speaker 3** _[15:12]_
+
+Okay. Okay.
+
+**Speaker 2** _[15:16]_
+
+TLDR, parallel processing, it helps us be speedy fast.
+
+**Speaker 3** _[15:20]_
+
+Thank you.
+
+**Speaker 2** _[15:21]_
+
+When doing the initial sort of run through this it did take about 10 minutes Which is another reason that we're not really going to run through the code right now
+
+**Speaker 3** _[15:28]_
+
+Um...
+
+**Speaker 2** _[15:30]_
+
+14 minutes into a half-hour talk, we're right at the AI part.
+
+**Speaker 3** _[15:34]_
+
+Um, so.
+
+**Speaker 2** _[15:35]_
+
+So let's talk about AI.
+
+**Speaker 3** _[15:37]_
+
+um
+
+**Speaker 2** _[15:39]_
+
+Snowflake has introduced Cortex Code CLI. It's a coding agent. It actually lets you use whichever model you like. So if you have a particular model that you prefer, you can actually specify that Cortex use a specific model. What Cortex really does for you is it knows inherently about your, thank you,
+
+**Speaker 3** _[15:56]_
+
+Um.
+
+**Speaker 2** _[15:58]_
+
+about your Snowflake environment. So if you are a Snowflake customer and if you have a Snowflake warehouse,
+
+**Speaker 3** _[16:04]_
+
+um
+
+**Speaker 2** _[16:05]_
+
+It knows your roles within that environment. It knows what data you can and can't access. It knows what data you can't access and what roles you might need to access it.
+
+**Speaker 3** _[16:15]_
+
+and it
+
+**Speaker 2** _[16:16]_
+
+and it can kind of assemble views of data for you. This is super useful.
+
+**Speaker 3** _[16:23]_
+
+Um.
+
+**Speaker 2** _[16:25]_
+
+So, let's play with some data, because I think that's easier to understand. And again, go easy on me, because this could go in many different directions. So I'm already connected.
+
+**Speaker 3** _[16:37]_
+
+um
+
+**Speaker 2** _[16:39]_
+
+We're connected to the DevRel account because I work in the DevRel org. We're also connected to this PyCon analysis public schema. And I think first things first, because none of you know what's in the schema. Can you tell me? Oh, I already asked. It's already here. Sweet.
+
+**Speaker 3** _[16:58]_
+
+Um, so.
+
+**Speaker 2** _[16:59]_
+
+So, we have a title called PyCon videos, again, so I pulled basically the name and the view count of Python videos on EuroPython, PyCon D, and PyCon US. We have the tags for each of those videos. We have the transcripts for the top 60 by view count across all of those channels. And we have a row of summaries. Also, I lied to you. This transcript is the top 50 videos by view count and the top 10 that mention Spark.
+
+**Speaker 3** _[17:31]_
+
+Um...
+
+**Speaker 2** _[17:32]_
+
+So, by way of starting, a thing to probably know about me is, I think I mentioned this a bit in my intro, I started my life as a technical writer, so I wouldn't call myself of a developer necessarily, and I learned a lot about data and a lot about cloud computing along the way.
+
+**Speaker 3** _[18:05]_
+
+But I think...
+
+**Speaker 2** _[18:06]_
+
+What I think is really, really interesting about this, that is maybe hard to access, especially if you're a developer, is that you don't actually need to know SQL.
+
+**Speaker 3** _[18:15]_
+
+Um...
+
+**Speaker 2** _[18:18]_
+
+You can describe what you're looking for and you can get a result without necessarily needing to know the details. So, with that said, you have a sense of the data that is kicking around in this database. Who has a fun question they'd like to ask to help me improve this talk? Hands up. Wow. This is not how it was supposed to go, guys. So apparently my talk should talk more about scalability and performance, about integrating with other tools, which it does, thank you very much.
+
+**Speaker 3** _[19:05]_
+
+Um,
+
+**Speaker 2** _[19:07]_
+
+And apparently this is my recommended talk title, is PySpark versus X, Scaling Python and Data Pipelines for the Real World. I'm going to put it out again. Does anybody have a question that they think would be interesting to ask? Yeah. How can I get a better audience? So within the scope of the data that we have, ultimately any AI tool is only as useful as the question that you ask. And in regards to this AI tool in specific, it's only going to be as useful as the question you ask can be referenced in the data that you have. So the question as you phrase it, how can I get a better audience, is probably not going to be a useful question to ask this particular AI or really any AI because it doesn't know who the audience is. What we do know, like I said, is we understand the transcripts and we have view cones.
+
+**Speaker 3** _[19:57]_
+
+Um...
+
+**Speaker 2** _[19:58]_
+
+So I think a better question that we can ask is which talks have the most views and what do they talk about? And can you give me the top three? And again, ultimately, that's only going to be as useful. OK. So Vim is a Python IDE developing Android apps. Productivity.
+
+**Speaker 3** _[20:38]_
+
+Thank you.
+
+**Speaker 2** _[20:39]_
+
+And interestingly, all three of these are tooling environment talks, no data around mental talks. So that's actually my data source's problem. I apparently only have five minutes left. So unfortunately, I can't take more of your questions, but if you come to me with a snowflake booth after, you can play around with this a bit more. And I do want to cap this off with a note on AI skepticism. Because who would describe themselves as somewhat skeptical of AI? And I think this is important because I think I would describe myself as the same. I don't sit quietly with this and I don't look at this and go, like, wow, amazing, how amazing is this? I don't think we've accurately assessed our impact on society as a whole. I think that the environmental impact is really, really large. I think that we're putting a lot of trust in these tools. However, I was having a conversation with a good friend of mine who is a rather well-known SRE, probably a month ago. And we were discussing AI in specific. And the thing that we both agree on is that the environmental impact is large, but realistically, it's on a downward curve. And I would also be remiss not to point out that it's on a downward curve because the data supports that. The cost of training models is getting lower and lower.
+
+**Speaker 3** _[22:00]_
+
+Um...
+
+**Speaker 2** _[22:02]_
+
+So that's thing number one. I think you have to assume that that problem is going to get solved because that is in these companies' best interest to do.
+
+**Speaker 3** _[22:11]_
+
+um
+
+**Speaker 2** _[22:12]_
+
+The other thing that I would say and I would say that I'm still probably quite critical of this technology to be quite honest with you The thing that I noticed when we deployed these things at Snowflake that was really, really interesting to me is that it wasn't the developers who were doing the most work with these tools. It was people in our sales organization. It was our solutions engineers who were talking to customers. It was our support teams. It was our IT teams. It was our marketing teams. And I think you sort of have to ask yourself, why is that? Why aren't the developers interested in it? And I think it's not a lack of interest from the developers, I think it's that in departments where there aren't developers, there are so many problems that can be solved that no developer will ever want to look at because they think it's not interesting.
+
+**Speaker 3** _[23:02]_
+
+um
+
+**Speaker 2** _[23:04]_
+
+An example that I have is one of the things that I do at Snowflake is I run the open source programs office. And we have a pipeline that people have to get a certain set of approvals before we publish something as open source. And it's very, very basic. It's security. It's security. It's IT. It's basic, basic checks. And it's absolutely the kind of thing that can be automated. But nobody's interested in doing that. there's developer productivity teams in large companies all over the place but they're not interested in automating a pipeline for legal but legal can do it themselves with this kind of tool and i think that's why you're seeing so much adoption outside of developer tools and i think if you're a data engineer and you're sitting here thinking i'm collecting all this data for you i'm storing all this data for you i'm moving all this data for you i'm processing all this data for you why aren't you making data-driven decisions, I think you need to maybe understand that it's because people can't. These tools are still too hard. And tools like natural language processing can help make that easier. To note, Snowflake is actually working on a tool like CortexCode, but specifically for business users. That's still under total lock and key, but watch this space and look up Project Snowwork if you're interested or if you work with a large set of business users who are not developers and who want to explore the data that you have.
+
+**Speaker 3** _[24:30]_
+
+Um...
+
+**Speaker 2** _[24:32]_
+
+That's the talk? I think I'm on time.
+
+**Speaker 1** _[24:44]_
+
+Well, thank you very much, Celeste. Well, there are no questions?
+
+**Speaker 2** _[24:51]_
+
+No questions?
+
+**Speaker 1** _[24:51]_
+
+No questions. No questions.
+
+**Speaker 2** _[24:52]_
+
+No questions.
+
+**Speaker 1** _[24:53]_
+
+I'm chill with that.
+
+**Speaker 2** _[24:53]_
+
+I'm told that.
+
+**Speaker 1** _[24:55]_
+
+So, anyone maybe wants to pose a question or a remark?
+
+**Speaker 2** _[25:00]_
+
+You don't have to.
+
+**Speaker 1** _[25:03]_
+
+Okay, well, in that case, thank you very much. No problem. Bye-bye.
+---
+transcript_status: auto
+---
+transcript_language: en

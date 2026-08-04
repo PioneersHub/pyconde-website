@@ -119,3 +119,97 @@ Web-based coding platforms often face security risks when executing user-submitt
 The platform is built using the HoloViz Panel ecosystem, utilizing its integrated code editor component—a wrapper around the ACE editor—to capture user input as strings. These strings are executed using Python's built-in exec function. To ensure security and educational constraints, the exec function is restricted by overwriting the globals and locals parameters, allowing the platform to disable specific built-in functions or the import mechanism. Code output is captured via redirect_stdout to compare actual results against predefined test cases. User progress is persisted using the browser's local storage.
 
 To provide pedagogical support, the platform integrates the Google Gemini API. The system sends a prompt containing the task description, expected outputs, and the specific error or failure result to the AI, which then returns targeted hints rather than direct solutions. Testing is conducted using the Playwright PyTest plugin for UI tests and standard PyTest for unit tests. To optimize performance and avoid repeated 30-to-60 second Pyodide load times during page transitions, the architecture is implemented as a single-page application.
+---
+transcript:
+
+**Speaker 1** _[00:35]_
+
+Okay. Hello, everyone, and welcome to this session. It's very nice to have you here. And please notice that we have a half an hour talk and then 10 minutes for Q&A. And so you can write your questions in the talks, or if you want to be more integrated, You are welcome to have the mic and ask your question. And our speaker today is Maris, and he is a junior software developer with a Bachelor of Science in Media Informatics, and he works on coding challenges and education and tutoring. So with a short introduction, we move on to the talks.
+
+**Speaker 2** _[01:27]_
+
+Hello, thank you for the introduction. Today I'll be presenting my web carding platform that I built in Python and that runs the code in WebAssembly. This was part of my bachelor's thesis project. But first, a bit about me. My name is Marius, I'm a junior software developer. My background, I just graduated my bachelor of science in media informatics at the Berliner Hochschule für Technik. Generally, I'm quite passionate about Python and programming in general. I love coding challenges, tutoring, education, and as you can see, also computer graphics. So I'll be just giving you a quick introduction, where does this all come from, requirements for the platform that I built, tell a bit about the tools that I used, and then going towards implementation, the architecture, then a few tits and tats from the actual implementation itself, and then, if we're lucky, a live demo. So, at the time I was working at QZ. QZ is a company that gives lots of Python tutorials, and they have freely available teaching materials for that, and one of them is the Python Spatial Tutorial. That was also like the the main entry point for me. In the Python Basics tutorial, all the sections have so-called checks at the ends, which are different programming related tasks to reflect on the past section. They consist on the one side for programming tasks, like write a function that does that, use list comprehension for this, but they also have more general questions, Like, what would happen if this, and how would you do? And, as I already mentioned, I like coding challenges, and I thought this is a really nice bachelor thesis project to integrate my love for coding challenges and build, like, a platform myself. So, the problem, I mean, there are, like, many coding platforms out there already, but what did we want to do? on the one side it's of course like a high workload for the trainer that gives the courses to be like available for all the trainees to help them and then also currently they're meant for like a local execution means everybody works on their own machine which also sometimes leads to some problems for example people have different Python versions installed Just to get it running can be a bit of a stopper in the beginning. We wanted to build a web platform where you can just open it and then code right away and have the checks, the tasks reflected in there. Just a quick concept, we have some example checks, remove all the numbers, which would Then we translate it to a link that leads to my platform where you have a task and a coding window and via the button you can run your code against predefined test cases. Then the question is how do we build such a platform? Of course we have the problem in the end we have to run code and running user-submitted code on your own server can be kind of dangerous. You never know. I thought about different solutions and researched a lot. Maybe we use Docker to container stuff, but then it can be kind of difficult to do that correctly. There are also external services, especially meant for safe code execution, and while JudgeZero is open source, you of course still have to deploy it somewhere, and the free tier of JudgeZero only gives community support, which is completely understandable, but we wanted to have our own thing, and the solution we found is Holowiz Panel, which usually goes via Jupyter to run in your browser, but then can also be deployed via WebAssembly, JupyterLite. In case you don't know, JupyterLite is Jupyter but also run in WebAssembly, or via PyScript. PyScript is a Python interpreter written JavaScript, And the route we chose is Pyodide, which is like a Python to WebAssembly interpreter translator. But first, what is Holovis? Holovis is a huge, huge ecosystem. Some of you might have heard of it. I think they're also sponsored here. I saw them at the first talk. They have a huge selection of tools, everything related to dataverse. And one of the tools that can bring it all together is Panel. And with Panel you can build dashboards that integrate all the HoloVis tools but also external tools that have the plot API. And internally, Panel uses Bokeh, also a famous database tool, Bokeh's layout library. But most importantly for me, Panel comes with an integrated code editor component, which gives some basic syntax highlighting and where I can get the code from. With architecture, more like the plan we had, we used WebAssembly for client-side code execution so we don't have to set up a backend. The code just runs in the browser's user and the user's browser. Because we decided we don't need a backend for this, we also don't want a backend for storing the progress, so we decided to store progress in the browser's user also using local storage. beautiful UML class diagram. I'll just quickly go over it. There are different types of challenges. One is like write a function that returns a value. One is like write a function that prints something. Some are just like assigned variable with value. And more like general try this out for that. It's like the playground component. And all these coding-related components These include the editor component, which is just a wrapper around the ACE editor, the panel-provided code editor, with some additional amenities for running the code. The results from the code execution get shown in the test result display. It's just like a fancy table. Then we store the stuff in the local storage. And for the general questions, we decided not to just try to answer them, so I translated most of them into single and multiple choice questions. So now we have challenges. The code editor gives us back a string. And what do we do with that? Python has a wonderful built-in exec, which can run arbitrary Python code, like from a string, which I get from the panel component, or they also have byte arrays, not important. Exec has two optional parameters. One is globals, that defines available built-ins. So if you don't include globals, if you just let it be, You have all functionalities available, but you might want to restrict that. And in locals you can store variables that come from the code execution. So now you have like beginners and you want to have them code stuff, learn stuff. So you might also want to restrict them. For example, you want to have them write their own sum function, min, max function, whatever. So you can restrict exec, restrict the mentioned built-ins by just overwriting them. And you can also, what's really fancy, import in Python is also just like a built-in function, so you can also overwrite that if you only want people to use this library and not that. Now, a quick jump into how I implemented stuff. Capturing outputs, like capturing print outputs. For that, I used redirect standard out. I run the code and then capture the output in buffer and then I can compare the expected outputs via the actual outputs from the user's code. Similar story for return values. Here's an example from the function component where I first execute a code then I look into the locals if I can actually find the function that the user should have written and then I can iterate over the input values in the expected outputs and see if it fits. If it fits, I make a result object where it is either test passed or if it not fits, test failed. That can then be used in the test result display. Still, people might also want to execute the code on their own, like if they're not taking part in the course, the course materials are freely available. Maybe they're on their own, or they want to continue because the lesson's over. So we thought it might also be nice to offer some AI help. And I researched a bit. Panel has in their component gallery also a web LLM component where you can also load different AI models into your browser that then get executed via WebGPU. But there are several models available. The smaller ones are, of course, easy to run, quick to run, but not as exact. The bigger ones, for the, I don't know, it was like a 5-gigabyte model that on my gaming PC took like 20 minutes for a quick, quite simple answer. So, and as an example here, I asked it which of the following cases raises an exception in Python, and that's one of the smaller models, and just roughly translates and then continue in Cyrillic. I thought, I think it was Ukrainian or something. It doesn't have anything to do with the question, so we decided against that. Yeah, I also tried to figure out what it meant. It got something about coding, it talks about JavaScript, but yeah. So yeah, we chose a different way, we chose to integrate an external API, and the cool thing is Google offers for their Gemini models free API keys. They are of course rate limited, but that's usually plenty enough for the kind of simple tasks we're doing here. So for that, what gets actually sent to the AI? We send the system prompt, quote, unquote, your Python teacher, give tips, not solutions, the task description, what should the user achieve, the actual input values, the expected outputs, and then the mentioned result object, like test failed, successful, errored, and additional outputs and errors. And with that, we shortly after get an answer here. The user just forgot a colon in the end, And it says, function definitions have should and a colon in the end. So, for testing, because I always had the browser right in front of me, I thought, write UI codes, write UI tests. And because we wanted to keep it like Pythonic in a way, we used the PlayWrite PyTest plugin. I wrote a lot of tests. Some might know writing front-end tests can be a bit flaky and just strenuous, so at one point I also realized, ah, I have the components there, I can also write unit tests, so for that I just used a plain PyTest. A few challenges that I had, that's of course not all of them, but one that annoyed me a bit. I'm not a front-end designer, not in any real way, but the layout library renders all components in shadow roots, which makes it really difficult to change stuff with CSS, so you have to traverse the DOM with JavaScript and look where's the shadow root, go in there, look if it's the correct one, and then apply stuff. And then when I converted all the sections that I made to HTML that integrates the WebAssembly. Every new page loaded all the Pyodate stuff again. This was like 30 seconds to one minute of waiting between every page switch. If you're ever going to do that, I would recommend building a single-page app where all the stuff is in one like HTML file on entry point, then you just have like the one time start uploading. Okay, I think there's a bit of time for a quick demo. So, the description says I should write a function report fact, which calculates the faculty of N and gives it out via print. Any ideas? Recursive, I think recursive is of course a way, I think also the way most people get taught about it, but there's a bit more efficient way. So we'll just like write the starting number, base case is always one, iterate. So then we multiply by the number and then we return it. And then, who could have guessed, it's not correct, who sees the error? The function in itself is correct, but it says use print, report the fact, so we should printed, but we can check. Don't see my API key. No, don't worry. This is a free API key. So now it can send to an endpoint where I can just check if it's valid, and then in a bit we get a quite useful answer, at least for German-speaking people, what could we we've done better. That's basically how it is. The only thing that left our browser now is the AI conversation. Finally, I think I have one more minute maybe. This is so confusing. If I only had my time, a few features that we could have set up. Local storage is of Of course, only on your browser. If you want to continue a different machine, you have to start over again. So it could have been nice to set up a database. Finally, set up a back-end so users can progress on different machines. Internationalization. This was all in German because most of our customers are German-speaking. But, of course, for one, the Python Basics tutorial is also available in English, so I could continue there and work on an English version. And then a bit of gamification elements, for example, measure performance, so you can compare it to your keyings, like count the opcodes or reason about efficiency by calculating cyclomatic complexity or whatever. And that's all. Thank you.
+
+**Speaker 1** _[20:21]_
+
+Okay, thank you very much for the nice presentation. So we've received just one question in talk, so I would recommend to just hand over the mic. The question is from who? I can hand over the microphone. Okay, we will be happy to hear your voice.
+
+**Speaker 3** _[20:42]_
+
+Thank you. Thank you for that nice talk. Did you consider implementing what you present as a Jupyter extension to get advantage of all the...
+
+**Speaker 2** _[20:52]_
+
+But at the end, like...
+
+**Speaker 3** _[20:54]_
+
+highlighting and other things.
+
+**Speaker 2** _[20:57]_
+
+Yeah, on the road I researched into Jupyter extensions. They're like different kinds. And then it gets more like into JavaScript because Jupyter backend is also written in JavaScript and I sort of had to keep in Python world and I also tried out a bit. It was a bit annoying so I was quite happy with the panel.
+
+**Speaker 1** _[21:20]_
+
+OK. Any other question?
+
+**Speaker 4** _[21:27]_
+
+I don't remember, what's the current state of libraries that you can use in WebAssembly?
+
+**Speaker 2** _[21:35]_
+
+for instance
+
+**Speaker 4** _[21:35]_
+
+Like, for instance, the popular ones like NumPy.
+
+**Speaker 2** _[21:38]_
+
+That's actually a good question. So Pyodide doesn't only come with the Python standard library, there are many external libraries. I'm pretty sure NumPy is also included in there, so you don't have to recompile Pyodide, but you can also expand Pyodide, provide your own wheels. There it depends if it's only pure Python code or if they're C extensions, but it's all possible. Thank you.
+
+**Speaker 1** _[22:05]_
+
+More question or even sharing ideas or Do you want to add something else because we have some time some minutes
+
+**Speaker 2** _[22:20]_
+
+No, I don't know if I captivated everybody I got
+
+**Speaker 1** _[22:24]_
+
+Okay, more question.
+
+**Speaker 2** _[22:39]_
+
+Maybe I missed that in the beginning, but I like that as an application for teaching, right? Are you planning to deploy it somehow, that students can access it to learn? Yeah, sure. There are of course many more tasks to implement, like the checks, but what you saw right here was already the WebAssembly version, and so this would only need like a server to lay on and maybe like a reverse proxy to put in front of.
+
+**Speaker 1** _[23:09]_
+
+Okay.
+
+**Speaker 4** _[23:13]_
+
+So to answer the previous question, I encourage you to talk to the people from KUZI. There are, I think, four with Marius. There's a total of four at the conference. Veit Schiele, myself, Andreas Jung, and Marius, of course. Because we are maintaining the Python basics tutorial. tutorial we basically need someone to to kick us a little bit to that we put models work online
+
+**Speaker 1** _[23:48]_
+
+Okay, so
+
+**Speaker 3** _[23:56]_
+
+Is there some checks to prevent people nasty stuff like infinite recursion or something or is that handled by WebAssembly already?
+
+**Speaker 2** _[24:04]_
+
+That's a point where I was also, like I thought about it in the meantime when it was not already running in WebAssembly, we had all the checks running in Jupyter, and Jupyter and processes and threads are a bit difficult, I'm not sure how WebAssembly would run it. So yeah, basically in pure Python it wouldn't be a big problem, you can just put a subprocess and set a timeout or a recursion depth, count opcodes, whatever. But I'm not yet sure how WebAssembly would handle.
+
+**Speaker 1** _[24:43]_
+
+Okay, so if anyone is interested more or any more sharing ideas, you can reach Magis afterwards in the break time. So thank you very much. And we will move on to the next.
+---
+transcript_status: auto
+---
+transcript_language: en

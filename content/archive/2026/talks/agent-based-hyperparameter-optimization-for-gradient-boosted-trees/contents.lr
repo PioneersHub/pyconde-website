@@ -112,3 +112,149 @@ Hyperparameter optimization for Gradient Boosted Trees, such as LightGBM and XGB
 The proposed approach integrates Large Language Models (LLMs) into the decision loop using the Model Context Protocol (MCP) and a structured "skills" framework. In this architecture, MCP acts as a toolset—providing the LLM with specific capabilities to fetch campaign status, summarize rounds, and review history—while skills provide domain-specific recipes and step-by-step instructions in markdown format. Instead of running a single massive batch of 200 trials, the process is split into multiple smaller rounds. After each round, the LLM analyzes the results against the provided domain knowledge and official documentation to decide whether to continue the current path, discard specific hyperparameters, or shift the search region.
 
 Testing on four public scikit-learn datasets demonstrated that this agent-driven framework consistently achieves competitive performance compared to standard tuning. The system functions as a guardrailed loop where the LLM proposes actions that are executed via a predefined CLI, ensuring the agent cannot perform unauthorized operations. This pattern is extensible to other computationally intensive decision loops, such as deep learning training, infrastructure scaling, and A/B test management.
+---
+transcript:
+
+**Speaker 1** _[00:00]_
+
+Welcome to the session today's session is about agent-based hyper parameter optimization for gradient boosted trees Please join me in giving a round of applause for our speaker you Jo Kim
+
+**Speaker 2** _[00:16]_
+
+Hello, guys. Thank you so much for choosing this talk. So today, I'm going to teach you how to leverage a large language model to tune some machine learning model or even beyond working on your workflow. So my name is Heejo Kim. I work as a senior data scientist at Voice. So Voice is a Hamburg-based, fast-paced, growing startup, and we do offer AI-powered procurement software. to maximize availability, minimize cash flow investment, and cut 90% of manual planning time for e-commerce brands. So after this talk, I will promise you that you are going to learn a design pattern using MCP as a tool set and your domain knowledge in your industries. So I'm going to demonstrate on hyperparameter optimization as one sample cases, but it will be beyond this only hyperparameter optimization or tuning. So you are going to live with a blueprint for putting large language model into your decision loops and also with some guardrails. So if you do machine learning, that's great. Please take as a sample project that, hey, I can do hyperparameter optimization with large language model. Even though you don't do it, this will be a reusable pattern for agent-driven optimization. So Gradient Boosted Tree is one of the very famous machine learning frameworks. It's really winning across all the competition or even industries. I used to talk to other machine learning or data scientists, hey, what do you use for your data to make some prediction or to forecast? To be honest, it's not always really deep learning, which people are really crazy about. But mostly, I'm hearing that, hey, I use light GBM or XGBoost. Or when you go to Kaggle competition, more than 60%, 70% of winners are utilizing this light GBM or gradient boosted tree. So this is super powerful, but there is some limitation of using this machine learning model framework because there are 14 to 19 tunable hyperparameters that you have to really select and then really tune, hey, this value should be 0, 0.1, 0.001. So this is something we have to iteratively search for the best parameter. So one famous thing is learning rates or other thing, regression parameters for noise data, or is this model really have to go to deep or really the wide? or when we are doing some self-sampling strategies. So this right parameter is not something you can get from the textbook. That means it really depends on your industry and data set. So often, senior to junior telling, hey, you start with this five hyperparameter, and you run some tuning overnight, then you will get decent results. So this is what has been happening. And Optuna is one of the very famous framework in this hyperparameter optimization, because we don't want to do every greedy grid search over whole dimension, because we are going to fall into curse of dimensionality. That's why Optuna is doing a smart job already. What it does is doing some Bayesian optimization based on previous hour training or fit. And it tried to do more promising region. We do more fit and try. But still, it needs some exploitation, which means we have to run a few decades or hundreds of run before do some exploitation. So for five parameters, in practice, about 200 iterations is a good starting point. So if your model requires just one minute of fit or train time, then it takes 200 minutes or three hours. Acceptable. But if it takes 100 minutes or longer, then five parameters is already hard. And when it comes to I want to exploit everything, I want to find the best parameter for my forecasting or prediction model, then you can't really make it within the time. So our goal is we are going to find some middle ground utilizing, hey, large language model is so powerful to do some reasoning, and why don't we use it? So before really going to agent thing, so I want to get us aligned with some terminology. I'm sure all of us are hearing a lot about clouds, chat GPT, codecs, and Gemini. And people are sending some LinkedIn posts, hey, I have built this MCP, and this is a skill. You can integrate this. And everybody has some slight different definition of their own. So let us align with Entropiq's definition, because to be honest, they have embedded MCP, and they are pushing for very hard skills. So based on their definition, which I also very like, MCP is about connectivity. So one analogy is a kitchen. So it provides tools, ingredients, equipment. So in our case, we can get some real-time data access, such as database. And there's a tool invocation, what kind of tools are available, and then explain what it does. So it's all about what Cloud or Codex Gemini can do. And skills is about domain knowledge. So it's a recipe, focus, a keyword is step-by-step interaction. So there's step one, you do this. Step two, you do this. And based on step two's result, Azure is supposed to do action A or B or C. So this is something we are going to enforce. And our whole goal is user to accomplish complex tasks without giving too much of manual intervention. So in our case, I'm talking about hyperparameter optimization. Then Cloud Code will utilize MCP tools. So MCP, which is a kitchen, will give eight tools. So large-language model or agent is not going to do some random stuff. So we will pre-define, hey, you are supposed to do these eight tools. So in our case, get campaign status, get round summary, get campaign history. So here, campaign means, hey, let's run one campaign. And it's going to run like 200 or 2,000 iterations. And each round, we will define. I will get more details. And then in the end, agent is going to act on, hey, what action I want to propose, and then just run the next. And at the same time, skill is about tuning guide. So not only you are just owning as a team or as a company, you can document it, if this is what is happening around this parameter, then we need to do this action A, action B. So let's get to more details. So this is one iterated slide. Once they existing one goal hyperparameter optimization, we submit, hey, this is a five hyperparameter that I want to optimize, and then just run over 200 cycle, maybe over one night or a week. But what we can really leverage is, let's not just do 200 trials in just one go. We can split into multiple. In the middle of that, LLM with the power of MCP and skills, and make a decision, hey, should we keep going on this? Or maybe dump this hyperparameter, or we switch it. So this is something we can really give a guidance in between. So we don't have to wake up in the middle of the night and then check revise. Agent is supposed to do it. So let's do one demo call. I think that's more, I hope it works out. Okay. Okay. I'm using Cloud for the sample case. So this will be the thing that I will ask. I will just make it bigger. Hey, let's do some tuning for a certain data set. Of course, you can define that I have data set of e-commerce data, I have data set of farming, I have data set of something. Then based on skills, we are supposed to define what you need to do. It looks like fancy initially, but it's nothing. But we just write it down as a skill file, hey, step one. This is something you have to clarify with user. And let me just follow what needs to be done. I want to use light GBM. I will use this. We'll just keep it very short one. What is shortest? I think almost same. So you can define some different modes. Hey, is it the right one? Just agent is doing whatever we have defined. You have to really get the proper input to run this Optuna or other hyperparameter tuning framework. And unfortunately, Postgres is not running, so I actually didn't run Docker yet. But it is going to run. yeah during this is it's running let me just continue on presentation I will get back to you so this is running on the left side yeah I think it's better I make it big so this is the summer because it's going to take a couple of minutes maybe we can revisit later so it's rounds rather than we go full round at once we will split into multiple round and then LLM can just sit again and then use MCP as your kitchen tools check from the previous run is it good or bad we put we define coming from let's say light GBM or XGBoost official documentation and then what is each parameters is supposed to do and then we also write some domain knowledge about industry it makes the decision over the time and this is one like bigger sample I have just already prepared last night so I made like 20 sample cases so each 20 of like rounds it makes decision okay keep going keep going I think we have to really reduce these two parameter and add these two this will be the make it's It's going to make this decision in the middle of the work. It does nothing, but it requires skill based on your guidance. So this is how we can not only training go to 200, because what I have some impression about using agent workflow is I just want to have really the best model performance, but I don't want to really spend my time, but let some electricity burn so we can achieve the best performance. So this is the way or framework that we can achieve this goal. So Not only one sample case, I also included some more public data sets. One I really see, hey, it can produce some more meaningful, better performance. So then these are four public data sets coming from scikit-learn. And I just compared with just using 10 parameter or parameters in our agent tune framework. And then it got always not the worst. But here the catch point is, OK, this is going to change everything about hyperparameter optimization. I don't think this is the right conclusion, that we already have our very well-performing framework. On top of that, we will just iterate with the loop. Agent is going to make a decision in the middle of it. I want to, during this talk, this is the one that we get some summary during the round. And then after this round, agent is making next propose, and then run it on and on and on. So this is the pattern. So beyond hyperparameter optimization, first, agent is very powerful after some structured signals. because it can read very hugely manufactured JSON data and then really keep tracking of it. Second, agent can diagnose via domain knowledge. But it has only limited knowledge coming from the public or pre-trained data set. So we really need to define as a skill. Skill is nothing but read me file or markdown file that we are really specifying. This is condition A, B, C, D. And then based on that, you do it. And next, agent can propose an action, but this action should be guardrailed based on our thing. So it's not supposed to do some delete of our database, or it's only supposed to define our predefined tools through our MCP, which is our kitchen. And we can enforce these guardrails that only can do the predefined tools. and keep repeating until we reach the point that we are happy with our results. I really strongly believe that it works for any domain with some decision loops. If you have to make some computation or some experimentation, and then you have to revisit and revisit on and on, then this framework will really shine. So it can be certain optimization, or infrastructure scaling, or A-B test management. It will really work out. So in short, large language model will decide and code enforce, and MCP is the interface that it will really connect each other. Thank you so much for listening to my talk. And all the frameworks are in open source in the GitHub repo, so you can check out. So also very short advertisement. So our team is hiring for data scientists and data engineers. So just get back to me. Then I love to talk to you.
+
+**Speaker 1** _[16:13]_
+
+For the insightful session, there are a few questions. What are examples of domain knowledge you would provide to your agent? Do you have to modify this for each data set or each customer?
+
+**Speaker 2** _[16:32]_
+
+I would say it's really dependent on dataset level, not the customer set. Of course, if one customer has a very strong seasonality dataset, then of course you can enforce it. Let me make some simple examples. So in my former work, I used to have the count of red berries. So this count of red berries are detecting from certain camera, and then we detect it. But there could be some blur from foggy air, or leaf is blocking, or there's some ants is blocking the camera lens, then this can mean it's a noise for counting the number of fruits, counting the number of some leaves. So this kind of domain knowledge, we can enforce it. Hey, if you see some certain drop, you might ignore this, or you can do some smooth thing. So this is the domain knowledge that I can think of as an example.
+
+**Speaker 1** _[17:32]_
+
+Is the agent able to tune parameters beyond the ML model for example data pre-processing?
+
+**Speaker 2** _[17:39]_
+
+So I think it will even shine more when it comes to deep learning. So when I was doing the computer vision training, it takes a day or a couple of days for one training because for light GBM, it takes mostly likely one minute or ten minutes. It hardly goes more than an hour for just one fit. But when it comes to deep learning or other framework, then one cycle becomes very, very long. So we really want to reduce the waiting time for the humanist deciding. So I think LightGPM is one example, but there are potential to apply other machine learning or deep learning framework.
+
+**Speaker 1** _[18:27]_
+
+Instead of running an agent and a custom MCP, wouldn't it be easier to have a callback to a model from the training pipeline after a run to ask for the next parameters to test?
+
+**Speaker 2** _[18:38]_
+
+This is actually a very good question, and also some counter-argument. Because I just here define, which is following Anthropics' guideline, skills as a recipes. But there is another approach that, in skill, you can write it down, hey, this is API, or this is a callback. You can just immediately run this query, or you can make some request. It will also work. And some people say, hey, this is more token efficient, and it's going to work. So I won't say this is a bad approach, but there is two different words how to achieve the same goal. But to me, this is a simple and clean approach.
+
+**Speaker 1** _[19:22]_
+
+Could you show an example of skills you use? For example, this problem, what exactly the skills look like? What knowledge and rules do they provide? Yes.
+
+**Speaker 2** _[19:31]_
+
+for sure I love to show really the case so one skill I already presented is when I start some campaign the question list that asked I think I better I make it Bigger. OK. And the other skills that I, so it's all about markdown file. And I don't write this skill. If you go to Cloud, Codecs, ask, there is a skill called Create Skill. Then you are going to create skill using this skill. So please don't write down this thing. And Cloud will ask you the very good question, hey, what should I solve and what should I do? And then based on that, it's going to create these skills. And there will be tons of very nice materials in YouTube. Go and check out. But if you come back to me after this talk, I'd love to give some more demos and examples.
+
+**Speaker 1** _[20:36]_
+
+similar question what exactly have you provided like what information does the skill provide
+
+**Speaker 2** _[20:42]_
+
+Again, please.
+
+**Speaker 1** _[20:44]_
+
+What information is provided in Skills Year?
+
+**Speaker 2** _[20:44]_
+
+What information? In this demo case, I have prepared or injected only public data set, which I can just download from the public, because I can't really expose our client data set from our work. But what you need to do is, one, you define how to fetch your data from either S3 or from your local machine. Don't write it yourself, ask Cloud, hey, I have this framework, and I want to inject my data set, not the public one. And second, I am using lightgbmjust.fit. Probably you are supposed to have some pre-processing, post-processing, again, ask your Cloud, hey, I need to do some pre-processing, post-processing, so this is the extra work you need to do.
+
+**Speaker 1** _[21:39]_
+
+How do you avoid going into an over-footing mode?
+
+**Speaker 2** _[21:48]_
+
+This is, I think, beyond of this topic. I think I have to really come back to just standard answer or some boring answer. Please check your validation and accuracy and also regression term. We should never drop these parameters for regularization. And then we can also check from this gradient of boosted tree. But others, you can also check out the other, the data between validation and test results.
+
+**Speaker 1** _[22:25]_
+
+Can you do the same thing programmatically instead of calling an agent?
+
+**Speaker 2** _[22:30]_
+
+Because what it does in the end is just calling some CLI that I define agent tune, so my project. And agent is not doing anything fun. It just called, I'm doing agent tune init with some parameter just to the CLI. So we don't really need agent to do it, but I think it's much easier for us humans that just write a natural language. Hey, agent do X, Y, Z. Maybe you can spend 72 hours until you get the maximum output, but this is something much better to use
+
+**Speaker 1** _[23:06]_
+
+Do you think we could use a VLM and use training plots as inputs for the hyperparameter optimization loop?
+
+**Speaker 2** _[23:14]_
+
+feel him
+
+**Speaker 1** _[23:16]_
+
+Yeah, that is what I was trying to do.
+
+**Speaker 2** _[23:18]_
+
+I think I can't really answer, so yeah. Okay.
+
+**Speaker 1** _[23:21]_
+
+I can ask the next one how is the performance of past trials passed as part of the agent context?
+
+**Speaker 2** _[23:30]_
+
+So the question was how much context is consumed by this iteration?
+
+**Speaker 1** _[23:37]_
+
+Like, how is the performance of the past trials passed as agent context? You could read it here if you want.
+
+**Speaker 2** _[23:55]_
+
+I get the question right. This is something I can't memorize, but we, agent is supposed to log in every performance over each run, and it also looks at what was the previous performance validation or so test, and then just keep tracking it. So I think I just answered.
+
+**Speaker 1** _[24:16]_
+
+Do you start with a course grid of hyperparameter values in the first trials to quicker determine which parameter to dump from optimization?
+
+**Speaker 2** _[24:26]_
+
+So this is, I think, something you will start with your default value that you are putting the default as a skill again. I'm repeating the same term again and again. And then agent will start from this starting point.
+
+**Speaker 1** _[24:43]_
+
+I think these were the questions that were asked. Are there any other questions in the room?
+
+**Speaker 3** _[25:02]_
+
+Thank you so much. I suppose there was a sequential setup on Optuna, right? So it wasn't parallelized. If it's possible to extend the MCP framework, the kitchen, in order to use the parallelized hyperparameter optimization, say I would like to use a cluster as a backend or maybe even to use multi-core setup.
+
+**Speaker 2** _[25:29]_
+
+This is for sure it won't work immediately because this our tool is predefined to cause us sequential Optuna, but of course you may define the tool that Run next around underscore Marty Yeah, so I don't think there is any limitation because in the end what this tool will do is call again this Optuna input some input arguments which is a multi is true and put the rest of like relevant input there
+
+**Speaker 1** _[26:06]_
+
+Okay, are there any other questions? Okay, just give me a moment.
+
+**Speaker 3** _[26:19]_
+
+Hey, thanks for the great talk. I was just curious whether you have seen Andrew Kaparthi's auto research that he published about one month ago that is doing something similar. Could you maybe elaborate on what are the differences or whether you have also considered using that for the purpose of your work?
+
+**Speaker 2** _[26:46]_
+
+I am for sure get inspired from this auto research but I really like narrow the scope of only focusing on this this problem solving so I believe this is fundamentally the same approach to handle a complex and looping problem, but Andrew's approach was more generic and really like any research paper, I will really build it. For me, I just limit my scope to hyperparameter optimisation, so my short answer is it's doing the same job, but just problem was slightly different.
+
+**Speaker 1** _[27:38]_
+
+Okay. Thank you so much for this session. And that's it for today. This was the final session in this room. And now you all are invited to go on spectrum on the first floor for the lightning talks.
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -100,3 +100,253 @@ Searching through a threat repository containing one trillion records requires a
 The current solution utilizes ScyllaDB as a high-performance key-value store to maintain the source of truth, where records are stored using a primary key composed of the file hash and feature type. When updates occur, file hashes are published to Kafka topics. A Python-based consumer service fetches the complete data set for each hash from ScyllaDB to build a comprehensive document for Solr. To prevent Solr from being overwhelmed by redundant updates, a custom deduplication buffer was implemented using a Python dictionary to track file hashes across batches. This buffer employs a Time-to-Live (TTL) mechanism and an eviction callback; data is only processed and sent to Solr when a hash is evicted from the buffer, ensuring that only the final state of a file is indexed.
 
 To maintain system stability, the service limits the number of messages processed per iteration to prevent Kafka health-check timeouts during backlog clearing. Additionally, a secondary deduplication layer manages Solr commits and re-indexing across daily collections to avoid heap exhaustion and cluster failure. This architecture reduced update latency from 36 hours to under five minutes and decreased the ingestion volume from 100,000 messages per second to fewer than 2,000.
+---
+transcript:
+
+**Speaker 1** _[00:00]_
+
+Today's session is about how to search through 800 billion records in real time. Please join me in giving a round of applause for our speakers, Philip and Marino. You can ask your questions directly at talks.pycon.de, and at the end they would be answered through the Q&A. Thank you.
+
+**Speaker 2** _[00:27]_
+
+is the mic working we get things done yeah okay okay so hello thanks everyone for coming my name is philip and this is my colleague mirano we are coming from a company called reversing labs and we'll talk about an interesting problem we had working with billions of records and how we solved it of course um and so the title says 800 billion records It's not really 800 billion, it's last year's news because when we applied for the conference it was last year, it's 1 trillion by now. So okay, so let's see where this comes from. To give you a bit of a context, Reversing Labs is a cybersecurity company specialized in threat analysis of all sorts of files. So we perform all kinds of types of techniques on those files, which give us useful data. For example, from this data we can conclude if some file is malicious or not. But also this data is useful by itself, so we store it in our databases and provide to our customers through our products. give a sense of scale, our Thread repository contains information for more than 60 billion files, and new insights are coming for more than 150 million files each day. So we are talking about billions of records and petabytes of data, because for these files we can identify more than 500 interesting features. The thing is, we can easily provide this information for these files, but for the specific file. That's not a problem. But to enable our users to search across files using any arbitrary criteria, well, that's a completely different ballgame. So for that part, the technology we chose is Apache Solr. Solr is an open source search platform which indexes documents. In our case, a document contains all the information we have for a specific file. And it seems simple enough, but as Mirano would say, appearances can be deceiving. So, why? Well, first, even if we take only the most interesting data, we are still talking about hundreds of terabytes of pure text. Sounds like my reading list, or even worse, Mirana's JIRA backlog. The second thing, our file analysis systems consist of hundreds of microservices, with each microservice asynchronously generating its own data. This results in a flood of partial updates, and Solr doesn't like partial updates, at least on our scale. And the third thing, the same file can be analyzed repeatedly in a short period of time, but in a different context, resulting in different data, which prevents our cache usefulness. For example, a file can be analyzed independently, but later it can also be analyzed as a part of a broader analysis, which gives us new insights. So the conclusion was we need to do the data aggregation before inserting into SOLR. And for that, we chose ClickHouse. One reason is because ClickHouse is a very fast analytical database which is designed for handling large datasets. But the second reason, and at that point of time maybe even more important, is we already had the data there, because we used it internally for analytical purposes. Again, the same problem. Clickhouse was not very good with updates, at least frequent updates. So we had a daily job. This daily job took all the data from the previous day, joined it all together and created a single record for each file and sent it downstream to Solr, once per day. And it was good enough for some time. But soon it became clear that for our users, the most interesting data is also the most recent data, and this pipeline with Clickhouse had up to 36 hours of delay for the updates to become searchable. So the next step was obvious. make it real-time. Yeah? You heard that before? Well, to just make it real-time, we just needed a completely different approach. Our other services, the MPIs, already used ScyllaDB and Kafka. ScyllaDB is a tremendously fast key value store, which can easily handle tens of millions of requests per second. So what we did there, we created a table and we stored everything into that table. You see here, the primary key is file hash plus feature type. File hash is a unique identifier for each file and feature type tells us from which part of analysis this record comes. We need to store everything and have everything. And in case you were wondering, that's where the one trillion records are. So that's a huge table. Okay, so let's see how this new pipeline works. When an update occurs in this huge table, we also publish file hash into a Kafka topic. Then downstream, there's a service which listens to this Kafka topic, and for each file hash, it fetches all the data from this huge table, all the data we have for that file, and creates a document and sends it downstream to solar. And that's it. We could end this presentation right now. But, of course, you probably see the problem. The problem is this volume of documents is simply too high. Because, for example, a file hash can occur 100 times in a short while, and And in that case, we don't want to send 100 documents to Solar, we want to send one. So, what we did next? Well, I'll stop here, and I'll leave you with this cliffhanger, and I'll let Mirana tell you the rest of the story. Mirana, the stage is yours.
+
+**Speaker 3** _[07:48]_
+
+Thanks. Thanks, Filip. Okay. So it's time to get into some actual code. We'll look at what this service actually does. Here is a very simple snippet of code that just consumes messages from Kafka. We could poll for one message at a time, but that would be very inefficient. So instead we define some batch size, the bigger the better, and then when we fill that number of messages, we send the batch to this callback function, this process messages, We should just loop through those messages. As Philip said, in Kafka, messages only contain file hashes. So we are actually looping through file hashes, and we do this whole processing from fetching the data from Stila to transforming the record into solar-compatible data structure and then forwarding it downstream to a Kafka topic for consumption for ingestion into solar. And once we've looped through all those messages, we simply acknowledge or hack this batch to We tell Kafka that we are done with processing, and we've done everything here. If the service restarts or is redeployed or crashes or whatever, Kafka will not re-deliver messages from this batch that have already been processed. Now this technically works, but that's the too much data part. So let's try to reduce the volume of this. The most natural way to reduce the volume, given what our batches look like, because we have a lot of duplicate messages in the same batch, is to simply process each distinct file hash exactly once. And that's super simple to implement in Python. We can just throw it into a set, and we're already halfway there. But looking closer at what data comes in batch after batch, we see repeated file hashes from one batch to another, because we get analysis, and then we get record from one analysis in one batch, and then a few seconds later, we get the record from another analysis, but so many other messages have come in from other files in between that those file hashes have been moved up to different batches. So we want to somehow track messages across multiple batches, and to do so, we can implant the duplicated class, give it some TTL, and we can use a dictionary as a buffer, starting from way back in Python 3.7, dictionaries, they preserve insertion order, which means that when you look through elements in a dictionary, you'll get them in the order that you inserted them into. So we can effectively use the dictionary as a first in first out queue. So what we do is for each file hash, we check, we try to add it to the buffer. We check whether it's already inside. If yes, we just return a noop. But if it's not already inside, we it together in the buffer with its expiration time. We set some TTL in which time we don't want to repeat processing for this. And we have to do some housekeeping for each batch. We look through the buffer checking first message whether it's expired. If yes, we delete it and then keep going. We only have to ever check the first message because the first message is the oldest one. So if the first one hasn't expired, no other messages will have expired either. But there is a problem with this. If we encounter a message, we process it, and then within this TTL window, we encounter the same file hash, and we'll throw that update away. And if we never see that file hash ever again, we'll have stale data because we'll have never processed that last update. So ideally what we want to do is process the last message that we see, not the first one. But we don't know what the last message is. So what we can do instead, we can approximate and flip the duplicator on its head. Instead of processing data when we add to the buffer, we process data when we evict from the buffer. And we just have an eviction callback function that we invoke during eviction for each deleted key, and the eviction callback is just processing. And, yeah, looking at our visualisation, we We are successfully duplicating across batches, we are always processing the state after the last message, so all great. We have successfully implemented the data duplicator. But we have a data loss here. Because we are doing this at the bottom of each processing. We are telling Kafka that we have successfully processed messages, and we've only actually successfully added them to the processing queue. And if the service is restarted at this point, all those messages in the buffer will get thrown out, and we'll never get them again. So, we obviously can't acknowledge messages here during the processing. We have to, during the process messages callback, we have to do them in the eviction, because that's the only time that it's safe to acknowledge the message after processing. But we're also throwing a lot of messages away. Here we're only, here we're processing, we're scheduling each file hash, but we're not actually processing it. So what happens to those messages we've thrown away? Do we have to acknowledge them too? event, if so, when. And to learn about that, we have to take a small digression, a crash course into Kafka. So Kafka is a distributed event steering platform. But what it actually does is just it's a message queue so that you have publisher services which write messages to Kafka topics, and then you have consumer services which consume those Kafka topics. And it works so that if you have multiple consumer services, all services get all the messages from this topic, but if you run multiple replicas of the same service, each replica will receive its own approximately identical share of messages with no overlap between them. So you can easily horizontally scale this. And the way this works under the hood is that Kafka topics are split into partitions. And in this example, we have a topic with four partitions. So if you have two replicas, which replica will get assigned two of those partitions and each will read its own messages. Now when messages are inserted into topics, they are added to the end of one of the partitions with its next sequential ID called offset. And when consumers acknowledge messages, they don't acknowledge individual messages. They can, but Kafka doesn't track individual message acknowledgements. Kafka only stores the offset of the last message from each partition that has been hacked. So you can't do out-of-order acknowledgements, but you also don't need to acknowledge all messages individually. You can just say, acknowledge everything from 139 to 134. And this stored offset will shift to 133. And so what does this mean for RD duplicator? Well, say you have this partition with 10 messages in the stream. As the duplicator goes to the stream, it will add the messages to the buffer every time it encounters the first distinct message for that file hash. And now, if it's time to process it, When we process message A100, we do it afterwards, so we've actually picked up all the changes from all messages with A file hash, so we want to acknowledge messages 100, 103, and 108, but that's not safe to do, because if we acknowledge all those messages, we'll acknowledge also implicitly all those messages in between, and that potentially leads to data loss. At this point, it's only safe to acknowledge this message 100. And this continues on with messages 101, 102, but then when we get to this D104, something gets interesting. We've skipped over 103, we forgot about it because we've thrown it away, but at this point when we've processed this message 104, we've also implicitly acknowledged this 103. And if in this point the service is restarted, yes, we'll have to reprocess all those messages intermediate that we forgot about, but that's not a big deal. But if the service continues working properly, as soon as it processes the next message, all those will be immediately acknowledged implicitly. So in conclusion, what we're doing is already pretty much correct. We want to acknowledge only the message that triggered the processing. So what we do is we extend the code to keep track of the partition offset pair for the message that we add to the buffer. And when we add it to the buffer, we read the partition offsets from the buffer when we call the eviction callback. And then we just after processing, we just add that specific partition offset. And yeah, that's pretty much it, ship it. And we did ship it, and it worked great for the first five minutes. And then everything came crashing down, a flood of errors, Kafka started complaining, and then everything stopped. So what happened? When we started the service, we had billions of records in the backlog in our Kafka topic, and our service immediately sprinted through that backlog and added everything to the buffer with no extreme ease, and once it came time to process, to evict and process the first message, it successfully processed it, but since this scheduled processing that it was doing all the time was super lightweight, and expiration timestamps between messages were mere microseconds, and processing took a lot longer than microseconds. As soon as the first message was processed correctly, the next few thousand messages were also ready for processing because they also expired, and this kept going. For each new process message, we had thousands more expired and waiting for processing. And we got stuck in this victim process expired messages loop until the service would clear all the messages from the buffer, but in reality what happened is that after five minutes, Kafka's health check kicked in, because Kafka checks how often you poll for new messages, and after five minutes, Kafka looked at our service, decided that we haven't asked for any new messages within five minutes, decided that our service is no longer healthy, and promptly cut us off and unassigned all of our partitions so that it could be reassigned to other more healthier replicas, but there were no healthier replicas because all of them were doing the same thing, and the whole thing crashed into a crash loop. So what we can do then is limit the number of messages we process in each iteration. Instead of evicting and processing for as long as we clean out the entire buffer or we reach the time stamp that has not expired, we simply set a limit to how many messages we process in each iteration, and if there is a large backlog, if there is an already known delay in processing, what this effectively does as a side effect is increase the TTL of our service so that we actually get improved the duplication rate while the service is cleaning up the backlog. And as soon as the backlog is cleared, this max evict messages is never actually hit in real time. So yeah, this is actually what is currently pretty much more or less what is currently deployed in our systems, and it works great. But there is one more thing. This produces messages for ingestion into Solr. Now when we insert data into Solr, there is another problem. Data in Solr is stored into collections. of collections like tables in a regular database. And when you insert data into Solr, that data isn't immediately searchable. Data becomes searchable only after it is committed to index and the collection needs to be re-indexed, which is very computationally heavy operation. It scales with the total data set size. It's not something we can afford to do on every insert. But it's also something that we cannot afford to wait for too long because that uncommitted data stays in heap. So if we keep delaying this committing and re-indexing, the heap might blow and the whole node might fail, or even worse and more likely scenario is that we'll get a cascade cluster failure. And we definitely want to avoid that. So what we did is we repeated this. Our new pipeline is that we have this service that consumes caches and generates documents, And then when we insert documents into Solr, we also store the names of collections we've just inserted into Solr. And the way we've structured these collections is that we create a new collection every day, and then we write files into collections with the same day that we first saw the file. That ensures consistent sharding, and it means that the vast majority of writes happen to the latest few collections. And if there is some batch reprocessing or someone asks us to rescan some old file, that's not a big deal. And then we have another service that has the same kind of the duplicator that listens to those collections and triggers, commits, and re-indexes of affected collections with some deduplication period where we can tune it so that we have the most recent collections be updated more frequently where we have data that customers just uploaded and is more relevant, we want to push that as much as possible, and then we have some older data caused by reprocessing that we want to update that in Solr as well, we want to make it searchable, but there is not that much urgency in that. And yeah, this is the final pipeline that we currently have. It gives us granular control.
+
+**Speaker 2** _[21:33]_
+
+from
+
+**Speaker 3** _[21:34]_
+
+from everything about depending on cluster load and available resources, we can scale the duplication period, we can check whether we need to pull back on the detail of documents to reduce the load on Solr if there is something or stuff like that. But more importantly, what we did, from the initial 36 hours of latency that Filip mentioned, we are now down consistently under five minutes, thanks to the duplicator which reduced the initial volume of 100,000 messages per second to just under 2,000. And yeah, that's it. Thank you very much for listening. If you have any questions, Philip will love to take them.
+
+**Speaker 1** _[22:20]_
+
+Thank you to our speakers for the insightful session. I would now go through the questions. This one is a very popular one. What tool did you use for your presentation? It is a very dynamic and a very and well put together.
+
+**Speaker 2** _[22:38]_
+
+Well, it was easy, we used Mirano.
+
+**Speaker 3** _[22:42]_
+
+Actually, it's just a website. It was written pre-LLMs, so it's actually not wipe coded, it's just written in plain JavaScript and uses Anime.js for tracking animations.
+
+**Speaker 1** _[22:57]_
+
+The next one, may there be a buffer overflow during the process underscore message call?
+
+**Speaker 3** _[23:03]_
+
+I'm not sure where you see buffer overflow. Can the person that asked the question elaborate?
+
+**Speaker 1** _[23:32]_
+
+If the person is here, maybe you can ask.
+
+**Speaker 3** _[23:34]_
+
+I would love to answer the question, but I'm not sure where the buffer also could be.
+
+**Speaker 1** _[23:39]_
+
+In the meantime, I can go to the next one. Was there a reason for not using materialized views for ClickHouse to handle duplicates and deletes and let ClickHouse do the job instead of having a pipeline?
+
+**Speaker 2** _[23:53]_
+
+Well, it was a reason, because we had the older version of QlikOS at that time, and materials views were a new thing then, and that's the thing. But also, for example, now we are not sure with this scale would it work without testing it for, as we said, we are using it for analytical purposes, so we would also like to have it in real time.
+
+**Speaker 3** _[24:23]_
+
+Yeah, we're actually doing right now on the roadmap there is an item that we're trying
+
+**Speaker 2** _[24:23]_
+
+Yeah, we're actually...
+
+**Speaker 3** _[24:27]_
+
+to do this near real time in QlikOS as well, but there are some issues with the scale of the data given the hardware that we wanted to put it on.
+
+**Speaker 1** _[24:39]_
+
+Would there be a benefit to take the number of occurrences per hash into account for that?
+
+**Speaker 3** _[24:44]_
+
+Is there a number of...
+
+**Speaker 1** _[24:46]_
+
+Occurrences.
+
+**Speaker 3** _[24:48]_
+
+We don't currently rank based on the number of hashes, as long as we've seen the hash we want to process it here, and in the search people don't actually, at least our customers don't actually ask about how frequent or how well processed the file hash is. It could be for a file that's a bit different design, it could work.
+
+**Speaker 1** _[25:13]_
+
+Next one. What happens if a file appears after it has been processed? Do you simply process again and override?
+
+**Speaker 3** _[25:20]_
+
+Yes, that's what currently we are doing. The thing is that in Solr we are overwriting the record with whatever new record we create for that single file. This doesn't mean that we will process each file exactly once, because we don't know when it's the final message, but this gives us the TTL that defines how long we are willing to wait for the file to become, for the update to become searchable, and if it takes more than like if the update comes in one hour, we want to have we would have wanted to have the updates by then already. So we'll just.
+
+**Speaker 2** _[25:56]_
+
+Yeah, like we showed on the slide, we're keeping it under five minutes, so that's for us.
+
+**Speaker 1** _[26:05]_
+
+Okay, why store the hash partitions in our dictionary? This won't prevent duplicated partitions across different consumers. Why not store in a Redis DB for example?
+
+**Speaker 3** _[26:17]_
+
+Okay, so each consumer has its own buffer. The buffer is literally local in memory, and file hash always arrives in the same partition. So back in the...
+
+**Speaker 2** _[26:27]_
+
+in the
+
+**Speaker 3** _[26:29]_
+
+In this slide. So each partition will say you have file A, it will always arrive in the same partition. So it will never be shown across multiple services. Each replica will see, each file will only be seen ever by a single replica.
+
+**Speaker 2** _[26:44]_
+
+Yes, as we, for example, we mentioned the primary key is file hash, and file hash can be distributed as we want to partition, you know, so for example by prefix, and everything which starts with the same prefix will appear in the same partition.
+
+**Speaker 1** _[27:04]_
+
+Why do you store the features in a separate DB instead of Kafka?
+
+**Speaker 3** _[27:08]_
+
+So Scylla is our persistent DB that contains all the, so when you get a new update for the same feature type, it will be overwritten because that's part of the key, but Scylla has entire history of the data and Kafka is just a message queue for communication, so data older than a few weeks will be removed from Kafka by its retention mechanism that automatically cleans up all data.
+
+**Speaker 1** _[27:36]_
+
+Have you thought about using Kafka streams for deduplication? Sounds like Kafka streams support similar sliding window deduplication out of the box. Not sure if it would be better, just curious.
+
+**Speaker 3** _[27:48]_
+
+I think Maria actually tried this. We did try this, but this proved to be a more efficient design. We actually don't have Kafka streams in production because something didn't work. I didn't work on that.
+
+**Speaker 2** _[28:05]_
+
+But we'll try again.
+
+**Speaker 1** _[28:08]_
+
+Could you give us more insights about the infrastructure, resources, hardware, storage strategy, et cetera?
+
+**Speaker 3** _[28:15]_
+
+Can we?
+
+**Speaker 2** _[28:16]_
+
+Well, I don't know, maybe for a discussion after the talk.
+
+**Speaker 3** _[28:22]_
+
+Ask us when we are not recording.
+
+**Speaker 1** _[28:25]_
+
+Okay, why solar and not elastic search?
+
+**Speaker 3** _[28:31]_
+
+Well, we actually tested Elasticsearch, and for this specific use case, Solr was better. We do use Elasticsearch in the company for some other use cases, like audit logs. I didn't personally do the testing, so I just know that...
+
+**Speaker 2** _[28:48]_
+
+I just know that yeah but I think that the scale was much lower we could we could operate on the probably the same hardware
+
+**Speaker 1** _[28:57]_
+
+What hash algorithm do you use?
+
+**Speaker 3** _[29:00]_
+
+Well, we actually hash using SHA-1, SHA-256, and we have, like, indexes for MD5 and stuff like that. Legacy. Yeah. We have very many customers that still use MD5.
+
+**Speaker 2** _[29:20]_
+
+So many questions
+
+**Speaker 1** _[29:22]_
+
+Yeah, I think most of them are answered now. So if there are any questions in the room, maybe you can raise your hand and I can give you the mic if needed.
+
+**Speaker 2** _[29:31]_
+
+Was it unclear or too interesting?
+
+**Speaker 1** _[29:36]_
+
+I think it was scared, yeah. Okay, just two more.
+
+**Speaker 3** _[29:44]_
+
+Not really about your problem that you solved, but do you ever have any collisions in your hashes? Yes, we actually have whole pipelines designed to track collisions both in MD5 and in SHA-1.
+
+**Speaker 2** _[29:55]_
+
+Yep. Yeah.
+
+**Speaker 1** _[29:59]_
+
+My question is about budget. Is moving from ClickHouse towards your solution affected your budget in any way?
+
+**Speaker 3** _[30:09]_
+
+uh
+
+**Speaker 2** _[30:11]_
+
+Well, not really because we already mentioned all our other services and APIs use CLA-DB, so we just put it.
+
+**Speaker 3** _[30:20]_
+
+We just bought a few more disks.
+
+**Speaker 2** _[30:22]_
+
+Yeah, a few more servers, a few more disks, but we had the technology. We had the libraries and everything for that, so it was...
+
+**Speaker 3** _[30:29]_
+
+And also this huge table that Philip talked, we are actually in the process of migrating
+
+**Speaker 2** _[30:29]_
+
+Yeah, and also...
+
+**Speaker 3** _[30:35]_
+
+some other APIs that could only use that table as a source of truth so that we don't have duplicate data. So in the end, we're trying to...
+
+**Speaker 2** _[30:42]_
+
+Yeah, we call it the most expensive pipeline, but because of that we want to reuse it for other services.
+
+**Speaker 1** _[30:49]_
+
+Okay, then we would like to thank you for the talk.
+
+**Speaker 2** _[30:53]_
+
+Thank you. Thank you.
+
+**Speaker 1** _[31:00]_
+
+10 we have agent-based hyper parameter optimization for gradient boosted trees thank you
+---
+transcript_status: auto
+---
+transcript_language: en

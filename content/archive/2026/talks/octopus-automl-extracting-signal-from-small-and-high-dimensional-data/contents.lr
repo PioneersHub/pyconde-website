@@ -106,3 +106,145 @@ Octopus AutoML is an open-source supervised machine learning library designed sp
 To mitigate this, Octopus AutoML implements nested cross-validation. Unlike standard k-fold cross-validation, this approach uses an inner loop for hyperparameter optimization and an outer loop for testing, ensuring that every data point is used for testing exactly once across multiple models. This process reduces the impact of split seeds and allows for model ensembling to improve overall performance. To address high dimensionality, the tool integrates various feature reduction methods directly into the nested cross-validation pipeline to prevent information leakage, ensuring that dimensionality reduction is performed only on training splits.
 
 The framework includes a comprehensive data health check to identify input issues early and a modular benchmarking system to compare different tools, such as the native TACO tool and AutoGluon, under identical conditions. It supports regression, classification, and time-to-event problems. By automating the pipeline from data preparation to evaluation, the tool enables a high-throughput screening approach where numerous use cases are ranked, allowing researchers to prioritize deep-dive investments only on the most promising signals.
+---
+transcript:
+
+**Speaker 1** _[00:03]_
+
+Hello everyone. We are back with the next talk, which is Octopus AutoML, extracting signals from small and high-dimensional data, presented to us by Andreas Wohl and Nielsen Hase from Merck. Give a warm round of applause.
+
+**Speaker 2** _[00:28]_
+
+Thanks for the nice introduction. Our talk is about another AutoML tool, but we think it's still worth doing it because we didn't find anything that has, working with small data and high dimensionality, a problem that occurs often in our company. So my name is Nils Haase. I'm a data scientist at the EMD Digital Group at Merck. I'm more coming from so I'm a physicist by training I'm coming from the material development I first start in the lab and then more and more over coming to this data science approach and yeah in the end we figured out that there's some lack for daily work that we won't work on so this is like an open source project so you can also use it if you want to So
+
+**Speaker 3** _[01:20]_
+
+My name is Andreas Wöhrl and I'm a data scientist in Merck Healthcare and in Merck Healthcare we do a lot of machine learning but we live in a small data world. So like a typical clinical trial has 300 patients and what we are really interested in is that does machine learning work on 50 patients?
+
+**Speaker 2** _[01:45]_
+
+Yeah, that said, whenever people talk about machine learning, it's all about big data, it feels like. So, for example, I mean, autonomous car driving is a hot topic right now. And so I looked at Intel and they say, like, you create like four terabytes of data each day with each car, which is a lot. And we could only dream about. So what you end up with that, you have millions or trillions of data points and you generate way more samples than you have features. I don't know how many sensors you have in the car, maybe 100, 150. And compared to this million or trillions of data points, you really get this like vertical flow when you have your samples against your features. So here, for example, overfitting is maybe not a problem because you have so many samples. Maybe you can remove outliers quite easily and so on. So the real problem is scalability. When you now join a company like Merck, things look a little bit different. So it's even hard to find public data set that really showcase our problem. So I found one interesting that is already from the early 90s, last century. But I think it gives a nice idea what problems we are dealing with. So it's about arrhythmia. So if you have an abnormal heart rhythm, this can be detected via machine learning. And back then, to create this data was a lot of effort because you need experts, they have to look at the graph and so on. So each data point you generate it was really costly. So in terms of nowadays you have all your smart watches, maybe this is not the case anymore. But I think it's a really easy transition to our current problems, like when we look at cancer, we want to create a new medicine. You for sure don't want to test it on like 10,000 people, maybe if you have a new drug. The same is true if we go to creating new materials for the semiconductor industry or the display industry, what we do at Merck, then normally it takes, I don't know, three to six months to synthesize a new molecule, and you still want to learn from it. So I normally end up with data sets that have 50 data points. If I'm lucky, I get 100 data points. But you still want to do machine learning to extract valuable insights out of this. So this example shows quite good what we can do with that. So we have like 150 patients and comparably around 280 features. So you get from this vertical stack to like a horizontal stack. So you have way more features than patient or at least the same number. So it's really like a small data set with high dimensionality. So when we talk about high dimensionality, it just means we have a lot of features compared to the number of patients. So the question is then, does normal centered machine learning, you can do with AutoGlue and whatever you name it, is this still valid, or do we run into problems because we have some changes in it? So what I have done is now for this example data set, I created different splits. That means it's always the same data set. The only difference is that some points are in training and some points are in testing, and I just change it. And then you get results like this. So we have five different data splits, and we get, like, for split one, split four, and split five, we get more or less the same result. So we get a score of 0.9. But then we have split two, which outperforms quite a lot. So we end up with a score of 0.94. And then we also have like split two where the score is very bad and we go with 0.77. So if I go to my scientist and I talk to them, so what is the best option to create the model? So if I do just like one split and end up at split two, I will tell them we have a super good model. we can use it, no worries. And then we will figure out over time that it may not be as good as we expected because it was just a lottery. I took a nice split for me and we have a very good model. The other part would be we end up in split three. The model is not very good and I would tell them, yeah, I don't think we can really do something in machine learning. The model is not good enough that we get any insights out of it and then we just leave it. both cases would be false in this case and both would be cost us a lot of money so it's really about knowing can I trust this model or not if I end up in like split one split four split five you maybe have like the real insights or you can have a yeah you can trust these more or less so you can already see that you maybe need to treat your data a little bit different if you want to do machine learning, and you also get an idea of what you can do. So everything that we implemented is nothing new. For example, this is called nested cross-validation. You do normally if you have very low data. But there's nothing out there that does this more or less automatically. So you have to do it all by yourself, and then you end up with different problems. We come to this later, because implementing in a nested cross-validation is maybe easy, but it gets you down the road into some troubles. So that's why we thought there's really a need to have this AutoML tool, even though there are a lot out there already, but nothing that really fits our problem. So yeah, we can just recommend if you have small data, although that's maybe the key takeaway already from my side, If you're going to have little data, you can remember this plot before and see, okay, maybe I run into a problem. Or you can just use Octopus AutoML. So it's a supervised machine learning. We have regression problems, classification, and also time to event. It works for a small data set, as I already said. And what you can also say, this is all driven by real industry problems. So, we figured out that we have some problems that we want to solve, and we already looked at these things, and then we developed this tool, and at some point we finalised, okay, we want to make this public, and people can use it also at our company, and this is not just used by, I don't know, Andreas and me, so that you can all have the advantage about that. It's like an open source under Apache 2 license. So you can go to the GitHub link and just work with it. Or you can also just pip install Octopus Autoclue, I guess. And with that.
+
+**Speaker 3** _[09:18]_
+
+Okay, now Niels mentioned, so what he mentioned was one of the problems that we face when we do machine learning on small data sets. So this lottery problem, so how do we tackle that? Before I explain that, just a short excursion into the classical approach. The classical approach is we have a data set, we split away a test data set here shown in red. And then we do a cross-validation to train and tune a model. And then once we have that model, we test it on the test data set and get the generalization performance. And that exposes us to this lottery problem. And what we do is we take a data set, we do this nested cross-validation, we split the data set into five equal parts. And each of those parts becomes exactly one test set. And that means in the end, we not only train one model, we train five models in the end. So what are the benefits? First, we reduce the impact of this data split seed dramatically. The second one, we test on every single data point and also get for every data point a test prediction. And then in the end, as we have five models, we can also investigate those models. For example, look at what features do those models use. And that tells us a little bit about the robustness of the solution. So if all models use the same set of features, that would tell us, oh, there is a converging solution, and that builds trust in our solution. Nested cross-validation comes at a cost, and that is compute and also complexity. And Octopus is designed just to take care of that complexity. Once we have trained a model, we always, in the end, we want to predict on new data. And then there comes another benefit. As we have five models, we can ensemble those models, and that ensembling also improves our performance. The second issue, as Nils mentioned, is the dimensionality. And coming back to the example he showed, so for this arrhythmia data set, we had roughly 450 patients, 280 features. that that means two patients per feature, two times as much patients as features. And that is a situation where machine learning algorithms start to struggle. So the message is clear. We need to reduce that dimension. And there are a lot of dimension reduction methods outside. We have checked or investigated them all and selected some that we find very beneficial and have implemented or imported that into this Octopus AutoML. The main point here is that we have embedded that in the nested cross-validation, and that prevents information leakage. For example, feature reduction should never be done on the full data set. It should be always done after the data split, and we take care of that. then like the first step to great results is a very simple one and it's simply is avoiding mistakes and that's why we with octopus we cover the full process machine learning process we start at the data preparation we cover data split we cover model training and also provide tools for model evaluation. So this process is full of pitfalls that need to be avoided. And one of the biggest topics already starts with the input data. And that's why we developed a comprehensive data health check that catches those problems very early on. The next big topic is the data split. And in contrast to other packages, we completely take care of the data split. So we take care of the splitting of the test data set and of course of the inner splits to avoid all the typical mistakes and the biggest point or the biggest issue of them all is information leakage i already mentioned that so never apply a processing or feature reduction method on the full data set but it can be also like very subtle on an organizational level to give you an example of a topic that we cannot cover is if you have two teams working on the same data set and the first team tells the second team about let's say three or four features that don't have an impact, that is already data leakage and it's something that needs to be avoided. So we cannot control every aspect of information leakage, but whatever is possible in our means we have done in Octopus. octopus is not only a machine learning tool it's also we have extended it to become a benchmarking tool because we have faced the situation that the machine learning world is a fast moving world and there are many claims in this and the claims are done on maybe benchmark data sets which may different to our data sets. So what we really needed or what we need is a way to compare tools against each other and this is what Octopus also provides. We have designed Octopus in a very modular way. Our own native machine learning tool is called TACO, but we also provide other machine learning tools from external libraries like Autoclone. So we import them and to make to be able to compare and what we want is we want to compare tools on identical conditions like identical data splits um but yeah and and yeah on the identical conditions and on our own data sets so if you use octopus you can basically you can benchmark on your data sets we also included feature selection methods, packaged them in modules, and the benchmarking framework allows to design complex, let's say, machine learning workflows where you can explore the different methods. The important point is that all that, all this benchmarking is done within this nested cross-validation, so we take care of that. Now some comments on how we started to use Octopus. So having Octopus available, and over time we have built trust in its capabilities. So we now have, let's say, good trust that if there is a signal in a data set, there is a high chance that Octopus finds it. And the third point, of course, it is an AutoML tool, so there is a high degree of automation, so the full process is much shorter. So all those three points together changed our approach to how we deal with machine learning use cases. And our typical setting is that we have many use cases, we have many ideas, but limited resources. And then when we invest in a machine learning use case, then we have one attempt. So if a data set or a use case fails, we don't look at it again. So what we now do is, because of this automation, we let it run, let Octopus run on as many as possible use cases, then rank the use cases and come up with a short list. And then we only do deep dives on that short list. So in this sense, Octopus is not only a machine learning tool, but it also helps you to make decisions where to invest your time. In order to wrap up, Octopus is a machine learning AutoML library optimized for small data sets. Its development is driven by our industry use cases and we now have made it open source so that everyone can use it and explore it and test it. Octopus has been a teamwork, so many thanks to the contributors, so they made this possible. And also many thanks to the people who gave us advice and to help us to shape our direction. So Octopus is available on GitHub, have a look. You can easily install it via pip and we would be very interested in your feedback and ideas. With that, thank you very much and happy to take questions.
+
+**Speaker 1** _[18:24]_
+
+Thank you, Nils and Andreas, for this wonderful talk. I remind you really quick that you can ask your questions on talks.pycon.de, as well as upvote questions. And the first question is, what's the difference between nested CV and standard K-fold CV?
+
+**Speaker 3** _[18:52]_
+
+I mean, the nested is that you do it twice. And with a standard cross-validation, you cover only the, let's say, inner loop. With a nested one, you do two on top of each other.
+
+**Speaker 2** _[19:08]_
+
+Yeah, we have to do this because we're doing hyperparameter optimisation, and so we have a force and back between, we call it like development dataset, and you should never do any assumption on your test dataset, right? So which model performs best? So that's why we use this nested cross-validation, so we do everything on our development dataset, which model works best, and so on. Otherwise, you introduce like data leakage. So you need to do it twice just to avoid data leakage would be the short answer.
+
+**Speaker 1** _[19:42]_
+
+the next question is what exactly is the optimization for small data sets how you have you adjusted the modeling part or do you use vanilla ML algorithms
+
+**Speaker 3** _[19:56]_
+
+Mm-hmm
+
+**Speaker 2** _[19:57]_
+
+Do you want to answer? Yeah, in principle, we just use, when you call it vanilla, so we use like standard libraries, right? So we do hyper-optimization, hyper-parameter optimization and so on, but there's like CatBoost, Random Forest, what you name it. But we also use like AutoGlue, so whatever AutoGlue uses, you can also do it. So as I said before, there's nothing like super special we introduced, but it's more like putting them all together in one tool so you don't have to select I just want to test like random forest and that's it no you just want to put all the things together so like in this model I approach that we don't have to test all these things by ourselves
+
+**Speaker 3** _[20:45]_
+
+Maybe I add something to here. So there are multiple approaches to that to deal with the small data sets. I mean, and what is beneficial is to combine different approaches like feature reduction methods. And what we also have implemented is a tool to constrain the hyperparameter optimization. optimization, so that in this hyper parameter optimization, that models are rewarded that are leaner from the beginning. But there are many ways of doing it, and that's why we provide this modular platform, so that you can test on your individual data set what works best for you.
+
+**Speaker 1** _[21:36]_
+
+The next question is an interesting one. How easy was it to obtain the company's permission to release the package as open source?
+
+**Speaker 2** _[21:46]_
+
+Yeah, so we were pretty lucky because I don't know who attended last year, but they are also the developers of the baby package, which is also done by Merck. So they get the way that it's a little bit more easy, so we can just use their work. And it was not that easy. It was easier than we thought, right? because I think like Merck is also very open to topics like this and it's just like we think there's a value gain to have this whole community because we thought that having like one single bug in your code is worth a lot of money, right? So if somebody outside of our company finds that, it's still worth to get like open-sourced just because we can maybe rescue two or three projects and yeah we also so we are just using open source tools in there right so there's nothing like fundamentally we're doing different you can just go on sklearn and find everything more or less what we are doing here right it's just like really the combination and the speed up and yeah
+
+**Speaker 3** _[23:01]_
+
+What we also found internally, so, I mean, our team is a very diverse team coming from different business units. And what we found is that because of this diversity, we get a lot of different information how to shape this software. And this is also the question to the audience. Please give us some ideas what you find useful and what you don't find useful. And we, of course, would like to consider that in the upcoming developments.
+
+**Speaker 2** _[23:32]_
+
+Developments, I think the only constraints we got is that we were asked to have a talk at the PyCon if we want to go public so
+
+**Speaker 1** _[23:40]_
+
+Excellent, the next question is what is the smallest data set size the AutoML framework needs to work well?
+
+**Speaker 2** _[23:52]_
+
+That is a hard question. It depends on how good your features are, I would say. So I think the smallest data set where we really got good results were 50 data points. So it depends a little bit on what is a good model, I would also say. Do you want to have best performance? But from the material development background, I would say you can still have a rather good model, but if it helps you to filter out the ones that really would not work and you limit your options so I mean the chemists they have like lots of ideas right and if you have like a solid model where you can get off like 30% of the models you want to synthesize that is always a huge gain and then you maybe just need like a good model but not the best model at all so it depends a little bit on your use case I think in healthcare it's a little bit different.
+
+**Speaker 3** _[24:51]_
+
+I was just thinking about one use case, one project I worked on, and we started with 67 patients, and I was very pessimistic about it. And finally, we were super surprised it worked. So we got a very, very strong model. But let's say that only, I mean, in this regime, it only works if the signal must be super strong. With a weak signal, it doesn't work. So in this case, we were lucky we had a strong signal, and it was a classification. So in this data set, also the classification was balanced, very balanced. And those two things were the precondition of it in order to make it work. If we had, let's say, an unbalanced data set with weak signal, no chance.
+
+**Speaker 1** _[25:38]_
+
+Okay, the next question is is octopus also able to cover imbalanced data sets when you have a small data set as entry point
+
+**Speaker 3** _[25:48]_
+
+We try to cover that.
+
+**Speaker 1** _[25:55]_
+
+Can you also use your framework for large data sets? If not, why not?
+
+**Speaker 3** _[26:01]_
+
+There should not be a problem in using large data sets, but what we didn't do was to optimise it or to technically optimise it for, let's say, one million samples or two million samples. Let's say all our optimisation efforts went into how to make it work well on small data sets. But there's nothing that, in principle, would stop it from working on a large data set.
+
+**Speaker 2** _[26:31]_
+
+I think the question is, can I do it or should I do it? So the compute is increasing quite a lot. If you have, I don't know, 20 data splits, and if you have one million rows, then I don't know if you really want to do that. So I think that's why we also, I think there are other ML tools out there that already fit the purpose, but that's why we only focus on the things that matter for us.
+
+**Speaker 1** _[27:01]_
+
+Can one use Octopus AutoML for tabular data?
+
+**Speaker 3** _[27:06]_
+
+It is primarily tabular data, yeah, and so is we we should have mentioned it. It's a tool for tabular data, but Of course, we are exposed to multi modalities in in our real work life, but there is one Trend that is is helping us a lot. So they are this there's this emergent of all those Foundation models, for example I'm now thinking of image foundation models and what those models do is basically they take an image and create an embedding and then the problem is converted from an image problem into a tabular problem where basically now we are playing.
+
+**Speaker 1** _[27:58]_
+
+I'm sorry, I'm trying to understand the question, I don't understand the question. Can octopus handle sparse data, or nonce, or corrupt data?
+
+**Speaker 3** _[28:11]_
+
+To some degree, of course, we do support imputations, but I mean, this could be a direction to develop it further. So I guess if it's too sparse, one hits some limits.
+
+**Speaker 2** _[28:27]_
+
+Also, we don't allow any nuns in the target currently.
+
+**Speaker 1** _[28:34]_
+
+I'm going to read the question and maybe you understand it better. Have you tried quantifying the confidence that the results of two models trained on very small data sets are different significantly and not just due to noise?
+
+**Speaker 3** _[28:48]_
+
+Yes, we do that. So that is one of the main directions to quantify this noise.
+
+**Speaker 1** _[28:56]_
+
+Could you expand a bit?
+
+**Speaker 3** _[28:58]_
+
+Yeah, I mean, it's like, so this is one of, like, we get performance means, and we also look at the standard deviations. And because if you have two solutions, then, of course, one should also do a significance test to find out, are those two solutions really different?
+
+**Speaker 1** _[29:26]_
+
+That was the last question. Thank you very much a round of applause to our speakers Please Visit the github page of the project of course and the Merck stand is in the first floor If you have more questions go to the Merck stand. Thank you very much
+---
+transcript_status: auto
+---
+transcript_language: en

@@ -129,3 +129,177 @@ Large Language Model (LLM) applications often fail in production despite passing
 To address these issues, a user-centric development approach replaces traditional waterfall or agile models with a process focused on transparency and real-world data. The methodology begins by collecting a baseline of 100 or more real-world questions, including the expected answers and the specific source documents required for the response. To manage performance, Arize Phoenix (OPIC) is used to trace the LLM pipeline, allowing developers to pinpoint bottlenecks—such as distinguishing between slow data retrieval and slow model generation—and communicate these constraints to the customer.
 
 Trust is established by explicitly defining the system's limitations and providing sample questions to guide user interaction. For Retrieval-Augmented Generation (RAG) systems, transparency is increased by providing direct links to source chunks and utilizing metadata filters to ensure the model retrieves information from the correct product version. Finally, adoption is driven by implementing "quick win" features that solve immediate pain points, such as voice-to-text maintenance reports or automated email translation, which integrate the LLM into the user's existing daily workflow.
+---
+transcript:
+
+**Speaker 1** _[00:04]_
+
+Good afternoon everybody We give a warm welcome to Frank Rast and Thomas Praxin We have today to talk about it works on my machine YLM AppSpam users, not tests, at the Palladium room The stage is yours
+
+**Speaker 2** _[00:31]_
+
+When some of you are delivering or developing LLM-based applications, you probably know the drill. You develop, you test, you deploy. Ten minutes later, customer calls are broken. Now, before I get into that, let me give you some context and I don't want to give you any advertisement or something, just for you to understand what we are doing. This is what we have in mind. Our day job is to free companies from what we call digital business work. If you're producing in Germany, your shop floor is basically full of robots, but your administrative floor is typically full of humans doing robots work. And this is what we do. Just very briefly, we do have a platform which is basically a fast API application. We basically treat everything as if we are a model ourselves. We use some Qtrend, some Postgres, some S3 storage, and we get kind of everything from customers.
+
+**Speaker 3** _[01:56]_
+
+first agent to agent.
+
+**Speaker 2** _[01:58]_
+
+And we literally talk to any model as long as it exposes some sort of API and we talk to any frontend as long as it can talk to an API and we can run on any infrastructure as long as it runs containers. So our day to day job is understanding processes, understanding data and then most importantly understanding user experience. Our customers typically come to us when they think generating AI will be a long game so they want to invest quite heavily
+
+**Speaker 3** _[02:37]_
+
+and to bring their whole organization together.
+
+**Speaker 2** _[02:39]_
+
+or if they have been disappointed by tools, because in a world where most people try to deliver off the shelf, we basically do tailor-made applications for companies. But enough about us, let's get back to the problem. Working like this means we have our users as part of our testing process from the very beginning. ideally users look like that and are part of the software development process themselves and of course we have tests various automated tests but still back to topic there's a call and people tell us the AI doesn't work in the last In the last two and a half years, since we've been working on this topic, we have found three major dimensions of these problems that we want to talk about.
+
+**Speaker 3** _[03:41]_
+
+expectations.
+
+**Speaker 2** _[03:56]_
+
+is operational. Now let me give
+
+**Speaker 3** _[04:02]_
+
+examples of that, you know, just some real life experiences that we had.
+
+**Speaker 2** _[04:08]_
+
+in the past. The first one and also the oldest one is
+
+**Speaker 3** _[04:16]_
+
+in a word where
+
+**Speaker 2** _[04:19]_
+
+was created by GenGPT. So we are competing at least regarding inspections with consumer level API. It's shiny, it does everything, it works for everyone and it always has an answer.
+
+**Speaker 3** _[04:41]_
+
+to work on a specific set of use cases.
+
+**Speaker 2** _[04:45]_
+
+on everything. We are optimized for a specific target group. And the reason why both these are true is we not only have to give an answer, but we have to give an answer that's kind
+
+**Speaker 3** _[05:05]_
+
+it's not very useful for business applications so still no of course we need to manage
+
+**Speaker 2** _[05:20]_
+
+that is tailored.
+
+**Speaker 3** _[05:27]_
+
+is
+
+**Speaker 2** _[05:32]_
+
+The problem with functional is we design for a specific
+
+**Speaker 3** _[05:37]_
+
+access to a specific set of data, whatever it is, and then the user tells us
+
+**Speaker 2** _[05:45]_
+
+for us, that our service technicians are using. It's really great. And now I ask it to do an email for marketing and it doesn't work. So either data was never available, because it was not in scope for what we did, or, and that's of course also true regardless if you have some connection to some you know in-company data lake storage whatever
+
+**Speaker 3** _[06:12]_
+
+or something
+
+**Speaker 2** _[06:17]_
+
+the CRM system or the ERP system.
+
+**Speaker 3** _[06:22]_
+
+So that's the functional part.
+
+**Speaker 2** _[06:38]_
+
+that it works all of the time when the customer is using it. One example here is time. When you are using your coding system today, maybe you're used to sometimes minutes if not hours of letting your coding agent do stuff. But for example, if you're working in a hotline And you have customers colleagues our customers have their customers calling them and they want to give an answer That is not an answer people tell them
+
+**Speaker 3** _[07:16]_
+
+It takes one to two minutes.
+
+**Speaker 2** _[07:17]_
+
+two minutes. So I can't do that much small talk anymore on the phone. I need your answer quicker. And we tell them, well, we don't understand with my computer in our development setup.
+
+**Speaker 3** _[07:29]_
+
+It is less than 10 seconds.
+
+**Speaker 2** _[07:35]_
+
+In this very specific case, one of the reasons was that, you know, when it was running in the customer's tenant, their LLM provider suddenly had timeouts. Right? One minute, two minutes, and then we were out of the game. So, three major problems.
+
+**Speaker 3** _[08:04]_
+
+The customer says it's wrong.
+
+**Speaker 2** _[08:06]_
+
+The one being that we have to manage expectations, the second one that we need to make sure that functionally everything is as expected, the third one is that we need to make sure that operationally it stays working. And how we do that? That is what Frank will tell you now.
+
+**Speaker 3** _[08:33]_
+
+when we start a project is to somehow make the users happy using AI. When I started or when I studied informatics 25 years ago our life as developers was quite easy. So maybe not easy but it was predictable. So we had waterfall models and we had something like a complete plan what to do. We somehow knew our obstacles. So it was like hiding with the map. We knew what we were focusing on. But the problem with that is that waterfall models sounds great for developers but not so much for users. So typically we had our formal specifications but they didn't meet the expectations of our users. This is why also some years ago Agile development arose. So we had something which helped us to better connect to the users and to also make sure that we always can adapt to changing user demands. So it was more like hiding with the compass, you know your goal, you don't have a predefined plan, but at least it worked. Now we have AI, and developing with AI. And it feels more like you're now hiking in a fog without a compass and without a map. So what do I mean by that? We have instead of predictable software, we have non-deterministic LLMs. So instead of a predefined user interface know what your users are clicking or doing, you have something like a chatbot where people just type in whatever they like. And most importantly also for us, you don't even know what kind of data requirements you have because you don't know what your users are requesting. So your goal is that you are somehow a guide which leads through this process with the users and you do this by giving them focus, create trust and transparency, and also ensure that the user experience is always great. So, how do we do this? Sharpen your focus. Before we start coding, so before we start single line, before we start writing a single line of code, we start collecting real-world questions. So, we talk to the users and tell them, okay, what kind of question do you, or are you looking to get answered? but what kind of answer are you looking for? So how we do this? Now, hopefully this works. I thought it's maybe more interesting to do this in this live setup. So this is just a demo case, a demo data set, but what we collect is really like, what is the question? For example, what are the mandatory break times during your workday according to the Arbeitszeitgesetz? So it's a German law. Then you note down what's the expected answer, and this is also very important but this is what we collect here you also tell the system this information needs to come from this specific PDF about Arbeitszeitgeist so this is an example but this is what we do whenever we start a project we collect 100 or more questions with the correct answers and also with the sources where this information is coming from. So this is the first step you have. Then the second part is you need to focus on the most valuable feedback. So early on, you identify your core group of users, your project team, who is really willing to support you, who is maybe a power user later on, and you work with them very closely. And you tell them, okay, this is a joint cooperation between us. And whenever you use our, for example, chatbot, we collect the data. So what we do is we tell them, okay, you know what, we have, for example, like this dashboard, which we also share with the users all of the time. This is why we incorporate this into the front end. You can see, okay, there are a lot of messages. we have the ratings and then you go with them through their feedback and you tell them okay you asked for the specific capacity of an iphone 17 you didn't get the answer you were looking for and you noted it also down here and then we try to explain okay why is this information not available or what might be done to improve the quality of the answers that's very important And that's why we do this several weeks in the first phase of the projects. Then, and I think that's the next slide. For us, it's also very important to not only get the qualitative feedback from the users, but also to understand your bottlenecks. As Thomas explained, it is very crucial that the response time meets the user expectations. and for that you need to understand what's really happening behind the scenes and I'm not sure who of you is, let me stop here using OPIC OPIC is a nice software which we are using where we trace all our projects several projects where you can see there are a lot of questions and answers where we enable the tracing you can see the response times is also for what the average response time is for the chats and what's more important for us and this also helps us a lot with when we are talking to customers about the performance it also gives us an overview okay what process in this chain takes up how much time and as you can see okay detecting the language based on what the user typed in it's important for us to answer in the correct language, it's not an LLM, so it's very fast, but we have the specification agent, it's a small model, you have your workflow, and you can see, okay, the retrieval of the data is very fast, but the generation, I need to scroll, is taking up more time. So, now you have the basis to talk to your customers and tell them, okay, I mean, we optimize our pipelines but the problem is your LLM provider is not fast enough for generating the response. So this is OPIC and as mentioned this helps us really to also understand where our bottlenecks are. So what we typically then do is beside the profiling we select different models maybe running on a specific DBU server, which is at your customer's side, or finding other models, and if needed, also optimize the retrieval process. So the next thing is that we need to build trust and create transparency. What do we mean by that? And I think this is maybe obvious, but it's very important. Tell up front what you can't do. So tell them what kind of data is not available. Tell them what kind of questions you will not be able to answer. Because it's very important that you reduce the frustration in the beginning. Because everyone will be frustrated because the expectation for AI can do everything is real in everyone's head. Tell them what you can't do. And then tell them also what you can't do. And this is, I think, most of you who work with chat GPT interfaces or with chatbot interfaces know there's some kind of sample question so that people get an understanding what kind of questions they can ask and also how to ask them. Because especially the RAC process needs some kind of structure to get better results. And then, and that's also something especially for the initial phase of the project, working with the core team power to the people what do we mean by that we mean that let's start differently if you're working for example on something like a rack based channel you start putting a lot of data into your systems and the problem with company data is that it's a lot that it's unstructured there's no metadata so it's really a mess and it's like if you want to find data in there it's like finding a needle in a jar of needles so it's very similar because maybe it's the specification of a product and this is the specification of a product B and the specification of a product C so it's very hard to find the right information what we do is and to also highlight that is we provide whenever we have, let's take a predefined question, whenever there's a question, for example, is the iPhone water resistant, we provide an answer, and then, and I think this all of you might know, we also provide the links, okay, where is this information coming from, what you see here are the different, the specific chunks, this can be done better, but this is how we currently do it, and they can immediately see, ah, okay, this is, the information is coming from this document that's the right document but as mentioned before the problem is if you have a lot of documents for example and you can see it here you have iphone 13 14 15 16 17 all the technical information it's very similar and if now someone is asking for specific information maybe you have hundreds of products it's very hard to find the right information but what we do and what you also need to show to the users because they really start to understand the value of that, you show them we have specific metadata which we assign to your data and in this case it's a product name and it's iPhone 15 so whenever they have a chat and they tell you ok I don't have the right information you tell them ok then please look, the filters we applied automatically, are they fitting this to the specific product you were looking for or for the specific part you were looking or searching for information. And this, I mean, even if it's very technical, but it helps to discuss with the people okay, what can we do to improve this and what maybe should be done more explicitly by allowing users to set a specific filter up front because this is done automatically but maybe they want this filter up front and this helped us a lot especially because and we didn't expect the debt that people ask us i know my documents why can't i just put in the right metadata myself so this is also what we then provide to the power users okay if you have specific metadata you can assign it and then it's also available for the automatic filters later on so very powerful also for you to learn also important and this is also about trust and transparency I mentioned in the beginning we are collecting a lot of questions and we have a baseline when we start the project and whenever we do a sprint review we also share with the whole team this is where we now stand we approved some things and so on so it's basic but it helps, again, based on the questions you defined earlier, to also manage expectations. So, last but not least, and I think this is for us at least the most interesting learning we had, we were focusing on our main tasks, so something like, okay, we have questions, we need to provide the correct answers, we need to improve the RAC system system or the connection to specific ERP systems to find the right information but while talking to the users we also learned quite some interesting things which also helps us to convince more users of this solution and important is that you also strive for quickness for example but people told us, okay, you know what? It's nice that you have this specific chatbot, but what I need to do is I need to email translate. So it's, I mean, we are all experts. I mean, it's the PyCon. Everyone of us knows how to use DeepL and maybe write some scripts for that. But for them, it's really like, wait, I can copy and paste my email somewhere and it formulates an answer in the language of the people who are requesting this information from me. It's like eye-opening. I mean, they are doing this, but it was very cumbersome. And, I mean, it's trivial, but it is something we just provided. And there are similar examples like bitumen summaries, text-review formatting, or FAQ-based answers. If you can do it, and you can do things like this very easily with LLMs, just do it. Because they love you for it, and they also then ensure that people are using the software. Another example, because it's also very nice, we talked to the company, and they were telling us, it's nice that you want to do this knowledge chatbot for our service and support, but you know what? We don't have the data. And we were asking, why don't you have the data? Yeah, because our maintenance guys, when they do a fix, they fix it and they typically, well, hopefully, they then go back to the PC or laptops and then create a maintenance report. Write down what was the problem, how did you fix it, and what are the fail-ups. The reality is no one is doing that. So for them, it was really hard to use AI for maintenance reports. And we told them, okay, you know what? we just create something very simple when your maintenance guys are driving back from their company you just have a record button in this application where you just via voice recording you just tell them okay I was creating a maintenance report, I was visiting a client, blah blah blah, there was something wrong, this is the serial number and then we have a pre-formatted report which is filled out and then automatically sent to the backend system. It helped them a lot. For us, it was not so much work, but this was one of the killer features. This is a more advanced one. This is also what you can do because the customer helps you to build up this metadata information. They had the problem that they had hundreds of products. The problem they are facing is, okay, we have also hundreds of characteristic tasks. So when I'm looking for a specific product, we don't have a product information system. And we told them, you know what, we have the data. If you are looking for something like this, we can build this quite easily. So now if you're starting in something like I'm looking for a product with a mechanical sensor in a silver context, which can be used in hazardous atmospheres, the system applies those filters automatically and then tells you, okay, now we only have those products left. And then you can see it down here. based on other criteria. So it's a product finder, which can easily be done based on the data we have. So I think key takeaways, at least from our side, is the 10GPT expectation is real. Plan for it. So as Thomas mentioned, this is what you are facing every time you tell people you are implementing AI in a business environment. Analyze what users actually ask and we mean not only by looking at some log files but by talking to them and then build on that and try to figure out what to optimize and really focus on this one. If there are quick wins you can do, just chip it because this will drive the daily usage of the system. All right, thank you very much.
+
+**Speaker 2** _[26:09]_
+
+Adios, eh?
+
+**Speaker 1** _[26:10]_
+
+the user feedback to improve the model
+
+**Speaker 3** _[26:15]_
+
+The model, if you mean, if the question is if we retrain or fine-tune the models, we don't do that. What we do is we improve the whole chain, the whole pipeline. So maybe there are some prompts we can optimize or there are some filters we can apply which helps us to even.
+
+**Speaker 1** _[26:44]_
+
+what is the pattern you are using to see the evaluation question and expected comments
+
+**Speaker 3** _[26:50]_
+
+Yeah, sorry, I didn't mention that. The platform is still OPIC, or OPIC, and they have a very good REST API you can use. So we really love this, but the problem we are facing is that OPIC, you cannot provide another interface to the users. This is why we use the REST API to implement it here and then just get their results in our front end. So this is just another example I didn't show before. We have also some different metrics. For example, if we test automatically, this is also coming from OPEC, we have something like, okay, we measure the source accuracy based on some RAC questions, or we have an LLM, which judges the quality of the answers for specific questions. This is all done through OPEC, but we integrate it in our interface so that we can show this.
+
+**Speaker 1** _[27:54]_
+
+How do you test for conversations and
+
+**Speaker 3** _[28:04]_
+
+Yes, this is also coming back here. This is exactly what we're doing here. So this LNM judge is really doing this. Okay, is this the right answer? Maybe phrased differently. Is there some kind of hallucination in there? It's also based on this specific judge.
+
+**Speaker 1** _[28:31]_
+
+to platform to deploy production already
+
+**Speaker 3** _[28:36]_
+
+What we use is we use containers for sure and we now have Kubernetes infrastructure for companies who are not willing to deploy their own solutions. So if you like, you can use the same containers in your Azure infrastructure or even on your local PC. you see it's not a problem but for us it's a kubernetes based and we're running this by ourselves and provide the
+
+**Speaker 1** _[29:13]_
+
+That is what users ask and build on that. Isn't it dangerous giving outpick in the market and user experience and expectations?
+
+**Speaker 3** _[29:23]_
+
+There's a famous quote from Henry Ford. If I would have asked the users what they want, they would have told me faster horses. And I mean, somehow it also applies here. When they tell you what they are looking for, what kind of answers they are looking for, you need to be a little bit careful, but at the same time, you learn so much more by talking to them. because sometimes they are asking some things, and if you dig deep, well, ask them.
+---
+transcript_status: auto
+---
+transcript_language: en

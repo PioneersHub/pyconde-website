@@ -80,3 +80,153 @@ Large Language Models (LLMs) introduce significant security risks when used for 
 To mitigate risks, a strategy of limiting the "blast radius" is essential. This involves running agentic AI—which can execute shell commands and write files via tools like bash—within isolated virtual machines (VMs) with limited API keys and no access to critical production data. Because prompt-based guardrails are "soft" and susceptible to injection attacks, security must be enforced through hard-coded system constraints and external validation scripts.
 
 An advanced approach to managing complex projects involves agentic workflows using specialized teams. By assigning distinct roles—such as a Product Owner, Architect, Security Expert, and Advocatus Diaboli—developers can maintain focus and context. Integrating security reviews at the start of the development lifecycle, rather than at the end, prevents costly architectural failures. This workflow is supported by maintaining modular project documentation in markdown files to manage context limits and implementing a continuous improvement process through "team retrospectives" to refine prompts based on logged failures.
+---
+transcript:
+
+**Speaker 1** _[00:01]_
+
+Good morning, everyone. How you guys enjoying the first day of the conference? Good? All right. Welcome, everyone, for today's first session, opening session. First things first, during the session, if you have questions, you can use your phone and go to talks.pycon.de. and there you can find the whole schedule and the schedule for today. You have to scroll a bit to the right to find this session specifically and there you can ask questions. And today I have Sonia and Lisa, volunteers who are helping me to moderate the questions. And let me introduce you to our first keynote speaker of the day, Gabriela Bock. She started 40 years ago hacking to play games in Eastern Germany and this curiosity led her to a 30 years long already career in tech. She's a longtime member of the Chaos Computer Club. It's nowadays a conference here in Germany, very prominent. Many of you might know that. She's also a former maintainer of the Dillon and Lisp compilers. More recently, she joined Mobile DE as Chief Information Security Officer and, most important for us, she's a Python enthusiast. So please help me welcome on stage Gabriela.
+
+**Speaker 2** _[01:40]_
+
+Yeah, thank you so much for the introduction and glad to be here The world of AI is changing so quickly and blink and you miss something right I when you do two three weeks of just using AI without looking into the development you feel like you're missing something and So when I was asked whether I would like to have a keynote on the PyCon, I was honored of course But this was a couple months ago, so what I looked into at this point in time was a bit of crypto code that we wrote. Details don't matter, I don't tell too much details about company internals, I show you public projects, but I still can share what I learn. But so much has happened since then, so I will talk about the crypto part as well, don't worry. But I will also talk about the experiences I made with AI, the insights I got, the learnings to take from there, and a little bit of hopefully framing this in the right perspective for you to be able to judge usage of AI in your coding life and in the projects you do. I mean, a year ago, or two years ago, I was kind of skeptical looking into AI, thinking, you know, that's the next Bitcoin, eats up a lot of energy and isn't really useful. You would have code completion in Visual Studio, right, you press tab, you get a bit of code. And the quality of the code was, I mean, about the same that you would get from copy pasting a Stack Overflow answer. So the security implication more or less is nothing changed at all. And then I joined Mobile and there were people working on a project that involved crypto and they essentially vibe coded that up in a hackathon in a week and then asked me, can Can you look at that, can you look whether it's secure? And to absolutely no one's surprise, that's not good, why are you doing that to me? To absolutely no one's surprise, of course it wasn't secure. And I started seeing issues, but then I started using AI to look into more issues, and that turned into something really interesting. And by the way, due to the changing nature of AI and the evolvement of everything, I didn't bring slides, so this is my slide for today, everything else will be live. So we had access to cloud code, so I pulled out cloud and said, you know, can't hurt to look into that, can it? And said, you know, could you do a security analysis of this code? like do the OWASP top 10, your regular, you know, injection, bad use of crypto, everything. And, of course, a couple of vulnerabilities fell out. So, I mean, that's a good start, right? So AI is not just able to write security vulnerabilities, it's also able to find them. So maybe we can use that for something useful. And I kept working on that, working on that. And there is a BSI technical report on the crypto protocol on the implementation day. And next thing I sat down and essentially, it was a long process. It took a week for me to tell it how to read a PDF page by page, right? Extract the contents, translate that into a set of requirements in a document, and then start writing tests for those requirements. I mean, six months later, you just say, go read the PDF, right? That's how much changed since then. But yeah, this is where we were. And voila, it found the next bunch of vulnerabilities. Those ones are a bit trickier. And then I started, you know, applying things that I theoretically knew, but that would have taken me like a day or two or three each to research and to implement the test correctly. So I said, you know, you're using elliptic curves there. Can you check whether any of those cryptographic primitives in use actually check for invalid points, right? Elliptic coordinates where one of the coordinates is zero. Stuff like that. Or known invalid keys. Play around with buffer sizes, et cetera, et cetera, et cetera. and it sat down, read a couple of papers and started writing code with standard test vectors to test the epic case. A couple of test vectors for the kind of attacks I suggested. And I found another round of vulnerabilities in that code. But that's already the first pattern that you see here. If you trust the AI to do the thinking for you, you will be burned. You need to use it as a tool and you need to drive it in the right direction so it doesn't ignore problems that you know exist. I found it to be an excellent amplifier for the things I vaguely know and sometimes completely useless for the things I don't know because I can't see it, I cannot judge the quality. So at the end, for me it's important, I'm still in the driver's seat, I'm still doing that and I mean you all know the usual problems oh you're absolutely right I didn't see that sorry oh I'm so sorry for deleting all your data I thought that was test data and you wanted a test that gives me a success result I wrote one that says print success no stuff like that and so you need to be very careful to start building your different layers of checking for those things what's what's your assurance that what's going on is the right thing to do right so for for the crypto code it was getting the set of requirements making sure I have the prompts that check for those requirements, making sure I'm looking into does it do the right thing, right? Does it actually check the functionality? No, I've seen it write integration tests against a complete mock. So that's not an integration test, that's a unit test, you know? Oh yes, you're absolutely right, I'm sorry. It's, that's a repeating pattern. Yeah, so I think we almost implemented all of the crypto stack of the library that we used in the end for our tests anyway, so we're that close to actually just doing all the crypto ourselves. So, I mean, I still don't recommend rolling your own crypto, but if you do, and if you use AI wisely, it might help you get better crypto out of it, because nobody loves writing 200 tests, and that's what AIs are good at. And then you need to come in and say, you know, did you think about refactoring that? I see the same code, copy-pasted 20 times. this needs to go somewhere in the prompt so all the quality issues you see you need in your process to have a way to check for to steer so everything you would tell a junior programmer like that's not correct what you're doing there you're not testing the edge cases you copy paste code right that's all stuff you also have to tell the AI at one point or another usually you have to tell it twice So the answer many people give you when you point to those problems is, yeah, yeah, I have another AI jacket. And, you know, on face value, this sounds ridiculous. But it actually is not. So my experience after playing around with that quite intensely is that the thing you need to consider when designing your agentic workflow is the cognitive capability of the individual agent. You have a context. Context is limited. And that's where I'm getting to the new part that hasn't been there when I designed the talk title. and the the cloud code agentic AI feature where you have agent teams right you have multiple running at the same time this is very helpful to manage the limits right there they're like humans the usually I agent feels a little bit like I'm very very smart person slightly hungover from LSD that's a very very bad short-term memory and very little focus and but you can start creating roles you can say I have one agent that's responsible for architecture I have one that's responsible for security I've run one that's the Advocatus Diaboli it's just you know it challenges everything if someone goes over something their job is to just find that and I will show you that in a second but before We were talking about agent security, right? Why do I feel comfortable typing that? Oh, no, let me do it the other way around. Who understands what's written there? It's not everybody in the audience. So a little bit of explanation necessary. so modern AI usage what we call agentic AI the agentic just means it can call tools and the most important tool is bash it can execute a shell command and it can write files and then when you have Python on the system it can write arbitrary code and execute it so just a little side note I found MCPs to be mostly a waste of time unless I can use them smartly for guardrails. But these days, I just, you know, tell it, you know, there's an API, go write some Python code for me to call the API. That's much faster, much more flexible, and it actually fits the thinking of the AI in air quotes much better because they have read a lot of code, and, you know, tool calling is kind of bolted onto the side. Okay, so what dangerously skip permissions does is usually when the AI calls a tool, you have to approve it. You have to say, yeah, that's okay. You don't need to ask me again for doing that. That's harmless. Or, no, that's kind of dangerous. I want to be in the loop when that happens. So ask me every time. And what dangerously skip permissions does is it completely disables it. So I now have an AI with no human intervention. It can do whatever it wants. Why am I feeling confident to do that? This is running in a VM. there's nothing on the VM that I can't afford to lose because the code is in a repo on GitHub, right? Every time I push, I have a backup of the code. It only has access to handcrafted API keys. So it can only do a certain number of things, right? I'm not confining it by controlling every tool use because you're sitting there and babysitting your AI, right? Pressing return all the time. It gets boring. You lose your attention. And no, I cannot change my screen saver because it's a company-managed property. So, and I want you to take this home as a thought. What's the blast radius? What is the worst case that can happen if that AI starts doing bad things, like deleting all your test data? Oh, I didn't know you needed that. You worked a week on that. I'm so sorry. So sorry for your loss. Yes, that happened. Blast radius is the idea. Limit the capability of the AI to what you can afford to lose. So the opposite of open-claw, just give it, you know, do whatever you want. The second thought that I would like to connect with that is the thought that the safety of user input, guardrails for confining the AI. The good thing about what I'm doing here with the VM, the limited file system access, with the keys, with limited capabilities, is it's hard-coded. It's pretty hard for the AI to get around that. For this one, it's impossible. we're getting to the problem later at the end of the talk because things evolve more quickly than you can think there are documented cases you probably all have heard about the fridge that was now using AI to fill itself up and then people talking it into ordering a Playstation and giving it away for free everything that is prompt is sort of a guidance but the defense against you know, sweet-talking the system into ignoring their instructions isn't very good. Everything that's prompt-based in terms of your guardrails is soft and can be worked around and is prone to injection attacks. So if you have a chatbot that you put on your website, the chatbot should only have access to, on the same level as the user using it. You need to, on the level of the tool calls of the system, make sure that this cannot call any tools you wouldn't want the user to call directly because you can't sweet-talk the AI into calling all the tools it has for you with all the parameters you want. Yeah, so that's the way around that. So hard-coded guardrails in code and then use AI on top of that within the confines you want to have. You could do other things. You could have an LLM generate something and then actual hard-coded lines of Python that check validity and correctness. If you have something that is a difficult research problem but that you can validate, always write the code to validate in the end. What I wanted to show you is the role model. That's a little hobby project I'm working on, so no secrets there. As I mentioned, the new Cloud feature with the agent teams, there were agents before, but you give it a task, it runs in the background, it gives an answer. The agent teams can actually talk to each other during lifetime. So I have one prompt that is responsible for managing the teams, and then specialized team roles. Some of them I have in every project, like there's a project manager. That's a product owner who writes the user stories for me. There's an architect caring about architectural issues. We have the security expert. We have a change manager who's responsible for making sure that the different agents don't step on each other's toes for management of gits, for pushing to production, so that they're gating. And then depending on the task, so what I'm writing here is a little audio project I'm doing on the site. So I have an audio engineer. And their prompts actually specify what their roles are, what they do, and what they don't do. And this helps me to get the right focus in the right context. I have 10 co-members here. Of course, I can add additional workers. And in the prompts, there's also the lifecycle of the different objects. So I've specified what's the user story, what's the lifecycle of the user story, where do I want to be involved? And also critically, since we're talking about security here, when does the security review happen? So there's always an encouragement to, during development, consult the responsible agents. When I first did that, it does what everybody in the industry does for security. They're putting the security validation of the product at the end. And what many of my customers, back in my consulting day, learned the hard way is, when you do that, you might have to scrap the project and start over. I once destroyed a two-year, 20-people project, and they scrapped the technology and started over. They didn't look very happy. That's why I left the consulting business and went into first security architecture, no security governance, because you need to do security from the beginning. So I had to teach that to my agents as well. And they're talking to each other during development. Every time something comes up that influences the audio path in the system, we get the audio engineer in. Every time I need to change something in the user interface, UX specialist gets in. Technical writer responsible for keeping documentation and everything, et cetera, et cetera. Workflow for the tickets. So it's built in a way that either you have it everything in files and memory. So one important pattern is I keep everything about the project in markdown files across the project with instructions to keep it modular because it ends up writing 5,000 lines of code and then reading that every time and running out of context. But that's in there. You don't need fancy memory management systems. It works fine with that, keeping index file. That's good. And either it uses one of those memory files for my tickets or it also is able to work with Jira and for the stories and for the to-dos actually use Jira workflows. And then comes the time, you know, story acceptance. And it wants to create a pull request. And this is where, again, the full team agent team comes in for a review. And it usually finds things, right? So that's my project state here. Currently working, I'm trying to get an audio, real-time audio stack work on a Raspberry Pi for a little DJ project, trying to get the real-time features work. It has a lot of tough and interesting challenges that I wouldn't be able to solve myself in my free time. So I'm very happy AI is helping me and also knows what a substrom analysis is and a double FFT for room correction. I did a bit of signal processing in my life. I'm a ham radio operator. I actually was paid for real-time operating systems. So again, it's a case of I know what I want and where to steer the AI, but my life is too short to actually read all the books to implement that and that's a very good cooperation. But let's see here. Let's do a bit of AI cinema here. The amazing thing with that setup is I select a couple of stories for development, I go to bed, and next morning stories are ready for acceptance. This is a level of independent work that's really, really good. You need to steer it into the right direction. You need to make sure that no tests are written. You need to have test protocols. So that's all in there. It scrolls a bit fast. Do you want me to scroll back and go through that more slowly, or is the impression good enough? Oh, yeah, lessons learned. That's a very good one. Some of the things happen again and again. And at one point, I got annoyed and said, you know what? We do a team retro now. You start keeping a log of everything that failed. From time to time, we sit together and look at all the prompts and see that we do improve those prompts. So there's a built-in continuous improvement process. us. And I think that is my main message of how I am working with AI and how I'm trying to maintain security in AI-driven projects for the things I do. I'm not sure. We have the chat, right? Who's operating the chat? So I think I would like to open the audience for questions. Now we can take some of the local audience here and then see what's in the chat. Microphone? Do you have a microphone for the gentleman in the first row?
+
+**Speaker 1** _[24:29]_
+
+We do have some questions online.
+
+**Speaker 2** _[24:31]_
+
+Maybe do one audience and one online question.
+
+**Speaker 1** _[24:34]_
+
+Any question? We are breaking protocol here today.
+
+**Speaker 2** _[24:42]_
+
+Hi, so it's two rather small questions here. So one is about the agents that you've set up here. Is that something that you brewed yourself?
+
+**Speaker 1** _[24:56]_
+
+brewed yourself here or you
+
+**Speaker 2** _[24:57]_
+
+here? Are you using a framework? And second, are you just...
+
+**Speaker 1** _[25:00]_
+
+Are you just using
+
+**Speaker 2** _[25:01]_
+
+just using a lot of API tokens running these sessions in parallel, or have you got it smoothed down to where you're keeping things within a normal, like, Cloud Max plan without overages? BORIS SMUS- Two very good questions. Question number one, that's completely my own framework. Turns out that there's a metagame. AI is very good at writing prompts if you steer it in the right direction. So all those prompts have been written by AI just by giving it the right input, by saying, you know, I want a product owner, product owners responsible for maintaining user stories. You have read enough books, you know how that shit works. And it says, yes, of course I do, and generates a long prompt. Maybe, oh wow, it came up. Maybe I'm able to show you a demonstration the software actually running and I'll show you that on github and while I pull that up and let me answer the second question it eats tokens like there is no tomorrow. Yeah I think it maxes out the CloudMax plan and then it doesn't do the overnight run on the CloudMax. Let's say like that. Yeah that's the repo so it's It's on GitHub. Search for Moge. Moge is the Eastern German word for a gig. My late father-in-law was a musician who toured the Eastern German Blues Circus, and this is where that word comes from. It is a short for Musikalisches Gelegenheitsgeschäft, which is the bureaucratic code for the income they had to specify. But yeah, everything's here. So the interesting stuff is in .cloud and then you have the team and there are different protocols. There's a team configuration because some things are project specific. Here's the lessons learned file I talked about. There's so much going wrong. And they keep repeating the same mistakes over and over again. And part of the problem is the built-in prompting of cloud codes. So I'm that close to just skip the thing entirely, because it injects the wrong prompts at the wrong moment, especially during compaction time. Discussion for another day. So this is lifecycle agent rules. This is things that are true for all the agents. Theory of mind of agents, if you send them a message, they will start working and they won't see additional messages and the orchestrator keeps piling up messages and you have to teach it not to do that. So there's a lot into that, but it's all there. You can have a look if you want. Okay.
+
+**Speaker 1** _[28:26]_
+
+The first question we have here online. What do you think of Project Glasswing and the capabilities of Anthropix Mythos model?
+
+**Speaker 2** _[28:34]_
+
+Yes, I was saving that for the end, but I'm glad you asked. I know people who have played with that, and it seems it's not an overhype. So for people not familiar, the Claude Mathos is the latest generation of AI, so it's like Claude Opus actually revolutionized certain things compared to other versions. Malthus is the next step up, and it's said to be able to find and exploit vulnerabilities at a blazing rate, including stories like the developers did what I did, putting them into a VM, and the thing developed a VM escape and sent an email to the researcher because it was instructed to send me an email or let me know when you're done and it didn't have a way to reach it so the easiest way it found was writing a VM exploit a VM shell escape exploit to get access to email and then send an email honestly that's a bit scary I'm not sure this answers the question but this is my take on it.
+
+**Speaker 1** _[30:01]_
+
+There is a request from the audience here, and it's highly voted. Can you instruct your team to attempt a sandbox scape?
+
+**Speaker 2** _[30:10]_
+
+We can ask. It's probably the wrong team to do that, but we can use the same VM. But this is not my first year, right? Before I do that, let me just quickly copy that port number and show you what I'm doing there. Because if you're lucky, I didn't check it, right? But if you're lucky, this is working and pretending to play audio. Yes. Yes, we want to play audio. We're pretty sure about that. And let's switch to DJ mode. Yeah. So all vibe coded. I didn't even open an editor for that. right so this is now a server which is running on raspberry pi and what you see is the web interface live streaming the music in there giving me the the level meters on all the channels um creating the fft with um acceleration et cetera et cetera so that's my little little hobby project here let
+
+**Speaker 1** _[31:26]_
+
+Let me hook a question on that coming from the audience.
+
+**Speaker 2** _[31:26]_
+
+That's me.
+
+**Speaker 1** _[31:30]_
+
+Are you worried or do you have any concerns that you don't fully grasp how your project works?
+
+**Speaker 2** _[31:37]_
+
+How many of you actually understand how your compilers work, how your CPUs work, how your operating systems work, all the way from the code you write down to the bits? Not a lot of hands. I'm in that Goldilocks generation that grew up with computers that were understandable by a teenager to every single bit. and every layer of abstraction was added in my lifetime while I was doing that and so at least I know what the layers are I do not pretend to understand everything but I have a rough idea it's just another layer of abstraction deal with it
+
+**Speaker 1** _[32:24]_
+
+Are you concerned about environmental impacts?
+
+**Speaker 2** _[32:27]_
+
+Yes, I am. So I mentioned that at the beginning, the energy consumption. So it's like Bitcoin, but a bit more useful. I worry a lot about that. There is a number of things that are maybe making it a bit better. That's like more efficiency. There is research on semiconductor design that actually uses analog effects like memristors for weights and everything that might bring the energy consumption down. but in the end it's an issue and you need to think about where the energy is coming from for a compute so I got a weekly report I did 11 grams of carbon dioxide last week with AI consumption it's an issue that I don't have an easy answer for and there's other ethical concerns And the big one is that that tech stack is owned by, what shall I say, not the most trustworthy individuals on this planet, including one who is trying to make sure their AI is not Vogue.
+
+**Speaker 1** _[33:58]_
+
+One more.
+
+**Speaker 2** _[33:59]_
+
+What we wanted to do here is, let's try that. Yes, I trust you. Thank you. Okay, next question.
+
+**Speaker 1** _[35:08]_
+
+You said at the beginning you didn't fully believe in the technology and now you're adopting it. It seems a common pattern with experienced engineers, this. Can you describe the process of your shift and what's changed for you?
+
+**Speaker 2** _[35:24]_
+
+I think what's changed is how much more useful it became, right? And even over the last six months, I've witnessed a great increase in capability. I forgot. Wait, wait, wait, wait, wait, wait, wait. Sorry, we have to start that one over. I did copy that, right? I forgot that part. Let's do that again. I mean, something like building the FFT for the audio we just saw. That was half an hour of design specs and telling it which colors I like. And then a little bit more of looking at that and saying, no, that looks jagged. something's wrong with aliasing in your binning for the FFT and then it did it. So what changed my mind is that it makes me incredibly more efficient as an engineer. It unlocks sheer power if you use it right.
+
+**Speaker 1** _[36:41]_
+
+And how long did it take you to build this whole team and the whole, you know, the cloud code agents that you showed?
+
+**Speaker 2** _[36:49]_
+
+I mean, I've been playing around with that, the NGX setup, essentially when this was introduced. I think this was introduced the same time as Opus 4.5, so I would call that February. So, yeah, two months.
+
+**Speaker 1** _[37:08]_
+
+Do you recommend all developers to have such kind of process, AI-assisted security advisory during implementation?
+
+**Speaker 2** _[37:17]_
+
+I think so, yes. I mean, it's a complete change in the way of work, up to the point that I'm actually now writing not just Python code, but also Rust code. I don't speak a line of Rust, right? I just tell it, you know, this is what I want you to do. Make sure there is no unsafe in your code, right? And, you know, go nuts. Be sure to write tests.
+
+**Speaker 1** _[37:42]_
+
+Do you have any concerns about the security of sending all our data to US servers?
+
+**Speaker 2** _[37:50]_
+
+Yes, I do. So if you do something that is a little bit more critical, the downloadable models that you can execute yourself, it's not a cloud 4.6, right? It's not as good as these kind of things. But it's not worlds apart. If you have the need to protect your data a little bit better or if you have the want to protect your data a little bit better, run local models. Macs are especially good because they share the complete system memory with the GPUs so you don't run into memory limits in your computations, or you are a gamer anyways, or you used to be a Bitcoin miner, now you're reformed and you have that GPU sitting around. Use local models, absolutely.
+
+**Speaker 1** _[38:44]_
+
+Last question, why are you using Chrome as a browser?
+
+**Speaker 2** _[38:52]_
+
+Did I mention it's a company-managed computer?
+
+**Speaker 1** _[38:54]_
+
+Yes, you did.
+
+**Speaker 2** _[38:57]_
+
+Use Firefox. Firefox is much better.
+
+**Speaker 1** _[39:03]_
+
+Okay, Gabriela, thanks very much. And please, let's give a warm applause to Gabriela. Thanks so much for being here today.
+
+**Speaker 2** _[39:22]_
+
+Yeah, so find me later to see if it succeeded escaping its boss
+---
+transcript_status: auto
+---
+transcript_language: en
