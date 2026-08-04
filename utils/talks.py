@@ -13,6 +13,7 @@ maps each submission to a Lektor talk node.
 
 from __future__ import annotations
 
+import argparse
 import calendar
 import json
 import os
@@ -22,6 +23,7 @@ import textwrap
 from collections import defaultdict
 from pathlib import Path
 from string import Template
+from urllib.parse import unquote
 
 import yaml
 from dotenv import load_dotenv
@@ -184,6 +186,12 @@ def submission_to_talk(sub, cfg: dict, year: str, audit: list | None = None) -> 
     t["supporting_material_url"] = answer_for(answers, questions.get("supporting_material"))
     t["slides_link"] = answer_for(answers, questions.get("slides_link"))
 
+    # Pretalx "resources" — the slide decks and links speakers attach to the
+    # submission itself, which is where most of them actually end up rather
+    # than in the two free-text questions above. Stored as a markdown list so
+    # the talk page can render it without a parser.
+    t["resources"] = resources_to_markdown(getattr(sub, "resources", None))
+
     # Governance booleans (Pretalx returns "true"/"false" strings or "Yes"/"No").
     t["streaming_consent"] = _to_bool(answer_for(answers, questions.get("streaming_consent")))
     t["already_recorded"] = _to_bool(answer_for(answers, questions.get("already_recorded")))
@@ -231,6 +239,36 @@ def _tag_name(tag: object) -> str:
     if hasattr(name, "en"):
         return name.en or ""
     return str(name) if name else ""
+
+
+def resources_to_markdown(resources: object) -> str:
+    """Render Pretalx submission resources as a markdown list.
+
+    Accepts pytanis `Resource` objects or the plain dicts of a raw API
+    dump — both carry a `resource` URL and a free-text `description`.
+    Entries without a URL are dropped; a missing description falls back
+    to the file name, because "Resource" as a link label tells a reader
+    nothing. Returns "" when there is nothing to show, which keeps the
+    field empty rather than emitting an empty list.
+    """
+    lines = []
+    for item in resources or []:
+        if isinstance(item, dict):
+            url = (item.get("resource") or "").strip()
+            label = (item.get("description") or "").strip()
+        else:
+            url = str(getattr(item, "resource", "") or "").strip()
+            label = str(getattr(item, "description", "") or "").strip()
+        if not url:
+            continue
+        if not label:
+            label = unquote(url.rstrip("/").rsplit("/", 1)[-1]) or "Resource"
+        # Brackets in a description would close the markdown link early, so
+        # they are escaped rather than dropped — the speaker's wording is
+        # what the reader sees.
+        label = label.replace("[", r"\[").replace("]", r"\]")
+        lines.append(f"- [{label}]({url})")
+    return "\n".join(lines)
 
 
 def speaker_to_markdown(speaker, audit: list | None = None) -> str:
@@ -318,6 +356,10 @@ supporting_material_url: $supporting_material_url
 ---
 slides_link: $slides_link
 ---
+resources:
+
+$resources
+---
 social_card_image: $social_card_image
 """
 )
@@ -383,8 +425,6 @@ def configure_pretalx_client() -> PretalxClient:
 
 
 def main() -> None:
-    import argparse
-
     parser = argparse.ArgumentParser(
         description="Import confirmed Pretalx talks into Lektor content tree."
     )
