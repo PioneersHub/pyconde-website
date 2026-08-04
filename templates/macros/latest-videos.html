@@ -23,6 +23,25 @@
   Self-hides when display != true or count is empty/no videos found.
 #}
 
+{#- Shared card — used by both the latest and the featured shelf. -#}
+{% macro _video_card(t, cur_year) -%}
+{%- set is_archive = t.url_path.startswith('/archive/') -%}
+{%- set year = (t.url_path.split('/')[2]|string) if is_archive else cur_year -%}
+{#- Prefer the branded social card; fall back to the YouTube
+    thumbnail only for talks without one. -#}
+{%- set thumb = t.social_card_image or t.video_thumbnail or ('https://i.ytimg.com/vi/' ~ t.youtube_id ~ '/maxresdefault.jpg') -%}
+<a href="{{ t|url }}" class="latest-videos__card">
+  <span class="latest-videos__thumb-wrap">
+    <img src="{{ thumb }}" alt="" class="latest-videos__thumb" loading="lazy" decoding="async">
+    <span class="latest-videos__play" aria-hidden="true">&#9654;</span>
+  </span>
+  <span class="latest-videos__info">
+    <span class="latest-videos__name">{{ t.title }}</span>
+    <span class="latest-videos__meta">{{ t.speaker_names }} &middot; {{ year }}</span>
+  </span>
+</a>
+{%- endmacro %}
+
 {% macro render_latest_videos(data, section_label='Latest talks') %}
 
 {% if data and data.display != false and data.count %}
@@ -85,23 +104,7 @@
   <div class="content">
     {% if data.section_title %}<h2 class="latest-videos__title">{{ data.section_title }}</h2>{% endif %}
     <div class="latest-videos__track">
-      {% for t in ns.shown %}
-      {%- set is_archive = t.url_path.startswith('/archive/') -%}
-      {%- set year = (t.url_path.split('/')[2]|string) if is_archive else cur_year -%}
-      {#- Prefer the branded social card; fall back to the YouTube
-          thumbnail only for talks without one. -#}
-      {%- set thumb = t.social_card_image or t.video_thumbnail or ('https://i.ytimg.com/vi/' ~ t.youtube_id ~ '/maxresdefault.jpg') -%}
-      <a href="{{ t|url }}" class="latest-videos__card">
-        <span class="latest-videos__thumb-wrap">
-          <img src="{{ thumb }}" alt="" class="latest-videos__thumb" loading="lazy" decoding="async">
-          <span class="latest-videos__play" aria-hidden="true">&#9654;</span>
-        </span>
-        <span class="latest-videos__info">
-          <span class="latest-videos__name">{{ t.title }}</span>
-          <span class="latest-videos__meta">{{ t.speaker_names }} &middot; {{ year }}</span>
-        </span>
-      </a>
-      {% endfor %}
+      {% for t in ns.shown %}{{ _video_card(t, cur_year) }}{% endfor %}
     </div>
     {% if data.see_all_text and data.see_all_url %}
     <a href="{{ data.see_all_url }}" class="latest-videos__all">{{ data.see_all_text }} &rarr;</a>
@@ -117,6 +120,90 @@
   "name": "Latest talks from PyCon DE & PyData",
   "itemListElement": [
     {%- for t in ns.shown -%}
+    { "@type": "ListItem", "position": {{ loop.index }}, "url": "{{ host }}{{ t|url }}", "name": {{ t.title|tojson }} }{{ "," if not loop.last }}
+    {%- endfor -%}
+  ]
+}
+</script>
+
+{% endif %}
+
+{% endif %}
+
+{% endmacro %}
+
+
+{#
+  Featured Videos
+  ───────────────
+  Hand-curated shelf, technically identical to Latest Videos: same
+  cards, same track, but the talks come from the pretalx session
+  codes in databags/frontpage/sections/featured_videos.yaml
+  (`sessions:`), rendered in the configured order. Codes match the
+  `code:` field of talk pages across the current edition and every
+  archive edition. Sessions without a published recording are
+  skipped silently.
+#}
+
+{% macro render_featured_videos(data, section_label='Featured videos') %}
+
+{% if data and data.display != false and data.sessions %}
+
+{%- set branding = bag('branding') -%}
+{%- set host = branding['canonical_host'] -%}
+{%- set cur_year = (bag('pretalx')['events']['current']['year']|string) if bag('pretalx') and bag('pretalx')['events'] and bag('pretalx')['events']['current'] else (site.config.PROJECT.year|string) -%}
+
+{#- Index every published recording by pretalx code. -#}
+{%- set idx = {} -%}
+{%- set current_talks = site.get('/talks') -%}
+{%- if current_talks -%}
+  {%- for t in current_talks.children -%}
+    {%- if t['_model'] != 'redirect' and t.youtube_id and not t.do_not_record and t.code -%}
+      {%- set _ = idx.update({t.code|string: t}) -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+{%- set archive_root = site.get('/archive') -%}
+{%- for ed in ((archive_root.children|list) if archive_root else []) -%}
+  {%- set talks_node = site.get('/archive/' ~ ed.year ~ '/talks') -%}
+  {%- if talks_node -%}
+    {%- for t in talks_node.children -%}
+      {%- if t['_model'] != 'redirect' and t.youtube_id and not t.do_not_record and t.code -%}
+        {%- set _ = idx.update({t.code|string: t}) -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{#- Resolve the configured sessions, keeping YAML order. -#}
+{%- set shown = [] -%}
+{%- for code in data.sessions -%}
+  {%- set t = idx.get(code|string) -%}
+  {%- if t -%}{%- set _ = shown.append(t) -%}{%- endif -%}
+{%- endfor -%}
+
+{% if shown|length %}
+
+<section class="latest-videos featured-videos" aria-label="{{ section_label }}">
+  <div class="content">
+    {% if data.section_title %}<h2 class="latest-videos__title">{{ data.section_title }}</h2>{% endif %}
+    <div class="latest-videos__track">
+      {% for t in shown %}{{ _video_card(t, cur_year) }}{% endfor %}
+    </div>
+    {% if data.see_all_text and data.see_all_url %}
+    <a href="{{ data.see_all_url }}" class="latest-videos__all">{{ data.see_all_text }} &rarr;</a>
+    {% endif %}
+  </div>
+</section>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "@id": "{{ host }}/#featured-videos",
+  "name": "Featured talks from PyCon DE & PyData",
+  "itemListElement": [
+    {%- for t in shown -%}
     { "@type": "ListItem", "position": {{ loop.index }}, "url": "{{ host }}{{ t|url }}", "name": {{ t.title|tojson }} }{{ "," if not loop.last }}
     {%- endfor -%}
   ]
