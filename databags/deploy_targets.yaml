@@ -1,0 +1,42 @@
+# ──────────────────────────────────────────────────────────────
+# Where the site is deployed — the only place buckets are named
+# ──────────────────────────────────────────────────────────────#
+# Read by utils/deploy_targets.py, which every workflow that writes to
+# or configures S3 calls:
+#
+#   .github/workflows/main.yml            current edition, every push
+#   .github/workflows/archive-build.yml   archive / full site, on demand
+#   .github/workflows/routing-config.yml  the bucket website configuration
+#
+# Adding or retiring a target is a one-line edit HERE. No workflow may
+# name a bucket. That rule exists because the alternative already failed:
+# when the site moved to a new bucket only main.yml was updated, the
+# archive workflow kept deploying to the old one, and every /archive/
+# URL was dead for a week while every deploy reported green.
+#
+# Entry forms:
+#   pyconde-27         a literal bucket name.
+#   env:AWS_S3_BUCKET  resolved from that environment variable at run
+#                      time; the workflows map it from the GitHub secret
+#                      of the same name. Use this for a name that should
+#                      not appear in this public repository. Unset or
+#                      empty is a hard error, never a skipped bucket —
+#                      a skipped bucket is a deploy that reports success
+#                      while nobody serves what it uploaded.
+#
+# Every bucket receives a complete, independent copy of the site. There
+# is no runtime dependency between them: each one must be able to serve
+# https://2027.pycon.de on its own, and deleting the other must change
+# nothing. Order matters only in that buckets sync top to bottom and the
+# first failure aborts the run, so the served bucket is listed first.
+#
+# Staging is deliberately absent. development.yml deploys to
+# pyconde-27-staging and must never write to a production bucket.
+# ──────────────────────────────────────────────────────────────
+
+buckets:
+  # Served by nginx as https://2027.pycon.de — the live site.
+  - pyconde-27
+  # Previous target, kept in sync until the migration is signed off.
+  # Retiring it is one line here plus deleting the GitHub secret.
+  - env:AWS_S3_BUCKET

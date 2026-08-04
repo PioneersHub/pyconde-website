@@ -1,13 +1,27 @@
 name: Apply hosting redirect config (on demand)
 
-# Applies the prefix rewrites in databags/routing.yaml to the S3 bucket's
-# website configuration — the /latest/ alias and anything added beside it.
+# Applies the prefix rewrites in databags/routing.yaml to the website
+# configuration of every bucket in databags/deploy_targets.yaml — the
+# /latest/ alias and anything added beside it.
 # See databags/routing.yaml and utils/generate_routing_config.py.
 #
 # Deliberately NOT part of the deploy workflows. `put-bucket-website` replaces
 # the entire website configuration, and the routing rules change once or twice
 # a year, so running it on every push is all risk and no benefit. It is also
 # the only workflow needing s3:PutBucketWebsite.
+#
+# The configuration is generated ONCE and applied identically to every bucket,
+# without --merge. Two reasons. Merging per bucket would let the buckets end up
+# with different IndexDocument/ErrorDocument, which defeats the point of a
+# shared configuration; and it would preserve exactly the values this workflow
+# exists to replace — a bucket carrying a hand-made SPA fallback
+# (404 -> 301 /index.html) keeps whatever ErrorDocument came with it.
+# databags/routing.yaml declares both documents and is the source of truth.
+#
+# Applying this REMOVES any catch-all fallback, so URLs that currently
+# soft-redirect to the homepage start returning a real 404. Make sure the
+# buckets are complete first — crawl sitemap.xml and expect every URL to be
+# 200. See docs/deployment.md.
 #
 # Caveat worth knowing before the first run: S3 routing rules only fire on the
 # bucket's *website* endpoint (bucket.s3-website.<region>.amazonaws.com). If a
@@ -42,27 +56,34 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_S3_REGION }}
+          # Resolves the `env:AWS_S3_BUCKET` entry in databags/deploy_targets.yaml.
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: |
           set -euo pipefail
-          # Read the bucket's current configuration so IndexDocument and
-          # ErrorDocument survive the replace. A bucket with no website
-          # configuration yet returns an error, hence the fallback.
-          aws s3api get-bucket-website --bucket "$AWS_S3_BUCKET" > current.json 2>/dev/null \
-            || echo '{}' > current.json
-          echo "Current configuration:"; cat current.json
+          python utils/generate_routing_config.py
+          echo "Configuration to apply:"
+          cat site-config/s3-website-routing.json
 
-          python utils/generate_routing_config.py --merge current.json
-          echo "New configuration:"; cat site-config/s3-website-routing.json
+          # Assignment first: a failing command substitution in argument
+          # position is swallowed by bash -e, a failing assignment is not.
+          BUCKETS=$(python utils/deploy_targets.py)
 
-          if [ "$DRY_RUN" = "true" ]; then
-            echo "Dry run — not applying. Re-run with dry_run=false to apply."
-            exit 0
-          fi
+          for BUCKET in $BUCKETS; do
+            echo "::group::${BUCKET}"
+            # Printed for the audit trail, not merged. put-bucket-website has
+            # no undo — this output is the only rollback material, so save it.
+            echo "Current configuration:"
+            aws s3api get-bucket-website --bucket "$BUCKET" || echo "  (none)"
 
-          aws s3api put-bucket-website --bucket "$AWS_S3_BUCKET" \
-            --website-configuration "file://site-config/s3-website-routing.json"
-          echo "Applied. Verifying:"
-          aws s3api get-bucket-website --bucket "$AWS_S3_BUCKET"
+            if [ "$DRY_RUN" = "true" ]; then
+              echo "Dry run — not applying to ${BUCKET}. Re-run with dry_run=false."
+            else
+              aws s3api put-bucket-website --bucket "$BUCKET" \
+                --website-configuration "file://site-config/s3-website-routing.json"
+              echo "Applied. Verifying:"
+              aws s3api get-bucket-website --bucket "$BUCKET"
+            fi
+            echo "::endgroup::"
+          done
