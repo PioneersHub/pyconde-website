@@ -1,11 +1,8 @@
 name: Upload website (S3)
 
-# Deactivated: hosting moves to Cloudflare Pages (make publish /
-# make deploy, see docs/deployment-cloudflare.md). Since ~Jul 29 the
-# AWS_S3_BUCKET secret no longer matches the bucket nginx serves, so
-# these deploys uploaded into the void anyway. Manual dispatch stays
-# available as an emergency escape hatch; delete the workflow once
-# the Cloudflare cutover is confirmed.
+# Since ~Jul 29 the AWS_S3_BUCKET secret no longer matches the bucket
+# nginx serves, so these deploys upload into the void. Fix the secret
+# before relying on this workflow again.
 on:
   push:
     branches: ["main"]
@@ -39,6 +36,15 @@ jobs:
         env:
           SOURCE_DIR: site
           AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET}}
+          AWS_REGION: ${{ secrets.AWS_S3_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Upload to s3 (temp-migration time)
+        uses: jakejarvis/s3-sync-action@master
+        env:
+          SOURCE_DIR: site
+          AWS_S3_BUCKET: pyconde-27
           AWS_REGION: ${{ secrets.AWS_S3_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
