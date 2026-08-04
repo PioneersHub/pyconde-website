@@ -3269,21 +3269,6 @@ main:focus { outline: none; }
   fill: currentColor;
 }
 
-/* Recording / slides / repo links on a talk page. These stay useful long
-   after the slot time stops mattering, so they sit above the abstract.
-   The selector must out-specify `.subsite .content ul` (0,0,2,1), which
-   would otherwise re-apply bullets and left padding. */
-.subsite .content ul.talk-resources {
-  list-style: none;
-  padding-left: 0;
-  margin: 0 0 1.25rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.25rem;
-}
-.talk-resources__link {
-  font-weight: 600;
-}
 /* ── Submission resource previews ────────────────────────────────────
    One card per file or link the speaker attached, in a single row under
    the description. Cards are the height of a collapsed .talk-aside so the
@@ -4301,10 +4286,16 @@ a.past-editions__row:hover .past-editions__location {
 .latest-videos__thumb-wrap {
     position: relative;
     display: block;
-    /* Social cards are 1200x630 — match their ratio so nothing crops. */
-    aspect-ratio: 1200 / 630;
+    /* Padding-ratio box at the 1200x630 social-card ratio — renders
+       identically on browsers without aspect-ratio support, so
+       odd-sized fallback images can never inflate a card. */
+    height: 0;
+    padding-top: 52.5%;
+    overflow: hidden;
 }
 .latest-videos__thumb {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -4418,9 +4409,17 @@ a.past-editions__row:hover .past-editions__location {
 .latest-blog__thumb-wrap {
     position: relative;
     display: block;
-    aspect-ratio: 16 / 9;
+    /* Padding-ratio box (1200x630 social-card ratio) instead of
+       aspect-ratio: identical rendering on browsers without
+       aspect-ratio support, where odd-sized images (e.g. square
+       cards) would otherwise inflate their tile. */
+    height: 0;
+    padding-top: 52.5%;
+    overflow: hidden;
 }
 .latest-blog__thumb {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
