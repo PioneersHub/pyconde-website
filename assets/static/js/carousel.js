@@ -57,8 +57,20 @@
 
   // ── Visible count (mode-aware) ──
 
+  /*
+   * How many slides are on screen. A carousel may declare it in CSS as
+   * --carousel-visible, in which case that value wins at every breakpoint:
+   * the slide width is `calc(100% / var(--carousel-visible))`, so reading
+   * the same property here is what keeps the translate maths and the
+   * layout from ever disagreeing. Carousels that do not set it keep the
+   * original 3-on-desktop / 1-on-mobile behaviour.
+   */
   Carousel.prototype._visibleCount = function () {
     if (this.mode === 'spotlight') return 1;
+    var declared = parseInt(
+      window.getComputedStyle(this.el).getPropertyValue('--carousel-visible'), 10
+    );
+    if (declared > 0) return declared;
     return window.innerWidth > BREAKPOINT ? DESKTOP_VISIBLE : MOBILE_VISIBLE;
   };
 
@@ -69,8 +81,10 @@
   // ── Init ──
 
   Carousel.prototype._init = function () {
-    // Shuffle slide order in the DOM (Fisher-Yates)
-    if (this.slides.length > 1) {
+    // Shuffle slide order in the DOM (Fisher-Yates). Opt out with
+    // data-carousel-shuffle="false" where the order carries meaning —
+    // newest-first, or a hand-curated running order.
+    if (this.slides.length > 1 && this.el.getAttribute('data-carousel-shuffle') !== 'false') {
       var i = this.slides.length;
       while (i > 1) {
         var j = Math.floor(Math.random() * i);

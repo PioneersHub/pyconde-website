@@ -42,6 +42,45 @@
 </a>
 {%- endmacro %}
 
+{#- The shelf itself. Both video sections use it, so they slide
+    identically — same component, same controls, same keyboard and swipe
+    handling as the masterclasses carousel (assets/static/js/carousel.js).
+
+    Two things differ from that carousel deliberately: the order is never
+    shuffled (newest-first here, curated there — both carry meaning), and
+    the number of cards on screen is declared in CSS as --carousel-visible
+    so five poster cards fit where three wide cards would.
+
+    No dot strip: 35 dots is not a control, it is a rash. -#}
+{% macro _video_shelf(talks, shelf_id, cur_year, section_label) -%}
+<div class="carousel carousel--multi carousel--videos"
+     data-carousel-id="{{ shelf_id }}"
+     data-carousel-mode="multi"
+     data-carousel-shuffle="false"
+     aria-roledescription="carousel"
+     aria-label="{{ section_label }}">
+  <div class="carousel-viewport" aria-live="polite">
+    <div class="carousel-slides" id="carousel-slides-{{ shelf_id }}">
+      {%- for t in talks %}
+      <article class="carousel-slide" role="group" aria-roledescription="slide"
+               aria-label="Video {{ loop.index }} of {{ talks|length }}: {{ t.title }}">
+        {{ _video_card(t, cur_year) }}
+      </article>
+      {%- endfor %}
+    </div>
+  </div>
+  {%- if talks|length > 1 %}
+  <nav class="carousel-controls carousel-controls--videos" aria-label="{{ section_label }} navigation">
+    <button class="carousel-btn carousel-btn--prev" aria-label="Previous videos"><span aria-hidden="true">&#8592;</span></button>
+    <button class="carousel-btn carousel-btn--next" aria-label="Next videos"><span aria-hidden="true">&#8594;</span></button>
+  </nav>
+  <div class="sr-only" aria-live="polite" aria-atomic="true" id="carousel-status-{{ shelf_id }}">
+    Showing items 1 to 5 of {{ talks|length }}
+  </div>
+  {%- endif %}
+</div>
+{%- endmacro %}
+
 {% macro render_latest_videos(data, section_label='Latest talks') %}
 
 {% if data and data.display != false and data.count %}
@@ -103,9 +142,7 @@
 <section class="latest-videos" aria-label="{{ section_label }}">
   <div class="content">
     {% if data.section_title %}<h2 class="latest-videos__title">{{ data.section_title }}</h2>{% endif %}
-    <div class="latest-videos__track">
-      {% for t in ns.shown %}{{ _video_card(t, cur_year) }}{% endfor %}
-    </div>
+    {{ _video_shelf(ns.shown, 'latest-videos', cur_year, section_label) }}
     {% if data.see_all_text and data.see_all_url %}
     <a href="{{ data.see_all_url }}" class="latest-videos__all">{{ data.see_all_text }} &rarr;</a>
     {% endif %}
@@ -187,9 +224,7 @@
 <section class="latest-videos featured-videos" aria-label="{{ section_label }}">
   <div class="content">
     {% if data.section_title %}<h2 class="latest-videos__title">{{ data.section_title }}</h2>{% endif %}
-    <div class="latest-videos__track">
-      {% for t in shown %}{{ _video_card(t, cur_year) }}{% endfor %}
-    </div>
+    {{ _video_shelf(shown, 'featured-videos', cur_year, section_label) }}
     {% if data.see_all_text and data.see_all_url %}
     <a href="{{ data.see_all_url }}" class="latest-videos__all">{{ data.see_all_text }} &rarr;</a>
     {% endif %}
