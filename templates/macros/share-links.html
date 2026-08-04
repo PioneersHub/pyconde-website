@@ -1,0 +1,76 @@
+{#-
+  Share this page
+  ───────────────
+  A small row of share targets. Every link is a plain outbound URL — no
+  network SDK, no tracking pixel, nothing that runs before the reader
+  clicks.
+
+  Mastodon has no central share endpoint: a /share URL only works for
+  readers signed in to that instance, so it points at ours
+  (branding.yaml → social.mastodon_url). Facebook Messenger is absent on
+  purpose — its desktop dialog needs a registered App ID; WhatsApp needs
+  none and works on both.
+
+  Brand marks are inlined from Simple Icons (CC0). LinkedIn's was
+  withdrawn from that set at LinkedIn's request, so it is drawn here as
+  the plain "in" mark.
+
+  Usage:
+    {% from "macros/share-links.html" import render_share_links %}
+    {{ render_share_links(host ~ this.url_path, this.title) }}
+-#}
+
+{%- macro render_share_links(url, title, label='Share') -%}
+{%- set enc_url = url|urlencode -%}
+{%- set enc_title = title|urlencode -%}
+{#- The instance host, not the profile URL: fosstodon.org/@pyconde → fosstodon.org -#}
+{%- set mastodon_host = ((bag('branding')['social']['mastodon_url'] or '')|replace('https://', '')|replace('http://', '')).split('/')[0] -%}
+<nav class="share-links" aria-label="Share this page" data-pagefind-ignore>
+  <span class="share-links__label">{{ label }}</span>
+
+  <a class="share-links__link" href="https://www.linkedin.com/sharing/share-offsite/?url={{ enc_url }}"
+     target="_blank" rel="noopener" title="Share on LinkedIn">
+    <span class="sr-only">Share on LinkedIn</span>
+    <svg class="share-links__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <rect x="0" y="0" width="24" height="24" rx="2" fill="currentColor"/>
+      <text x="12" y="17.5" text-anchor="middle" font-size="13" font-weight="700"
+            font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" fill="#fff">in</text>
+    </svg>
+  </a>
+
+  <a class="share-links__link" href="https://x.com/intent/post?url={{ enc_url }}&amp;text={{ enc_title }}"
+     target="_blank" rel="noopener" title="Share on X">
+    <span class="sr-only">Share on X</span>
+    <svg class="share-links__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path fill="currentColor" d="M14.234 10.162 22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299-.929-1.329L3.076 1.56h3.182l5.965 8.532.929 1.329 7.754 11.09h-3.182z"/>
+    </svg>
+  </a>
+
+  {%- if mastodon_host %}
+  <a class="share-links__link" href="https://{{ mastodon_host }}/share?text={{ enc_title }}%20{{ enc_url }}"
+     target="_blank" rel="noopener" title="Share on Mastodon ({{ mastodon_host }})">
+    <span class="sr-only">Share on Mastodon</span>
+    <svg class="share-links__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path fill="currentColor" d="M23.268 5.313c-.35-2.578-2.617-4.61-5.304-5.004C17.51.242 15.792 0 11.813 0h-.03c-3.98 0-4.835.242-5.288.309C3.882.692 1.496 2.518.917 5.127.64 6.412.61 7.837.661 9.143c.074 1.874.088 3.745.26 5.611.118 1.24.325 2.47.62 3.68.55 2.237 2.777 4.098 4.96 4.857 2.336.792 4.849.923 7.256.38.265-.061.527-.132.786-.213.585-.184 1.27-.39 1.774-.753a.057.057 0 0 0 .023-.043v-1.809a.052.052 0 0 0-.02-.041.053.053 0 0 0-.046-.01 20.282 20.282 0 0 1-4.709.545c-2.73 0-3.463-1.284-3.674-1.818a5.593 5.593 0 0 1-.319-1.433.053.053 0 0 1 .066-.054c1.517.363 3.072.546 4.632.546.376 0 .75 0 1.125-.01 1.57-.044 3.224-.124 4.768-.422.038-.008.077-.015.11-.024 2.435-.464 4.753-1.92 4.989-5.604.008-.145.03-1.52.03-1.67.002-.512.167-3.63-.024-5.545zm-3.748 9.195h-2.561V8.29c0-1.309-.55-1.976-1.67-1.976-1.23 0-1.846.79-1.846 2.35v3.403h-2.546V8.663c0-1.56-.617-2.35-1.848-2.35-1.112 0-1.668.668-1.67 1.977v6.218H4.822V8.102c0-1.31.337-2.35 1.011-3.12.696-.77 1.608-1.164 2.74-1.164 1.311 0 2.302.5 2.962 1.498l.638 1.06.638-1.06c.66-.999 1.65-1.498 2.96-1.498 1.13 0 2.043.395 2.74 1.164.675.77 1.012 1.81 1.012 3.12z"/>
+    </svg>
+  </a>
+  {%- endif %}
+
+  <a class="share-links__link" href="https://wa.me/?text={{ enc_title }}%20{{ enc_url }}"
+     target="_blank" rel="noopener" title="Share on WhatsApp">
+    <span class="sr-only">Share on WhatsApp</span>
+    <svg class="share-links__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
+    </svg>
+  </a>
+
+  <a class="share-links__link" href="mailto:?subject={{ enc_title }}&amp;body={{ enc_url }}"
+     title="Share by email">
+    <span class="sr-only">Share by email</span>
+    <svg class="share-links__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"
+            d="M2 5h20v14H2zM2 5l10 8 10-8"/>
+    </svg>
+  </a>
+</nav>
+{%- endmacro -%}

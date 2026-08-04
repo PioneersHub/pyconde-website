@@ -4,6 +4,7 @@
 {% from "macros/related-talks.html" import related_panel %}
 {% from "macros/funnel-cta.html" import render_funnel_cta %}
 {% from "macros/newsletter-inline.html" import render_newsletter_inline %}
+{% from "macros/share-links.html" import render_share_links %}
 
 {% block title %}{{ this.title }}{% endblock %}
 
@@ -238,6 +239,11 @@
 
   <section class="subsite talk">
     <div class="content">
+      {#- Sharing sits directly under the title band, before the session's
+          own content starts. Plain outbound links — nothing from a social
+          network runs on the page. -#}
+      {{ render_share_links(host ~ this.url_path, this.title) }}
+
       {#- Room and clock time matter only while an edition is upcoming. Every
           edition under /archive/ is over, so the slot line is dropped there
           entirely; the JSON-LD above keeps startDate/endDate and the room as
