@@ -536,8 +536,13 @@ def write_edition(year: int, title: str, date_from: str, date_to: str,
         ("recording_count", str(n_rec)),
         ("body", "\n" + body),
     ]), encoding="utf-8")
+    # The talks index forwards to the edition page, which carries the session
+    # list itself. `_model` must stay `talks` — the talk pages under it have no
+    # model of their own and inherit it from models/talks.ini [children].
     (base / "talks" / "contents.lr").write_text(lr([
-        ("_model", "talks"), ("title", talks_title)]), encoding="utf-8")
+        ("_model", "talks"),
+        ("_template", "talks-index-redirect.html"),
+        ("title", talks_title)]), encoding="utf-8")
     (base / "speakers" / "contents.lr").write_text(lr([
         ("_model", "speakers"), ("title", speakers_title)]), encoding="utf-8")
 
@@ -560,8 +565,8 @@ def main() -> None:
         2017, "PyCon.DE 2017 & PyData Karlsruhe",
         "2017-10-25", "2017-10-27", "ZKM | Center for Art and Media, Karlsruhe",
         "The 2017 edition of PyCon.DE & PyData Karlsruhe took place 25–27 October 2017 "
-        "at the ZKM in Karlsruhe. Browse the [archived talks](talks/) and [speakers](speakers/) "
-        "below, or revisit the [original conference site](https://2017.pycon.de/).",
+        "at the ZKM in Karlsruhe. Every session is listed below, with the [speakers](speakers/) "
+        "on their own page. Revisit the [original conference site](https://2017.pycon.de/).",
         len(talks17), n_rec17,
         "PyCon.DE 2017 & PyData Karlsruhe — Talks",
         "PyCon.DE 2017 & PyData Karlsruhe — Speakers")
@@ -579,7 +584,7 @@ def main() -> None:
         2016, "PyCon.DE 2016 Munich",
         "2016-10-28", "2016-10-30", "Ludwig-Maximilians-Universität, Munich",
         "The 2016 edition of PyCon.DE took place 28–30 October 2016 in Munich. "
-        "Browse the [archived talks](talks/) and [speakers](speakers/) below — every "
+        "Every session is listed below, with the [speakers](speakers/) on their own page — every "
         "session was recorded and is hosted by LMU Munich.",
         len(talks16), n_rec16,
         "PyCon.DE 2016 Munich — Talks",

@@ -1,0 +1,15 @@
+{#-
+  The per-edition talks index, after its session list moved onto the
+  edition page itself (/archive/{year}/). The page still exists as a
+  record — its children are the talk pages, and they inherit their model
+  from it via models/talks.ini [children] — but it no longer renders a
+  second copy of the list. It forwards instead, so old links and any
+  existing search results land on the one canonical URL.
+
+  Selected per edition with `_template:` in content/archive/{year}/talks/
+  contents.lr; `_model: talks` must stay, or every talk under it loses its
+  model. The target is the parent record, so no year is hardcoded and a
+  new edition needs nothing but the same one-line field.
+-#}
+{%- set redirect_target = this.parent.url_path -%}
+{% include "redirect.html" %}
