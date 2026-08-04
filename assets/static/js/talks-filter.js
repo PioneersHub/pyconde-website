@@ -27,8 +27,7 @@
     { key: "format", param: "format", label: "Format", noun: "formats" },
     { key: "pythonSkill", param: "python_skill", label: "Python skill", noun: "levels" },
     { key: "domainExpertise", param: "domain_expertise", label: "Domain expertise", noun: "levels" },
-    { key: "recording", param: "recording", label: "Recording", noun: "options" },
-    { key: "transcript", param: "transcript", label: "Transcript", noun: "options" }
+    { key: "recording", param: "recording", label: "Recording", noun: "options" }
   ];
 
   // Skill levels read as a progression, not an alphabet.
@@ -89,7 +88,7 @@
   }
 
   function sortValues(key, values) {
-    if (key === "recording" || key === "transcript") {
+    if (key === "recording") {
       return values.slice().sort(function (a, b) {
         return YES_NO_ORDER.indexOf(a) - YES_NO_ORDER.indexOf(b);
       });

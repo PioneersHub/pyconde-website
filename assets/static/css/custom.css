@@ -3029,58 +3029,62 @@ main:focus { outline: none; }
   padding-bottom: var(--space-md, 1.5rem);
   color: #1a1a1a;
 }
-/* One row of comboboxes rather than a wall of pills: an edition with
-   twenty tracks costs the same vertical space as one with three. */
+/* One field per facet rather than a wall of pills: an edition with twenty
+   tracks costs the same vertical space as one with three. Square corners,
+   flat brand colours, uppercase labels — the same language as the rest of
+   the site's controls (see `input,textarea,select { border-radius: 0 }`). */
 .talk-filters__bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem 1rem;
+  gap: 1rem 1.25rem;
   align-items: flex-end;
 }
 .talk-filters__field {
-  flex: 1 1 11rem;
-  min-width: 10rem;
+  flex: 1 1 13rem;
+  min-width: 11rem;
 }
 .talk-filters__field--search {
-  flex: 2 1 18rem;
+  flex: 2 1 20rem;
 }
 .talk-filters__label {
   display: block;
-  margin-bottom: 0.25em;
+  margin-bottom: 0.35em;
   font-weight: 700;
-  font-size: 0.75rem;
-  letter-spacing: 0.03em;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 .talk-filters__input {
   width: 100%;
-  padding: 0.4rem 0.6rem;
-  border: 2px solid currentColor;
-  border-radius: 4px;
+  padding: 0.55rem 0.7rem;
+  border: 2px solid var(--text-primary, #111);
   font: inherit;
-  font-size: 0.9rem;
-  background: #fff;
-  color: #1a1a1a;
+  font-size: 1rem;
+  background: var(--white, #fff);
+  color: var(--text-primary, #111);
 }
 .talk-filters__input::placeholder {
-  color: #555;
+  color: var(--text-secondary, #555);
   opacity: 1;
 }
-/* A facet with a selection says so even when the list is closed. */
+.talk-filters__input:focus-visible {
+  outline: 2px solid var(--blue, #3778be);
+  outline-offset: 1px;
+}
+/* A facet with a selection says so even when its list is closed. */
 .talk-filters__field.is-filtered .talk-filters__input {
   border-color: var(--blue, #3778be);
-  background: #eef4fb;
 }
 .talk-filters__field.is-filtered .talk-filters__input::placeholder {
-  color: #1a1a1a;
-  font-weight: 600;
+  color: var(--text-primary, #111);
+  font-weight: 700;
 }
 
 .combo {
   position: relative;
 }
 .combo__input {
-  padding-right: 1.8rem;
+  padding-right: 2rem;
   cursor: pointer;
 }
 .combo__toggle {
@@ -3088,28 +3092,28 @@ main:focus { outline: none; }
   top: 0;
   right: 0;
   height: 100%;
-  width: 1.8rem;
+  width: 2rem;
   border: 0;
   background: none;
   color: inherit;
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   line-height: 1;
   cursor: pointer;
 }
 .combo__list {
   position: absolute;
   z-index: 20;
-  top: calc(100% + 2px);
+  top: 100%;
   left: 0;
   right: 0;
   margin: 0;
   padding: 0;
   list-style: none;
-  max-height: 15rem;
+  max-height: 16rem;
   overflow-y: auto;
-  background: #fff;
-  border: 2px solid var(--blue, #3778be);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  background: var(--white, #fff);
+  border: 2px solid var(--text-primary, #111);
+  border-top: 0;
 }
 .subsite .content .combo__list li {
   margin: 0;
@@ -3118,15 +3122,20 @@ main:focus { outline: none; }
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.35rem 0.6rem;
-  font-size: 0.85rem;
-  line-height: 1.3;
+  gap: 0.75rem;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.95rem;
+  line-height: 1.35;
   cursor: pointer;
 }
 .combo__option.is-active,
 .combo__option:hover {
-  background: #eef4fb;
+  background: var(--blue, #3778be);
+  color: var(--white, #fff);
+}
+.combo__option.is-active .combo__option-count,
+.combo__option:hover .combo__option-count {
+  color: inherit;
 }
 .combo__option.is-selected {
   font-weight: 700;
@@ -3135,12 +3144,11 @@ main:focus { outline: none; }
    still gets the full width of the list. */
 .combo__option.is-selected .combo__option-label::before {
   content: "✓ ";
-  color: var(--blue, #3778be);
 }
 .combo__option-count {
   flex: 0 0 auto;
-  font-size: 0.75rem;
-  color: #555;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #555);
   font-weight: 400;
 }
 
@@ -3148,8 +3156,8 @@ main:focus { outline: none; }
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.35rem 0.5rem;
-  margin-top: 0.85rem;
+  gap: 0.4rem 0.6rem;
+  margin-top: 1rem;
 }
 .filter-chips__label {
   margin: 0;
@@ -3157,14 +3165,13 @@ main:focus { outline: none; }
 .filter-chip {
   display: inline-flex;
   align-items: center;
-  gap: 0.35em;
-  padding: 0.15rem 0.5rem;
-  border: 1px solid #1a1a1a;
-  border-radius: 999px;
-  background: #1a1a1a;
-  color: #fff;
+  gap: 0.4em;
+  padding: 0.25rem 0.6rem;
+  border: 2px solid var(--text-primary, #111);
+  background: var(--text-primary, #111);
+  color: var(--white, #fff);
   font: inherit;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   cursor: pointer;
 }
 .filter-chip:hover,
@@ -3173,13 +3180,13 @@ main:focus { outline: none; }
   border-color: var(--blue, #3778be);
 }
 .filter-chip__x {
-  font-size: 1em;
+  font-size: 1.1em;
   line-height: 1;
 }
 .filter-count {
   display: block;
-  margin: 0.75rem 0 0;
-  font-size: 0.85rem;
+  margin: 1rem 0 0;
+  font-size: 0.95rem;
   font-weight: 700;
 }
 .filter-clear {
@@ -3189,7 +3196,7 @@ main:focus { outline: none; }
   background: none;
   color: inherit;
   font: inherit;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   text-decoration: underline;
   text-underline-offset: 0.2em;
   cursor: pointer;
@@ -3201,41 +3208,21 @@ main:focus { outline: none; }
   margin: 0;
   padding-top: 0;
   padding-bottom: var(--space-md, 1.5rem);
-  font-size: 0.8rem;
-  font-style: italic;
+  font-size: 0.9rem;
   color: var(--text-secondary, #555);
 }
 
-/* ── Talk list: search pointer band ──────────────────────────────────
-   Lifted out of the dark page header, where it read as small print under
-   the title. Its own band under the header gives it the width of the page
-   and a colour of its own. */
-.talks-search-band {
-  background: #eef4fb;
-  border-bottom: 2px solid var(--blue, #3778be);
-}
-.talks-search-band .content {
+/* ── Talk list: search pointer ───────────────────────────────────────
+   Body text directly under the header — no band, no icon, no button. It
+   carries a plain text link because the top-nav search icon is disabled
+   (databags/nav.yaml → show_search: false). */
+.subsite .content.talks-search-note,
+.content.talks-search-note {
   max-width: var(--content-width-wide);
   margin: 0 auto;
-  padding: 0.85rem var(--space-page-margin);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.25rem 0.6rem;
-  color: #10333a;
-}
-.talks-search-band__lead {
-  font-size: 0.95rem;
-}
-.talks-search-band__link {
-  font-weight: 700;
-  color: #1c5b96;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-.talks-search-band__link:hover,
-.talks-search-band__link:focus-visible {
-  color: #10333a;
+  padding: var(--space-md, 1.5rem) var(--space-page-margin) 0;
+  font-size: var(--font-size-base);
+  color: var(--text-primary, #111);
 }
 
 /* ── Talk list rows ──────────────────────────────────────────────────
@@ -3243,54 +3230,54 @@ main:focus { outline: none; }
    row is title, one meta line, one summary line. `.talk` also carries
    `.content`, whose section padding is far too generous here. */
 .talks--dense li a.content.talk {
-  padding-top: 0.7rem;
-  padding-bottom: 0.7rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 .talks--dense li .talk-title {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: 0.5rem;
   margin: 0;
-  font-size: 1.05rem;
-  line-height: 1.3;
+  font-size: var(--font-size-lg);
+  line-height: 1.25;
 }
 .talks--dense li .talk-meta {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 0.15rem 0.6rem;
-  margin: 0.15rem 0 0;
-  font-size: 0.8rem;
+  gap: 0.15rem 0.7rem;
+  margin: 0.3rem 0 0;
+  font-size: 0.95rem;
   line-height: 1.4;
 }
 .talks--dense li .talk-speakers {
-  font-weight: 600;
+  font-weight: 700;
 }
 .talks--dense li .talk-track {
-  opacity: 0.85;
+  font-weight: 400;
 }
 .talks--dense li .talk-track::before {
   content: "· ";
 }
+/* Full body size: the summary is the only prose on the row and has to be
+   read, not skimmed past. Three lines before the cut. */
 .talks--dense li .talk-summary {
-  margin: 0.2rem 0 0;
-  font-size: 0.85rem;
-  line-height: 1.45;
-  /* Two lines is enough to tell two talks apart; the page is a list, not
-     a set of abstracts. */
+  margin: 0.35rem 0 0;
+  font-size: var(--font-size-base);
+  line-height: 1.55;
+  max-width: 75ch;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 /* Recording marker: the video glyph alone, no label. */
 .talks--dense li .talk-play {
   flex: 0 0 auto;
-  width: 1.35rem;
+  width: 1.5rem;
   height: auto;
   fill: currentColor;
-  opacity: 0.9;
 }
 
 /* Recording / slides / repo links on a talk page. These stay useful long
