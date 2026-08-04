@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
+{% from "macros/breadcrumbs.html" import breadcrumb_jsonld %}
 {% from "macros/edition-context.html" import edition_notice %}
 
 {% block title %}{{ this.title }}{% endblock %}
@@ -62,15 +62,10 @@
 {% block body %}
 
 {%- set is_current_talks = this.url_path == '/talks/' -%}
-{%- set visible_trail = [] -%}
-{%- if is_archive -%}
-  {%- set _ = visible_trail.append(('/archive/', 'Archive')) -%}
-  {%- set _ = visible_trail.append(('/archive/' ~ archive_year ~ '/', archive_year)) -%}
-  {%- set _ = visible_trail.append((none, 'Talks')) -%}
-{%- else -%}
-  {%- set _ = visible_trail.append((none, 'Talks')) -%}
-{%- endif -%}
-{{ breadcrumb(visible_trail) }}
+{#- No visible breadcrumb here: the edition band below already says which
+    edition this is and links back to it, so the trail only repeated it.
+    The BreadcrumbList in the head stays — it is what search results use for
+    the path under the title, and nothing on the page depends on it. -#}
 {{ edition_notice(archive_year, 'talks') }}
 
 <div class="subsite">
