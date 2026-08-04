@@ -1,22 +1,31 @@
 {#
   Edition context band
   ────────────────────
-  One band per page for content belonging to a specific edition. Three
-  states:
+  One band per page for content belonging to a specific edition. It answers
+  one question — which edition am I reading? — and it answers it the same
+  way every cycle:
 
-    - current edition (archive_year empty)  → nothing
-    - featured edition                      → "latest edition" band
-    - any other past edition                → "Archive" band
+    - current edition (archive_year empty)  → nothing; there is no elsewhere
+    - featured edition, its landing page    → badge + this cycle's note
+    - featured edition, any other page      → badge + where this page sits
+    - any older edition                     → "Archive" + where this page
+                                              sits + the way back to now
 
   The featured edition is the newest completed one, named in
-  databags/site_state.yaml → featured_edition.year. It lives at the same
-  permanent /archive/{year}/ URLs as every other past edition; only the
-  framing differs, for as long as it is still being promoted.
+  databags/site_state.yaml → featured_edition.year. Rolling a cycle is that
+  one edit: set it to 2027 and 2027 pages take the "latest edition" framing
+  while 2026 falls back to "Archive", with no template change.
+
+  What the band never does is push a reader towards the edition they are
+  already inside — "Explore the 2026 edition" on a 2026 talk page is a
+  round trip to nowhere. The promo sentence therefore lives on the edition
+  landing page alone, and every other page in that edition gets the plain
+  factual line instead.
 
   `kind` picks the sentence: talk | talks | speaker | speakers | track |
   tracks | edition. Unknown kinds fall back to a generic line.
 
-  The archive copy stays here rather than in YAML on purpose: it is
+  The per-kind copy stays here rather than in YAML on purpose: it is
   boilerplate that never changes per cycle. Only the featured-state copy —
   which does change every cycle — lives in the databag.
 
@@ -25,10 +34,26 @@
     {{ edition_notice(archive_year, 'talk') }}
 #}
 
-{#- `linked=false` suppresses the "Explore the {year} edition" CTA. Pass it
-    from the edition landing page itself, where the link would point at the
-    page you are already reading. It is a parameter rather than a check on
+{#- The "where am I" clause, shared by both bands so the two never drift
+    apart. `linked=false` renders the year as plain text — pass it from the
+    edition landing page, where the link would point at the page you are
+    already reading. It is a parameter rather than a check on
     `this.url_path` because an imported macro has no template context. -#}
+{% macro edition_phrase(kind, year, linked=true) -%}
+  {%- set edition -%}
+    {%- if linked %}<a href="/archive/{{ year }}/">{{ year }} edition</a>
+    {%- else %}{{ year }} edition{% endif -%}
+  {%- endset -%}
+  {%- if kind == 'talk' %}this talk is from the {{ edition }}.
+  {%- elif kind == 'talks' %}talks of the {{ edition }}.
+  {%- elif kind == 'speaker' %}speaker profile from the {{ edition }}.
+  {%- elif kind == 'speakers' %}speakers of the {{ edition }}.
+  {%- elif kind == 'track' or kind == 'tracks' %}tracks of the {{ edition }}.
+  {%- elif kind == 'edition' %}this page documents the {{ year }} edition of PyCon DE &amp; PyData.
+  {%- else %}content from the {{ edition }}.
+  {%- endif -%}
+{%- endmacro %}
+
 {% macro edition_notice(archive_year, kind='page', linked=true) %}
 {%- set fe = (bag('site_state') or {}).get('featured_edition') or {} -%}
 {%- set fy = (fe.get('year') or '')|string -%}
@@ -37,26 +62,25 @@
 {%- elif year == fy -%}
 <aside class="archive-banner archive-banner--featured" role="note" aria-label="Latest edition" data-pagefind-ignore>
   <div class="content">
-    <strong>{{ fe.get('badge') or 'Latest edition' }}</strong>
-    {%- if fe.get('note') %} — {{ fe['note'] }}{% endif %}
-    {%- if linked %}
-    <a href="/archive/{{ year }}/">Explore the {{ year }} edition</a>.
-    {%- endif %}
+    <strong>{{ fe.get('badge') or 'Latest edition' }}</strong> —
+    {# The edition's own page: the cycle's news belongs there and nowhere
+       else, so it is the one place the databag note is rendered. #}
+    {% if kind == 'edition' %}{{ fe.get('note') or edition_phrase(kind, year, linked) }}
+    {% else %}{{ edition_phrase(kind, year, linked) }}
+    {% endif %}
   </div>
 </aside>
 {%- else -%}
 <aside class="archive-banner" role="note" aria-label="Archived {{ kind }}" data-pagefind-ignore>
   <div class="content">
     <strong>Archive</strong> —
-    {%- if kind == 'talk' %} this talk is from the <a href="/archive/{{ year }}/">{{ year }} edition</a>.
+    {{ edition_phrase(kind, year, linked) }}
+    {#- Only past editions get the way back: for the latest one, "the
+        current programme" is a page that has nothing on it yet. -#}
+    {%- if kind == 'talk' %}
       See the <a href="/talks/">current programme</a> for the upcoming conference.
-    {%- elif kind == 'talks' %} talks of the <a href="/archive/{{ year }}/">{{ year }} edition</a>.
-    {%- elif kind == 'speaker' %} speaker profile from the <a href="/archive/{{ year }}/">{{ year }} edition</a>.
-    {%- elif kind == 'speakers' %} speakers of the <a href="/archive/{{ year }}/">{{ year }} edition</a>.
-    {%- elif kind == 'track' or kind == 'tracks' %} tracks of the <a href="/archive/{{ year }}/">{{ year }} edition</a>.
-    {%- elif kind == 'edition' %} this page documents the {{ year }} edition of PyCon DE &amp; PyData.
+    {%- elif kind == 'edition' %}
       See the <a href="/">current edition</a> for the upcoming conference.
-    {%- else %} content from the <a href="/archive/{{ year }}/">{{ year }} edition</a>.
     {%- endif %}
   </div>
 </aside>
