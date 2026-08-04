@@ -188,9 +188,8 @@ def submission_to_talk(sub, cfg: dict, year: str, audit: list | None = None) -> 
 
     # Pretalx "resources" — the slide decks and links speakers attach to the
     # submission itself, which is where most of them actually end up rather
-    # than in the two free-text questions above. Stored as a markdown list so
-    # the talk page can render it without a parser.
-    t["resources"] = resources_to_markdown(getattr(sub, "resources", None))
+    # than in the two free-text questions above.
+    t["resources"] = resources_to_lines(getattr(sub, "resources", None))
 
     # Governance booleans (Pretalx returns "true"/"false" strings or "Yes"/"No").
     t["streaming_consent"] = _to_bool(answer_for(answers, questions.get("streaming_consent")))
@@ -241,15 +240,40 @@ def _tag_name(tag: object) -> str:
     return str(name) if name else ""
 
 
-def resources_to_markdown(resources: object) -> str:
-    """Render Pretalx submission resources as a markdown list.
+RESOURCE_SEP = " | "
+
+
+def parse_resource_line(line: str) -> tuple[str, str, str]:
+    """Split one `label | url | preview` line; missing segments come back ''.
+
+    The single reader for the format written by :func:`resources_to_lines`
+    and extended by utils/generate_resource_thumbs.py — the talk template
+    does the same split in Jinja.
+    """
+    parts = [p.strip() for p in line.split(RESOURCE_SEP)]
+    parts += [""] * (3 - len(parts))
+    return parts[0], parts[1], parts[2]
+
+
+def resources_to_lines(resources: object) -> str:
+    """Render Pretalx submission resources as one `label | url` line each.
 
     Accepts pytanis `Resource` objects or the plain dicts of a raw API
     dump — both carry a `resource` URL and a free-text `description`.
     Entries without a URL are dropped; a missing description falls back
-    to the file name, because "Resource" as a link label tells a reader
+    to the file name, because "Resource" as a label tells a reader
     nothing. Returns "" when there is nothing to show, which keeps the
-    field empty rather than emitting an empty list.
+    field empty rather than emitting a stray blank line.
+
+    The field is `type = strings`, so the talk template splits each line
+    on the separator. A third segment may be appended later by
+    utils/generate_resource_thumbs.py:
+
+        Slides | https://pretalx.com/…/deck.pdf | /static/media/resources/ABC123-1.png
+
+    Descriptions are the speaker's own words, so any literal separator in
+    them is rewritten to a slash rather than dropped — it would otherwise
+    split one resource into two.
     """
     lines = []
     for item in resources or []:
@@ -263,11 +287,8 @@ def resources_to_markdown(resources: object) -> str:
             continue
         if not label:
             label = unquote(url.rstrip("/").rsplit("/", 1)[-1]) or "Resource"
-        # Brackets in a description would close the markdown link early, so
-        # they are escaped rather than dropped — the speaker's wording is
-        # what the reader sees.
-        label = label.replace("[", r"\[").replace("]", r"\]")
-        lines.append(f"- [{label}]({url})")
+        label = " ".join(label.split()).replace("|", "/")
+        lines.append(f"{label}{RESOURCE_SEP}{url}")
     return "\n".join(lines)
 
 

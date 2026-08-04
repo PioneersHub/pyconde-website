@@ -12,9 +12,13 @@ Source layout — one raw submission dump per talk, keyed by Pretalx code:
     {SRC}/{CODE}.json  ->  {"code": "...", "resources": [{"resource": url,
                                                           "description": str}]}
 
-The markdown rendering is `talks.resources_to_markdown`, the same function
-the live Pretalx importer uses, so a backfilled page and a freshly imported
-one are byte-identical.
+The rendering is `talks.resources_to_lines`, the same function the live
+Pretalx importer uses, so a backfilled page and a freshly imported one are
+byte-identical.
+
+Previews are a separate, later step: utils/generate_resource_thumbs.py
+appends a third segment to the lines it can render. This importer never
+discards one — a re-import keeps the preview attached to its resource.
 
 Talks are resolved through `lektor_lr.build_code_index()`, i.e. by each
 talk's `code:` field — never by folder name, which after the slug migration
@@ -33,7 +37,7 @@ import sys
 from pathlib import Path
 
 import lektor_lr
-from talks import resources_to_markdown
+from talks import RESOURCE_SEP, parse_resource_line, resources_to_lines
 
 REPO = Path(__file__).resolve().parent.parent
 
@@ -41,7 +45,7 @@ TALK_FIELD = "resources"
 
 
 def read_resources(path: Path) -> str:
-    """Return one submission's resources as markdown, or '' when it has none."""
+    """Return one submission's resources as `label | url` lines, '' when none."""
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
@@ -50,7 +54,29 @@ def read_resources(path: Path) -> str:
     if not isinstance(data, dict):
         print(f"  skip: {path.name} is not a JSON object", file=sys.stderr)
         return ""
-    return resources_to_markdown(data.get("resources"))
+    return resources_to_lines(data.get("resources"))
+
+
+def keep_previews(fresh: str, existing: str) -> str:
+    """Carry generated preview paths across a re-import, matched by URL.
+
+    Previews are produced separately and appended as a third segment. A
+    re-import rebuilds the lines from Pretalx, which knows nothing about
+    them, so without this the generator would have to run again after
+    every import.
+    """
+    previews = {}
+    for line in existing.splitlines():
+        _, url, preview = parse_resource_line(line)
+        if url and preview:
+            previews[url] = preview
+
+    merged = []
+    for line in fresh.splitlines():
+        _, url, _ = parse_resource_line(line)
+        preview = previews.get(url)
+        merged.append(f"{line}{RESOURCE_SEP}{preview}" if preview else line)
+    return "\n".join(merged)
 
 
 def main() -> int:
@@ -84,8 +110,8 @@ def main() -> int:
             orphans.append(code)
             continue
 
-        markdown = read_resources(record)
-        if not markdown:
+        fresh = read_resources(record)
+        if not fresh:
             counts["empty"] += 1
             continue
 
@@ -98,18 +124,19 @@ def main() -> int:
         if not lektor_lr.round_trip_ok(text, fields):
             raise SystemExit(f"Refusing to write: {lr_path} does not round-trip.")
 
-        if lektor_lr.field_value(fields, TALK_FIELD, "") == markdown:
+        merged = keep_previews(fresh, lektor_lr.field_value(fields, TALK_FIELD, "") or "")
+        if lektor_lr.field_value(fields, TALK_FIELD, "") == merged:
             counts["unchanged"] += 1
             continue
 
         rel = lr_path.relative_to(REPO)
-        n = markdown.count("\n") + 1
+        n = merged.count("\n") + 1
         if args.dry_run:
             counts["imported"] += 1
             print(f"  {code}: would-import  {n} resource(s)  -> {rel}")
             continue
 
-        lektor_lr.upsert_fields(fields, {TALK_FIELD: markdown})
+        lektor_lr.upsert_fields(fields, {TALK_FIELD: merged})
         lektor_lr.write_lr(lr_path, fields)
         counts["imported"] += 1
         print(f"  {code}: imported  {n} resource(s)  -> {rel}")
