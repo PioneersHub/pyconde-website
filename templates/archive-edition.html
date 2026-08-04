@@ -1,7 +1,15 @@
 {% extends "layout.html" %}
-{% from "macros/breadcrumbs.html" import breadcrumb, breadcrumb_jsonld %}
+{% from "macros/breadcrumbs.html" import breadcrumb_jsonld %}
 {% from "macros/edition-context.html" import edition_notice %}
+{% from "macros/edition-tabs.html" import edition_tabs %}
 {% from "macros/funnel-cta.html" import render_funnel_cta %}
+{% from "macros/session-list.html" import session_list, session_list_jsonld %}
+
+{#- This page is the edition's session list. The talks index that used to
+    hold it forwards here (templates/talks-index-redirect.html), so the
+    record still exists — it is the parent of every talk page — and this is
+    where its children are listed. Top-level set: visible in both blocks. -#}
+{%- set talks_node = site.get(this.url_path ~ 'talks') -%}
 
 {# The featured edition is still promoted as the latest one, so it does not
    carry the "(Archive)" suffix. `is_featured_edition` comes from layout.html. #}
@@ -61,10 +69,13 @@
 </script>
 {%- set crumb_trail = [('/archive/', 'Archive'), (this.url_path, this.year|string)] -%}
 {{ breadcrumb_jsonld(crumb_trail) }}
+{{ session_list_jsonld(talks_node, this.url_path, this.title) }}
 {% endblock %}
 
 {% block body %}
-{{ breadcrumb([('/archive/', 'Archive'), (none, this.year|string)]) }}
+{#- No visible breadcrumb: the band below names the edition and the tabs
+    below that carry the navigation. The BreadcrumbList above stays — it is
+    what search results use for the path under the title. -#}
 {{ edition_notice(this.year, 'edition', linked=false) }}
 
 <article class="archive-edition-article">
@@ -85,16 +96,15 @@
 
   <section class="subsite">
     <div class="content">
-      {%- set tracks_node = site.get(this.url_path ~ 'tracks') -%}
-      <nav class="archive-edition__subnav" aria-label="Edition sections">
-        <a href="{{ this.url_path }}talks/" class="archive-edition__subnav-link">Talks{% if this.talk_count %} <span class="archive-edition__subnav-count">({{ this.talk_count }})</span>{% endif %}</a>
-        <a href="{{ this.url_path }}speakers/" class="archive-edition__subnav-link">Speakers</a>
-        {%- if tracks_node and tracks_node.children|list %}
-        <a href="{{ this.url_path }}tracks/" class="archive-edition__subnav-link">Tracks <span class="archive-edition__subnav-count">({{ tracks_node.children|list|length }})</span></a>
-        {%- endif %}
-      </nav>
+      {{ edition_tabs(this.year, 'sessions') }}
       {{ this.body|shift_headings }}
     </div>
+  </section>
+
+  {#- The edition's programme, the thing visitors came for. It used to sit
+      one click away at {url}talks/; that page now forwards here. -#}
+  <section class="subsite">
+    {{ session_list(talks_node) }}
   </section>
 </article>
 
