@@ -4,20 +4,22 @@
   Persistent "tickets on sale" module for archive surfaces (talk,
   speaker, track, edition, topic-hub pages). Reads
   databags/site_state.yaml for the current-conference context.
-  The site is always in conference mode (no recap switch), so the
-  band renders whenever `headline` is non-empty; clear it to hide.
+  The band renders while `cta_enabled` is true and `headline` is set —
+  so it can be parked between cycles (tickets not on sale yet) without
+  throwing the copy away.
 
   Usage:
     {% from "macros/funnel-cta.html" import render_funnel_cta %}
     {{ render_funnel_cta(bag('site_state')) }}
 
   Databag schema (site_state.yaml):
-    year, headline, sub, tickets_url, tickets_label, early_bird_until
+    year, cta_enabled, headline, sub, tickets_url, tickets_label,
+    early_bird_until
 #}
 
 {% macro render_funnel_cta(state) %}
 
-{% if state and state.headline %}
+{% if state and state.cta_enabled and state.headline %}
 
 <aside class="funnel-cta" aria-label="Tickets on sale">
   <div class="funnel-cta__content">
