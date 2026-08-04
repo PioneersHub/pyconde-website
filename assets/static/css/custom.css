@@ -3659,58 +3659,44 @@ a.past-editions__row:hover .past-editions__location {
   }
 }
 
-/* ── Talk transcript section ────────────────────────────────────────── */
-/* The speaker's original proposal, collapsed beneath the session recap.
-   Deliberately the same treatment as the transcript below, so the two
-   secondary blocks on a talk page read as siblings. */
-.talk-submission {
-  margin: 1.5rem 0;
-}
-.talk-submission__details {
-  border: 1px solid var(--neutral-200, #e2e6ea);
-  border-left: 4px solid var(--neutral-200, #e2e6ea);
-  padding: 1rem 1.25rem;
-  background: var(--neutral-50, #f6f7f8);
-}
-.talk-submission__summary {
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 1.1rem;
-  list-style: none;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.talk-submission__summary::-webkit-details-marker { display: none; }
-.talk-submission__summary::before {
-  content: "▸";
-  display: inline-block;
-  transition: transform 0.15s ease;
-  color: var(--blue, #00c8e1);
-}
-.talk-submission__details[open] .talk-submission__summary::before {
-  transform: rotate(90deg);
-}
-.talk-submission__note {
-  margin: 0.75rem 0 1rem;
-  font-size: 0.85rem;
+/* ── Talk description footnotes ──────────────────────────────────────
+   Provenance of the description, then the speaker's own classification of
+   the session. Both are <p>, so they need `.subsite .content` specificity
+   to beat that section's blanket paragraph colour. */
+.subsite .content .talk-ai-note {
+  margin: 1rem 0 0.25rem;
+  font-size: 0.9rem;
+  font-style: italic;
   color: var(--text-secondary, #555);
 }
-.talk-submission__body {
+.subsite .content .talk-classification {
+  margin: 0 0 1.5rem;
   font-size: 0.95rem;
-  line-height: 1.6;
+  color: var(--text-secondary, #555);
 }
 
-.talk-transcript {
-  margin: 1.5rem 0 2rem;
+/* ── Talk asides: submission + transcript ───────────────────────────
+   The speaker's original proposal and the transcript of the recording are
+   the two secondary blocks on a talk page, so they read as siblings and
+   share one definition. Only the transcript body caps its height. */
+.talk-aside {
+  margin: 1.5rem 0;
 }
-.talk-transcript__details {
-  border: 1px solid var(--neutral-200, #e2e6ea);
-  border-left: 4px solid var(--blue, #00c8e1);
+.talk-aside:last-of-type {
+  margin-bottom: 2rem;
+}
+.talk-aside__details {
+  border: 1px solid var(--neutral-200, #e0e0e0);
+  border-left: 4px solid var(--neutral-200, #e0e0e0);
   padding: 1rem 1.25rem;
-  background: var(--neutral-50, #f6f7f8);
+  background: var(--neutral-50, #f5f5f5);
+  /* `.subsite .content` (main.css) sets color:white for text on the dark
+     bands. This panel is light, so it owns its colour — and everything
+     inside inherits ink, including <summary>, bare <strong> and <code>,
+     which the section's paragraph-only override never reached. */
+  color: var(--text-primary, #111);
 }
-.talk-transcript__summary {
+.talk-aside__summary {
   cursor: pointer;
   font-weight: 700;
   font-size: 1.1rem;
@@ -3719,41 +3705,42 @@ a.past-editions__row:hover .past-editions__location {
   align-items: center;
   gap: 0.5rem;
 }
-.talk-transcript__summary::-webkit-details-marker { display: none; }
-.talk-transcript__summary::before {
+.talk-aside__summary::-webkit-details-marker { display: none; }
+.talk-aside__summary::before {
   content: "▸";
   display: inline-block;
   transition: transform 0.15s ease;
-  color: var(--blue, #00c8e1);
+  color: var(--blue, #3778be);
 }
-.talk-transcript__details[open] .talk-transcript__summary::before {
+.talk-aside__details[open] .talk-aside__summary::before {
   transform: rotate(90deg);
 }
-.talk-transcript__status {
+.talk-aside__status {
   font-weight: 400;
   font-size: 0.85rem;
   color: var(--text-secondary, #555);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
-.talk-transcript__note {
+.subsite .content .talk-aside__note {
   margin: 0.75rem 0 1rem;
-  padding: 0.5rem 0.75rem;
-  background: rgba(0, 0, 0, 0.04);
-  border-left: 2px solid var(--neutral-200, #e2e6ea);
   font-size: 0.85rem;
   color: var(--text-secondary, #555);
 }
-.talk-transcript__body {
+.talk-aside__body {
   font-size: 0.95rem;
   line-height: 1.6;
+}
+.talk-aside__body p { margin: 0 0 0.9em; }
+.talk-aside__body strong { color: var(--text-primary, #111); }
+.talk-aside__body em { color: var(--text-secondary, #555); }
+/* Transcripts run to tens of thousands of characters — cap the opened
+   height so the rest of the page stays reachable. */
+.talk-transcript__body {
   max-height: 60vh;
   overflow-y: auto;
   padding-right: 0.5rem;
 }
-.talk-transcript__body p { margin: 0 0 0.9em; }
-.talk-transcript__body strong { color: var(--text-primary, #111); }
-.talk-transcript__body em { color: var(--text-secondary, #555); }
 
 /* ── Archive edition sub-nav (Talks / Speakers) ────────────────────── */
 .archive-edition__subnav {

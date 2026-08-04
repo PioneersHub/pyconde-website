@@ -4,7 +4,10 @@
   Sections (rendered only if non-empty):
     1. More by this speaker   — other talks by any of this talk's speakers (same edition first, then archive)
     2. Same track             — other talks in the same edition with the same track
-    3. Also in this edition   — sibling talks (capped, deterministic order)
+    3. Also in this edition   — sibling talks (deterministic order)
+
+  Every group shows at most 3 entries: the panel is a tail, not a second
+  programme page, and the three groups stay balanced against each other.
 -#}
 
 {%- macro related_panel(talk, my_speakers, talks_root, speakers_root, archive_year) -%}
@@ -25,7 +28,7 @@
       {%- for ref in (sp.talks or []) -%}
         {%- if ref != my_ref and ref != my_code -%}
           {%- set sibling = site.get(talks_root ~ '/' ~ ref) -%}
-          {%- if sibling and sibling['_model'] != 'redirect' and (by_speaker|length) < 8 -%}
+          {%- if sibling and sibling['_model'] != 'redirect' and (by_speaker|length) < 3 -%}
             {%- if sibling not in by_speaker -%}
               {%- set _ = by_speaker.append(sibling) -%}
             {%- endif -%}
@@ -41,7 +44,7 @@
   {%- if talk.track and talks_index -%}
     {%- for sibling in talks_index.children if sibling['_model'] != 'redirect' -%}
       {%- if sibling.track == talk.track and sibling.code != my_code -%}
-        {%- if (same_track|length) < 6 and sibling not in by_speaker -%}
+        {%- if (same_track|length) < 3 and sibling not in by_speaker -%}
           {%- set _ = same_track.append(sibling) -%}
         {%- endif -%}
       {%- endif -%}
@@ -59,7 +62,7 @@
       {%- endif -%}
     {%- endfor -%}
     {%- for sibling in valid_siblings|sort(attribute='title') -%}
-      {%- if sibling.code != my_code and sibling not in seen and (also_in|length) < 4 -%}
+      {%- if sibling.code != my_code and sibling not in seen and (also_in|length) < 3 -%}
         {%- set _ = also_in.append(sibling) -%}
       {%- endif -%}
     {%- endfor -%}
@@ -78,7 +81,7 @@
           {%- endif -%}
         </h3>
         <ul class="related-talks__list">
-          {%- for t in by_speaker[:6] %}
+          {%- for t in by_speaker %}
           <li class="related-talks__item">
             <a href="{{ t|url }}">
               <span class="related-talks__title">{{ t.title }}</span>
