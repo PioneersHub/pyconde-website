@@ -88,7 +88,9 @@
       {% for t in ns.shown %}
       {%- set is_archive = t.url_path.startswith('/archive/') -%}
       {%- set year = (t.url_path.split('/')[2]|string) if is_archive else cur_year -%}
-      {%- set thumb = t.video_thumbnail or ('https://i.ytimg.com/vi/' ~ t.youtube_id ~ '/maxresdefault.jpg') -%}
+      {#- Prefer the branded social card; fall back to the YouTube
+          thumbnail only for talks without one. -#}
+      {%- set thumb = t.social_card_image or t.video_thumbnail or ('https://i.ytimg.com/vi/' ~ t.youtube_id ~ '/maxresdefault.jpg') -%}
       <a href="{{ t|url }}" class="latest-videos__card">
         <span class="latest-videos__thumb-wrap">
           <img src="{{ thumb }}" alt="" class="latest-videos__thumb" loading="lazy" decoding="async">
@@ -101,6 +103,9 @@
       </a>
       {% endfor %}
     </div>
+    {% if data.see_all_text and data.see_all_url %}
+    <a href="{{ data.see_all_url }}" class="latest-videos__all">{{ data.see_all_text }} &rarr;</a>
+    {% endif %}
   </div>
 </section>
 
