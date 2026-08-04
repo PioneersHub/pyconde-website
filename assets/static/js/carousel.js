@@ -310,6 +310,31 @@
       }
     }
 
+    /*
+     * A two-finger swipe on a Mac trackpad is not a pointer drag at all —
+     * it arrives as a wheel event with horizontal delta, so without this
+     * the shelf ignores the most natural gesture on a desktop Mac. Only
+     * clearly horizontal intent is taken; anything more vertical than
+     * horizontal stays with the page so scrolling past the shelf still
+     * works.
+     */
+    var wheelDx = 0, wheelIdle = null;
+    viewport.addEventListener('wheel', function (e) {
+      if (self._maxPosition() === 0) return;
+      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+      e.preventDefault();
+      self.handOver();
+      wheelDx += e.deltaX;
+      var step = (viewport.getBoundingClientRect().width || 1) / self._visibleCount();
+      if (Math.abs(wheelDx) >= step * 0.35) {
+        var dir = wheelDx > 0 ? 1 : -1;
+        wheelDx = 0;
+        self.goTo(self.current + dir);
+      }
+      window.clearTimeout(wheelIdle);
+      wheelIdle = window.setTimeout(function () { wheelDx = 0; }, 200);
+    }, { passive: false });
+
     viewport.addEventListener('pointerup', release);
     viewport.addEventListener('pointercancel', release);
     viewport.addEventListener('pointerleave', release);

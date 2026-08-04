@@ -4221,6 +4221,42 @@ a.past-editions__row:hover .past-editions__location {
 .carousel--fits .carousel-controls {
   display: none;
 }
+/* On the video shelves the arrows sit over the outermost cards, centred
+   on the row, instead of on a bar below it. Same buttons as the
+   masterclasses carousel — solid here, because they land on artwork
+   rather than on a flat band. */
+.carousel--videos {
+  position: relative;
+}
+.carousel--videos .carousel-controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* The row of cards, not the whole section: the controls box is only as
+     tall as the viewport it overlays. */
+  height: 100%;
+  padding: 0 0.35rem;
+  background: transparent;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0;
+  /* The bar itself must not swallow clicks meant for the cards. */
+  pointer-events: none;
+  z-index: 2;
+}
+.carousel--videos .carousel-btn {
+  pointer-events: auto;
+  background: var(--text-primary, #111);
+  border-color: var(--text-primary, #111);
+  color: #fff;
+}
+.carousel--videos .carousel-btn:hover,
+.carousel--videos .carousel-btn:focus {
+  background: var(--blue, #3778be);
+  border-color: var(--blue, #3778be);
+  color: #fff;
+}
 /* Horizontal drags belong to the shelf; vertical ones still scroll. The
    cards are links around images, so the browser's own drag has to be shut
    off or it swallows the pointer stream before the carousel sees it. */
