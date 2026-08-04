@@ -238,17 +238,22 @@
           {% endfor %}
         </nav>
         <hr class="footer-links__separator" />
+        {#- Driven by the same databag as the homepage band, so the two can
+            never disagree about which editions exist or where a year goes.
+            While `archive_ready` is false each year opens its original
+            conference site; flipping that one flag points both bands at
+            the in-site archive instead. An edition with no surviving site
+            (2016) falls back to its archive page rather than rendering as
+            dead text in a nav. -#}
+        {%- set past = bag('frontpage/sections/past_editions') or {} -%}
+        {%- set to_archive = past.get('archive_ready') -%}
         <nav class="footer-links__editions" aria-label="Past editions">
           <a href="/archive/" class="footer-links__editions-label"><strong>Past editions</strong></a>
-          <a href="/archive/2026/">2026</a>
-          <a href="/archive/2025/">2025</a>
-          <a href="/archive/2024/">2024</a>
-          <a href="/archive/2023/">2023</a>
-          <a href="/archive/2022/">2022</a>
-          <a href="/archive/2019/">2019</a>
-          <a href="/archive/2018/">2018</a>
-          <a href="/archive/2017/">2017</a>
-          <a href="/archive/2016/">2016</a>
+          {%- for edition in (past.get('editions') or []) %}
+          {%- set external = (not to_archive) and edition.get('site') %}
+          <a href="{{ edition['site'] if external else edition['path'] }}"
+             {%- if external %} target="_blank" rel="noopener"{% endif %}>{{ edition['year'] }}</a>
+          {%- endfor %}
           <a href="/archive/" class="footer-links__editions-all">All editions →</a>
         </nav>
       </div>
