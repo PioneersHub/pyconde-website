@@ -2358,7 +2358,7 @@ footer a:hover {
 /* ── Fix: Talks page — force white text on colored backgrounds ── */
 .talks li a.talk,
 .talks li a.talk *,
-.talks li .talk-title,
+.talks--dense li .talk-title,
 .talks li h4,
 .talks li .talk-info-label,
 .talks li .track,
@@ -3029,57 +3029,152 @@ main:focus { outline: none; }
   padding-bottom: var(--space-md, 1.5rem);
   color: #1a1a1a;
 }
-.talk-filters__search {
-  margin-bottom: 1rem;
+/* One row of comboboxes rather than a wall of pills: an edition with
+   twenty tracks costs the same vertical space as one with three. */
+.talk-filters__bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: flex-end;
 }
-.talk-filters__search-label {
+.talk-filters__field {
+  flex: 1 1 11rem;
+  min-width: 10rem;
+}
+.talk-filters__field--search {
+  flex: 2 1 18rem;
+}
+.talk-filters__label {
   display: block;
-  margin-bottom: 0.3em;
+  margin-bottom: 0.25em;
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   letter-spacing: 0.03em;
   text-transform: uppercase;
 }
-.talk-filters__search-input {
+.talk-filters__input {
   width: 100%;
-  max-width: 28rem;
-  padding: 0.55rem 0.75rem;
+  padding: 0.4rem 0.6rem;
   border: 2px solid currentColor;
   border-radius: 4px;
   font: inherit;
+  font-size: 0.9rem;
   background: #fff;
   color: #1a1a1a;
 }
-.filter-group {
-  margin-bottom: 0.75rem;
+.talk-filters__input::placeholder {
+  color: #555;
+  opacity: 1;
 }
-.filter-group-label {
-  display: block;
-  margin-bottom: 0.3em;
+/* A facet with a selection says so even when the list is closed. */
+.talk-filters__field.is-filtered .talk-filters__input {
+  border-color: var(--blue, #3778be);
+  background: #eef4fb;
 }
-.filter-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35em;
+.talk-filters__field.is-filtered .talk-filters__input::placeholder {
+  color: #1a1a1a;
+  font-weight: 600;
 }
-.filter-option {
-  padding: 0.2rem 0.6rem;
-  border: 1px solid currentColor;
-  border-radius: 999px;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  font-size: 0.85rem;
+
+.combo {
+  position: relative;
+}
+.combo__input {
+  padding-right: 1.8rem;
   cursor: pointer;
 }
-.filter-option:hover,
-.filter-option:focus-visible {
-  background: rgba(0, 0, 0, 0.08);
+.combo__toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 1.8rem;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-size: 0.7rem;
+  line-height: 1;
+  cursor: pointer;
 }
-.filter-option.active {
+.combo__list {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 15rem;
+  overflow-y: auto;
+  background: #fff;
+  border: 2px solid var(--blue, #3778be);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+.subsite .content .combo__list li {
+  margin: 0;
+}
+.combo__option {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.85rem;
+  line-height: 1.3;
+  cursor: pointer;
+}
+.combo__option.is-active,
+.combo__option:hover {
+  background: #eef4fb;
+}
+.combo__option.is-selected {
+  font-weight: 700;
+}
+/* The tick marks selection without a checkbox column, so a long track name
+   still gets the full width of the list. */
+.combo__option.is-selected .combo__option-label::before {
+  content: "✓ ";
+  color: var(--blue, #3778be);
+}
+.combo__option-count {
+  flex: 0 0 auto;
+  font-size: 0.75rem;
+  color: #555;
+  font-weight: 400;
+}
+
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+  margin-top: 0.85rem;
+}
+.filter-chips__label {
+  margin: 0;
+}
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid #1a1a1a;
+  border-radius: 999px;
   background: #1a1a1a;
   color: #fff;
-  border-color: #1a1a1a;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.filter-chip:hover,
+.filter-chip:focus-visible {
+  background: var(--blue, #3778be);
+  border-color: var(--blue, #3778be);
+}
+.filter-chip__x {
+  font-size: 1em;
+  line-height: 1;
 }
 .filter-count {
   display: block;
@@ -3089,16 +3184,113 @@ main:focus { outline: none; }
 }
 .filter-clear {
   display: inline-block;
-  margin-top: 0.5rem;
   padding: 0;
   border: 0;
   background: none;
   color: inherit;
   font: inherit;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   text-decoration: underline;
   text-underline-offset: 0.2em;
   cursor: pointer;
+}
+
+/* Provenance of the list itself, so it sits with the controls rather than
+   repeating on every row. */
+.subsite .content.talks-ai-note {
+  margin: 0;
+  padding-top: 0;
+  padding-bottom: var(--space-md, 1.5rem);
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--text-secondary, #555);
+}
+
+/* ── Talk list: search pointer band ──────────────────────────────────
+   Lifted out of the dark page header, where it read as small print under
+   the title. Its own band under the header gives it the width of the page
+   and a colour of its own. */
+.talks-search-band {
+  background: #eef4fb;
+  border-bottom: 2px solid var(--blue, #3778be);
+}
+.talks-search-band .content {
+  max-width: var(--content-width-wide);
+  margin: 0 auto;
+  padding: 0.85rem var(--space-page-margin);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.6rem;
+  color: #10333a;
+}
+.talks-search-band__lead {
+  font-size: 0.95rem;
+}
+.talks-search-band__link {
+  font-weight: 700;
+  color: #1c5b96;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.talks-search-band__link:hover,
+.talks-search-band__link:focus-visible {
+  color: #10333a;
+}
+
+/* ── Talk list rows ──────────────────────────────────────────────────
+   Denser than the section default: a programme is a list to scan, so each
+   row is title, one meta line, one summary line. `.talk` also carries
+   `.content`, whose section padding is far too generous here. */
+.talks--dense li a.content.talk {
+  padding-top: 0.7rem;
+  padding-bottom: 0.7rem;
+}
+.talks--dense li .talk-title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.3;
+}
+.talks--dense li .talk-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem 0.6rem;
+  margin: 0.15rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+.talks--dense li .talk-speakers {
+  font-weight: 600;
+}
+.talks--dense li .talk-track {
+  opacity: 0.85;
+}
+.talks--dense li .talk-track::before {
+  content: "· ";
+}
+.talks--dense li .talk-summary {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  /* Two lines is enough to tell two talks apart; the page is a list, not
+     a set of abstracts. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+/* Recording marker: the video glyph alone, no label. */
+.talks--dense li .talk-play {
+  flex: 0 0 auto;
+  width: 1.35rem;
+  height: auto;
+  fill: currentColor;
+  opacity: 0.9;
 }
 
 /* Recording / slides / repo links on a talk page. These stay useful long

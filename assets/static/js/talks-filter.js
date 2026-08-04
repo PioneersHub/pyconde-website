@@ -11,6 +11,11 @@
  * build, so this must not depend on Pagefind being fresh. For full-text
  * search across abstracts and transcripts the page links out to /search/.
  *
+ * Each facet is a combobox: type to narrow the options, Enter or click to
+ * toggle one. Twenty tracks as pills pushed the list itself below the fold,
+ * which is what the dropdowns fix — the whole filter bar is now two rows
+ * regardless of how many values an edition has.
+ *
  * State lives in the query string, so a filtered view is shareable:
  *   /archive/2026/talks/?q=polars&track=Data%20Handling&recording=yes
  */
@@ -18,12 +23,12 @@
   "use strict";
 
   var FACETS = [
-    { key: "track", param: "track", label: "Track" },
-    { key: "format", param: "format", label: "Format" },
-    { key: "pythonSkill", param: "python_skill", label: "Python skill" },
-    { key: "domainExpertise", param: "domain_expertise", label: "Domain expertise" },
-    { key: "recording", param: "recording", label: "Recording" },
-    { key: "transcript", param: "transcript", label: "Transcript" }
+    { key: "track", param: "track", label: "Track", noun: "tracks" },
+    { key: "format", param: "format", label: "Format", noun: "formats" },
+    { key: "pythonSkill", param: "python_skill", label: "Python skill", noun: "levels" },
+    { key: "domainExpertise", param: "domain_expertise", label: "Domain expertise", noun: "levels" },
+    { key: "recording", param: "recording", label: "Recording", noun: "options" },
+    { key: "transcript", param: "transcript", label: "Transcript", noun: "options" }
   ];
 
   // Skill levels read as a progression, not an alphabet.
@@ -98,22 +103,54 @@
     return values.slice().sort(function (a, b) { return a.localeCompare(b); });
   }
 
+  function labelFor(value) {
+    return VALUE_LABELS[value] || value;
+  }
+
+  function anyActive() {
+    return FACETS.some(function (f) { return active[f.key].size; });
+  }
+
   function build() {
     container.textContent = "";
 
-    var search = document.createElement("div");
-    search.className = "talk-filters__search";
+    var bar = document.createElement("div");
+    bar.className = "talk-filters__bar";
+
+    bar.appendChild(buildSearch());
+    FACETS.forEach(function (f) {
+      var counts = valuesFor(f.key);
+      var values = sortValues(f.key, Object.keys(counts));
+      // A facet with nothing to choose between is noise.
+      if (values.length < 2) return;
+      bar.appendChild(buildCombo(f, values, counts));
+    });
+    container.appendChild(bar);
+
+    if (anyActive()) container.appendChild(buildChips());
+
+    var status = document.createElement("p");
+    status.className = "filter-count";
+    status.id = "talk-filter-count";
+    status.setAttribute("role", "status");
+    status.setAttribute("aria-live", "polite");
+    container.appendChild(status);
+  }
+
+  function buildSearch() {
+    var field = document.createElement("div");
+    field.className = "talk-filters__field talk-filters__field--search";
 
     var label = document.createElement("label");
-    label.className = "talk-filters__search-label";
+    label.className = "talk-filters__label";
     label.setAttribute("for", "talk-search");
     label.textContent = "Search talks";
-    search.appendChild(label);
+    field.appendChild(label);
 
     var input = document.createElement("input");
     input.type = "search";
     input.id = "talk-search";
-    input.className = "talk-filters__search-input";
+    input.className = "talk-filters__input";
     input.placeholder = "Title, speaker or abstract…";
     input.autocomplete = "off";
     input.value = query;
@@ -122,75 +159,249 @@
       updateURL();
       apply();
     });
-    search.appendChild(input);
-    container.appendChild(search);
+    field.appendChild(input);
+    return field;
+  }
 
-    FACETS.forEach(function (f) {
-      var counts = valuesFor(f.key);
-      var values = sortValues(f.key, Object.keys(counts));
-      // A facet with nothing to choose between is noise.
-      if (values.length < 2) return;
+  /*
+   * One facet as a combobox. The input doubles as the autocomplete filter
+   * and as the summary of what is selected, so the control keeps a single
+   * line whether nothing or six values are chosen. Selected values are
+   * removable from the chip row below the bar.
+   */
+  function buildCombo(facet, values, counts) {
+    var field = document.createElement("div");
+    field.className = "talk-filters__field";
 
-      var group = document.createElement("div");
-      group.className = "filter-group";
+    var listId = "facet-list-" + facet.param;
+    var label = document.createElement("label");
+    label.className = "talk-filters__label";
+    label.setAttribute("for", "facet-" + facet.param);
+    label.textContent = facet.label;
+    field.appendChild(label);
 
-      var groupLabel = document.createElement("span");
-      groupLabel.className = "filter-group-label talk-info-label";
-      groupLabel.id = "facet-" + f.param;
-      groupLabel.textContent = f.label;
-      group.appendChild(groupLabel);
+    var combo = document.createElement("div");
+    combo.className = "combo";
 
-      var options = document.createElement("div");
-      options.className = "filter-options";
-      options.setAttribute("role", "group");
-      options.setAttribute("aria-labelledby", groupLabel.id);
+    var input = document.createElement("input");
+    input.type = "text";
+    input.id = "facet-" + facet.param;
+    input.className = "talk-filters__input combo__input";
+    input.autocomplete = "off";
+    input.setAttribute("role", "combobox");
+    input.setAttribute("aria-expanded", "false");
+    input.setAttribute("aria-controls", listId);
+    input.setAttribute("aria-autocomplete", "list");
 
-      values.forEach(function (val) {
-        var btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "filter-option";
-        btn.dataset.filterKey = f.key;
-        btn.dataset.filterValue = val;
-        btn.textContent = (VALUE_LABELS[val] || val) + " (" + counts[val] + ")";
-        btn.setAttribute("aria-pressed", active[f.key].has(val) ? "true" : "false");
-        if (active[f.key].has(val)) btn.classList.add("active");
-        btn.addEventListener("click", function () {
-          if (active[f.key].has(val)) active[f.key].delete(val);
-          else active[f.key].add(val);
-          updateURL();
-          build();
-          apply();
-        });
-        options.appendChild(btn);
+    var list = document.createElement("ul");
+    list.className = "combo__list";
+    list.id = listId;
+    list.setAttribute("role", "listbox");
+    list.setAttribute("aria-multiselectable", "true");
+    list.hidden = true;
+
+    var toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "combo__toggle";
+    toggle.tabIndex = -1;
+    toggle.setAttribute("aria-hidden", "true");
+    toggle.textContent = "▾";
+
+    var options = [];
+    var cursor = -1;
+
+    values.forEach(function (value, index) {
+      var option = document.createElement("li");
+      option.className = "combo__option";
+      option.id = listId + "-" + index;
+      option.setAttribute("role", "option");
+      option.dataset.value = value;
+      option.dataset.match = labelFor(value).toLowerCase();
+      option.setAttribute("aria-selected", active[facet.key].has(value) ? "true" : "false");
+      if (active[facet.key].has(value)) option.classList.add("is-selected");
+
+      var text = document.createElement("span");
+      text.className = "combo__option-label";
+      text.textContent = labelFor(value);
+      option.appendChild(text);
+
+      var count = document.createElement("span");
+      count.className = "combo__option-count";
+      count.textContent = counts[value];
+      option.appendChild(count);
+
+      // mousedown, not click: the input's blur would close the list first.
+      option.addEventListener("mousedown", function (event) {
+        event.preventDefault();
+        toggleValue(facet, value);
       });
-
-      group.appendChild(options);
-      container.appendChild(group);
+      list.appendChild(option);
+      options.push(option);
     });
 
-    var status = document.createElement("p");
-    status.className = "filter-count";
-    status.id = "talk-filter-count";
-    status.setAttribute("role", "status");
-    status.setAttribute("aria-live", "polite");
-    container.appendChild(status);
-
-    if (query || FACETS.some(function (f) { return active[f.key].size; })) {
-      var clear = document.createElement("button");
-      clear.type = "button";
-      clear.className = "filter-clear";
-      clear.textContent = "Clear all filters";
-      clear.addEventListener("click", function () {
-        query = "";
-        FACETS.forEach(function (f) { active[f.key].clear(); });
-        updateURL();
-        build();
-        apply();
-        var el = document.getElementById("talk-search");
-        if (el) el.focus();
-      });
-      container.appendChild(clear);
+    function summarise() {
+      var chosen = Array.from(active[facet.key]);
+      if (!chosen.length) {
+        input.value = "";
+        input.placeholder = "All " + facet.noun;
+        field.classList.remove("is-filtered");
+        return;
+      }
+      input.value = "";
+      input.placeholder = chosen.length === 1
+        ? labelFor(chosen[0])
+        : chosen.length + " selected";
+      field.classList.add("is-filtered");
     }
+
+    function visibleOptions() {
+      return options.filter(function (o) { return !o.hidden; });
+    }
+
+    function highlight(next) {
+      var shown = visibleOptions();
+      if (!shown.length) return;
+      cursor = (next + shown.length) % shown.length;
+      options.forEach(function (o) { o.classList.remove("is-active"); });
+      var current = shown[cursor];
+      current.classList.add("is-active");
+      input.setAttribute("aria-activedescendant", current.id);
+      current.scrollIntoView({ block: "nearest" });
+    }
+
+    function open() {
+      if (!list.hidden) return;
+      closeAllCombos();
+      list.hidden = false;
+      input.setAttribute("aria-expanded", "true");
+      cursor = -1;
+    }
+
+    function close() {
+      list.hidden = true;
+      input.setAttribute("aria-expanded", "false");
+      input.removeAttribute("aria-activedescendant");
+      options.forEach(function (o) { o.classList.remove("is-active"); });
+      filterOptions("");
+      cursor = -1;
+    }
+
+    function filterOptions(needle) {
+      var text = needle.trim().toLowerCase();
+      options.forEach(function (o) {
+        o.hidden = text ? o.dataset.match.indexOf(text) === -1 : false;
+      });
+    }
+
+    input.addEventListener("focus", open);
+    input.addEventListener("click", open);
+    toggle.addEventListener("mousedown", function (event) {
+      event.preventDefault();
+      if (list.hidden) { input.focus(); } else { close(); }
+    });
+    input.addEventListener("input", function () {
+      open();
+      filterOptions(input.value);
+      cursor = -1;
+    });
+    input.addEventListener("keydown", function (event) {
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        open();
+        highlight(cursor + 1);
+      } else if (event.key === "ArrowUp") {
+        event.preventDefault();
+        open();
+        highlight(cursor - 1);
+      } else if (event.key === "Enter") {
+        var shown = visibleOptions();
+        var pick = cursor >= 0 ? shown[cursor] : (shown.length === 1 ? shown[0] : null);
+        if (pick) {
+          event.preventDefault();
+          toggleValue(facet, pick.dataset.value);
+        }
+      } else if (event.key === "Escape") {
+        if (!list.hidden) event.stopPropagation();
+        close();
+      }
+    });
+    input.addEventListener("blur", function () {
+      // A click on an option fires mousedown first, so the value is already
+      // toggled by the time focus leaves.
+      window.setTimeout(close, 0);
+    });
+
+    summarise();
+    combo.appendChild(input);
+    combo.appendChild(toggle);
+    combo.appendChild(list);
+    field.appendChild(combo);
+    return field;
+  }
+
+  function closeAllCombos() {
+    Array.prototype.forEach.call(container.querySelectorAll(".combo__list"), function (list) {
+      list.hidden = true;
+      var input = list.parentNode.querySelector(".combo__input");
+      if (input) input.setAttribute("aria-expanded", "false");
+    });
+  }
+
+  /* Everything currently narrowing the list, in one removable row — the
+     combobox summarises its own facet, but only the chips show the whole
+     filter state at a glance. */
+  function buildChips() {
+    var row = document.createElement("div");
+    row.className = "filter-chips";
+
+    var heading = document.createElement("span");
+    heading.className = "filter-chips__label talk-info-label";
+    heading.textContent = "Filtering by";
+    row.appendChild(heading);
+
+    FACETS.forEach(function (f) {
+      Array.from(active[f.key]).forEach(function (value) {
+        var chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "filter-chip";
+        chip.title = "Remove filter: " + f.label + " — " + labelFor(value);
+        chip.setAttribute("aria-label", chip.title);
+        chip.appendChild(document.createTextNode(labelFor(value)));
+        var x = document.createElement("span");
+        x.className = "filter-chip__x";
+        x.setAttribute("aria-hidden", "true");
+        x.textContent = "×";
+        chip.appendChild(x);
+        chip.addEventListener("click", function () { toggleValue(f, value); });
+        row.appendChild(chip);
+      });
+    });
+
+    var clear = document.createElement("button");
+    clear.type = "button";
+    clear.className = "filter-clear";
+    clear.textContent = "Clear all";
+    clear.addEventListener("click", function () {
+      query = "";
+      FACETS.forEach(function (f) { active[f.key].clear(); });
+      updateURL();
+      build();
+      apply();
+      var el = document.getElementById("talk-search");
+      if (el) el.focus();
+    });
+    row.appendChild(clear);
+    return row;
+  }
+
+  function toggleValue(facet, value) {
+    if (active[facet.key].has(value)) active[facet.key].delete(value);
+    else active[facet.key].add(value);
+    updateURL();
+    build();
+    apply();
+    var reopened = document.getElementById("facet-" + facet.param);
+    if (reopened) reopened.focus();
   }
 
   function apply() {
