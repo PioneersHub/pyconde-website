@@ -22,8 +22,19 @@
   <div class="content">
     {{ this.body|shift_headings }}
 
+    {#- `archive_years` in databags/site_state.yaml narrows this list to the
+        editions named there; empty or absent lists them all. The editions
+        left out keep working at their own URLs — only the index is
+        shortened. -#}
+    {%- set listed_years = (bag('site_state') or {}).get('archive_years') or [] -%}
+    {%- set editions = [] -%}
+    {%- for edition in this.children|sort(attribute='year', reverse=true) -%}
+      {%- if not listed_years or (edition.year|string) in (listed_years|map('string')|list) -%}
+        {%- set _ = editions.append(edition) -%}
+      {%- endif -%}
+    {%- endfor %}
     <ul class="archive-editions">
-      {%- for edition in this.children|sort(attribute='year', reverse=true) %}
+      {%- for edition in editions %}
       <li>
         <a href="{{ edition|url }}" class="archive-edition-card">
           <h2 class="archive-edition__title">{{ edition.title }}
