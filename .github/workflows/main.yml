@@ -1,8 +1,7 @@
 name: Upload website (S3)
 
-# Since ~Jul 29 the AWS_S3_BUCKET secret no longer matches the bucket
-# nginx serves, so these deploys upload into the void. Fix the secret
-# before relying on this workflow again.
+# Deploys the current edition to every bucket in databags/deploy_targets.yaml.
+# That file is the only place buckets are named — see utils/deploy_to_s3.py.
 on:
   push:
     branches: ["main"]
@@ -27,24 +26,18 @@ jobs:
 #        run: make sponsor-pages
 
       - name: Build static page (current edition only)
-        # Archive editions and certificates deploy on demand via
-        # archive-build.yml — see plans/selective-builds.md.
+        # Archive editions deploy on demand via archive-build.yml —
+        # see plans/selective-builds.md.
         run: make build BUILD_MODE=current
 
-      - name: Upload to s3
-        uses: jakejarvis/s3-sync-action@master
+      - name: Deploy to S3
         env:
-          SOURCE_DIR: site
-          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET}}
-          AWS_REGION: ${{ secrets.AWS_S3_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: Upload to s3 (temp-migration time)
-        uses: jakejarvis/s3-sync-action@master
-        env:
-          SOURCE_DIR: site
-          AWS_S3_BUCKET: pyconde-27
-          AWS_REGION: ${{ secrets.AWS_S3_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_S3_REGION }}
+          # Resolves the `env:AWS_S3_BUCKET` entry in databags/deploy_targets.yaml.
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        # --scope full uploads everything this build rendered, which for
+        # BUILD_MODE=current is the current edition only. The sync never
+        # deletes, so the archive already in the bucket stays live.
+        run: python utils/deploy_to_s3.py --scope full

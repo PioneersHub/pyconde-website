@@ -1,18 +1,32 @@
-# Selective Builds — Current Edition Fast, Archives & Certificates On Demand
+# Selective Builds — Current Edition Fast, Archives On Demand
 
 > Hand-off brief, companion to `content-strategy.md`. Status: **implemented
-> and locally verified** (2026-07-02); remaining: staging rehearsal + first
-> archive dispatch (see Verification results).
+> and locally verified** (2026-07-02).
+>
+> **Amended 2026-08-05.** Two things below are no longer true as written, and
+> the sections concerned have been corrected in place:
+>
+> 1. **Attendee certificates are out of scope.** `content/attendee-certificate/`
+>    was moved to `content-archived/` in `b00f336e`, so it no longer builds in
+>    any mode and has been removed from `databags/selective_build.yaml`.
+>    `/attendee-certificate/{uuid}/` URLs are not served.
+> 2. **Deploy targets are now a list, not a bucket.** Both syncs go through
+>    `utils/deploy_to_s3.py`, which fans out to every bucket in
+>    `databags/deploy_targets.yaml`. `jakejarvis/s3-sync-action` is gone.
+>    Each bucket receives a complete, independent copy — this document's
+>    "the S3 sync never deletes, so previously deployed pages stay live"
+>    property now has to hold *per bucket*, which is what it failed to do
+>    when a second bucket was added to one workflow only.
 
 ## TL;DR
 
 Production deploys build **only the current edition** (~600 pages, incl. the
 blog — it covers only the current conference). Archive editions (~2,500 pages)
-and attendee certificates (~1,900 pages) are static after their initial
-generation — they get built **only on demand**, all past editions at once, via
-a manually dispatched GitHub Actions workflow. Because the S3 sync never
-deletes, previously deployed archive/certificate pages **stay live** even when
-a deploy omits them.
+are static after their initial generation — they get built **only on demand**,
+all past editions at once, via a manually dispatched GitHub Actions workflow.
+Because the S3 sync never deletes, previously deployed archive pages **stay
+live** even when a deploy omits them — in each bucket that has received an
+archive deploy at least once. See Deploy semantics.
 
 The critical design property (learned the hard way in review): the filter
 applies to the **build traversal, not record discovery** — every page that
@@ -48,7 +62,7 @@ Controlled by a `BUILD_MODE` environment variable, default `current`.
 | Mode | Scope | Trigger |
 | --- | --- | --- |
 | `current` | Current edition: `/`, `/talks/`, `/speakers/`, blog (per-year, current conference only), pages | Every push to `main` (production) and every PR (staging) |
-| `archive` | All past editions under `/archive/` + all certificates | Manual dispatch (`archive-build.yml`) |
+| `archive` | All past editions under `/archive/` | Manual dispatch (`archive-build.yml`) |
 | `full` | Everything — the only mode that regenerates cross-edition outputs | Manual dispatch; run after archiving an edition or changing shared templates |
 
 Per-year archive builds were considered and rejected — a single `archive` mode
@@ -72,11 +86,12 @@ record tree.
 > class impossible — artifacts are mode-independent in content (verified:
 > zero non-identical shared files between a `current` and a `full` build).
 
-- `current` skips building exactly two subtrees: `/archive` and
-  `/attendee-certificate`. The list lives in
+- `current` skips building one subtree: `/archive`. The list lives in
   **`databags/selective_build.yaml`** — single source of truth, also read by
   the archive workflow to derive its S3 sync scope
-  (`utils/selective_build_sync_args.py`).
+  (`utils/selective_build_sync_args.py`). Every entry must match an existing
+  subtree under `content/`; a stale entry widens the archive deploy's sync
+  scope to a prefix nothing builds.
 - `archive` and `full` exclude **nothing** — a full render. Rationale: the
   current edition is only ~12% of pages, so excluding it from archive builds
   saves nothing. The difference between `archive` and `full` lives outside
@@ -124,16 +139,30 @@ promptly — until then the freshly listed `/archive/{year}/…` URLs 404.
 
 ## Deploy semantics
 
-The S3 sync (`jakejarvis/s3-sync-action`, no `--delete`) only uploads what the
-build produced and never removes bucket objects. This is what makes the whole
-strategy work: a `current` deploy leaves `/archive/`, `/attendee-certificate/`,
-`/pagefind/` and the archive sitemap segments untouched in the bucket.
+Every deploy goes through **`utils/deploy_to_s3.py`**, which syncs the built
+`site/` to each bucket in `databags/deploy_targets.yaml` in turn. The sync
+never passes `--delete`, so it only uploads what the build produced and never
+removes bucket objects. That is what makes the whole strategy work: a
+`current` deploy leaves `/archive/`, `/pagefind/` and the archive sitemap
+segments untouched in the bucket.
 **Invariant: never add `--delete` to the sync of a non-`full` build.**
 
 `archive` builds sync only their scope — exactly the excluded subtrees
-(`--exclude '*' --include archive/* --include attendee-certificate/*`,
-derived from `databags/selective_build.yaml`). Everything else is already
-kept fresh by regular `current` deploys.
+(`--exclude '*' --include archive/*`, derived from
+`databags/selective_build.yaml`). Everything else is already kept fresh by
+regular `current` deploys.
+
+**The no-delete property holds per bucket, and so does the completeness it
+buys.** A bucket that never received an `archive` deploy has no archive, no
+matter how many `current` deploys it has had. That is not hypothetical: when a
+second bucket was added to `main.yml` alone in Aug 2026, `archive-build.yml`
+kept deploying to the old one and 2,098 of the site's 2,119 sitemap URLs were
+dead on the served bucket for a week, while every deploy reported success.
+Naming targets in one file (`databags/deploy_targets.yaml`) rather than per
+workflow is what prevents the recurrence — a new bucket needs one `archive`
+or `full` dispatch before it is complete.
+
+`site/.lektor/` (Lektor's build-state database) is excluded from every sync.
 
 ## Changes
 
@@ -147,15 +176,22 @@ kept fresh by regular `current` deploys.
 | `.github/workflows/development.yml` | `BUILD_MODE=current` |
 | `.github/workflows/archive-build.yml` | New: manual dispatch, input `mode` (`archive` \| `full`); `archive` syncs only the derived scope, `full` syncs everything incl. Pagefind |
 
-Not touched: `content/archive/`, `content/attendee-certificate/` stay in git
-as-is. Certificates remain at `/attendee-certificate/{uuid}/`.
+Not touched: `content/archive/` stays in git as-is.
 
-## Future (separate decision): certificates under the archive
+Added 2026-08-05: `databags/deploy_targets.yaml` + `utils/deploy_targets.py`
+(the bucket list and its reader) and `utils/deploy_to_s3.py` (the one sync
+mechanism, used by `main.yml` and `archive-build.yml`).
+`.github/workflows/routing-config.yml` applies the website configuration to
+every bucket in the same list.
 
-Certificates conceptually belong to their edition (`/archive/{year}/…`). Moving
-them means 301-redirecting ~1,900 published URLs (QR codes, shared links) via a
-generated redirect set — `databags/redirects.yaml` is hand-maintained and won't
-scale to that. Out of scope here; revisit when archiving the 2026 edition.
+## Attendee certificates — retired (2026-08-05)
+
+Superseded the "certificates under the archive" question this document used to
+park here. `content/attendee-certificate/` moved to `content-archived/` in
+`b00f336e` and `/attendee-certificate` was dropped from
+`databags/selective_build.yaml`; nothing builds or deploys them. The ~1,930
+published `/attendee-certificate/{uuid}/` URLs (QR codes, shared links) are not
+served. Decided deliberately, not as a side effect.
 
 ## Verification results (2026-07-02, local)
 
@@ -175,10 +211,12 @@ scale to that. Out of scope here; revisit when archiving the 2026 edition.
    CI/CD deploy, SEO invariants), 2 independent verifiers per finding —
    5 distinct confirmed findings, all fixed (see next section).
 8. ⬜ **Staging rehearsal** (remaining): deploy a `current` build to
-   `pyconde-26-staging`, verify archive pages, certificates, search, and
-   sitemap segments still resolve from the previously synced state.
-9. ⬜ **First archive dispatch** (remaining): run `archive-build.yml` with
-   `mode=archive` once and confirm only the archive scope changes in S3.
+   `pyconde-27-staging`, verify archive pages, search and sitemap segments
+   still resolve from the previously synced state.
+9. ⬜ **First archive dispatch** (remaining, and now urgent): `archive-build.yml`
+   has never run. Dispatch it with `mode=full` — the served bucket is missing
+   both `/archive/**` and `/pagefind/**`, and `full` restores both in one pass.
+   Then crawl `sitemap.xml` and confirm every URL returns 200.
 
 ## Review findings & responses (2026-07-02)
 

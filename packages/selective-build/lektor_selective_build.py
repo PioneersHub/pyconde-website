@@ -1,10 +1,9 @@
 """Scope a Lektor build to the current edition (selective builds).
 
 BUILD_MODE=current skips BUILDING the archive-scoped artifacts (past
-editions, attendee certificates), so production deploys only re-render
-the current-edition pages (~12% of the site). Because the production S3
-sync never deletes, the previously deployed archive stays live — it just
-stops being rebuilt.
+editions), so production deploys only re-render the current-edition pages
+(~12% of the site). Because the production S3 sync never deletes, the
+previously deployed archive stays live — it just stops being rebuilt.
 
 Crucially the filter applies to the build traversal, NOT to record
 discovery: every page that does render — homepage, sitemap segments,
