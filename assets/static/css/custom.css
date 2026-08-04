@@ -4217,23 +4217,21 @@ a.past-editions__row:hover .past-editions__location {
 @media (max-width: 768px) {
     .carousel--videos { --carousel-visible: 1; }
 }
-/* Controls sit on the section's own band, not the blue strip the
-   masterclasses carousel uses. */
-.carousel-controls--videos {
-    background: transparent;
-    justify-content: flex-end;
-    gap: 0.5rem;
-    padding: 0.5rem 0 0;
+/* Nothing to page through: the arrows would be dead controls. */
+.carousel--fits .carousel-controls {
+  display: none;
 }
-.carousel-controls--videos .carousel-btn {
-    border-color: var(--text-primary);
-    color: var(--text-primary);
+/* Horizontal drags belong to the shelf; vertical ones still scroll. */
+.carousel--videos .carousel-viewport {
+  touch-action: pan-y;
+  cursor: grab;
 }
-.carousel-controls--videos .carousel-btn:hover,
-.carousel-controls--videos .carousel-btn:focus {
-    background: var(--text-primary);
-    color: var(--white);
-    border-color: var(--text-primary);
+.carousel--videos.is-dragging .carousel-viewport {
+  cursor: grabbing;
+  user-select: none;
+}
+.carousel--videos.is-dragging .carousel-slides {
+  transition: none;
 }
 .latest-videos__card {
     /* border-box so the 5px white frame counts into the card width. */

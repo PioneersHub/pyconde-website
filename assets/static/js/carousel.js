@@ -106,6 +106,7 @@
     }
 
     var self = this;
+    this.handedOver = false;
 
     if (this.prevBtn) {
       this.prevBtn.addEventListener('click', function () { self.prev(); });
@@ -125,17 +126,7 @@
     this.el.addEventListener('focusout',   function () { self.resume(); });
     this.el.addEventListener('keydown', function (e) { self._handleKey(e); });
 
-    // Touch / swipe
-    this.el.addEventListener('touchstart', function (e) {
-      if (e.touches.length === 1) self.touchStartX = e.touches[0].clientX;
-    }, { passive: true });
-    this.el.addEventListener('touchend', function (e) {
-      if (e.changedTouches.length !== 1) return;
-      var diff = self.touchStartX - e.changedTouches[0].clientX;
-      if (Math.abs(diff) > SWIPE_THRESHOLD) {
-        if (diff > 0) self.next(); else self.prev();
-      }
-    }, { passive: true });
+    this._initDrag();
 
     // Resize handler (multi mode recalculates visible count)
     if (this.mode === 'multi') {
@@ -147,13 +138,12 @@
             self.current = self._maxPosition();
           }
           self._update(true);
+          self._syncFit();
         }, 150);
       });
     }
 
-    if (!this.reducedMotion) {
-      this._startTimer();
-    }
+    this._syncFit();
   };
 
   // ── Navigation ──
@@ -183,6 +173,7 @@
 
   Carousel.prototype._startTimer = function () {
     var self = this;
+    if (this.timer) clearInterval(this.timer);
     this.timer = setInterval(function () {
       var max = self._maxPosition();
       self.current = self.current >= max ? 0 : self.current + 1;
@@ -192,7 +183,7 @@
 
   Carousel.prototype._resetTimer = function () {
     this.pause();
-    if (!this.reducedMotion) this._startTimer();
+    if (this._canAutoplay()) this._startTimer();
   };
 
   Carousel.prototype.pause = function () {
@@ -200,7 +191,100 @@
   };
 
   Carousel.prototype.resume = function () {
-    if (!this.timer && !this.reducedMotion) this._startTimer();
+    if (!this.timer && this._canAutoplay()) this._startTimer();
+  };
+
+  /*
+   * Autoplay is off when it would be pointless or unwelcome: fewer slides
+   * than fit on screen (there is nowhere to go), reduced motion, or the
+   * reader having already dragged or swiped — once someone steers, the
+   * carousel stops steering itself.
+   */
+  Carousel.prototype._canAutoplay = function () {
+    return !this.reducedMotion && !this.handedOver && this._maxPosition() > 0;
+  };
+
+  /* Everything fits: no autoplay, and the controls have nothing to do. */
+  Carousel.prototype._syncFit = function () {
+    var fits = this._maxPosition() === 0;
+    this.el.classList.toggle('carousel--fits', fits);
+    if (fits) this.pause();
+    else this.resume();
+  };
+
+  /* The reader took over — stop moving on our own from here on. */
+  Carousel.prototype.handOver = function () {
+    this.handedOver = true;
+    this.pause();
+  };
+
+  // ── Drag / swipe ──
+
+  /*
+   * One handler for finger and mouse: pointer events cover both, so the
+   * shelf can be pushed around with a trackpad exactly as on a phone. The
+   * track follows the pointer live and snaps to the nearest card on
+   * release; a drag longer than a few pixels also swallows the click that
+   * follows, so dragging across a card never opens it.
+   */
+  Carousel.prototype._initDrag = function () {
+    var self = this;
+    var viewport = this.el.querySelector('.carousel-viewport') || this.el;
+    var startX = 0, dx = 0, dragging = false, width = 1;
+
+    if (!window.PointerEvent) return;
+
+    viewport.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      if (self._maxPosition() === 0) return;
+      dragging = true;
+      startX = e.clientX;
+      dx = 0;
+      width = viewport.getBoundingClientRect().width || 1;
+      self.handOver();
+      if (self.track) self.track.style.transition = 'none';
+      self.el.classList.add('is-dragging');
+    });
+
+    viewport.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      dx = e.clientX - startX;
+      if (self.mode === 'multi' && self.track) {
+        var base = (self.current * 100) / self._visibleCount();
+        self.track.style.transform =
+          'translateX(calc(-' + base + '% + ' + dx + 'px))';
+      }
+    });
+
+    function release() {
+      if (!dragging) return;
+      dragging = false;
+      self.el.classList.remove('is-dragging');
+      if (self.track) self.track.style.transition = '';
+      // A card's width in pixels. If the viewport reports nothing useful,
+      // fall back to a single step in the drag's direction rather than
+      // dividing by something near zero and flinging to the end.
+      var step = width / self._visibleCount();
+      var cards = step > 1 ? Math.round(-dx / step) : (dx < 0 ? 1 : -1);
+      if (Math.abs(dx) > SWIPE_THRESHOLD) {
+        self.goTo(self.current + (cards || (dx < 0 ? 1 : -1)));
+      } else {
+        self._update();
+      }
+    }
+
+    viewport.addEventListener('pointerup', release);
+    viewport.addEventListener('pointercancel', release);
+    viewport.addEventListener('pointerleave', release);
+
+    // A drag that ends on a card must not also follow its link.
+    viewport.addEventListener('click', function (e) {
+      if (Math.abs(dx) > 5) {
+        e.preventDefault();
+        e.stopPropagation();
+        dx = 0;
+      }
+    }, true);
   };
 
   // ── Update DOM (mode-aware) ──
