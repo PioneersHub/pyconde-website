@@ -17,6 +17,12 @@
 >    "the S3 sync never deletes, so previously deployed pages stay live"
 >    property now has to hold *per bucket*, which is what it failed to do
 >    when a second bucket was added to one workflow only.
+> 3. **The `archive` / `full` build-mode choice no longer reaches CI.** The
+>    archive workflow always builds `full` and narrows the *upload* with
+>    `--year`. Build scope and deploy scope are now separate knobs: a
+>    year-scoped render would leave Pagefind indexing a fraction of the site
+>    and overwrite the complete index, so only the upload is scoped. See
+>    Deploy semantics below.
 
 ## TL;DR
 
@@ -147,10 +153,18 @@ removes bucket objects. That is what makes the whole strategy work: a
 segments untouched in the bucket.
 **Invariant: never add `--delete` to the sync of a non-`full` build.**
 
-`archive` builds sync only their scope — exactly the excluded subtrees
-(`--exclude '*' --include archive/*`, derived from
-`databags/selective_build.yaml`). Everything else is already kept fresh by
-regular `current` deploys.
+Archive deploys sync only their scope — the excluded subtrees plus the search
+index (`--exclude '*' --include archive/* --include pagefind/*`, the archive
+patterns derived from `databags/selective_build.yaml`). Everything else is
+already kept fresh by regular `current` deploys.
+
+`--year 2026` narrows that further to `--include archive/2026/*`, still keeping
+the search index. The **render is never narrowed**: the archive job always builds
+`full`, so Pagefind always indexes the whole site. Rendering is ~106 s and the
+upload is what costs minutes, so scoping the upload is both the faster and the
+safer half to cut. The year is validated against the directories under
+`content/archive/`, so no list needs maintaining and a typo cannot publish the
+wrong subset.
 
 **The no-delete property holds per bucket, and so does the completeness it
 buys.** A bucket that never received an `archive` deploy has no archive, no

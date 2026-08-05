@@ -95,3 +95,9 @@ publish-video-batch:
 		exit 2; \
 	fi
 	$(RUN) python utils/publish_video_batch.py --year $(YEAR) --batch $(BATCH)
+
+# /talks/{PRETALX_CODE}/ permalinks, as S3 object redirects. Both deploy
+# workflows run this automatically; this target is for inspecting the mapping
+# locally. `make talk-permalinks` prints it and touches nothing.
+talk-permalinks:
+	$(RUN) python utils/talk_permalinks.py --dry-run

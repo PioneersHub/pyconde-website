@@ -1,25 +1,28 @@
-name: Build archive (on demand)
+name: Update the archive
 
-# Archive editions are static after their initial generation — production
-# deploys (main.yml) build only the current edition. Dispatch this workflow
-# to rebuild and deploy them. See plans/selective-builds.md.
+# One of the site's two update operations. The other is main.yml, which
+# publishes the current edition automatically on every push to main.
 #
-# Deploy targets come from databags/deploy_targets.yaml, the same list
-# main.yml and routing-config.yml read, so a bucket cannot be added to one
-# workflow and forgotten in another.
+# This one publishes past editions. Dispatch it when an archived talk page
+# changes, or after archiving a new edition. Pick a single year to publish
+# just that edition, or 'all' — which is always correct, only slower, and is
+# what a shared template or layout change needs.
+#
+# It ALWAYS renders the whole site. Only the upload is narrowed by year. A
+# year-scoped render would leave Pagefind indexing a fraction of the site and
+# overwrite the complete search index; rendering is ~2 minutes and the upload
+# is what costs time, so scoping the upload is both faster and safe.
+#
+# Deploy targets come from databags/deploy_targets.yaml — the same list
+# main.yml and routing-config.yml read.
 
 on:
   workflow_dispatch:
     inputs:
-      mode:
-        description: >-
-          archive: full render, deploy only the archive scope.
-          full: full render + Pagefind search index, deploy everything.
-        type: choice
-        options:
-          - archive
-          - full
-        default: archive
+      year:
+        description: "Edition to publish — a year like 2026, or 'all' for every edition."
+        type: string
+        default: all
 
 jobs:
   build:
@@ -35,27 +38,38 @@ jobs:
           python-version-file: '.python-version'
           cache: 'pip'
       # pagefind lives in pyproject's dev dependency group, which the
-      # compiled requirements.txt does not include — full mode needs it.
+      # compiled requirements.txt does not include.
       - run: pip install -r requirements.txt pagefind pagefind-bin
 
       # No `make sponsor-pages` here. utils/sponsors.py recreates
       # content/sponsors/ from databags/sponsors.yaml, and that subtree was
-      # archived to content-archived/ — running it would rebuild and, in
-      # full mode, republish pages that were deliberately taken down.
-      # main.yml has had the step disabled since a25066a7.
+      # archived to content-archived/ — running it would republish pages that
+      # were deliberately taken down. main.yml has had it disabled since
+      # a25066a7.
 
-      - name: Build static page (${{ inputs.mode }})
-        run: make build BUILD_MODE=${{ inputs.mode }}
+      - name: Build the whole site
+        run: make build BUILD_MODE=full
 
-      - name: Deploy to S3 (${{ inputs.mode }} scope)
+      - name: Publish
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_S3_REGION }}
           # Resolves the `env:AWS_S3_BUCKET` entry in databags/deploy_targets.yaml.
           AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-          DEPLOY_SCOPE: ${{ inputs.mode }}
-        # The archive scope derives from databags/selective_build.yaml — the
-        # same list the selective-build plugin excludes from current builds,
-        # so build scope and deploy scope cannot drift apart.
-        run: python utils/deploy_to_s3.py --scope "$DEPLOY_SCOPE"
+          # Via env, not interpolated into the script body. Validated against
+          # the editions that exist under content/archive/, so there is no list
+          # to keep in sync and a typo fails with the valid years listed.
+          DEPLOY_YEAR: ${{ inputs.year }}
+        run: python utils/deploy_to_s3.py --scope archive --year "$DEPLOY_YEAR"
+
+      - name: Refresh talk permalinks
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_S3_REGION }}
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        # Archiving an edition moves its talks from /talks/ to /archive/{year}/,
+        # so every affected permalink has to be repointed. Reconciling here means
+        # nobody has to remember. See utils/talk_permalinks.py.
+        run: python utils/talk_permalinks.py
