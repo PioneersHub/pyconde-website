@@ -1,7 +1,11 @@
-name: Upload website (S3)
+name: Update the current site
 
-# Deploys the current edition to every bucket in databags/deploy_targets.yaml.
-# That file is the only place buckets are named — see utils/deploy_to_s3.py.
+# One of the site's two update operations. The other is archive-build.yml,
+# which publishes past editions on demand.
+#
+# This one runs by itself on every push to main and publishes the current
+# edition — everything except /archive/**. Deploy targets come from
+# databags/deploy_targets.yaml, the only place buckets are named.
 on:
   push:
     branches: ["main"]
@@ -41,3 +45,15 @@ jobs:
         # BUILD_MODE=current is the current edition only. The sync never
         # deletes, so the archive already in the bucket stays live.
         run: python utils/deploy_to_s3.py --scope full
+
+      - name: Refresh talk permalinks
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_S3_REGION }}
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        # /talks/{PRETALX_CODE}/ is the permanent URL for a talk. Reconciling on
+        # every deploy means a new talk gets its permalink on the same push that
+        # publishes the page, and nobody maintains a redirect by hand.
+        # See utils/talk_permalinks.py.
+        run: python utils/talk_permalinks.py
