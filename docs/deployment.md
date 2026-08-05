@@ -155,7 +155,9 @@ edition.
 
 **Which bucket is live is decided by nginx, outside this repository.** Nothing
 in the repo, and no green Actions run, tells you which one that is. Check the
-server config before assuming a deploy reached visitors.
+server config before assuming a deploy reached visitors — see
+[docs/hosting-proxy.md](hosting-proxy.md), which also covers the apex redirect
+and the still-live per-year sites.
 
 ## Running a workflow
 

@@ -9,6 +9,8 @@ Four redirect pipelines run side by side:
 
 Layer 4 is the odd one out: it is the only layer that is **not a Lektor artifact**. It exists solely as S3 object metadata, so it cannot be seen in `site/` or reproduced locally.
 
+All four live inside the site. Redirects *between hostnames* — the `pycon.de` apex, and the still-live per-year sites at `YYYY.pycon.de` — belong to the nginx proxy in front of the buckets; see [docs/hosting-proxy.md](hosting-proxy.md).
+
 Layers 1 and 2 produce static HTML pages with `<meta http-equiv="refresh">`, a JS `window.location.replace`, a canonical link, and `robots: noindex,follow`. The HTML pages work the instant the build deploys.
 
 > **The nginx and Caddy snippets these two layers emit are not deployed.** `site-config/` is gitignored
