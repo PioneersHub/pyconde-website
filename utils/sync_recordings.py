@@ -349,10 +349,21 @@ def apply_to_talk_file(talk_dir: Path, video: dict, dry_run: bool = False) -> st
     if incoming_link or not lektor_lr.field_value(fields, "video_link"):
         new_values["video_link"] = incoming_link
 
+    # Same guard as video_link above, and for the same reason: an empty
+    # incoming value must not wipe a good stored one. Only the API supplies
+    # these two, so every override-only run — including a `--mode api` run that
+    # fell back for want of a key — would otherwise blank whatever is on disk.
+    # A real incoming value still wins, so a re-upload still re-stamps.
+    # Assigned in canonical order (see above) so appends land in the right spot.
+    for field in ("video_published_at", "video_duration_iso"):
+        incoming = video.get(field, "")
+        new_values[field] = (
+            incoming if incoming or not lektor_lr.field_value(fields, field)
+            else lektor_lr.field_value(fields, field)
+        )
+
     new_values.update(
         {
-            "video_published_at": video.get("video_published_at", ""),
-            "video_duration_iso": video.get("video_duration_iso", ""),
             "video_thumbnail": video.get("video_thumbnail", ""),
             "recording_available": "yes" if youtube_id else "no",
         }
@@ -365,6 +376,13 @@ def apply_to_talk_file(talk_dir: Path, video: dict, dry_run: bool = False) -> st
         return "would-update"
 
     lektor_lr.upsert_fields(fields, new_values)
+    # Every field here holds a single scalar, so it wants Lektor's inline
+    # spelling. A field that was empty on disk parses as block form, and
+    # giving it a value would otherwise render `name:`, a blank line, then
+    # the value — correct, but unlike the same field in every other edition.
+    for f in fields:
+        if f.name in new_values:
+            f.block = False
     lektor_lr.write_lr(lr_path, fields)
     return "updated"
 
