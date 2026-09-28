@@ -111,7 +111,7 @@ def generate_email_html(
             </div>
             <div class="footer">
                 <p>Submitted: {timestamp}</p>
-                <p>This message was sent via the PyConDE 2026 contact form.</p>
+                <p>This message was sent via the PyConDE 2027 contact form.</p>
             </div>
         </div>
     </body>
@@ -153,7 +153,7 @@ Message:
 
 --------
 Submitted: {timestamp}
-This message was sent via the PyConDE 2026 contact form.
+This message was sent via the PyConDE 2027 contact form.
     """
     return text.strip()
 

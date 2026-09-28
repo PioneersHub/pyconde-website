@@ -59,7 +59,7 @@ def json_to_dict(sponsor, _type, type_id):
     s["id"] = sponsor.get("id")
     s["name"] = sponsor.get("name")
     s["logo"] = sponsor.get("logo")
-    s["title"] = f"{sponsor.get('name')} - {what} of PyCon DE & PyData"
+    s["title"] = f"{sponsor.get('name')} - {what}"
     s["website"] = sponsor.get("website") or ""
     s["full_description"] = sponsor.get("description")
     s["social_card_image"] = f"/sponsors/{sponsor['id']}/social_card.png"
