@@ -321,7 +321,7 @@ def main() -> None:
     ]
     print(f"Fetched {len(all_speakers)} speakers from Pretalx; {len(speakers)} matched confirmed talks.")
 
-    edition_title = f"PyCon DE & PyData {year}"
+    edition_title = f"PyCon DE & PyData {year}" if is_archive else f"PyCon DE {year}"
     if not args.keep_existing:
         remove_old_speakers(speakers_dir)
     write_speakers_index(speakers_dir, edition_title)

@@ -14,6 +14,7 @@
 {%- set archive_year = (this.url_path.split('/')[2] if is_archive else site.config.PROJECT.year|string) -%}
 {%- set edition_id = (host ~ '/archive/' ~ archive_year ~ '/#event-' ~ archive_year) if is_archive else (host ~ '/#event-' ~ site.config.PROJECT.year|string) -%}
 {%- set talks_root = '/archive/' ~ archive_year ~ '/talks' if is_archive else '/talks' -%}
+{%- set edition_brand = 'PyCon DE & PyData' if is_archive else 'PyCon DE' -%}
 
 {% block structured_data %}
 {#- Normalise each social field to a canonical URL. Speaker data was
@@ -127,7 +128,7 @@
           </p>
           {%- endif %}
           {%- if this.is_first_time_speaker %}
-          <p class="speaker-badge">First-time speaker at PyCon DE &amp; PyData {{ archive_year }}</p>
+          <p class="speaker-badge">First-time speaker at {{ edition_brand }} {{ archive_year }}</p>
           {%- endif %}
         </div>
       </section>
@@ -172,7 +173,7 @@
   {% if this.talks %}
   <section class="subsite speaker-talks">
     <div class="content">
-      <h2>Sessions at PyCon DE &amp; PyData {{ archive_year }}</h2>
+      <h2>Sessions at {{ edition_brand }} {{ archive_year }}</h2>
       <ul class="speaker-talks-list">
         {%- for code in this.talks -%}
         {%- set talk = site.get(talks_root ~ '/' ~ code) -%}
@@ -209,7 +210,7 @@
   {% if other_editions %}
   <section class="subsite speaker-other-editions" data-pagefind-ignore>
     <div class="content">
-      <h2>Also at PyCon DE &amp; PyData</h2>
+      <h2>Also at PyCon DE</h2>
       <p class="speaker-other-editions__intro">{{ this.name }} has also appeared in other editions:</p>
       <ul class="speaker-other-editions__list">
         {%- for year, sp in other_editions|sort(attribute='0', reverse=true) %}
