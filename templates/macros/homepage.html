@@ -11,8 +11,10 @@
     - the master entry `display` is true (checked by the caller's loop), AND
     - `bag('frontpage/sections/<id>').display != false` (checked here).
 
-  Both default true. Add a new section by: appending to homepage.yaml,
-  creating databags/frontpage/sections/<id>.yaml, and adding one elif branch here.
+  Both default true. Add a new section by: appending to config.yaml and
+  creating databags/frontpage/sections/<id>.yaml, then adding one elif branch here.
+  Exception: a section file with `type: announcement` needs no branch — ids
+  without an elif fall through to the announcement dispatch at the end.
 
   Usage:
     {% from "macros/homepage.html" import render_homepage_section %}
@@ -37,6 +39,7 @@
 {% from "macros/sponsor.html" import render_sponsors_list %}
 {% from "macros/sponsoring-cta.html" import render_sponsoring_cta %}
 {% from "macros/newsletter.html" import render_newsletter %}
+{% from "macros/announcement.html" import render_announcement %}
 
 {% macro render_homepage_section(id) %}
 {% if id == 'intro' %}{% set d = bag('frontpage/sections/intro') %}{% if d and d.display != false %}{{ render_intro(d) }}{% endif %}
@@ -67,5 +70,6 @@
 </section>{% endif %}
 {% elif id == 'sponsoring' %}{% set d = bag('frontpage/sections/sponsoring') %}{% if d and d.display != false %}{{ render_sponsoring_cta(d) }}{% endif %}
 {% elif id == 'newsletter' %}{% set d = bag('frontpage/sections/newsletter') %}{% if d and d.display != false %}{{ render_newsletter(d) }}{% endif %}
+{% else %}{% set d = bag('frontpage/sections/' ~ id) %}{% if d.type == 'announcement' and d.display != false %}{{ render_announcement(d) }}{% endif %}
 {% endif %}
 {% endmacro %}

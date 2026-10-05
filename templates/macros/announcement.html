@@ -1,0 +1,49 @@
+{#
+  Announcement block
+  ──────────────────
+  Front-page notice driven entirely by its section file. Any
+  databags/frontpage/sections/<id>.yaml with `type: announcement` renders
+  through this macro via the `else` branch of render_homepage_section()
+  in macros/homepage.html, so a new announcement needs no template edit.
+
+  Usage:
+    {% from "macros/announcement.html" import render_announcement %}
+    {{ render_announcement(bag('frontpage/sections/masterclasses-call')) }}
+
+  Parameters:
+    data          – section databag dict (see schema below)
+    section_label – accessible label (default: 'Announcement')
+
+  Databag schema (sections/<id>.yaml):
+    type: announcement
+    display: true
+    color: "yellow"               # palette name: blue, blue-light, green, yellow, orange, pink, red
+    headline: "Call for Masterclasses is open."
+    subline: "Propose a masterclass for PyCon DE."
+    link_text: "Read the call"    # optional, only with link_url
+    link_url: /masterclasses/     # optional
+
+  `color` selects the .announcement--<color> modifier in custom.css.
+  Unknown names produce an unstyled block rather than a guessed colour.
+#}
+
+{% macro render_announcement(data, section_label='Announcement') %}
+
+{% if data and data.headline %}
+
+<section class="announcement announcement--{{ data.color }}" aria-label="{{ section_label }}">
+
+  <div class="content">
+    <h2 class="announcement__headline">{{ data.headline }}</h2>
+    {% if data.subline %}
+    <p class="announcement__subline">{{ data.subline }}</p>
+    {% endif %}
+    {% if data.link_text and data.link_url %}
+    <a href="{{ data.link_url }}" class="announcement__link">{{ data.link_text }}</a>
+    {% endif %}
+  </div>
+</section>
+
+{% endif %}
+
+{% endmacro %}

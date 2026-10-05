@@ -25,7 +25,8 @@ stack in the landing template.
 A section renders iff **both** `display` flags are true (master AND
 section file; both default true). To add a section: append to
 `frontpage/config.yaml`, create `databags/frontpage/sections/<id>.yaml`, and add one `elif`
-branch in `macros/homepage.html`. Full guide:
+branch in `macros/homepage.html`. Announcements are the exception: a section file with
+`type: announcement` renders through `macros/announcement.html` with no `elif`. Full guide:
 [docs/landing_pages.md](landing_pages.md).
 
 The section databags live in `databags/frontpage/sections/`, one file per section
