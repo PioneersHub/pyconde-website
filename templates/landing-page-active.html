@@ -86,12 +86,16 @@
 
 {% block body %}
 
-    {# The front page is fully config-driven: `databags/homepage.yaml`
-       defines the section order + display, and each section's content
-       lives in `databags/frontpage/sections/<id>.yaml`. The dispatcher maps id -> macro. #}
+    {# The front page is fully config-driven: `databags/frontpage/config.yaml`
+       defines the section order, display and anchor, and each section's content
+       lives in `databags/frontpage/sections/<id>.yaml`. The dispatcher maps id -> macro.
+       An entry with an `anchor` is wrapped in an element with that id, so
+       links like /#key-dates land on the section. #}
     {% from "macros/homepage.html" import render_homepage_section %}
     {% for sec in bag('frontpage/config')['sections'] if sec.display %}
+    {% if sec.anchor %}<div class="home-section" id="{{ sec.anchor }}">{% endif %}
     {{ render_homepage_section(sec.id) }}
+    {% if sec.anchor %}</div>{% endif %}
     {% endfor %}
 
 {% endblock %}
