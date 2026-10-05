@@ -43,6 +43,12 @@ the fields. Rebuild (`make build`).
 **Reorder sections:** move the section's entry up or down in
 `databags/frontpage/config.yaml`. Rebuild. No template edit.
 
+**Link to a section:** set `anchor: <slug>` on its entry in
+`databags/frontpage/config.yaml`, then link to `/#<slug>` (for example
+`/#key-dates`). The template wraps the section in an element with that id, and
+a scroll offset keeps the heading clear of the top nav. Entries without an
+`anchor` get no id.
+
 **Add a new section:**
 
 1. Append an `- id: <new>` entry (with `display: true`) to
