@@ -53,6 +53,16 @@ the fields. Rebuild (`make build`).
    `templates/macros/homepage.html` that maps the id to a render
    macro.
 
+**Add an announcement (no template edit):** an announcement is a notice
+block such as a call-for-proposals banner. Steps 1 and 2 are the same; in
+the section file set `type: announcement`. Skip step 3: ids without an
+`elif` branch fall through to the generic announcement dispatch, which
+renders `headline`, `subline` and an optional `link_text` / `link_url`
+through `templates/macros/announcement.html`. Set `color` to a palette name
+(`blue`, `blue-light`, `green`, `yellow`, `orange`, `pink`, `red`); it picks
+the `.announcement--<color>` modifier in `assets/static/css/custom.css`.
+Position and on/off are controlled by the `config.yaml` entry, as for any section.
+
 ## Section inventory
 
 | `id` | Config file | Renders |
@@ -73,6 +83,7 @@ the fields. Rebuild (`make build`).
 | `sponsors` | `sponsors.yaml` | Sponsors heading + logo grid (logos from `sponsors.yaml`) |
 | `sponsoring` | `sponsoring.yaml` | Sponsoring CTA |
 | `newsletter` | `newsletter.yaml` | Newsletter CTA |
+| `masterclasses-call` | `masterclasses-call.yaml` | Announcement block (`type: announcement`) |
 
 > `content/contents.lr` is a minimal record (`_model:
 > landing-page-active`, `title`, `full_landing_page: false`). Do not
