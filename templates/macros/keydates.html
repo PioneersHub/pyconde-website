@@ -4,9 +4,11 @@
   <div class="content">
     {% if data.section_title %}<h2 class="keydates__title">{{ data.section_title }}</h2>{% endif %}
     <div class="keydates__grid">
+      {# Colour wheel: walk data.colors by position and wrap around.
+         loop.cycle() raises if the palette is missing or empty. #}
       {% for item in data.dates %}
-      <div class="keydates__item keydates__item--{{ item.color }}">
-        <span class="keydates__date keydates__date--{{ item.color }}">{{ item.date }}</span>
+      <div class="keydates__item keydates__item--{{ loop.cycle(*data.colors) }}">
+        <span class="keydates__date">{{ item.date }}</span>
         <span class="keydates__label">{{ item.label }}</span>
       </div>
       {% endfor %}
