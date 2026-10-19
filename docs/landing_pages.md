@@ -100,6 +100,11 @@ Position and on/off are controlled by the `config.yaml` entry, as for any sectio
 
 ## Pricing on the front page
 
-Ticket prices (UI CTA + `AggregateOffer` schema) are kept in sync by
-`make flip-pricing` (early ↔ late). See the tickets section of the
-component docs and `utils/flip_pricing.py`.
+Ticket prices (UI CTA + `AggregateOffer` schema) follow the ticket
+editions listed in `databags/tickets.yaml` (Early → Blind → Wise →
+Late Bird). CI runs `make sync-pricing` before every build, and the
+production workflow runs daily, so the price switches to the next
+edition on its `opens` date. `make flip-pricing` advances by hand
+(e.g. when Edition I sells out early); `PERIOD=<edition id>` jumps to
+one. See the tickets section of the component docs and
+`utils/flip_pricing.py`.
