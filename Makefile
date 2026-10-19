@@ -89,6 +89,9 @@ sponsor-pages:
 	fi
 flip-pricing:
 	$(RUN) python utils/flip_pricing.py $(if $(PERIOD),--period $(PERIOD))
+# Set the ticket edition from today's date (CI runs this before every build).
+sync-pricing:
+	$(RUN) python utils/flip_pricing.py --by-date
 publish-video-batch:
 	@if [ -z "$(YEAR)" ] || [ -z "$(BATCH)" ]; then \
 		echo "Usage: make publish-video-batch YEAR=2026 BATCH=llm-agents"; \

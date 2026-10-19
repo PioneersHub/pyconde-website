@@ -1,22 +1,28 @@
-"""Atomically flip ticket pricing between Early-Bird and Late-Bird.
+"""Atomically flip ticket pricing to the next ticket edition.
 
-`make flip-pricing` (or `make flip-pricing PERIOD=late`) rewrites both
-the schema source (`databags/tickets.yaml`) and the UI CTA
-(`databags/frontpage/sections/tickets.yaml`) from the tier list so the
-AggregateOffer JSON-LD and the on-page price line never drift:
+Tickets are sold in editions (e.g. Early -> Blind -> Wise -> Late Bird),
+listed in sale order under `editions` in `databags/tickets.yaml`.
+`make flip-pricing` advances to the next edition; `make flip-pricing
+PERIOD=<edition id>` jumps to (or rolls back to) a specific one.
+`make sync-pricing` (`--by-date`, run by CI) picks the edition whose
+`opens` date is the latest one reached today in the configured time
+zone, and never moves back to an earlier edition — so a manual early
+flip (e.g. Edition I sold out before its date) survives the next
+build. Both the schema source and the UI CTA are rewritten from the
+tier list so the AggregateOffer JSON-LD and the on-page price line
+never drift:
 
-  - tickets.yaml: toggles `active_period`, rewrites `aggregate`
+  - tickets.yaml: sets `active_period`, rewrites `aggregate`
     (low/high/offer_count from the on-sale tiers only) and
-    `price_valid_until` (early -> late_bird_from - 1 day; late ->
-    valid_through).
-  - frontpage/sections/tickets.yaml: rewrites `period`, `price_label` (from the
-    3-day standard tier of the active period) and `strike_price`
-    (early period: the future late 3-day price, loss-framing; late
-    period: empty — the regret anchor is dropped).
+    `price_valid_until` (the day before the next edition opens; the
+    last edition runs to `valid_through`).
+  - frontpage/sections/tickets.yaml: rewrites `period`, `price_label`
+    (from the 3-day standard tier of the active edition) and
+    `strike_price` (the next edition's 3-day standard price,
+    loss-framing; empty for the last edition).
 
 Comment-preserving: edits are line-targeted, not a full YAML round
-trip, so the helpful docs in both files survive the flip. Roll back
-with `make flip-pricing PERIOD=early`.
+trip, so the helpful docs in both files survive the flip.
 """
 
 from __future__ import annotations
@@ -26,6 +32,7 @@ import re
 import sys
 from datetime import date, datetime, timedelta
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import yaml
 
@@ -34,15 +41,11 @@ TICKETS = REPO / "databags" / "tickets.yaml"
 TICKETS_CTA = REPO / "databags" / "frontpage" / "sections" / "tickets.yaml"
 
 
-def period_of(tier: dict) -> str:
-    return (tier.get("period") or "").lower()
-
-
-def set_line(text: str, key: str, value: str) -> str:
+def set_line(text: str, key: str, value: str, source: Path) -> str:
     """Replace a top-level `key: ...` line (regex, multiline)."""
     pattern = re.compile(rf"(?m)^{re.escape(key)}: .*$")
     if not pattern.search(text):
-        raise SystemExit(f"Field `{key}` not found in {TICKETS.name}")
+        raise SystemExit(f"Field `{key}` not found in {source.name}")
     return pattern.sub(f"{key}: {value}", text, count=1)
 
 
@@ -62,84 +65,147 @@ def fmt(d: date) -> str:
     return f'"{d.isoformat()}"'
 
 
-def main() -> int:
+def three_day_standard_price(tiers: list[dict], edition: str) -> int:
+    """The headline price of an edition: its 3-day standard tier."""
+    for t in tiers:
+        if t.get("id") == f"3day-standard-{edition}":
+            return t["price"]
+    raise SystemExit(f"No tier `3day-standard-{edition}` in {TICKETS.name}.")
+
+
+def edition_by_date(cfg: dict, ids: list[str], current: str, today: date) -> str:
+    """The latest edition whose `opens` date has been reached, never earlier than `current`.
+
+    Before the first edition opens, the first edition's prices stand.
+    """
+    reached = [e["id"] for e in cfg["editions"] if parse_date(e["opens"]) <= today]
+    by_date = reached[-1] if reached else ids[0]
+    return max(by_date, current, key=ids.index)
+
+
+def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument(
+    mode = p.add_mutually_exclusive_group()
+    mode.add_argument(
         "--period",
-        choices=("early", "late"),
-        help="Target period; default toggles from the current active_period.",
+        help="Target edition id; default advances to the next edition.",
+    )
+    mode.add_argument(
+        "--by-date",
+        action="store_true",
+        help="Select the edition from today's date (used by CI).",
+    )
+    p.add_argument(
+        "--today",
+        help="Override today's date (YYYY-MM-DD) for --by-date, e.g. to preview a switch.",
     )
     p.add_argument("--dry-run", action="store_true")
     args = p.parse_args()
+    if args.today and not args.by_date:
+        p.error("--today only applies with --by-date")
+    return args
 
-    cfg = yaml.safe_load(TICKETS.read_text(encoding="utf-8"))
-    current = (cfg.get("active_period") or "early").lower()
-    target = args.period or ("late" if current == "early" else "early")
-    if target == current:
-        print(f"active_period is already {target}; nothing to do.")
-        return 0
 
-    tiers = cfg.get("tiers") or []
-    public = [t for t in tiers if (t.get("kind") == "public")]
-    on_sale = [t for t in public if target in period_of(t)]
+def select_target(
+    cfg: dict, ids: list[str], current: str, args: argparse.Namespace
+) -> str:
+    """Resolve the edition to switch to from the command-line mode."""
+    if args.by_date:
+        if args.today:
+            today = parse_date(args.today)
+        else:
+            tz = cfg.get("timezone")
+            if not tz:
+                raise SystemExit(f"--by-date needs `timezone` in {TICKETS.name}.")
+            today = datetime.now(ZoneInfo(tz)).date()
+        target = edition_by_date(cfg, ids, current, today)
+        print(f"Edition by date ({today.isoformat()}): {target}")
+        return target
+    if args.period:
+        if args.period not in ids:
+            raise SystemExit(f"Unknown edition `{args.period}`; choose one of {ids}.")
+        return args.period
+    position = ids.index(current)
+    if position == len(ids) - 1:
+        raise SystemExit(
+            f"`{current}` is the last edition; pass PERIOD=<edition id> to roll back."
+        )
+    return ids[position + 1]
+
+
+def flip(cfg: dict, current: str, target: str, dry_run: bool) -> None:
+    """Rewrite tickets.yaml and the UI CTA for the `target` edition."""
+    editions = cfg["editions"]
+    public = [t for t in cfg.get("tiers") or [] if t.get("kind") == "public"]
+    on_sale = [t for t in public if t.get("period") == target]
     if not on_sale:
-        raise SystemExit(f"No public tiers match period '{target}' in tickets.yaml.")
+        raise SystemExit(f"No public tiers for edition `{target}` in {TICKETS.name}.")
 
     low = min(t["price"] for t in on_sale)
     high = max(t["price"] for t in on_sale)
     offer_count = len(on_sale)
 
-    def three_day_price(period: str) -> int | None:
-        for t in public:
-            if (t.get("id") or "").startswith("3day-standard-") and period in period_of(t):
-                return t["price"]
-        # Fallback: first on-sale tier of that period.
-        for t in public:
-            if period in period_of(t):
-                return t["price"]
-        return None
-
-    target_3day = three_day_price(target)
-    opposite_3day = three_day_price("late" if target == "early" else "early")
-    if target_3day is None:
-        raise SystemExit("Could not resolve a 3-day standard price for the target period.")
-
-    valid_through = cfg.get("valid_through")
-    late_bird_from = cfg.get("late_bird_from")
-    # Compute price_valid_until: early -> day before late-bird opens; late -> sale close.
-    if target == "early":
-        price_valid_until = fmt(parse_date(late_bird_from) - timedelta(days=1))
+    position = [e["id"] for e in editions].index(target)
+    next_edition = editions[position + 1] if position + 1 < len(editions) else None
+    if next_edition:
+        price_valid_until = fmt(parse_date(next_edition["opens"]) - timedelta(days=1))
     else:
-        price_valid_until = fmt(parse_date(valid_through))
+        price_valid_until = fmt(parse_date(cfg["valid_through"]))
+
+    target_price = three_day_standard_price(public, target)
+    next_price = (
+        three_day_standard_price(public, next_edition["id"]) if next_edition else None
+    )
 
     # --- tickets.yaml (schema source) ---
     tx = TICKETS.read_text(encoding="utf-8")
-    tx = set_line(tx, "active_period", target)
-    tx = set_line(tx, "price_valid_until", price_valid_until)
+    tx = set_line(tx, "active_period", target, TICKETS)
+    tx = set_line(tx, "price_valid_until", price_valid_until, TICKETS)
     tx = set_indented_line(tx, "low_price", str(low))
     tx = set_indented_line(tx, "high_price", str(high))
     tx = set_indented_line(tx, "offer_count", str(offer_count))
 
     # --- frontpage/sections/tickets.yaml (UI copy) ---
-    price_label = f'"from €{target_3day}"'
-    strike_price = f'"€{opposite_3day}"' if (target == "early" and opposite_3day is not None) else '""'
+    price_label = f'"from €{target_price}"'
+    strike_price = f'"€{next_price}"' if next_price is not None else '""'
     cx = TICKETS_CTA.read_text(encoding="utf-8")
-    cx = set_line(cx, "period", target)
-    cx = set_line(cx, "price_label", price_label)
-    cx = set_line(cx, "strike_price", strike_price)
+    cx = set_line(cx, "period", target, TICKETS_CTA)
+    cx = set_line(cx, "price_label", price_label, TICKETS_CTA)
+    cx = set_line(cx, "strike_price", strike_price, TICKETS_CTA)
 
     print(f"Flipping pricing: {current} -> {target}")
     print(f"  aggregate: low={low} high={high} offer_count={offer_count}")
     print(f"  price_valid_until: {price_valid_until}")
     print(f"  UI: price_label={price_label} strike_price={strike_price}")
 
-    if args.dry_run:
+    if dry_run:
         print("Dry run — no files written.")
-        return 0
+        return
 
     TICKETS.write_text(tx, encoding="utf-8")
     TICKETS_CTA.write_text(cx, encoding="utf-8")
-    print("Wrote databags/tickets.yaml + databags/frontpage/sections/tickets.yaml. Rebuild to publish.")
+    print(
+        "Wrote databags/tickets.yaml + databags/frontpage/sections/tickets.yaml. Rebuild to publish."
+    )
+
+
+def main() -> int:
+    args = parse_args()
+    cfg = yaml.safe_load(TICKETS.read_text(encoding="utf-8"))
+    ids = [e["id"] for e in cfg.get("editions") or []]
+    if not ids:
+        raise SystemExit(f"No `editions` listed in {TICKETS.name}.")
+
+    current = cfg.get("active_period")
+    if current not in ids:
+        raise SystemExit(f"active_period `{current}` is not one of the editions {ids}.")
+
+    target = select_target(cfg, ids, current, args)
+    if target == current:
+        print(f"active_period is already {target}; nothing to do.")
+        return 0
+
+    flip(cfg, current, target, args.dry_run)
     return 0
 
 

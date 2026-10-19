@@ -3,63 +3,143 @@
 # Single source of truth for BOTH:
 #  - the schema.org AggregateOffer JSON-LD (read by
 #    templates/landing-page-active.html), and
-#  - the UI tickets CTA (databags/tickets_cta.yaml, kept in sync by
-#    `make flip-pricing` via utils/flip_pricing.py).
+#  - the UI tickets CTA (databags/frontpage/sections/tickets.yaml,
+#    kept in sync by `make flip-pricing` via utils/flip_pricing.py).
 #
-# `make flip-pricing` flips `active_period` (early -> late) and
-# rewrites `aggregate` + `price_valid_until` + the UI CTA copy from
-# the tier list below, so schema and UI never drift. Roll back with
-# `make flip-pricing PERIOD=early`.
+# Prices step up through four editions, mirroring the public ticket
+# page (content/buy-ticket/contents.lr). `make flip-pricing` advances
+# `active_period` to the next edition and rewrites `aggregate` +
+# `price_valid_until` + the UI CTA copy from the tier list below, so
+# schema and UI never drift. Jump to a specific edition (or roll back)
+# with `make flip-pricing PERIOD=<edition id>`.
 #
-# Prices are the public conference passes only. Update the tier
-# prices for each cycle; the aggregate is derived by the flip helper.
+# Prices are the public on-site passes only. Update the tier prices
+# and edition dates for each cycle; the aggregate is derived by the
+# flip helper.
 
 currency: EUR
 
-# Public sale window close — Offer.validThrough for the late period.
+# Public sale window close — Offer.validThrough, and priceValidUntil
+# for the last edition.
 valid_through: "2027-04-16"
 
-# Switch point Early -> Late (informational + drives the early-period
-# price_valid_until = this date minus one day).
-late_bird_from: "2027-02-11"
+# Time zone the edition `opens` dates are read in. `make sync-pricing`
+# (run by CI before every build, and daily on a schedule) picks the
+# edition whose `opens` date is the latest one reached in this zone.
+timezone: Europe/Berlin
 
-# Which tier set is on sale now. flip_pricing.py toggles this and
+# Editions in sale order. `opens` is the date the edition goes on
+# sale; the previous edition's priceValidUntil is the day before.
+# Edition II opens earlier if the 150 Edition I tickets sell out
+# first — flip by hand on that day (`make flip-pricing`); the
+# date-based sync never moves back to an earlier edition.
+editions:
+  - id: early
+    name: "Edition I: Early Bird"
+    opens: "2026-10-21"
+  - id: blind
+    name: "Edition II: Blind Bird"
+    opens: "2026-11-04"
+  - id: wise
+    name: "Edition III: Wise Bird"
+    opens: "2027-02-10"
+  - id: late
+    name: "Edition IV: Late Bird"
+    opens: "2027-03-03"
+
+# Which edition is on sale now. flip_pricing.py sets this and
 # rewrites `aggregate` + `price_valid_until` to match.
 active_period: early
 
-# priceValidUntil for the currently-on-sale period:
-#  - early: late_bird_from - 1 day
-#  - late:  valid_through
-price_valid_until: "2027-02-10"
+# priceValidUntil for the edition currently on sale: the day before
+# the next edition opens, or valid_through for the last edition.
+price_valid_until: "2026-11-03"
 
 # Tier list — order preserved in rendered output. `kind: public`
-# counts toward the public-retail AggregateOffer bracket.
+# counts toward the public-retail AggregateOffer bracket. `period`
+# is an edition id from the list above.
 tiers:
   - id: 3day-standard-early
     kind: public
     name: "Conference Pass (3-day, Standard)"
-    period: "Early Bird"
+    period: early
     price: 690
+  - id: 3day-individual-early
+    kind: public
+    name: "Conference Pass (3-day, Individual)"
+    period: early
+    price: 450
+  - id: 3day-student-early
+    kind: public
+    name: "Conference Pass (3-day, Student)"
+    period: early
+    price: 275
+  - id: 3day-standard-blind
+    kind: public
+    name: "Conference Pass (3-day, Standard)"
+    period: blind
+    price: 790
+  - id: 3day-individual-blind
+    kind: public
+    name: "Conference Pass (3-day, Individual)"
+    period: blind
+    price: 500
+  - id: 3day-student-blind
+    kind: public
+    name: "Conference Pass (3-day, Student)"
+    period: blind
+    price: 300
+  - id: 3day-standard-wise
+    kind: public
+    name: "Conference Pass (3-day, Standard)"
+    period: wise
+    price: 890
+  - id: 3day-individual-wise
+    kind: public
+    name: "Conference Pass (3-day, Individual)"
+    period: wise
+    price: 550
+  - id: 3day-student-wise
+    kind: public
+    name: "Conference Pass (3-day, Student)"
+    period: wise
+    price: 325
   - id: 3day-standard-late
     kind: public
     name: "Conference Pass (3-day, Standard)"
-    period: "Late Bird"
-    price: 890
-  - id: 1day-individual-early
+    period: late
+    price: 990
+  - id: 3day-individual-late
     kind: public
-    name: "Conference Pass (1-day, Individual)"
-    period: "Early Bird"
-    price: 400
+    name: "Conference Pass (3-day, Individual)"
+    period: late
+    price: 625
+  - id: 3day-student-late
+    kind: public
+    name: "Conference Pass (3-day, Student)"
+    period: late
+    price: 375
+  # Day passes go on sale with Edition IV, once the schedule is out.
+  - id: 1day-standard-late
+    kind: public
+    name: "Day Pass (Standard)"
+    period: late
+    price: 550
   - id: 1day-individual-late
     kind: public
-    name: "Conference Pass (1-day, Individual)"
-    period: "Late Bird"
-    price: 550
+    name: "Day Pass (Individual)"
+    period: late
+    price: 300
+  - id: 1day-student-late
+    kind: public
+    name: "Day Pass (Student)"
+    period: late
+    price: 200
 
-# AggregateOffer hints for the CURRENTLY on-sale period only.
+# AggregateOffer hints for the CURRENTLY on-sale edition only.
 # Derived by flip_pricing.py from the tiers whose `period` matches
 # active_period — do not hand-edit; run `make flip-pricing`.
 aggregate:
-  low_price: 400
+  low_price: 275
   high_price: 690
-  offer_count: 2
+  offer_count: 3
