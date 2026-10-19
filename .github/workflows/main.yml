@@ -6,9 +6,16 @@ name: Update the current site
 # This one runs by itself on every push to main and publishes the current
 # edition — everything except /archive/**. Deploy targets come from
 # databags/deploy_targets.yaml, the only place buckets are named.
+#
+# It also runs daily just after midnight Berlin time, so ticket prices
+# switch to the next edition on its `opens` date (databags/tickets.yaml)
+# without anyone having to push.
 on:
   push:
     branches: ["main"]
+  schedule:
+    # 23:01 UTC = 00:01 CET / 01:01 CEST; edition switches fall in CET.
+    - cron: "1 23 * * *"
   workflow_dispatch:
 
 jobs:
@@ -28,6 +35,9 @@ jobs:
 
 #      - name: Build sponsor pages
 #        run: make sponsor-pages
+
+      - name: Sync ticket pricing to today's edition
+        run: make sync-pricing
 
       - name: Build static page (current edition only)
         # Archive editions deploy on demand via archive-build.yml —
