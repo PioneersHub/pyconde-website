@@ -1,4 +1,5 @@
-/* PyCon DE & PyData 2026 — Design Guidelines App */
+/* Design Guidelines App — 2026 edition (PyCon DE & PyData 2026).
+ * Naming: "PyCon DE" for current and future conferences (e.g. "PyCon DE 2027"). "PyCon DE & PyData" is admissible only on archive pages of the 2019–2026 editions. */
 
 (async function () {
   const res = await fetch('design-system.json');
@@ -115,7 +116,7 @@
       <div class="type-example">
         <div class="label">${l.name} \u2014 ${l.size} ${l.weight}</div>
         <div class="type-specimen" style="font-size:${l.size};font-weight:${fw}">
-          PyConDE &amp; PyData Darmstadt 2026
+          PyCon DE 2027
         </div>
       </div>`;
   });

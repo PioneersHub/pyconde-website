@@ -1,10 +1,12 @@
-# PyCon DE & PyData Website
+# PyCon DE Website
 
 [![Fetch submissions](https://github.com/PioneersHub/pyconde-website/actions/workflows/fetch_submissions.yml/badge.svg)](https://github.com/PioneersHub/pyconde-website/actions/workflows/fetch_submissions.yml)
 [![Upload website](https://github.com/PioneersHub/pyconde-website/actions/workflows/main.yml/badge.svg)](https://github.com/PioneersHub/pyconde-website/actions/workflows/main.yml)
 [![Upload staging website](https://github.com/PioneersHub/pyconde-website/actions/workflows/development.yml/badge.svg)](https://github.com/PioneersHub/pyconde-website/actions/workflows/development.yml)
 
-Static site for the PyCon DE & PyData conference, built with Lektor. Serves the current edition plus an archive of every previous edition with talks, speakers, recordings, transcripts, and full-text search.
+Static site for the PyCon DE conference, built with Lektor. Serves the current edition plus an archive of every previous edition with talks, speakers, recordings, transcripts, and full-text search.
+
+**Naming:** current and future conferences are called "PyCon DE" (e.g. "PyCon DE 2027"). "PyCon DE & PyData" is admissible only on archive pages of the 2019–2026 editions.
 
 > **Speakers:** session and bio data come from Pretalx. Update your information there; the website picks up changes on the next scheduled sync. Direct edits to talk or speaker files in this repo are overwritten by the next import.
 
