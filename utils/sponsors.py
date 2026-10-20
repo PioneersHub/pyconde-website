@@ -24,6 +24,49 @@ def validate_unique_ids(sponsor_types):
         sys.exit(1)
 
 
+LOGO_SIZES = {"xl", "lg", "md", "sm"}
+
+
+def validate_presentation(data):
+    """The sponsor wall template needs every tier's layout and every past lineup.
+
+    Jinja renders a missing value as nothing, so a typo here would silently drop
+    logos from the page; catch it before build instead.
+    """
+    errors = []
+    for sponsor_type in data["types"]:
+        is_partner = sponsor_type.get("partner") is True
+        logo_size = sponsor_type.get("logo_size")
+        if is_partner == (logo_size is not None):
+            errors.append(
+                f"type '{sponsor_type['id']}' needs exactly one of 'partner: true' or 'logo_size'"
+            )
+        elif logo_size is not None and logo_size not in LOGO_SIZES:
+            errors.append(
+                f"type '{sponsor_type['id']}' has logo_size '{logo_size}', expected one of {sorted(LOGO_SIZES)}"
+            )
+
+    past_editions = data.get("past_editions")
+    if (
+        not past_editions
+        or not past_editions.get("title")
+        or not past_editions.get("bags")
+    ):
+        errors.append("'past_editions' needs a 'title' and a non-empty 'bags' list")
+    else:
+        for bag_name in past_editions["bags"]:
+            if not (Path(__file__).parents[1] / f"databags/{bag_name}.yaml").is_file():
+                errors.append(
+                    f"past_editions bag 'databags/{bag_name}.yaml' does not exist"
+                )
+
+    if errors:
+        print("ERROR: Invalid sponsor wall configuration in databags/sponsors.yaml:")
+        for error in errors:
+            print(f"  {error}")
+        sys.exit(1)
+
+
 def dict_to_lektor(sponsor):
     tmpl = Template("""name: $name
 ---
@@ -73,6 +116,7 @@ def load_sponsors():
         j = yaml.load(f, Loader=yaml.SafeLoader)
         sponsor_types = j["types"]
     validate_unique_ids(sponsor_types)
+    validate_presentation(j)
     for sponsor_type in sponsor_types:
         sponsors += [
             json_to_dict(s, sponsor_type["name"], sponsor_type["id"])
