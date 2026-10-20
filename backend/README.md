@@ -70,7 +70,7 @@ Edit `.env` and set the following variables:
 RECAPTCHA_SECRET_KEY=your_recaptcha_secret_key
 
 # Email Configuration
-EMAIL_RECIPIENT=info26@pycon.de
+EMAIL_RECIPIENT=info27@pycon.de
 EMAIL_SENDER=noreply@pycon.de
 
 # Mailgun Configuration
@@ -79,7 +79,7 @@ MAILGUN_DOMAIN=your_mailgun_domain.com
 MAILGUN_API_BASE_URL=https://api.mailgun.net/v3
 
 # CORS Configuration
-ALLOWED_ORIGINS=https://2026.pycon.de,https://pycon.de,http://localhost:5001
+ALLOWED_ORIGINS=https://pycon.de,http://localhost:5001
 
 # Debug Mode
 DEBUG=False
@@ -90,7 +90,6 @@ DEBUG=False
 1. Go to [Google reCAPTCHA Admin](https://www.google.com/recaptcha/admin)
 2. Create a new site with reCAPTCHA v3
 3. Add your domains:
-   - `2026.pycon.de`
    - `pycon.de`
    - `localhost` (for testing)
 4. Copy the **Site Key** (for frontend) and **Secret Key** (for backend)
@@ -127,6 +126,71 @@ DEBUG=False
 5. **Configure sender email**:
    - Ensure `EMAIL_SENDER` uses your verified Mailgun domain
    - Example: `noreply@mg.yourdomain.com` or `noreply@pycon.de` (if domain is verified)
+
+### 5. Configure Topic-based Email Routing
+
+Each contact form topic can be delivered to its own inbox. The mapping lives in
+`backend/topic_emails.yaml`, loaded once at startup by `topic_email_config.py`.
+
+> **⚠️ This file is not in git.** The repository is public and the website
+> intentionally publishes no email addresses, so the mapping is kept out of
+> version control. Keep your local copy safe and never commit it.
+
+**How routing resolves:**
+
+1. The form posts the selected `topic` (e.g. `Program`).
+2. `get_recipient_for_topic()` looks the topic up in `topic_emails.yaml`.
+3. If the topic is not listed, the file is missing, or the YAML is invalid, the
+   email goes to `EMAIL_RECIPIENT`. This fallback only logs a warning, so a
+   missing file silently sends **every** topic to one inbox.
+
+**Format:**
+
+```yaml
+topics:
+  Program: program@example.org
+  Tickets: tickets@example.org
+  Sponsoring: sponsoring@example.org
+  "Financial Aid": financial-aid@example.org
+  Sprints: sprints@example.org
+  Partnering: partnering@example.org
+  Other: info@example.org
+```
+
+Topic keys must match the `TopicEnum` values in `main.py` exactly, which in turn
+must match the `<option>` values in `templates/contact-form.html`. Adding or
+renaming a topic means changing all three.
+
+**How the file reaches production:**
+
+The SAM templates use `CodeUri: ./`, so `sam build` packages whatever is in your
+local `backend/` directory. The routing file is deployed only if it exists
+there at build time. A deploy from a fresh clone ships without it and falls back
+to `EMAIL_RECIPIENT` for all topics.
+
+**Where to find the current mapping:**
+
+- **Live (authoritative):** AWS Console → Lambda → `pyconde-contact-form-api` →
+  *Code* tab → `topic_emails.yaml`. Or download the deployed package:
+
+  ```bash
+  aws lambda get-function --function-name pyconde-contact-form-api \
+    --region eu-central-1 --query 'Code.Location' --output text
+  ```
+
+  The live default inbox is under *Configuration → Environment variables →
+  `EMAIL_RECIPIENT`*.
+- **Last local build:** `backend/.aws-sam/build/ContactFormFunction/topic_emails.yaml`
+  on the machine that last ran `sam build`. This reflects that build only, not
+  necessarily what is deployed.
+
+**New conference year checklist:**
+
+- [ ] Update the year-specific addresses in `topic_emails.yaml`
+- [ ] Update `EMAIL_RECIPIENT` in `.env` / `samconfig.toml`
+- [ ] Update `ALLOWED_ORIGINS` in `.env` / `samconfig.toml` and the CORS list in `template.yaml`
+- [ ] Confirm `topic_emails.yaml` is present in `backend/` before `sam build`
+- [ ] After deploying, submit one test message per topic and check each inbox
 
 ## Running Locally
 
@@ -178,7 +242,8 @@ Submit a contact form message.
 {
   "name": "John Doe",
   "email": "john@example.com",
-  "subject": "Question about PyConDE",
+  "topic": "Program",
+  "subject": "[Program] Question about PyConDE",
   "message": "I have a question...",
   "recaptcha_token": "03AGdBq...",
   "honeypot": ""
@@ -275,7 +340,8 @@ For AWS Lambda, configure via SAM template parameters:
 
 3. Navigate to http://localhost:5001/contact
 4. Fill out and submit the form
-5. Check email delivery at info26@pycon.de
+5. Check email delivery at the inbox mapped to the selected topic
+   (see [Topic-based Email Routing](#5-configure-topic-based-email-routing))
 
 ### API Testing with curl
 
@@ -285,7 +351,8 @@ curl -X POST http://localhost:8000/api/contact \
   -d '{
     "name": "Test User",
     "email": "test@example.com",
-    "subject": "Test Subject",
+    "topic": "Other",
+    "subject": "[Other] Test Subject",
     "message": "This is a test message with at least 10 characters.",
     "recaptcha_token": "test_token",
     "honeypot": ""

@@ -36,7 +36,7 @@ Contact form available at http://localhost:5001/contact
 
 1. Navigate to http://localhost:5001/contact
 2. Fill out form and complete reCAPTCHA
-3. Submit and verify email delivery to info26@pycon.de
+3. Submit and verify delivery to the inbox mapped to the selected topic (see `backend/README.md`, "Configure Topic-based Email Routing")
 
 ## Configuration
 
@@ -44,7 +44,6 @@ Contact form available at http://localhost:5001/contact
 
 1. Register at https://www.google.com/recaptcha/admin
 2. Create reCAPTCHA v3 site for domains:
-   - `2026.pycon.de`
    - `pycon.de`
    - `localhost` (testing)
 3. Configure credentials:
@@ -59,7 +58,7 @@ Configure in `backend/.env`:
 MAILGUN_API_KEY=key-your-api-key
 MAILGUN_DOMAIN=mg.yourdomain.com
 MAILGUN_API_BASE_URL=https://api.eu.mailgun.net/v3
-EMAIL_RECIPIENT=info26@pycon.de
+EMAIL_RECIPIENT=info27@pycon.de
 EMAIL_SENDER=noreply@pycon.de
 ```
 

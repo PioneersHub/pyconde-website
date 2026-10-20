@@ -102,7 +102,6 @@ fetch(API_URL, {
 
 **Allowed origins:**
 
-- `https://2026.pycon.de`
 - `https://pycon.de`
 - `http://localhost:5001` (development only)
 
