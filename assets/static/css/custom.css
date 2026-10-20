@@ -4761,6 +4761,64 @@ body.front-page {
     opacity: 1;
 }
 
+/* Past sponsors: one endlessly moving line. The track holds two copies
+   of the list and slides by exactly one copy (-50%); every copy ends with
+   the same spacing it uses between logos, so the seam is invisible.
+   Duration scales with the logo count to keep the speed constant. */
+.sponsor-marquee {
+    --marquee-gap: var(--space-lg);
+    overflow: hidden;
+    mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+}
+
+.sponsor-marquee__track {
+    display: flex;
+    width: max-content;
+    animation: sponsor-marquee calc(var(--marquee-items) * 1.6s) linear infinite;
+}
+
+/* Specific enough to beat the `.subsite .content ul` list spacing on /sponsors/ */
+.sponsor-wall .sponsor-marquee .sponsor-wall__row--past {
+    flex: none;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: var(--marquee-gap);
+    margin: 0;
+    padding: 0 var(--marquee-gap) 0 0;
+}
+
+.sponsor-marquee:hover .sponsor-marquee__track,
+.sponsor-marquee:focus-within .sponsor-marquee__track {
+    animation-play-state: paused;
+}
+
+@keyframes sponsor-marquee {
+    to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sponsor-marquee {
+        mask-image: none;
+    }
+
+    .sponsor-marquee__track {
+        width: auto;
+        animation: none;
+    }
+
+    .sponsor-wall .sponsor-marquee .sponsor-wall__row--past {
+        flex: 1;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: var(--space-xs) var(--space-sm);
+        padding-right: 0;
+    }
+
+    .sponsor-marquee .sponsor-wall__row--past[aria-hidden="true"] {
+        display: none;
+    }
+}
+
 @media screen and (max-width: 690px) {
     .sponsor-wall__row         { gap: var(--space-md) var(--space-lg); }
     .sponsor-wall__row--xl     { --logo-w: 15rem;  --logo-h: 6rem; }

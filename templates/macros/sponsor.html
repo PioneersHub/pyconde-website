@@ -5,9 +5,10 @@
   in databags/sponsors.yaml.
 #}
 
-{% macro sponsor_logo(sponsor, href) %}
-<li class="sponsor-wall__logo{% if sponsor.scale %} {{ sponsor.scale }}{% endif %}" id="{{ sponsor.id }}">
-    {% if href %}<a href="{{ href }}" target="_blank" rel="noopener" title="{{ sponsor.name }}">{% endif %}
+{# decorative: a visual repeat (marquee loop) — no id, not focusable #}
+{% macro sponsor_logo(sponsor, href, decorative=false) %}
+<li class="sponsor-wall__logo{% if sponsor.scale %} {{ sponsor.scale }}{% endif %}"{% if not decorative %} id="{{ sponsor.id }}"{% endif %}>
+    {% if href %}<a href="{{ href }}" target="_blank" rel="noopener" title="{{ sponsor.name }}"{% if decorative %} tabindex="-1"{% endif %}>{% endif %}
         <img src="{{ sponsor.logo }}" alt="{{ sponsor.name }}" loading="lazy" decoding="async" />
     {% if href %}</a>{% endif %}
 </li>
@@ -51,12 +52,24 @@
 {% set seen.sponsors = seen.sponsors + [sponsor] %}
 {% endif %}
 {% endfor %}{% endfor %}{% endfor %}
+{#
+  One moving line: the list is rendered twice and the track slides by one
+  copy's width, so the loop has no visible seam. The second copy is hidden
+  from assistive tech and keyboard focus.
+#}
 {% if seen.sponsors %}
 <div class="sponsor-wall sponsor-wall--past">
     <p class="sponsor-wall__divider">{{ data.past_editions.title }}</p>
-    <ul class="sponsor-wall__row sponsor-wall__row--past" aria-label="{{ data.past_editions.title }}">
-        {% for sponsor in seen.sponsors %}{{ sponsor_logo(sponsor, sponsor.website) }}{% endfor %}
-    </ul>
+    <div class="sponsor-marquee" style="--marquee-items: {{ seen.sponsors|length }}">
+        <div class="sponsor-marquee__track">
+            <ul class="sponsor-wall__row sponsor-wall__row--past" aria-label="{{ data.past_editions.title }}">
+                {% for sponsor in seen.sponsors %}{{ sponsor_logo(sponsor, sponsor.website) }}{% endfor %}
+            </ul>
+            <ul class="sponsor-wall__row sponsor-wall__row--past" aria-hidden="true">
+                {% for sponsor in seen.sponsors %}{{ sponsor_logo(sponsor, sponsor.website, decorative=true) }}{% endfor %}
+            </ul>
+        </div>
+    </div>
 </div>
 {% endif %}
 {% endmacro %}
