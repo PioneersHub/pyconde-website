@@ -2,7 +2,7 @@
 
 import logging
 from contextlib import asynccontextmanager
-from enum import Enum
+from enum import StrEnum
 
 from cert_api import router as cert_router
 from config import settings
@@ -55,13 +55,14 @@ app.add_middleware(
 app.include_router(cert_router)
 
 
-class TopicEnum(str, Enum):
+class TopicEnum(StrEnum):
     """Allowed contact form topics."""
 
     PROGRAM = "Program"
     TICKETS = "Tickets"
     SPONSORING = "Sponsoring"
     FINANCIAL_AID = "Financial Aid"
+    SPRINTS = "Sprints"
     PARTNERING = "Partnering"
     OTHER = "Other"
 

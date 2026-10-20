@@ -52,6 +52,10 @@ Deploy the contact form API to AWS Lambda for redundant, serverless operation.
 
 ## Deploy
 
+> **⚠️ Before `sam build`:** make sure `backend/topic_emails.yaml` is present.
+> It is not in git, and without it every contact topic is delivered to
+> `EmailRecipient`. See [Topic-based Email Routing](README.md#5-configure-topic-based-email-routing).
+
 ### Read .env to shell variables
 
 ```bash
@@ -82,7 +86,7 @@ sam deploy --guided --template-file template-secure.yaml
 - `RecaptchaSecretKey` - Your reCAPTCHA secret
 - `MailgunApiKey` - Your Mailgun API key
 - `MailgunDomain` - Your domain (e.g., `mg.pycon.de`)
-- `EmailRecipient` - Recipient email (e.g., `info26@pycon.de`)
+- `EmailRecipient` - Recipient email (e.g., `info27@pycon.de`)
 - `EmailSender` - Sender email (e.g., `noreply@pycon.de`)
 - `AllowedOrigins` - CORS origins (comma-separated)
 - `ApiKey` - **(Secure only)** Optional API key for extra security
@@ -100,7 +104,7 @@ ContactFormFunction has no authentication. Is this okay? [y/N]:
 **Why?** This is a public contact form that must be accessible to website visitors without login. Security is handled through multiple layers:
 
 - ✅ **reCAPTCHA v3** - Google bot protection validates every request
-- ✅ **CORS restrictions** - Only allows requests from `2026.pycon.de` and `pycon.de`
+- ✅ **CORS restrictions** - Only allows requests from `pycon.de`
 - ✅ **Honeypot field** - Additional bot detection
 - ✅ **Input validation** - Pydantic models validate all data
 - ✅ **Optional API key** - Application-level auth available if needed (via `ApiKey` parameter)
@@ -129,6 +133,7 @@ sam deploy --config-file samconfig.toml --config-env secure \
 ```
 
 The `samconfig.toml` file presets:
+
 - Stack name (without spaces!)
 - AWS region
 - Non-sensitive parameters (site key, emails, domains)
@@ -155,6 +160,7 @@ cp .env.example .env
 ```
 
 The script will:
+
 1. Load all parameters from `.env`
 2. Validate required variables
 3. Build the SAM application

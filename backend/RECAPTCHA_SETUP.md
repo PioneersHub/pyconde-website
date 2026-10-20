@@ -15,12 +15,13 @@
    - **Label:** PyConDE Contact Form (or any name you prefer)
    - **reCAPTCHA type:** Select **"reCAPTCHA v2"** → **"I'm not a robot" Checkbox**
    - **Domains:** Add these domains:
+
      ```
      localhost
      127.0.0.1
-     2026.pycon.de
      pycon.de
      ```
+
    - **Accept terms** and click **Submit**
 
 3. **Copy your keys:**
@@ -64,6 +65,7 @@ Replace `YOUR_ACTUAL_SECRET_KEY_HERE` with the **Secret Key** from step 1.
 ### 4. Restart Services
 
 **Restart Lektor (if running):**
+
 ```bash
 # Press Ctrl+C to stop, then:
 make run
@@ -83,11 +85,13 @@ make run
 Google provides test keys that always pass, but they show a warning:
 
 **Test Site Key:**
+
 ```
 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
 ```
 
 **Test Secret Key:**
+
 ```
 6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe
 ```
@@ -100,9 +104,10 @@ When deploying to production:
 
 1. **Update domains in reCAPTCHA admin:**
    - Remove `localhost` and `127.0.0.1`
-   - Keep only `2026.pycon.de` and `pycon.de`
+   - Keep only `pycon.de`
 
 2. **Update frontend `contents.lr`:**
+
    ```
    api_endpoint: https://your-production-api-url/api/contact
    recaptcha_site_key: YOUR_PRODUCTION_SITE_KEY
@@ -115,15 +120,18 @@ When deploying to production:
 ## Troubleshooting
 
 ### Error: "Invalid site key"
+
 - Check that the site key is correct
 - Verify the domain is added in reCAPTCHA admin
 - Clear browser cache and reload
 
 ### Error: "ERROR for site owner: Invalid domain for site key"
+
 - Add the current domain to reCAPTCHA admin
 - For local testing, ensure `localhost` is added
 
 ### reCAPTCHA verification fails on backend
+
 - Check that `RECAPTCHA_SECRET_KEY` matches the site key
 - Verify backend can reach Google's API (https://www.google.com/recaptcha/api/siteverify)
 - Check backend logs for detailed error messages
@@ -133,16 +141,19 @@ When deploying to production:
 If you want to test immediately without registration:
 
 1. **Update `content/contact/contents.lr`:**
+
    ```
    recaptcha_site_key: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
    ```
 
 2. **Update `backend/.env`:**
+
    ```
    RECAPTCHA_SECRET_KEY=6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe
    ```
 
 3. **Restart Lektor:**
+
    ```bash
    make run
    ```
@@ -162,5 +173,6 @@ The form should work, but will show a warning banner about using test keys.
 ---
 
 **Need Help?**
+
 - reCAPTCHA Docs: https://developers.google.com/recaptcha/docs/display
 - reCAPTCHA Admin: https://www.google.com/recaptcha/admin

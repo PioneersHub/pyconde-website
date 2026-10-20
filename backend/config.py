@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     recaptcha_min_score: float = 0.5
 
     # Email settings
-    email_recipient: str = "info26@pycon.de"
+    email_recipient: str = "info27@pycon.de"
     email_sender: str = "noreply@pycon.de"
     email_subject_prefix: str = "[Website]"
 
@@ -31,7 +31,7 @@ class Settings(BaseSettings):
 
     # CORS settings
     # Note: In .env file, use comma-separated string: "origin1,origin2,origin3"
-    allowed_origins: str = "https://2026.pycon.de,https://pycon.de,http://localhost:5001,http://127.0.0.1:5001"
+    allowed_origins: str = "https://pycon.de,http://localhost:5001,http://127.0.0.1:5001"
 
     # Application settings
     debug: bool = False
