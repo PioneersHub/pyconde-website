@@ -2,9 +2,15 @@
 # ===================================================
 # This file contains preset deployment parameters to avoid manual entry during sam deploy.
 #
-# Usage:
-#   sam deploy --config-file samconfig.toml --config-env basic
-#   sam deploy --config-file samconfig.toml --config-env secure
+# Usage (production runs the secure stack):
+#   sam build --config-env secure && sam deploy --config-env secure
+#   sam build && sam deploy   # basic (default env) - same stack name, use with care
+#
+# Each env builds into its own directory and deploys only that build's
+# template. Deploying the build output (not the source template) is what
+# keeps .env, .aws-sam/ and __pycache__ out of the Lambda package: SAM's
+# Python builder excludes them, while packaging the source template would
+# zip the whole backend/ directory (CodeUri: ./).
 #
 # Note: Sensitive values (API keys, secrets) should be passed via --parameter-overrides
 # or loaded from .env file. See DEPLOY.md for details.
@@ -17,7 +23,7 @@ region = "eu-central-1"
 
 # Basic deployment configuration (template.yaml)
 [default.deploy.parameters]
-template_file = "template.yaml"
+template_file = ".aws-sam/build-basic/template.yaml"
 stack_name = "pyconde-contact-form"
 region = "eu-central-1"
 confirm_changeset = true
@@ -40,7 +46,7 @@ parameter_overrides = [
 
 # Secure deployment configuration (template-secure.yaml) - RECOMMENDED
 [secure.deploy.parameters]
-template_file = "template-secure.yaml"
+template_file = ".aws-sam/build-secure/template.yaml"
 stack_name = "pyconde-contact-form"
 region = "eu-central-1"
 confirm_changeset = true
@@ -60,7 +66,16 @@ parameter_overrides = [
     "AllowedOrigins=https://pycon.de"
 ]
 
-# Build parameters (shared across all environments)
+# Build parameters, one build directory per env so a deploy can never pick up
+# the other template's build
 [default.build.parameters]
+template_file = "template.yaml"
+build_dir = ".aws-sam/build-basic"
+cached = true
+parallel = true
+
+[secure.build.parameters]
+template_file = "template-secure.yaml"
+build_dir = ".aws-sam/build-secure"
 cached = true
 parallel = true
