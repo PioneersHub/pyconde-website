@@ -45,3 +45,27 @@ buckets:
   # Previous target, kept in sync until the migration is signed off.
   # Retiring it is one line here plus deleting the GitHub secret.
   - env:AWS_S3_BUCKET
+
+# ──────────────────────────────────────────────────────────────
+# Folders the current-edition deploy MIRRORS (deletes what the build dropped)
+# ──────────────────────────────────────────────────────────────
+#
+# The deploy sync never deletes, because a current build renders only part
+# of the site (see plans/selective-builds.md). So a page removed from the
+# repo stays live forever. For a folder that EVERY current build renders
+# completely, and that nothing but the deploy writes to, that is not
+# needed: utils/deploy_to_s3.py --scope full runs one extra
+#   aws s3 sync site/<folder>/ s3://<bucket>/<folder>/ --delete
+# per folder listed here, in every bucket, after the normal upload.
+#
+# The deploy refuses to run, before touching any bucket, when a folder
+#   - overlaps the archive (databags/selective_build.yaml current_excludes),
+#     the search index (pagefind/) or the talk permalinks (talks/), which
+#     live in S3 but not in a current build; or
+#   - is missing or empty in site/ — a broken or unpublished build must not
+#     empty the folder in S3. To unpublish a folder on purpose, remove it
+#     from this list first.
+#
+# Entries are relative folder paths without leading or trailing slash.
+mirror_prefixes:
+  - sponsors

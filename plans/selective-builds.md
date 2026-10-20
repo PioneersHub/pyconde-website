@@ -153,6 +153,19 @@ removes bucket objects. That is what makes the whole strategy work: a
 segments untouched in the bucket.
 **Invariant: never add `--delete` to the sync of a non-`full` build.**
 
+**The one exception: mirrored folders.** Never deleting also means a page
+removed from the repo stays live forever (in Oct 2026, 53 retired sponsor
+pages were still served from `sponsors/`). For a folder that every `current`
+build renders completely and that nothing but the deploy writes to,
+`databags/deploy_targets.yaml` lists it under `mirror_prefixes`. After the
+normal upload, `--scope full` runs one delete-sync limited to that folder,
+`aws s3 sync site/<folder>/ s3://<bucket>/<folder>/ --delete`, per bucket.
+Before any bucket is touched, the deploy refuses a folder that overlaps a path
+that lives in S3 but not in a `current` build: the archive (from
+`selective_build.yaml`), `pagefind/`, and the `talks/` permalinks. It also
+refuses a folder that is missing or empty in `site/`. The archive scope never
+mirrors.
+
 Archive deploys sync only their scope — the excluded subtrees plus the search
 index (`--exclude '*' --include archive/* --include pagefind/*`, the archive
 patterns derived from `databags/selective_build.yaml`). Everything else is
