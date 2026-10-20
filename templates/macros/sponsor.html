@@ -1,19 +1,62 @@
-{% macro render_sponsors_list() %}
+{#
+  Sponsor wall: current sponsors as size-tiered logo rows (tier names hidden,
+  size carries the tier), partners in one shared row, then a compact strip of
+  past-edition sponsors. Layout per tier and the past lineups are configured
+  in databags/sponsors.yaml.
+#}
 
-{% for sponsor_type in bag('sponsors')['types'] %}
-{% if sponsor_type.sponsors %}
-<div class="{{ sponsor_type.id }} sponsor-type">
-    <h2>{{ sponsor_type.name }}</h2>
-    <ul class="sponsors">
-        {% for sponsor in sponsor_type.sponsors %}
-        <li class="sponsor{% if sponsor.scale %} {{ sponsor.scale }}{% endif %}" id="{{ sponsor.id }}">
-            <a href="/sponsors/{{ sponsor.id }}" target="_blank" rel="noopener">
-                <img src="{{ sponsor.logo }}" alt="{{ sponsor.name }}" loading="lazy" decoding="async" />
-            </a>
-        </li>
+{% macro sponsor_logo(sponsor, href) %}
+<li class="sponsor-wall__logo{% if sponsor.scale %} {{ sponsor.scale }}{% endif %}" id="{{ sponsor.id }}">
+    {% if href %}<a href="{{ href }}" target="_blank" rel="noopener" title="{{ sponsor.name }}">{% endif %}
+        <img src="{{ sponsor.logo }}" alt="{{ sponsor.name }}" loading="lazy" decoding="async" />
+    {% if href %}</a>{% endif %}
+</li>
+{% endmacro %}
+
+{% macro render_sponsors_list() %}
+{% set data = bag('sponsors') %}
+{% set partner_tiers = data.types|selectattr('partner')|list %}
+<div class="sponsor-wall">
+    {% for tier in data.types if tier.sponsors and not tier.partner %}
+    <ul class="sponsor-wall__row sponsor-wall__row--{{ tier.logo_size }}" aria-label="{{ tier.name }}">
+        {% for sponsor in tier.sponsors %}{{ sponsor_logo(sponsor, '/sponsors/' ~ sponsor.id) }}{% endfor %}
+    </ul>
+    {% endfor %}
+
+    {% if partner_tiers|selectattr('sponsors')|list %}
+    <p class="sponsor-wall__divider">Partners</p>
+    <ul class="sponsor-wall__row sponsor-wall__row--partner" aria-label="Partners">
+        {% for tier in partner_tiers %}
+        {% for sponsor in tier.sponsors %}{{ sponsor_logo(sponsor, '/sponsors/' ~ sponsor.id) }}{% endfor %}
         {% endfor %}
+    </ul>
+    {% endif %}
+</div>
+{{ render_past_sponsors(data) }}
+{% endmacro %}
+
+{#
+  Past lineups are read newest first. A sponsor shows once: repeats across
+  editions and anyone in the current lineup are skipped, matched by id or by
+  logo file (the same organisation sometimes appears under two tier ids).
+#}
+{% macro render_past_sponsors(data) %}
+{% set seen = namespace(ids=[], logos=[], sponsors=[]) %}
+{% for tier in data.types %}{% for sponsor in tier.sponsors %}
+{% set seen.ids = seen.ids + [sponsor.id] %}{% set seen.logos = seen.logos + [sponsor.logo] %}
+{% endfor %}{% endfor %}
+{% for bag_name in data.past_editions.bags %}{% for tier in bag(bag_name).types %}{% for sponsor in tier.sponsors %}
+{% if sponsor.id not in seen.ids and sponsor.logo not in seen.logos %}
+{% set seen.ids = seen.ids + [sponsor.id] %}{% set seen.logos = seen.logos + [sponsor.logo] %}
+{% set seen.sponsors = seen.sponsors + [sponsor] %}
+{% endif %}
+{% endfor %}{% endfor %}{% endfor %}
+{% if seen.sponsors %}
+<div class="sponsor-wall sponsor-wall--past">
+    <p class="sponsor-wall__divider">{{ data.past_editions.title }}</p>
+    <ul class="sponsor-wall__row sponsor-wall__row--past" aria-label="{{ data.past_editions.title }}">
+        {% for sponsor in seen.sponsors %}{{ sponsor_logo(sponsor, sponsor.website) }}{% endfor %}
     </ul>
 </div>
 {% endif %}
-{% endfor %}
 {% endmacro %}

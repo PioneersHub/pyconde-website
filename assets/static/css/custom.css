@@ -4656,3 +4656,117 @@ body.front-page {
     min-width: 6rem;
   }
 }
+
+/* ── Sponsor wall ───────────────────────────────────────────
+   Size-tiered logo rows (macros/sponsor.html). Every logo sits in a
+   box with a max width AND height and is contained in it, so square
+   and wide logos carry similar visual weight. Box sizes per tier are
+   picked with `logo_size` in databags/sponsors.yaml. */
+.sponsor-wall {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    padding: var(--space-md) 0;
+}
+
+.sponsor-wall__row {
+    --logo-w: 8.5rem;
+    --logo-h: 3.25rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-lg) var(--space-xl);
+}
+
+.sponsor-wall__row--xl      { --logo-w: 20rem;  --logo-h: 8rem; }
+.sponsor-wall__row--lg      { --logo-w: 15rem;  --logo-h: 6rem; }
+.sponsor-wall__row--md      { --logo-w: 11rem;  --logo-h: 4.25rem; }
+.sponsor-wall__row--sm      { --logo-w: 8.5rem; --logo-h: 3.25rem; }
+.sponsor-wall__row--partner { --logo-w: 7rem;   --logo-h: 2.75rem; gap: var(--space-md) var(--space-lg); }
+.sponsor-wall__row--past    { --logo-w: 3.75rem; --logo-h: 1.5rem; gap: var(--space-xs) var(--space-sm); }
+
+/* Row-scoped so the generic `.subsite li` / `.subsite .content li` list
+   spacing on the /sponsors/ page can't push the logo boxes apart */
+.sponsor-wall .sponsor-wall__row > .sponsor-wall__logo {
+    width: var(--logo-w);
+    height: var(--logo-h);
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+}
+
+.sponsor-wall__logo a {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.sponsor-wall .sponsor-wall__logo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 0;
+    filter: none;
+}
+
+/* Per-sponsor optical correction from the `scale` field */
+.sponsor-wall__logo.scale-90 img { scale: 0.9; }
+.sponsor-wall__logo.scale-80 img { scale: 0.8; }
+.sponsor-wall__logo.scale-70 img { scale: 0.7; }
+.sponsor-wall__logo.scale-60 img { scale: 0.6; }
+
+.sponsor-wall__divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin: 0;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.sponsor-wall__divider::before,
+.sponsor-wall__divider::after {
+    content: "";
+    flex: 1;
+    border-top: 1px solid var(--neutral-200);
+}
+
+/* The partner divider sits inside the current wall: pull it closer */
+.sponsor-wall:not(.sponsor-wall--past) > .sponsor-wall__divider {
+    margin-bottom: calc(var(--space-md) - var(--space-lg));
+}
+
+.sponsor-wall--past {
+    gap: var(--space-md);
+    margin-top: var(--space-lg);
+}
+
+.sponsor-wall--past .sponsor-wall__logo img {
+    filter: grayscale(1);
+    opacity: 0.75;
+    transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+.sponsor-wall--past .sponsor-wall__logo a:hover img,
+.sponsor-wall--past .sponsor-wall__logo a:focus-visible img {
+    filter: none;
+    opacity: 1;
+}
+
+@media screen and (max-width: 690px) {
+    .sponsor-wall__row         { gap: var(--space-md) var(--space-lg); }
+    .sponsor-wall__row--xl     { --logo-w: 15rem;  --logo-h: 6rem; }
+    .sponsor-wall__row--lg     { --logo-w: 11rem;  --logo-h: 4.5rem; }
+    .sponsor-wall__row--md     { --logo-w: 8.5rem; --logo-h: 3.25rem; }
+    .sponsor-wall__row--sm     { --logo-w: 6.5rem; --logo-h: 2.5rem; }
+    .sponsor-wall__row--partner { --logo-w: 5.5rem; --logo-h: 2.25rem; }
+    .sponsor-wall__row--past   { --logo-w: 3.25rem; --logo-h: 1.25rem; gap: var(--space-xs); }
+}
