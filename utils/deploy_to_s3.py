@@ -18,9 +18,16 @@ everything, because a partial render would leave Pagefind indexing a fraction
 of the site and overwrite the complete index. Rendering is the cheap part
 (~106 s); the upload is what costs minutes, so that is what gets scoped.
 
-Invariant (plans/selective-builds.md): never pass --delete. Production
-builds render a fraction of the site, so a deleting sync would strip the
-archive out of the bucket.
+Invariant (plans/selective-builds.md): never pass --delete to the site-wide
+sync. Production builds render a fraction of the site, so a deleting sync
+would strip the archive out of the bucket.
+
+The one exception is narrow and opt-in: --scope full mirrors each folder in
+`mirror_prefixes` (databags/deploy_targets.yaml) with a delete-sync limited
+to that folder, so pages removed from the repo also leave the bucket. Every
+folder is checked before any bucket is touched: it must not overlap a path
+that lives in S3 but not in a current build (the archive, the search index,
+the talk permalinks), and it must exist and be non-empty in site/.
 
 Each bucket gets a complete, independent copy — nothing here makes one
 bucket depend on another. Buckets are synced in list order and the first
@@ -36,8 +43,9 @@ import subprocess
 import sys
 from pathlib import Path
 
-from deploy_targets import resolve_targets
+from deploy_targets import resolve_mirror_prefixes, resolve_targets
 from selective_build_sync_args import sync_include_args
+from talk_permalinks import PERMALINK_ROOT
 
 REPO = Path(__file__).resolve().parent.parent
 SITE_DIR = REPO / "site"
@@ -54,6 +62,62 @@ BUILD_STATE_EXCLUDE = [".lektor/*"]
 # so it has to ship with every archive upload or the deployed index drifts out
 # of step with the content it describes.
 SEARCH_INDEX_INCLUDE = ["pagefind/*"]
+
+
+def s3_only_roots() -> list[str]:
+    """Bucket paths a current build does not render: the archive subtrees,
+    the search index and the talk permalinks. A delete-sync over any of them
+    would remove live content. Derived from the same sources that define them.
+    """
+    patterns = sync_include_args()[1::2] + SEARCH_INDEX_INCLUDE
+    return [pattern.removesuffix("/*") for pattern in patterns] + [PERMALINK_ROOT]
+
+
+def overlaps(a: str, b: str) -> bool:
+    """True when one bucket path is the other or lies inside it."""
+    return a == b or a.startswith(f"{b}/") or b.startswith(f"{a}/")
+
+
+def checked_mirror_prefixes() -> list[str]:
+    """The configured mirror folders, refused before any upload if unsafe."""
+    prefixes = resolve_mirror_prefixes()
+    protected = s3_only_roots()
+    problems: list[str] = []
+    for prefix in prefixes:
+        clashes = [root for root in protected if overlaps(prefix, root)]
+        if clashes:
+            problems.append(
+                f"'{prefix}' overlaps {', '.join(clashes)}, which lives in S3 but "
+                f"not in a current build — a delete-sync would remove it."
+            )
+            continue
+        folder = SITE_DIR / prefix
+        if not folder.is_dir() or not any(f.is_file() for f in folder.rglob("*")):
+            problems.append(
+                f"'{prefix}' is missing or empty in {SITE_DIR}. Mirroring it would "
+                f"empty s3://<bucket>/{prefix}/. If the folder is unpublished on "
+                f"purpose, remove it from mirror_prefixes first."
+            )
+    if problems:
+        raise SystemExit(
+            "Refusing to deploy, mirror_prefixes in databags/deploy_targets.yaml:\n  "
+            + "\n  ".join(problems)
+        )
+    return prefixes
+
+
+def mirror_cmd(prefix: str, bucket: str) -> list[str]:
+    # Both ends carry a trailing slash: S3 keys match by plain string prefix,
+    # so 's3://b/sponsors' would also cover a sibling like 'sponsors-old/'.
+    return [
+        "aws",
+        "s3",
+        "sync",
+        f"{SITE_DIR / prefix}/",
+        f"s3://{bucket}/{prefix}/",
+        "--no-progress",
+        "--delete",
+    ]
 
 
 def known_years() -> list[str]:
@@ -137,6 +201,9 @@ def main() -> int:
 
     buckets = resolve_targets()
     selection = sync_args(args.scope, args.year)
+    # Only a current-edition deploy renders these folders completely; the
+    # archive scope uploads a slice and must never delete anything.
+    mirrors = checked_mirror_prefixes() if args.scope == "full" else []
     label = args.scope if args.year == ALL_YEARS else f"{args.scope} {args.year}"
 
     for bucket in buckets:
@@ -155,6 +222,12 @@ def main() -> int:
             # shell=False: '*' reaches aws as a literal argument, so no glob
             # guard is needed. check=True aborts before the next bucket.
             subprocess.run(cmd, check=True)
+        # After the upload, so a page is never missing while it is replaced.
+        for prefix in mirrors:
+            mirror = mirror_cmd(prefix, bucket)
+            print(" ".join(mirror), flush=True)
+            if not args.dry_run:
+                subprocess.run(mirror, check=True)
         print("::endgroup::", flush=True)
 
     if args.dry_run:

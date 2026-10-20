@@ -33,12 +33,20 @@ ENV_PREFIX = "env:"
 # trailing separator. Catches a stray quote or a path fragment in the
 # secret before it is interpolated into an s3:// URI.
 BUCKET_NAME = re.compile(r"^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$")
+# A relative folder path in site/: lowercase segments, no leading or trailing
+# slash, no '.', '..' or wildcard — anything else could widen a --delete sync
+# to more of the bucket than the entry appears to name.
+MIRROR_PREFIX = re.compile(r"^[a-z0-9][a-z0-9_-]*(/[a-z0-9][a-z0-9_-]*)*$")
+
+
+def _load_config() -> dict:
+    if not CONFIG_FILE.exists():
+        raise SystemExit(f"Missing required config: {CONFIG_FILE}")
+    return yaml.safe_load(CONFIG_FILE.read_text(encoding="utf-8")) or {}
 
 
 def resolve_targets() -> list[str]:
-    if not CONFIG_FILE.exists():
-        raise SystemExit(f"Missing required config: {CONFIG_FILE}")
-    data = yaml.safe_load(CONFIG_FILE.read_text(encoding="utf-8")) or {}
+    data = _load_config()
     entries = data.get("buckets")
     if not entries:
         raise SystemExit(f"'buckets' missing or empty in {CONFIG_FILE}")
@@ -73,6 +81,34 @@ def resolve_targets() -> list[str]:
             )
         names.append(name)
     return names
+
+
+def resolve_mirror_prefixes() -> list[str]:
+    """Folders the current-edition deploy syncs with --delete.
+
+    Only the shape of each entry is checked here. Whether a folder is safe to
+    mirror (outside the archive, search index and permalinks, and present in
+    the build) is decided by utils/deploy_to_s3.py, which knows those paths.
+    An absent key means no folder is mirrored; a malformed entry is fatal.
+    """
+    entries = _load_config().get("mirror_prefixes") or []
+    if not isinstance(entries, list):
+        raise SystemExit(
+            f"'mirror_prefixes' must be a list in {CONFIG_FILE}, got {entries!r}"
+        )
+    prefixes: list[str] = []
+    for i, entry in enumerate(entries):
+        if not isinstance(entry, str) or not MIRROR_PREFIX.match(entry):
+            raise SystemExit(
+                f"mirror_prefixes[{i}] must be a relative folder path like "
+                f"'sponsors' (no leading/trailing slash, no wildcard), got {entry!r}"
+            )
+        if entry in prefixes:
+            raise SystemExit(
+                f"mirror_prefixes[{i}] ('{entry}') is listed twice in {CONFIG_FILE.name}."
+            )
+        prefixes.append(entry)
+    return prefixes
 
 
 if __name__ == "__main__":

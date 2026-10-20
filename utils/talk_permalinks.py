@@ -48,6 +48,9 @@ PRETALX_CODE = re.compile(r"^[A-Z0-9]{6}$")
 
 # The same shape, as an S3 key. Reconciliation deletes only keys matching this,
 # so it can never touch a real talk page (those are lowercase).
+# The S3 folder the permalinks live in. Named so utils/deploy_to_s3.py can
+# refuse to mirror (delete-sync) it: the redirects are not in site/.
+PERMALINK_ROOT = "talks"
 PERMALINK_KEY = re.compile(r"^talks/[A-Z0-9]{6}/index\.html$")
 
 CODE_FIELD = re.compile(r"^code:\s*(\S+)\s*$", re.M)
@@ -158,7 +161,7 @@ def existing_permalinks(bucket: str) -> set[str]:
         "--bucket",
         bucket,
         "--prefix",
-        "talks/",
+        f"{PERMALINK_ROOT}/",
         "--query",
         "Contents[].Key",
         "--output",
