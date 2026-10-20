@@ -54,10 +54,23 @@ def validate_presentation(data):
     ):
         errors.append("'past_editions' needs a 'title' and a non-empty 'bags' list")
     else:
+        past_ids = set()
         for bag_name in past_editions["bags"]:
-            if not (Path(__file__).parents[1] / f"databags/{bag_name}.yaml").is_file():
+            bag_path = Path(__file__).parents[1] / f"databags/{bag_name}.yaml"
+            if not bag_path.is_file():
                 errors.append(
                     f"past_editions bag 'databags/{bag_name}.yaml' does not exist"
+                )
+                continue
+            with bag_path.open() as f:
+                past_data = yaml.load(f, Loader=yaml.SafeLoader)
+            past_ids |= {
+                s["id"] for t in past_data["types"] for s in t.get("sponsors", [])
+            }
+        for logo_id in past_editions.get("tonal_logos", []):
+            if logo_id not in past_ids:
+                errors.append(
+                    f"past_editions tonal_logos id '{logo_id}' is not in any past lineup"
                 )
 
     if errors:

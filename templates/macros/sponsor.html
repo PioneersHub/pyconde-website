@@ -5,9 +5,10 @@
   in databags/sponsors.yaml.
 #}
 
-{# decorative: a visual repeat (marquee loop) — no id, not focusable #}
-{% macro sponsor_logo(sponsor, href, decorative=false) %}
-<li class="sponsor-wall__logo{% if sponsor.scale %} {{ sponsor.scale }}{% endif %}"{% if not decorative %} id="{{ sponsor.id }}"{% endif %}>
+{# decorative: a visual repeat (marquee loop) — no id, not focusable.
+   tonal: render in greyscale instead of the past strip's silhouette. #}
+{% macro sponsor_logo(sponsor, href, decorative=false, tonal=false) %}
+<li class="sponsor-wall__logo{% if tonal %} sponsor-wall__logo--tonal{% endif %}{% if sponsor.scale %} {{ sponsor.scale }}{% endif %}"{% if not decorative %} id="{{ sponsor.id }}"{% endif %}>
     {% if href %}<a href="{{ href }}" target="_blank" rel="noopener" title="{{ sponsor.name }}"{% if decorative %} tabindex="-1"{% endif %}>{% endif %}
         <img src="{{ sponsor.logo }}" alt="{{ sponsor.name }}" loading="lazy" decoding="async" />
     {% if href %}</a>{% endif %}
@@ -58,15 +59,16 @@
   from assistive tech and keyboard focus.
 #}
 {% if seen.sponsors %}
+{% set tonal_ids = data.past_editions.tonal_logos or [] %}
 <div class="sponsor-wall sponsor-wall--past">
     <p class="sponsor-wall__divider">{{ data.past_editions.title }}</p>
     <div class="sponsor-marquee" style="--marquee-items: {{ seen.sponsors|length }}">
         <div class="sponsor-marquee__track">
             <ul class="sponsor-wall__row sponsor-wall__row--past" aria-label="{{ data.past_editions.title }}">
-                {% for sponsor in seen.sponsors %}{{ sponsor_logo(sponsor, sponsor.website) }}{% endfor %}
+                {% for sponsor in seen.sponsors %}{{ sponsor_logo(sponsor, sponsor.website, tonal=sponsor.id in tonal_ids) }}{% endfor %}
             </ul>
             <ul class="sponsor-wall__row sponsor-wall__row--past" aria-hidden="true">
-                {% for sponsor in seen.sponsors %}{{ sponsor_logo(sponsor, sponsor.website, decorative=true) }}{% endfor %}
+                {% for sponsor in seen.sponsors %}{{ sponsor_logo(sponsor, sponsor.website, decorative=true, tonal=sponsor.id in tonal_ids) }}{% endfor %}
             </ul>
         </div>
     </div>
