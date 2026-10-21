@@ -24,6 +24,7 @@ Merging to `main` is not enough for any of these — each needs a manual dispatc
 |---|---|
 | Add or edit a blog post | [docs/blog_post.md](blog_post.md) |
 | Add a sponsor or community partner | [docs/sponsors_partners.md](sponsors_partners.md) |
+| Add a masterclass, or change masterclass times and prices | [docs/masterclasses.md](masterclasses.md) |
 | Add a subsite (a top-level page that isn't a blog post) | [docs/subsites.md](subsites.md) |
 | Manage the homepage / landing page (pre-, during-, post-conference) | [docs/landing_pages.md](landing_pages.md) |
 | Talk / speaker data from Pretalx | [docs/pretalx.md](pretalx.md) |
