@@ -1,6 +1,7 @@
 {#
   Sponsor wall: current sponsors as size-tiered logo rows (tier names hidden,
-  size carries the tier), partners in one shared row, then a compact strip of
+  size carries the tier), grouped tiers in labelled rows (e.g. Institutional
+  Sponsors, Partners), then a moving line of
   past-edition sponsors. Layout per tier and the past lineups are configured
   in databags/sponsors.yaml.
 #}
@@ -17,22 +18,26 @@
 
 {% macro render_sponsors_list() %}
 {% set data = bag('sponsors') %}
-{% set partner_tiers = data.types|selectattr('partner')|list %}
+{# Group labels that have logos, in order of first appearance #}
+{% set groups = namespace(labels=[]) %}
+{% for tier in data.types if tier.group and tier.sponsors and tier.group not in groups.labels %}
+{% set groups.labels = groups.labels + [tier.group] %}
+{% endfor %}
 <div class="sponsor-wall">
-    {% for tier in data.types if tier.sponsors and not tier.partner %}
+    {% for tier in data.types if tier.sponsors and not tier.group %}
     <ul class="sponsor-wall__row sponsor-wall__row--{{ tier.logo_size }}" aria-label="{{ tier.name }}">
         {% for sponsor in tier.sponsors %}{{ sponsor_logo(sponsor, '/sponsors/' ~ sponsor.id) }}{% endfor %}
     </ul>
     {% endfor %}
 
-    {% if partner_tiers|selectattr('sponsors')|list %}
-    <p class="sponsor-wall__divider">Partners</p>
-    <ul class="sponsor-wall__row sponsor-wall__row--partner" aria-label="Partners">
-        {% for tier in partner_tiers %}
+    {% for label in groups.labels %}
+    <p class="sponsor-wall__divider">{{ label }}</p>
+    <ul class="sponsor-wall__row sponsor-wall__row--group" aria-label="{{ label }}">
+        {% for tier in data.types if tier.group == label %}
         {% for sponsor in tier.sponsors %}{{ sponsor_logo(sponsor, '/sponsors/' ~ sponsor.id) }}{% endfor %}
         {% endfor %}
     </ul>
-    {% endif %}
+    {% endfor %}
 </div>
 {{ render_past_sponsors(data) }}
 {% endmacro %}
@@ -41,18 +46,36 @@
   Past lineups are read newest first. A sponsor shows once: repeats across
   editions and anyone in the current lineup are skipped, matched by id or by
   logo file (the same organisation sometimes appears under two tier ids).
+  Order: curated `featured` ids first, then best tier ever held, then more
+  editions, then most recent edition (see past_editions in sponsors.yaml).
 #}
 {% macro render_past_sponsors(data) %}
+{% set cfg = data.past_editions %}
+{% set featured = cfg.featured or [] %}
 {% set seen = namespace(ids=[], logos=[], sponsors=[]) %}
 {% for tier in data.types %}{% for sponsor in tier.sponsors %}
 {% set seen.ids = seen.ids + [sponsor.id] %}{% set seen.logos = seen.logos + [sponsor.logo] %}
 {% endfor %}{% endfor %}
-{% for bag_name in data.past_editions.bags %}{% for tier in bag(bag_name).types %}{% for sponsor in tier.sponsors %}
+{% for bag_name in cfg.bags %}{% for tier in bag(bag_name).types %}{% for sponsor in tier.sponsors %}
 {% if sponsor.id not in seen.ids and sponsor.logo not in seen.logos %}
 {% set seen.ids = seen.ids + [sponsor.id] %}{% set seen.logos = seen.logos + [sponsor.logo] %}
 {% set seen.sponsors = seen.sponsors + [sponsor] %}
 {% endif %}
 {% endfor %}{% endfor %}{% endfor %}
+{# Sort key per sponsor: [featured position, best tier, -editions, newest edition, first-seen position] #}
+{% set ranked = namespace(entries=[]) %}
+{% for sponsor in seen.sponsors %}
+{% set stats = namespace(tier=cfg.tier_order|length, editions=[]) %}
+{% for bag_name in cfg.bags %}{% set edition = loop.index0 %}
+{% for tier in bag(bag_name).types if sponsor.id in tier.sponsors|map(attribute='id')|list %}
+{% set stats.tier = [stats.tier, cfg.tier_order.index(tier.id)]|min %}
+{% set stats.editions = stats.editions + [edition] %}
+{% endfor %}{% endfor %}
+{% set editions = stats.editions|unique|list %}
+{% set featured_pos = featured.index(sponsor.id) if sponsor.id in featured else featured|length %}
+{% set ranked.entries = ranked.entries + [{'sponsor': sponsor, 'key': [featured_pos, stats.tier, -(editions|length), editions|min, loop.index0]}] %}
+{% endfor %}
+{% set seen.sponsors = ranked.entries|sort(attribute='key')|map(attribute='sponsor')|list %}
 {#
   One moving line: the list is rendered twice and the track slides by one
   copy's width, so the loop has no visible seam. The second copy is hidden

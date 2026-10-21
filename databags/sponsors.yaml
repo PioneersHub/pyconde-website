@@ -3,7 +3,8 @@
 #
 # Each tier sets how it renders in the sponsor wall (macros/sponsor.html):
 #   logo_size  xl | lg | md | sm — logo box size; the tier name itself is not shown
-#   partner    true — collected into one shared row under a "Partners" divider
+#   group      a divider label — tiers sharing the same label are collected into
+#              one small-logo row under that label, in order of first appearance
 #
 # past_editions lists the frozen lineups shown as a compact strip below the
 # current sponsors. Sponsors already in this file are left out of the strip.
@@ -11,11 +12,52 @@
 # section background. tonal_logos lists the ids whose logo is a filled shape
 # with knocked-out text (white on a box or circle): a silhouette turns those
 # into a solid blob, so they render in greyscale instead.
+#
+# Order of the moving line: the curated `featured` ids come first, in the
+# order listed. They are picked by brand weight — how widely the name is
+# known — not by the tier they bought: a household name that was Silver
+# belongs here. Everyone else follows automatically: best tier ever held
+# (position in `tier_order`, which must name every tier id used in the past
+# lineups), then more editions, then most recent edition.
 past_editions:
   title: Sponsors of past editions
   bags:
     - sponsors_2026
     - sponsors_2025
+  featured:
+    - merck
+    - meta
+    - lufthansa-technik
+    - eon
+    - rewe
+    - jetbrains
+    - zeiss
+    - schwaebisch_hall
+    - snowflake
+    - dmtech
+    - deepl
+    - vattenfall
+    - rlboo
+    - munich-digital
+    - okta
+    - redis
+    - anaconda
+    - vonage
+    - blueyonder
+    - pydantic_logfire
+    - aleph-alpha
+  tier_order:
+    - keystone
+    - diamond
+    - platinum
+    - gold
+    - silver
+    - community-sponsors
+    - institutional-sponsors
+    - institutional-partners
+    - diversity-sponsors
+    - community-partners
+    - technical-partners
   tonal_logos:
     - exocad
     - rewe
@@ -82,9 +124,9 @@ types:
     id: community-sponsors
     logo_size: sm
     sponsors: []
-  - name: Institutional Partners
-    id: institutional-partners
-    partner: true
+  - name: Institutional Sponsors
+    id: institutional-sponsors
+    group: Institutional Sponsors
     sponsors:
       - name: Python Softwareverband e.V.
         id: pysv
@@ -106,23 +148,6 @@ types:
       presence and impact in Germany, Austria, and Switzerland.'
         website: https://pysv.org
         logo: /static/media/sponsors/pysv.svg
-        scale: null
-      - name: NumFOCUS
-        id: numfocus
-        headline: NumFOCUS
-        description: 'NumFOCUS is a nonprofit organization that supports open source software
-      in science, technology, engineering, and mathematics (STEM). Its mission is
-      to promote sustainable, high-quality, open source projects and foster an inclusive
-      and collaborative community around them.<br/><br/>
-
-      By providing financial, legal, and operational support to core open source projects
-      like NumPy, pandas, Jupyter, and many others, NumFOCUS helps ensure that vital
-      tools remain accessible and reliable for the global data and scientific communities.
-      Beyond software, NumFOCUS cultivates diversity and education through programs
-      like PyData, community events, fellowships, and outreach initiatives—building
-      a more inclusive future for open source.'
-        website: https://numfocus.org
-        logo: /static/media/sponsors/numfocus.svg
         scale: null
       - name: Pioneers Hub
         id: pioneershub
@@ -150,13 +175,13 @@ types:
         scale: null
   - name: Diversity Sponsors
     id: diversity-sponsors
-    partner: true
+    group: Partners
     sponsors: []
   - name: Community Partners
     id: community-partners
-    partner: true
+    group: Partners
     sponsors: []
   - name: Technical Partners
     id: technical-partners
-    partner: true
+    group: Partners
     sponsors: []
