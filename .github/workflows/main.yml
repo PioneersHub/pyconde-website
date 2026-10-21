@@ -18,15 +18,23 @@ on:
     - cron: "1 23 * * *"
   workflow_dispatch:
 
-# One production deploy at a time. Merges minutes apart used to deploy in
-# parallel, and whichever run finished last won — an older commit's pages
-# could overwrite a newer one's. A running deploy is never cancelled (it
-# would stop halfway through a bucket); GitHub keeps only the newest waiting
-# run and cancels any older one still waiting, so a burst of merges ends
-# with exactly one deploy of the latest commit.
+# One write to the production buckets at a time, shared with
+# archive-build.yml. Merges minutes apart used to deploy in parallel, and
+# whichever run finished last won — an older commit's pages could overwrite
+# a newer one's.
+#   cancel-in-progress: false  a running deploy is never stopped halfway
+#                              through a bucket.
+#   queue: max                 every waiting run is kept. The default keeps
+#                              only one per group, so a merge would cancel a
+#                              waiting archive dispatch, or a dispatch the
+#                              deploy of the latest merge.
+# Waiting runs start roughly, not strictly, in order, so the checkout below
+# takes the branch tip rather than the triggering commit: whichever run goes
+# last deploys the newest main.
 concurrency:
   group: production-deploy
   cancel-in-progress: false
+  queue: max
 
 jobs:
   build:
@@ -35,6 +43,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          # The branch tip when this run starts, not github.sha — see concurrency.
+          ref: ${{ github.ref }}
 
       - name: Setting up python
         uses: actions/setup-python@v5
