@@ -83,16 +83,16 @@ Choose deployment mode:
 
 ```bash
 cd backend
-sam build -t template.yaml
-sam deploy --guided --template-file template.yaml
+sam build
+sam deploy --guided
 ```
 
 **Secure** (API Gateway + WAF) - Recommended for production:
 
 ```bash
 cd backend
-sam build -t template-secure.yaml
-sam deploy --guided --template-file template-secure.yaml
+sam build --config-env secure
+sam deploy --guided --config-env secure
 ```
 
 After deployment, update frontend `api_endpoint` with the output URL.

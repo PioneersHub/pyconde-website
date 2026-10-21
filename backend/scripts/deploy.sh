@@ -137,10 +137,10 @@ success "All required environment variables are set"
 # Build the SAM application
 if [[ "$USE_CONTAINER" == true ]]; then
     info "Building SAM application in Docker container (Lambda-compatible environment)..."
-    sam build -t "$TEMPLATE_FILE" --use-container || error "SAM build failed"
+    sam build --config-file samconfig.toml --config-env "$CONFIG_ENV" --use-container || error "SAM build failed"
 else
     info "Building SAM application..."
-    sam build -t "$TEMPLATE_FILE" || error "SAM build failed"
+    sam build --config-file samconfig.toml --config-env "$CONFIG_ENV" || error "SAM build failed"
 fi
 success "Build completed"
 

@@ -163,8 +163,9 @@ renaming a topic means changing all three.
 
 **How the file reaches production:**
 
-The SAM templates use `CodeUri: ./`, so `sam build` packages whatever is in your
-local `backend/` directory. The routing file is deployed only if it exists
+The SAM templates use `CodeUri: ./`, so `sam build` copies your local `backend/`
+directory (minus `.env`, `.aws-sam/`, caches and virtualenvs) into the build
+output that `sam deploy` ships. The routing file is deployed only if it exists
 there at build time. A deploy from a fresh clone ships without it and falls back
 to `EMAIL_RECIPIENT` for all topics.
 
@@ -292,9 +293,9 @@ Quick start:
 # Install AWS SAM CLI
 brew install aws-sam-cli  # macOS
 
-# Deploy
-sam build
-sam deploy --guided
+# Deploy (production uses the secure env)
+sam build --config-env secure
+sam deploy --guided --config-env secure
 ```
 
 **Advantages:**

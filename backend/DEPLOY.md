@@ -67,17 +67,24 @@ export $(grep -v '^#' .env | xargs)
 
 ```bash
 cd backend
-sam build -t template.yaml
-sam deploy --guided --template-file template.yaml
+sam build
+sam deploy --guided
 ```
 
 ### Secure Deployment ⭐
 
 ```bash
 cd backend
-sam build -t template-secure.yaml
-sam deploy --guided --template-file template-secure.yaml
+sam build --config-env secure
+sam deploy --guided --config-env secure
 ```
+
+> **Why the build output is deployed:** `samconfig.toml` points each env's
+> `sam deploy` at its own `sam build` output (`.aws-sam/build-basic/` or
+> `.aws-sam/build-secure/`). SAM's Python builder leaves out `.env`,
+> `.aws-sam/`, `__pycache__` and virtualenvs. Packaging the source template
+> instead would zip the whole `backend/` directory (`CodeUri: ./`), including
+> your `.env` secrets. Don't pass `--template-file template*.yaml` to `sam deploy`.
 
 **Parameters you'll be prompted for:**
 
@@ -120,7 +127,7 @@ To avoid entering parameters manually every time, use the included `samconfig.to
 cd backend
 
 # Build
-sam build -t template-secure.yaml
+sam build --config-env secure
 
 # Load all Variables from .env file
 export $(grep -v '^#' .env | xargs)
@@ -173,8 +180,12 @@ The script will:
 
 ```bash
 cd backend
-sam build && sam deploy
+sam build --config-env secure && sam deploy --config-env secure
 ```
+
+> ⚠️ Both envs deploy to the same stack `pyconde-contact-form`. A plain
+> `sam build && sam deploy` uses the basic `default` env and would replace
+> the production API Gateway + WAF setup.
 
 **Option 2: Full redeploy with deploy.sh (recommended)**
 
@@ -296,7 +307,7 @@ View metrics in AWS Console:
 ```bash
 # Make code changes, then:
 cd backend
-sam build && sam deploy
+sam build --config-env secure && sam deploy --config-env secure
 ```
 
 ## Troubleshooting

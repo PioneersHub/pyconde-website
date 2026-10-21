@@ -174,7 +174,7 @@ fetch(API_URL, {
 **Deploy:**
 
 ```bash
-sam build -t template.yaml
+sam build
 sam deploy --guided
 ```
 
@@ -203,8 +203,8 @@ sam deploy --guided
 **Deploy:**
 
 ```bash
-sam build -t template-secure.yaml
-sam deploy --guided --template-file template-secure.yaml
+sam build --config-env secure
+sam deploy --guided --config-env secure
 ```
 
 ## Configuration Guide
