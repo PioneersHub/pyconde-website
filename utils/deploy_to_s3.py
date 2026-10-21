@@ -29,6 +29,13 @@ folder is checked before any bucket is touched: it must not overlap a path
 that lives in S3 but not in a current build (the archive, the search index,
 the talk permalinks), and it must exist and be non-empty in site/.
 
+Only changed files are uploaded. `aws s3 sync` uploads a file when its size
+differs or its local mtime is newer than the object's, and a CI build writes
+every file fresh, so on its own it re-uploads all of site/ on every deploy.
+Before each bucket's sync, files whose content matches the object (same size,
+same S3 ETag) are backdated so sync skips them; everything else is uploaded.
+A wrong or missing match only ever costs an upload, never skips a change.
+
 Each bucket gets a complete, independent copy — nothing here makes one
 bucket depend on another. Buckets are synced in list order and the first
 failure aborts the run.
@@ -39,10 +46,14 @@ Credentials come from the usual AWS_* environment variables.
 from __future__ import annotations
 
 import argparse
+import hashlib
+import os
 import subprocess
 import sys
+from fnmatch import fnmatch
 from pathlib import Path
 
+import boto3
 from deploy_targets import resolve_mirror_prefixes, resolve_targets
 from selective_build_sync_args import sync_include_args
 from talk_permalinks import PERMALINK_ROOT
@@ -62,6 +73,14 @@ BUILD_STATE_EXCLUDE = [".lektor/*"]
 # so it has to ship with every archive upload or the deployed index drifts out
 # of step with the content it describes.
 SEARCH_INDEX_INCLUDE = ["pagefind/*"]
+
+# The aws CLI's defaults: files of 8 MiB or more go up in 8 MiB parts, and a
+# multipart object's ETag is the MD5 of the parts' MD5s, suffixed "-{parts}".
+MULTIPART_THRESHOLD = 8 * 1024 * 1024
+MULTIPART_CHUNKSIZE = 8 * 1024 * 1024
+
+# Older than any object, so sync treats a same-size file as already uploaded.
+UNCHANGED_MTIME = 0
 
 
 def s3_only_roots() -> list[str]:
@@ -118,6 +137,60 @@ def mirror_cmd(prefix: str, bucket: str) -> list[str]:
         "--no-progress",
         "--delete",
     ]
+
+
+def s3_etag(path: Path) -> str:
+    """The ETag S3 assigns this file when the aws CLI uploads it unencrypted
+    or with SSE-S3. Other encryption gives ETags that never match, which
+    means a full upload, not a skipped change.
+    """
+    part_md5s: list[bytes] = []
+    with path.open("rb") as f:
+        while chunk := f.read(MULTIPART_CHUNKSIZE):
+            part_md5s.append(hashlib.md5(chunk).digest())
+    if path.stat().st_size < MULTIPART_THRESHOLD:
+        return (part_md5s[0] if part_md5s else hashlib.md5(b"").digest()).hex()
+    return f"{hashlib.md5(b''.join(part_md5s)).hexdigest()}-{len(part_md5s)}"
+
+
+def local_fingerprints() -> dict[str, tuple[int, str]]:
+    """Bucket key -> (size, ETag) for every file in site/ that sync may upload."""
+    fingerprints: dict[str, tuple[int, str]] = {}
+    for path in SITE_DIR.rglob("*"):
+        key = path.relative_to(SITE_DIR).as_posix()
+        if path.is_file() and not any(fnmatch(key, p) for p in BUILD_STATE_EXCLUDE):
+            fingerprints[key] = (path.stat().st_size, s3_etag(path))
+    return fingerprints
+
+
+def remote_fingerprints(s3, bucket: str) -> dict[str, tuple[int, str]]:
+    """Bucket key -> (size, ETag) for every object in the bucket."""
+    pages = s3.get_paginator("list_objects_v2").paginate(Bucket=bucket)
+    return {
+        obj["Key"]: (obj["Size"], obj["ETag"].strip('"'))
+        for page in pages
+        for obj in page.get("Contents", [])
+    }
+
+
+def mark_unchanged(
+    local: dict[str, tuple[int, str]], remote: dict[str, tuple[int, str]]
+) -> int:
+    """Backdate the files the bucket already holds; return how many.
+
+    Every other file gets the current time, which is newer than any object,
+    so the next sync uploads it. That reset matters from the second bucket
+    on: a file backdated for one bucket may differ in the next.
+    """
+    unchanged = 0
+    for key, fingerprint in local.items():
+        path = SITE_DIR / key
+        if remote.get(key) == fingerprint:
+            os.utime(path, (UNCHANGED_MTIME, UNCHANGED_MTIME))
+            unchanged += 1
+        else:
+            os.utime(path)
+    return unchanged
 
 
 def known_years() -> list[str]:
@@ -205,6 +278,10 @@ def main() -> int:
     # archive scope uploads a slice and must never delete anything.
     mirrors = checked_mirror_prefixes() if args.scope == "full" else []
     label = args.scope if args.year == ALL_YEARS else f"{args.scope} {args.year}"
+    # A dry run stays local: which files are unchanged is only known once a
+    # bucket is listed.
+    s3 = None if args.dry_run else boto3.client("s3")
+    local = None if args.dry_run else local_fingerprints()
 
     for bucket in buckets:
         cmd = [
@@ -219,6 +296,12 @@ def main() -> int:
         print(f"::group::{label} scope -> s3://{bucket}", flush=True)
         print(" ".join(cmd), flush=True)
         if not args.dry_run:
+            unchanged = mark_unchanged(local, remote_fingerprints(s3, bucket))
+            print(
+                f"{unchanged} of {len(local)} files already in s3://{bucket}, "
+                f"not uploaded again",
+                flush=True,
+            )
             # shell=False: '*' reaches aws as a literal argument, so no glob
             # guard is needed. check=True aborts before the next bucket.
             subprocess.run(cmd, check=True)
