@@ -166,7 +166,7 @@ PARAM_STRING=$(IFS=' '; echo "${PARAMS[*]}")
 info "Deploying to AWS..."
 info "Stack name: pyconde-contact-form"
 info "Region: eu-central-1"
-info "Template: $TEMPLATE_FILE"
+info "Template: $TEMPLATE_FILE, deployed from its sam build output ([${CONFIG_ENV}.deploy.parameters] template_file in samconfig.toml)"
 echo ""
 
 sam deploy \
