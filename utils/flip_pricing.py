@@ -16,10 +16,11 @@ never drift:
     (low/high/offer_count from the on-sale tiers only) and
     `price_valid_until` (the day before the next edition opens; the
     last edition runs to `valid_through`).
-  - frontpage/sections/tickets.yaml: rewrites `period`, `price_label`
-    (from the 3-day standard tier of the active edition) and
-    `strike_price` (the next edition's 3-day standard price,
-    loss-framing; empty for the last edition).
+  - frontpage/sections/tickets.yaml: rewrites `period` and
+    `current_drop`, the one-line summary of the edition on sale: its
+    name, its 3-day standard price, its `size` if set, and how long it
+    runs (until the next edition opens, or until sold out for the
+    last). It never shows a later edition's price.
 
 Comment-preserving: edits are line-targeted, not a full YAML round
 trip, so the helpful docs in both files survive the flip.
@@ -39,6 +40,8 @@ import yaml
 REPO = Path(__file__).resolve().parent.parent
 TICKETS = REPO / "databags" / "tickets.yaml"
 TICKETS_CTA = REPO / "databags" / "frontpage" / "sections" / "tickets.yaml"
+# Keeps "690 €" and "4 Nov" together when the CTA line wraps.
+NBSP = "\u00a0"
 
 
 def set_line(text: str, key: str, value: str, source: Path) -> str:
@@ -71,6 +74,20 @@ def three_day_standard_price(tiers: list[dict], edition: str) -> int:
         if t.get("id") == f"3day-standard-{edition}":
             return t["price"]
     raise SystemExit(f"No tier `3day-standard-{edition}` in {TICKETS.name}.")
+
+
+def current_drop_line(edition: dict, price: int, next_edition: dict | None) -> str:
+    """The tickets CTA line for the edition on sale.
+
+    Example: `Current drop: Edition I: Early Bird 690 €, 150 available until 4 Nov`.
+    """
+    details = [f"{edition['size']} available"] if edition.get("size") else []
+    if next_edition:
+        closes = parse_date(next_edition["opens"])
+        details.append(f"until {closes.day}{NBSP}{closes:%b}")
+    else:
+        details.append("until sold out")
+    return f"Current drop: {edition['name']} {price}{NBSP}€, {' '.join(details)}"
 
 
 def edition_by_date(cfg: dict, ids: list[str], current: str, today: date) -> str:
@@ -153,9 +170,6 @@ def flip(cfg: dict, current: str, target: str, dry_run: bool) -> None:
         price_valid_until = fmt(parse_date(cfg["valid_through"]))
 
     target_price = three_day_standard_price(public, target)
-    next_price = (
-        three_day_standard_price(public, next_edition["id"]) if next_edition else None
-    )
 
     # --- tickets.yaml (schema source) ---
     tx = TICKETS.read_text(encoding="utf-8")
@@ -166,17 +180,17 @@ def flip(cfg: dict, current: str, target: str, dry_run: bool) -> None:
     tx = set_indented_line(tx, "offer_count", str(offer_count))
 
     # --- frontpage/sections/tickets.yaml (UI copy) ---
-    price_label = f'"from €{target_price}"'
-    strike_price = f'"€{next_price}"' if next_price is not None else '""'
+    current_drop = (
+        f'"{current_drop_line(editions[position], target_price, next_edition)}"'
+    )
     cx = TICKETS_CTA.read_text(encoding="utf-8")
     cx = set_line(cx, "period", target, TICKETS_CTA)
-    cx = set_line(cx, "price_label", price_label, TICKETS_CTA)
-    cx = set_line(cx, "strike_price", strike_price, TICKETS_CTA)
+    cx = set_line(cx, "current_drop", current_drop, TICKETS_CTA)
 
     print(f"Flipping pricing: {current} -> {target}")
     print(f"  aggregate: low={low} high={high} offer_count={offer_count}")
     print(f"  price_valid_until: {price_valid_until}")
-    print(f"  UI: price_label={price_label} strike_price={strike_price}")
+    print(f"  UI: current_drop={current_drop}")
 
     if dry_run:
         print("Dry run — no files written.")
