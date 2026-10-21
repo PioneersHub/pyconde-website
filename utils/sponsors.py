@@ -35,11 +35,15 @@ def validate_presentation(data):
     """
     errors = []
     for sponsor_type in data["types"]:
-        is_partner = sponsor_type.get("partner") is True
+        group = sponsor_type.get("group")
         logo_size = sponsor_type.get("logo_size")
-        if is_partner == (logo_size is not None):
+        if "group" in sponsor_type and not (isinstance(group, str) and group.strip()):
             errors.append(
-                f"type '{sponsor_type['id']}' needs exactly one of 'partner: true' or 'logo_size'"
+                f"type '{sponsor_type['id']}' has an empty 'group'; it is the divider label"
+            )
+        elif (group is not None) == (logo_size is not None):
+            errors.append(
+                f"type '{sponsor_type['id']}' needs exactly one of 'group' or 'logo_size'"
             )
         elif logo_size is not None and logo_size not in LOGO_SIZES:
             errors.append(
