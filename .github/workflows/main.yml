@@ -18,6 +18,16 @@ on:
     - cron: "1 23 * * *"
   workflow_dispatch:
 
+# One production deploy at a time. Merges minutes apart used to deploy in
+# parallel, and whichever run finished last won — an older commit's pages
+# could overwrite a newer one's. A running deploy is never cancelled (it
+# would stop halfway through a bucket); GitHub keeps only the newest waiting
+# run and cancels any older one still waiting, so a burst of merges ends
+# with exactly one deploy of the latest commit.
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
