@@ -1,0 +1,50 @@
+{#
+  Sprints, Hackathons & Initiatives
+  ─────────────────────────────────
+  Compact info blocks for the activities around the conference, each
+  pointing to its subpage. Content lives in
+  databags/frontpage/sections/initiatives.yaml (schema documented there).
+
+  Usage:
+    {% from "macros/initiatives.html" import render_initiatives %}
+    {{ render_initiatives(bag('frontpage/sections/initiatives')) }}
+#}
+
+{% macro render_initiatives(data, section_label='Sprints, hackathons and initiatives') %}
+{% if data and data.blocks %}
+<section class="initiatives" aria-label="{{ section_label }}">
+  <div class="content">
+    {% if data.section_title %}<h2 class="initiatives__title">{{ data.section_title }}</h2>{% endif %}
+    {% if data.section_teaser %}<p class="initiatives__teaser">{{ data.section_teaser }}</p>{% endif %}
+    <div class="initiatives__grid">
+      {% for b in data.blocks %}
+      <article class="initiatives__block">
+        <h3 class="initiatives__block-title">{{ b.title }}</h3>
+        {% if b.when %}<p class="initiatives__when">{{ b.when }}</p>{% endif %}
+        {% if b.body %}<p class="initiatives__body">{{ b.body }}</p>{% endif %}
+        {% if b.committed %}
+        <p class="initiatives__label">Committed</p>
+        <ul class="initiatives__committed">
+          {% for c in b.committed %}
+          <li>
+            <a href="{{ c.url }}">
+              {% if c.logo %}<img src="{{ c.logo }}" alt="{{ c.name }}" class="initiatives__logo" loading="lazy">{% else %}{{ c.name }}{% endif %}
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        {% if b.links %}
+        <ul class="initiatives__links">
+          {% for l in b.links %}
+          <li><a href="{{ l.url }}" class="initiatives__link{% if loop.first %} initiatives__link--primary{% endif %}">{{ l.text }} →</a></li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endmacro %}
