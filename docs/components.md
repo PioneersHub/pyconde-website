@@ -91,6 +91,8 @@ Multi-instance carousel with two display modes. Renders slides from a databag wi
 | `section_label` | `'Carousel'` | Accessible `aria-label` for the section |
 | `header_title` | `''` | Optional heading above the slides |
 | `header_teaser` | `''` | Optional teaser line below the heading |
+| `header_link_text` | `''` | Optional link label shown right after the teaser (needs `header_link_url`) |
+| `header_link_url` | `''` | Destination of the header link |
 
 **Item schema** (all databags use the same format):
 

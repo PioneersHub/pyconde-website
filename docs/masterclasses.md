@@ -148,6 +148,8 @@ Do **not** publish the email address, training methods, timeline, or room requir
 
 The homepage carousel only shows when `masterclasses` has `display: true` in `databags/frontpage/config.yaml`. It is on while masterclasses are being sold.
 
+The carousel heading ends with a "Propose a masterclass →" link to the call (`header_link_text` and `header_link_url` in the same databag). Remove both lines when the call closes.
+
 ## When times, prices or rules change
 
 The masterclass times, prices and switching rule appear on several pages as plain text. Change all of them together:

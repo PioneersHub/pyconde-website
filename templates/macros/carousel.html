@@ -23,6 +23,8 @@
     section_label – accessible label for the carousel section
     header_title  – optional heading displayed above the slides
     header_teaser – optional teaser line below the heading
+    header_link_text – optional link label shown right after the teaser (needs header_link_url)
+    header_link_url  – optional link destination for header_link_text
     cta_text      – optional footer CTA button label (needs cta_url)
     cta_url       – optional footer CTA button destination
 
@@ -30,7 +32,7 @@
     - id, type, name, title, teaser, image, image_alt, link_text, link_url
 #}
 
-{% macro render_carousel(items, carousel_id='carousel', mode='multi', image_dir='featured', section_label='Carousel', header_title='', header_teaser='', cta_text='', cta_url='') %}
+{% macro render_carousel(items, carousel_id='carousel', mode='multi', image_dir='featured', section_label='Carousel', header_title='', header_teaser='', header_link_text='', header_link_url='', cta_text='', cta_url='') %}
 
 {% if items and items|length > 0 %}
 
@@ -42,8 +44,13 @@
   {% if header_title %}
   <div class="carousel-header">
     <h2 class="carousel-header__title">{{ header_title }}</h2>
-    {% if header_teaser %}
-    <p class="carousel-header__teaser">{{ header_teaser }}</p>
+    {% if header_teaser or (header_link_text and header_link_url) %}
+    <p class="carousel-header__teaser">
+      {{ header_teaser }}
+      {% if header_link_text and header_link_url %}
+      <a href="{{ header_link_url }}" class="carousel-header__link">{{ header_link_text }}</a>
+      {% endif %}
+    </p>
     {% endif %}
   </div>
   {% endif %}
