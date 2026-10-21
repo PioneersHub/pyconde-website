@@ -42,16 +42,19 @@
 
   {# ── Optional header ── #}
   {% if header_title %}
+  {# Inner .content puts the header on the same column as the other front-page sections. #}
   <div class="carousel-header">
-    <h2 class="carousel-header__title">{{ header_title }}</h2>
-    {% if header_teaser or (header_link_text and header_link_url) %}
-    <p class="carousel-header__teaser">
-      {{ header_teaser }}
-      {% if header_link_text and header_link_url %}
-      <a href="{{ header_link_url }}" class="carousel-header__link">{{ header_link_text }}</a>
+    <div class="content">
+      <h2 class="carousel-header__title">{{ header_title }}</h2>
+      {% if header_teaser or (header_link_text and header_link_url) %}
+      <p class="carousel-header__teaser">
+        {{ header_teaser }}
+        {% if header_link_text and header_link_url %}
+        <a href="{{ header_link_url }}" class="carousel-header__link">{{ header_link_text }}</a>
+        {% endif %}
+      </p>
       {% endif %}
-    </p>
-    {% endif %}
+    </div>
   </div>
   {% endif %}
 

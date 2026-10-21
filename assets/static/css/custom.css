@@ -1760,23 +1760,26 @@ button.pretix-widget-button[type="submit"] {
     padding: var(--space-xl) 0;
 }
 
+/* Orange field (§02 text-safe, ink text) so the section reads apart from
+   the blue tickets field above it and the green newsletter below. */
 [data-carousel-id="masterclasses"] .carousel-header {
-    background: var(--blue);
-    margin: 0 calc(-1 * var(--space-page-margin));
-    padding: var(--space-lg) var(--space-page-margin) var(--space-lg);
+    background: var(--orange);
+    padding: var(--space-lg) 0;
+    text-align: left;
 }
 
-[data-carousel-id="masterclasses"] .carousel-header__title {
-    color: var(--white);
+[data-carousel-id="masterclasses"] .carousel-header__title,
+[data-carousel-id="masterclasses"] .carousel-header__teaser {
+    color: var(--text-primary);
 }
 
 [data-carousel-id="masterclasses"] .carousel-header__teaser {
-    color: rgba(255, 255, 255, 0.9);
+    margin-left: 0;
 }
 
 [data-carousel-id="masterclasses"] .carousel-slide {
     background: var(--white);
-    border-left: 4px solid var(--blue);
+    border-left: 4px solid var(--orange);
     border-radius: 0;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
     transition: box-shadow 0.2s ease, border-color 0.2s ease;
@@ -1824,15 +1827,15 @@ button.pretix-widget-button[type="submit"] {
 
 [data-carousel-id="masterclasses"] .slide-cta {
     background: transparent;
-    color: var(--blue);
-    border: 2px solid var(--blue);
+    color: var(--text-primary);
+    border: 2px solid var(--text-primary);
     font-weight: 600;
     padding: var(--space-xs) var(--space-md);
 }
 
 [data-carousel-id="masterclasses"] .slide-cta:hover {
-    background: var(--blue);
-    color: var(--white);
+    background: var(--orange);
+    color: var(--text-primary);
 }
 
 /* Masterclass carousel dots + controls: same as featured carousel */
@@ -4846,4 +4849,145 @@ body.front-page {
     .sponsor-wall__row--sm     { --logo-w: 6.5rem; --logo-h: 2.5rem; }
     .sponsor-wall__row--group   { --logo-w: 5.5rem; --logo-h: 2.25rem; }
     .sponsor-wall__row--past   { --logo-w: 3.25rem; --logo-h: 1.25rem; gap: var(--space-xs); }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Sprints, Hackathons & Initiatives (front page)
+   ══════════════════════════════════════════════════════════════
+   White field between the orange masterclasses and the green
+   newsletter; each block carries an Aicher colour stripe on top. */
+
+.initiatives {
+    background: var(--white);
+    color: var(--text-primary);
+    padding: var(--space-xl) 0;
+}
+
+.initiatives__title {
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    margin: 0 0 var(--space-xs);
+    letter-spacing: -0.02em;
+}
+
+.initiatives__teaser {
+    font-size: var(--font-size-lg);
+    color: var(--text-secondary);
+    margin: 0 0 var(--space-lg);
+}
+
+.initiatives__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: var(--space-md);
+}
+
+.initiatives__block {
+    border-top: 6px solid var(--green);
+    background: var(--neutral-50);
+    padding: var(--space-md);
+    display: flex;
+    flex-direction: column;
+}
+
+.initiatives__block:nth-child(3n+2) {
+    border-top-color: var(--pink);
+}
+
+.initiatives__block:nth-child(3n+3) {
+    border-top-color: var(--blue);
+}
+
+.initiatives__block-title {
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    margin: 0;
+}
+
+.initiatives__when {
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: var(--space-xs) 0 var(--space-sm);
+}
+
+.initiatives__body {
+    font-size: var(--font-size-sm);
+    line-height: 1.55;
+    margin: 0 0 var(--space-sm);
+}
+
+.initiatives__label {
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    margin: 0 0 var(--space-xs);
+}
+
+.initiatives__committed {
+    list-style: none;
+    margin: 0 0 var(--space-sm);
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm) var(--space-md);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+}
+
+.initiatives__committed a {
+    color: var(--text-primary);
+}
+
+.initiatives__logo {
+    display: block;
+    height: 2rem;
+    width: auto;
+}
+
+.initiatives__links {
+    list-style: none;
+    margin: auto 0 0;
+    padding: var(--space-sm) 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs) var(--space-md);
+    font-size: var(--font-size-sm);
+}
+
+.initiatives__link {
+    color: var(--text-primary);
+    text-decoration: underline;
+}
+
+.initiatives__link--primary {
+    font-weight: 700;
+}
+
+/* /sprints/ — accepted project logos on white tiles, so blue logos
+   stay visible on the page's blue field. */
+.subsite #accepted-projects + ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.subsite #accepted-projects + ul li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-sm);
+}
+
+.subsite #accepted-projects + ul img {
+    display: block;
+    box-sizing: content-box;
+    width: 7rem;
+    height: 3rem;
+    object-fit: contain;
+    background: var(--white);
+    padding: var(--space-xs) var(--space-sm);
 }
