@@ -8,12 +8,13 @@
     {{ render_tickets_cta(bag('tickets_cta')) }}
 
   Parameters:
-    data          – full databag dict with title, body, link_text, link_url
+    data          – full databag dict with title, body, current_drop, link_text, link_url
     section_label – accessible label (default: 'Tickets')
 
   Databag schema (tickets_cta.yaml):
     title: "Tickets"
-    body: "PyCon DE 2027 sells out..."
+    body: "Four editions, four limited shirts..."
+    current_drop: "Current drop: Edition I: Early Bird 690 €, ..."   # written by make flip-pricing
     link_text: "Get your ticket"
     link_url: /buy-ticket/
 #}
@@ -28,13 +29,8 @@
     <h2 class="tickets-cta__title">{{ data.title }}</h2>
     {% endif %}
     <p class="tickets-cta__body">{{ data.body }}</p>
-    {% if data.price_label %}
-    <p class="tickets-cta__price">
-      <span class="tickets-cta__price-label">{{ data.price_label }}</span>
-      {% if data.strike_price %}
-      <span class="tickets-cta__price-strike">{{ data.strike_price }}</span>
-      {% endif %}
-    </p>
+    {% if data.current_drop %}
+    <p class="tickets-cta__price">{{ data.current_drop }}</p>
     {% endif %}
     {% if data.link_text and data.link_url %}
     <a href="{{ data.link_url }}" class="tickets-cta__link">
