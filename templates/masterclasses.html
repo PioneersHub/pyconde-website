@@ -11,11 +11,20 @@
   </div>
 </div>
 
+{% if this.notes %}
+<section class="content-block--blue-light">
+  <div class="content">
+    {{ this.notes|shift_headings }}
+  </div>
+</section>
+{% endif %}
+
 {# ── Card Grid ── #}
 <section class="mc-listing">
   <div class="content">
     <div class="mc-grid">
-      {% for child in this.children %}
+      {# Only masterclass pages; the call for masterclasses lives at /masterclasses/call/. #}
+      {% for child in this.children.filter(F._model == 'masterclass') %}
       <a href="{{ child|url }}" class="mc-card">
 
         {% if child.social_card_image %}
