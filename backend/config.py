@@ -27,7 +27,8 @@ class Settings(BaseSettings):
     # Mailgun settings
     mailgun_api_key: str
     mailgun_domain: str
-    mailgun_api_base_url: str = "https://api.mailgun.net/v3"
+    # Required: no default, a wrong region fails every send with 401
+    mailgun_api_base_url: str
 
     # CORS settings
     # Note: In .env file, use comma-separated string: "origin1,origin2,origin3"
