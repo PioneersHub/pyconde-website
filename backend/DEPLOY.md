@@ -93,6 +93,7 @@ sam deploy --guided --config-env secure
 - `RecaptchaSecretKey` - Your reCAPTCHA secret
 - `MailgunApiKey` - Your Mailgun API key
 - `MailgunDomain` - Your domain (e.g., `mg.pycon.de`)
+- `MailgunApiBaseUrl` - API base URL for the domain's region (`mg.pycon.de` is EU: `https://api.eu.mailgun.net/v3`)
 - `EmailRecipient` - Recipient email (e.g., `info27@pycon.de`)
 - `EmailSender` - Sender email (e.g., `noreply@pycon.de`)
 - `AllowedOrigins` - CORS origins (comma-separated)

@@ -76,7 +76,7 @@ EMAIL_SENDER=noreply@pycon.de
 # Mailgun Configuration
 MAILGUN_API_KEY=your_mailgun_api_key
 MAILGUN_DOMAIN=your_mailgun_domain.com
-MAILGUN_API_BASE_URL=https://api.mailgun.net/v3
+MAILGUN_API_BASE_URL=https://api.eu.mailgun.net/v3
 
 # CORS Configuration
 ALLOWED_ORIGINS=https://pycon.de,http://localhost:5001
@@ -111,16 +111,16 @@ DEBUG=False
    - This is usually already done for your account
 
 3. **Choose your region**:
-   - **US region**: Use `https://api.mailgun.net/v3` (default)
-   - **EU region**: Use `https://api.eu.mailgun.net/v3` (for GDPR compliance)
-   - Set `MAILGUN_API_BASE_URL` in `.env` accordingly
+   - **EU region**: Use `https://api.eu.mailgun.net/v3` (`mg.pycon.de` lives here)
+   - **US region**: Use `https://api.mailgun.net/v3`
+   - `MAILGUN_API_BASE_URL` is required (no default). A region mismatch makes every send fail with `401 Forbidden`
 
 4. **Set credentials in `.env`**:
 
    ```env
    MAILGUN_API_KEY=key-your-actual-api-key-here
    MAILGUN_DOMAIN=mg.yourdomain.com
-   MAILGUN_API_BASE_URL=https://api.mailgun.net/v3
+   MAILGUN_API_BASE_URL=https://api.eu.mailgun.net/v3
    ```
 
 5. **Configure sender email**:
@@ -318,6 +318,7 @@ For AWS Lambda, configure via SAM template parameters:
 - `RECAPTCHA_SECRET_KEY`
 - `MAILGUN_API_KEY`
 - `MAILGUN_DOMAIN`
+- `MAILGUN_API_BASE_URL` (`mg.pycon.de` is in the EU region: `https://api.eu.mailgun.net/v3`)
 - `EMAIL_RECIPIENT`
 - `EMAIL_SENDER`
 - `ALLOWED_ORIGINS`
@@ -401,7 +402,7 @@ curl -X POST http://localhost:8000/api/contact \
 - Check that `MAILGUN_DOMAIN` matches your verified domain
 - Ensure sender email domain is verified in Mailgun
 - Check Mailgun dashboard logs for delivery status
-- Verify API base URL matches your region (US/EU)
+- `401 Forbidden` from Mailgun: `MAILGUN_API_BASE_URL` points at the wrong region (`mg.pycon.de` is EU)
 - Check application logs for error details
 
 **Issue: CORS errors**
