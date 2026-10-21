@@ -10,6 +10,7 @@ dependencies = [
     "lektor>=3.3.13, <4",
     "pytanis@git+https://github.com/PioneersHub/pytanis.git@main",
     "python-dotenv>=1.0.0",
+    "boto3>=1.40,<2",
 ]
 
 [project.optional-dependencies]
@@ -56,4 +57,10 @@ docstring-code-format = true
 dev = [
     "pagefind>=1.5.2",
     "pagefind-bin>=1.5.2",
+    "pytest>=9.1.1",
 ]
+
+[tool.pytest.ini_options]
+# utils/ scripts import each other as top-level modules (run as `python utils/x.py`).
+pythonpath = ["utils"]
+testpaths = ["tests"]

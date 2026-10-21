@@ -27,11 +27,12 @@ from __future__ import annotations
 
 import argparse
 import re
-import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
+import boto3
+from botocore.config import Config
 from deploy_targets import resolve_targets
 
 REPO = Path(__file__).resolve().parent.parent
@@ -148,51 +149,50 @@ def assert_targets_built(mapping: dict[str, str]) -> None:
         )
 
 
-def aws(*args: str) -> str:
-    return subprocess.run(
-        ["aws", *args], check=True, capture_output=True, text=True
-    ).stdout.strip()
+def s3_client():
+    """One client shared by the worker threads; boto3 clients are thread-safe.
+
+    In-process calls, not one `aws` CLI process per object: starting ~1,700
+    of those (every permalink, every bucket) was most of a deploy's runtime.
+    The connection pool matches the thread pool so no worker waits on another.
+    """
+    return boto3.client("s3", config=Config(max_pool_connections=MAX_WORKERS))
 
 
-def existing_permalinks(bucket: str) -> set[str]:
-    out = aws(
-        "s3api",
-        "list-objects-v2",
-        "--bucket",
-        bucket,
-        "--prefix",
-        f"{PERMALINK_ROOT}/",
-        "--query",
-        "Contents[].Key",
-        "--output",
-        "text",
+def existing_permalinks(s3, bucket: str) -> set[str]:
+    pages = s3.get_paginator("list_objects_v2").paginate(
+        Bucket=bucket, Prefix=f"{PERMALINK_ROOT}/"
     )
-    return {k for k in out.split() if k != "None" and PERMALINK_KEY.match(k)}
+    return {
+        obj["Key"]
+        for page in pages
+        for obj in page.get("Contents", [])
+        if PERMALINK_KEY.match(obj["Key"])
+    }
 
 
-def put_permalink(bucket: str, code: str, target: str) -> None:
-    aws(
-        "s3api",
-        "put-object",
-        "--bucket",
-        bucket,
-        "--key",
-        f"talks/{code}/index.html",
-        "--website-redirect-location",
-        target,
-        "--content-length",
-        "0",
+def put_permalink(s3, bucket: str, code: str, target: str) -> None:
+    s3.put_object(
+        Bucket=bucket,
+        Key=f"talks/{code}/index.html",
+        WebsiteRedirectLocation=target,
+        Body=b"",
     )
 
 
-def delete_permalink(bucket: str, key: str) -> None:
-    aws("s3api", "delete-object", "--bucket", bucket, "--key", key)
+def delete_permalink(s3, bucket: str, key: str) -> None:
+    s3.delete_object(Bucket=bucket, Key=key)
 
 
-def reconcile(bucket: str, mapping: dict[str, str]) -> None:
-    """Make the bucket's permalinks match the mapping exactly."""
+def reconcile(s3, bucket: str, mapping: dict[str, str]) -> None:
+    """Make the bucket's permalinks match the mapping exactly.
+
+    Every permalink is rewritten, not only the ones that look changed:
+    listing does not return the redirect target, so finding the changed ones
+    would cost one request per key anyway, and rewriting is idempotent.
+    """
     wanted = {f"talks/{code}/index.html" for code in mapping}
-    stale = sorted(existing_permalinks(bucket) - wanted)
+    stale = sorted(existing_permalinks(s3, bucket) - wanted)
 
     print(f"::group::permalinks -> s3://{bucket}", flush=True)
     print(f"  {len(mapping)} permalinks, {len(stale)} stale", flush=True)
@@ -200,8 +200,12 @@ def reconcile(bucket: str, mapping: dict[str, str]) -> None:
         print(f"  delete {key}", flush=True)
 
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
-        list(pool.map(lambda kv: put_permalink(bucket, kv[0], kv[1]), mapping.items()))
-        list(pool.map(lambda key: delete_permalink(bucket, key), stale))
+        list(
+            pool.map(
+                lambda kv: put_permalink(s3, bucket, kv[0], kv[1]), mapping.items()
+            )
+        )
+        list(pool.map(lambda key: delete_permalink(s3, bucket, key), stale))
 
     print("::endgroup::", flush=True)
 
@@ -231,8 +235,9 @@ def main() -> int:
         )
         return 0
 
+    s3 = s3_client()
     for bucket in resolve_targets():
-        reconcile(bucket, mapping)
+        reconcile(s3, bucket, mapping)
     return 0
 
 
