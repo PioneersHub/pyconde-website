@@ -24,6 +24,13 @@ on:
         type: string
         default: all
 
+# Queues with main.yml so the two never write to the buckets at once. The
+# settings must match there; see main.yml for why each one is needed.
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+  queue: max
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -31,6 +38,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          # The branch tip when this run starts, not github.sha — a queued run
+          # may start after newer commits, and must not publish older content.
+          ref: ${{ github.ref }}
 
       - name: Setting up python
         uses: actions/setup-python@v5
