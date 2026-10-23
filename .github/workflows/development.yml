@@ -11,6 +11,10 @@ permissions:
 
 jobs:
   build:
+    # Only people run builds, never bots or GitHub Apps: an app's sender type
+    # is 'Bot'. Fork PRs from outside the organization additionally wait for
+    # a team member to approve the run (repository Actions setting).
+    if: github.event.sender.type == 'User'
     runs-on: ubuntu-latest
 
     steps:
@@ -33,7 +37,6 @@ jobs:
         run: make build BUILD_MODE=current
 
       - name: Save staging website
-        if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
         uses: actions/upload-artifact@v4
         with:
           name: staging-site

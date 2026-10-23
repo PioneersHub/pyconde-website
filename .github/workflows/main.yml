@@ -38,6 +38,9 @@ concurrency:
 
 jobs:
   build:
+    # Only people deploy, never bots or GitHub Apps (sender type 'Bot'). A
+    # bot's push to main goes live with the nightly scheduled run instead.
+    if: github.event_name == 'schedule' || github.event.sender.type == 'User'
     runs-on: ubuntu-latest
 
     steps:

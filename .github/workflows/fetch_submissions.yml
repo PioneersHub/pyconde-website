@@ -20,6 +20,9 @@ on:
 
 jobs:
   fetch_submissions:
+    # Only people or the cron run this, never bots or GitHub Apps (sender
+    # type 'Bot').
+    if: github.event_name == 'schedule' || github.event.sender.type == 'User'
     runs-on: ubuntu-latest
     permissions:
       contents: write
