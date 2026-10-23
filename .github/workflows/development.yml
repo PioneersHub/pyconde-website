@@ -11,9 +11,9 @@ permissions:
 
 jobs:
   build:
-    # Only people run builds, never bots or GitHub Apps: an app's sender type
-    # is 'Bot'. Fork PRs from outside the organization additionally wait for
-    # a team member to approve the run (repository Actions setting).
+    # Skips events sent by bots and GitHub Apps (sender type 'Bot'). Fork PRs
+    # from outside the organization also wait for a team member to approve
+    # the run. See docs/deployment.md, "Who can trigger a run".
     if: github.event.sender.type == 'User'
     runs-on: ubuntu-latest
 

@@ -20,8 +20,8 @@ on:
 
 jobs:
   fetch_submissions:
-    # Only people or the cron run this, never bots or GitHub Apps (sender
-    # type 'Bot').
+    # Skips events sent by bots and GitHub Apps (sender type 'Bot'); scheduled
+    # runs are exempt. See docs/deployment.md, "Who can trigger a run".
     if: github.event_name == 'schedule' || github.event.sender.type == 'User'
     runs-on: ubuntu-latest
     permissions:

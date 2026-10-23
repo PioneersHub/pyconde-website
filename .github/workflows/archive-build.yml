@@ -33,7 +33,8 @@ concurrency:
 
 jobs:
   build:
-    # Only people deploy, never bots or GitHub Apps (sender type 'Bot').
+    # Skips events sent by bots and GitHub Apps (sender type 'Bot').
+    # See docs/deployment.md, "Who can trigger a run".
     if: github.event.sender.type == 'User'
     runs-on: ubuntu-latest
 
