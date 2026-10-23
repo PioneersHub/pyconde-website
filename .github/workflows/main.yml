@@ -38,6 +38,10 @@ concurrency:
 
 jobs:
   build:
+    # Skips events sent by bots and GitHub Apps (sender type 'Bot'); scheduled
+    # runs are exempt, so a bot's push to main goes live with the nightly run.
+    # See docs/deployment.md, "Who can trigger a run".
+    if: github.event_name == 'schedule' || github.event.sender.type == 'User'
     runs-on: ubuntu-latest
 
     steps:

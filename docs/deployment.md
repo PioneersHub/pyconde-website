@@ -38,10 +38,12 @@ search can never silently fall behind.
 | Trigger | Workflow | What it updates | Duration |
 | --- | --- | --- | --- |
 | Manual dispatch | `routing-config.yml` | The buckets' website configuration (`/latest/` alias, 404 handling) — no page content | ~30 s |
-| Manual dispatch | `fetch_submissions.yml` | Pulls talks/speakers from Pretalx and **commits** them, which then triggers operation 1 | — |
-| Push to `development`, or a PR to `main` | `development.yml` | The staging bucket only. Never production. | ~2.5 min |
+| Manual dispatch | `fetch_submissions.yml` | Pulls talks/speakers from Pretalx and **commits** them. A commit pushed with the workflow's `GITHUB_TOKEN` starts no workflow, so it goes live with the next push or the nightly run of operation 1 | — |
+| Push to `development`, or a same-repository PR to `main` | `development.yml` | Builds, then uploads to the staging bucket only. Never production. | ~2.5 min |
+| A fork PR to `main` | `development.yml` | Nothing — it builds only. See [Who can trigger a run](#who-can-trigger-a-run). | ~1 min |
 
-Durations are measured from real runs on 2026-08-04. `fetch_submissions.yml` has
+Durations are measured from real runs on 2026-08-04; the fork-PR build from
+one on 2026-10-22. `fetch_submissions.yml` has
 no recent successful run to measure; its cron is commented out between conference
 cycles, so it only runs on dispatch.
 
@@ -228,6 +230,54 @@ Prefer the workflows. If you must, use the same script CI uses — a bare
 make build BUILD_MODE=full
 python utils/deploy_to_s3.py --scope full        # add --dry-run to preview
 ```
+
+## Who can trigger a run
+
+The intent is that builds and deploys run only for people we trust — anyone in
+the PioneersHub organization — never for bots or outsiders. Organization
+membership is not enforced as such: only the fork-PR approval setting looks at
+it, and only for fork PRs. The three mechanisms below approximate the intent:
+
+- **Fork PRs need approval from outside the organization.** The repository's
+  Actions setting *Approval for running fork pull request workflows* is
+  **Require approval for all external contributors**. A fork PR from someone
+  who is not an organization member builds only after a team member clicks
+  **Approve and run**. Review the PR's changes to `.github/` before approving:
+  a `pull_request` run uses the workflow files from the PR itself.
+- **Fork PRs only build.** The `development.yml` build job gets a read-only
+  `GITHUB_TOKEN` and no AWS credentials. The separate `staging` job, which
+  holds the AWS keys and comments on the PR, runs only for pushes to
+  `development` and PRs from a branch in this repository — that is, from
+  someone with write access. A fork PR, even an approved one or one from an
+  organization member, never deploys to staging.
+- **Jobs skip bot events.** Every workflow's job runs only when
+  `github.event.sender.type == 'User'`. An event sent by a bot or GitHub App
+  (Renovate, Claude, Cursor, `github-actions[bot]`, …) still creates a
+  workflow run, but its job is skipped. A bot's push to `main` therefore goes
+  live with the nightly run, not straight away. The check tells people from
+  bots; it does not check whether that person is in the organization.
+
+Deliberate exceptions:
+
+- **Scheduled runs** of `main.yml` (and of `fetch_submissions.yml` once its
+  cron is re-enabled) are exempt from the sender check.
+- **Automation using a person's credentials** — a personal access token or an
+  app's user access token — is sent as that `User` and runs.
+- **Re-runs** started by an app with Actions write permission run; the check
+  looks at the original event's sender, not at who re-ran it.
+
+Do not use `pull_request_target` here. It runs whatever the approval setting,
+with the repository's secrets and a `GITHUB_TOKEN` whose permissions come from
+the workflow's `permissions:` block or the repository default (currently
+write). Checking out and running PR code in it hands those to whoever opened
+the PR. `actions/checkout` refuses to check out a fork's code in this event
+unless `allow-unsafe-pr-checkout: true` is set; do not treat that guard as the
+safeguard.
+
+These mechanisms decide who can *start* a job. They do not isolate the AWS
+credentials: they are repository secrets, available to any workflow on a
+branch pushed to this repository, including workflows edited by an app with
+`workflows: write` access.
 
 ## Secrets and permissions
 
