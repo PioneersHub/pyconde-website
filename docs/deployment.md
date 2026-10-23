@@ -233,9 +233,10 @@ python utils/deploy_to_s3.py --scope full        # add --dry-run to preview
 
 ## Who can trigger a run
 
-Builds and deploys are meant to run only for people we trust — anyone in the
-PioneersHub organization — never for bots or outsiders. Three mechanisms
-enforce this:
+The intent is that builds and deploys run only for people we trust — anyone in
+the PioneersHub organization — never for bots or outsiders. Organization
+membership is not enforced as such: only the fork-PR approval setting looks at
+it, and only for fork PRs. The three mechanisms below approximate the intent:
 
 - **Fork PRs need approval from outside the organization.** The repository's
   Actions setting *Approval for running fork pull request workflows* is
@@ -253,7 +254,8 @@ enforce this:
   `github.event.sender.type == 'User'`. An event sent by a bot or GitHub App
   (Renovate, Claude, Cursor, `github-actions[bot]`, …) still creates a
   workflow run, but its job is skipped. A bot's push to `main` therefore goes
-  live with the nightly run, not straight away.
+  live with the nightly run, not straight away. The check tells people from
+  bots; it does not check whether that person is in the organization.
 
 Deliberate exceptions:
 
@@ -264,9 +266,18 @@ Deliberate exceptions:
 - **Re-runs** started by an app with Actions write permission run; the check
   looks at the original event's sender, not at who re-ran it.
 
-Never use `pull_request_target` here. It runs with the repository's secrets
-and a write token whatever the approval setting, so checking out PR code in it
-hands both to whoever opened the PR.
+Do not use `pull_request_target` here. It runs whatever the approval setting,
+with the repository's secrets and a `GITHUB_TOKEN` whose permissions come from
+the workflow's `permissions:` block or the repository default (currently
+write). Checking out and running PR code in it hands those to whoever opened
+the PR. `actions/checkout` refuses to check out a fork's code in this event
+unless `allow-unsafe-pr-checkout: true` is set; do not treat that guard as the
+safeguard.
+
+These mechanisms decide who can *start* a job. They do not isolate the AWS
+credentials: they are repository secrets, available to any workflow on a
+branch pushed to this repository, including workflows edited by an app with
+`workflows: write` access.
 
 ## Secrets and permissions
 
