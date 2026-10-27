@@ -150,13 +150,13 @@ promo_images:
 
 ## Photo Grid — `macros/photo-grid.html`
 
-Captioned photos in a responsive grid: two columns from 640px up, one on phones. Every tile is cropped to 3:2, so the grid keeps its shape while images load. Used for the booth photos on `/sponsoring/`.
+Captioned photos in a responsive grid: two columns from 640px up, one on phones. Every tile is cropped to 3:2, so the grid keeps its shape while images load. Used on `/sponsoring/` for photos of sponsored talks, panels and booths.
 
 **Usage:**
 
 ```jinja2
 {% from "macros/photo-grid.html" import render_photo_grid %}
-{{ render_photo_grid(bag('sponsoring_gallery'), section_label='Sponsor booths') }}
+{{ render_photo_grid(bag('sponsoring_gallery'), section_label='Sponsoring formats') }}
 ```
 
 **Parameters:**
@@ -170,13 +170,13 @@ Captioned photos in a responsive grid: two columns from 640px up, one on phones.
 
 ```yaml
 display: true                    # false hides the section
-title: Meet the community at your booth
+title: On stage and on the floor
 teaser: One line below the heading
 image_dir: /static/media/sponsoring
 images:                          # shown in this order
-  - file: booth-merck.jpg        # required, inside image_dir
+  - file: sponsored-talk.jpg     # required, inside image_dir
     alt: What the photo shows    # required
-    caption: Merck               # optional
+    caption: Sponsored talks     # optional
 ```
 
 **Maintaining the photos:** put the file in `assets/static/media/sponsoring/`, then add, move or remove its entry
