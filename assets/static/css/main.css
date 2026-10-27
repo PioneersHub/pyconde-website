@@ -2268,6 +2268,104 @@ a.newsletter.cta {
     transform: translateY(-1px);
 }
 
+/* With photos: slideshow above the text on phones, left of it from 800px. */
+.sponsoring-cta--with-photos .sponsoring-cta__layout {
+    display: grid;
+    gap: var(--space-lg);
+}
+
+@media screen and (min-width: 800px) {
+    .sponsoring-cta--with-photos .sponsoring-cta__layout {
+        grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+        gap: var(--space-xl);
+        align-items: center;
+    }
+}
+
+/* ─── Photo Slideshow — crossfading captioned photos ───── */
+
+/* Caption and dots take the section's text colour (currentColor), so
+   the slideshow reads on any section background. */
+
+/* Slides share one grid cell, so the box is as tall as the tallest
+   slide (caption included) and nothing jumps while they fade. */
+.photo-slideshow__slides {
+    display: grid;
+}
+
+.photo-slideshow__slide {
+    grid-area: 1 / 1;
+    margin: 0;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+}
+
+.photo-slideshow__slide.active {
+    opacity: 1;
+}
+
+.photo-slideshow__slide img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    border-radius: 6px;
+    background: var(--neutral-200);
+}
+
+.photo-slideshow__slide figcaption {
+    margin-top: var(--space-xs);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: inherit;
+}
+
+.photo-slideshow__dots {
+    display: flex;
+    gap: 0.25rem;
+    margin-top: var(--space-xs);
+    /* Pull the 24px hit areas flush with the photo's left edge */
+    margin-left: -7px;
+}
+
+/* 24px hit area around a 10px dot */
+.photo-slideshow__dot {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+}
+
+.photo-slideshow__dot::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    box-sizing: border-box;
+}
+
+.photo-slideshow__dot.active::before {
+    background: currentColor;
+}
+
+.photo-slideshow__dot:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 1px;
+    border-radius: 50%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .photo-slideshow__slide {
+        transition: none;
+    }
+}
+
 /* ─── Key Dates — bold on dark background ─────────────── */
 
 .keydates {

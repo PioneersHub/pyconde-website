@@ -32,13 +32,14 @@
 {% set has_slideshow = intro_data.hero_images and intro_data.hero_images | length > 0 %}
 {% set image_dir = intro_data.hero_image_dir | default('/static/media/hero_images') %}
 
-<section class="intro"{{ ' data-hero-slideshow' if has_slideshow }} aria-label="{{ section_label }}">
+<section class="intro" aria-label="{{ section_label }}">
 
   {% if has_slideshow %}
-  <div class="intro__slideshow" aria-hidden="true">
+  <div class="intro__slideshow" aria-hidden="true"
+       data-slideshow data-slideshow-interval="6000" data-slideshow-shuffle>
     {% for image in intro_data.hero_images %}
     {% set base_name = image.rsplit('.', 1)[0] %}
-    <picture class="intro__slide">
+    <picture class="intro__slide{{ ' active' if loop.first }}" data-slide>
       <source srcset="{{ image_dir }}/{{ base_name }}.webp" type="image/webp" />
       <img src="{{ image_dir }}/{{ image }}"
            alt=""
