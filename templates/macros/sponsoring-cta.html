@@ -1,38 +1,50 @@
 {#
   Sponsoring CTA
   ──────────────
-  Call-to-action section for sponsoring opportunities.
+  Call-to-action section for sponsoring opportunities, optionally with a
+  photo slideshow to the left of the text (stacked above it on phones).
 
   Usage:
     {% from "macros/sponsoring-cta.html" import render_sponsoring_cta %}
-    {{ render_sponsoring_cta(bag('sponsoring_cta')) }}
+    {{ render_sponsoring_cta(bag('frontpage/sections/sponsoring')) }}
 
   Parameters:
-    data          – full databag dict with title, body, link_text, link_url
+    data          – full databag dict with title, body, link_text, link_url, photos
     section_label – accessible label (default: 'Sponsoring')
 
-  Databag schema (sponsoring_cta.yaml):
+  Databag schema (frontpage/sections/sponsoring.yaml):
     title: "Sponsoring"
     body: "Reach 2,000+ Python & AI professionals..."
     link_text: "Explore sponsoring opportunities"
     link_url: /sponsoring/
+    photos: sponsoring_gallery   # optional — name of the databag with the
+                                 # photos; omit for a text-only section
 #}
+
+{% from "macros/photo-slideshow.html" import render_photo_slideshow %}
 
 {% macro render_sponsoring_cta(data, section_label='Sponsoring') %}
 
 {% if data and data.body %}
 
-<section class="sponsoring-cta" aria-label="{{ section_label }}">
-  <div class="content">
-    {% if data.title %}
-    <h2 class="sponsoring-cta__title">{{ data.title }}</h2>
+{% set gallery = bag(data.photos) if data.photos %}
+
+<section class="sponsoring-cta{{ ' sponsoring-cta--with-photos' if gallery }}" aria-label="{{ section_label }}">
+  <div class="content sponsoring-cta__layout">
+    {% if gallery %}
+    {{ render_photo_slideshow(gallery, interval_ms=6000, section_label='Sponsoring formats') }}
     {% endif %}
-    <p class="sponsoring-cta__body">{{ data.body }}</p>
-    {% if data.link_text and data.link_url %}
-    <a href="{{ data.link_url }}" class="sponsoring-cta__link">
-      {{ data.link_text }}
-    </a>
-    {% endif %}
+    <div class="sponsoring-cta__text">
+      {% if data.title %}
+      <h2 class="sponsoring-cta__title">{{ data.title }}</h2>
+      {% endif %}
+      <p class="sponsoring-cta__body">{{ data.body }}</p>
+      {% if data.link_text and data.link_url %}
+      <a href="{{ data.link_url }}" class="sponsoring-cta__link">
+        {{ data.link_text }}
+      </a>
+      {% endif %}
+    </div>
   </div>
 </section>
 
