@@ -1,4 +1,6 @@
 {% extends "layout.html" %}
+{% from "macros/why-attend.html" import render_why_attend %}
+{% from "macros/photo-grid.html" import render_photo_grid %}
 
 {% block title %}{{ this.title }}{% endblock %}
 
@@ -8,7 +10,7 @@
     <div class="subsite-title">
         <section class="content">
             <h1>{{ this.title }}</h1>
-            <p class="subtitle">{{ this.subtitle }}</p>
+            {% if this.subtitle %}<p class="subtitle">{{ this.subtitle }}</p>{% endif %}
         </section>
     </div>
 </div>
@@ -18,6 +20,19 @@
         {{ this.body|shift_headings }}
     </div>
 </section>
+
+{# Same numbers as the homepage section; its display flag only governs the homepage. #}
+{{ render_why_attend(bag('frontpage/sections/why_attend'), section_label='PyCon DE in numbers') }}
+
+{{ render_photo_grid(bag('sponsoring_gallery'), section_label='Sponsoring formats') }}
+
+{% if this.form_intro %}
+<section class="subsite content-block--red-light">
+    <div class="content">
+        <p>{{ this.form_intro }}</p>
+    </div>
+</section>
+{% endif %}
 
 <section class="content embedded">
     <iframe src="{{ this.url }}" frameborder="0" scrolling="auto" allowfullscreen
