@@ -1,0 +1,452 @@
+# ──────────────────────────────────────────────────────────────
+# PyCon DE 2027 — social-card brand specification
+# ──────────────────────────────────────────────────────────────
+#
+# Single source of truth for everything the card engine may draw.
+# Event facts (name, dates, venue) are NOT repeated here: they are read
+# from databags/branding.yaml so cards and website can never disagree.
+#
+# Every rule carries its provenance:
+#   verified  — taken from the 2027 website CSS, the live site, or the
+#               official 2027 asset files
+#   inherited — from the 2026 design guide (design_guidelines/), still
+#               consistent with the 2027 palette, not re-confirmed for 2027
+#   provisional — no 2027 source exists; a conservative working rule.
+#               Replace it when the design rules define it.
+#
+# tests/test_social_cards_brand.py checks the palette against
+# assets/static/css/main.css so the two cannot drift.
+# ──────────────────────────────────────────────────────────────
+
+edition: 2027
+
+# Strings that must never appear on a 2027 card (verified: naming rule in
+# design_guidelines/design-system.json `naming`, venue from branding.yaml,
+# ticket categories are "Standard" and "Personal").
+forbidden_terms:
+  - pattern: "PyData"
+    reason: "2027 is 'PyCon DE 2027'; 'PyCon DE & PyData' is archive-only"
+  - pattern: "PyConDE"
+    reason: "the name is written with a space: 'PyCon DE'"
+  - pattern: "Darmstadt|Berlin"
+    reason: "2027 takes place at HCC Heidelberg"
+  - pattern: "(?i)\\breduced\\b|\\berm(ä|ae)(ss|ß)igt"
+    reason: "ticket categories are Standard and Personal, never 'reduced'"
+
+# ── Colour ───────────────────────────────────────────────────
+# verified: assets/static/css/main.css :root, logo SVG fills.
+palette:
+  orange: "#ff9b00"
+  yellow: "#fac800"
+  lime: "#96dc00"
+  cyan: "#00c8e1"
+  blue: "#3778be"
+  green: "#00aa41"
+  silver: "#b7bcbf"
+  coral: "#e54f53"
+  red: "#c41011"
+  pink: "#e199c3"
+  magenta: "#d14190"
+  light_blue: "#a2d9ef"
+  light_lime: "#d5f199"
+  white: "#ffffff"
+  # verified: --text-primary
+  ink: "#111111"
+  # verified: .keydates background
+  ink_field: "#1a1a1a"
+
+# CSS custom property for every palette entry that main.css defines, used by
+# the drift test. ink_field is a literal in main.css, not a variable.
+css_tokens:
+  orange: --orange
+  yellow: --yellow
+  lime: --green-light
+  cyan: --blue-light
+  blue: --blue
+  green: --green
+  silver: --grey
+  coral: --red-light
+  red: --red
+  pink: --pink-light
+  magenta: --pink
+  light_blue: --blue-lighter
+  light_lime: --green-lighter
+  white: --white
+  ink: --text-primary
+
+# Colour fields a card may sit on, with the only text and logo colours
+# allowed on each. verified: live-site sections — intro/tickets/sponsoring
+# blue + white, newsletter green + white, masterclasses orange + ink,
+# why-attend yellow (ink for running text, blue for the monogram), blog
+# white + ink, key dates #1a1a1a + white. §02: no text on silver, so silver,
+# cyan and lime are never text fields.
+fields:
+  blue:
+    text: white
+    accent: yellow        # non-text accents only (CTA plate, spine): 2.9:1
+    logo: [white]
+  green:
+    text: white
+    accent: yellow
+    logo: [white]
+  orange:
+    text: ink
+    accent: white
+    logo: [black]
+  yellow:
+    text: ink
+    accent: blue
+    logo: [blue, black]
+  white:
+    text: ink
+    accent: blue          # speaker names: 4.57:1
+    logo: [black, blue]
+  ink_field:
+    text: white
+    accent: yellow
+    logo: [white, yellow]
+
+# Minimum WCAG contrast for any text. All card text is set at "large text"
+# sizes (≥ 18.66 px bold equivalent), where WCAG AA asks for 3:1.
+min_text_contrast: 3.0
+
+# Seven-colour brand bar. verified: main.css .brand-bar, Design Rules §05 —
+# order and colours are fixed. Used only on white and ink fields, where all
+# seven segments stay visible.
+brand_bar:
+  order: [yellow, cyan, blue, green, orange, lime, silver]
+  fields: [white, ink_field]
+
+# Accent spine (verified: §06 card accent bar, .keydates__item border-left).
+spine_colors: [blue, orange, green, yellow, cyan, lime, magenta, red]
+
+# Forbidden text-on-field pairs. inherited: 2026 design guide.
+forbidden_pairs:
+  - [orange, yellow]
+  - [orange, cyan]
+  - [orange, silver]
+  - [yellow, orange]
+  - [yellow, lime]
+  - [yellow, silver]
+  - [lime, yellow]
+  - [lime, cyan]
+  - [lime, silver]
+  - [cyan, orange]
+  - [cyan, lime]
+  - [cyan, silver]
+  - [blue, green]
+  - [green, blue]
+  - [silver, yellow]
+  - [silver, lime]
+  - [silver, cyan]
+
+# ── Typography ───────────────────────────────────────────────
+# verified: the live site renders IBM Plex Sans 400/500/600/700 (computed
+# styles, 2026-10-27); these are the shipped, OFL-licensed files.
+fonts:
+  regular: assets/static/fonts/IBMPlexSans-Regular.ttf
+  medium: assets/static/fonts/IBMPlexSans-Medium.ttf
+  semibold: assets/static/fonts/IBMPlexSans-SemiBold.ttf
+  bold: assets/static/fonts/IBMPlexSans-Bold.ttf
+
+# Text roles. Sizes are px on a 1200 px wide canvas and scale with the
+# format's `type_scale`. verified: display 700 / line-height 1.02 /
+# tracking −0.02em (.intro__headline); labels 700 caps tracking 0.08em
+# (.intro__cta, .latest-videos__all). Leading opens up at smaller sizes,
+# where 1.02 would let ascenders and descenders touch.
+roles:
+  headline:
+    font: bold
+    sizes: [132, 116, 104, 92, 84, 76, 68, 60, 54, 48]
+    leading: {at_large: 1.02, at_small: 1.1, large: 92, small: 48}
+    tracking: {at_large: -0.02, at_small: -0.01, large: 92, small: 48}
+    max_lines: 5
+  kicker:
+    font: bold
+    size: 24
+    leading: 1.2
+    tracking: 0.08
+    uppercase: true
+  subline:
+    font: medium
+    sizes: [34, 30, 27]
+    leading: 1.24
+    tracking: -0.005
+    max_lines: 3
+  speaker:
+    font: bold
+    sizes: [38, 34, 30, 27]
+    leading: 1.18
+    tracking: -0.01
+    max_lines: 4
+  meta:
+    font: medium
+    size: 26
+    leading: 1.3
+    tracking: 0.0
+  meta_strong:
+    font: bold
+    size: 26
+    leading: 1.3
+    tracking: 0.0
+  date:
+    font: bold
+    sizes: [44, 40, 36, 33, 30, 27, 24]
+    leading: 1.2
+    tracking: -0.005
+  date_label:
+    font: medium
+    sizes: [34, 31, 28, 26, 24, 22, 20]
+    leading: 1.2
+    tracking: -0.005
+  cta:
+    font: bold
+    size: 24
+    leading: 1.0
+    tracking: 0.08
+    uppercase: true
+
+# Hard floor for any role, px at the 1200 px reference.
+min_text_px: 20
+
+# Hierarchy the critique rewards (headline / next level).
+hierarchy:
+  headline_to_secondary_min: 1.6
+  headline_to_secondary_ideal: 2.4
+
+# Line breaking. Words a line should not end on (EN + DE).
+line_breaking:
+  weak_line_endings:
+    - a
+    - an
+    - the
+    - of
+    - in
+    - "on"
+    - at
+    - to
+    - for
+    - with
+    - and
+    - or
+    - by
+    - from
+    - as
+    - is
+    - vs
+    - via
+    - into
+    - your
+    - our
+    - my
+    - how
+    - "&"
+    - der
+    - die
+    - das
+    - den
+    - dem
+    - des
+    - ein
+    - eine
+    - einen
+    - einem
+    - einer
+    - und
+    - oder
+    - mit
+    - von
+    - für
+    - im
+    - am
+    - auf
+    - zu
+    - zum
+    - zur
+    - bei
+    - aus
+    - nach
+    - über
+    - vor
+    - wie
+  # A line ending in one of these reads as a natural pause.
+  strong_line_endings: [":", "—", "–", ",", "?", "!", ";"]
+  # The last line of a multi-line headline must reach this share of the
+  # longest line; a single-word last line is never accepted.
+  min_last_line_ratio: 0.33
+
+# ── Logo ─────────────────────────────────────────────────────
+# verified: assets/static/logo-2027/ — the official 2027 monogram in nine
+# colours. Used as-is; only uniform scaling is allowed.
+logo:
+  files:
+    orange: "assets/static/logo-2027/Logo 1 VO.svg"
+    yellow: "assets/static/logo-2027/Logo 2 VY.svg"
+    lime: "assets/static/logo-2027/Logo 3 VLG.svg"
+    cyan: "assets/static/logo-2027/Logo 4 VLB.svg"
+    blue: "assets/static/logo-2027/Logo 5 VDB.svg"
+    green: "assets/static/logo-2027/Logo 6 VDG.svg"
+    white: "assets/static/logo-2027/Logo 7 VW.svg"
+    silver: "assets/static/logo-2027/Logo 8 VS.svg"
+    black: "assets/static/logo-2027/Logo 10 VB.svg"
+  # provisional: the 2026 clear-space rule (one wordmark line) has no
+  # equivalent on the 2027 monogram. Clear space = this share of logo width.
+  clear_space_ratio: 0.25
+  # Smallest permitted logo height, px at the 1200 px reference.
+  min_height: 110
+
+# ── Illustration ─────────────────────────────────────────────
+# verified: assets/static/pythons/ — official python artwork. Their body
+# colours exclude blue: they are drawn for the blue field (§05, blog
+# fallback). On another field a python is only allowed when none of its
+# body colours equals the field colour.
+pythons:
+  directory: assets/static/pythons
+  # Share of opaque pixels a palette colour needs to count as a body colour.
+  body_color_threshold: 0.02
+
+# ── Photography ──────────────────────────────────────────────
+# provisional: no 2027 photo rule exists. Photos are used unaltered,
+# cropped to a square-cornered panel. The vertical focus follows the
+# website hero (object-position: center 30%).
+photo:
+  default_focus_y: 0.3
+  # A photo may be enlarged at most this much at export size; softer
+  # images are rejected rather than published blurry.
+  max_upscale: 1.5
+
+# ── CTA plate ────────────────────────────────────────────────
+# verified: §06 primary button — yellow fill, ink text, 2 px ink border,
+# square corners, padding 0.8em × 2.2em. On a yellow field the plate would
+# vanish; there the §06 default applies ("default buttons are black on a
+# primary", .latest-videos__all).
+cta:
+  fill: yellow
+  text: ink
+  border: ink
+  border_px: 3
+  padding_em: [0.8, 2.2]
+  on_matching_field:
+    fill: ink
+    text: white
+    border: ink
+
+# ── Formats ──────────────────────────────────────────────────
+# OG matches templates/layout.html (1200×630) and is exported at 2×.
+# Safe areas for stories keep text clear of the platform UI.
+formats:
+  og:
+    size: [1200, 630]
+    export_scale: 2
+    type_scale: 1.0
+    unit: 12
+    margin_units: 5
+    safe_top: 0
+    safe_bottom: 0
+  square:
+    size: [1080, 1080]
+    export_scale: 1
+    type_scale: 0.95
+    unit: 10.8
+    margin_units: 7
+    safe_top: 0
+    safe_bottom: 0
+  portrait:
+    size: [1080, 1350]
+    export_scale: 1
+    type_scale: 0.95
+    unit: 10.8
+    margin_units: 7
+    safe_top: 0
+    safe_bottom: 0
+  story:
+    size: [1080, 1920]
+    export_scale: 1
+    type_scale: 1.0
+    unit: 10.8
+    margin_units: 7
+    safe_top: 220
+    safe_bottom: 320
+
+# Spacing in grid units.
+spacing:
+  xs: 1
+  sm: 2
+  md: 3
+  lg: 5
+  xl: 8
+
+# Decorative element sizes, in grid units.
+decoration:
+  spine_width: 1.25
+  brand_bar_height: 1.25
+
+# Fields each strategy may use, whatever the category allows. verified:
+# spine cards appear on white (sessions, masterclasses) and on the
+# key-dates ink; python artwork on the blue field (§05, blog fallback).
+strategy_fields:
+  spine: [white, ink_field]
+  python: [blue]
+  dates: [ink_field]
+
+# ── Categories ───────────────────────────────────────────────
+# `fields` lists permitted fields, best first. The first entries are the
+# field the website uses for the same content (verified: section colours).
+categories:
+  announcement:
+    label: {en: "", de: ""}
+    strategies: [field, python]
+    fields: [blue, yellow, green]
+  keynote:
+    label: {en: Keynote, de: Keynote}
+    strategies: [portrait, field]
+    fields: [blue, ink_field]
+  talk:
+    label: {en: Talk, de: Vortrag}
+    strategies: [spine]
+    fields: [white, ink_field]
+  speaker_spotlight:
+    label: {en: Speaker spotlight, de: Speaker im Porträt}
+    strategies: [portrait, spine]
+    fields: [blue, green, white]
+  cfp:
+    label: {en: Call for Proposals, de: Call for Proposals}
+    strategies: [field, python]
+    fields: [blue, yellow, orange]
+  tickets:
+    label: {en: Tickets, de: Tickets}
+    strategies: [field]
+    fields: [blue, yellow]
+  masterclass:
+    label: {en: Masterclass, de: Masterclass}
+    strategies: [field, spine, portrait]
+    fields: [orange, white]
+  sponsorship:
+    label: {en: Sponsoring, de: Sponsoring}
+    strategies: [field, python]
+    fields: [blue]
+  community:
+    label: {en: Community, de: Community}
+    strategies: [field, python, portrait]
+    fields: [green, blue]
+  volunteers:
+    label: {en: Volunteers, de: Volunteers}
+    strategies: [field, python, portrait]
+    fields: [green, blue]
+  schedule:
+    label: {en: Schedule, de: Programm}
+    strategies: [dates, field, python]
+    fields: [ink_field, blue]
+  dates:
+    label: {en: Key dates, de: Wichtige Termine}
+    strategies: [dates]
+    fields: [ink_field]
+  news:
+    label: {en: News, de: News}
+    strategies: [python, spine, field]
+    fields: [blue, white]
+
+# Month names for event-fact formatting (dates come from branding.yaml).
+months:
+  en: [January, February, March, April, May, June, July, August, September, October, November, December]
+  de: [Januar, Februar, März, April, Mai, Juni, Juli, August, September, Oktober, November, Dezember]
