@@ -78,7 +78,16 @@ serve: build
 	$(RUN) python -m http.server 0 --bind 127.0.0.1 --directory site
 fetch-submissions:
 	$(RUN) python utils/talks.py
-	$(RUN) python utils/social_card_img_gen.py
+	$(RUN) --extra cards python utils/social_card_img_gen.py
+# Render social cards from a card file:
+#   make social-cards CARDS=path/to/cards.yaml OUT=path/to/dir
+# The validation set lives in tests/social_cards/cards.yaml.
+social-cards:
+	@if [ -z "$(CARDS)" ] || [ -z "$(OUT)" ]; then \
+		echo "Usage: make social-cards CARDS=cards.yaml OUT=dir"; \
+		exit 2; \
+	fi
+	$(RUN) --extra cards python utils/render_social_cards.py $(CARDS) --out $(OUT) --sheet $(OUT)/contact-sheet.png
 sponsor-pages:
 	$(RUN) python utils/sponsors.py
 	@new_files=$$(git ls-files --others --exclude-standard content/sponsors/); \
