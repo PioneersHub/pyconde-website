@@ -148,6 +148,44 @@ promo_images:
 
 ---
 
+## Photo Grid — `macros/photo-grid.html`
+
+Captioned photos in a responsive grid: two columns from 640px up, one on phones. Every tile is cropped to 3:2, so the grid keeps its shape while images load. Used for the booth photos on `/sponsoring/`.
+
+**Usage:**
+
+```jinja2
+{% from "macros/photo-grid.html" import render_photo_grid %}
+{{ render_photo_grid(bag('sponsoring_gallery'), section_label='Sponsor booths') }}
+```
+
+**Parameters:**
+
+| Parameter       | Default      | Description                                                                 |
+|-----------------|--------------|-----------------------------------------------------------------------------|
+| `data`          | *(required)* | Full databag dict with `display`, `title`, `teaser`, `image_dir`, `images`  |
+| `section_label` | `'Photos'`   | Accessible `aria-label` for the section                                     |
+
+**Databag schema** (`sponsoring_gallery.yaml`):
+
+```yaml
+display: true                    # false hides the section
+title: Meet the community at your booth
+teaser: One line below the heading
+image_dir: /static/media/sponsoring
+images:                          # shown in this order
+  - file: booth-merck.jpg        # required, inside image_dir
+    alt: What the photo shows    # required
+    caption: Merck               # optional
+```
+
+**Maintaining the photos:** put the file in `assets/static/media/sponsoring/`, then add, move or remove its entry
+in `databags/sponsoring_gallery.yaml`. No template change is needed for any number of photos. Use landscape 3:2
+JPEGs, about 1280px wide and ideally under 200 KB; other shapes are cropped. `tests/test_sponsoring_gallery.py`
+fails if a listed file is missing or an entry has no alt text.
+
+---
+
 ## Sponsors List — `macros/sponsor.html`
 
 Renders sponsor logos grouped by tier (Keystone, Platinum, Gold, etc.). Each logo links to the sponsor's detail page.
