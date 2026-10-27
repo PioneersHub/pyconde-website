@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% from "macros/sponsor.html" import render_sponsors_list %}
+{% from "macros/sponsoring-cta.html" import render_sponsoring_cta %}
 
 {% block title %}{{ this.title }}{% endblock %}
 
@@ -9,6 +10,7 @@
     <div class="subsite-title">
         <section class="content">
             <h1>{{ this.title }}</h1>
+            <p class="subtitle">{{ this.subtitle }}</p>
         </section>
     </div>
 </div>
@@ -19,5 +21,9 @@
 
     </div>
 </section>
+
+{# Same CTA and copy as the front page section, including its display toggle #}
+{% set cta = bag('frontpage/sections/sponsoring') %}
+{% if cta and cta.display != false %}{{ render_sponsoring_cta(cta) }}{% endif %}
 
 {% endblock %}

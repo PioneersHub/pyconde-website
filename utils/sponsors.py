@@ -141,7 +141,11 @@ def json_to_dict(sponsor, _type, type_id):
     s["title"] = f"{sponsor.get('name')} - {what}"
     s["website"] = sponsor.get("website") or ""
     s["full_description"] = sponsor.get("description")
-    s["social_card_image"] = f"/sponsors/{sponsor['id']}/social_card.png"
+    # Point at the sponsor's own card only once it exists; with the field
+    # empty, layout.html shares the edition's site card instead of a 404.
+    card = f"/sponsors/{sponsor['id']}/social_card.png"
+    has_card = (Path(__file__).parents[1] / f"content{card}").is_file()
+    s["social_card_image"] = card if has_card else ""
     return s
 
 
