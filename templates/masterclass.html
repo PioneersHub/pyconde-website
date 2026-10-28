@@ -4,6 +4,10 @@
 
 {% block og_type %}event{% endblock %}
 
+{% block header %}
+<link rel="stylesheet" href="{{ '/static/css/masterclass.css'|url }}">
+{% endblock %}
+
 {% block structured_data %}
 {%- set branding = bag('branding') -%}
 {%- set host = branding['canonical_host'] -%}
@@ -57,46 +61,46 @@
 {% endblock %}
 
 {% block body %}
+{% macro booking() %}
+<section class="masterclass-booking" aria-label="Book this masterclass">
+  <div class="masterclass-container masterclass-booking__inner">
+    <p>Space is limited. Book your place.</p>
+    <a class="masterclass-booking__button" href="/buy-ticket/" aria-label="Get your ticket for {{ this.title }}">Get your ticket <span aria-hidden="true">→</span></a>
+  </div>
+</section>
+{% endmacro %}
+
 <article class="masterclass-article">
-  <header class="subsite">
-    <div class="subsite-title">
-      <section class="content">
-        <h1 class="title">{{ this.title }}</h1>
-        <p class="title trainer">by {{ this.trainer }}</p>
-        <p class="title date">{{ this.date }} · {{ this.hours }} hours</p>
-        {% if this.tags %}
-          <div class="tags">
-            {% for tag in this.tags %}
-              <span class="tag">{{ tag }}</span>
-            {% endfor %}
-          </div>
-        {% endif %}
-      </section>
+  <header class="masterclass-header">
+    <div class="masterclass-container">
+      <h1>{{ this.title }}</h1>
+      <p class="masterclass-header__trainer">{{ this.trainer }}</p>
+      <div class="masterclass-header__meta">
+        <p>{{ this.date }}</p>
+        <p class="masterclass-header__duration">{% if this.hours == '3' %}Half-day masterclass{% elif this.hours == '6' %}Full-day masterclass{% else %}Masterclass{% endif %} · {{ this.hours }} hours</p>
+      </div>
+      {% if this.tags %}
+      <ul class="masterclass-tags" aria-label="Topics">
+        {% for tag in this.tags %}
+        <li>{{ tag }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
     </div>
   </header>
 
-  <section class="content-block--blue-light cta">
-    <div class="content">
-      <p><a href="/buy-ticket/">Space is limited 👉 Get your ticket for {{ this.title }} in our ticket shop</a></p>
-    </div>
-  </section>
+  {{ booking() }}
 
-  <section class="subsite blog content-block--blue">
-    <div class="content">
-      {{ this.body|shift_headings }}
-    </div>
-  </section>
+  <div class="masterclass-container masterclass-prose">
+    {{ this.body|shift_headings }}
+  </div>
 
-  <section class="content-block--blue-light cta">
-    <div class="content">
-      <p><a href="/buy-ticket/">Space is limited 👉 Get your ticket for {{ this.title }} in our ticket shop</a></p>
-    </div>
-  </section>
+  {{ booking() }}
 
-  <section class="subsite blog content-block--green">
-    <div class="content">
-      {{ this.notes|shift_headings }}
-    </div>
-  </section>
+  {% if this.notes %}
+  <aside class="masterclass-container masterclass-prose masterclass-notes" aria-label="Additional information">
+    {{ this.notes|shift_headings }}
+  </aside>
+  {% endif %}
 </article>
 {% endblock %}
