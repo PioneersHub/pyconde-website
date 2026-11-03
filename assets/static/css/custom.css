@@ -1,17 +1,3 @@
-#zeiss {
-    margin: 0;
-    padding: 0;
-    display: block;
-}
-
-#zeiss.sponsor {
-    margin-bottom: -20px; /* Adjust this value as needed */
-}
-
-#heidelberger-druckmaschinen.sponsor {
-    transform: scale(120%);
-}
-
 /* FAQ table styles */
 .qa table {
     border-collapse: collapse;
@@ -2328,50 +2314,6 @@ footer a:hover {
     }
 }
 
-/* ── Fix: Sponsors section — dense layout, readable text ── */
-.sponsor-type {
-    margin-bottom: var(--space-md);
-}
-
-.sponsor-type h4 {
-    font-size: var(--font-size-xs);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--text-muted);
-    margin-bottom: var(--space-sm);
-    padding-bottom: var(--space-xs);
-    border-bottom: 2px solid var(--neutral-200);
-}
-
-.sponsor-logo {
-    height: 5em;
-}
-
-.sponsor-type .sponsors {
-    gap: var(--space-sm);
-    margin-bottom: var(--space-sm);
-}
-
-.keystone .sponsor-logo {
-    height: 6em;
-}
-
-.platinum .sponsor-logo,
-.diamond .sponsor-logo {
-    height: 5em;
-}
-
-.gold .sponsor-logo,
-.institutional-partners .sponsor-logo {
-    height: 4em;
-}
-
-.silver .sponsor-logo,
-.community-partners .sponsor-logo,
-.diversity-sponsors .sponsor-logo {
-    height: 3em;
-}
-
 /* Override the v4 grayscale removal — keep logos crisp */
 .sponsors .content img {
     filter: none;
@@ -2389,23 +2331,6 @@ footer a:hover {
 .landing-page--section.sponsors {
     min-height: auto !important;
     padding: var(--space-lg) 0;
-}
-
-@media screen and (min-width: 800px) {
-    .sponsor-type .sponsors {
-        gap: var(--space-sm);
-    }
-
-    .silver .sponsors,
-    .community-partners .sponsors {
-        grid-template-columns: repeat(6, 1fr);
-    }
-
-    .institutional-partners .sponsors,
-    .diversity-sponsors .sponsors,
-    .gold .sponsors {
-        grid-template-columns: repeat(5, 1fr);
-    }
 }
 
 /* ── Fix: Sponsoring page — ensure readable text on proper background ── */
@@ -2452,44 +2377,6 @@ footer a:hover {
 .landing-page--section.sponsors,
 .sponsors.content-block {
     background: #b7bcbf !important;
-}
-
-.sponsor-type {
-    margin-bottom: 4px !important;
-}
-
-.sponsor-type h4 {
-    margin-bottom: 4px !important;
-    padding-bottom: 2px !important;
-}
-
-.sponsor-type .sponsors {
-    margin-bottom: 2px !important;
-    gap: 4px !important;
-}
-
-.sponsor-logo {
-    height: 3em !important;
-}
-
-.keystone .sponsor-logo {
-    height: 4em !important;
-}
-
-.platinum .sponsor-logo,
-.diamond .sponsor-logo {
-    height: 3.5em !important;
-}
-
-.gold .sponsor-logo,
-.institutional-partners .sponsor-logo {
-    height: 2.5em !important;
-}
-
-.silver .sponsor-logo,
-.community-partners .sponsor-logo,
-.diversity-sponsors .sponsor-logo {
-    height: 2em !important;
 }
 
 /* ── FAQ: Expand/Collapse buttons ──────────────────────── */
@@ -2791,7 +2678,6 @@ footer a:hover {
 h1, h2, h3, h4, h5, h6,
 .subsite-title h2,
 .sponsors h3,
-.sponsor-type h4,
 .section-heading,
 .blog-post .title,
 .carousel-header__title,
@@ -4928,6 +4814,99 @@ body.front-page {
     .sponsor-wall__row--sm     { --logo-w: 6.5rem; --logo-h: 2.5rem; }
     .sponsor-wall__row--group   { --logo-w: 5.5rem; --logo-h: 2.25rem; }
     .sponsor-wall__row--past   { --logo-w: 3.25rem; --logo-h: 1.25rem; gap: var(--space-xs); }
+}
+
+/* ── Sponsor detail page ────────────────────────────────────
+   Logo card and website button beside the description, stacked on
+   phones (templates/sponsor.html). The card is white on purpose:
+   logos are drawn for white, so dark, light-grey, colourful and
+   filled-shape marks all read on it — the title band would swallow
+   some of them. */
+.sponsor-profile__tier {
+    margin: 0 0 var(--space-xs);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.sponsor-profile__layout {
+    display: grid;
+    gap: var(--space-lg);
+    align-items: start;
+}
+
+.sponsor-profile__aside {
+    width: 100%;
+    max-width: 22rem;
+}
+
+.sponsor-profile__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 16 / 10;
+    padding: var(--space-lg);
+    background: var(--white);
+    border: 1px solid var(--neutral-200);
+}
+
+.sponsor-profile__logo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    object-fit: contain;
+    filter: none;
+}
+
+.subsite .content a.sponsor-profile__website {
+    display: flex;
+    justify-content: center;
+    gap: 0.5em;
+    margin-top: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    border: 2px solid var(--text-primary);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    text-decoration: none;
+}
+
+.subsite .content a.sponsor-profile__website:hover,
+.subsite .content a.sponsor-profile__website:focus-visible {
+    background: var(--text-primary);
+    color: var(--white);
+}
+
+.sponsor-profile__description {
+    max-width: var(--content-width-narrow);
+    font-size: var(--font-size-md);
+    line-height: 1.7;
+    color: var(--text-primary);
+}
+
+.sponsor-profile__description p {
+    margin: 0 0 1em;
+}
+
+.sponsor-profile__description > :last-child {
+    margin-bottom: 0;
+}
+
+.sponsor-profile__back {
+    margin: var(--space-xl) 0 0;
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--neutral-200);
+    font-size: var(--font-size-sm);
+}
+
+@media screen and (min-width: 800px) {
+    .sponsor-profile__layout {
+        grid-template-columns: 20rem minmax(0, 1fr);
+        gap: var(--space-xl);
+    }
 }
 
 /* ══════════════════════════════════════════════════════════════

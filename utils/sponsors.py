@@ -1,3 +1,4 @@
+import re
 import sys
 from collections import Counter
 from pathlib import Path
@@ -103,6 +104,19 @@ def validate_presentation(data):
         sys.exit(1)
 
 
+PARAGRAPH_BREAK = re.compile(r"(?:<br\s*/?>\s*){2,}")
+
+
+def as_paragraphs(description):
+    """Turn the `<br/><br/>` breaks used in sponsors.yaml into blank lines.
+
+    The page renders the description as Markdown, so a blank line becomes a
+    real paragraph with the site's spacing; the doubled <br/> tags only add
+    uneven gaps on top of (or instead of) that.
+    """
+    return PARAGRAPH_BREAK.sub("\n\n", description).strip()
+
+
 def dict_to_lektor(sponsor):
     tmpl = Template("""name: $name
 ---
@@ -140,7 +154,7 @@ def json_to_dict(sponsor, _type, type_id):
     s["logo"] = sponsor.get("logo")
     s["title"] = f"{sponsor.get('name')} - {what}"
     s["website"] = sponsor.get("website") or ""
-    s["full_description"] = sponsor.get("description")
+    s["full_description"] = as_paragraphs(sponsor["description"])
     # Point at the sponsor's own card only once it exists; with the field
     # empty, layout.html shares the edition's site card instead of a 404.
     card = f"/sponsors/{sponsor['id']}/social_card.png"
