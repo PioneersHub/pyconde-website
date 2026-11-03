@@ -64,23 +64,39 @@
     (none, this.name)
 ]) }}
 
+{%- set edition = site.config.PROJECT.name ~ ' ' ~ site.config.PROJECT.year|string -%}
 <div class="subsite">
   <div class="subsite-title">
     <section class="content">
-      <img src="{{this.logo }}" alt="{{this.name}} logo" class="sponsor-logo">
-      <h1 class="title">{{ this.name }}</h1>
-      <p class="title">{{ this.type }} of {{ site.config.PROJECT.name }} {{ site.config.PROJECT.year }}</p>
+      <p class="sponsor-profile__tier">{{ this.type }} of {{ edition }}</p>
+      <h1>{{ this.name }}</h1>
     </section>
   </div>
 </div>
 
-<section class="subsite sponsor">
+{# The logo sits on its own white card, never on the coloured title band:
+   white is the background nearly every logo is designed for. #}
+<section class="subsite sponsor-profile">
   <div class="content">
-    {{ this.full_description }}
-
-    {% if this.website %}
-    <div><a href="{{ this.website }}" class="sponsor-website" rel="noopener" target="_blank">{{ this.website }}</a></div>
-    {% endif %}
+    <div class="sponsor-profile__layout">
+      <div class="sponsor-profile__aside">
+        <div class="sponsor-profile__logo">
+          <img src="{{ this.logo }}" alt="{{ this.name }} logo">
+        </div>
+        {% if this.website %}
+        {# Visible label is the bare host, e.g. quantco.com #}
+        <a href="{{ this.website }}" class="button sponsor-profile__website" rel="noopener" target="_blank">
+          Visit {{ this.website.split('//')[-1].removeprefix('www.').rstrip('/') }} <span aria-hidden="true">↗</span>
+        </a>
+        {% endif %}
+      </div>
+      <div class="sponsor-profile__description">
+        {{ this.full_description }}
+      </div>
+    </div>
+    <p class="sponsor-profile__back">
+      <a href="{{ '/sponsors/'|url }}"><span aria-hidden="true">←</span> All sponsors of {{ edition }}</a>
+    </p>
   </div>
 </section>
 
