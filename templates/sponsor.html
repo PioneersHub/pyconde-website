@@ -93,10 +93,15 @@
         </a>
         {% endif %}
         {% if this.social_links %}
+        {# Same icon files as the site footer (media/social/), drawn dark here #}
         <ul class="sponsor-profile__social" aria-label="{{ this.name }} on social media">
           {% for link in this.social_links %}
           {% set platform, url = link.rsplit(' ', 1) %}
-          <li><a href="{{ url }}" rel="noopener" target="_blank">{{ platform }} <span aria-hidden="true">↗</span></a></li>
+          <li>
+            <a class="sponsor-profile__social-link" href="{{ url }}" rel="noopener" target="_blank" aria-label="{{ this.name }} on {{ platform }}">
+              <img src="/static/media/social/{{ platform|lower }}.svg" alt="">
+            </a>
+          </li>
           {% endfor %}
         </ul>
         {% endif %}
