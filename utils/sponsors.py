@@ -3,6 +3,7 @@ import sys
 from collections import Counter
 from pathlib import Path
 from string import Template
+from urllib.parse import urlsplit
 
 import yaml
 
@@ -104,6 +105,34 @@ def validate_presentation(data):
         sys.exit(1)
 
 
+# Profile hosts a sponsor's `social` links may point to, and the link text
+# shown for each on the sponsor page.
+SOCIAL_PLATFORMS = {"instagram.com": "Instagram", "linkedin.com": "LinkedIn"}
+
+
+def social_platform(url):
+    """Name of the platform a profile URL is on, or None for an unknown host."""
+    host = (urlsplit(url).hostname or "").removeprefix("www.")
+    return SOCIAL_PLATFORMS.get(host)
+
+
+def validate_social_links(sponsor_types):
+    """The page labels each link by its platform, so every host must be known."""
+    errors = [
+        f"sponsor '{sponsor['id']}' social link {url} is not on one of {sorted(SOCIAL_PLATFORMS)}"
+        for sponsor_type in sponsor_types
+        for sponsor in sponsor_type.get("sponsors", [])
+        for url in sponsor.get("social", [])
+        if social_platform(url) is None
+    ]
+    if errors:
+        print("ERROR: Unknown social links in databags/sponsors.yaml:")
+        for error in errors:
+            print(f"  {error}")
+        print("  Add the platform to SOCIAL_PLATFORMS in utils/sponsors.py.")
+        sys.exit(1)
+
+
 PARAGRAPH_BREAK = re.compile(r"(?:<br\s*/?>\s*){2,}")
 
 
@@ -134,6 +163,8 @@ logo: $logo
 ---
 website: $website
 ---
+social_links: $social_links
+---
 social_card_image: $social_card_image
 """)
     return tmpl.substitute(sponsor)
@@ -155,6 +186,11 @@ def json_to_dict(sponsor, _type, type_id):
     s["title"] = f"{sponsor.get('name')} - {what}"
     s["website"] = sponsor.get("website") or ""
     s["full_description"] = as_paragraphs(sponsor["description"])
+    # One "Platform url" per line; the URL has no spaces, so the template
+    # splits on the last one.
+    s["social_links"] = "\n".join(
+        f"{social_platform(url)} {url}" for url in sponsor.get("social", [])
+    )
     # Point at the sponsor's own card only once it exists; with the field
     # empty, layout.html shares the edition's site card instead of a 404.
     card = f"/sponsors/{sponsor['id']}/social_card.png"
@@ -171,6 +207,7 @@ def load_sponsors():
         sponsor_types = j["types"]
     validate_unique_ids(sponsor_types)
     validate_presentation(j)
+    validate_social_links(sponsor_types)
     for sponsor_type in sponsor_types:
         sponsors += [
             json_to_dict(s, sponsor_type["name"], sponsor_type["id"])

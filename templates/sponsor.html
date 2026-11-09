@@ -28,6 +28,9 @@
   {%- if this.logo %}
   "logo": "{{ host }}{{ this.logo }}",
   {%- endif %}
+  {%- if this.social_links %}
+  "sameAs": [{% for link in this.social_links %}{{ link.rsplit(' ', 1)[1]|tojson }}{{ ', ' if not loop.last }}{% endfor %}],
+  {%- endif %}
   {%- if this.full_description %}
   "description": {{ (this.full_description|string|striptags|truncate(400))|tojson }},
   {%- endif %}
@@ -88,6 +91,19 @@
         <a href="{{ this.website }}" class="button sponsor-profile__website" rel="noopener" target="_blank">
           Visit {{ this.website.split('//')[-1].removeprefix('www.').rstrip('/') }} <span aria-hidden="true">↗</span>
         </a>
+        {% endif %}
+        {% if this.social_links %}
+        {# Same icon files as the site footer (media/social/), drawn dark here #}
+        <ul class="sponsor-profile__social" aria-label="{{ this.name }} on social media">
+          {% for link in this.social_links %}
+          {% set platform, url = link.rsplit(' ', 1) %}
+          <li>
+            <a class="sponsor-profile__social-link" href="{{ url }}" rel="noopener" target="_blank" aria-label="{{ this.name }} on {{ platform }}">
+              <img src="/static/media/social/{{ platform|lower }}.svg" alt="">
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
         {% endif %}
       </div>
       <div class="sponsor-profile__description">

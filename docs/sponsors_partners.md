@@ -24,6 +24,7 @@ types:
           QuantCo is an Applied AI company. …<br/><br/>
           …
         website: https://www.quantco.com
+        social: []                       # optional profile URLs, shown under the website button
         logo: /static/media/sponsors/Q_quantco_BLACK.svg
         scale: null                      # optional optical correction: scale-90 | scale-80 | scale-70 | scale-60
   - name: Community Partners
@@ -33,6 +34,10 @@ types:
 ```
 
 `description` accepts HTML (rendered as-is — escape carefully); use it for paragraph breaks and links.
+
+`social` lists the sponsor's profile URLs. The sponsor page labels each link by its platform and adds them to the page's structured data (`sameAs`).
+Supported platforms are the hosts in `SOCIAL_PLATFORMS` in `utils/sponsors.py` (Instagram and LinkedIn).
+`make sponsor-pages` stops with an error for any other host, so add the platform there first.
 
 ### How a tier renders
 
