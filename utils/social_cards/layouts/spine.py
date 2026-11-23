@@ -1,7 +1,8 @@
 """Spine: the §06 card — a coloured accent bar beside the type.
 
-The website's session and masterclass cards: white (or the key-dates ink)
-ground, a solid spine on the left, kicker, title, then the people. The
+The website's session cards: a solid spine on the left, kicker, title, then
+the people. The spine takes a colour other than the card's background and
+never one the style guide forbids on it. On a white or ink ground the
 seven-colour brand bar closes the foot, as in the site footer.
 """
 
@@ -36,7 +37,12 @@ class Spine(Strategy):
 
     def variants(self, ctx: Context, fields: list[str]) -> Iterator[dict[str, Any]]:
         for field in fields:
-            colors = [c for c in ctx.brand.raw["spine_colors"] if c != field]
+            forbidden = {tuple(p) for p in ctx.brand.raw["forbidden_pairs"]}
+            colors = [
+                c
+                for c in ctx.brand.raw["spine_colors"]
+                if c != field and (field, c) not in forbidden
+            ]
             for color in ctx.pick(colors, 2, f"spine:{field}"):
                 for mode in ("corner_top", "corner_bottom"):
                     # follow: people under the title; bottom: people on the

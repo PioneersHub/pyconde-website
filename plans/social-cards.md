@@ -11,6 +11,14 @@
 > **Amended 2026-11-23.** Site pages get cards too (`make page-cards`, recipes in `utils/social_cards/pages.yaml`), with one fixed visual
 > family per content type (talk, keynote, masterclass, news, page). Generated PNGs carry a record of their content and a pixel checksum:
 > cards are redrawn only when that content or `brand.yaml` changes, and any other PNG is hand-made and never replaced.
+>
+> **Amended again 2026-11-23.** Backgrounds are no longer fixed per category or strategy (`strategy_fields` is gone). Every card takes one of
+> blue, green, orange or yellow (`backgrounds`), picked from a hash of its id: random across cards, stable for each card. Content types
+> are told apart by layout instead: spine for talks, python for blog posts, corner monogram for masterclasses, large monogram for pages.
+>
+> Same day, sponsors: the generated sponsor cards were removed. Sponsors get thank-you cards instead (`thanks` strategy): tier, "Thank you
+> for your support!" and the sponsor's logo on the sponsor-section off-white. They stay `preview_only` until confirmed in `make card-preview`,
+> a local gallery of every card on every background and format with scores and rejection reasons.
 
 ## 1. What exists today
 

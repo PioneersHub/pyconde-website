@@ -9,12 +9,15 @@
 # Recipe keys:
 #   category    brand.yaml category; fixes the card's visual family
 #   headline    page field printed as the headline
+#   headline_text  fixed headline per language, instead of a page field
+#   kicker      page field printed verbatim as the kicker
 #   speakers    page field with names; "Name One & Name Two" gives two
 #   kicker_from page field whose value picks the kicker from the
 #               category's kicker_by_<field> table
 #   event       whose dates the footer shows: conference | masterclasses
 #   day_field   page field that must name that event day; a page that
 #               names another day gets no card
+#   sponsor_logo   page field with the logo's site path (/static/…)
 # ──────────────────────────────────────────────────────────────
 
 # Past editions are static and keep their cards.
@@ -22,6 +25,13 @@ skip_dirs: [archive]
 
 # Talk cards come from Pretalx data: utils/social_card_img_gen.py.
 skip_models: [talk]
+
+# Recipes still being confirmed: shown by `make card-preview`, never drawn
+# onto the site by `make page-cards`. Remove a model here to publish it.
+preview_only: [sponsor]
+
+# Where site paths such as /static/… live in the repository.
+site_root: assets
 
 # Pages are written in English unless listed here (path below content/).
 page_lang:
@@ -54,6 +64,10 @@ recipes:
   media-kit:
     category: page
     headline: title
+  # Thank-you card: tier as kicker, the sponsor's logo as the hero.
+  # verified: the 2025 thank-you banners (assets/static/media/thank_you_banners).
   sponsor:
-    category: page
-    headline: title
+    category: sponsor
+    headline_text: {en: "Thank you for your support!"}
+    kicker: type
+    sponsor_logo: logo

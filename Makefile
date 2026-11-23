@@ -84,6 +84,10 @@ fetch-submissions:
 # Hand-made cards are never replaced; see docs/social_cards.md.
 page-cards:
 	$(RUN) --extra cards python utils/page_social_cards.py
+# Preview every social-card variant (all backgrounds × formats, with scores
+# and rejection reasons) in build/card-preview/index.html, to review and tune.
+card-preview:
+	$(RUN) --extra cards python utils/card_preview.py
 # Render social cards from a card file:
 #   make social-cards CARDS=path/to/cards.yaml OUT=path/to/dir
 # The validation set lives in tests/social_cards/cards.yaml.

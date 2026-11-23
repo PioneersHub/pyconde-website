@@ -15,6 +15,7 @@ from social_cards.brand import REPO_ROOT, Brand, contrast
 from social_cards.composition import Composition, Logo, Raster, Rect, Text
 from social_cards.content import Card
 from social_cards.render import logo_aspect
+from social_cards.sponsor_logo import load_sponsor_logo
 
 CONTENT_ROLES = ("cta_plate",)
 LOGO_ASPECT_TOLERANCE = 0.002
@@ -48,9 +49,12 @@ def _allowed_text_colors(brand: Brand, ground: str) -> set[str]:
 def _check_field(comp: Composition, brand: Brand, card: Card) -> list[Violation]:
     if comp.field not in brand.raw["fields"]:
         return [Violation("field", f"'{comp.field}' is not an approved card field")]
-    if comp.field not in brand.category(card.category)["fields"]:
+    assigned = brand.field_for(card.id, card.category)
+    if comp.field != assigned:
         return [
-            Violation("field", f"'{comp.field}' is not permitted for {card.category}")
+            Violation(
+                "field", f"'{comp.field}' is not this card's background '{assigned}'"
+            )
         ]
     return []
 
@@ -225,6 +229,55 @@ def check_photos(comp: Composition, brand: Brand) -> list[Violation]:
     return out
 
 
+def check_sponsor_logo(comp: Composition, brand: Brand, card: Card) -> list[Violation]:
+    """The sponsor's logo: present when the card has one, in its own
+    proportions, legible, sharp, and with free space around it."""
+    placed = [r for r in comp.rasters if r.kind == "sponsor_logo"]
+    if card.sponsor_logo is None:
+        return (
+            [Violation("sponsor-logo", "logo on a card without one")] if placed else []
+        )
+    if len(placed) != 1:
+        return [Violation("content-missing", "the sponsor's logo is not on the card")]
+    r = placed[0]
+    if r.path != card.sponsor_logo:
+        return [Violation("content-altered", f"sponsor logo is {r.path.name}")]
+    spec = brand.raw["sponsor_logo"]
+    sponsor = load_sponsor_logo(r.path, brand, comp.field)
+    out = []
+    aspect = r.box.w / r.box.h
+    if abs(aspect / sponsor.aspect - 1) > LOGO_ASPECT_TOLERANCE:
+        out.append(
+            Violation(
+                "sponsor-logo-distortion",
+                f"aspect {aspect:.4f} differs from the logo's {sponsor.aspect:.4f}",
+            )
+        )
+    if r.box.h < comp.fmt.px(spec["min_height"]) - 0.5:
+        out.append(Violation("sponsor-logo", f"logo {r.box.h:.0f}px tall"))
+    if sponsor.rasterised:
+        need = r.box.w * comp.fmt.export_scale / sponsor.width
+        if need > spec["max_upscale"]:
+            out.append(
+                Violation(
+                    "sponsor-logo-resolution",
+                    f"{r.path.name} ({sponsor.width}×{sponsor.height}) "
+                    f"would be enlarged {need:.1f}×",
+                )
+            )
+    zone = r.box.grow(min(r.box.w, r.box.h) * spec["clear_space_ratio"])
+    for e in comp.elements:
+        if e is r or (isinstance(e, Rect) and e.role == "brand_bar"):
+            continue
+        box = e.layout_box if isinstance(e, Text) else e.box
+        if zone.intersects(box):
+            role = getattr(e, "role", getattr(e, "kind", "logo"))
+            out.append(
+                Violation("sponsor-logo-clear-space", f"{role} too close to the logo")
+            )
+    return out
+
+
 def check_geometry(comp: Composition) -> list[Violation]:
     out = []
     fmt = comp.fmt
@@ -327,6 +380,7 @@ def validate(comp: Composition, brand: Brand, card: Card) -> list[Violation]:
         *check_typography(comp, brand),
         *check_logo(comp, brand),
         *check_photos(comp, brand),
+        *check_sponsor_logo(comp, brand, card),
         *check_geometry(comp),
         *check_copy(comp, brand, card),
     ]

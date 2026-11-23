@@ -1,9 +1,9 @@
 """Python: an official python illustration as the counterweight to the type.
 
-§05 / blog fallback: the python artwork lives on the blue field. Type sits
+§05 / blog fallback: the python artwork on a solid brand colour. Type sits
 on the opposite side, bottom-anchored on the event facts, so the python and
-the headline balance diagonally. On any other field only pythons without a
-body segment in the field colour are used.
+the headline balance diagonally. Only pythons without a body segment in the
+background colour are used, so no part of the snake disappears.
 """
 
 from collections.abc import Iterator

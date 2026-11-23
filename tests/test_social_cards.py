@@ -156,7 +156,7 @@ def good(brand, cards) -> tuple[Composition, object]:
     comp = STRATEGIES["field"].build(
         ctx,
         {
-            "field": "blue",
+            "field": brand.field_for(card.id, card.category),
             "logo": "corner_bottom",
             "anchor": "top",
             "measure": 1.0,
@@ -359,31 +359,201 @@ def test_talk_cards_are_only_redrawn_when_their_content_changes(tmp_path):
 # ── content families ─────────────────────────────────────────
 
 
+def _card_on(brand, category: str, background: str):
+    """A card of `category` whose id draws `background`."""
+    for n in range(200):
+        card_id = f"family-{category}-{n}"
+        if brand.field_for(card_id, category) == background:
+            return card_from_dict(
+                {
+                    "id": card_id,
+                    "category": category,
+                    "lang": "en",
+                    "headline": "Typing at scale",
+                    "formats": ["og"],
+                },
+                brand,
+            )
+    raise AssertionError(f"no id draws {background}")
+
+
+def test_backgrounds_are_spread_at_random_but_stable(brand):
+    ids = [f"blog/post-{n}" for n in range(200)]
+    drawn = [brand.field_for(i, "news") for i in ids]
+    assert set(drawn) == set(brand.raw["backgrounds"])
+    assert drawn == [brand.field_for(i, "news") for i in ids]
+
+
+def test_a_card_on_another_background_is_rejected(brand, good):
+    comp, card = good
+    other = next(f for f in brand.raw["backgrounds"] if f != comp.field)
+    assert "field" in rules(validate(replace(comp, field=other), brand, card))
+
+
+@pytest.mark.parametrize("background", ["blue", "green", "orange", "yellow"])
 @pytest.mark.parametrize(
-    ("category", "strategy", "field"),
+    ("category", "strategy", "logos"),
     [
-        ("talk", "spine", "white"),
-        ("masterclass", "field", "orange"),
-        ("news", "python", "blue"),
-        ("page", "field", "blue"),
+        ("talk", "spine", None),
+        ("masterclass", "field", {"corner_top", "corner_bottom"}),
+        ("news", "python", None),
+        ("page", "field", {"column", "top"}),
     ],
 )
-def test_each_content_family_keeps_its_signature(brand, category, strategy, field):
-    card = card_from_dict(
+def test_each_content_family_keeps_its_layout_on_every_background(
+    brand, category, strategy, logos, background
+):
+    card = _card_on(brand, category, background)
+    for fmt in ("og", "square"):
+        ranking = design(card, fmt, brand).ranking
+        assert {(c.comp.strategy, c.comp.field) for c in ranking} == {
+            (strategy, background)
+        }
+        if logos:
+            assert {c.comp.params["logo"] for c in ranking} <= logos
+
+
+def test_spine_avoids_forbidden_pairs(brand):
+    forbidden = {tuple(p) for p in brand.raw["forbidden_pairs"]}
+    for background in brand.raw["backgrounds"]:
+        card = _card_on(brand, "talk", background)
+        for c in design(card, "og", brand).ranking:
+            assert (background, c.comp.params["spine"]) not in forbidden
+
+
+# ── sponsor thank-you cards ──────────────────────────────────
+
+SPONSOR_LOGOS = REPO_ROOT / "assets/static/media/sponsors"
+
+
+def _sponsor(brand, logo: str, card_id: str = "sponsor-test"):
+    return card_from_dict(
         {
-            "id": f"family-{category}",
-            "category": category,
+            "id": card_id,
+            "category": "sponsor",
             "lang": "en",
-            "headline": "Typing at scale",
+            "kicker": "Silver Sponsor",
+            "headline": "Thank you for your support!",
+            "sponsor_logo": f"assets/static/media/sponsors/{logo}",
             "formats": ["og"],
         },
         brand,
     )
-    for fmt in ("og", "square"):
-        ranking = design(card, fmt, brand).ranking
-        assert {(c.comp.strategy, c.comp.field) for c in ranking} == {(strategy, field)}
-    if category == "page":
-        assert {c.comp.params["logo"] for c in ranking} <= {"column", "top"}
+
+
+def test_sponsor_cards_sit_on_the_sponsor_section_background(brand, cards):
+    comp = design(cards["sponsor-wide"], "og", brand).chosen.comp
+    assert (comp.field, comp.strategy) == ("warm_white", "thanks")
+    assert comp.text("kicker").block.text.casefold() == "silver sponsor"
+    assert [r.path.name for r in comp.rasters] == ["SH_Logo_Box_links.svg"]
+
+
+def test_warm_white_is_the_sponsor_section_colour(brand):
+    css = (REPO_ROOT / "assets/static/css/custom.css").read_text()
+    rule = css[css.index("/* ── Sponsor section: warm off-white") :][:400]
+    assert f"linear-gradient(180deg, {brand.palette['warm_white']}" in rule
+
+
+def test_square_and_wide_logos_get_the_same_area(brand, cards):
+    """Optical sizing: a logo's area, not its width, is held constant
+    wherever the logo fits (the split layout's tall stage)."""
+    params = {
+        "field": "warm_white",
+        "layout": "split",
+        "bar": False,
+        "lines": 2,
+        "measure": 1.0,
+        "size_shift": 0,
+    }
+    areas = []
+    for card in (
+        cards["sponsor-square"],
+        _sponsor(brand, "appliedAI_horizontal_rgb_RZ.svg"),
+    ):
+        ctx = Context(brand, brand.format("og"), card, analyse(card))
+        box = STRATEGIES["thanks"].build(ctx, params).rasters[0].box
+        areas.append(box.w * box.h)
+    assert areas[0] == pytest.approx(areas[1], rel=0.01)
+
+
+@pytest.mark.parametrize(
+    ("card_id", "layout"),
+    [("sponsor-square", "split"), ("sponsor-tall", "split"), ("sponsor-wide", "stage")],
+)
+def test_landscape_layout_follows_the_logo_shape(brand, cards, card_id, layout):
+    """No layout may shrink a logo below its common area: on og, compact
+    marks move beside the text, wide wordmarks stay under the headline."""
+    ranking = design(cards[card_id], "og", brand).ranking
+    assert {c.comp.params["layout"] for c in ranking} == {layout}
+
+
+def test_monogram_signs_the_card_bottom_right(brand, cards):
+    comp = design(cards["sponsor-wide"], "story", brand).chosen.comp
+    mono = comp.logos[0].box
+    content_bottom = comp.text("event_facts").layout_box.bottom
+    assert mono.bottom == pytest.approx(content_bottom, abs=2)
+    assert mono.x > comp.text("event_facts").layout_box.right
+
+
+def test_sponsor_logo_keeps_its_proportions(brand, cards):
+    card = cards["sponsor-square"]
+    comp = design(card, "og", brand).chosen.comp
+    r = comp.rasters[0]
+    squashed = replace(r, box=Box(r.box.x, r.box.y, r.box.w * 1.2, r.box.h))
+    assert "sponsor-logo-distortion" in rules(
+        validate(_swap(comp, r, squashed), brand, card)
+    )
+
+
+def test_sponsor_logo_must_be_on_the_card(brand, cards):
+    card = cards["sponsor-square"]
+    comp = design(card, "og", brand).chosen.comp
+    without = replace(
+        comp, elements=[e for e in comp.elements if e not in comp.rasters]
+    )
+    assert "content-missing" in rules(validate(without, brand, card))
+
+
+def test_raster_logo_is_never_enlarged_beyond_the_limit(brand, cards):
+    card = cards["sponsor-raster"]
+    comp = design(card, "og", brand).chosen.comp
+    r = comp.rasters[0]
+    big = replace(r, box=Box(r.box.x, r.box.y, r.box.w * 3, r.box.h * 3))
+    assert "sponsor-logo-resolution" in rules(
+        validate(_swap(comp, r, big), brand, card)
+    )
+
+
+@pytest.mark.parametrize(
+    ("logo", "reason"),
+    [
+        ("academis_logo_bg.svg", "outlined text"),  # live <text>
+        ("python4data.svg", "viewBox"),  # size in pt, no viewBox
+    ],
+)
+def test_logos_the_renderer_cannot_draw_faithfully_are_rejected(brand, logo, reason):
+    with pytest.raises(CardContentError, match=reason):
+        _sponsor(brand, logo)
+
+
+def test_a_white_logo_is_rejected_as_unreadable(brand, tmp_path):
+    white = tmp_path / "white.svg"
+    white.write_text(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 10">'
+        '<rect width="40" height="10" fill="#ffffff"/></svg>'
+    )
+    with pytest.raises(CardContentError, match="too light"):
+        card_from_dict(
+            {
+                "id": "white-logo",
+                "category": "sponsor",
+                "lang": "en",
+                "headline": "Thank you for your support!",
+                "sponsor_logo": str(white),
+                "formats": ["og"],
+            },
+            brand,
+        )
 
 
 # ── page cards ───────────────────────────────────────────────
@@ -490,11 +660,40 @@ def test_brand_spec_change_redraws_cards(content_root, monkeypatch):
     assert set(pc.generate(content_root).values()) == {"redrawn: spec changed"}
 
 
+def test_sponsor_cards_stay_in_the_preview_until_published(tmp_path):
+    root = tmp_path / "content"
+    shutil.copytree(pc.CONTENT_DIR / "sponsors/lidl", root / "sponsors/lidl")
+    shutil.copy(pc.CONTENT_DIR / "sponsors/contents.lr", root / "sponsors/contents.lr")
+    assert pc.generate(root) == {}
+    assert pc.pages(root, pc.load_config(), preview=True) == [
+        (root / "sponsors/lidl", "sponsor")
+    ]
+
+
+def test_sponsor_page_gets_a_thank_you_card_redrawn_when_its_logo_changes(
+    tmp_path, monkeypatch
+):
+    published = {**pc.load_config(), "preview_only": []}
+    monkeypatch.setattr(pc, "load_config", lambda: published)
+    root = tmp_path / "content"
+    page = "sponsors/lidl"
+    shutil.copytree(pc.CONTENT_DIR / page, root / page)
+    shutil.copy(pc.CONTENT_DIR / "sponsors/contents.lr", root / "sponsors/contents.lr")
+    assert pc.generate(root) == {page: f"drawn, linked as /{page}/social_card.png"}
+    record = pc.read_card_record(root / page / pc.CARD_NAME)
+    assert (record["category"], record["kicker"]) == ("sponsor", "Silver Sponsor")
+    _edit(
+        root,
+        page,
+        "logo: /static/media/sponsors/lidl.svg",
+        "logo: /static/media/sponsors/merck.svg",
+    )
+    assert pc.generate(root) == {page: "redrawn: sponsor_logo changed"}
+
+
 def test_masterclass_card_shows_the_masterclass_day(brand, content_root):
     _, fields = pc.lektor_lr.read_lr(content_root / RUST / "contents.lr")
-    card = pc.page_card(
-        RUST, fields, pc.load_config()["recipes"]["masterclass"], "en", brand
-    )
+    card = pc.page_card(RUST, fields, "masterclass", pc.load_config(), brand)
     facts = design(card, "og", brand).chosen.comp.text("event_facts").block.text
     assert "19 April 2027" in facts
     assert "20–22" not in facts

@@ -12,6 +12,7 @@ from typing import Any
 import yaml
 
 from social_cards.brand import EVENTS, REPO_ROOT, Brand
+from social_cards.sponsor_logo import SponsorLogoError, load_sponsor_logo
 
 LANGUAGES = ("en", "de")
 REQUIRED = ("id", "category", "lang", "headline", "formats")
@@ -24,6 +25,7 @@ OPTIONAL = (
     "image_focus_y",
     "dates",
     "event",
+    "sponsor_logo",
 )
 
 
@@ -59,6 +61,8 @@ class Card:
     dates: tuple[DateRow, ...] = ()
     # Whose dates the event facts show: "conference" or "masterclasses".
     event: str = "conference"
+    # Thank-you cards: the sponsor's logo file (SVG or transparent PNG).
+    sponsor_logo: Path | None = None
 
     def kicker_text(self, brand: Brand) -> str:
         """Explicit kicker, else the category label in the card's language."""
@@ -82,6 +86,7 @@ class Analysis:
     has_image: bool
     has_dates: bool
     has_cta: bool
+    has_sponsor_logo: bool
 
 
 def analyse(card: Card) -> Analysis:
@@ -90,6 +95,7 @@ def analyse(card: Card) -> Analysis:
         has_image=card.image is not None,
         has_dates=bool(card.dates),
         has_cta=card.cta is not None,
+        has_sponsor_logo=card.sponsor_logo is not None,
     )
 
 
@@ -130,6 +136,23 @@ def _image(card_id: str, data: dict[str, Any]) -> tuple[Path | None, float | Non
     return image, focus
 
 
+def sponsor_logo_path(card_id: str, category: str, path: Path, brand: Brand) -> Path:
+    """The logo file, once it is known to show faithfully on the card's
+    background; a CardContentError says why it cannot."""
+    try:
+        load_sponsor_logo(path, brand, brand.field_for(card_id, category))
+    except SponsorLogoError as err:
+        raise CardContentError(f"card {card_id}: {err}") from None
+    return path
+
+
+def _sponsor_logo(card_id: str, data: dict[str, Any], brand: Brand) -> Path | None:
+    if not data.get("sponsor_logo"):
+        return None
+    path = (REPO_ROOT / data["sponsor_logo"]).resolve()
+    return sponsor_logo_path(card_id, data["category"], path, brand)
+
+
 def _check_fields(card_id: str, data: dict[str, Any], brand: Brand) -> None:
     missing = [k for k in REQUIRED if not data.get(k)]
     if missing:
@@ -168,6 +191,7 @@ def card_from_dict(data: dict[str, Any], brand: Brand) -> Card:
         image_focus_y=focus,
         dates=_dates(card_id, data.get("dates", [])),
         event=data.get("event", "conference"),
+        sponsor_logo=_sponsor_logo(card_id, data, brand),
     )
 
 

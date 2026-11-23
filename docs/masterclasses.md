@@ -166,7 +166,7 @@ When a card is redrawn, and how to use a hand-made card instead, is the same for
 | Trainer(s) | `trainer`; "Name One & Name Two" becomes two names |
 | PyCon DE 2027 · 19 April 2027 · HCC Heidelberg | `databags/branding.yaml` (`masterclasses_iso`, venue) |
 
-Every masterclass card is orange, like the masterclass section of the site. Nothing else from the page is on the card:
+The background is one of the brand primaries, picked per page (see [Background colours](social_cards.md#background-colours)). Nothing else from the page is on the card:
 not the description, body, tags, or the time of day in `date`.
 
 A masterclass page gets no card, and the run reports it as failed, when `title`, `trainer`, `hours` or `date` is missing,
