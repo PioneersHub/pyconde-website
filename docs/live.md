@@ -4,7 +4,9 @@ Tasks performed while the upcoming or in-flight conference is the live site at `
 
 ## What runs automatically
 
-- **Pretalx sync** — `.github/workflows/fetch_submissions.yml` imports talks and speakers from the Pretalx API on a schedule. The cron is paused outside conference cycles; re-enable it by uncommenting the `schedule:` lines in the workflow when the next CFP closes. Manual runs via `workflow_dispatch` are always available.
+- **Pretalx sync** — `.github/workflows/fetch_submissions.yml` imports talks and speakers from the Pretalx API on a schedule.
+  The cron is paused outside conference cycles; re-enable it by uncommenting the `schedule:` lines in the workflow when the next CFP closes.
+  Manual runs via `workflow_dispatch` are always available.
 - **Deploy** — `.github/workflows/main.yml` builds and uploads to S3 on every push to `main`. **It updates the current edition only**, and it never deletes anything.
 - **Staging deploy** — `.github/workflows/development.yml` mirrors the above for the staging bucket.
 
@@ -21,10 +23,11 @@ Merging to `main` is not enough for any of these — each needs a manual dispatc
 ## Common tasks
 
 | Task | Doc |
-|---|---|
+| --- | --- |
 | Add or edit a blog post | [docs/blog_post.md](blog_post.md) |
 | Add a sponsor or community partner | [docs/sponsors_partners.md](sponsors_partners.md) |
 | Add a masterclass, or change masterclass times and prices | [docs/masterclasses.md](masterclasses.md) |
+| Add an accepted sprint project with its logo | [docs/sprints.md](sprints.md) |
 | Add a subsite (a top-level page that isn't a blog post) | [docs/subsites.md](subsites.md) |
 | Manage the homepage / landing page (pre-, during-, post-conference) | [docs/landing_pages.md](landing_pages.md) |
 | Talk / speaker data from Pretalx | [docs/pretalx.md](pretalx.md) |

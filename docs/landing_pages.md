@@ -87,7 +87,7 @@ Position and on/off are controlled by the `config.yaml` entry, as for any sectio
 | `past_editions` | `past_editions.yaml` | Past-editions cards |
 | `tickets` | `tickets.yaml` | Tickets CTA (price + struck anchor) |
 | `sponsors` | `sponsors.yaml` | Sponsors heading + logo grid (logos from `sponsors.yaml`) |
-| `sponsoring` | `sponsoring.yaml` | Sponsoring CTA |
+| `sponsoring` | `sponsoring.yaml` | Sponsoring CTA, with a photo slideshow when `photos` names a databag |
 | `newsletter` | `newsletter.yaml` | Newsletter CTA |
 | `masterclasses-call` | `masterclasses-call.yaml` | Announcement block (`type: announcement`) |
 

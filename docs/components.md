@@ -148,6 +148,77 @@ promo_images:
 
 ---
 
+## Photo Grid — `macros/photo-grid.html`
+
+Captioned photos in a responsive grid: two columns from 640px up, one on phones. Every tile is cropped to 3:2, so the grid keeps its shape while images load. Used on `/sponsoring/` for photos of sponsored talks, panels and booths.
+
+**Usage:**
+
+```jinja2
+{% from "macros/photo-grid.html" import render_photo_grid %}
+{{ render_photo_grid(bag('sponsoring_gallery'), section_label='Sponsoring formats') }}
+```
+
+**Parameters:**
+
+| Parameter       | Default      | Description                                                                 |
+|-----------------|--------------|-----------------------------------------------------------------------------|
+| `data`          | *(required)* | Full databag dict with `display`, `title`, `teaser`, `image_dir`, `images`  |
+| `section_label` | `'Photos'`   | Accessible `aria-label` for the section                                     |
+
+**Databag schema** (`sponsoring_gallery.yaml`):
+
+```yaml
+display: true                    # false hides the section
+title: On stage and on the floor
+teaser: One line below the heading
+image_dir: /static/media/sponsoring
+images:                          # shown in this order
+  - file: sponsored-talk.jpg     # required, inside image_dir
+    alt: What the photo shows    # required
+    caption: Sponsored talks     # optional
+```
+
+**Maintaining the photos:** put the file in `assets/static/media/sponsoring/`, then add, move or remove its entry
+in `databags/sponsoring_gallery.yaml`. No template change is needed for any number of photos. Use landscape 3:2
+JPEGs, about 1280px wide and ideally under 200 KB; other shapes are cropped. `tests/test_sponsoring_gallery.py`
+fails if a listed file is missing or an entry has no alt text.
+
+The same photos crossfade in the homepage sponsoring teaser; see the photo slideshow below.
+
+---
+
+## Photo Slideshow — `macros/photo-slideshow.html`
+
+Captioned photos that crossfade one at a time, with dots to jump to a photo. It reads the same databag shape as the
+photo grid, so one photo list feeds both. Used in the homepage sponsoring teaser (`macros/sponsoring-cta.html`), left
+of the text from 800px up and above it on phones.
+
+**Usage:**
+
+```jinja2
+{% from "macros/photo-slideshow.html" import render_photo_slideshow %}
+{{ render_photo_slideshow(bag('sponsoring_gallery'), interval_ms=6000, section_label='Sponsoring formats') }}
+```
+
+**Parameters:**
+
+| Parameter       | Default      | Description                                                     |
+|-----------------|--------------|-----------------------------------------------------------------|
+| `data`          | *(required)* | Databag dict with `image_dir` and `images` (see Photo Grid)     |
+| `interval_ms`   | `6000`       | Time each photo stays, in milliseconds                          |
+| `section_label` | `'Photos'`   | Accessible `aria-label` for the slideshow                       |
+
+**Homepage teaser:** `photos: sponsoring_gallery` in `databags/frontpage/sections/sponsoring.yaml` names the databag
+to show. Remove the key for a text-only section.
+
+**Behavior** (provided by `static/js/slideshow.js`, shared with the hero background): plays in databag order, pauses
+while hovered or focused and while the tab is hidden, and does not cycle under `prefers-reduced-motion`. Without
+JavaScript the first photo shows. The script runs every element marked `data-slideshow`; its header comment lists
+the attributes.
+
+---
+
 ## Sponsors List — `macros/sponsor.html`
 
 Renders sponsor logos grouped by tier (Keystone, Platinum, Gold, etc.). Each logo links to the sponsor's detail page.

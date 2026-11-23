@@ -1,0 +1,54 @@
+{#
+  Photo Slideshow
+  ───────────────
+  Captioned photos that crossfade one at a time, with dots to jump to a
+  photo. Reads the same databag shape as the photo grid
+  (macros/photo-grid.html), so one photo list can feed both. Driven by
+  static/js/slideshow.js; without JS the first photo shows.
+
+  Usage:
+    {% from "macros/photo-slideshow.html" import render_photo_slideshow %}
+    {{ render_photo_slideshow(bag('sponsoring_gallery'), interval_ms=6000,
+                              section_label='Sponsoring formats') }}
+
+  Parameters:
+    data          – databag dict with image_dir and images (file, alt, caption)
+    interval_ms   – time each photo stays, in milliseconds (default: 6000)
+    section_label – accessible label (default: 'Photos')
+
+  Behaviour: plays in databag order, pauses while hovered or focused and
+  while the tab is hidden, and does not cycle under prefers-reduced-motion.
+#}
+
+{% macro render_photo_slideshow(data, interval_ms=6000, section_label='Photos') %}
+
+{% if data and data.images %}
+
+<div class="photo-slideshow" role="group" aria-roledescription="slideshow" aria-label="{{ section_label }}"
+     data-slideshow data-slideshow-interval="{{ interval_ms }}" data-slideshow-pause-on-hover>
+  <div class="photo-slideshow__slides">
+    {% for image in data.images %}
+    <figure class="photo-slideshow__slide{{ ' active' if loop.first }}" data-slide>
+      <img src="{{ data.image_dir }}/{{ image.file }}"
+           alt="{{ image.alt }}"
+           loading="{{ 'eager' if loop.first else 'lazy' }}"
+           decoding="async" />
+      {% if image.caption %}<figcaption>{{ image.caption }}</figcaption>{% endif %}
+    </figure>
+    {% endfor %}
+  </div>
+  {% if data.images|length > 1 %}
+  <div class="photo-slideshow__dots">
+    {% for image in data.images %}
+    <button type="button" class="photo-slideshow__dot{{ ' active' if loop.first }}"
+            data-slide-dot="{{ loop.index0 }}"
+            aria-label="Show photo {{ loop.index }} of {{ data.images|length }}"
+            aria-current="{{ 'true' if loop.first else 'false' }}"></button>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+{% endif %}
+
+{% endmacro %}

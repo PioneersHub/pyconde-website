@@ -71,23 +71,21 @@ Do **not** publish the email address, training methods, timeline, or room requir
    ---
    body:
 
-   ## Rust for Python Developers — Full-Day Masterclass
-
    <summary from the form>
 
-   ### Who Should Attend
+   # Who Should Attend
 
    <target audience from the form>
 
-   ### What You'll Learn
+   # What You'll Learn
 
    * <one bullet per learning goal>
 
-   ### What to Bring
+   # What to Bring
 
    <technical requirements from the form>
 
-   ## Your trainer: Rodrigo Girão Serrão
+   # Your trainer: Rodrigo Girão Serrão
 
    <bio from the form>
 
@@ -103,7 +101,8 @@ Do **not** publish the email address, training methods, timeline, or room requir
    - `trainer`: the name exactly as given in the form. For two trainers, write `Name One & Name Two`.
    - `date` and `hours`: copy them from [Formats](#formats).
    - `tags`: 3–4 short topic tags.
-   - Body heading: `## <Title> — Full-Day Masterclass` or `— Half-Day Masterclass`.
+   - Body: start with the summary. Do not repeat the page title; the template already renders it as the page's single `h1`.
+   - Body headings: use `#` for peer sections and the trainer heading, and `##` for any nested subsection. The template's `shift_headings` filter renders these as `h2` and `h3`, respectively.
    - `notes`: leave it empty.
 
 3. **Edit the trainer's text lightly.** Keep their wording and voice, including a bio written in the first person. Do only these:

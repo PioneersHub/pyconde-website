@@ -1,0 +1,53 @@
+{#
+  Photo Grid
+  ──────────
+  Captioned photos in a responsive grid: two columns on wide screens,
+  one on phones. Every tile is cropped to 3:2, so the layout is fixed
+  before the images load.
+
+  Usage:
+    {% from "macros/photo-grid.html" import render_photo_grid %}
+    {{ render_photo_grid(bag('sponsoring_gallery'), section_label='Sponsoring formats') }}
+
+  Parameters:
+    data          – full databag dict with title, teaser, image_dir, images
+    section_label – accessible label (default: 'Photos')
+
+  Databag schema (see databags/sponsoring_gallery.yaml):
+    display: true
+    title: "On stage and on the floor"
+    teaser: "One line below the heading"
+    image_dir: /static/media/sponsoring
+    images:
+      - file: sponsored-talk.jpg
+        alt: "What the photo shows"
+        caption: "Sponsored talks"
+#}
+
+{% macro render_photo_grid(data, section_label='Photos') %}
+
+{% if data and data.display != false and data.images %}
+
+<section class="photo-grid" aria-label="{{ section_label }}">
+  <div class="content">
+    {% if data.title %}<h2 class="photo-grid__title">{{ data.title }}</h2>{% endif %}
+    {% if data.teaser %}<p class="photo-grid__teaser">{{ data.teaser }}</p>{% endif %}
+    <ul class="photo-grid__list">
+      {% for image in data.images %}
+      <li>
+        <figure class="photo-grid__item">
+          <img src="{{ data.image_dir }}/{{ image.file }}"
+               alt="{{ image.alt }}"
+               loading="lazy"
+               decoding="async" />
+          {% if image.caption %}<figcaption>{{ image.caption }}</figcaption>{% endif %}
+        </figure>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+
+{% endif %}
+
+{% endmacro %}
