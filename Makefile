@@ -102,6 +102,11 @@ social-cards:
 sponsor-assets:
 	@test -n "$(FOLDER)" || { echo "FOLDER=<drive-folder-link> is required"; exit 1; }
 	PYTHONUNBUFFERED=1 uv run --extra drive python utils/drive_fetch.py "$(FOLDER)"
+# Draw every sponsor's thank-you card in every format and upload them to the
+# sponsor-cards folder in Google Drive (drive_upload in pages.yaml), one
+# subfolder per sponsor. Run by hand; not part of the site build or CI.
+sponsor-cards-upload:
+	PYTHONUNBUFFERED=1 $(RUN) --extra cards --extra drive python utils/sponsor_cards_drive.py
 sponsor-pages:
 	$(RUN) python utils/sponsors.py
 	@new_files=$$(git ls-files --others --exclude-standard content/sponsors/); \

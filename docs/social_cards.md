@@ -3,11 +3,13 @@
 Social cards (og:image, feed posts, stories) are designed by an engine in `utils/social_cards/`. It does not fill templates.
 For every card it builds many brand-compliant layouts, rejects any that break a brand rule, scores the rest and refines the best few. Then it exports the winner.
 
-Cards reach the site in three ways:
+Cards reach the site, and the sponsors, in four ways:
 
 - **Talks:** `make fetch-submissions` draws a card for every talk from Pretalx data.
 - **Site pages** (blog posts, masterclasses, call and info pages): `make page-cards`, see [Page cards](#page-cards).
 - **Campaign cards** for social posts: written by hand in a card file and rendered with `make social-cards`, see [Card files](#card-files).
+- **Sponsor cards in Google Drive** (all four formats, for sponsors and social media): `make sponsor-cards-upload`, run by hand,
+  see [Sponsor cards in Google Drive](#sponsor-cards-in-google-drive).
 
 ## Running it
 
@@ -197,6 +199,37 @@ A logo file is refused, with the reason, when the card renderer cannot show it f
 The page then gets no card and is listed in the preview. In November 2026 this applied to Academis and PyData Berlin (text in a font)
 and Python4DataScience (no `viewBox`). The rules are in `sponsor_logo` in `brand.yaml`.
 
+### Sponsor cards in Google Drive
+
+The site only uses the og card. Sponsors and the social-media team get every sponsor's thank-you card in all four formats
+in the shared sponsor-cards folder in Google Drive:
+
+```bash
+make sponsor-cards-upload
+```
+
+**This is a local process.** Neither the site build nor CI runs it, and nothing it writes is committed. Run it after a sponsor is
+added, a logo or tier changes, or the card design is tuned.
+
+It draws each sponsor's card in og, square, portrait and story into `build/sponsor-cards/` and uploads them, one subfolder per sponsor:
+
+```text
+<slug>/<slug>_og.png
+<slug>/<slug>_square.png
+<slug>/<slug>_portrait.png
+<slug>/<slug>_story.png
+```
+
+`<slug>` is the sponsor's folder under `content/sponsors` (`lidl`, `mm-software`, `schwaebisch_hall`). A rerun replaces files of the
+same name, so Drive never holds two versions of a card. A sponsor whose card cannot be drawn in every format (see the refusals above)
+is listed at the end and left out; the others are still uploaded and the run exits non-zero. The Drive folder and the page model are
+set under `drive_upload` in `utils/social_cards/pages.yaml`. Sponsor cards are drawn even while `sponsor` is listed in `preview_only`.
+
+It signs in to Drive exactly as `make sponsor-assets` does, with the same Google OAuth client and the same Drive token
+(`drive_token_json` in your pytanis config, see [Sponsors & partners](sponsors_partners.md)). That token holds full Drive access:
+the narrower `drive.file` scope cannot add files to a folder the tool did not create. A token from before, granted read-only access,
+is replaced: the next run of either command asks you to approve full access once.
+
 ## How a card is designed
 
 | Step | Module | What happens |
@@ -272,6 +305,7 @@ Some checks are beyond it:
 
 ```bash
 uv run --extra cards pytest tests/test_social_cards.py
+uv run --extra cards --extra drive pytest tests/test_sponsor_cards_drive.py
 ```
 
 The suite checks the palette against the website CSS and the line breaker on known cases. Each validation rule gets a deliberately broken composition and must reject it.

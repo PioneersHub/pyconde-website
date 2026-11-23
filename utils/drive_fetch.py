@@ -8,7 +8,9 @@ URLs behind linked text, which a plain-text export drops.
 
 Authentication reuses the Google OAuth client configured for pytanis
 (~/.pytanis/config.toml, or the file named by $PYTANIS_CONFIG) but keeps a
-separate, read-only Drive token, so the pytanis token is never touched:
+separate Drive token, so the pytanis token is never touched. The same token
+serves utils/sponsor_cards_drive.py, which uploads the sponsor cards, so it
+holds full Drive access:
 
     [Google]
     client_secret_json = "client_secret.json"
@@ -36,7 +38,10 @@ from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaIoBaseDownload
 from pytanis.config import get_cfg_file
 
-SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
+# Full Drive access, shared by fetching logos and uploading sponsor cards:
+# the narrower drive.file scope cannot add files to a folder the upload did
+# not create.
+SCOPES = ["https://www.googleapis.com/auth/drive"]
 REPO = Path(__file__).parents[1]
 LOGO_DIR = REPO / "assets/static/media/sponsors"
 LOGO_TYPES = {"image/svg+xml", "image/png", "image/jpeg"}
@@ -90,12 +95,12 @@ def oauth_files():
 
 
 def credentials(secret, token):
-    """Read-only Drive credentials; asks for consent once, then refreshes."""
-    creds = (
-        Credentials.from_authorized_user_file(token, SCOPES)
-        if token.is_file()
-        else None
-    )
+    """Drive credentials; asks for consent once, then refreshes. A token
+    granted for fewer scopes (the former read-only one) asks again."""
+    creds = Credentials.from_authorized_user_file(token) if token.is_file() else None
+    if creds and not creds.has_scopes(SCOPES):
+        print(f"{token.name} lacks full Drive access; approve it in the browser")
+        creds = None
     if creds and creds.valid:
         return creds
     if creds and creds.expired and creds.refresh_token:
@@ -109,6 +114,11 @@ def credentials(secret, token):
         ).run_local_server(host="127.0.0.1", port=0)
     token.write_text(creds.to_json())
     return creds
+
+
+def drive_service():
+    """The Drive v3 API, signed in with the shared Drive token."""
+    return build("drive", "v3", credentials=credentials(*oauth_files()))
 
 
 def list_folder(drive, folder):
@@ -181,7 +191,7 @@ def main():
 
 
 def fetch(folder):
-    drive = build("drive", "v3", credentials=credentials(*oauth_files()))
+    drive = drive_service()
     files = list_folder(drive, folder)
     if not files:
         fail("the folder is empty or not shared with this Google account")
