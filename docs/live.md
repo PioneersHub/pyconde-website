@@ -4,7 +4,9 @@ Tasks performed while the upcoming or in-flight conference is the live site at `
 
 ## What runs automatically
 
-- **Pretalx sync** — `.github/workflows/fetch_submissions.yml` imports talks and speakers from the Pretalx API on a schedule. The cron is paused outside conference cycles; re-enable it by uncommenting the `schedule:` lines in the workflow when the next CFP closes. Manual runs via `workflow_dispatch` are always available.
+- **Pretalx sync** — `.github/workflows/fetch_submissions.yml` imports talks and speakers from the Pretalx API on a schedule.
+  The cron is paused outside conference cycles; re-enable it by uncommenting the `schedule:` lines in the workflow when the next CFP closes.
+  Manual runs via `workflow_dispatch` are always available.
 - **Deploy** — `.github/workflows/main.yml` builds and uploads to S3 on every push to `main`. **It updates the current edition only**, and it never deletes anything.
 - **Staging deploy** — `.github/workflows/development.yml` mirrors the above for the staging bucket.
 
