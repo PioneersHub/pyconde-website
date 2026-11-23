@@ -21,7 +21,7 @@ Merging to `main` is not enough for any of these — each needs a manual dispatc
 ## Common tasks
 
 | Task | Doc |
-|---|---|
+| --- | --- |
 | Add or edit a blog post | [docs/blog_post.md](blog_post.md) |
 | Add a sponsor or community partner | [docs/sponsors_partners.md](sponsors_partners.md) |
 | Add a masterclass, or change masterclass times and prices | [docs/masterclasses.md](masterclasses.md) |
