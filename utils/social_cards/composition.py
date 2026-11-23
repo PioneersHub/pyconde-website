@@ -115,7 +115,7 @@ class Logo:
 class Raster:
     path: Path
     box: Box
-    kind: str  # "python" | "photo"
+    kind: str  # "python" | "photo" | "sponsor_logo"
     focus_y: float = 0.5
     # Body colours of a python illustration (palette keys), for validation.
     colors: tuple[str, ...] = ()

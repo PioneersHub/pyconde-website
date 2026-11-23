@@ -24,6 +24,7 @@ branding.yaml, no design passing the brand checks) is reported as failed;
 the other pages are still processed, and the run exits non-zero.
 """
 
+import hashlib
 import sys
 from configparser import RawConfigParser
 from functools import cache
@@ -34,7 +35,7 @@ import lektor_lr
 import yaml
 from social_cards.brand import REPO_ROOT, Brand, load_brand, spec_fingerprint
 from social_cards.composition import Composition
-from social_cards.content import Card, Speaker
+from social_cards.content import Card, CardContentError, Speaker, sponsor_logo_path
 from social_cards.pipeline import NoValidDesignError, design, export
 from social_cards.render import read_card_record
 
@@ -97,14 +98,70 @@ def _value(fields: list[lektor_lr.Field], name: str, slug: str) -> str:
     return value
 
 
-def page_card(
+def _kicker(
     slug: str,
     fields: list[lektor_lr.Field],
     recipe: dict[str, Any],
     lang: str,
     brand: Brand,
+) -> str | None:
+    """A page field verbatim (`kicker`), or a field's value looked up in the
+    category's table (`kicker_from`), or the category label."""
+    if "kicker" in recipe:
+        return _value(fields, recipe["kicker"], slug)
+    if "kicker_from" not in recipe:
+        return None
+    source = recipe["kicker_from"]
+    table = brand.category(recipe["category"])[f"kicker_by_{source}"]
+    value = _value(fields, source, slug)
+    if value not in table:
+        raise PageCardError(
+            f"{slug}: {source} {value!r} is not one of {', '.join(table)}"
+        )
+    return table[value][lang]
+
+
+def _headline(
+    slug: str, fields: list[lektor_lr.Field], recipe: dict[str, Any], lang: str
+) -> str:
+    """A page field (`headline`) or the recipe's fixed text (`headline_text`)."""
+    if "headline_text" in recipe:
+        if lang not in recipe["headline_text"]:
+            raise PageCardError(f"{slug}: pages.yaml has no headline_text in {lang}")
+        return recipe["headline_text"][lang]
+    return _value(fields, recipe["headline"], slug)
+
+
+def _sponsor_logo(
+    slug: str,
+    fields: list[lektor_lr.Field],
+    recipe: dict[str, Any],
+    config: dict[str, Any],
+    brand: Brand,
+) -> Path | None:
+    """The logo file behind the page's site path (e.g. /static/…)."""
+    if "sponsor_logo" not in recipe:
+        return None
+    url = _value(fields, recipe["sponsor_logo"], slug)
+    path = REPO_ROOT / config["site_root"] / url.lstrip("/")
+    if not path.is_file():
+        raise PageCardError(f"{slug}: sponsor logo not found: {path}")
+    try:
+        return sponsor_logo_path(slug, recipe["category"], path, brand)
+    except CardContentError as err:
+        raise PageCardError(str(err)) from None
+
+
+def page_card(
+    slug: str,
+    fields: list[lektor_lr.Field],
+    model: str,
+    config: dict[str, Any],
+    brand: Brand,
 ) -> Card:
-    """The card a recipe makes of one page."""
+    """The card the model's recipe in pages.yaml makes of one page."""
+    recipe = config["recipes"][model]
+    lang = config["page_lang"].get(slug, "en")
     event = recipe.get("event", "conference")
     if "day_field" in recipe:
         day = brand.event_dates(lang, event)
@@ -112,16 +169,6 @@ def page_card(
             raise PageCardError(
                 f"{slug}: {recipe['day_field']} does not name {day}, the {event} day in databags/branding.yaml"
             )
-    kicker = None
-    if "kicker_from" in recipe:
-        source = recipe["kicker_from"]
-        table = brand.category(recipe["category"])[f"kicker_by_{source}"]
-        value = _value(fields, source, slug)
-        if value not in table:
-            raise PageCardError(
-                f"{slug}: {source} {value!r} is not one of {', '.join(table)}"
-            )
-        kicker = table[value][lang]
     speakers: tuple[Speaker, ...] = ()
     if "speakers" in recipe:
         names = _value(fields, recipe["speakers"], slug).split(" & ")
@@ -130,12 +177,17 @@ def page_card(
         id=slug,
         category=recipe["category"],
         lang=lang,
-        headline=_value(fields, recipe["headline"], slug),
+        headline=_headline(slug, fields, recipe, lang),
         formats=(FORMAT,),
-        kicker=kicker,
+        kicker=_kicker(slug, fields, recipe, lang, brand),
         speakers=speakers,
         event=event,
+        sponsor_logo=_sponsor_logo(slug, fields, recipe, config, brand),
     )
+
+
+def _file_digest(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()[:16]
 
 
 def card_record(card: Card, brand: Brand) -> dict[str, str]:
@@ -150,24 +202,44 @@ def card_record(card: Card, brand: Brand) -> dict[str, str]:
         "venue": brand.event.venue,
         "event": brand.event.name,
         "spec": spec_fingerprint(),
+        "sponsor_logo": _file_digest(card.sponsor_logo) if card.sponsor_logo else "",
     }
 
 
-def pages(root: Path, config: dict[str, Any]) -> list[tuple[Path, str]]:
-    """(page folder, model) for every page with a recipe."""
+def pages(
+    root: Path, config: dict[str, Any], *, preview: bool = False
+) -> list[tuple[Path, str]]:
+    """(page folder, model) for every page with a recipe. Models listed in
+    `preview_only` are included only for the preview gallery."""
+    skipped = set(config["skip_models"])
+    if not preview:
+        skipped |= set(config["preview_only"])
     found = []
     for lr in sorted(root.rglob("contents.lr")):
         rel = lr.parent.relative_to(root)
         if rel.parts and rel.parts[0] in config["skip_dirs"]:
             continue
         model = resolve_model(lr.parent, root)
-        if model and model not in config["skip_models"] and model in config["recipes"]:
+        if model and model not in skipped and model in config["recipes"]:
             if not has_card_field(model):
                 raise PageCardError(
                     f"pages.yaml has a recipe for {model}, but models/{model}.ini has no social_card_image field"
                 )
             found.append((lr.parent, model))
     return found
+
+
+def card_for(
+    page_dir: Path,
+    model: str,
+    root: Path,
+    config: dict[str, Any],
+    brand: Brand,
+) -> Card:
+    """The card of one page, as its recipe in pages.yaml makes it."""
+    _, fields = lektor_lr.read_lr(page_dir / "contents.lr")
+    slug = page_dir.relative_to(root).as_posix()
+    return page_card(slug, fields, model, config, brand)
 
 
 def update_page(
@@ -199,8 +271,7 @@ def update_page(
             f"{slug}: contents.lr does not round-trip through lektor_lr "
             "(often a missing final newline); fix the file, then run again"
         )
-    lang = config["page_lang"].get(slug, "en")
-    card = page_card(slug, fields, config["recipes"][model], lang, brand)
+    card = card_for(page_dir, model, root, config, brand)
     record = card_record(card, brand)
     if stored == record:
         what = "up to date"
@@ -227,7 +298,7 @@ def generate(root: Path = CONTENT_DIR) -> dict[str, str]:
         slug = page_dir.relative_to(root).as_posix()
         try:
             outcome[slug] = update_page(page_dir, model, root, config, history)
-        except (PageCardError, NoValidDesignError) as err:
+        except (PageCardError, CardContentError, NoValidDesignError) as err:
             outcome[slug] = f"failed: {str(err).splitlines()[0]}"
     return outcome
 

@@ -51,8 +51,6 @@ ALIGNMENT_FALLBACK = 0.5
 WEAK_HIERARCHY_SCORE = 0.3
 STRONG_CONTRAST = 7.0
 # Colour and refinement
-FIELD_PREFERENCE_STEP = 0.12
-REPEATED_FIELD = 0.65
 MAX_DECORATIONS = 2
 BUSY = 0.75
 SAME_COMPOSITION = 0.6
@@ -245,12 +243,13 @@ class Critic:
         return _clamp(0.7 * r + 0.3 * min(1.0, c / STRONG_CONTRAST))
 
     def color(self, comp: Composition) -> float:
-        fields = self.brand.category(self.card.category)["fields"]
-        preference = 1.0 - FIELD_PREFERENCE_STEP * fields.index(comp.field)
-        repeated = (
-            self.history and self.history[-1].field == comp.field and len(fields) > 1
+        """The background is fixed per card (Brand.field_for), so colour is
+        judged by how legible the weakest text sits on its ground."""
+        weakest = min(
+            contrast(self.brand.color(t.color), self.brand.color(t.ground))
+            for t in comp.texts
         )
-        return _clamp(preference * (REPEATED_FIELD if repeated else 1.0))
+        return _clamp(weakest / STRONG_CONTRAST)
 
     def refinement(self, comp: Composition) -> float:
         decorations = sum(

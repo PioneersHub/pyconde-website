@@ -24,7 +24,7 @@ The `pub_date` field is the date, formatted as `YYYY-MM-DD`.
 
 The `body` field contains the blog post content in Markdown format.
 
-4. Run `make page-cards` to draw the post's social card. It shows the title on the blog's python-on-blue card,
+4. Run `make page-cards` to draw the post's social card. It shows the title beside a python, on a background colour picked for the post,
    is saved as `content/blog/<blogpost-title>/social_card.png` and linked from the post.
    To use your own image instead, see [Hand-made cards are never replaced](social_cards.md#hand-made-cards-are-never-replaced).
 5. Commit the changes to your new branch

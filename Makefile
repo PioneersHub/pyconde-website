@@ -84,6 +84,10 @@ fetch-submissions:
 # Hand-made cards are never replaced; see docs/social_cards.md.
 page-cards:
 	$(RUN) --extra cards python utils/page_social_cards.py
+# Preview every social-card variant (all backgrounds × formats, with scores
+# and rejection reasons) in build/card-preview/index.html, to review and tune.
+card-preview:
+	$(RUN) --extra cards python utils/card_preview.py
 # Render social cards from a card file:
 #   make social-cards CARDS=path/to/cards.yaml OUT=path/to/dir
 # The validation set lives in tests/social_cards/cards.yaml.
@@ -98,6 +102,11 @@ social-cards:
 sponsor-assets:
 	@test -n "$(FOLDER)" || { echo "FOLDER=<drive-folder-link> is required"; exit 1; }
 	PYTHONUNBUFFERED=1 uv run --extra drive python utils/drive_fetch.py "$(FOLDER)"
+# Draw every sponsor's thank-you card in every format and upload them to the
+# sponsor-cards folder in Google Drive (drive_upload in pages.yaml), one
+# subfolder per sponsor. Run by hand; not part of the site build or CI.
+sponsor-cards-upload:
+	PYTHONUNBUFFERED=1 $(RUN) --extra cards --extra drive python utils/sponsor_cards_drive.py
 sponsor-pages:
 	$(RUN) python utils/sponsors.py
 	@new_files=$$(git ls-files --others --exclude-standard content/sponsors/); \

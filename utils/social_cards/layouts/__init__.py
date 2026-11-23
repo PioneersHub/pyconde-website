@@ -6,9 +6,10 @@ from social_cards.layouts.field import Field
 from social_cards.layouts.portrait import Portrait
 from social_cards.layouts.python import Python
 from social_cards.layouts.spine import Spine
+from social_cards.layouts.thanks import Thanks
 
 STRATEGIES: dict[str, Strategy] = {
-    s.name: s for s in (Field(), Spine(), Python(), Portrait(), Dates())
+    s.name: s for s in (Field(), Spine(), Python(), Portrait(), Dates(), Thanks())
 }
 
 __all__ = ["STRATEGIES", "Context", "DoesNotFitError", "Strategy"]

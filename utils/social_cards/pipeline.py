@@ -96,14 +96,14 @@ def _score(
 
 
 def _initial(ctx: Context, brand: Brand, rejected: list) -> dict[str, Candidate]:
-    """Every permitted strategy × field × variant that builds and validates."""
+    """Every permitted strategy × variant on the card's background that
+    builds and validates."""
     category = brand.category(ctx.card.category)
+    fields = [brand.field_for(ctx.card.id, ctx.card.category)]
     pool: dict[str, Candidate] = {}
     for name in category["strategies"]:
         strategy = STRATEGIES[name]
-        allowed = brand.raw["strategy_fields"].get(name)
-        fields = [f for f in category["fields"] if allowed is None or f in allowed]
-        if not fields or not strategy.applicable(ctx):
+        if not strategy.applicable(ctx):
             continue
         for params in strategy.variants(ctx, fields):
             comp = _permitted(params, category) and _build(

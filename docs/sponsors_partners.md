@@ -71,7 +71,8 @@ Confirmed sponsors deliver their logo and texts in a folder under **Sponsors 202
 copy or link it into `.claude/skills/` to use it with Claude Code. By hand:
 
 1. Fetch the folder with `make sponsor-assets FOLDER=<drive-folder-link>`: it saves the logo into `assets/static/media/sponsors/`
-   and prints the sponsor's document as Markdown, links included. It uses the Google OAuth client of your pytanis config; add a token path for read-only Drive access once:
+   and prints the sponsor's document as Markdown, links included. It uses the Google OAuth client of your pytanis config; add a token path for Drive access once
+   (the same token uploads the sponsor cards, so it holds full Drive access):
 
    ```toml
    [Google]
@@ -95,6 +96,10 @@ copy or link it into `.claude/skills/` to use it with Claude Code. By hand:
 A sponsor page uses `content/sponsors/{id}/social_card.png` as its share image when that file exists.
 Without it, the page shares the edition's site card (`social_card` in `PyconDE.lektorproject`).
 After adding a card, re-run `make sponsor-pages` so the page points at it.
+
+Every sponsor's thank-you card, in all four formats, also goes to the sponsor-cards folder in Google Drive with
+`make sponsor-cards-upload`. That is a local step, not part of the build or CI; run it after adding a sponsor.
+See [Sponsor cards in Google Drive](social_cards.md#sponsor-cards-in-google-drive).
 
 There is no 2027 thank-you card template yet; the banners in `assets/static/media/thank_you_banners/` are from past editions and must not be copied in.
 

@@ -57,6 +57,9 @@ palette:
   ink: "#111111"
   # verified: .keydates background
   ink_field: "#1a1a1a"
+  # verified: custom.css sponsor section (.sponsors), the top of its warm
+  # off-white gradient: "close to the white most logos are designed for".
+  warm_white: "#f7f5ee"
 
 # CSS custom property for every palette entry that main.css defines, used by
 # the drift test. ink_field is a literal in main.css, not a variable.
@@ -108,6 +111,10 @@ fields:
     text: white
     accent: yellow
     logo: [white, yellow]
+  warm_white:
+    text: ink
+    accent: blue
+    logo: [black, blue]
 
 # Minimum WCAG contrast for any text. All card text is set at "large text"
 # sizes (≥ 18.66 px bold equivalent), where WCAG AA asks for 3:1.
@@ -118,7 +125,7 @@ min_text_contrast: 3.0
 # seven segments stay visible.
 brand_bar:
   order: [yellow, cyan, blue, green, orange, lime, silver]
-  fields: [white, ink_field]
+  fields: [white, ink_field, warm_white]
 
 # Accent spine (verified: §06 card accent bar, .keydates__item border-left).
 spine_colors: [blue, orange, green, yellow, cyan, lime, magenta, red]
@@ -384,60 +391,85 @@ decoration:
   spine_width: 1.25
   brand_bar_height: 1.25
 
-# Fields each strategy may use, whatever the category allows. verified:
-# spine cards appear on white (sessions, masterclasses) and on the
-# key-dates ink; python artwork on the blue field (§05, blog fallback).
-strategy_fields:
-  spine: [white, ink_field]
-  python: [blue]
-  dates: [ink_field]
+# Card backgrounds. verified: design-system.json `flags` — a brand surface
+# is one solid primary (orange, yellow, lime, cyan, blue, green). Cyan and
+# lime are left out: no card text/logo rules are verified for them (see
+# `fields`). Every card gets one background from this pool, picked from a
+# hash of its id: the colours spread at random across cards, yet a card
+# keeps its colour on every run (Brand.field_for). A category may name its
+# own `backgrounds` instead (sponsor cards).
+backgrounds: [blue, green, orange, yellow]
+
+# Sponsor logos on thank-you cards. provisional: no 2027 rule for partner
+# logos exists; these follow the website's sponsor wall (logos in their own
+# colours on the warm off-white, never recoloured or distorted).
+sponsor_logo:
+  # Width in px an SVG logo is rendered at before it is placed.
+  render_width: 2400
+  # A raster logo may be enlarged at most this much at export size.
+  max_upscale: 1.5
+  # Logo area as a share of the content area, per format. Every logo gets
+  # the same area, so a square and a long wordmark weigh the same. og is set
+  # so every compact 2027 logo keeps its full area beside the text (the
+  # tallest, QuantCo, 95 %), and square so the tall marks fit under the
+  # two-line thank-you; measured 2026-11-23.
+  area: {og: 0.085, square: 0.12, portrait: 0.2, story: 0.2}
+  # A layout may shrink a logo to no less than this share of that area;
+  # only a wordmark already spanning the full width may go below it.
+  min_fit: 0.85
+  # Smallest logo height, in px at the og format, before it reads as a
+  # footnote.
+  min_height: 70
+  # Free space around the logo, as a share of its shorter side.
+  clear_space_ratio: 0.25
+  # Share of the logo's visible pixels that must stand out from the
+  # background (contrast >= min_ink_contrast); a white or pale-only logo on
+  # the off-white would vanish. Measured 2026-11-23: every 2027 sponsor logo
+  # has at least 0.15 (Tereza Iofciu: dark name beside a lime mark).
+  min_ink_share: 0.1
+  min_ink_contrast: 1.5
 
 # ── Categories ───────────────────────────────────────────────
-# `fields` lists permitted fields, best first. The first entries are the
-# field the website uses for the same content (verified: section colours).
 # `params` narrows a strategy's variants (e.g. only the monogram-column
-# logo placement).
+# logo placement). The background is not chosen per category: every card
+# draws from `backgrounds`.
 #
-# Content families. Cards drawn from site content keep one fixed signature
+# Content families. Cards drawn from site content keep one layout signature
 # per content type, so a feed reader can tell a talk from a masterclass or
-# a blog post at a glance; the engine varies only type and composition
-# inside it. Each signature is the website's own treatment of that content:
-#   talk         white session card, coloured spine, seven-colour bar (§06, footer)
-#   keynote      ink field (key-dates band)
-#   masterclass  orange field (masterclass section)
-#   news         python artwork on blue (blog-card fallback, §05)
-#   page         blue field with the large monogram (site intro)
+# a blog post at a glance, whatever the background colour:
+#   talk         coloured spine beside the type (§06 session card)
+#   keynote      speaker photo; the "Keynote" kicker without one
+#   masterclass  "Full-/Half-Day Masterclass" kicker, monogram in a corner
+#   news         python artwork (blog-card fallback, §05)
+#   page         large monogram column or top (site intro)
+#   sponsor      thank-you with the sponsor's logo on the sponsor-section
+#                off-white (website sponsor wall)
 # The other categories are campaign cards written by hand in card files and
-# keep their wider choice.
+# keep their wider choice of layouts.
 categories:
   announcement:
     label: {en: "", de: ""}
     strategies: [field, python]
-    fields: [blue, yellow, green]
   keynote:
     label: {en: Keynote, de: Keynote}
     strategies: [portrait, field]
-    fields: [ink_field]
   talk:
     label: {en: Talk, de: Vortrag}
     strategies: [spine]
-    fields: [white]
   speaker_spotlight:
     label: {en: Speaker spotlight, de: Speaker im Porträt}
     strategies: [portrait, spine]
-    fields: [blue, green, white]
   cfp:
     label: {en: Call for Proposals, de: Call for Proposals}
     strategies: [field, python]
-    fields: [blue, yellow, orange]
   tickets:
     label: {en: Tickets, de: Tickets}
     strategies: [field]
-    fields: [blue, yellow]
   masterclass:
     label: {en: Masterclass, de: Masterclass}
     strategies: [field]
-    fields: [orange]
+    params:
+      logo: [corner_top, corner_bottom]
     # Kicker per page `hours` value. verified: docs/masterclasses.md formats
     # and the "— Full-Day Masterclass" meta-title convention.
     kicker_by_hours:
@@ -446,33 +478,32 @@ categories:
   sponsorship:
     label: {en: Sponsoring, de: Sponsoring}
     strategies: [field, python]
-    fields: [blue]
   community:
     label: {en: Community, de: Community}
     strategies: [field, python, portrait]
-    fields: [green, blue]
   volunteers:
     label: {en: Volunteers, de: Volunteers}
     strategies: [field, python, portrait]
-    fields: [green, blue]
   schedule:
     label: {en: Schedule, de: Programm}
     strategies: [dates, field, python]
-    fields: [ink_field, blue]
   dates:
     label: {en: Key dates, de: Wichtige Termine}
     strategies: [dates]
-    fields: [ink_field]
   news:
     label: {en: News, de: News}
     strategies: [python]
-    fields: [blue]
   page:
     label: {en: "", de: ""}
     strategies: [field]
-    fields: [blue]
     params:
       logo: [column, top]
+  # Thank-you card: the sponsor's logo in its own colours on the website's
+  # sponsor-section background, the tier as kicker.
+  sponsor:
+    label: {en: "", de: ""}
+    strategies: [thanks]
+    backgrounds: [warm_white]
 
 # Month names for event-fact formatting (dates come from branding.yaml).
 months:

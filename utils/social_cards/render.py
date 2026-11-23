@@ -22,6 +22,7 @@ from PIL.PngImagePlugin import PngInfo
 from social_cards.art import trimmed_png
 from social_cards.brand import Brand
 from social_cards.composition import Box, Composition, Logo, Raster, Rect, Text
+from social_cards.sponsor_logo import load_sponsor_logo
 
 # PNG text-chunk key under which a generated card records its content.
 CARD_RECORD_KEY = "pyconde-social-card"
@@ -119,11 +120,15 @@ def _logo(e: Logo, brand: Brand) -> str:
     )
 
 
-def _raster(e: Raster, scale: float) -> str:
+def _raster(e: Raster, scale: float, brand: Brand, field: str) -> str:
     b = e.box
     if e.kind == "photo":
         href = crop_photo(e.path, b, e.focus_y, scale)
         aspect = "none"
+    elif e.kind == "sponsor_logo":
+        png = load_sponsor_logo(e.path, brand, field).png
+        href = f"data:image/png;base64,{base64.b64encode(png).decode()}"
+        aspect = "xMidYMid meet"
     else:
         href = f"data:image/png;base64,{base64.b64encode(trimmed_png(e.path)).decode()}"
         aspect = "xMidYMid meet"
@@ -148,7 +153,7 @@ def to_svg(comp: Composition, brand: Brand, scale: float = 1.0) -> str:
         elif isinstance(e, Logo):
             parts.append(_logo(e, brand))
         elif isinstance(e, Raster):
-            parts.append(_raster(e, scale))
+            parts.append(_raster(e, scale, brand, comp.field))
     parts.append("</svg>")
     return "".join(parts)
 

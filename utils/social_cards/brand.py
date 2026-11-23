@@ -104,6 +104,19 @@ class Brand:
         except KeyError:
             raise BrandSpecError(f"'{name}' is not an approved card field") from None
 
+    def backgrounds(self, category: str) -> list[str]:
+        """The backgrounds a category's cards draw from: its own list when it
+        names one (sponsor cards), else the shared pool."""
+        return self.category(category).get("backgrounds", self.raw["backgrounds"])
+
+    def field_for(self, card_id: str, category: str) -> str:
+        """The card's background, drawn from its category's backgrounds by a
+        hash of its id: random across cards, but a card never changes colour
+        between runs, so a redraw happens only when its content does."""
+        pool = self.backgrounds(category)
+        digest = hashlib.sha256(card_id.encode("utf-8")).digest()
+        return pool[int.from_bytes(digest[:8]) % len(pool)]
+
     def role(self, name: str) -> dict[str, Any]:
         return self.raw["roles"][name]
 
@@ -212,4 +225,10 @@ def load_brand() -> Brand:
     for color in raw["logo"]["files"]:
         if not brand.logo_path(color).is_file():
             raise BrandSpecError(f"logo file missing: {brand.logo_path(color)}")
+    for category in raw["categories"]:
+        pool = brand.backgrounds(category)
+        if not pool:
+            raise BrandSpecError(f"{category}: no backgrounds, every card needs one")
+        for name in pool:
+            brand.field(name)
     return brand
