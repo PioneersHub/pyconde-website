@@ -79,6 +79,11 @@ serve: build
 fetch-submissions:
 	$(RUN) python utils/talks.py
 	$(RUN) python utils/social_card_img_gen.py
+# Save a sponsor's logo from its Drive folder and print its texts:
+#   make sponsor-assets FOLDER=<drive-folder-link>
+sponsor-assets:
+	@test -n "$(FOLDER)" || { echo "FOLDER=<drive-folder-link> is required"; exit 1; }
+	PYTHONUNBUFFERED=1 uv run --extra drive python utils/drive_fetch.py "$(FOLDER)"
 sponsor-pages:
 	$(RUN) python utils/sponsors.py
 	@new_files=$$(git ls-files --others --exclude-standard content/sponsors/); \

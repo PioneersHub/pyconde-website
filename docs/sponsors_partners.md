@@ -36,7 +36,7 @@ types:
 `description` accepts HTML (rendered as-is — escape carefully); use it for paragraph breaks and links.
 
 `social` lists the sponsor's profile URLs. The sponsor page labels each link by its platform and adds them to the page's structured data (`sameAs`).
-Supported platforms are the hosts in `SOCIAL_PLATFORMS` in `utils/sponsors.py` (Instagram and LinkedIn).
+Supported platforms are the hosts in `SOCIAL_PLATFORMS` in `utils/sponsors.py` (Instagram and LinkedIn); their subdomains, such as `de.linkedin.com`, count too.
 `make sponsor-pages` stops with an error for any other host, so add the platform there first.
 
 ### How a tier renders
@@ -66,7 +66,20 @@ A sponsor shows once, and anyone in the current lineup is left out of the strip.
 
 ## Add a sponsor
 
-1. Drop the logo at `assets/static/media/sponsors/`. Prefer SVG; PNG works as a fallback for raster-only artwork.
+Confirmed sponsors deliver their logo and texts in a folder under **Sponsors 2027** on Google Drive.
+`skills/add-sponsor/SKILL.md` is an agent skill that runs the whole procedure from that folder to a pull request;
+copy or link it into `.claude/skills/` to use it with Claude Code. By hand:
+
+1. Fetch the folder with `make sponsor-assets FOLDER=<drive-folder-link>`: it saves the logo into `assets/static/media/sponsors/`
+   and prints the sponsor's document as text. It uses the Google OAuth client of your pytanis config; add a token path for read-only Drive access once:
+
+   ```toml
+   [Google]
+   client_secret_json = "client_secret.json"
+   drive_token_json = "drive_token.json"   # created on the first run, after you approve access in the browser
+   ```
+
+   Without Drive access, drop the logo at `assets/static/media/sponsors/` by hand. Prefer SVG; PNG works as a fallback for raster-only artwork.
 2. Add the sponsor entry under the right tier in `databags/sponsors.yaml`. Within a tier, logos appear in file order.
 3. Generate the per-sponsor content pages:
 
