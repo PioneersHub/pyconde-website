@@ -27,7 +27,7 @@ The user names the sponsor or gives the folder link. Everything else comes from 
 | Tier | Folder name prefix (`Gold`, `Silver`, …), or the user | yes |
 | Company name | Document title / first line | yes |
 | Logo | Image file in the folder; SVG preferred, PNG accepted | yes |
-| Website | `Website:` line in the document | yes |
+| Website | `Website:` line in the document (the link target, if the line is linked text) | yes |
 | Social links | `LinkedIn:`, `Instagram:` lines in the document | no |
 | Description | Text after `Description:` in the document | yes |
 
@@ -36,9 +36,10 @@ If a required item is missing or two candidates conflict (two logos, two website
 ## Steps
 
 1. **Branch from the latest `main`**: `git fetch origin && git switch -c <prefix>/add-<sponsor-id> origin/main`.
-2. **Fetch the folder**: `make sponsor-assets FOLDER=<folder-link>`. It saves the logo files (SVG, PNG, JPEG) under their original names
-   to `assets/static/media/sponsors/`, refuses SVGs containing script or event handlers, and prints each Google Doc as plain text.
-   It stops rather than overwrite an existing logo.
+2. **Fetch the folder**: `make sponsor-assets FOLDER=<folder-link>`. It saves the logo files (SVG, PNG, JPEG) to `assets/static/media/sponsors/`
+   under a URL-safe version of their names (it prints any renaming), refuses SVGs containing script or event handlers, and stops rather than
+   overwrite an existing logo. Each Google Doc is printed as Markdown, so a linked text such as `[Company](https://…)` shows its URL:
+   take the website from the link target, and drop Markdown escapes such as `\&` when copying text.
 3. **Check the logo**: note the aspect ratio. Logos wider than about 5:1 render very small in the fixed logo boxes of the sponsor wall;
    tell the user and suggest asking the sponsor for a more compact variant.
 4. **Add the entry** to `databags/sponsors.yaml` under the tier's `sponsors:` list (append unless the user gives a position):

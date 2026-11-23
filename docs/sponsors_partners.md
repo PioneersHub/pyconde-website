@@ -71,7 +71,7 @@ Confirmed sponsors deliver their logo and texts in a folder under **Sponsors 202
 copy or link it into `.claude/skills/` to use it with Claude Code. By hand:
 
 1. Fetch the folder with `make sponsor-assets FOLDER=<drive-folder-link>`: it saves the logo into `assets/static/media/sponsors/`
-   and prints the sponsor's document as text. It uses the Google OAuth client of your pytanis config; add a token path for read-only Drive access once:
+   and prints the sponsor's document as Markdown, links included. It uses the Google OAuth client of your pytanis config; add a token path for read-only Drive access once:
 
    ```toml
    [Google]

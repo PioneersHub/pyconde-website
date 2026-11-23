@@ -2,8 +2,9 @@
 
 Confirmed sponsors deliver a logo and a document (website, social links,
 description) in a folder under "Sponsors 2027". This saves the folder's logo
-files into the sponsor logo directory and prints each Google Doc as plain
-text, ready to be turned into an entry in databags/sponsors.yaml.
+files into the sponsor logo directory and prints each Google Doc as Markdown,
+ready to be turned into an entry in databags/sponsors.yaml. Markdown keeps the
+URLs behind linked text, which a plain-text export drops.
 
 Authentication reuses the Google OAuth client configured for pytanis
 (~/.pytanis/config.toml, or the file named by $PYTANIS_CONFIG) but keeps a
@@ -43,6 +44,8 @@ GOOGLE_DOC = "application/vnd.google-apps.document"
 
 FOLDER_URL = re.compile(r"/folders/([\w-]+)")
 DRIVE_ID = re.compile(r"^[\w-]{20,}$")
+# Logo names end up in URLs; spaces, "&" or brackets would need escaping there.
+UNSAFE_NAME = re.compile(r"[^A-Za-z0-9._-]+")
 # An SVG is served from our own origin, so anything that can run script is refused.
 UNSAFE_SVG = re.compile(
     rb"<script|\son[a-z]+\s*=|javascript:|<foreignObject", re.IGNORECASE
@@ -136,8 +139,14 @@ def download(request):
     return buffer.getvalue()
 
 
+def safe_name(name):
+    """File name usable in a URL as is: '240125_M&M Logo (2).svg' -> '240125_M-M-Logo-2.svg'."""
+    path = Path(name)
+    return f"{UNSAFE_NAME.sub('-', path.stem).strip('-')}{path.suffix.lower()}"
+
+
 def save_logo(drive, item):
-    target = LOGO_DIR / item["name"]
+    target = LOGO_DIR / safe_name(item["name"])
     if target.exists():
         fail(f"{target} already exists; remove it first to replace it")
     content = download(
@@ -149,11 +158,13 @@ def save_logo(drive, item):
         )
     target.write_bytes(content)
     print(f"Saved logo: {target.relative_to(REPO)} ({len(content):,} bytes)")
+    if target.name != item["name"]:
+        print(f"  renamed from '{item['name']}'")
 
 
 def print_doc(drive, item):
     text = download(
-        drive.files().export_media(fileId=item["id"], mimeType="text/plain")
+        drive.files().export_media(fileId=item["id"], mimeType="text/markdown")
     )
     print(f"\n----- {item['name']} -----\n{text.decode('utf-8-sig').strip()}\n")
 
