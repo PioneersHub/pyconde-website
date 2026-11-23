@@ -118,7 +118,7 @@ to refresh a card after such a change, delete its `social_card.png` and run agai
 
 A page that cannot get a card is reported as `failed: …` and keeps whatever it had; the other pages are still processed and the run ends with an error.
 This happens when a field the recipe needs is missing, when a masterclass's `date` names another day than `branding.yaml` or its `hours` is not 6 or 3,
-when no design passes the brand checks (e.g. a title containing "PyData"), or when the page file cannot be rewritten safely
+when no design passes the brand checks (e.g. a title containing "PyCon DE & PyData", the archive-only name), or when the page file cannot be rewritten safely
 (usually a missing final newline; add one and run again).
 
 ### Hand-made cards are never replaced

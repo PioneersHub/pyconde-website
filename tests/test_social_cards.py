@@ -191,6 +191,36 @@ def test_rejects_forbidden_naming(brand, good):
     )
 
 
+@pytest.mark.parametrize(
+    "text",
+    ["PyConDE PyData Darmstadt", "PyCon DE and PyData", "See you in Berlin"],
+)
+def test_copy_rules_catch_the_archive_name_and_old_venues(brand, good, text):
+    comp, card = good
+    hl = comp.text("headline")
+    bad = replace(hl, block=replace(hl.block, lines=(hl.block.style.shape(text),)))
+    assert "copy" in rules(validate(_swap(comp, hl, bad), brand, card))
+
+
+@pytest.mark.parametrize(
+    "name",
+    ["PyData Berlin", "PyData Rhein-Main", "PyData Südwest", "PyLadies Berlin"],
+)
+def test_partner_community_names_pass_the_copy_rules(brand, name):
+    card = card_from_dict(
+        {
+            "id": "partner",
+            "category": "page",
+            "lang": "en",
+            "headline": f"{name} - Community Partner",
+            "formats": ["og"],
+        },
+        brand,
+    )
+    result = design(card, "og", brand)
+    assert "copy" not in rules(validate(result.chosen.comp, brand, card))
+
+
 def test_rejects_distorted_logo(brand, good):
     comp, card = good
     lg: Logo = comp.logos[0]
@@ -231,7 +261,9 @@ def test_rejects_tiny_text(brand, good):
     )
 
 
-def test_rejects_wrong_event_facts(brand, good):
+def test_rejects_previous_edition_facts(brand, good):
+    """A card must never show 2026's dates and venue; the 2027 facts come
+    from databags/branding.yaml."""
     comp, card = good
     facts: Text = comp.text("event_facts")
     style = facts.block.style
