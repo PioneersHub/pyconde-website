@@ -111,9 +111,16 @@ SOCIAL_PLATFORMS = {"instagram.com": "Instagram", "linkedin.com": "LinkedIn"}
 
 
 def social_platform(url):
-    """Name of the platform a profile URL is on, or None for an unknown host."""
-    host = (urlsplit(url).hostname or "").removeprefix("www.")
-    return SOCIAL_PLATFORMS.get(host)
+    """Name of the platform a profile URL is on, or None for an unknown host.
+
+    Subdomains count as the platform, so a country address such as
+    de.linkedin.com is LinkedIn.
+    """
+    host = urlsplit(url).hostname or ""
+    for domain, name in SOCIAL_PLATFORMS.items():
+        if host == domain or host.endswith(f".{domain}"):
+            return name
+    return None
 
 
 def validate_social_links(sponsor_types):
