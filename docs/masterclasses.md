@@ -128,7 +128,9 @@ Do **not** publish the email address, training methods, timeline, or room requir
 
    Keep `teaser` to one sentence of about 80–120 characters.
 
-5. **Social card (optional).** Put a 16:9 PNG at `content/masterclasses/<slug>/social_card.png` and add `social_card_image: /masterclasses/<slug>/social_card.png` to the page. Without it, the page uses the site's default card.
+5. **Social card.** Run `make page-cards`. It writes `content/masterclasses/<slug>/social_card.png`
+   and adds `social_card_image: /masterclasses/<slug>/social_card.png` to the page.
+   The overview page shows the card on each masterclass tile. See [Masterclass social cards](#masterclass-social-cards) for what the card shows.
 
 6. **Check it locally.**
 
@@ -148,6 +150,27 @@ Do **not** publish the email address, training methods, timeline, or room requir
 The homepage carousel only shows when `masterclasses` has `display: true` in `databags/frontpage/config.yaml`. It is on while masterclasses are being sold.
 
 The carousel heading ends with a "Propose a masterclass →" link to the call (`header_link_text` and `header_link_url` in the same databag). Remove both lines when the call closes.
+
+## Masterclass social cards
+
+`make page-cards` draws the card of every masterclass page (and of every other page with a card recipe).
+Run it after adding a masterclass, and again after changing a title, trainer or `hours`.
+When a card is redrawn, and how to use a hand-made card instead, is the same for all pages: see [Page cards](social_cards.md#page-cards).
+
+### What the card shows
+
+| On the card | Comes from |
+| --- | --- |
+| "Full-Day Masterclass" or "Half-Day Masterclass" | `hours`: 6 or 3 |
+| Title | `title` |
+| Trainer(s) | `trainer`; "Name One & Name Two" becomes two names |
+| PyCon DE 2027 · 19 April 2027 · HCC Heidelberg | `databags/branding.yaml` (`masterclasses_iso`, venue) |
+
+Every masterclass card is orange, like the masterclass section of the site. Nothing else from the page is on the card:
+not the description, body, tags, or the time of day in `date`.
+
+A masterclass page gets no card, and the run reports it as failed, when `title`, `trainer`, `hours` or `date` is missing,
+when `hours` is not 6 or 3, or when the day in `date` is not the masterclass day in `branding.yaml`.
 
 ## When times, prices or rules change
 

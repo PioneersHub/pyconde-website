@@ -1,0 +1,59 @@
+# ──────────────────────────────────────────────────────────────
+# Social cards for site pages — what `make page-cards` draws
+# ──────────────────────────────────────────────────────────────
+#
+# One recipe per Lektor page model: which card category (and so which
+# visual family, see `categories` in brand.yaml) and which page fields fill
+# the card. A model needs a `social_card_image` field to carry a card.
+#
+# Recipe keys:
+#   category    brand.yaml category; fixes the card's visual family
+#   headline    page field printed as the headline
+#   speakers    page field with names; "Name One & Name Two" gives two
+#   kicker_from page field whose value picks the kicker from the
+#               category's kicker_by_<field> table
+#   event       whose dates the footer shows: conference | masterclasses
+#   day_field   page field that must name that event day; a page that
+#               names another day gets no card
+# ──────────────────────────────────────────────────────────────
+
+# Past editions are static and keep their cards.
+skip_dirs: [archive]
+
+# Talk cards come from Pretalx data: utils/social_card_img_gen.py.
+skip_models: [talk]
+
+# Pages are written in English unless listed here (path below content/).
+page_lang:
+  terms: de
+
+recipes:
+  blog-post:
+    category: news
+    headline: title
+  masterclass:
+    category: masterclass
+    headline: title
+    speakers: trainer
+    kicker_from: hours
+    event: masterclasses
+    day_field: date
+  keynote:
+    category: keynote
+    headline: title
+    speakers: speaker_name
+  call-for-proposals:
+    category: page
+    headline: title
+  financial-aid:
+    category: page
+    headline: title
+  standard-page:
+    category: page
+    headline: title
+  media-kit:
+    category: page
+    headline: title
+  sponsor:
+    category: page
+    headline: title
