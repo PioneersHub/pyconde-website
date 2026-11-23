@@ -3,7 +3,11 @@
 Social cards (og:image, feed posts, stories) are designed by an engine in `utils/social_cards/`. It does not fill templates.
 For every card it builds many brand-compliant layouts, rejects any that break a brand rule, scores the rest and refines the best few. Then it exports the winner.
 
-The talk cards on every talk page come from the same engine (`make fetch-submissions`).
+Cards reach the site in three ways:
+
+- **Talks:** `make fetch-submissions` draws a card for every talk from Pretalx data.
+- **Site pages** (blog posts, masterclasses, call and info pages, sponsors): `make page-cards`, see [Page cards](#page-cards).
+- **Campaign cards** for social posts: written by hand in a card file and rendered with `make social-cards`, see [Card files](#card-files).
 
 ## Running it
 
@@ -38,6 +42,7 @@ cards:
         affiliation: Example GmbH
     image: assets/static/media/hero_images/….jpg   # repo-relative; must be used if given
     image_focus_y: 0.4         # vertical crop focus, default 0.3 (as the site hero)
+    event: masterclasses       # whose dates the footer shows: conference (default) | masterclasses
     dates:                     # rows for the key-dates layout
       - {date: 19 April 2027, label: Masterclasses & DjangoGirls}
 ```
@@ -47,6 +52,95 @@ The text is used exactly as written. The engine chooses line breaks and sizes, b
 Event facts are never written into a card file. "PyCon DE 2027", the dates and the venue come from `databags/branding.yaml`.
 
 Formats: `og` (1200×630, exported at 2×, the size `templates/layout.html` announces), `square` (1080²), `portrait` (1080×1350), `story` (1080×1920, with text kept clear of the platform UI).
+
+## Content families
+
+Cards drawn from site content keep one visual signature per content type. A reader scrolling a feed can tell a talk from a masterclass
+or a blog post before reading a word. The engine varies only type and composition inside a family. Each signature is how the website
+already shows that content:
+
+| Content | Category | Signature | Taken from the website |
+| --- | --- | --- | --- |
+| Talks | `talk` | White card, coloured spine on the left, seven-colour bar at the foot | Session and masterclass cards (§06), footer bar |
+| Keynotes | `keynote` | Ink field | Key-dates band |
+| Masterclasses | `masterclass` | Orange field, "Full-Day / Half-Day Masterclass" | Masterclass section |
+| Blog posts | `news` | Python artwork on blue, "News" | Blog-card fallback (§05) |
+| Other pages | `page` | Blue field with the large monogram, no kicker | Site intro |
+
+The families are set in `categories` in `utils/social_cards/brand.yaml` (strategies, fields and, for `page`, the pinned logo placement).
+Campaign categories (`cfp`, `tickets`, `sponsorship`, `community`, …) keep a wider choice, because each campaign card is art-directed on its own.
+
+## Page cards
+
+`make page-cards` brings the card of every eligible page up to date. It is safe to run at any time and touches only cards that are out of date.
+Run it after adding or retitling a page.
+
+### Which pages get a card
+
+`utils/social_cards/pages.yaml` holds one recipe per page model: the category (and so the family) and the page fields that fill the card.
+
+| Page model | Family | Card shows |
+| --- | --- | --- |
+| `blog-post` | news | `title` |
+| `masterclass` | masterclass | `title`, `trainer`, "Full-Day/Half-Day Masterclass" from `hours`, the masterclass day |
+| `keynote` | keynote | `title`, `speaker_name` |
+| `call-for-proposals`, `financial-aid`, `standard-page`, `media-kit`, `sponsor` | page | `title` |
+
+Every card also shows "PyCon DE 2027" with the dates and venue from `databags/branding.yaml`: the conference dates, or the masterclass day.
+Nothing else on a page reaches its card.
+
+Not included:
+
+- **Talks** have their own generator (`make fetch-submissions`).
+- **Archive pages** (`content/archive/`) keep their cards.
+- **Pages whose model has no `social_card_image` field** (FAQ, tickets, sponsoring, newsletter, …) use the site's default card.
+  To include one, add the field to its model in `models/` and a recipe to `pages.yaml`.
+
+The card is saved next to the page as `social_card.png`. The page gets `social_card_image: /<path>/social_card.png` if it does not have it yet;
+no other line of the page changes. Pages are treated as English; `page_lang` in `pages.yaml` lists the exceptions (the German terms page).
+
+### When a card is redrawn
+
+Each generated card stores a record inside the PNG: what is printed on it (category, headline, names, kicker, dates, venue, event name),
+a fingerprint of `brand.yaml`, and a checksum of its pixels. The record is PNG metadata, so no extra file is published.
+On every run the generator builds the record from the page and `branding.yaml` again and compares:
+
+| Situation | Result | Reported as |
+| --- | --- | --- |
+| No `social_card.png` yet | Card drawn | `drawn` |
+| Record matches | File left untouched | `up to date` |
+| Something printed on the card changed (title, names, `hours`, dates, venue) | Card redrawn | `redrawn: headline changed` (lists every change) |
+| `brand.yaml` changed | Card redrawn | `redrawn: spec changed` |
+| Page not yet linked to its card | `social_card_image` added | `…, linked as /<path>/social_card.png` |
+
+Other edits (body, description, tags, a masterclass's time of day) do not redraw a card. Changes to the engine's code alone do not either:
+to refresh a card after such a change, delete its `social_card.png` and run again.
+
+A page that cannot get a card is reported as `failed: …` and keeps whatever it had; the other pages are still processed and the run ends with an error.
+This happens when a field the recipe needs is missing, when a masterclass's `date` names another day than `branding.yaml` or its `hours` is not 6 or 3,
+when no design passes the brand checks (e.g. a title containing "PyData"), or when the page file cannot be rewritten safely
+(usually a missing final newline; add one and run again).
+
+### Hand-made cards are never replaced
+
+A card is hand-made when the generator did not draw it, or when it was changed after the generator drew it. In practice:
+
+- any `social_card_image` other than `/<path>/social_card.png`, or
+- a `social_card.png` without the generator's record, or whose pixels no longer match the stored checksum. An image edited in place counts,
+  even if the editing tool kept the metadata.
+
+The generator never overwrites, deletes or relinks a hand-made card, and it never touches the page of one. The run reports it as `kept: …`.
+When the title of such a page changes, update the hand-made card yourself.
+
+**To replace a generated card with your own**, pick one:
+
+- **Overwrite `social_card.png`** with your file (1200×630 or 2400×1260 PNG) and commit. Nothing else to change; the page already points to it.
+  From then on the run reports `kept: social_card.png is hand-made or was edited by hand`.
+- **Use another file name**: save it as, say, `card.png` in the page folder, set `social_card_image: /<path>/card.png`,
+  and delete the generated `social_card.png`, which would otherwise still be published. The run reports `kept: social_card_image points to …`.
+
+**To go back to a generated card**, delete your file, point `social_card_image` back to `/<path>/social_card.png` (or remove the line),
+and run `make page-cards`.
 
 ## How a card is designed
 

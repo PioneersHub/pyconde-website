@@ -392,6 +392,20 @@ strategy_fields:
 # ── Categories ───────────────────────────────────────────────
 # `fields` lists permitted fields, best first. The first entries are the
 # field the website uses for the same content (verified: section colours).
+# `params` narrows a strategy's variants (e.g. only the monogram-column
+# logo placement).
+#
+# Content families. Cards drawn from site content keep one fixed signature
+# per content type, so a feed reader can tell a talk from a masterclass or
+# a blog post at a glance; the engine varies only type and composition
+# inside it. Each signature is the website's own treatment of that content:
+#   talk         white session card, coloured spine, seven-colour bar (§06, footer)
+#   keynote      ink field (key-dates band)
+#   masterclass  orange field (masterclass section)
+#   news         python artwork on blue (blog-card fallback, §05)
+#   page         blue field with the large monogram (site intro)
+# The other categories are campaign cards written by hand in card files and
+# keep their wider choice.
 categories:
   announcement:
     label: {en: "", de: ""}
@@ -400,11 +414,11 @@ categories:
   keynote:
     label: {en: Keynote, de: Keynote}
     strategies: [portrait, field]
-    fields: [blue, ink_field]
+    fields: [ink_field]
   talk:
     label: {en: Talk, de: Vortrag}
     strategies: [spine]
-    fields: [white, ink_field]
+    fields: [white]
   speaker_spotlight:
     label: {en: Speaker spotlight, de: Speaker im Porträt}
     strategies: [portrait, spine]
@@ -419,8 +433,13 @@ categories:
     fields: [blue, yellow]
   masterclass:
     label: {en: Masterclass, de: Masterclass}
-    strategies: [field, spine, portrait]
-    fields: [orange, white]
+    strategies: [field]
+    fields: [orange]
+    # Kicker per page `hours` value. verified: docs/masterclasses.md formats
+    # and the "— Full-Day Masterclass" meta-title convention.
+    kicker_by_hours:
+      "6": {en: Full-Day Masterclass, de: Ganztägige Masterclass}
+      "3": {en: Half-Day Masterclass, de: Halbtägige Masterclass}
   sponsorship:
     label: {en: Sponsoring, de: Sponsoring}
     strategies: [field, python]
@@ -443,8 +462,14 @@ categories:
     fields: [ink_field]
   news:
     label: {en: News, de: News}
-    strategies: [python, spine, field]
-    fields: [blue, white]
+    strategies: [python]
+    fields: [blue]
+  page:
+    label: {en: "", de: ""}
+    strategies: [field]
+    fields: [blue]
+    params:
+      logo: [column, top]
 
 # Month names for event-fact formatting (dates come from branding.yaml).
 months:

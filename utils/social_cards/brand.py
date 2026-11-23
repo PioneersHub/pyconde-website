@@ -6,6 +6,7 @@ website). Every value the engine draws comes from here; layout code never
 hardcodes a colour, size or event fact.
 """
 
+import hashlib
 from dataclasses import dataclass
 from datetime import date
 from functools import cache
@@ -37,6 +38,10 @@ def contrast(a: str, b: str) -> float:
     la, lb = _luminance(a), _luminance(b)
     return (max(la, lb) + 0.05) / (min(la, lb) + 0.05)
 
+
+# Which dates a card's event facts show: the conference, or the masterclass
+# day before it.
+EVENTS = ("conference", "masterclasses")
 
 # Wider than this, a card is laid out in columns rather than rows.
 LANDSCAPE_RATIO = 1.3
@@ -72,6 +77,7 @@ class EventFacts:
     name: str
     start: date
     end: date
+    masterclasses: date
     venue: str
 
 
@@ -137,8 +143,16 @@ class Brand:
     def month(self, lang: str, month: int) -> str:
         return self.raw["months"][lang][month - 1]
 
-    def event_dates(self, lang: str) -> str:
-        """'20–22 April 2027' / '20.–22. April 2027', from branding.yaml."""
+    def event_dates(self, lang: str, event: str = "conference") -> str:
+        """'20–22 April 2027' / '20.–22. April 2027' for the conference,
+        '19 April 2027' / '19. April 2027' for the masterclass day; both from
+        branding.yaml."""
+        if event == "masterclasses":
+            return self.day(lang, self.event.masterclasses)
+        if event != "conference":
+            raise BrandSpecError(
+                f"unknown event '{event}' (known: {', '.join(EVENTS)})"
+            )
         start, end = self.event.start, self.event.end
         month = self.month(lang, end.month)
         if start.month != end.month:
@@ -148,6 +162,11 @@ class Brand:
         if lang == "de":
             return f"{start.day}.–{end.day}. {month} {end.year}"
         return f"{start.day}–{end.day} {month} {end.year}"
+
+    def day(self, lang: str, when: date) -> str:
+        """'19 April 2027' / '19. April 2027'."""
+        dot = "." if lang == "de" else ""
+        return f"{when.day}{dot} {self.month(lang, when.month)} {when.year}"
 
 
 def _parse_iso(value: str, key: str) -> date:
@@ -171,8 +190,15 @@ def _load_event(branding: dict[str, Any], edition: int) -> EventFacts:
         name=f"PyCon DE {edition}",
         start=start,
         end=_parse_iso(dates["end_iso"], "end_iso"),
+        masterclasses=_parse_iso(dates["masterclasses_iso"], "masterclasses_iso"),
         venue=location["venue"],
     )
+
+
+def spec_fingerprint() -> str:
+    """Changes whenever brand.yaml does; a stored card made under another
+    fingerprint was drawn with different rules and is redrawn."""
+    return hashlib.sha256(SPEC_PATH.read_bytes()).hexdigest()[:16]
 
 
 @cache

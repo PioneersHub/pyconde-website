@@ -311,7 +311,8 @@ def check_copy(comp: Composition, brand: Brand, card: Card) -> list[Violation]:
     if card.cta and "cta" not in texts:
         out.append(Violation("content-missing", "call to action not on the card"))
     facts = texts.get("event_facts", "")
-    if brand.event_dates(card.lang) not in facts or brand.event.venue not in facts:
+    expected_dates = brand.event_dates(card.lang, card.event)
+    if expected_dates not in facts or brand.event.venue not in facts:
         out.append(
             Violation(
                 "event-facts", f"event facts {facts!r} do not match branding.yaml"

@@ -14,15 +14,19 @@ from __future__ import annotations
 import io
 import json
 import re
+import shutil
 from dataclasses import replace
 from pathlib import Path
 
 import pytest
+from PIL import Image, ImageDraw
+from PIL.PngImagePlugin import PngInfo
 
 pytest.importorskip(
     "uharfbuzz", reason="the social-card engine needs: uv run --extra cards pytest"
 )
 
+import page_social_cards as pc  # noqa: E402
 import social_card_img_gen  # noqa: E402
 from social_cards.brand import REPO_ROOT, BrandSpecError, contrast, load_brand  # noqa: E402
 from social_cards.composition import Box, Composition, Logo, Text  # noqa: E402
@@ -318,3 +322,268 @@ def test_talk_cards_are_only_redrawn_when_their_content_changes(tmp_path):
     assert social_card_img_gen.generate(talks, tmp_path) == []
     talks[0] = {**talks[0], "title": talks[0]["title"] + " (updated)"}
     assert social_card_img_gen.generate(talks, tmp_path) == [talks[0]["code"]]
+
+
+# ── content families ─────────────────────────────────────────
+
+
+@pytest.mark.parametrize(
+    ("category", "strategy", "field"),
+    [
+        ("talk", "spine", "white"),
+        ("masterclass", "field", "orange"),
+        ("news", "python", "blue"),
+        ("page", "field", "blue"),
+    ],
+)
+def test_each_content_family_keeps_its_signature(brand, category, strategy, field):
+    card = card_from_dict(
+        {
+            "id": f"family-{category}",
+            "category": category,
+            "lang": "en",
+            "headline": "Typing at scale",
+            "formats": ["og"],
+        },
+        brand,
+    )
+    for fmt in ("og", "square"):
+        ranking = design(card, fmt, brand).ranking
+        assert {(c.comp.strategy, c.comp.field) for c in ranking} == {(strategy, field)}
+    if category == "page":
+        assert {c.comp.params["logo"] for c in ranking} <= {"column", "top"}
+
+
+# ── page cards ───────────────────────────────────────────────
+
+RUST = "masterclasses/rust-for-python-developers-rodrigo-girao-serrao"
+RUST_URL = f"/{RUST}/social_card.png"
+POST = "blog/t-shirt-sizes"
+
+
+@pytest.fixture
+def content_root(tmp_path) -> Path:
+    """Copies of a real masterclass page and a real blog post, without cards.
+    The blog index is copied too: blog posts take their model from it."""
+    root = tmp_path / "content"
+    for page in (RUST, POST):
+        shutil.copytree(pc.CONTENT_DIR / page, root / page)
+        (root / page / pc.CARD_NAME).unlink(missing_ok=True)
+        lr = root / page / "contents.lr"
+        lr.write_text(re.sub(r"\n---\nsocial_card_image: [^\n]*", "", lr.read_text()))
+    shutil.copy(pc.CONTENT_DIR / "blog" / "contents.lr", root / "blog" / "contents.lr")
+    return root
+
+
+def _edit(root: Path, page: str, old: str, new: str) -> None:
+    lr = root / page / "contents.lr"
+    text = lr.read_text()
+    assert old in text
+    lr.write_text(text.replace(old, new, 1))
+
+
+def _hand_made(path: Path) -> bytes:
+    """A PNG without the generator's record, as a designer would export it."""
+    out = io.BytesIO()
+    Image.new("RGB", (1200, 630), "#3778be").save(out, "PNG")
+    path.write_bytes(out.getvalue())
+    return out.getvalue()
+
+
+def test_page_cards_are_drawn_and_linked(content_root):
+    lr = content_root / RUST / "contents.lr"
+    before = lr.read_text()
+    assert pc.generate(content_root) == {
+        POST: f"drawn, linked as /{POST}/social_card.png",
+        RUST: f"drawn, linked as {RUST_URL}",
+    }
+    # The page gains exactly one field; nothing else in it changes.
+    assert (
+        lr.read_text()
+        == before.rstrip("\n") + f"\n---\nsocial_card_image: {RUST_URL}\n"
+    )
+
+
+def test_blog_post_takes_its_model_from_the_blog_index(content_root):
+    assert pc.resolve_model(content_root / POST, content_root) == "blog-post"
+    pc.generate(content_root)
+    assert pc.read_card_record(content_root / POST / pc.CARD_NAME)["category"] == "news"
+
+
+def test_unchanged_card_is_not_rewritten(content_root):
+    pc.generate(content_root)
+    png = content_root / RUST / pc.CARD_NAME
+    stamp = png.stat().st_mtime_ns
+    assert pc.generate(content_root)[RUST] == "up to date"
+    assert png.stat().st_mtime_ns == stamp
+
+
+def test_edits_off_the_card_do_not_redraw_it(content_root):
+    pc.generate(content_root)
+    _edit(
+        content_root, RUST, "9:00–16:00", "9:30–16:30"
+    )  # time of day is not on the card
+    _edit(content_root, RUST, "tags:\n", "tags:\n\nNewTag\n")
+    assert pc.generate(content_root)[RUST] == "up to date"
+
+
+@pytest.mark.parametrize(
+    ("old", "new", "changed", "printed"),
+    [
+        (
+            "title: Rust for Python Developers",
+            "title: Rust for Pythonistas",
+            "headline",
+            "Rust for Pythonistas",
+        ),
+        (
+            "trainer: Rodrigo Girão Serrão",
+            "trainer: Rodrigo Girão Serrão & Ada Lindqvist",
+            "speakers",
+            "Rodrigo Girão Serrão, Ada Lindqvist",
+        ),
+        ("hours: 6", "hours: 3", "kicker", "Half-Day Masterclass"),
+    ],
+)
+def test_changes_on_the_card_redraw_it(content_root, old, new, changed, printed):
+    pc.generate(content_root)
+    _edit(content_root, RUST, old, new)
+    assert pc.generate(content_root)[RUST] == f"redrawn: {changed} changed"
+    assert pc.read_card_record(content_root / RUST / pc.CARD_NAME)[changed] == printed
+
+
+def test_brand_spec_change_redraws_cards(content_root, monkeypatch):
+    pc.generate(content_root)
+    monkeypatch.setattr(pc, "spec_fingerprint", lambda: "new-spec")
+    assert set(pc.generate(content_root).values()) == {"redrawn: spec changed"}
+
+
+def test_masterclass_card_shows_the_masterclass_day(brand, content_root):
+    _, fields = pc.lektor_lr.read_lr(content_root / RUST / "contents.lr")
+    card = pc.page_card(
+        RUST, fields, pc.load_config()["recipes"]["masterclass"], "en", brand
+    )
+    facts = design(card, "og", brand).chosen.comp.text("event_facts").block.text
+    assert "19 April 2027" in facts
+    assert "20–22" not in facts
+    assert card.kicker == "Full-Day Masterclass"
+
+
+def test_page_contradicting_branding_gets_no_card(content_root):
+    _edit(content_root, RUST, "19 April 2027", "18 April 2027")
+    outcome = pc.generate(content_root)
+    assert outcome[RUST].startswith("failed:") and "masterclasses day" in outcome[RUST]
+    assert not (content_root / RUST / pc.CARD_NAME).exists()
+    assert outcome[POST].startswith("drawn")  # one bad page does not block the others
+
+
+def test_unknown_hours_gets_no_card(content_root):
+    _edit(content_root, RUST, "hours: 6", "hours: 4")
+    assert pc.generate(content_root)[RUST].startswith("failed: ")
+
+
+def test_unwritable_page_gets_no_card_file(content_root):
+    lr = content_root / POST / "contents.lr"
+    lr.write_text(lr.read_text().rstrip("\n"))  # no final newline: does not round-trip
+    assert "round-trip" in pc.generate(content_root)[POST]
+    assert not (content_root / POST / pc.CARD_NAME).exists()
+
+
+# ── hand-made cards are never replaced ───────────────────────
+
+
+def test_card_linked_under_another_path_is_kept(content_root):
+    lr = content_root / RUST / "contents.lr"
+    lr.write_text(
+        lr.read_text().rstrip("\n") + f"\n---\nsocial_card_image: /{RUST}/card-v2.png\n"
+    )
+    assert (
+        pc.generate(content_root)[RUST]
+        == f"kept: social_card_image points to /{RUST}/card-v2.png"
+    )
+    assert not (content_root / RUST / pc.CARD_NAME).exists()
+
+
+def test_generated_card_replaced_by_a_hand_made_one_is_kept(content_root):
+    """Procedure A: overwrite the generated social_card.png with your own file."""
+    pc.generate(content_root)
+    png = content_root / RUST / pc.CARD_NAME
+    original = _hand_made(png)
+    _edit(
+        content_root,
+        RUST,
+        "title: Rust for Python Developers",
+        "title: Rust for Pythonistas",
+    )
+    assert (
+        pc.generate(content_root)[RUST]
+        == "kept: social_card.png is hand-made or was edited by hand"
+    )
+    assert png.read_bytes() == original
+
+
+def test_generated_card_edited_in_place_is_kept(content_root):
+    """An editor that keeps the PNG metadata still cannot fool the generator:
+    the pixels no longer match the stored checksum."""
+    pc.generate(content_root)
+    png = content_root / RUST / pc.CARD_NAME
+    with Image.open(png) as im:
+        info = PngInfo()
+        for key, value in im.text.items():
+            info.add_text(key, value)
+        edited = im.convert("RGB")
+    ImageDraw.Draw(edited).rectangle((0, 0, 200, 200), fill="#fac800")
+    edited.save(png, "PNG", pnginfo=info)
+    original = png.read_bytes()
+    _edit(
+        content_root,
+        RUST,
+        "title: Rust for Python Developers",
+        "title: Rust for Pythonistas",
+    )
+    assert (
+        pc.generate(content_root)[RUST]
+        == "kept: social_card.png is hand-made or was edited by hand"
+    )
+    assert png.read_bytes() == original
+
+
+def test_generated_card_replaced_under_another_name_is_kept(content_root):
+    """Procedure B: new file name, page points to it, generated file deleted."""
+    pc.generate(content_root)
+    lr = content_root / RUST / "contents.lr"
+    _hand_made(content_root / RUST / "card.png")
+    (content_root / RUST / pc.CARD_NAME).unlink()
+    lr.write_text(lr.read_text().replace(RUST_URL, f"/{RUST}/card.png"))
+    _edit(
+        content_root,
+        RUST,
+        "title: Rust for Python Developers",
+        "title: Rust for Pythonistas",
+    )
+    assert (
+        pc.generate(content_root)[RUST]
+        == f"kept: social_card_image points to /{RUST}/card.png"
+    )
+    assert not (content_root / RUST / pc.CARD_NAME).exists()
+
+
+def test_unlinked_hand_made_card_is_neither_overwritten_nor_linked(content_root):
+    png = content_root / POST / pc.CARD_NAME
+    original = _hand_made(png)
+    assert (
+        pc.generate(content_root)[POST]
+        == "kept: social_card.png is hand-made or was edited by hand"
+    )
+    assert png.read_bytes() == original
+    assert "social_card_image" not in (content_root / POST / "contents.lr").read_text()
+
+
+def test_every_existing_card_in_the_repo_is_classified():
+    """Snapshot of the real site: each card file is either one the generator
+    drew (and could redraw) or hand-made (and must be kept)."""
+    for png in pc.CONTENT_DIR.rglob(pc.CARD_NAME):
+        if "archive" in png.parts:
+            continue
+        record = pc.read_card_record(png)
+        assert record is None or record["category"] in pc.load_brand().raw["categories"]

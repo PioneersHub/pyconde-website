@@ -79,6 +79,11 @@ serve: build
 fetch-submissions:
 	$(RUN) python utils/talks.py
 	$(RUN) --extra cards python utils/social_card_img_gen.py
+# Draw or update the social card of every page with a recipe in
+# utils/social_cards/pages.yaml (blog posts, masterclasses, call pages, …).
+# Hand-made cards are never replaced; see docs/social_cards.md.
+page-cards:
+	$(RUN) --extra cards python utils/page_social_cards.py
 # Render social cards from a card file:
 #   make social-cards CARDS=path/to/cards.yaml OUT=path/to/dir
 # The validation set lives in tests/social_cards/cards.yaml.

@@ -146,7 +146,8 @@ def event_lines(
     In a narrow column dates and venue take a line each, as on the site hero."""
     brand, fmt = ctx.brand, ctx.fmt
     name = set_line(style_for(brand, fmt, "meta_strong"), brand.event.name, max_width)
-    dates, venue = brand.event_dates(ctx.card.lang), brand.event.venue
+    dates = brand.event_dates(ctx.card.lang, ctx.card.event)
+    venue = brand.event.venue
     style = style_for(brand, fmt, "meta")
     facts = set_line(style, f"{dates} · {venue}", max_width)
     if facts is None and all(

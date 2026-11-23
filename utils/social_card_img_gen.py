@@ -9,11 +9,10 @@ redrawn when its title, speakers, session type or the brand spec changed,
 so a submissions fetch does not churn hundreds of unchanged images.
 """
 
-import hashlib
 import json
 from pathlib import Path
 
-from social_cards.brand import SPEC_PATH, load_brand
+from social_cards.brand import load_brand, spec_fingerprint
 from social_cards.composition import Composition
 from social_cards.content import Card, Speaker
 from social_cards.pipeline import design, export
@@ -27,11 +26,6 @@ FORMAT = "og"
 def load_talks() -> list[dict]:
     with TALKS_JSON.open() as f:
         return json.load(f)["talks"]
-
-
-def spec_fingerprint() -> str:
-    """Changes whenever the brand spec does, so every card is redrawn."""
-    return hashlib.sha256(SPEC_PATH.read_bytes()).hexdigest()[:16]
 
 
 def talk_card(talk: dict) -> Card:

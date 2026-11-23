@@ -11,11 +11,20 @@ from typing import Any
 
 import yaml
 
-from social_cards.brand import REPO_ROOT, Brand
+from social_cards.brand import EVENTS, REPO_ROOT, Brand
 
 LANGUAGES = ("en", "de")
 REQUIRED = ("id", "category", "lang", "headline", "formats")
-OPTIONAL = ("kicker", "subline", "speakers", "cta", "image", "image_focus_y", "dates")
+OPTIONAL = (
+    "kicker",
+    "subline",
+    "speakers",
+    "cta",
+    "image",
+    "image_focus_y",
+    "dates",
+    "event",
+)
 
 
 class CardContentError(ValueError):
@@ -48,6 +57,8 @@ class Card:
     image: Path | None = None
     image_focus_y: float | None = None
     dates: tuple[DateRow, ...] = ()
+    # Whose dates the event facts show: "conference" or "masterclasses".
+    event: str = "conference"
 
     def kicker_text(self, brand: Brand) -> str:
         """Explicit kicker, else the category label in the card's language."""
@@ -133,6 +144,8 @@ def _check_fields(card_id: str, data: dict[str, Any], brand: Brand) -> None:
     brand.category(data["category"])  # raises for unknown categories
     if data["lang"] not in LANGUAGES:
         raise CardContentError(f"card {card_id}: lang must be one of {LANGUAGES}")
+    if data.get("event", "conference") not in EVENTS:
+        raise CardContentError(f"card {card_id}: event must be one of {EVENTS}")
     for fmt in data["formats"]:
         brand.format(fmt)  # raises for unknown formats
 
@@ -154,6 +167,7 @@ def card_from_dict(data: dict[str, Any], brand: Brand) -> Card:
         image=image,
         image_focus_y=focus,
         dates=_dates(card_id, data.get("dates", [])),
+        event=data.get("event", "conference"),
     )
 
 

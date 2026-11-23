@@ -7,7 +7,9 @@ so the result depends on nothing but the repository's own files.
 """
 
 import base64
+import hashlib
 import io
+import json
 import re
 from functools import cache
 from pathlib import Path
@@ -15,11 +17,15 @@ from xml.sax.saxutils import escape
 
 import resvg_py
 from PIL import Image
+from PIL.PngImagePlugin import PngInfo
 
 from social_cards.art import trimmed_png
 from social_cards.brand import Brand
 from social_cards.composition import Box, Composition, Logo, Raster, Rect, Text
 
+# PNG text-chunk key under which a generated card records its content.
+CARD_RECORD_KEY = "pyconde-social-card"
+PIXELS_KEY = "pixels"
 SVG_ROOT = re.compile(r"<svg\b[^>]*>(.*)</svg>", re.S)
 VIEWBOX = re.compile(r'viewBox="([^"]+)"')
 
@@ -159,6 +165,35 @@ def render(comp: Composition, brand: Brand, scale: float | None = None) -> Image
         return im.convert("RGB")
 
 
-def export_png(image: Image.Image, path: Path) -> None:
+def export_png(
+    image: Image.Image, path: Path, record: dict[str, str] | None = None
+) -> None:
+    """Write the PNG; ``record`` (what the card shows) goes into a text
+    chunk, so the file itself says what it was made from. A checksum of the
+    pixels goes with it, so a hand edit is recognised even when the editing
+    tool keeps the text chunk."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    image.save(path, "PNG", optimize=True)
+    info = PngInfo()
+    if record is not None:
+        stamped = {**record, PIXELS_KEY: _pixel_digest(image)}
+        info.add_text(
+            CARD_RECORD_KEY, json.dumps(stamped, sort_keys=True, ensure_ascii=False)
+        )
+    image.save(path, "PNG", optimize=True, pnginfo=info)
+
+
+def _pixel_digest(image: Image.Image) -> str:
+    return hashlib.sha256(image.convert("RGB").tobytes()).hexdigest()
+
+
+def read_card_record(path: Path) -> dict[str, str] | None:
+    """The record of a card exactly as the generator drew it. None for any
+    other PNG: one without a record, or one whose pixels were changed since."""
+    with Image.open(path) as im:
+        raw = im.text.get(CARD_RECORD_KEY)
+        if not raw:
+            return None
+        record = json.loads(raw)
+        if record.pop(PIXELS_KEY, None) != _pixel_digest(im):
+            return None
+    return record

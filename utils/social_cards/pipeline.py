@@ -62,6 +62,12 @@ class Result:
         return "\n".join(lines)
 
 
+def _permitted(params: dict, category: dict) -> bool:
+    """A category may pin parameters of its family signature."""
+    pinned = category.get("params", {})
+    return all(params.get(key) in allowed for key, allowed in pinned.items())
+
+
 def _build(
     ctx: Context, strategy: Strategy, params: dict, brand: Brand, rejected: list
 ) -> Composition | None:
@@ -89,53 +95,61 @@ def _score(
         c.score = critic.score(c.comp, render(c.comp, brand, scale=PREVIEW_SCALE))
 
 
+def _initial(ctx: Context, brand: Brand, rejected: list) -> dict[str, Candidate]:
+    """Every permitted strategy × field × variant that builds and validates."""
+    category = brand.category(ctx.card.category)
+    pool: dict[str, Candidate] = {}
+    for name in category["strategies"]:
+        strategy = STRATEGIES[name]
+        allowed = brand.raw["strategy_fields"].get(name)
+        fields = [f for f in category["fields"] if allowed is None or f in allowed]
+        if not fields or not strategy.applicable(ctx):
+            continue
+        for params in strategy.variants(ctx, fields):
+            comp = _permitted(params, category) and _build(
+                ctx, strategy, params, brand, rejected
+            )
+            if comp:
+                pool.setdefault(comp.key, Candidate(strategy, comp))
+    return pool
+
+
+def _refine(
+    ctx: Context, brand: Brand, pool: dict[str, Candidate], rejected: list
+) -> list[Candidate]:
+    """Neighbours of the current best few; returns the candidates added."""
+    category = brand.category(ctx.card.category)
+    best = sorted(pool.values(), key=lambda c: c.score.total, reverse=True)[:REFINE_TOP]
+    fresh = []
+    for cand in best:
+        for params in cand.strategy.neighbours(ctx, cand.comp.params):
+            comp = _permitted(params, category) and _build(
+                ctx, cand.strategy, params, brand, rejected
+            )
+            if comp and comp.key not in pool:
+                pool[comp.key] = Candidate(cand.strategy, comp)
+                fresh.append(pool[comp.key])
+    return fresh
+
+
 def design(
     card: Card, fmt_name: str, brand: Brand, history: list[Composition] | None = None
 ) -> Result:
     history = history or []
-    fmt = brand.format(fmt_name)
-    ctx = Context(brand, fmt, card, analyse(card))
-    category = brand.category(card.category)
+    ctx = Context(brand, brand.format(fmt_name), card, analyse(card))
     rejected: list[tuple[str, str]] = []
-    pool: dict[str, Candidate] = {}
-
-    for name in category["strategies"]:
-        strategy = STRATEGIES[name]
-        if not strategy.applicable(ctx):
-            continue
-        allowed = brand.raw["strategy_fields"].get(name)
-        fields = [f for f in category["fields"] if allowed is None or f in allowed]
-        if not fields:
-            continue
-        for params in strategy.variants(ctx, fields):
-            comp = _build(ctx, strategy, params, brand, rejected)
-            if comp is not None:
-                pool.setdefault(comp.key, Candidate(strategy, comp))
+    pool = _initial(ctx, brand, rejected)
     if not pool:
         reasons = "\n  ".join(f"{k}: {r}" for k, r in rejected[:12])
         raise NoValidDesignError(
             f"{card.id} [{fmt_name}]: no candidate passed validation\n  {reasons}"
         )
-
-    cands = list(pool.values())
-    _score(cands, brand, card, history)
-
+    _score(list(pool.values()), brand, card, history)
     for _ in range(REFINE_ROUNDS):
-        cands.sort(key=lambda c: c.score.total, reverse=True)
-        fresh = []
-        for best in cands[:REFINE_TOP]:
-            for params in best.strategy.neighbours(ctx, best.comp.params):
-                comp = _build(ctx, best.strategy, params, brand, rejected)
-                if comp is not None and comp.key not in pool:
-                    cand = Candidate(best.strategy, comp)
-                    pool[comp.key] = cand
-                    fresh.append(cand)
-        if not fresh:
+        if not _refine(ctx, brand, pool, rejected):
             break
-        cands = list(pool.values())
-        _score(cands, brand, card, history)
-
-    cands.sort(key=lambda c: c.score.total, reverse=True)
+        _score(list(pool.values()), brand, card, history)
+    cands = sorted(pool.values(), key=lambda c: c.score.total, reverse=True)
     return Result(
         card=card,
         format=fmt_name,
@@ -146,7 +160,9 @@ def design(
     )
 
 
-def export(result: Result, brand: Brand, path: Path) -> Path:
+def export(
+    result: Result, brand: Brand, path: Path, record: dict[str, str] | None = None
+) -> Path:
     comp = result.chosen.comp
     image = render(comp, brand)
     expected = (
@@ -157,6 +173,6 @@ def export(result: Result, brand: Brand, path: Path) -> Path:
         raise NoValidDesignError(
             f"{result.card.id}: rendered {image.size}, expected {expected}"
         )
-    export_png(image, path)
+    export_png(image, path, record)
     result.image = image
     return path

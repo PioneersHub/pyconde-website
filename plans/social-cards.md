@@ -7,6 +7,10 @@
 > Deviations from the plan below: Field also carries speakers (keynotes); strategies are restricted per field
 > (`strategy_fields`, spine only on white/ink, python only on blue); a card's photo must appear on it; photos enlarged
 > more than 1.5× are rejected; the CTA turns ink on a yellow field (§06 default button).
+>
+> **Amended 2026-11-23.** Site pages get cards too (`make page-cards`, recipes in `utils/social_cards/pages.yaml`), with one fixed visual
+> family per content type (talk, keynote, masterclass, news, page). Generated PNGs carry a record of their content and a pixel checksum:
+> cards are redrawn only when that content or `brand.yaml` changes, and any other PNG is hand-made and never replaced.
 
 ## 1. What exists today
 

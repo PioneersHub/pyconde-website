@@ -16,8 +16,9 @@ from social_cards.brand import Brand, Format
 from social_cards.fonts import Font, ShapedRun, load_font
 
 OPENING_PUNCTUATION = "“„\"'‚‘«»([‹›"
-# A version number, dash or colon belongs to the word before it.
-GLUE_TO_PREVIOUS = re.compile(r"^(v?\d[\w.+-]*|[–—:·/|])$")
+# A version number, dash (also a free-standing hyphen used as one) or colon
+# belongs to the word before it.
+GLUE_TO_PREVIOUS = re.compile(r"^(v?\d[\w.+-]*|[-–—:·/|])$")
 # A count binds to a short unit or noun after it: '40 TB', '3 Tage'.
 COUNT = re.compile(r"^\d[\d,.]*\+?%?$")
 MAX_UNIT_LEN = 5
