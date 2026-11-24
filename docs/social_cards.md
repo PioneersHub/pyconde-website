@@ -117,7 +117,7 @@ Run it after adding or retitling a page.
 | `masterclass` | masterclass | `title`, `trainer`, "Full-Day/Half-Day Masterclass" from `hours`, the masterclass day |
 | `keynote` | keynote | `title`, `speaker_name` |
 | `call-for-proposals`, `financial-aid`, `standard-page`, `media-kit` | page | `title` |
-| `sponsor` (preview only, see below) | sponsor | "Thank you for your support!", `type` (the tier), `logo` |
+| `sponsor` | sponsor | "Thank you for your support!", `type` (the tier), `logo` |
 
 Every card also shows "PyCon DE 2027" with the dates and venue from `databags/branding.yaml`: the conference dates, or the masterclass day.
 Nothing else on a page reaches its card.
@@ -126,9 +126,6 @@ Not included:
 
 - **Talks** have their own generator (`make fetch-submissions`).
 - **Archive pages** (`content/archive/`) keep their cards.
-- **Sponsor pages** are listed in `preview_only` in `pages.yaml` while their thank-you design is being confirmed. `make card-preview`
-  shows them, but `make page-cards` does not draw them, so the site keeps its default card. To publish them, remove `sponsor` from
-  `preview_only` and run `make page-cards`.
 - **Pages whose model has no `social_card_image` field** (FAQ, tickets, sponsoring, newsletter, …) use the site's default card.
   To include one, add the field to its model in `models/` and a recipe to `pages.yaml`.
 
@@ -223,7 +220,7 @@ It draws each sponsor's card in og, square, portrait and story into `build/spons
 `<slug>` is the sponsor's folder under `content/sponsors` (`lidl`, `mm-software`, `schwaebisch_hall`). A rerun replaces files of the
 same name, so Drive never holds two versions of a card. A sponsor whose card cannot be drawn in every format (see the refusals above)
 is listed at the end and left out; the others are still uploaded and the run exits non-zero. The Drive folder and the page model are
-set under `drive_upload` in `utils/social_cards/pages.yaml`. Sponsor cards are drawn even while `sponsor` is listed in `preview_only`.
+set under `drive_upload` in `utils/social_cards/pages.yaml`. Sponsor cards are drawn even when `sponsor` is listed in `preview_only`.
 
 It signs in to Drive exactly as `make sponsor-assets` does, with the same Google OAuth client and the same Drive token
 (`drive_token_json` in your pytanis config, see [Sponsors & partners](sponsors_partners.md)). That token holds full Drive access:
